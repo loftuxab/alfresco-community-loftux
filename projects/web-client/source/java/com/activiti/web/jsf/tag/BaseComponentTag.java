@@ -39,7 +39,7 @@ public abstract class BaseComponentTag extends UIComponentTag
    
    /**
     * Helper method to set a String value property into the component.
-    * Assumes the that the property value must be a Value Binding.
+    * Assumes the that the property value can only be a Value Binding.
     * 
     * @param component  UIComponent
     * @param name       property string name
@@ -89,7 +89,29 @@ public abstract class BaseComponentTag extends UIComponentTag
          }
          else
          {
+            try
+            {
+               component.getAttributes().put(name, new Integer(value));
+            }
+            catch (NumberFormatException ne)
+            {
+               throw new RuntimeException("Was expecting Int value for property '" + name + "' but passed value: " + value); 
+            }
+         }
+      }
+   }
+   
+   protected void setIntStaticProperty(UIComponent component, String name, String value)
+   {
+      if (value != null)
+      {
+         try
+         {
             component.getAttributes().put(name, new Integer(value));
+         }
+         catch (NumberFormatException ne)
+         {
+            throw new RuntimeException("Was expecting Int value for property '" + name + "' but passed value: " + value); 
          }
       }
    }
@@ -115,6 +137,14 @@ public abstract class BaseComponentTag extends UIComponentTag
          {
             component.getAttributes().put(name, Boolean.valueOf(value));
          }
+      }
+   }
+   
+   protected void setBooleanStaticProperty(UIComponent component, String name, String value)
+   {
+      if (value != null)
+      {
+         component.getAttributes().put(name, Boolean.valueOf(value));
       }
    }
 }

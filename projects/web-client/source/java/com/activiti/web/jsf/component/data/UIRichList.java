@@ -4,18 +4,20 @@
 package com.activiti.web.jsf.component.data;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
+import javax.faces.el.ValueBinding;
 
+import com.activiti.web.data.IDataContainer;
 import com.activiti.web.jsf.renderer.data.IRichListRenderer;
 import com.activiti.web.jsf.renderer.data.RichListRenderer;
-
 
 /**
  * @author kevinr
  */
-public class UIRichList extends UIComponentBase
+public class UIRichList extends UIComponentBase implements IDataContainer
 {
    // ------------------------------------------------------------------------------
    // Construction
@@ -51,6 +53,9 @@ public class UIRichList extends UIComponentBase
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
       m_currentPage = ((Integer)values[1]).intValue();
+      m_sortColumn = (String)values[2];
+      m_sortDirection = ((Boolean)values[3]).booleanValue();
+      m_pageSize = ((Integer)values[4]).intValue();
    }
    
    /**
@@ -62,12 +67,114 @@ public class UIRichList extends UIComponentBase
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = new Integer(m_currentPage);
+      values[2] = m_sortColumn;
+      values[3] = (m_sortDirection ? Boolean.TRUE : Boolean.FALSE);
+      values[4] = new Integer(m_pageSize);
       return (values);
+   }
+   
+   /**
+    * @see javax.faces.component.UIComponent#processDecodes(javax.faces.context.FacesContext)
+    */
+   public void processDecodes(FacesContext context)
+   {
+      if (isRendered() == true)
+      {
+         
+      }
+      
+      super.processDecodes(context);
+   }
+   
+   /**
+    * Get the value (for this component the value is an object used as the DataModel)
+    *
+    * @return the value
+    */
+   public Object getValue()
+   {
+      if (m_value == null)
+      {
+         ValueBinding vb = getValueBinding("value");
+         if (vb != null)
+         {
+            m_value = vb.getValue(getFacesContext());
+         }
+      }
+      return m_value;
+   }
+
+   /**
+    * Set the value (for this component the value is an object used as the DataModel)
+    *
+    * @param value     the value
+    */
+   public void setValue(Object value)
+   {
+      m_dataModel = null;
+      m_value = value;
+   }
+   
+   /**
+    * Return the currently sorted column if any
+    * 
+    * @return current sorted column if any
+    */
+   public String getCurrentSortColumn()
+   {
+      return m_sortColumn;
+   }
+   
+   /**
+    * Returns the current sort direction. Only valid if a sort column is set.
+    * True is returned for descending sort, false for accending sort.
+    * 
+    * @return true for descending sort, false for accending sort
+    */
+   public boolean getCurrentSortDirection()
+   {
+      return m_sortDirection;
+   }
+   
+   /**
+    * Returns the current page size used for this list, or -1 for no paging.
+    */
+   public int getPageSize()
+   {
+      return m_pageSize;
+   }
+   
+   /**
+    * Sets the current page size used for the list.
+    * 
+    * @param val
+    */
+   public void setPageSize(int val)
+   {
+      // TODO: value binding code
+      m_pageSize = val;
    }
    
    
    // ------------------------------------------------------------------------------
    // UIRichList implementation
+   
+   /**
+    * Method called to bind the RichList component state to the data model value
+    */
+   public void bind()
+   {
+      // if a page size is specified, then we use that
+      if (getPageSize() != -1)
+      {
+         m_rowIndex = (m_currentPage * getPageSize()) - 1;
+      }
+      // else we are not paged so show all data from start
+      else
+      {
+         m_rowIndex = -1;
+      }
+   }
    
    /**
     * @return A new IRichListRenderer implementation for the current view mode
@@ -78,24 +185,6 @@ public class UIRichList extends UIComponentBase
       return new RichListRenderer.ListViewRenderer();
    }
    
-   /**
-    * Method called to bind the RichList component state to the data model value
-    */
-   public void bind()
-   {
-      Integer pageSize = (Integer)getAttributes().get("pageSize");
-      // if a page size is specified, then we use that
-      if (pageSize != null)
-      {
-         m_rowIndex = (m_currentPage * pageSize.intValue()) - 1;
-      }
-      // else we are not paged so show all data from start
-      else
-      {
-         m_rowIndex = -1;
-      }
-   }
-   
    public boolean isDataAvailable()
    {
       return m_rowIndex < (getDataModel().size() - 1);
@@ -103,7 +192,28 @@ public class UIRichList extends UIComponentBase
    
    public Object nextRow()
    {
-      return getDataModel().getRow(++m_rowIndex);
+      // get next row and increment row count
+      Object rowData = getDataModel().getRow(m_rowIndex + 1);
+      
+      // Prepare the data-binding variable "var" ready for the next cycle of
+      // renderering for the child components. 
+      String var = (String)getAttributes().get("var");
+      if (var != null)
+      {
+         Map requestMap = getFacesContext().getExternalContext().getRequestMap();
+         if (isDataAvailable() == true)
+         {
+            requestMap.put(var, rowData);
+         }
+         else
+         {
+            requestMap.remove(var);
+         }
+      }
+      
+      m_rowIndex++;
+      
+      return rowData;
    }
    
    public int getCurrentPage()
@@ -115,7 +225,7 @@ public class UIRichList extends UIComponentBase
    {
       if (m_dataModel == null)
       {
-         Object val = getAttributes().get("value");
+         Object val = getValue();
          if (val instanceof List)
          {
             m_dataModel = new GridListDataModel((List)val);
@@ -129,6 +239,7 @@ public class UIRichList extends UIComponentBase
             throw new IllegalStateException("UIRichList 'value' attribute binding should specify data model of a supported type!"); 
          }
       }
+      
       return m_dataModel;
    }
    
@@ -136,7 +247,15 @@ public class UIRichList extends UIComponentBase
    // ------------------------------------------------------------------------------
    // Private data
    
+   // component state
    private int m_currentPage = 0;
    private int m_rowIndex = -1;
+   private String m_sortColumn = null;
+   private boolean m_sortDirection = true;
+   private int m_pageSize = -1;
+   
    private IGridDataModel m_dataModel = null;
+   
+   // component properties - NOTE: may use ValueBinding!
+   private Object m_value = null;
 }

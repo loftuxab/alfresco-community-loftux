@@ -49,7 +49,7 @@
    </tag>
    
    <tag>
-      <name>data-grid</name>
+      <name>dataList</name>
       <tagclass>com.activiti.web.jsf.tag.data.DataGridTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
@@ -97,7 +97,7 @@
    </tag>
    
    <tag>
-      <name>rich-list</name>
+      <name>richList</name>
       <tagclass>com.activiti.web.jsf.tag.data.RichListTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
@@ -138,12 +138,6 @@
       </attribute>
    
       <attribute>
-         <name>filtering</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   
-      <attribute>
          <name>initialSortColumn</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
@@ -157,12 +151,6 @@
    
       <attribute>
          <name>listConfig</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   
-      <attribute>
-         <name>sorting</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -211,6 +199,60 @@
 
       <attribute>
          <name>primary</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
+   
+   <tag>
+      <name>sortLink</name>
+      <tagclass>com.activiti.web.jsf.tag.data.SortLinkTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>binding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>styleClass</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>style</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>title</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>type</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>label</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>

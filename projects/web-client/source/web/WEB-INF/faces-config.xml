@@ -26,6 +26,11 @@
       <component-type>awc.faces.RichListColumn</component-type>
       <component-class>com.activiti.web.jsf.component.data.UIColumn</component-class>
    </component>
+   
+   <component>
+      <component-type>awc.faces.SortLink</component-type>
+      <component-class>com.activiti.web.jsf.component.data.UISortLink</component-class>
+   </component>
 
 
    <!-- ==================== RENDERERS ==================== -->

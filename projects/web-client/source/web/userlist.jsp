@@ -27,22 +27,41 @@
       <p>
       --%>
       
-      <%-- data grid test --%>
-      before datagrid table
-      <awc:data-grid cellspacing="2" cellpadding="1" styleClass="mycss" style="border:2px">
-      inside datagrid table
-      </awc:data-grid>
-      after datagrid table
+      <%-- DataList component test --%>
+      before datalist table
+      <awc:dataList cellspacing="2" cellpadding="1" styleClass="mycss" style="border:2px">
+         inside datalist table
+      </awc:dataList>
+      after datalist table
       
-      <%-- rich list test --%>
-      <awc:rich-list viewModes="list,details,icon" filtering="true" sorting="true" pageSize="5" styleClass="mycss" style="border:2px" value="#{UserListBean.users}" var="u">
-         <awc:column label="Name" primary="true">
+      <%-- RichList component test --%>
+      <%-- The RichList component is different to the data-grid in that it is
+           designed to render it's own child components. This means it is capable
+           of rendering the columns in any order and in any kind of layout. Allowing
+           the impl of details, icons and list views within a single component. --%>
+      <awc:richList viewModes="list,details,icon" pageSize="5" styleClass="mycss" style="border:2px"
+            value="#{UserListBean.users}" var="u" initialSortColumn="name" initialSortDirection="true">
+         <awc:column primary="true">
+            <f:facet name="header">
+               <awc:sortLink label="#{msg.name}" value="name" type="java.lang.String"/>
+            </f:facet>
             <h:outputText value="#{u.name}"/>
          </awc:column>
-         <awc:column label="Join Date">
-            <h:commandButton value="#{u.joinDate}"/>
+         <awc:column>
+            <f:facet name="header">
+               <awc:sortLink label="#{msg.joindate}" value="dateJoined" type="java.lang.String"/>
+            </f:facet>
+            <h:outputText value="#{u.dateJoined}">
+               <%-- example of a DateTime converter --%>
+               <%-- can be used to convert both input and output text --%>
+               <f:convertDateTime dateStyle="short" />
+            </h:outputText>
          </awc:column>
-      </awc:rich-list>
+         
+         <%-- could add a data pager or other well known controls to the rich list --%>
+         <%-- these components are expected and specifically renderer by the parent --%>
+         <%-- <awc:data-pager/> --%>
+      </awc:richList>
       
       <%-- example of using a JSF DataTable to list the users --%>
       <%-- iterates around the List of User objects in the UserListBean --%>

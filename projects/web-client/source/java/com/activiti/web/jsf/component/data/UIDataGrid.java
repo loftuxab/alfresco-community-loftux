@@ -6,13 +6,14 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import com.activiti.web.data.IDataContainer;
 import com.activiti.web.jsf.component.SelfRenderingComponent;
 
 
 /**
  * @author kevinr
  */
-public class UIDataGrid extends SelfRenderingComponent
+public class UIDataGrid extends SelfRenderingComponent implements IDataContainer
 {
    /**
     * @see javax.faces.component.UIComponent#getFamily()

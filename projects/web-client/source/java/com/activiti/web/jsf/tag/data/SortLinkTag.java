@@ -1,24 +1,26 @@
 /*
- * Created on Mar 11, 2005
+ * Created on Mar 15, 2005
  */
 package com.activiti.web.jsf.tag.data;
 
 import javax.faces.component.UIComponent;
 
-import com.activiti.web.jsf.tag.BaseComponentTag;
-
+import com.activiti.web.jsf.tag.HtmlComponentTag;
 
 /**
  * @author kevinr
  */
-public class ColumnTag extends BaseComponentTag
+public class SortLinkTag extends HtmlComponentTag
 {
+   // ------------------------------------------------------------------------------
+   // Component methods 
+   
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
     */
    public String getComponentType()
    {
-      return "awc.faces.RichListColumn";
+      return "awc.faces.SortLink";
    }
 
    /**
@@ -26,7 +28,6 @@ public class ColumnTag extends BaseComponentTag
     */
    public String getRendererType()
    {
-      // the component is renderer by the parent
       return null;
    }
    
@@ -36,9 +37,9 @@ public class ColumnTag extends BaseComponentTag
    public void release()
    {
       super.release();
+      m_type = null;
       m_value = null;
       m_label = null;
-      m_primary = null;
    }
    
    /**
@@ -47,16 +48,11 @@ public class ColumnTag extends BaseComponentTag
    protected void setProperties(UIComponent component)
    {
       super.setProperties(component);
-      
-      setStringBindingProperty(component, "value", m_value);
+      setStringProperty(component, "value", m_value);
       setStringProperty(component, "label", m_label);
-      setBooleanProperty(component, "primary", m_primary);
+      setStringProperty(component, "type", m_type);
    }
    
-   
-   // ------------------------------------------------------------------------------
-   // Tag properties
-
    /**
     * Set the value
     *
@@ -65,6 +61,16 @@ public class ColumnTag extends BaseComponentTag
    public void setValue(String value)
    {
       m_value = value;
+   }
+
+   /**
+    * Set the type
+    *
+    * @param type     the type
+    */
+   public void setType(String type)
+   {
+      m_type = type;
    }
 
    /**
@@ -77,23 +83,13 @@ public class ColumnTag extends BaseComponentTag
       m_label = label;
    }
 
-   /**
-    * Set the primary
-    *
-    * @param primary     the primary
-    */
-   public void setPrimary(String primary)
-   {
-      m_primary = primary;
-   }
-
-
-   /** the primary */
-   private String m_primary;
-   
-   /** the value */
-   private String m_value;
 
    /** the label */
    private String m_label;
+
+   /** the value */
+   private String m_value;
+
+   /** the type */
+   private String m_type;
 }

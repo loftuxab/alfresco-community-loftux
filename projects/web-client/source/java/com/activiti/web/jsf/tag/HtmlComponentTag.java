@@ -3,6 +3,8 @@
  */
 package com.activiti.web.jsf.tag;
 
+import javax.faces.component.UIComponent;
+
 
 /**
  * Base class for tags that represent HTML components.
@@ -11,6 +13,19 @@ package com.activiti.web.jsf.tag;
  */
 public abstract class HtmlComponentTag extends BaseComponentTag
 {
+   /**
+    * @see javax.faces.webapp.UIComponentTag#setProperties(javax.faces.component.UIComponent)
+    */
+   protected void setProperties(UIComponent component)
+   {
+      super.setProperties(component);
+      
+      setStringProperty(component, "style", m_style);
+      setStringProperty(component, "styleClass", m_styleClass);
+      setStringProperty(component, "title", m_title);
+      setBooleanProperty(component, "visible", m_visible);
+   }
+   
    /**
     * @see javax.servlet.jsp.tagext.Tag#release()
     */

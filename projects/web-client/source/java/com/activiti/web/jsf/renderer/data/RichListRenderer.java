@@ -52,6 +52,9 @@ public class RichListRenderer extends BaseRenderer
       // the RichList component we are working with
       UIRichList richList = (UIRichList)component;
       
+      // prepare the component current row against the current page settings
+      richList.bind();
+      
       // collect child column components so they can be passed to the renderer
       List columnList = new ArrayList(8);
       for (Iterator i=richList.getChildren().iterator(); i.hasNext(); /**/)
@@ -82,7 +85,11 @@ public class RichListRenderer extends BaseRenderer
       // TODO: rendering sort links etc. - how to wire up events for sort clicks...?
       
       // call render-before to output headers if required
+      ResponseWriter out = context.getResponseWriter();
+      out.write("<thead>");
       renderer.renderListBefore(context, richList, columns);
+      out.write("</thead>");
+      out.write("<tbody>");
       while (richList.isDataAvailable() == true)
       {
          // render each row in turn
@@ -90,6 +97,7 @@ public class RichListRenderer extends BaseRenderer
       }
       // call render-after to output footers if required
       renderer.renderListAfter(context, richList, columns);
+      out.write("</tbody>");
    }
    
    /**
@@ -138,17 +146,25 @@ public class RichListRenderer extends BaseRenderer
          ResponseWriter out = context.getResponseWriter();
          
          // render column headers as labels
-         // TODO: render as sort links!
-         out.write("<th>");
+         out.write("<tr>");
          for (int i=0; i<columns.length; i++)
          {
             // render column as appropriate for the list type
-            out.write("<td><b>");
-            out.write( (String)columns[i].getAttributes().get("label") );
+            out.write("<th>");
+            
+            // output the header facet if any
+            UIComponent header = columns[i].getHeader();
+            if (header != null)
+            {
+               header.encodeBegin(context);
+               header.encodeChildren(context);
+               header.encodeEnd(context);
+            }
+            
             // we don't render child controls for the header row
-            out.write("</b></td>");
+            out.write("</th>");
          }
-         out.write("</th>");
+         out.write("</tr>");
       }
       
       /**
