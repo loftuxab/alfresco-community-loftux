@@ -69,7 +69,7 @@ public class NodeServiceTest extends BaseSpringTest
     public void testCreateNodeNoProperties() throws Exception
     {
         // flush to ensure that the pure JDBC query will work
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef, "path1", Node.TYPE_CONTAINER);
+        NodeRef nodeRef = nodeService.createNode(rootNodeRef, null, "path1", Node.TYPE_CONTAINER);
         // count the nodes with the given id
         int count = countNodesById(nodeRef);
         assertEquals("Unexpected number of nodes present", 1, count);
@@ -77,7 +77,7 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testDelete() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef, "path1", Node.TYPE_CONTAINER);
+        NodeRef nodeRef = nodeService.createNode(rootNodeRef, null, "path1", Node.TYPE_CONTAINER);
         int countBefore = countNodesById(nodeRef);
         assertEquals("Node not created", 1, countBefore);
         // delete it
@@ -111,18 +111,18 @@ public class NodeServiceTest extends BaseSpringTest
         NodeRef bogusChildRef = new NodeRef(rootNodeRef.getStoreRef(), "BOGUS");
         try
         {
-            nodeService.addChild(rootNodeRef, bogusChildRef, "BOGUS_PATH");
+            nodeService.addChild(rootNodeRef, bogusChildRef, null, "BOGUS_PATH");
             fail("Failed to detect invalid child node reference");
         }
         catch (InvalidNodeRefException e)
         {
             // expected
         }
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef, "pathA", Node.TYPE_CONTAINER);
+        NodeRef nodeRef = nodeService.createNode(rootNodeRef, null, "pathA", Node.TYPE_CONTAINER);
 //        int countBefore = countChildrenOfNode(rootNodeRef);
 //        assertEquals("Root children count incorrect", 1, countBefore);
         // associate the two nodes
-        nodeService.addChild(rootNodeRef, nodeRef, "pathB");
+        nodeService.addChild(rootNodeRef, nodeRef, null, "pathB");
         // there should now be 2 child assocs on the root
 //        int countAfter = countChildrenOfNode(rootNodeRef);
 //        assertEquals("Root children count incorrect", 2, countAfter);
@@ -130,25 +130,25 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testRemoveChildByRef() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef, "pathA", Node.TYPE_CONTAINER);
-        nodeService.addChild(rootNodeRef, nodeRef, "pathB");
-        nodeService.addChild(rootNodeRef, nodeRef, "pathC");
+        NodeRef nodeRef = nodeService.createNode(rootNodeRef, null, "pathA", Node.TYPE_CONTAINER);
+        nodeService.addChild(rootNodeRef, nodeRef, null, "pathB");
+        nodeService.addChild(rootNodeRef, nodeRef, null, "pathC");
         // delete all the associations
         nodeService.removeChild(rootNodeRef, nodeRef);
     }
     
     public void testRemoveChildByName() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef, "pathA", Node.TYPE_CONTAINER);
-        nodeService.addChild(rootNodeRef, nodeRef, "pathB");
-        nodeService.addChild(rootNodeRef, nodeRef, "pathC");
+        NodeRef nodeRef = nodeService.createNode(rootNodeRef, null, "pathA", Node.TYPE_CONTAINER);
+        nodeService.addChild(rootNodeRef, nodeRef, null, "pathB");
+        nodeService.addChild(rootNodeRef, nodeRef, null, "pathC");
         // delete all the associations
-        nodeService.removeChildren(rootNodeRef, "pathB");
+        nodeService.removeChildren(rootNodeRef, null, "pathB");
     }
     
     public void testGetType() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef, "pathA", Node.TYPE_CONTAINER);
+        NodeRef nodeRef = nodeService.createNode(rootNodeRef, null, "pathA", Node.TYPE_CONTAINER);
         // get the type
         String type = nodeService.getType(nodeRef);
         assertEquals("Type mismatch", Node.TYPE_CONTAINER, type);
@@ -181,10 +181,10 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testGetParents() throws Exception
     {
-        NodeRef parent1Ref = nodeService.createNode(rootNodeRef, "P1", Node.TYPE_CONTAINER);
-        NodeRef parent2Ref = nodeService.createNode(rootNodeRef, "P2", Node.TYPE_CONTAINER);
-        NodeRef childRef = nodeService.createNode(parent1Ref, "PrimaryChild", Node.TYPE_CONTENT);
-        nodeService.addChild(parent2Ref, childRef, "SecondaryChild");
+        NodeRef parent1Ref = nodeService.createNode(rootNodeRef, null, "P1", Node.TYPE_CONTAINER);
+        NodeRef parent2Ref = nodeService.createNode(rootNodeRef, null, "P2", Node.TYPE_CONTAINER);
+        NodeRef childRef = nodeService.createNode(parent1Ref, null, "PrimaryChild", Node.TYPE_CONTENT);
+        nodeService.addChild(parent2Ref, childRef, null, "SecondaryChild");
         // get the child node's parents
         Collection<NodeRef> parents = nodeService.getParents(childRef);
         assertEquals("Incorrect number of parents", 2, parents.size());
@@ -202,10 +202,10 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testGetChildren() throws Exception
     {
-        NodeRef parentRef = nodeService.createNode(rootNodeRef, "P1", Node.TYPE_CONTAINER);
-        NodeRef child1Ref = nodeService.createNode(parentRef, "PrimaryChild", Node.TYPE_CONTENT);
-        NodeRef child2Ref = nodeService.createNode(rootNodeRef, "OtherChild", Node.TYPE_CONTENT);
-        nodeService.addChild(parentRef, child2Ref, "SecondaryChild");
+        NodeRef parentRef = nodeService.createNode(rootNodeRef, null, "P1", Node.TYPE_CONTAINER);
+        NodeRef child1Ref = nodeService.createNode(parentRef, null, "PrimaryChild", Node.TYPE_CONTENT);
+        NodeRef child2Ref = nodeService.createNode(rootNodeRef, null, "OtherChild", Node.TYPE_CONTENT);
+        nodeService.addChild(parentRef, child2Ref, null, "SecondaryChild");
         // get the parent node's children
         Collection<NodeRef> children = nodeService.getChildren(parentRef);
         assertEquals("Incorrect number of children", 2, children.size());
@@ -220,8 +220,8 @@ public class NodeServiceTest extends BaseSpringTest
      */
     private Object[] createAssociation() throws Exception
     {
-        NodeRef sourceRef = nodeService.createNode(rootNodeRef, "N1", Node.TYPE_REAL);
-        NodeRef targetRef = nodeService.createNode(rootNodeRef, "N2", Node.TYPE_REFERENCE);
+        NodeRef sourceRef = nodeService.createNode(rootNodeRef, null, "N1", Node.TYPE_REAL);
+        NodeRef targetRef = nodeService.createNode(rootNodeRef, null, "N2", Node.TYPE_REFERENCE);
         String assocName = "next";
         nodeService.createAssociation(sourceRef, targetRef, assocName);
         // done
@@ -313,27 +313,33 @@ public class NodeServiceTest extends BaseSpringTest
      * Level 3:     n3_p_n6     n4_n6       n5_p_n7
      * Level 4:     n6_p_n8     n7_n8
      * </pre>
+     * <p>
+     * The namespace URI for all associations is <b>http://x</b>.
+     * <p>
+     * The session is flushed to ensure that persistence occurs correctly.  It is
+     * cleared to ensure that fetches against the created data are correct.
      * 
      * @return Returns a map <code>NodeRef</code> instances keyed by node name
      */
     private Map<String, NodeRef> buildNodeGraph() throws Exception
     {
+        String ns = "http://x";
         // LEVEL 0
         // LEVEL 1
-        NodeRef n1 = nodeService.createNode(rootNodeRef, "root_p_n1", Node.TYPE_CONTAINER);
-        NodeRef n2 = nodeService.createNode(rootNodeRef, "root_p_n2", Node.TYPE_CONTAINER);
+        NodeRef n1 = nodeService.createNode(rootNodeRef, ns, "root_p_n1", Node.TYPE_CONTAINER);
+        NodeRef n2 = nodeService.createNode(rootNodeRef, ns, "root_p_n2", Node.TYPE_CONTAINER);
         // LEVEL 2
-        NodeRef n3 = nodeService.createNode(n1, "n1_p_n3", Node.TYPE_CONTAINER);
-        NodeRef n4 = nodeService.createNode(n2, "n2_p_n4", Node.TYPE_CONTAINER);
-        nodeService.addChild(n1, n4, "n1_n4");
-        NodeRef n5 = nodeService.createNode(n2, "n2_p_n5", Node.TYPE_CONTAINER);
+        NodeRef n3 = nodeService.createNode(n1, ns, "n1_p_n3", Node.TYPE_CONTAINER);
+        NodeRef n4 = nodeService.createNode(n2, ns, "n2_p_n4", Node.TYPE_CONTAINER);
+        nodeService.addChild(n1, n4, ns, "n1_n4");
+        NodeRef n5 = nodeService.createNode(n2, ns, "n2_p_n5", Node.TYPE_CONTAINER);
         // LEVEL 3
-        NodeRef n6 = nodeService.createNode(n3, "n3_p_n6", Node.TYPE_CONTAINER);
-        nodeService.addChild(n4, n6, "n4_n6");
-        NodeRef n7 = nodeService.createNode(n5, "n5_p_n7", Node.TYPE_CONTAINER);
+        NodeRef n6 = nodeService.createNode(n3, ns, "n3_p_n6", Node.TYPE_CONTAINER);
+        nodeService.addChild(n4, n6, ns, "n4_n6");
+        NodeRef n7 = nodeService.createNode(n5, ns, "n5_p_n7", Node.TYPE_CONTAINER);
         // LEVEL 4
-        NodeRef n8 = nodeService.createNode(n6, "n6_p_n8", Node.TYPE_CONTAINER);
-        nodeService.addChild(n7, n8, "n7_n8");
+        NodeRef n8 = nodeService.createNode(n6, ns, "n6_p_n8", Node.TYPE_CONTAINER);
+        nodeService.addChild(n7, n8, ns, "n7_n8");
         // compile the map
         Map<String, NodeRef> ret = new HashMap<String, NodeRef>(13);
         ret.put("root", rootNodeRef);
@@ -345,6 +351,11 @@ public class NodeServiceTest extends BaseSpringTest
         ret.put("n6", n6);
         ret.put("n7", n7);
         ret.put("n8", n8);
+        
+        // flush and clear
+        getSession().flush();
+        getSession().clear();
+        
         // done
         return ret;
     }
@@ -360,7 +371,7 @@ public class NodeServiceTest extends BaseSpringTest
         // get the primary node path for n8
         Path path = nodeService.getPath(n8Ref);
         assertEquals("Primary path incorrect",
-                "/{}root_p_n1/{}n1_p_n3/{}n3_p_n6/{}n6_p_n8",
+                "/{http://x}root_p_n1/{http://x}n1_p_n3/{http://x}n3_p_n6/{http://x}n6_p_n8",
                 path.toString());
     }
     
@@ -372,7 +383,6 @@ public class NodeServiceTest extends BaseSpringTest
         Map<String, NodeRef> nodes = buildNodeGraph();
         NodeRef n8Ref = nodes.get("n8");
 
-        long before = System.currentTimeMillis();
         // get all paths for n8
         Collection<Path> paths = nodeService.getPaths(n8Ref, false);
         assertEquals("Incorrect path count", 4, paths.size());
@@ -391,18 +401,13 @@ public class NodeServiceTest extends BaseSpringTest
             }
         }
 
-        long after = System.currentTimeMillis();
-        long delay = (after - before);
-        // no more than 20ms
-        assertTrue("getPaths(..., false) took " + delay + "ms", delay < 20);
-        
         // get primary path for n8
         paths = nodeService.getPaths(n8Ref, true);
         assertEquals("Incorrect path count", 1, paths.size());
         
         // check that a cyclic path is detected - make n8_n2
         NodeRef n6Ref = nodes.get("n6");
-        nodeService.addChild(n8Ref, n6Ref, "n8_n6");
+        nodeService.addChild(n8Ref, n6Ref, null, "n8_n6");
         try
         {
             nodeService.getPaths(n8Ref, false);

@@ -12,18 +12,9 @@ public class ChildAssocImpl implements ChildAssoc
     private long id;
     private ContainerNode parent;
     private Node child;
+    private String namespaceUri;
     private String name;
     private boolean isPrimary;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
 
     public void buildAssociation(ContainerNode parentNode, Node childNode)
     {
@@ -47,6 +38,16 @@ public class ChildAssocImpl implements ChildAssoc
         return sb.toString();
     }
 
+    public long getId()
+    {
+        return id;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
+    }
+
     public ContainerNode getParent()
     {
         return parent;
@@ -65,6 +66,16 @@ public class ChildAssocImpl implements ChildAssoc
     public void setChild(Node node)
     {
         child = node;
+    }
+
+    public String getNamespaceUri()
+    {
+        return namespaceUri;
+    }
+
+    public void setNamespaceUri(String namespaceUri)
+    {
+        this.namespaceUri = namespaceUri;
     }
 
     public String getName()

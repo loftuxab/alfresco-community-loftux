@@ -70,12 +70,14 @@ public interface NodeDaoService
     public void deleteNode(Node node);
     
     /**
+     * @param assocNamespaceUri TODO
      * @return Returns the persisted and filled association
      * @see ChildAssoc
      */
     public ChildAssoc newChildAssoc(ContainerNode parentNode,
             Node childNode,
             boolean isPrimary,
+            String assocNamespaceUri,
             String assocName);
     
     /**

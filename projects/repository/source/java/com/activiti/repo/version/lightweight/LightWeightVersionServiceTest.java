@@ -99,7 +99,7 @@ public class LightWeightVersionServiceTest extends BaseSpringTest
      */
     public void testCreateVersionWithNoExistingVersionHistory()
     {
-        NodeRef versionableNode = nodeService.createNode(rootNodeRef, "MyVersionableNode", Node.TYPE_REAL);
+        NodeRef versionableNode = nodeService.createNode(rootNodeRef, null, "MyVersionableNode", Node.TYPE_REAL);
         assertNotNull(versionableNode);
         
         // Now lets create a new version for this node

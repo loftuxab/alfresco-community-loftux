@@ -107,10 +107,12 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public ChildAssoc newChildAssoc(ContainerNode parentNode,
             Node childNode,
             boolean isPrimary,
+            String assocNamespaceUri,
             String assocName)
     {
         ChildAssoc assoc = new ChildAssocImpl();
         assoc.setIsPrimary(isPrimary);
+        assoc.setNamespaceUri(assocNamespaceUri);
         assoc.setName(assocName);
         assoc.buildAssociation(parentNode, childNode);
         // persist

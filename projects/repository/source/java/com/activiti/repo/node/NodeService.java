@@ -14,14 +14,18 @@ import com.activiti.repo.ref.Path;
 public interface NodeService
 {
     /**
-     * @see #createNode(NodeRef, String, String, Map)
+     * @see #createNode(NodeRef, String, String, String, Map<String,String>)
      */
-    public NodeRef createNode(NodeRef parentRef, String name, String nodeType) throws InvalidNodeRefException;
+    public NodeRef createNode(NodeRef parentRef,
+            String namespaceUri,
+            String name,
+            String nodeType) throws InvalidNodeRefException;
     
     /**
      * Creates a new, non-abstract, real node as a primary child of the given parent node.
      * 
      * @param parentRef the parent node
+     * @param namespaceUri the namespace of the association - may be null
      * @param name the name of the child association between the parent and the new child
      * @param nodeType a predefined node type
      * @param properties optional map of properties to assign to the node
@@ -29,6 +33,7 @@ public interface NodeService
      * @throws InvalidNodeRefException if the parent reference is invalid
      */
     public NodeRef createNode(NodeRef parentRef,
+            String namespaceUri,
             String name,
             String nodeType,
             Map<String, String> properties) throws InvalidNodeRefException;
@@ -46,10 +51,14 @@ public interface NodeService
      * 
      * @param parentRef
      * @param childRef 
+     * @param namespaceUri the namespace of the association - may be null
      * @param name the name of the association
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
      */
-    public void addChild(NodeRef parentRef, NodeRef childRef, String name) throws InvalidNodeRefException;
+    public void addChild(NodeRef parentRef,
+            NodeRef childRef,
+            String namespaceUri,
+            String name) throws InvalidNodeRefException;
     
     /**
      * Severs all parent-child relationships between two nodes.
@@ -68,10 +77,11 @@ public interface NodeService
      * was the primary association, i.e. the one with which the child node was created.
      * 
      * @param parentRef the parent of the associations to remove
+     * @param namespaceUri the namespace of the association - may be null
      * @param name the name of the associations to remove
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public void removeChildren(NodeRef parentRef, String name) throws InvalidNodeRefException;
+    public void removeChildren(NodeRef parentRef, String namespaceUri, String name) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef

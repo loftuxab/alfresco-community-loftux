@@ -34,6 +34,10 @@ public interface ChildAssoc
 
     public void setChild(Node node);
 
+    public String getNamespaceUri();
+
+    public void setNamespaceUri(String namespaceUri);
+
     public String getName();
 
     public void setName(String name);

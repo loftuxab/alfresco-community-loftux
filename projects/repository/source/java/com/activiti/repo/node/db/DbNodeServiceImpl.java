@@ -47,12 +47,19 @@ public class DbNodeServiceImpl implements NodeService
         this.storeDaoService = storeDaoService;
     }
 
-    public NodeRef createNode(NodeRef parentRef, String name, String nodeType)
+    public NodeRef createNode(NodeRef parentRef,
+            String namespaceUri,
+            String name,
+            String nodeType)
     {
-        return this.createNode(parentRef, name, nodeType, null);
+        return this.createNode(parentRef, namespaceUri, name, nodeType, null);
     }
 
-    public NodeRef createNode(NodeRef parentRef, String name, String nodeType, Map<String, String> properties)
+    public NodeRef createNode(NodeRef parentRef,
+            String namespaceUri,
+            String name,
+            String nodeType,
+            Map<String, String> properties)
     {
         // get the store that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
@@ -66,7 +73,7 @@ public class DbNodeServiceImpl implements NodeService
         // get the parent node
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // create the association
-        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, name);
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, namespaceUri, name);
         
         // set the properties
         if (properties != null)
@@ -141,7 +148,7 @@ public class DbNodeServiceImpl implements NodeService
         nodeDaoService.deleteNode(node);
     }
 
-    public void addChild(NodeRef parentRef, NodeRef childRef, String name) throws InvalidNodeRefException
+    public void addChild(NodeRef parentRef, NodeRef childRef, String namespaceUri, String name) throws InvalidNodeRefException
     {
         // check that both nodes belong to the same store
         if (!parentRef.getStoreRef().equals(childRef.getStoreRef()))
@@ -158,7 +165,7 @@ public class DbNodeServiceImpl implements NodeService
         // get the child node
         Node childNode = getNodeNotNull(childRef);
         // make the association
-        nodeDaoService.newChildAssoc(parentNode, childNode, false, name);
+        nodeDaoService.newChildAssoc(parentNode, childNode, false, namespaceUri, name);
         // done
     }
 
@@ -192,7 +199,7 @@ public class DbNodeServiceImpl implements NodeService
         // done
     }
 
-    public void removeChildren(NodeRef parentRef, String name) throws InvalidNodeRefException
+    public void removeChildren(NodeRef parentRef, String namespaceUri, String name) throws InvalidNodeRefException
     {
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // get all the child assocs
@@ -416,7 +423,7 @@ public class DbNodeServiceImpl implements NodeService
                 }
                 // build a path element
                 NodeRef parentRef = assoc.getParent().getNodeRef();
-                QName qname = QName.createQName(null, assoc.getName());  // TODO: get uri from assoc
+                QName qname = QName.createQName(assoc.getNamespaceUri(), assoc.getName());
                 NodeRef childRef = assoc.getChild().getNodeRef();
                 ChildAssocRef assocRef = new ChildAssocRef(parentRef, qname, childRef, -1);
                 Path.Element element = new Path.ChildAssocElement(assocRef);  // TODO: consider ordering

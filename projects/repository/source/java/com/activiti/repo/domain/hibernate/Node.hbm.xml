@@ -139,7 +139,8 @@
             type="long" >
          <generator class="increment" />
       </id>
-      <property name="name" />
+      <property name="namespaceUri" column="namespace_uri" length="100" />
+      <property name="name" length="100" />
       <property name="isPrimary" />
       <!-- forward assoc to parent node -->
       <many-to-one

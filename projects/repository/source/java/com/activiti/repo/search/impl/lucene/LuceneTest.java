@@ -176,7 +176,7 @@ public class LuceneTest extends TestCase
       Map<String, String> testProperties = new HashMap<String, String>();
       testProperties.put("property", "value");
 
-      NodeRef newNode = nodeService.createNode(rootNode, "path", Node.TYPE_CONTENT, testProperties);
+      NodeRef newNode = nodeService.createNode(rootNode, null, "path", Node.TYPE_CONTENT, testProperties);
 
       LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
       indexer.setNodeService(nodeService);
@@ -454,13 +454,13 @@ public class LuceneTest extends TestCase
          return parents;
       }
 
-      public NodeRef createNode(NodeRef parentRef, String name, String nodeType) throws InvalidNodeRefException
+      public NodeRef createNode(NodeRef parentRef, String namespaceUri, String name, String nodeType) throws InvalidNodeRefException
       {
          // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
-      public NodeRef createNode(NodeRef parentRef, String name, String nodeType, Map<String, String> properties)
+      public NodeRef createNode(NodeRef parentRef, String namespaceUri, String name, String nodeType, Map<String, String> properties)
             throws InvalidNodeRefException
       {
          // TODO Auto-generated method stub
@@ -473,7 +473,7 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-      public void addChild(NodeRef parentRef, NodeRef childRef, String name) throws InvalidNodeRefException
+      public void addChild(NodeRef parentRef, NodeRef childRef, String namespaceUri, String name) throws InvalidNodeRefException
       {
          // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
@@ -485,7 +485,7 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-      public void removeChildren(NodeRef parentRef, String name) throws InvalidNodeRefException
+      public void removeChildren(NodeRef parentRef, String namespaceUri, String name) throws InvalidNodeRefException
       {
          // TODO Auto-generated method stub
          throw new UnsupportedOperationException();

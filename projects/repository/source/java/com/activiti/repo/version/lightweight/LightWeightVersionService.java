@@ -192,8 +192,8 @@ public class LightWeightVersionService implements VersionService
             // Create a new version history node
             versionHistoryRef = this.nodeService.createNode(
                     this.versionStoreRootNodeRef, 
-                    LightWeightVersionService.CHILD_VERSION_HISTORIES, 
-                    Node.TYPE_CONTAINER);
+                    null, 
+                    LightWeightVersionService.CHILD_VERSION_HISTORIES, Node.TYPE_CONTAINER);
             
             // TODO store the id of the node that relates to this version history ??
         }
@@ -283,8 +283,8 @@ public class LightWeightVersionService implements VersionService
     {
         NodeRef newVersion = this.nodeService.createNode(
                 versionHistoryRef, 
-                LightWeightVersionService.CHILD_VERSIONS, 
-                Node.TYPE_REAL);
+                null, 
+                LightWeightVersionService.CHILD_VERSIONS, Node.TYPE_REAL);
         
         // Set the version number for the new version
         this.nodeService.setProperty(newVersion, LightWeightVersionService.ATTR_VERSION_NUMBER, Integer.toString(versionNumber));
