@@ -16,8 +16,8 @@
          optimistic-lock="version" >
       <!-- composite PK -->
       <composite-id name="key" class="com.activiti.repo.domain.StoreKey">
-         <key-property name="protocol"/>
-         <key-property name="identifier"/>
+         <key-property name="protocol" length="100" />
+         <key-property name="identifier" length="100" />
       </composite-id>
       <!-- forward assoc to root node -->
       <many-to-one

@@ -16,9 +16,9 @@
          discriminator-value="GENERIC" >
       <!-- composite PK -->
       <composite-id name="key" class="com.activiti.repo.domain.NodeKey">
-         <key-property name="protocol" />
-         <key-property name="identifier" />
-         <key-property name="guid"/>
+         <key-property name="protocol" length="100" />
+         <key-property name="identifier" length="100" />
+         <key-property name="guid" length="36"/>
       </composite-id>
       <discriminator
             column="auto_type"
@@ -33,11 +33,11 @@
             inverse="false"
             cascade="all" >
          <key>
-            <column name="protocol" />
-            <column name="identifier" />
-            <column name="guid" />
+            <column name="protocol" length="100"  />
+            <column name="identifier" length="100" />
+            <column name="guid" length="36" />
          </key>
-         <index column="property_name" type="string" />
+         <index column="property_name" type="string" length="100" />
          <element column="property_value" type="string" />
       </map>
       <!-- forward assoc to store -->
@@ -58,7 +58,7 @@
          <key>
             <column name="child_protocol" />
             <column name="child_identifier" />
-            <column name="child_guid" />
+            <column name="child_guid" length="36" />
          </key>
          <one-to-many class="com.activiti.repo.domain.hibernate.ChildAssocImpl" />
       </set>
@@ -70,7 +70,7 @@
          <key>
             <column name="target_protocol" />
             <column name="target_identifier" />
-            <column name="target_guid" />
+            <column name="target_guid" length="36" />
          </key>
          <one-to-many class="com.activiti.repo.domain.hibernate.NodeAssocImpl" />
       </set>
@@ -97,7 +97,7 @@
          <key>
             <column name="source_protocol" />
             <column name="source_identifier" />
-            <column name="source_guid" />
+            <column name="source_guid" length="36" />
          </key>
          <one-to-many class="com.activiti.repo.domain.hibernate.NodeAssocImpl" />
       </set>
@@ -123,7 +123,7 @@
          <key>
             <column name="parent_protocol" />
             <column name="parent_identifier" />
-            <column name="parent_guid" />
+            <column name="parent_guid" length="36" />
          </key>
          <one-to-many class="com.activiti.repo.domain.hibernate.ChildAssocImpl" />
       </set>
@@ -148,7 +148,7 @@
             not-null="true" >
          <column name="parent_protocol" />
          <column name="parent_identifier" />
-         <column name="parent_guid" />
+         <column name="parent_guid" length="36" />
       </many-to-one>
       <!-- forward assoc to child node -->
       <many-to-one
@@ -157,7 +157,7 @@
             not-null="true" >
          <column name="child_protocol" />
          <column name="child_identifier" />
-         <column name="child_guid" />
+         <column name="child_guid" length="36" />
       </many-to-one>
    </class>
 
@@ -179,7 +179,7 @@
             not-null="true" >
          <column name="source_protocol" />
          <column name="source_identifier" />
-         <column name="source_guid" />
+         <column name="source_guid" length="36" />
       </many-to-one>
       <!-- forward assoc to target node -->
       <many-to-one
@@ -188,7 +188,7 @@
             not-null="true" >
          <column name="target_protocol" />
          <column name="target_identifier" />
-         <column name="target_guid" />
+         <column name="target_guid" length="36" />
       </many-to-one>
    </class>
    
