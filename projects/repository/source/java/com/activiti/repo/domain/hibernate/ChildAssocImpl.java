@@ -3,18 +3,21 @@ package com.activiti.repo.domain.hibernate;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
+import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.QName;
 
 /**
  * @author Derek Hulley
  */
 public class ChildAssocImpl implements ChildAssoc
 {
-    private long id;
+    private Long id;
     private ContainerNode parent;
     private Node child;
     private String namespaceUri;
     private String name;
     private boolean isPrimary;
+    private ChildAssocRef childAssocRef;
 
     public void buildAssociation(ContainerNode parentNode, Node childNode)
     {
@@ -26,6 +29,25 @@ public class ChildAssocImpl implements ChildAssoc
         childNode.getParentAssocs().add(this);
     }
     
+    public void removeAssociation()
+    {
+        // maintain inverse assoc from parent node to this instance
+        this.getParent().getChildAssocs().remove(this);
+        // maintain inverse assoc from child node to this instance
+        this.getChild().getParentAssocs().remove(this);
+    }
+    
+    public synchronized ChildAssocRef getChildAssocRef()
+    {
+        if (childAssocRef == null)
+        {
+            childAssocRef = new ChildAssocRef(getParent().getNodeRef(),
+                    QName.createQName(getNamespaceUri(), getName()),
+                    getChild().getNodeRef());
+        }
+        return childAssocRef;
+    }
+
     public String toString()
     {
         StringBuffer sb = new StringBuffer(32);
@@ -38,12 +60,12 @@ public class ChildAssocImpl implements ChildAssoc
         return sb.toString();
     }
 
-    public long getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(long id)
+    public void setId(Long id)
     {
         this.id = id;
     }

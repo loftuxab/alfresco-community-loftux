@@ -31,6 +31,17 @@ public abstract class BaseSpringTest extends AbstractTransactionalDataSourceSpri
     {
         return SessionFactoryUtils.getSession(sessionFactory, false);
     }
+    
+    /**
+     * Forces the session to flush to the database (without commiting) and clear the
+     * cache.  This ensures that all reads against the session are fresh instances,
+     * which gives the assurance that the DB read/write operations occur correctly.
+     */
+    protected void flushAndClear()
+    {
+        getSession().flush();
+        getSession().clear();
+    }
 
     protected String[] getConfigLocations()
     {

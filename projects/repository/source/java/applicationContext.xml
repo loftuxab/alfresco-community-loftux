@@ -155,7 +155,7 @@
    <!--  PUBLIC SERVICES   -->
    <!--                    -->
    
-   <bean id="storeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="dbStoreService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.store.StoreService</value>
       </property>
@@ -182,7 +182,7 @@
       </property>
    </bean>
    
-   <bean id="nodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.node.NodeService</value>
       </property>
@@ -222,10 +222,10 @@
       <property name="target">
          <bean class="com.activiti.repo.version.lightweight.LightWeightVersionService" init-method="initialise">
             <property name="nodeService">
-               <ref bean="nodeService" />
+               <ref bean="dbNodeService" />
             </property>
 			<property name="storeService">
-				<ref bean="storeService"/>
+				<ref bean="dbStoreService"/>
 			</property>
 			<property name="versionCounterDaoService">
 				<ref bean="versionCounterDaoService"/>
@@ -285,7 +285,7 @@
       <property name="target">
          <bean class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory" factory-method="getInstance">
 			<property name="nodeService">
-				<ref bean="nodeService"/>
+				<ref bean="dbNodeService"/>
 			</property>
          </bean>
       </property>

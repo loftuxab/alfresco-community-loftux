@@ -1,5 +1,7 @@
 package com.activiti.repo.domain;
 
+import com.activiti.repo.ref.ChildAssocRef;
+
 /**
  * Represents a special type of association between nodes, that of the
  * parent-child relationship.
@@ -8,10 +10,6 @@ package com.activiti.repo.domain;
  */
 public interface ChildAssoc
 {
-    public long getId();
-
-    public void setId(long id);
-
     /**
      * Performs the necessary work on the provided nodes to ensure that a bidirectional
      * association is properly set up.
@@ -25,6 +23,18 @@ public interface ChildAssoc
      * @see #setIsPrimary(boolean)
      */
     public void buildAssociation(ContainerNode parentNode, Node childNode);
+    
+    /**
+     * Performs the necessary work on the {@link #getParent() parent} and {@link #getChild() child} nodes
+     * to maintain the inverse association sets
+     */
+    public void removeAssociation();
+    
+    public ChildAssocRef getChildAssocRef();
+
+    public Long getId();
+
+    public void setId(Long id);
 
     public ContainerNode getParent();
 

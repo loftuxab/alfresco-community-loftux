@@ -510,7 +510,7 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-      public Collection<NodeRef> getChildren(NodeRef nodeRef) throws InvalidNodeRefException
+      public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
       {
          // TODO Auto-generated method stub
          throw new UnsupportedOperationException();

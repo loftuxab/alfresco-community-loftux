@@ -139,11 +139,23 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testRemoveChildByName() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef, null, "pathA", Node.TYPE_CONTAINER);
-        nodeService.addChild(rootNodeRef, nodeRef, null, "pathB");
-        nodeService.addChild(rootNodeRef, nodeRef, null, "pathC");
+        NodeRef nodeRef = nodeService.createNode(rootNodeRef, "nsA", "pathA", Node.TYPE_CONTAINER);
+        nodeService.addChild(rootNodeRef, nodeRef, "nsB1", "pathB");
+        nodeService.addChild(rootNodeRef, nodeRef, "nsB2", "pathB");
+        nodeService.addChild(rootNodeRef, nodeRef, "nsC", "pathC");
         // delete all the associations
-        nodeService.removeChildren(rootNodeRef, null, "pathB");
+        nodeService.removeChildren(rootNodeRef, "nsB1", "pathB");
+        
+        // get the children of the root
+        Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(rootNodeRef);
+        assertEquals("Unexpected number of children under root", 3, childAssocRefs.size());
+        
+        // flush and clear
+        flushAndClear();
+        
+        // get the children again to check that the flushing didn't produce different results
+        childAssocRefs = nodeService.getChildAssocs(rootNodeRef);
+        assertEquals("Unexpected number of children under root", 3, childAssocRefs.size());
     }
     
     public void testGetType() throws Exception
@@ -200,17 +212,18 @@ public class NodeServiceTest extends BaseSpringTest
         assertNull("Expected null primary parent for root node", nullParent);
     }
     
-    public void testGetChildren() throws Exception
+    public void testGetChildAssocs() throws Exception
     {
         NodeRef parentRef = nodeService.createNode(rootNodeRef, null, "P1", Node.TYPE_CONTAINER);
         NodeRef child1Ref = nodeService.createNode(parentRef, null, "PrimaryChild", Node.TYPE_CONTENT);
         NodeRef child2Ref = nodeService.createNode(rootNodeRef, null, "OtherChild", Node.TYPE_CONTENT);
         nodeService.addChild(parentRef, child2Ref, null, "SecondaryChild");
+        
+        flushAndClear();
+        
         // get the parent node's children
-        Collection<NodeRef> children = nodeService.getChildren(parentRef);
-        assertEquals("Incorrect number of children", 2, children.size());
-        assertTrue("Expected child not found", children.contains(child1Ref));
-        assertTrue("Expected child not found", children.contains(child2Ref));
+        Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(parentRef);
+        assertEquals("Incorrect number of children", 2, childAssocRefs.size());
     }
     
     /**

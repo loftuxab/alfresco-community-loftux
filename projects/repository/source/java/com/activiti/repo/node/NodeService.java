@@ -3,6 +3,7 @@ package com.activiti.repo.node;
 import java.util.Collection;
 import java.util.Map;
 
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 
@@ -130,10 +131,10 @@ public interface NodeService
     
     /**
      * @param nodeRef the parent node - must be a <b>container</b>
-     * @return Returns a collection of <code>NodeRef</code> instances
+     * @return Returns a collection of <code>ChildAssocRef</code> instances
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public Collection<NodeRef> getChildren(NodeRef nodeRef) throws InvalidNodeRefException;
+    public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef

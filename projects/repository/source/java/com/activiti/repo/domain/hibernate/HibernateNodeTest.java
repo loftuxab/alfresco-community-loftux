@@ -2,6 +2,7 @@ package com.activiti.repo.domain.hibernate;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -221,21 +222,20 @@ public class HibernateNodeTest extends BaseHibernateTest
         containerNode.setType(Node.TYPE_CONTAINER);
         Serializable containerNodeKey = getSession().save(containerNode);
         // create an association to the content
-        ChildAssoc assoc = new ChildAssocImpl();
-        assoc.setIsPrimary(true);
-        assoc.setName("number1");
-        assoc.buildAssociation(containerNode, contentNode);
-        getSession().save(assoc);
+        ChildAssoc assoc1 = new ChildAssocImpl();
+        assoc1.setIsPrimary(true);
+        assoc1.setName("number1");
+        assoc1.buildAssociation(containerNode, contentNode);
+        getSession().save(assoc1);
 
         // make another association between the same two parent and child nodes
-        assoc = new ChildAssocImpl();
-        assoc.setIsPrimary(true);
-        assoc.setName("number2");
-        assoc.buildAssociation(containerNode, contentNode);
-        getSession().save(assoc);
+        ChildAssoc assoc2 = new ChildAssocImpl();
+        assoc2.setIsPrimary(true);
+        assoc2.setName("number2");
+        assoc2.buildAssociation(containerNode, contentNode);
+        getSession().save(assoc2);
 
-        getSession().flush();
-        getSession().clear();
+//        flushAndClear();
 
         // reload the container
         containerNode = (ContainerNode) getSession().get(ContainerNodeImpl.class, containerNodeKey);
@@ -244,7 +244,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         assertEquals("Expected exactly 2 children", 2, containerNode.getChildAssocs().size());
         for (Iterator iterator = containerNode.getChildAssocs().iterator(); iterator.hasNext(); /**/)
         {
-            assoc = (ChildAssoc) iterator.next();
+            ChildAssoc assoc = (ChildAssoc) iterator.next();
             // the node id must be known
             assertNotNull("Node not populated on assoc", assoc.getChild());
             assertEquals("Node key on child assoc is incorrect", contentNodeKey,
@@ -252,7 +252,19 @@ public class HibernateNodeTest extends BaseHibernateTest
         }
 
         // check that we can traverse the association from the child
-        Set parentAssocs = contentNode.getParentAssocs();
-        assertEquals("Expected exactly 2 parents", 2, parentAssocs.size());
+        Set<ChildAssoc> parentAssocs = contentNode.getParentAssocs();
+        assertEquals("Expected exactly 2 parent assocs", 2, parentAssocs.size());
+        parentAssocs = new HashSet<ChildAssoc>(parentAssocs);
+        for (ChildAssoc assoc : parentAssocs)
+        {
+            // maintain inverse assoc sets
+            assoc.removeAssociation();
+            // remove the assoc
+            getSession().delete(assoc);
+        }
+        
+        // check that the child now has zero parents
+        parentAssocs = contentNode.getParentAssocs();
+        assertEquals("Expected exactly 0 parent assocs", 0, parentAssocs.size());
     }
 }

@@ -204,6 +204,7 @@ public class DbNodeServiceImpl implements NodeService
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // get all the child assocs
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
+        // copy the set as we might be 
         int childrenDeleted = 0;
         for (ChildAssoc assoc : assocs)
         {
@@ -281,18 +282,17 @@ public class DbNodeServiceImpl implements NodeService
         return results;
     }
 
-    public Collection<NodeRef> getChildren(NodeRef nodeRef) throws InvalidNodeRefException
+    public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
         ContainerNode node = getContainerNodeNotNull(nodeRef);
         // get the assocs pointing from it
         Set<ChildAssoc> childAssocs = node.getChildAssocs();
         // list of results
-        List<NodeRef> results = new ArrayList<NodeRef>(childAssocs.size());
+        List<ChildAssocRef> results = new ArrayList<ChildAssocRef>(childAssocs.size());
         for (ChildAssoc assoc : childAssocs)
         {
             // get the child
-            Node childNode = assoc.getChild();
-            results.add(childNode.getNodeRef());
+            results.add(assoc.getChildAssocRef());
         }
         // done
         return results;
