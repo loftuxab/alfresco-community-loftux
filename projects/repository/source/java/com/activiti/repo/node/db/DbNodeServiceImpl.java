@@ -2,10 +2,10 @@ package com.activiti.repo.node.db;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +19,7 @@ import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.node.AssociationExistsException;
+import com.activiti.repo.node.CyclicChildRelationshipException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
@@ -420,63 +421,122 @@ public class DbNodeServiceImpl implements NodeService
     }
 
     /**
-     * This method can pull many objects into the first level cache.  The
-     * {@link NodeDaoService#evict(Node)} method is used to ensure that the cache size
-     * doesn't grow too large.
+     * Recursive method used to build up paths from a given node to the root.
+     * 
+     * @param currentNode the node to start from, i.e. the child node to work upwards from
+     * @param currentPath the path from the current node to the descendent that we started from
+     * @param completedPaths paths that have reached the root are added to this collection
+     * @param assocStack the parent-child relationships traversed whilst building the path.
+     *      Used to detected cyclic relationships.
+     * @param primaryOnly true if only the primary parent association must be traversed
+     * @throws CyclicChildRelationshipException
      */
-    public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
+    private void prependPaths(final Node currentNode,
+            final Path currentPath,
+            Collection<Path> completedPaths,
+            Stack<ChildAssoc> assocStack,
+            boolean primaryOnly)
+        throws CyclicChildRelationshipException
     {
-        // get the starting node
-        Node node = getNodeNotNull(nodeRef);
-        // build the path
-        Path path = new Path();         // the path we will build
-        ChildAssoc assoc = null;        // the storage for each assoc as we move up the path
-        Set<Node> touchedNodes = new HashSet<Node>(5);  // ensure that we don't walk up cyclic associations
-        while(true)
+        // get the parent associations of the given node
+        Set<ChildAssoc> parentAssocs = currentNode.getParentAssocs();
+        if (parentAssocs.size() == 0)
         {
-            if (!touchedNodes.add(node))
+            // there are no parents so we must be at the root - save the current path
+            completedPaths.add(currentPath);
+        }
+        else // we have some parents
+        {
+            for (ChildAssoc assoc : parentAssocs)
             {
-                throw new RuntimeException("Cyclic child relationship detected: \n" +
-                        "   touched nodes: " + touchedNodes);
+                // does the association already exist in the stack
+                if (assocStack.contains(assoc))
+                {
+                    // the association was present already
+                    throw new CyclicChildRelationshipException(
+                            "Cyclic parent-child relationship detected: \n" +
+                            "   current node: " + currentNode + "\n" +
+                            "   current path: " + currentPath + "\n" +
+                            "   next assoc: " + assoc,
+                            assoc);
+                }
+                // do we consider only primary assocs?
+                if (primaryOnly && !assoc.getIsPrimary())
+                {
+                    continue;
+                }
+                // build a path element
+                QName qname = QName.createQName(null, assoc.getName());  // TODO: get uri from assoc
+                Path.Element element = new Path.QNameElement(qname, -1);  // TODO: consider ordering
+                // create a new path that builds on the current path
+                Path path = new Path();
+                path.append(currentPath);
+                // prepend element
+                path.prepend(element);
+                // get parent node
+                Node parentNode = assoc.getParent();
+                
+                // push the assoc stack, recurse and pop
+                assocStack.push(assoc);
+                prependPaths(parentNode, path, completedPaths, assocStack, primaryOnly);
+                assocStack.pop();
             }
-            assoc = nodeDaoService.getPrimaryParentAssoc(node);
-            if (assoc == null)
-            {
-                break;      // stop once we hit the root node, i.e. a node without primary parents
-            }
-            // move up the relationship
-            node = assoc.getParent();
-            // prepend this association to the path as we are traversing upwards
-            QName qname = QName.createQName(null, assoc.getName());  // TODO: get namespace from assoc
-            Path.Element element = new Path.QNameElement(qname);
-            path.prepend(element);
         }
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Fetched primary node path: \n" +
-                    "   node: " + nodeRef + "\n" +
-                    "   path: " + path);
-        }
-        return path;
     }
 
     /**
-     * @param currentNode the node to start from, i.e. the child node to work upwards from
-     * @param currentPath the path from the current node to the descendent that we started from
-     * @param primaryOnly true if only the primary parent association must be traversed
-     * @return Returns a collection of new <code>Path</code> instances for the extended paths.  The <code>currentPath</code>
-     *      instance may be included in the list
+     * @see #getPaths(NodeRef, boolean)
+     * @see #prependPaths(Node, Path, Collection<Path>, Stack<ChildAssoc>, boolean)
      */
-    private Collection<Path> prependPaths(Node currentNode, Path currentPath, boolean primaryOnly)
+    public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException();
+        Collection<Path> paths = getPaths(nodeRef, true);   // checks primary path count
+        if (paths.size() == 1)
+        {
+            for (Path path : paths)
+            {
+                return path;   // we know there is only one
+            }
+        }
+        throw new RuntimeException("Primary path count not checked");
     }
 
-    public Collection<Path> getPaths(NodeRef nodeRef) throws InvalidNodeRefException
+    /**
+     * When searching for <code>primaryOnly == true</code>, checks that there is exactly
+     * one path.
+     * @see #prependPaths(Node, Path, Collection<Path>, Stack<ChildAssoc>, boolean)
+     */
+    public Collection<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
     {
         // get the starting node
         Node node = getNodeNotNull(nodeRef);
-        throw new UnsupportedOperationException();
+        // create storage for the paths - only need 1 bucket if we are looking for the primary path
+        Collection<Path> paths = new ArrayList<Path>(primaryOnly ? 1 : 10);
+        // create an emtpy current path to start from
+        Path currentPath = new Path();
+        // create storage for touched associations
+        Stack<ChildAssoc> assocStack = new Stack<ChildAssoc>();
+        // call recursive method to sort it out
+        prependPaths(node, currentPath, paths, assocStack, primaryOnly);
+        
+        // check that for the primary only case we have exactly one path
+        if (primaryOnly && paths.size() != 1)
+        {
+            throw new RuntimeException("Node has " + paths.size() + " primary paths: " + nodeRef);
+        }
+        
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Fetched paths for node: \n" +
+                    "   node: " + node + "\n" +
+                    "   primary only: " + primaryOnly);
+            for (Path path : paths)
+            {
+                logger.debug("   Path >>> " + path);
+            }
+        }
+        return paths;
     }
 }

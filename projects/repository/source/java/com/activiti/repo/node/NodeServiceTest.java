@@ -292,21 +292,113 @@ public class NodeServiceTest extends BaseSpringTest
         assertTrue("Source not found", sources.contains(sourceRef));
     }
     
+    /**
+     * Builds a web of nodes paths
+     * <p>
+     * Naming convention is:
+     * <pre>
+     * n2_p_n5
+     * n4_n5
+     * where
+     *      n5 is the node number of the node
+     *      n2 is the primary parent node number
+     *      n4 is any other non-primary parent
+     * </pre>
+     * The following structure is used to name associations in the test:
+     * <pre>
+     * Level 0:     root
+     * Level 1:     root_p_n1   root_p_n2
+     * Level 2:     n1_p_n3     n2_p_n4     n1_n4       n2_p_n5
+     * Level 3:     n3_p_n6     n4_n6       n5_p_n7
+     * Level 4:     n6_p_n8     n7_n8
+     * </pre>
+     * 
+     * @return Returns a map <code>NodeRef</code> instances keyed by node name
+     */
+    private Map<String, NodeRef> buildNodeGraph() throws Exception
+    {
+        // LEVEL 0
+        // LEVEL 1
+        NodeRef n1 = nodeService.createNode(rootNodeRef, "root_p_n1", Node.TYPE_CONTAINER);
+        NodeRef n2 = nodeService.createNode(rootNodeRef, "root_p_n2", Node.TYPE_CONTAINER);
+        // LEVEL 2
+        NodeRef n3 = nodeService.createNode(n1, "n1_p_n3", Node.TYPE_CONTAINER);
+        NodeRef n4 = nodeService.createNode(n2, "n2_p_n4", Node.TYPE_CONTAINER);
+        nodeService.addChild(n1, n4, "n1_n4");
+        NodeRef n5 = nodeService.createNode(n2, "n2_p_n5", Node.TYPE_CONTAINER);
+        // LEVEL 3
+        NodeRef n6 = nodeService.createNode(n3, "n3_p_n6", Node.TYPE_CONTAINER);
+        nodeService.addChild(n4, n6, "n4_n6");
+        NodeRef n7 = nodeService.createNode(n5, "n5_p_n7", Node.TYPE_CONTAINER);
+        // LEVEL 4
+        NodeRef n8 = nodeService.createNode(n6, "n6_p_n8", Node.TYPE_CONTAINER);
+        nodeService.addChild(n7, n8, "n7_n8");
+        // compile the map
+        Map<String, NodeRef> ret = new HashMap<String, NodeRef>(13);
+        ret.put("root", rootNodeRef);
+        ret.put("n1", n1);
+        ret.put("n2", n2);
+        ret.put("n3", n3);
+        ret.put("n4", n4);
+        ret.put("n5", n5);
+        ret.put("n6", n6);
+        ret.put("n7", n7);
+        ret.put("n8", n8);
+        // done
+        return ret;
+    }
+    
+    /**
+     * @see #buildNodeGraph() 
+     */
     public void testGetPath() throws Exception
     {
-        // create primary node path
-        NodeRef level1Ref = nodeService.createNode(rootNodeRef, "PL1", Node.TYPE_CONTAINER);
-        NodeRef level2Ref = nodeService.createNode(level1Ref, "PL2", Node.TYPE_CONTAINER);
-        NodeRef level3Ref = nodeService.createNode(level2Ref, "PL3", Node.TYPE_CONTAINER);
-        // create secondary node path
-        nodeService.addChild(rootNodeRef, level1Ref, "SL1");
-        nodeService.addChild(level1Ref, level2Ref, "SL2");
-        nodeService.addChild(level2Ref, level3Ref, "SL3");
-        
-        // get the primary path for level 3
-        Path path = nodeService.getPath(level3Ref);
+        Map<String, NodeRef> nodes = buildNodeGraph();
+        NodeRef n8Ref = nodes.get("n8");
+
+        // get the primary node path for n8
+        Path path = nodeService.getPath(n8Ref);
         assertEquals("Primary path incorrect",
-                "/{}PL1/{}PL2/{}PL3",
+                "/{}root_p_n1/{}n1_p_n3/{}n3_p_n6/{}n6_p_n8",
                 path.toString());
+    }
+    
+    /**
+     * @see #buildNodeGraph() 
+     */
+    public void testGetPaths() throws Exception
+    {
+        Map<String, NodeRef> nodes = buildNodeGraph();
+        NodeRef n8Ref = nodes.get("n8");
+
+        long before = System.currentTimeMillis();
+        // get all paths for n8
+        Collection<Path> paths = nodeService.getPaths(n8Ref, false);
+        assertEquals("Incorrect path count", 4, paths.size());
+        long after = System.currentTimeMillis();
+        long delay = (after - before);
+        // no more than 20ms
+        assertTrue("getPaths(..., false) took " + delay + "ms", delay < 20);
+        
+        // get primary path for n8
+        paths = nodeService.getPaths(n8Ref, true);
+        assertEquals("Incorrect path count", 1, paths.size());
+        
+        // check that a cyclic path is detected - make n8_n2
+        NodeRef n6Ref = nodes.get("n6");
+        nodeService.addChild(n8Ref, n6Ref, "n8_n6");
+        try
+        {
+            nodeService.getPaths(n8Ref, false);
+            fail("Cyclic relationship not detected");
+        }
+        catch (CyclicChildRelationshipException e)
+        {
+            // expected
+        }
+        catch (StackOverflowError e)
+        {
+            fail("Cyclic relationship caused stack overflow");
+        }
     }
 }

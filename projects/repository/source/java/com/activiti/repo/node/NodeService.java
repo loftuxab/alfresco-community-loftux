@@ -178,13 +178,17 @@ public interface NodeService
      * @param nodeRef
      * @return Returns the path to the node along the primary node path
      * @throws InvalidNodeRefException if the node could not be found
+     * 
+     * @see #getPaths(NodeRef, boolean)
      */
     public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef
+     * @param primaryOnly true if only the primary path must be retrieved.  If true, the
+     *      result will have exactly one entry.
      * @return Returns a collection of all possible paths to the given node
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public Collection<Path> getPaths(NodeRef nodeRef) throws InvalidNodeRefException;
+    public Collection<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException;
 }
