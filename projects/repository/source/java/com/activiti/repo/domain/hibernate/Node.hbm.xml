@@ -40,14 +40,14 @@
             name='parentAssocs'
             inverse='true' >
          <key column='child_id' />
-         <one-to-many class='com.activiti.repo.domain.ChildAssocImpl' />
+         <one-to-many class='com.activiti.repo.domain.hibernate.ChildAssocImpl' />
       </set>
    </class>
 
    <subclass
          name='com.activiti.repo.domain.hibernate.ReferenceNodeImpl'
          proxy='com.activiti.repo.domain.ReferenceNode'
-         extends='com.activiti.repo.domain.NodeImpl'
+         extends='com.activiti.repo.domain.hibernate.NodeImpl'
          discriminator-value='REFERENCE' >
       <property name='referencedPath' not-null='true' />
    </subclass>
@@ -55,28 +55,28 @@
    <subclass
          name='com.activiti.repo.domain.hibernate.RealNodeImpl'
          proxy='com.activiti.repo.domain.RealNode'
-         extends='com.activiti.repo.domain.NodeImpl'
+         extends='com.activiti.repo.domain.hibernate.NodeImpl'
          discriminator-value='REAL' >
    </subclass>
 
    <subclass
          name='com.activiti.repo.domain.hibernate.ContentNodeImpl'
          proxy='com.activiti.repo.domain.ContentNode'
-         extends='com.activiti.repo.domain.RealNodeImpl'
+         extends='com.activiti.repo.domain.hibernate.RealNodeImpl'
          discriminator-value='CONTENT' >
    </subclass>
 
    <subclass
          name='com.activiti.repo.domain.hibernate.ContainerNodeImpl'
          proxy='com.activiti.repo.domain.ContainerNode'
-         extends='com.activiti.repo.domain.RealNodeImpl'
+         extends='com.activiti.repo.domain.hibernate.RealNodeImpl'
          discriminator-value='CONTAINER' >
       <!-- inverse assoc to child childassocs -->
       <set
             name='childAssocs'
             inverse='true' >
          <key column='parent_id' />
-         <one-to-many class='com.activiti.repo.domain.ChildAssocImpl' />
+         <one-to-many class='com.activiti.repo.domain.hibernate.ChildAssocImpl' />
       </set>
    </subclass>
 
@@ -95,13 +95,13 @@
       <!-- forward assoc to parent node -->
       <many-to-one
             name='parent'
-            class='com.activiti.repo.domain.ContainerNodeImpl'
+            class='com.activiti.repo.domain.hibernate.ContainerNodeImpl'
             column='parent_id'
             not-null='true' />
       <!-- forward assoc to child node -->
       <many-to-one
             name='child'
-            class='com.activiti.repo.domain.NodeImpl'
+            class='com.activiti.repo.domain.hibernate.NodeImpl'
             column='child_id'
             not-null='true' />
    </class>

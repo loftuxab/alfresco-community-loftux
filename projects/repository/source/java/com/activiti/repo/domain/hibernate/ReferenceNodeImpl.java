@@ -7,14 +7,14 @@ import com.activiti.repo.domain.ReferenceNode;
  */
 public class ReferenceNodeImpl extends NodeImpl implements ReferenceNode
 {
-   private String m_referencedPath;
+   private String referencedPath;
    
    public String getReferencedPath()
    {
-      return m_referencedPath;
+      return referencedPath;
    }
    public void setReferencedPath(String path)
    {
-      m_referencedPath = path;
+      referencedPath = path;
    }
 }

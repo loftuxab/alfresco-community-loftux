@@ -13,5 +13,20 @@
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/standard.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/aopalliance.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bucket.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cglib-full-2.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ehcache-0.9.jar"/>
+	<classpathentry exported="true" sourcepath="C:/java/hibernate-3.0/src" kind="lib" path="lib/hibernate3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
+	<classpathentry exported="true" sourcepath="C:/java/spring-framework-1.2-dev/src" kind="lib" path="lib/spring.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-aop.jar"/>
+	<classpathentry exported="true" sourcepath="C:/java/spring-framework-1.2-dev/mock" kind="lib" path="lib/spring-mock.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jta.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

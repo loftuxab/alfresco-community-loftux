@@ -5,7 +5,7 @@
    
    <!-- load common properties -->
    <bean id="properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-      <property name="database">
+      <property name="location">
          <value>db.properties</value>
       </property>
    </bean>
@@ -15,21 +15,21 @@
          destroy-method='close'>
       <property name='driverClassName'>
          <value>${db.driver}</value>
-      <property>
+      </property>
       <property name='url'>
          <value>${db.url}</value>
-      <property>
+      </property>
       <property name='username'>
          <value>${db.username}</value>
-      <property>
+      </property>
       <property name='password'>
          <value>${db.password}</value>
-      <property>
+      </property>
    </bean>
    
-   <bean id='sessionFactory' class='org.springframework.orm.hibernate.LocalSessionFactoryBean'>
+   <bean id='sessionFactory' class='org.springframework.orm.hibernate3.LocalSessionFactoryBean'>
       <property name='dataSource' >
-         <ref local='dataSource'>
+         <ref local='dataSource' />
       </property>
       <property name='mappingResources' >
          <value>com/activiti/repo/domain/hibernate/Node.hbm.xml</value>
@@ -47,13 +47,13 @@
    </bean>
    
    <!-- create a transaction manager to handle the Hibernate sessions -->
-   <bean id='transactionManager' class='org.springframework.orm.hibernate.HibernateTransactionManager'>
+   <bean id='transactionManager' class='org.springframework.orm.hibernate3.HibernateTransactionManager'>
       <property name='sessionFactory'>
          <ref local='sessionFactory'/>
       </property>
    </bean>
-   
-   
+
+<!--   
    <bean id='nodeService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
          <value>com.as.core.NodeService</value>
@@ -74,5 +74,6 @@
          </props>
       </property>
    </bean>
+-->
 
 </beans>
