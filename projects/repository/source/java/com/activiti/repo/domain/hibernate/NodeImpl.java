@@ -34,6 +34,29 @@ public class NodeImpl implements Node
         parentAssocs = new HashSet<ChildAssoc>(3);
         properties = new HashMap<String, String>(5);
     }
+    
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        else if (obj == this)
+        {
+            return true;
+        }
+        else if (!(obj instanceof Node))
+        {
+            return false;
+        }
+        Node that = (Node) obj;
+        return (this.getKey().equals(that.getKey()));
+    }
+    
+    public int hashCode()
+    {
+        return getKey().hashCode();
+    }
 
     public NodeKey getKey() {
 		return key;

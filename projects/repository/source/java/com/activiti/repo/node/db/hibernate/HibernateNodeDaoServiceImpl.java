@@ -2,11 +2,13 @@ package com.activiti.repo.node.db.hibernate;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -155,6 +157,52 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public void deleteChildAssoc(ChildAssoc assoc)
     {
         getHibernateTemplate().delete(assoc);
+    }
+
+    public ChildAssoc getPrimaryParentAssoc(Node node)
+    {
+        // get the assocs pointing to the node
+        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
+        ChildAssoc primaryAssoc = null;
+        for (ChildAssoc assoc : parentAssocs)
+        {
+            // ignore non-primary assocs
+            if (!assoc.getIsPrimary())
+            {
+                continue;
+            }
+            else if (primaryAssoc != null)
+            {
+                // we have more than one somehow
+                throw new DataIntegrityViolationException("Multiple primary associations: \n" +
+                        "   child: " + node + "\n" +
+                        "   first primary assoc: " + primaryAssoc + "\n" +
+                        "   second primary assoc: " + assoc);
+            }
+            primaryAssoc = assoc;
+            // we keep looping to hunt out data integrity issues
+        }
+        // did we find a primary assoc?
+        if (primaryAssoc == null)
+        {
+            // the only condition where this is allowed is if the given node is a root node
+            Store store = node.getStore();
+            Node rootNode = store.getRootNode();
+            if (!rootNode.equals(node))
+            {
+                // it wasn't the root node
+                throw new DataIntegrityViolationException("Non-root node has no primary parent: \n" +
+                        "   child: " + node);
+            }
+        }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Retrieved node primary parent assoc: \n" +
+                    "   child: " + node + "\n" +
+                    "   primary parent asoc: " + primaryAssoc);
+        }
+        return primaryAssoc;
     }
 
     public NodeAssoc newNodeAssoc(RealNode sourceNode, Node targetNode, String assocName)

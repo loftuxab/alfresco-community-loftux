@@ -2,6 +2,7 @@ package com.activiti.repo.node.db;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,8 @@ import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.Path;
+import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.store.db.StoreDaoService;
 
@@ -341,48 +344,11 @@ public class DbNodeServiceImpl implements NodeService
     public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
-        // get the assocs pointing to it
-        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
-        Node parentNode = null;
-        for (ChildAssoc assoc : parentAssocs)
-        {
-            // ignore non-primary assocs
-            if (!assoc.getIsPrimary())
-            {
-                continue;
-            }
-            else if (parentNode != null)
-            {
-                // we have more than one somehow
-                throw new DataIntegrityViolationException("Multiple primary associations: \n" +
-                        "   child: " + nodeRef + "\n" +
-                        "   first primary parent: " + parentNode + "\n" +
-                        "   second primary parent: " + assoc.getParent());
-            }
-            parentNode = assoc.getParent();
-            // we keep looping to hunt out data integrity issues
-        }
-        // did we find a primary parent?
-        if (parentNode == null)
-        {
-            // the only condition where this is allowed is if it is a root node
-            Store store = node.getStore();
-            Node rootNode = store.getRootNode();
-            if (!rootNode.equals(node))
-            {
-                // it wasn't the root node
-                throw new DataIntegrityViolationException("Non-root node has no primary parent: \n" +
-                        "   child: " + nodeRef);
-            }
-        }
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Retrieved node primary parent: \n" +
-                    "   child: " + nodeRef + "\n" +
-                    "   primary parent: " + parentNode);
-        }
-        return (parentNode == null ? null : parentNode.getNodeRef());
+        // get the primary parent assoc
+        ChildAssoc assoc = nodeDaoService.getPrimaryParentAssoc(node);
+
+        // done - the assoc may be null
+        return (assoc == null ? null : assoc.getParent().getNodeRef());
     }
 
     public void createAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
@@ -458,8 +424,59 @@ public class DbNodeServiceImpl implements NodeService
      * {@link NodeDaoService#evict(Node)} method is used to ensure that the cache size
      * doesn't grow too large.
      */
-    public String getPath(NodeRef nodeRef) throws InvalidNodeRefException
+    public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
     {
+        // get the starting node
+        Node node = getNodeNotNull(nodeRef);
+        // build the path
+        Path path = new Path();         // the path we will build
+        ChildAssoc assoc = null;        // the storage for each assoc as we move up the path
+        Set<Node> touchedNodes = new HashSet<Node>(5);  // ensure that we don't walk up cyclic associations
+        while(true)
+        {
+            if (!touchedNodes.add(node))
+            {
+                throw new RuntimeException("Cyclic child relationship detected: \n" +
+                        "   touched nodes: " + touchedNodes);
+            }
+            assoc = nodeDaoService.getPrimaryParentAssoc(node);
+            if (assoc == null)
+            {
+                break;      // stop once we hit the root node, i.e. a node without primary parents
+            }
+            // move up the relationship
+            node = assoc.getParent();
+            // prepend this association to the path as we are traversing upwards
+            QName qname = QName.createQName(null, assoc.getName());  // TODO: get namespace from assoc
+            Path.Element element = new Path.QNameElement(qname);
+            path.prepend(element);
+        }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Fetched primary node path: \n" +
+                    "   node: " + nodeRef + "\n" +
+                    "   path: " + path);
+        }
+        return path;
+    }
+
+    /**
+     * @param currentNode the node to start from, i.e. the child node to work upwards from
+     * @param currentPath the path from the current node to the descendent that we started from
+     * @param primaryOnly true if only the primary parent association must be traversed
+     * @return Returns a collection of new <code>Path</code> instances for the extended paths.  The <code>currentPath</code>
+     *      instance may be included in the list
+     */
+    private Collection<Path> prependPaths(Node currentNode, Path currentPath, boolean primaryOnly)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public Collection<Path> getPaths(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        // get the starting node
+        Node node = getNodeNotNull(nodeRef);
         throw new UnsupportedOperationException();
     }
 }

@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.store.StoreService;
 import com.activiti.util.BaseSpringTest;
@@ -293,6 +294,19 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testGetPath() throws Exception
     {
+        // create primary node path
+        NodeRef level1Ref = nodeService.createNode(rootNodeRef, "PL1", Node.TYPE_CONTAINER);
+        NodeRef level2Ref = nodeService.createNode(level1Ref, "PL2", Node.TYPE_CONTAINER);
+        NodeRef level3Ref = nodeService.createNode(level2Ref, "PL3", Node.TYPE_CONTAINER);
+        // create secondary node path
+        nodeService.addChild(rootNodeRef, level1Ref, "SL1");
+        nodeService.addChild(level1Ref, level2Ref, "SL2");
+        nodeService.addChild(level2Ref, level3Ref, "SL3");
         
+        // get the primary path for level 3
+        Path path = nodeService.getPath(level3Ref);
+        assertEquals("Primary path incorrect",
+                "/{}PL1/{}PL2/{}PL3",
+                path.toString());
     }
 }

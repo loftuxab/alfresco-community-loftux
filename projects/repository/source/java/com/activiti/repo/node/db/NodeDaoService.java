@@ -84,6 +84,15 @@ public interface NodeDaoService
     public void deleteChildAssoc(ChildAssoc assoc);
     
     /**
+     * Finds the association between the node's primary parent and the node itself
+     * 
+     * @param node the child node
+     * @return Returns the primary <code>ChildAssoc</code> instance where the given node is the child.
+     *      The return value could be null for a root node - but ONLY a root node
+     */
+    public ChildAssoc getPrimaryParentAssoc(Node node);
+    
+    /**
      * @return Returns the persisted and filled association
      * @see NodeAssoc
      */

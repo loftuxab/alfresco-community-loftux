@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.Path;
 
 /**
  * Interface for public and internal <b>node</b> operations
@@ -178,5 +179,12 @@ public interface NodeService
      * @return Returns the path to the node along the primary node path
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public String getPath(NodeRef nodeRef) throws InvalidNodeRefException;
+    public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException;
+    
+    /**
+     * @param nodeRef
+     * @return Returns a collection of all possible paths to the given node
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    public Collection<Path> getPaths(NodeRef nodeRef) throws InvalidNodeRefException;
 }
