@@ -3,12 +3,46 @@
 
 <beans>
    
-   <!-- construct the datasource to work with -->
-   <!-- TODO -->
+   <!-- load common properties -->
+   <bean id="properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="database">
+         <value>db.properties</value>
+      </property>
+   </bean>
+   
+   <!-- Datasource bean -->
+   <bean id='dataSource' class='org.apache.commons.dbcp.BasicDataSource'
+         destroy-method='close'>
+      <property name='driverClassName'>
+         <value>${db.driver}</value>
+      <property>
+      <property name='url'>
+         <value>${db.url}</value>
+      <property>
+      <property name='username'>
+         <value>${db.username}</value>
+      <property>
+      <property name='password'>
+         <value>${db.password}</value>
+      <property>
+   </bean>
    
    <bean id='sessionFactory' class='org.springframework.orm.hibernate.LocalSessionFactoryBean'>
-      <property name='configLocation' >
-         <value>classpath:hibernate.cfg.xml</value>
+      <property name='dataSource' >
+         <ref local='dataSource'>
+      </property>
+      <property name='mappingResources' >
+         <value>com/activiti/repo/domain/hibernate/Node.hbm.xml</value>
+      </property>
+      <property name='hibernateProperties' >
+         <props>
+            <prop key='hibernate.dialect' >org.hibernate.dialect.MySQLDialect</prop>
+            <prop key='hibernate.show_sql'>true</prop>
+            <prop key='hibernate.hbm2ddl.auto'>update</prop>
+            <prop key='hibernate.cache.use_query_cache'>true</prop>
+            <prop key='hibernate.max_fetch_depth'>1</prop>
+            <prop key='hibernate.cache.provider_class'>org.hibernate.cache.EhCacheProvider</prop>
+         </props>
       </property>
    </bean>
    
@@ -19,11 +53,6 @@
       </property>
    </bean>
    
-   <bean id='nodeServiceTarget' class='com.as.core.HibernateNodeService'>
-      <property name='sessionFactory'>
-         <ref local='sessionFactory'/>
-      </property>
-   </bean>
    
    <bean id='nodeService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
@@ -33,7 +62,11 @@
          <ref bean='transactionManager'/>
       </property>
       <property name='target'>
-         <ref bean='nodeServiceTarget'/>
+         <bean class='com.as.core.HibernateNodeService'>
+            <property name='sessionFactory'>
+               <ref local='sessionFactory'/>
+            </property>
+         </bean>
       </property>
       <property name='transactionAttributes'>
          <props>
