@@ -158,14 +158,23 @@ public class NodeServiceTest extends BaseSpringTest
         properties.put("PROPERTY1", "VALUE1");
         // add some properties to the root node
         nodeService.setProperties(rootNodeRef, properties);
+        // set a single property
+        nodeService.setProperty(rootNodeRef, "PROPERTY2", "VALUE2");
         
         // force a flush
         getSession().flush();
         getSession().clear();
         
         // now get them back
-        Map check = nodeService.getProperties(rootNodeRef);
-        assertEquals("Properties were not set/retrieved", properties, check);
+        Map checkMap = nodeService.getProperties(rootNodeRef);
+        assertNotNull("Properties were not set/retrieved", checkMap);
+        assertNotNull("Property value not set", checkMap.get("PROPERTY1"));
+        assertNotNull("Property value not set", checkMap.get("PROPERTY2"));
+        
+        // get a single property direct from the node
+        String valueCheck = nodeService.getProperty(rootNodeRef, "PROPERTY2");
+        assertNotNull("Property value not set", valueCheck);
+        assertEquals("Property value incorrect", "VALUE2", valueCheck);
     }
     
     public void testGetParents() throws Exception

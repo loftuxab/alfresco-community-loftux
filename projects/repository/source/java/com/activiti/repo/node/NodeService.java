@@ -87,12 +87,28 @@ public interface NodeService
     public Map<String, String> getProperties(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
+     * @param nodeRef
+     * @param propertyName the fully qualified name of the property
+     * @return Returns the value of the property, or null if not yet set
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    public String getProperty(NodeRef nodeRef, String propertyName) throws InvalidNodeRefException;
+    
+    /**
      * 
      * @param nodeRef
      * @param properties all the properties of the node
      * @throws InvalidNodeRefException if the node could not be found
      */
     public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException;
+    
+    /**
+     * @param nodeRef
+     * @param propertyName the fully qualified name of the property
+     * @param propertyValue the value of the property
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    public void setProperty(NodeRef nodeRef, String propertyName, String propertyValue) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef the child node

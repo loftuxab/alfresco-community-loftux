@@ -251,6 +251,13 @@ public class DbNodeServiceImpl implements NodeService
         return node.getProperties();
     }
     
+    public String getProperty(NodeRef nodeRef, String propertyName) throws InvalidNodeRefException
+    {
+        Node node = getNodeNotNull(nodeRef);
+        Map<String, String> properties = node.getProperties();
+        return properties.get(propertyName);
+    }
+
     public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException
     {
         if (properties == null)
@@ -261,6 +268,28 @@ public class DbNodeServiceImpl implements NodeService
         Node node = getNodeNotNull(nodeRef);
         node.getProperties().clear();
         node.getProperties().putAll(properties);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Set node properties: \n" +
+                    "   node: " + nodeRef + "\n" +
+                    "   count: " + properties.size());
+        }
+    }
+
+    public void setProperty(NodeRef nodeRef, String propertyName, String propertyValue) throws InvalidNodeRefException
+    {
+        Node node = getNodeNotNull(nodeRef);
+        Map<String, String> properties = node.getProperties();
+        properties.put(propertyName, propertyValue);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Set node property: \n" +
+                    "   node: " + nodeRef + "\n" +
+                    "   name: " + propertyName + "\n" +
+                    "   value: " + propertyValue);
+        }
     }
 
     public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
