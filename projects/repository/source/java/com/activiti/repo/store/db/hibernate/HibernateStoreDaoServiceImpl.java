@@ -10,7 +10,7 @@ import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.hibernate.StoreImpl;
-import com.activiti.repo.node.TypedNodeService;
+import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.repo.store.db.StoreDaoService;
 
 /**
@@ -24,11 +24,11 @@ public class HibernateStoreDaoServiceImpl
 {
     private static final Log logger = LogFactory.getLog(HibernateStoreDaoServiceImpl.class);
     
-    private TypedNodeService typedNodeService;
+    private NodeDaoService nodeDaoService;
     
-    public void setTypedNodeService(TypedNodeService typedNodeService)
+    public void setNodeDaoService(NodeDaoService nodeDaoService)
     {
-        this.typedNodeService = typedNodeService;
+        this.nodeDaoService = nodeDaoService;
     }
 
     /**
@@ -53,7 +53,7 @@ public class HibernateStoreDaoServiceImpl
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(workspace);
         // create and assign a root node
-        RealNode rootNode = typedNodeService.newRealNode(workspace, Node.TYPE_CONTAINER);
+        RealNode rootNode = nodeDaoService.newRealNode(workspace, Node.TYPE_CONTAINER);
         workspace.setRootNode(rootNode);
         // done
         if (logger.isDebugEnabled())

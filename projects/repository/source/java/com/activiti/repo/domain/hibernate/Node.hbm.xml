@@ -115,16 +115,16 @@
             not-null="true" />
    </class>
 
-   <query name="node.FindNodeInWorkspace" >
+   <query name="node.FindNodeInStore" >
       select
          node
       from
          com.activiti.repo.domain.hibernate.NodeImpl node
-         join node.workspace workspace
+         join node.store store
       where
          node.guid = :nodeGuid and
-         workspace.protocol = :workspaceProtocol and
-         workspace.identifier = :workspaceIdentifier
+         store.protocol = :storeProtocol and
+         store.identifier = :storeIdentifier
    </query>
 
 </hibernate-mapping>

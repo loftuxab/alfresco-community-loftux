@@ -1,4 +1,4 @@
-package com.activiti.repo.node;
+package com.activiti.repo.node.db;
 
 import java.util.Map;
 
@@ -11,23 +11,24 @@ import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
+import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.workspace.DbStoreService;
+import com.activiti.repo.store.db.StoreDaoService;
 
 /**
- * Persistent-independent <b>node</b> functionality
+ * Node service using database persistence layer to fulfill functionality
  * 
  * @author derekh
  */
-public class NodeServiceImpl implements NodeService
+public class DbNodeServiceImpl implements NodeService
 {
-    private static final Log logger = LogFactory.getLog(NodeServiceImpl.class);
+    private static final Log logger = LogFactory.getLog(DbNodeServiceImpl.class);
     
-    private TypedNodeService typedNodeService;
+    private NodeDaoService typedNodeService;
     private StoreDaoService typedWorkspaceService;
     
-    public void setTypedNodeService(TypedNodeService typedNodeService)
+    public void setTypedNodeService(NodeDaoService typedNodeService)
     {
         this.typedNodeService = typedNodeService;
     }

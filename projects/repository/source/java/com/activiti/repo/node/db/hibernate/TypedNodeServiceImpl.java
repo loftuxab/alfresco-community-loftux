@@ -1,4 +1,4 @@
-package com.activiti.repo.node.hibernate;
+package com.activiti.repo.node.db.hibernate;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import com.activiti.repo.domain.hibernate.ContainerNodeImpl;
 import com.activiti.repo.domain.hibernate.ContentNodeImpl;
 import com.activiti.repo.domain.hibernate.RealNodeImpl;
 import com.activiti.repo.domain.hibernate.ReferenceNodeImpl;
-import com.activiti.repo.node.TypedNodeService;
+import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.util.GUID;
 
 /**
@@ -25,7 +25,7 @@ import com.activiti.util.GUID;
  * 
  * @author derekh
  */
-public class TypedNodeServiceImpl extends HibernateDaoSupport implements TypedNodeService
+public class TypedNodeServiceImpl extends HibernateDaoSupport implements NodeDaoService
 {
     private static final Log logger = LogFactory.getLog(TypedNodeServiceImpl.class);
 
@@ -96,11 +96,11 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements TypedNo
         return assoc;
     }
 
-    public Node findNodeInWorkspace(Store workspace, String id)
+    public Node findNodeInStore(Store store, String id)
     {
-        List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Node.QUERY_FIND_NODE_IN_WORKSPACE,
+        List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Node.QUERY_FIND_NODE_IN_STORE,
                 new String[] {"nodeGuid", "workspaceProtocol", "workspaceIdentifier"},
-                new Object[] {id, workspace.getProtocol(), workspace.getIdentifier()});
+                new Object[] {id, store.getProtocol(), store.getIdentifier()});
         Node node = null;
         if (results.size() == 0)
         {
@@ -109,7 +109,7 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements TypedNo
         else if (results.size() > 1)
         {
             throw new RuntimeException("Multiple node ID matches in workspace: \n" +
-                    "   workspace: " + workspace + "\n" +
+                    "   workspace: " + store + "\n" +
                     "   node id: " + id + "\n" +
                     "   results: " + results);
         }
@@ -121,7 +121,7 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements TypedNo
         if (logger.isDebugEnabled())
         {
             logger.debug("Finding node in workspace: \n" +
-                    "   workspace: " + workspace + "\n" +
+                    "   workspace: " + store + "\n" +
                     "   node id: " + id + "\n" +
                     "   result: " + node);
         }

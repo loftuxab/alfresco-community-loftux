@@ -12,7 +12,7 @@ import com.activiti.repo.ref.NodeRef;
  */
 public interface Node
 {
-    public static final String QUERY_FIND_NODE_IN_WORKSPACE = "node.FindNodeInWorkspace";
+    public static final String QUERY_FIND_NODE_IN_STORE = "node.FindNodeInStore";
     
     // TODO: Remove this in favour of the Data Dictionary
     public static final String TYPE_REFERENCE = "reference";
