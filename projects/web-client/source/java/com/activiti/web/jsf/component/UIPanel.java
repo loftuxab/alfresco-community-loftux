@@ -207,7 +207,7 @@ public class UIPanel extends SelfRenderingComponent
    }
    
    /**
-    * @param bgcolor The bgcolor to set.
+    * @param bgcolor    The bgcolor to set.
     */
    public void setBgcolor(String bgcolor)
    {
@@ -215,7 +215,7 @@ public class UIPanel extends SelfRenderingComponent
    }
 
    /**
-    * @return Returns the border.
+    * @return Returns the border name.
     */
    public String getBorder()
    {
@@ -231,7 +231,7 @@ public class UIPanel extends SelfRenderingComponent
    }
 
    /**
-    * @param border The border to set.
+    * @param border  The border name to user.
     */
    public void setBorder(String border)
    {
@@ -263,7 +263,7 @@ public class UIPanel extends SelfRenderingComponent
    }
 
    /**
-    * @return Returns the progressive.
+    * @return Returns the progressive display setting.
     */
    public boolean isProgressive()
    {
@@ -275,11 +275,18 @@ public class UIPanel extends SelfRenderingComponent
             this.progressive = (Boolean)vb.getValue(getFacesContext());
          }
       }
-      return this.progressive.booleanValue();
+      if (this.progressive != null)
+      {
+         return this.progressive.booleanValue();
+      }
+      else
+      {
+         return Boolean.FALSE;
+      }
    }
    
    /**
-    * @param progressive The progressive to set.
+    * @param progressive   The progressive display boolean to set.
     */
    public void setProgressive(boolean progressive)
    {
@@ -317,7 +324,7 @@ public class UIPanel extends SelfRenderingComponent
    // component settings
    private String border = null;
    private String bgcolor = null;
-   private Boolean progressive = Boolean.TRUE;
+   private Boolean progressive = null;
    private String label = null;
    
    // component state
