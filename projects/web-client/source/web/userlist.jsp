@@ -30,6 +30,19 @@
       <p>
       --%>
       
+      <%-- Breadcrumb tests --%>
+      <b>Breadcrumbs:</b><br>
+      Default style with modified separator:<br>
+      <awc:breadcrumb id="path1" value="/horse/biscuit/flibble/1234" action="success" actionListener="#{TestList.clickBreadcrumb}" separator="~" />
+      <br>
+      Path style with default separator:<br>
+      <awc:breadcrumb id="path2" styleClass="path"  value="/this/is/a/small/breadcrumb" />
+      <br>
+      Root should be missing from this breadcrumb:<br>
+      <awc:breadcrumb id="path3" styleClass="path" value="/001/002/003/004/005" showRoot="false" />
+      
+      <p>
+      
       <%-- Progressive panel test --%>
       <awc:panel id="panel1" border="mainwhite" bgcolor="white" progressive="true" label="Progressive Panel Test!" styleClass="mainTitle">
          <p>

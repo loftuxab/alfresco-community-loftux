@@ -3,16 +3,65 @@
  */
 package com.activiti.web.jsf.tag;
 
+import javax.faces.FacesException;
+import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
+import javax.faces.el.MethodBinding;
 import javax.faces.el.ValueBinding;
 import javax.faces.webapp.UIComponentTag;
 
+import com.sun.faces.util.ConstantMethodBinding;
 
 /**
- * @author kevinr
+ * @author Kevin Roast
  */
 public abstract class BaseComponentTag extends UIComponentTag
 {
+   /**
+    * Helper to set an action property into a command component
+    * 
+    * @param command    Command component
+    * @param action     The action method binding or outcome to set
+    */
+   protected void setActionProperty(UICommand command, String action)
+   {
+      if (action != null)
+      {
+         if (isValueReference(action))
+         {
+            MethodBinding vb = getFacesContext().getApplication().createMethodBinding(action, null);
+            command.setAction(vb);
+         }
+         else
+         {
+            MethodBinding vb = new ConstantMethodBinding(action);
+            command.setAction(vb);
+         }
+      }
+   }
+   
+   /**
+    * Helper to set an action listener property into a command component
+    * 
+    * @param command          Command component
+    * @param actionListener   Action listener method binding
+    */
+   protected void setActionListenerProperty(UICommand command, String actionListener)
+   {
+      if (actionListener != null)
+      {
+         if (isValueReference(actionListener))
+         {
+            MethodBinding vb = getFacesContext().getApplication().createMethodBinding(actionListener, ACTION_CLASS_ARGS);
+            command.setActionListener(vb);
+         }
+         else
+         {
+            throw new FacesException("Action listener method binding incorrectly specified: " + actionListener);
+         }
+      }
+   }
+   
    /**
     * Helper method to set a String property value into the component.
     * Respects the possibility that the property value is a Value Binding.
@@ -147,4 +196,6 @@ public abstract class BaseComponentTag extends UIComponentTag
          component.getAttributes().put(name, Boolean.valueOf(value));
       }
    }
+   
+   private final static Class ACTION_CLASS_ARGS[] = {javax.faces.event.ActionEvent.class};
 }

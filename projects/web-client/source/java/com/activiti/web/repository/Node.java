@@ -67,7 +67,7 @@ public class Node implements Serializable
     */
 //   public String toString()
 //   {
-//      StringBuffer buffer = new StringBuffer();
+//      StringBuilder buffer = new StringBuilder();
 //      buffer.append(super.toString());
 //      buffer.append(" (type=").append(this.type);
 //      buffer.append(" properties=").append(this.properties).append(")");

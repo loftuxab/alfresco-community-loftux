@@ -49,7 +49,7 @@ public class UIDataPager extends UICommand
       
       ResponseWriter out = context.getResponseWriter();
       
-      StringBuffer buf = new StringBuffer(420);
+      StringBuilder buf = new StringBuilder(420);
       
       // output HTML links or labels to render the paging controls
       int nCurrentPage = dataContainer.getCurrentPage();
@@ -121,13 +121,6 @@ public class UIDataPager extends UICommand
       }
       
       out.write(buf.toString());
-   }
-   
-   /**
-    * @see javax.faces.component.UIComponentBase#encodeEnd(javax.faces.context.FacesContext)
-    */
-   public void encodeEnd(FacesContext context) throws IOException
-   {
    }
 
    /**

@@ -188,7 +188,7 @@ public class GenericConfigElement implements ConfigElement
     */
    public String toString()
    {
-      StringBuffer buffer = new StringBuffer(super.toString());
+      StringBuilder buffer = new StringBuilder(super.toString());
       buffer.append(" (name=").append(this.name).append(")");
       return buffer.toString();
    }

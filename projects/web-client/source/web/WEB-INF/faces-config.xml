@@ -51,6 +51,11 @@
       <component-type>awc.faces.Panel</component-type>
       <component-class>com.activiti.web.jsf.component.UIPanel</component-class>
    </component>
+   
+   <component>
+      <component-type>awc.faces.Breadcrumb</component-type>
+      <component-class>com.activiti.web.jsf.component.UIBreadcrumb</component-class>
+   </component>
 
 
    <!-- ==================== CONVERTERS ==================== -->
@@ -62,8 +67,9 @@
    
    <!-- ==================== RENDERERS ==================== -->
    <render-kit>
-      <!-- custom renderer for a standard UI Input component -->
+      <!-- custom Data Picker renderer for a UI Input component -->
       <renderer>
+         <!-- the component family is a convention name -->
          <component-family>javax.faces.Input</component-family>
          <!-- the renderer type is a convention name - not an actual class -->
          <renderer-type>awc.faces.DatePickerRenderer</renderer-type>
@@ -71,13 +77,17 @@
          <renderer-class>com.activiti.web.jsf.renderer.DatePickerRenderer</renderer-class>
       </renderer>
       
-      <!-- custom renderer for the rich list UI component -->
       <renderer>
          <component-family>awc.faces.Data</component-family>
          <renderer-type>awc.faces.RichListRenderer</renderer-type>
          <renderer-class>com.activiti.web.jsf.renderer.data.RichListRenderer</renderer-class>
       </renderer>
       
+      <renderer>
+         <component-family>awc.faces.Controls</component-family>
+         <renderer-type>awc.faces.BreadcrumbRenderer</renderer-type>
+         <renderer-class>com.activiti.web.jsf.renderer.BreadcrumbRenderer</renderer-class>
+      </renderer>
    </render-kit>
 
 

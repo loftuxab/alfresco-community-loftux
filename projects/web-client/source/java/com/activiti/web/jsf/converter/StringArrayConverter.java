@@ -47,7 +47,7 @@ public class StringArrayConverter implements Converter
       
       if (value instanceof String[])
       {
-         StringBuffer buffer = new StringBuffer();
+         StringBuilder buffer = new StringBuilder();
          String[] arr = (String[])value;
          for (int x = 0; x < arr.length; x++)
          {

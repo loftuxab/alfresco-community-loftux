@@ -491,5 +491,71 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
+   
+   <tag>
+      <name>breadcrumb</name>
+      <tagclass>com.activiti.web.jsf.tag.BreadcrumbTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>binding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>action</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>actionListener</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>style</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>styleClass</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>separator</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>showRoot</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
 
 </taglib>

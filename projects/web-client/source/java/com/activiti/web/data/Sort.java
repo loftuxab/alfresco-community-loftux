@@ -88,7 +88,7 @@ public abstract class Sort
       {
          // create the Bean getter method invoker to retrieve the value for a colunm
          String methodName = getGetterMethodName(this.column);
-         Method getter = this.data.get(0).getClass().getMethod(methodName, null);
+         Method getter = this.data.get(0).getClass().getMethod(methodName, (Class [])null);
          
          // create appropriate comparator instance based on data type
          // using the strategy pattern so  sub-classes of Sort simply invoke the
@@ -129,7 +129,7 @@ public abstract class Sort
          // create a collation key for each required column item in the dataset
          for (int iIndex=0; iIndex<iSize; iIndex++)
          {
-            Object obj = getter.invoke(data.get(iIndex), null);
+            Object obj = getter.invoke(data.get(iIndex), (Object [])null);
             
             if (obj instanceof String)
             {
@@ -138,7 +138,7 @@ public abstract class Sort
                {
                   // quote white space characters or they will be ignored by the Collator!
                   int iLength = str.length();
-                  StringBuffer s = new StringBuffer(iLength + 4);
+                  StringBuilder s = new StringBuilder(iLength + 4);
                   char c;
                   for (int i=0; i<iLength; i++)
                   {

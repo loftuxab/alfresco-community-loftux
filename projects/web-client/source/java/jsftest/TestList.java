@@ -7,6 +7,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.faces.event.ActionEvent;
+
+import org.apache.log4j.Logger;
+
+import com.activiti.web.jsf.component.UIBreadcrumb;
+
 /**
  * @author kevinr
  */
@@ -35,6 +41,17 @@ public class TestList
    {
       return this.rows;
    }
+   
+   public void clickBreadcrumb(ActionEvent event)
+   {
+      if (event.getComponent() instanceof UIBreadcrumb)
+      {
+         s_logger.debug("clickBreadcrumb action listener called, path now: " + ((UIBreadcrumb)event.getComponent()).getValue());
+      }
+   }
 
+
+   private final static Logger s_logger = Logger.getLogger(TestList.class);
+   
    private List rows = new ArrayList();;
 }

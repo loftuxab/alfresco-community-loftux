@@ -40,7 +40,7 @@ public final class Utils
       
       String formClientId = form.getClientId(context);
       
-      StringBuffer buf = new StringBuffer(200);
+      StringBuilder buf = new StringBuilder(200);
       buf.append("document.forms[");
       buf.append("'");
       buf.append(formClientId);
@@ -78,7 +78,7 @@ public final class Utils
     */
    public static String buildImageTag(FacesContext context, String image, int width, int height, String alt)
    {
-      StringBuffer buf = new StringBuffer(100);
+      StringBuilder buf = new StringBuilder(100);
       
       buf.append("<img src='")
          .append(context.getExternalContext().getRequestContextPath())
@@ -115,7 +115,7 @@ public final class Utils
     */
    public static String buildImageTag(FacesContext context, String image, String alt)
    {
-      StringBuffer buf = new StringBuffer(100);
+      StringBuilder buf = new StringBuilder(100);
       
       buf.append("<img src='")
          .append(context.getExternalContext().getRequestContextPath())

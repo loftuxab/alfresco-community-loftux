@@ -76,7 +76,7 @@ public class ConfigSectionImpl implements ConfigSection
     */
    public String toString()
    {
-      StringBuffer buffer = new StringBuffer(super.toString());
+      StringBuilder buffer = new StringBuilder(super.toString());
       buffer.append(" (evaluator=").append(this.evaluator);
       buffer.append(" condition=").append(this.condition).append(")");
       return buffer.toString();

@@ -29,7 +29,7 @@ public class UIPanel extends SelfRenderingComponent
     */
    public String getFamily()
    {
-      return "awc.faces.Basic";
+      return "awc.faces.Controls";
    }
 
    /**

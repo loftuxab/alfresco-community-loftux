@@ -49,7 +49,7 @@ public class UISortLink extends UICommand
       }
       
       // render sort link
-      StringBuffer buf = new StringBuffer(256);
+      StringBuilder buf = new StringBuilder(256);
       buf.append("<a href='#' onclick=\"");
       // generate some JavaScript to set a hidden form field and submit
       // a form which request attributes that we can decode
@@ -101,13 +101,6 @@ public class UISortLink extends UICommand
       buf.append("</a>&nbsp;");
       
       out.write(buf.toString());
-   }
-   
-   /**
-    * @see javax.faces.component.UIComponent#encodeEnd(javax.faces.context.FacesContext)
-    */
-   public void encodeEnd(FacesContext context) throws IOException
-   {
    }
    
    /**
