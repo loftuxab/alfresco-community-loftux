@@ -29,11 +29,11 @@ public class PathTokenFilter extends TokenFilter
    
    public final static String PATH_SEPARATOR = ";";
    
-   public final static String NAMESPACE_START_DELIMITER = ":";
+   public final static String NAMESPACE_START_DELIMITER = "{";
    
-   public final static String NAMESPACE_END_DELIMITER = ":";
+   public final static String NAMESPACE_END_DELIMITER = "}";
 
-   public final static String SEPARATOR_TOKEN_TEXT = " ";
+   public final static String SEPARATOR_TOKEN_TEXT = ";";
 
    public final static String NO_NS_TOKEN_TEXT = "<No Namespace>";
 

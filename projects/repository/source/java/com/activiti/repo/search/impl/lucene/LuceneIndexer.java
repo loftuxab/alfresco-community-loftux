@@ -5,6 +5,7 @@
 package com.activiti.repo.search.impl.lucene;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -519,19 +520,57 @@ public class LuceneIndexer extends LuceneBase implements Indexer
 
       if (nodeService.getType(nodeRef).equals(Node.TYPE_CONTAINER))
       {
-         StringBuffer buffer = new StringBuffer();
+         StringBuffer pathBuffer = new StringBuffer();
+         StringBuffer parentBuffer = new StringBuffer();
+         
+         ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>();
          Collection<Path> paths = nodeService.getPaths(nodeRef, false);
          for(Iterator<Path> it = paths.iterator(); it.hasNext(); /**/)
          {
             Path path = it.next();
-            buffer.append(path.toString());
+            pathBuffer.append(path.toString());
+            
+            for(Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
+            {
+               Path.Element element = elit.next();
+               if(!(element instanceof Path.ChildAssocElement))
+               {
+                  throw new IndexerException("Confused path: "+path);
+               }
+               Path.ChildAssocElement cae = (Path.ChildAssocElement)element;
+               parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getParentRef());
+               if(!elit.hasNext())
+               {
+                  parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getChildRef());
+               }
+            }
+            
+            for(NodeRef ref: parentsInDepthOrderStartingWithSelf)
+            {
+               if(parentBuffer.length() > 0)
+               {
+                  parentBuffer.append(" ");
+               }
+               parentBuffer.append(ref.getId());
+            }
+            
+            parentsInDepthOrderStartingWithSelf.clear();
+            
             if(it.hasNext())
             {
-               buffer.append(PathTokenFilter.PATH_SEPARATOR);
+               pathBuffer.append(PathTokenFilter.PATH_SEPARATOR);
+               if(parentBuffer.length() > 0)
+               {
+                  parentBuffer.append(" ");
+               }
+               parentBuffer.append(PathTokenFilter.PATH_SEPARATOR);
             }
+            
+            
          }
-         doc.add(new Field("PATH", buffer.toString(), true, true, true));
-         // TODO: Parent nodes for each element in order
+         doc.add(new Field("PATH", pathBuffer.toString(), true, true, true));
+         doc.add(new Field("ANCESTOR", parentBuffer.toString(), true, true, true));
+         
       }
 
       return doc;

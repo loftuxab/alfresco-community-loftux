@@ -198,6 +198,8 @@ public class LuceneTest extends TestCase
 
       StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "test-workspace"
             + System.currentTimeMillis());
+      
+      
 
    }
 
@@ -560,92 +562,92 @@ public class LuceneTest extends TestCase
          if (nodeRef.getId().equals("1"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "one"), n1)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("2"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "two"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "two"), n2)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("3"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "three"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "three"), n3)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("4"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "four"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "four"), n4)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("5"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "one"), n1)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n1, QName.createQName("", "five"), n5)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("6"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "six"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "one"), n1)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n1, QName.createQName("", "six"), n6)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("7"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "two"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "seven"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "two"), n2)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n2, QName.createQName("", "seven"), n7)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("8"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "eight-0"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "eight-0"), n8)));
             paths.add(path);
             path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "eight-1"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "one"), n1)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n1, QName.createQName("", "eight-1"), n8)));
             paths.add(path);
             path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "two"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "eight-2"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "two"), n2)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n2, QName.createQName("", "eight-2"), n8)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("9"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "nine"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "one"), n1)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n1, QName.createQName("", "five"), n5)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n5, QName.createQName("", "nine"), n9)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("10"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "ten"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "one"), n1)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n1, QName.createQName("", "five"), n5)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n5, QName.createQName("", "ten"), n10)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("11"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "eleven"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "one"), n1)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n1, QName.createQName("", "five"), n5)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n5, QName.createQName("", "eleven"), n11)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("12"))
          {
             Path path = new Path();
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
-            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "twelve"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(rootNode, QName.createQName("", "one"), n1)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n1, QName.createQName("", "five"), n5)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(n5, QName.createQName("", "twelve"), n12)));
             paths.add(path);
          }
 

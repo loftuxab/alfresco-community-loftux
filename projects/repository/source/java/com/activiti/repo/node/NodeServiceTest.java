@@ -380,7 +380,7 @@ public class NodeServiceTest extends BaseSpringTest
         for (Path path : paths)
         {
             // get the path elements
-            for (Path.Element element : path.getElements())
+            for (Path.Element element : path)
             {
                 assertTrue("Path element of incorrect type", element instanceof Path.ChildAssocElement);
                 Path.ChildAssocElement childAssocElement = (Path.ChildAssocElement) element;

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import com.activiti.repo.search.impl.lucene.analysis.PathAnalyser;
@@ -71,6 +72,10 @@ public class LuceneAnalyser extends Analyzer
       if(fieldName.equals("PATH"))
       {
          analyser = new PathAnalyser();
+      }
+      else if(fieldName.equals("ANCESTOR"))
+      {
+         analyser = new WhitespaceAnalyzer();
       }
       else
       {

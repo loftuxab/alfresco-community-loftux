@@ -1,6 +1,6 @@
 package com.activiti.repo.ref;
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -25,7 +25,7 @@ import java.util.LinkedList;
  * 
  * @author Derek Hulley
  */
-public class Path
+public class Path implements Iterable<Path.Element>
 {
     private LinkedList<Element> elements;
     
@@ -36,13 +36,14 @@ public class Path
     }
     
     /**
-     * This is required as we cannot use the <code>Iterable</code> iterface directly.
+     * Get a typed iterator over the path elements.
      * 
-     * @return Returns a collection of <code>Path.Element</code> instances that can be iterated over
+     * @return
      */
-    public Collection<Element> getElements()
+    
+    public Iterator<Path.Element> iterator()
     {
-        return elements;
+       return elements.iterator();
     }
     
     /**
@@ -165,7 +166,7 @@ public class Path
     {
         public String getElementString()
         {
-            return "";
+            return "/descendant-or-self::node()" ;
         }
     }
     

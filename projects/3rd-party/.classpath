@@ -25,6 +25,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/lucene-1.4.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/saxpath.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-aop.jar"/>
