@@ -26,10 +26,6 @@ public class DataDictionary
       Property modified = new Property("modified", "datetime", "Modified Date", false);
       Property keywords = new Property("keywords", "string[]", "Keywords", false);
       
-      Property sopid = new Property("sopId", "string", "SOP ID", true);
-      Property effective = new Property("effective", "datetime", "Effective Date", false);
-      Property approved = new Property("approved", "boolean", "Approved", false);
-      
       MetaData base = new MetaData("base");
       base.addProperty(name);
       base.addProperty(desc);
@@ -37,11 +33,19 @@ public class DataDictionary
       base.addProperty(modified);
       base.addProperty(keywords);
       
+      Property sopid = new Property("sopId", "string", "SOP ID", true);
+      Property effective = new Property("effective", "datetime", "Effective Date", false);
+      Property approved = new Property("approved", "boolean", "Approved", false);
+      Property latestVersion = new Property("latestversion", "string", "Latest Version", true);
+      
       MetaData sop = new MetaData("SOP");
       sop.setProperties(base.getProperties());
       sop.addProperty(sopid);
       sop.addProperty(effective);
       sop.addProperty(approved);
+      // add an aspect and the associated property
+      sop.addAspect("versionable");
+      sop.addProperty(latestVersion);
       
       this.types.put(base.getTypeName(), base);
       this.types.put(sop.getTypeName(), sop);
@@ -74,11 +78,13 @@ public class DataDictionary
       private Map propertiesMap;
 	   private List properties;
 	   private String typeName;
+      private List aspects;
 	   
 	   public MetaData(String typeName)
 	   {
 	      this.properties = new ArrayList();
          this.propertiesMap = new HashMap();
+         this.aspects = new ArrayList();
 	      this.typeName = typeName;
 	   }
 	   
@@ -121,6 +127,16 @@ public class DataDictionary
       public Map getPropertiesMap()
       {
          return this.propertiesMap;
+      }
+      
+      public List getAspects()
+      {
+         return this.aspects;
+      }
+      
+      public void addAspect(String aspect)
+      {
+         this.aspects.add(aspect);
       }
       
       /**

@@ -3,6 +3,7 @@
    <global>
       <evaluators>
          <evaluator id="type-name" class="com.activiti.web.config.evaluator.TypeNameEvaluator" />
+         <evaluator id="aspect" class="com.activiti.web.config.evaluator.AspectEvaluator" />         
       </evaluators>
       <element-readers>
          <!-- NOTE: This will be a built-in element reader, it's here for testing -->
@@ -28,11 +29,16 @@
    
    <config evaluator-ref="type-name" condition="SOP">
       <properties>
-         <!-- NOTE: the first few props are repeated for now until we get aspect support implemented -->
          <property name="description" />
          <property name="modified" />
          <property name="effective" />
          <property name="approved" />
+      </properties>
+   </config>
+   
+   <config evaluator-ref="aspect" condition="versionable">
+      <properties>
+         <property name="latestversion" />
       </properties>
    </config>
    

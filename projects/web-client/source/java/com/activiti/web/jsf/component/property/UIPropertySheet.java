@@ -119,15 +119,11 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       
       // put the node in the session if it is not there already
       Map sessionMap = getFacesContext().getExternalContext().getSessionMap();
-      Object obj = sessionMap.get(this.variable);
-      if (obj == null)
-      {
-         sessionMap.put(this.variable, this.node);
-         
-         if (logger.isDebugEnabled())
-            logger.debug("Put node into session with key '" + this.variable + "': " + this.node);
-      }
-      
+      sessionMap.put(this.variable, this.node);
+
+      if (logger.isDebugEnabled())
+         logger.debug("Put node into session with key '" + this.variable + "': " + this.node);
+
       super.encodeBegin(context);
    }
    

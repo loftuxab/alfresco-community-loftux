@@ -79,6 +79,7 @@ public class NodeService
          props.put("sopId", sop);
          props.put("effective", date);
          props.put("approved", new Boolean(true));
+         props.put("latestversion", "1.6");
       }
       
       return props; 
