@@ -102,6 +102,13 @@ public interface NodeService
     public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
+     * @param nodeRef the parent node - must be a <b>container</b>
+     * @return Returns a collection of <code>NodeRef</code> instances
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    public Collection<NodeRef> getChildren(NodeRef nodeRef) throws InvalidNodeRefException;
+    
+    /**
      * @param nodeRef
      * @return Returns Fetches the primary parent of the node unless it is a root node,
      *      in which case null is returned.

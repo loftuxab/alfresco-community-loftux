@@ -189,6 +189,19 @@ public class NodeServiceTest extends BaseSpringTest
         assertNull("Expected null primary parent for root node", nullParent);
     }
     
+    public void testGetChildren() throws Exception
+    {
+        NodeRef parentRef = nodeService.createNode(rootNodeRef, "P1", Node.TYPE_CONTAINER);
+        NodeRef child1Ref = nodeService.createNode(parentRef, "PrimaryChild", Node.TYPE_CONTENT);
+        NodeRef child2Ref = nodeService.createNode(rootNodeRef, "OtherChild", Node.TYPE_CONTENT);
+        nodeService.addChild(parentRef, child2Ref, "SecondaryChild");
+        // get the parent node's children
+        Collection<NodeRef> children = nodeService.getChildren(parentRef);
+        assertEquals("Incorrect number of children", 2, children.size());
+        assertTrue("Expected child not found", children.contains(child1Ref));
+        assertTrue("Expected child not found", children.contains(child2Ref));
+    }
+    
     /**
      * Creates a named association between two nodes
      * 

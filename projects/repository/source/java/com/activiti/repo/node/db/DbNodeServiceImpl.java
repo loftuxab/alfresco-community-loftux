@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
+import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
@@ -81,7 +82,7 @@ public class DbNodeServiceImpl implements NodeService
     }
 
     /**
-     * Performs a null- and type-safe check before returning the container node
+     * Performs a null- and type-safe check before returning the <b>container</b> node
      * @param nodeRef a reference to a container node
      * @return Returns an instance of a container node (never null)
      * @throws InvalidNodeRefException if the node referenced doesn't exist
@@ -95,6 +96,23 @@ public class DbNodeServiceImpl implements NodeService
             throw new RuntimeException("Node must be of type " + Node.TYPE_CONTAINER + ": " + nodeRef);
         }
         return (ContainerNode) unchecked;
+    }
+    
+    /**
+     * Performs a null- and type-safe check before returning the <b>real</b> node
+     * @param nodeRef a reference to a real node
+     * @return Returns an instance of a real node (never null)
+     * @throws InvalidNodeRefException if the node referenced doesn't exist
+     * @throws RuntimeException if the reference is to a node type that is incompatible with the return type
+     */
+    private RealNode getRealNodeNotNull(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        Node unchecked = getNodeNotNull(nodeRef);
+        if (!(unchecked instanceof RealNode))
+        {
+            throw new RuntimeException("Node must be of type " + Node.TYPE_REAL + ": " + nodeRef);
+        }
+        return (RealNode) unchecked;
     }
     
     /**
@@ -259,6 +277,29 @@ public class DbNodeServiceImpl implements NodeService
         return results;
     }
 
+    public Collection<NodeRef> getChildren(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        ContainerNode node = getContainerNodeNotNull(nodeRef);
+        // get the assocs pointing from it
+        Set<ChildAssoc> childAssocs = node.getChildAssocs();
+        // list of results
+        List<NodeRef> results = new ArrayList<NodeRef>(childAssocs.size());
+        for (ChildAssoc assoc : childAssocs)
+        {
+            // get the child
+            Node childNode = assoc.getChild();
+            results.add(childNode.getNodeRef());
+        }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Fetched node children: \n" +
+                    "   node: " + nodeRef + "\n" +
+                    "   children: " + results);
+        }
+        return results;
+    }
+
     public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
@@ -309,6 +350,10 @@ public class DbNodeServiceImpl implements NodeService
     public void createAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
             throws InvalidNodeRefException, AssociationExistsException
     {
+        RealNode sourceNode = getRealNodeNotNull(sourceRef);
+        // get the current associations from the source
+        Set<NodeAssoc> targetAssocs = sourceNode.getTargetNodeAssocs();
+        Node targetNode = getNodeNotNull(targetRef);
         throw new UnsupportedOperationException();
     }
 
