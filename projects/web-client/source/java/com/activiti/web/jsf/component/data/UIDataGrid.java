@@ -54,4 +54,65 @@ public class UIDataGrid extends SelfRenderingComponent implements IDataContainer
          out.write("</table>");
       }
    }
+
+   /**
+    * @see com.activiti.web.data.IDataContainer#getCurrentPage()
+    */
+   public int getCurrentPage()
+   {
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
+   /**
+    * @see com.activiti.web.data.IDataContainer#getCurrentSortColumn()
+    */
+   public String getCurrentSortColumn()
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   /**
+    * @see com.activiti.web.data.IDataContainer#getCurrentSortDirection()
+    */
+   public boolean getCurrentSortDirection()
+   {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
+   /**
+    * @see com.activiti.web.data.IDataContainer#getPageSize()
+    */
+   public int getPageSize()
+   {
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
+   /**
+    * @see com.activiti.web.data.IDataContainer#isDataAvailable()
+    */
+   public boolean isDataAvailable()
+   {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
+   /**
+    * @see com.activiti.web.data.IDataContainer#nextRow()
+    */
+   public Object nextRow()
+   {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   /**
+    * @see com.activiti.web.data.IDataContainer#sort(java.lang.String, boolean, java.lang.String)
+    */
+   public void sort(String column, boolean bAscending, String mode)
+   {
+   }
 }
