@@ -6,7 +6,7 @@ import com.activiti.util.BaseSpringTest;
 /**
  * Tests the default implementation of the <code>WorkspaceService</code>
  * 
- * @see com.activiti.repo.workspace.StoreService
+ * @see com.activiti.repo.store.StoreService
  *
  * @author derekh
  */

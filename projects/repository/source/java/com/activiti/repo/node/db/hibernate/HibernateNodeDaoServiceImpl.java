@@ -108,8 +108,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         }
         else if (results.size() > 1)
         {
-            throw new RuntimeException("Multiple node ID matches in workspace: \n" +
-                    "   workspace: " + store + "\n" +
+            throw new RuntimeException("Multiple node ID matches in store: \n" +
+                    "   store: " + store + "\n" +
                     "   node id: " + id + "\n" +
                     "   results: " + results);
         }
@@ -120,8 +120,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // done
         if (logger.isDebugEnabled())
         {
-            logger.debug("Finding node in workspace: \n" +
-                    "   workspace: " + store + "\n" +
+            logger.debug("Finding node in store: \n" +
+                    "   store: " + store + "\n" +
                     "   node id: " + id + "\n" +
                     "   result: " + node);
         }

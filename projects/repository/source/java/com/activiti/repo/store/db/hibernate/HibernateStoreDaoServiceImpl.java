@@ -14,7 +14,7 @@ import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.repo.store.db.StoreDaoService;
 
 /**
- * Hibernate-specific implementation of the entity-aware workspace service.
+ * Hibernate-specific implementation of the entity-aware store service.
  * 
  * @author derekh
  */
@@ -32,35 +32,35 @@ public class HibernateStoreDaoServiceImpl
     }
 
     /**
-     * Ensures that the workspace protocol/identifier combination is unique
+     * Ensures that the store protocol/identifier combination is unique
      */
     public Store createStore(String protocol, String identifier)
     {
         // ensure that the name isn't in use
-        Store workspace = findStore(protocol, identifier);
-        if (workspace != null)
+        Store store = findStore(protocol, identifier);
+        if (store != null)
         {
-            throw new RuntimeException("A workspace already exists: \n" +
+            throw new RuntimeException("A store already exists: \n" +
                     "   protocol: " + protocol + "\n" +
                     "   identifier: " + identifier + "\n" +
-                    "   workspace: " + workspace);
+                    "   store: " + store);
         }
         
-        workspace = new StoreImpl();
+        store = new StoreImpl();
         // set attributes
-        workspace.setProtocol(protocol);
-        workspace.setIdentifier(identifier);
+        store.setProtocol(protocol);
+        store.setIdentifier(identifier);
         // persist so that it is present in the hibernate cache
-        getHibernateTemplate().save(workspace);
+        getHibernateTemplate().save(store);
         // create and assign a root node
-        RealNode rootNode = nodeDaoService.newRealNode(workspace, Node.TYPE_CONTAINER);
-        workspace.setRootNode(rootNode);
+        RealNode rootNode = nodeDaoService.newRealNode(store, Node.TYPE_CONTAINER);
+        store.setRootNode(rootNode);
         // done
         if (logger.isDebugEnabled())
         {
-            logger.debug("Created workspace: " + workspace);
+            logger.debug("Created store: " + store);
         }
-        return workspace;
+        return store;
     }
 
     public Store findStore(String protocol, String identifier)
@@ -68,10 +68,10 @@ public class HibernateStoreDaoServiceImpl
         List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Store.QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER,
                 new String[] {"protocol", "identifier"},
                 new Object[] {protocol, identifier});
-        Store workspace = null;
+        Store store = null;
         if (results.size() > 0)
         {
-            workspace = (Store) results.get(0); 
+            store = (Store) results.get(0); 
         }
         // done
         if (logger.isDebugEnabled())
@@ -79,8 +79,8 @@ public class HibernateStoreDaoServiceImpl
             logger.debug("getWorkspace results: \n" +
                     "   protocol: " + protocol + "\n" +
                     "   identifier: " + identifier + "\n" +
-                    "   result: " + workspace);
+                    "   result: " + store);
         }
-        return workspace;
+        return store;
     }
 }

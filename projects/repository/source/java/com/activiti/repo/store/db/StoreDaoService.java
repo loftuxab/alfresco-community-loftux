@@ -19,7 +19,7 @@ public interface StoreDaoService
     public Store createStore(String protocol, String identifier);
     
     /**
-     * @param protocol the protocol that the workspace serves
+     * @param protocol the protocol that the store serves
      * @param identifier the protocol-specific identifer
      * @return Returns a store with the given values or null if one doesn't exist
      */

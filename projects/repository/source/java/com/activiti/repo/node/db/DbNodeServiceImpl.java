@@ -52,7 +52,7 @@ public class DbNodeServiceImpl implements NodeService
                     "   name: " + name + "\n" +
                     "   nodeType: " + nodeType);
         }
-        // extract the name of the workspace that the parent belongs to
+        // get the store that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
         Store store = storeDaoService.findStore(storeRef.getProtocol(), storeRef.getIdentifier());
         if (store == null)

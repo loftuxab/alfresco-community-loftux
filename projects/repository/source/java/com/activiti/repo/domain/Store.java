@@ -3,7 +3,7 @@ package com.activiti.repo.domain;
 import com.activiti.repo.ref.StoreRef;
 
 /**
- * Represents a workspace
+ * Represents a store entity
  * 
  * @author derekh
  */
@@ -22,17 +22,17 @@ public interface Store
     public void setId(Long id);
     
     /**
-     * @return Returns the protocol applicable to this workspace
+     * @return Returns the protocol applicable to this store
      */
     public String getProtocol();
     
     /**
-     * @param protocol the specific protocol that the workspace is supporting
+     * @param protocol the specific protocol that the store is supporting
      */
     public void setProtocol(String protocol);
     
     /**
-     * @return Returns the protocol unique identifier of the workspace
+     * @return Returns the protocol unique identifier of the store
      */
     public String getIdentifier();
     
@@ -42,18 +42,18 @@ public interface Store
     public void setIdentifier(String identifier);
     
     /**
-     * @return Returns the root of the workspace
+     * @return Returns the root of the store
      */
     public RealNode getRootNode();
     
     /**
-     * @param rootNode mandatory association to the root of the workspace
+     * @param rootNode mandatory association to the root of the store
      */
     public void setRootNode(RealNode rootNode);
     
     /**
      * Convenience method to access the reference
-     * @return Returns the reference to the workspace as a store
+     * @return Returns the reference to the store
      */
     public StoreRef getStoreRef();
 }
