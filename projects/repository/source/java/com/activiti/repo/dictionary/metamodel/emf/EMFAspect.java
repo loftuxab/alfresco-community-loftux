@@ -5,6 +5,5 @@ package com.activiti.repo.dictionary.metamodel.emf;
  */
 public interface EMFAspect extends EMFClass
 {
-
     
 }

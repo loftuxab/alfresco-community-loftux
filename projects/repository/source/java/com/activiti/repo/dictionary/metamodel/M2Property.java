@@ -4,7 +4,11 @@ import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.PropertyRef;
 
 
-
+/**
+ * Property Definition
+ * 
+ * @author David Caruana
+ */
 public interface M2Property
 {
     public PropertyRef getReference();
@@ -49,6 +53,11 @@ public interface M2Property
     
     // TODO: IndexTokenizer Class setter/getters??
     
+    /**
+     * Gets the Read-only Property Definition
+     * 
+     * @return  the read-only property definition
+     */
     public PropertyDefinition getPropertyDefinition();
     
 }

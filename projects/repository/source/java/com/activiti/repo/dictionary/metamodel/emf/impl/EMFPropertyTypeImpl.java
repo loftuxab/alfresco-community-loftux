@@ -177,6 +177,9 @@ public class EMFPropertyTypeImpl extends EObjectImpl implements EMFPropertyType,
         return result.toString();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2PropertyType#getPropertyTypeDefinition()
+     */
     public PropertyTypeDefinition getPropertyTypeDefinition()
     {
         // TODO: Implement...

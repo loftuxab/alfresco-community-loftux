@@ -7,7 +7,11 @@ import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.QName;
 
 
-
+/**
+ * Class Definition
+ * 
+ * @author David Caruana
+ */
 public interface M2Class
 {
     public ClassRef getReference();
@@ -33,7 +37,12 @@ public interface M2Class
     public M2ChildAssociation createChildAssociation(String associationName);
     
     public List getInheritedAssociations();
-    
+
+    /**
+     * Gets the read-only class definition
+     * 
+     * @return  read-only class definition
+     */
     public ClassDefinition getClassDefinition();
     
 }

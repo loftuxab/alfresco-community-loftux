@@ -2,6 +2,13 @@ package com.activiti.repo.dictionary.metamodel;
 
 import com.activiti.repo.dictionary.AspectDefinition;
 
+
+/**
+ * Default Read-Only Aspect Definition Implementation
+ * 
+ * @author David Caruana
+ */
+
 public class M2AspectDefinition extends M2ClassDefinition
     implements AspectDefinition
 {
@@ -11,5 +18,4 @@ public class M2AspectDefinition extends M2ClassDefinition
         super(m2Aspect);
     }
 
-    
 }

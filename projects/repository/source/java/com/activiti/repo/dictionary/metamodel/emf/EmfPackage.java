@@ -26,7 +26,8 @@ import org.eclipse.emf.ecore.EReference;
  * @see com.activiti.repo.dictionary.metamodel.emf.EmfFactory
  * @generated
  */
-public interface EmfPackage extends EPackage{
+public interface EmfPackage extends EPackage
+{
     /**
      * The package name.
      * <!-- begin-user-doc -->

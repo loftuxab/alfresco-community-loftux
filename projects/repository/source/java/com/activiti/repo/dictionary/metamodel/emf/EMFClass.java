@@ -8,13 +8,13 @@ import com.activiti.repo.ref.QName;
 /**
  * @model abstract="true"
  */
-public interface EMFClass extends EObject {
+public interface EMFClass extends EObject
+{
 
     /**
      * @model
      */
     public QName getEmfName();
-
 
     /**
      * Sets the value of the '{@link com.activiti.repo.dictionary.metamodel.emf.EMFClass#getEmfName <em>Emf Name</em>}' attribute.

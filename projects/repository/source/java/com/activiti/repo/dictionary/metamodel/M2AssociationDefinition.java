@@ -8,13 +8,27 @@ import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.QName;
 
 
+/**
+ * Default Read-Only Association Definition Implementation
+ * 
+ * @author David Caruana
+ */
 public class M2AssociationDefinition implements AssociationDefinition
 {
 
+    /**
+     * Association definition to wrap
+     */
     private M2Association m2Association;
 
     
-    public static M2AssociationDefinition create(M2Association m2Association)
+    /**
+     * Construct read-only Association Definition
+     * 
+     * @param m2Association  association definition
+     * @return  the read-only definition
+     */
+    public static AssociationDefinition create(M2Association m2Association)
     {
         if (m2Association instanceof M2ChildAssociation)
         {
@@ -43,48 +57,72 @@ public class M2AssociationDefinition implements AssociationDefinition
     }
     
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.AssociationDefinition#getName()
+     */
     public QName getName()
     {
         return getReference().getQName();
     }
 
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.AssociationDefinition#getReference()
+     */
     public AssociationRef getReference()
     {
         return m2Association.getReference();
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.AssociationDefinition#getContainerClass()
+     */
     public ClassRef getContainerClass()
     {
         return m2Association.getContainerClass().getReference();
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.AssociationDefinition#isChild()
+     */
     public boolean isChild()
     {
         return (m2Association instanceof M2ChildAssociation);
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.AssociationDefinition#isMultiValued()
+     */
     public boolean isMultiValued()
     {
         return m2Association.isMultiValued();
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.AssociationDefinition#isMandatory()
+     */
     public boolean isMandatory()
     {
         return m2Association.isMandatory();
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.AssociationDefinition#isProtected()
+     */
     public boolean isProtected()
     {
         return m2Association.isProtected();
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.AssociationDefinition#getRequiredToClasses()
+     */
     public List getRequiredToClasses()
     {
         return M2References.createClassRefList(m2Association.getRequiredToClasses());

@@ -46,6 +46,10 @@ import com.activiti.repo.dictionary.metamodel.emf.EmfPackage;
  *
  * @generated
  */
+/**
+ * @author David Caruana
+ *
+ */
 public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Property
 {
     /**
@@ -199,8 +203,14 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
      */
     protected String emfIndexTokeniserClassName = EMF_INDEX_TOKENISER_CLASS_NAME_EDEFAULT;
 
+    /**
+     * Property Reference
+     */
     protected PropertyRef propertyRef = null;
     
+    /**
+     * Read-only Property Definition
+     */
     protected PropertyDefinition propertyDefinition = null;
     
     /**
@@ -667,6 +677,9 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
         return result.toString();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#getReference()
+     */
     public PropertyRef getReference()
     {
         if (propertyRef == null)
@@ -676,92 +689,145 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
         return propertyRef;
     }
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#getName()
+     */
     public String getName()
     {
         return getEmfName();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#setName(java.lang.String)
+     */
     public void setName(String name)
     {
         setEmfName(name);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#getContainerClass()
+     */
     public M2Class getContainerClass()
     {
         return (M2Class)getEmfContainerClass();
     }
 
-
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#getType()
+     */
     public M2PropertyType getType()
     {
         return (M2PropertyType)getEmfType();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#setType(com.activiti.repo.dictionary.metamodel.M2PropertyType)
+     */
     public void setType(M2PropertyType type)
     {
         setEmfType((EMFPropertyType)type);
     }
-
+    
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#isProtected()
+     */
     public boolean isProtected()
     {
         return getEmfProtected();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#setProtected(boolean)
+     */
     public void setProtected(boolean isProtected)
     {
         setEmfProtected(isProtected);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#isMandatory()
+     */
     public boolean isMandatory()
     {
         return getEmfMandatory();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#setMandatory(boolean)
+     */
     public void setMandatory(boolean isMandatory)
     {
         setEmfMandatory(isMandatory);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#isMultiValued()
+     */
     public boolean isMultiValued()
     {
         return getEmfMultiple();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#setMultiValued(boolean)
+     */
     public void setMultiValued(boolean isMultiValued)
     {
         setEmfMultiple(isMultiValued);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#isIndexed()
+     */
     public boolean isIndexed()
     {
         return getEmfIndexed();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#setIndexed(boolean)
+     */
     public void setIndexed(boolean isIndexed)
     {
         setEmfIndexed(isIndexed);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#isStoredInIndex()
+     */
     public boolean isStoredInIndex()
     {
         return getEmfStoredInIndex();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#setStoredInIndex(boolean)
+     */
     public void setStoredInIndex(boolean isStoredInIndex)
     {
         setEmfStoredInIndex(isStoredInIndex);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#getIndexTokeniserClassName()
+     */
     public String getIndexTokeniserClassName()
     {
         return getEmfIndexTokeniserClassName();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#setIndexTokeniserClassName(java.lang.String)
+     */
     public void setIndexTokeniserClassName(String indexTokeniserName)
     {
         setEmfIndexTokeniserClassName(indexTokeniserName);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Property#getPropertyDefinition()
+     */
     public PropertyDefinition getPropertyDefinition()
     {
         if (propertyDefinition == null)

@@ -16,6 +16,11 @@ import com.activiti.repo.dictionary.metamodel.emf.EMFMetaModelDAO;
 import com.activiti.repo.ref.QName;
 
 
+/**
+ * Data Dictionary Service Tests
+ * 
+ * @author David Caruana
+ */
 public class DictionaryServiceImplTest extends TestCase
 {
 

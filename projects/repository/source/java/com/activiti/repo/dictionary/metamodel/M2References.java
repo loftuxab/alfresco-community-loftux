@@ -10,9 +10,20 @@ import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.QName;
 
 
+/**
+ * Utilities for managing Data Dictionary References
+ * 
+ * @author David Caruana
+ */
 public class M2References
 {
-    
+
+    /**
+     * Construct an immutable list of Class References
+     * 
+     * @param m2Classes  list of Class to construct references from
+     * @return  list of class references
+     */
     public static List createClassRefList(Collection m2Classes)
     {
         List references = new ArrayList(m2Classes.size());
@@ -24,7 +35,13 @@ public class M2References
         return Collections.unmodifiableList(references);
     }
 
-    
+
+    /**
+     * Construct an immutable list of Property References
+     * 
+     * @param m2Properties  list of properties to construct references from
+     * @return  list of property references
+     */
     public static List createPropertyRefList(Collection m2Properties)
     {
         List references = new ArrayList(m2Properties.size());
@@ -36,7 +53,13 @@ public class M2References
         return Collections.unmodifiableList(references);
     }
     
-    
+
+    /**
+     * Construct an immutable list of Class References
+     * 
+     * @param qnames  list of QNames to construct references from
+     * @return  list of class references
+     */
     public static Collection createQNameClassRefCollection(Collection/*QName*/ qnames)
     {
         Collection ddrefs = new ArrayList(qnames.size());

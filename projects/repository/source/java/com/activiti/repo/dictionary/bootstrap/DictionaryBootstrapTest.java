@@ -7,6 +7,11 @@ import com.activiti.repo.dictionary.metamodel.M2PropertyType;
 import com.activiti.repo.dictionary.metamodel.emf.EMFMetaModelDAO;
 
 
+/**
+ * Test Dictionary Bootstrap
+ * 
+ * @author David Caruana
+ */
 public class DictionaryBootstrapTest extends TestCase
 {
 

@@ -138,9 +138,14 @@ public class EMFAssociationImpl extends EObjectImpl implements EMFAssociation, M
      */
     protected EList emfRequiredToClasses = null;
 
-    
+    /**
+     * Association Reference
+     */
     protected AssociationRef assocRef = null;
     
+    /**
+     * Read-only Association Definition
+     */
     protected AssociationDefinition associationDefinition = null;
     
     /**
@@ -473,6 +478,9 @@ public class EMFAssociationImpl extends EObjectImpl implements EMFAssociation, M
         return result.toString();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#getReference()
+     */
     public AssociationRef getReference()
     {
         if (assocRef == null)
@@ -482,56 +490,89 @@ public class EMFAssociationImpl extends EObjectImpl implements EMFAssociation, M
         return assocRef;
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#getContainerClass()
+     */
     public M2Class getContainerClass()
     {
         return (M2Class)getEmfContainerClass();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#getName()
+     */
     public String getName()
     {
         return getEmfName();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#setName(java.lang.String)
+     */
     public void setName(String name)
     {
         setEmfName(name);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#isProtected()
+     */
     public boolean isProtected()
     {
         return getEmfProtected();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#setProtected(boolean)
+     */
     public void setProtected(boolean isProtected)
     {
         setEmfProtected(isProtected);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#isMandatory()
+     */
     public boolean isMandatory()
     {
         return getEmfMandatory();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#setMandatory(boolean)
+     */
     public void setMandatory(boolean isMandatory)
     {
         setEmfMandatory(isMandatory);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#isMultiValued()
+     */
     public boolean isMultiValued()
     {
         return getEmfMultiple();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#setMultiValued(boolean)
+     */
     public void setMultiValued(boolean isMultiValued)
     {
         setEmfMultiple(isMultiValued);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#getRequiredToClasses()
+     */
     public List getRequiredToClasses()
     {
         return (List)getEmfRequiredToClasses();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Association#getAssociationDefintion()
+     */
     public AssociationDefinition getAssociationDefintion()
     {
         if (associationDefinition == null)

@@ -1,9 +1,3 @@
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
- */
 package com.activiti.repo.dictionary.metamodel.emf;
 
 import org.eclipse.emf.ecore.EFactory;
@@ -16,7 +10,8 @@ import org.eclipse.emf.ecore.EFactory;
  * @see com.activiti.repo.dictionary.metamodel.emf.EmfPackage
  * @generated
  */
-public interface EmfFactory extends EFactory{
+public interface EmfFactory extends EFactory
+{
     /**
      * The singleton instance of the factory.
      * <!-- begin-user-doc -->

@@ -6,7 +6,8 @@ import org.eclipse.emf.ecore.EObject;
 /**
  * @model
  */
-public interface EMFAssociation extends EObject{
+public interface EMFAssociation extends EObject
+{
 
     /**
      * @model

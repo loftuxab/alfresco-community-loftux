@@ -26,23 +26,54 @@ import com.activiti.repo.dictionary.metamodel.emf.impl.EmfPackageImpl;
 import com.activiti.repo.ref.QName;
 
 
+/**
+ * EMF implementation of Meta Model DAO
+ * 
+ * @author David Caruana
+ */
+/**
+ * @author David Caruana
+ *
+ */
 public class EMFMetaModelDAO implements MetaModelDAO
 {
+    /**
+     * Default Resource URI
+     */
     private static final String DEFAULT_RESOURCEURI = "metamodel.xml";
 
+    /**
+     * Resource URI for Model Definitions
+     */
     private String resourceURI = DEFAULT_RESOURCEURI;
     
+    /**
+     * Resource that holds Model Definitions
+     */
     private Resource resource = null;
 
+    /**
+     * Index of QName to EMF Class
+     */
     private Map classIndex;
     
-    
+
+    /**
+     * Sets the Resource URI
+     * 
+     * @param resourceURI  the resource URI
+     */
     public void setResourceURI(String resourceURI)
     {
         this.resourceURI = resourceURI;
     }
     
 
+    /**
+     * Initialise EMF DAO
+     * 
+     * Note: A new Resource is created, even if one already exists.
+     */
     public void initCreate()
     {
         initEMF();
@@ -67,7 +98,12 @@ public class EMFMetaModelDAO implements MetaModelDAO
         initIndex(resource);
     }
 
-    
+
+    /**
+     * Initialise EMF DAO
+     * 
+     * Note: Resource must already exist
+     */
     public void init()
     {
         initEMF();
@@ -83,6 +119,9 @@ public class EMFMetaModelDAO implements MetaModelDAO
     }
 
 
+    /**
+     * Initialise EMF Framework
+     */
     private void initEMF()
     {
         // Initialise EMF Package
@@ -98,6 +137,143 @@ public class EMFMetaModelDAO implements MetaModelDAO
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#getTypes()
+     */
+    public Collection getTypes()
+    {
+        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFType());
+        return objectIndex == null ? null : objectIndex.keySet();
+    }
+
+
+    
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#getClass(com.activiti.repo.ref.QName)
+     */
+    public M2Class getClass(QName className)
+    {
+        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFClass()); 
+        return objectIndex == null ? null : (M2Class)objectIndex.get(className);
+    }
+
+    
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#getType(com.activiti.repo.ref.QName)
+     */
+    public M2Type getType(QName typeName)
+    {
+        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFType()); 
+        return objectIndex == null ? null : (M2Type)objectIndex.get(typeName);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#getAspect(com.activiti.repo.ref.QName)
+     */
+    public M2Aspect getAspect(QName aspectName)
+    {
+        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFAspect()); 
+        return objectIndex == null ? null : (M2Aspect)objectIndex.get(aspectName);
+    }
+        
+    
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#getProperty(com.activiti.repo.ref.QName, java.lang.String)
+     */
+    public M2Property getProperty(QName className, String propertyName)
+    {
+        M2Class m2Class = getClass(className);
+        if (m2Class != null)
+        {
+            List properties = m2Class.getProperties();
+            Iterator iter = properties.iterator();
+            while (iter.hasNext())
+            {
+                M2Property property = (M2Property)iter.next();
+                if (property.getName().equals(propertyName))
+                {
+                    return property;
+                }
+            }
+        }
+        return null;
+    }
+
+    
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#getPropertyType(com.activiti.repo.ref.QName)
+     */
+    public M2PropertyType getPropertyType(QName propertyType)
+    {
+        Map idIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFPropertyType()); 
+        return idIndex == null ? null : (M2PropertyType)idIndex.get(propertyType);
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#createPropertyType(com.activiti.repo.ref.QName)
+     */
+    public M2PropertyType createPropertyType(QName typeName)
+    {
+        EmfFactory factory = EmfFactory.eINSTANCE;
+        M2PropertyType type = (M2PropertyType)factory.createEMFPropertyType();
+        type.setName(typeName);
+        resource.getContents().add(type);
+        indexObject((EObject)type);
+        return type;
+    }
+        
+    
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#createType(com.activiti.repo.ref.QName)
+     */
+    public M2Type createType(QName typeName)
+    {
+        EmfFactory factory = EmfFactory.eINSTANCE;
+        M2Type type = (M2Type)factory.createEMFType();
+        type.setName(typeName);
+        resource.getContents().add(type);
+        indexObject((EObject)type);
+        return type;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#createAspect(com.activiti.repo.ref.QName)
+     */
+    public M2Aspect createAspect(QName aspectName)
+    {
+        EmfFactory factory = EmfFactory.eINSTANCE;
+        M2Aspect aspect = (M2Aspect)factory.createEMFAspect();
+        aspect.setName(aspectName);
+        resource.getContents().add(aspect);
+        indexObject((EObject)aspect);
+        return aspect;
+    }
+
+    
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#save()
+     */
+    public void save()
+    {
+        try
+        {
+            resource.save(null);
+        }
+        catch(IOException e)
+        {
+            throw new DictionaryException("Failed to save EMF Resource " + resourceURI, e);
+        }
+    }
+
+
+    
+    //
+    // EMF Class and Object Indexes (by QName)
+    //
+    
     private void initIndex(Resource resource)
     {
         classIndex = new HashMap();
@@ -108,7 +284,6 @@ public class EMFMetaModelDAO implements MetaModelDAO
             indexObject(eObject);
         }
     }
-    
     
     private void indexObject(EObject object)
     {
@@ -132,7 +307,6 @@ public class EMFMetaModelDAO implements MetaModelDAO
         }
     }
 
-    
     private Map getObjectIndex(EClass eClass)
     {
         Map objectIndex = (Map)classIndex.get(eClass);
@@ -143,108 +317,5 @@ public class EMFMetaModelDAO implements MetaModelDAO
         }
         return objectIndex; 
     }
-
-    
-    public Collection getTypes()
-    {
-        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFType());
-        return objectIndex == null ? null : objectIndex.keySet();
-    }
-
-
-    public M2Class getClass(QName className)
-    {
-        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFClass()); 
-        return objectIndex == null ? null : (M2Class)objectIndex.get(className);
-    }
-
-    
-    public M2Type getType(QName typeName)
-    {
-        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFType()); 
-        return objectIndex == null ? null : (M2Type)objectIndex.get(typeName);
-    }
-
-
-    public M2Aspect getAspect(QName aspectName)
-    {
-        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFAspect()); 
-        return objectIndex == null ? null : (M2Aspect)objectIndex.get(aspectName);
-    }
         
-    
-    public M2Property getProperty(QName className, String propertyName)
-    {
-        M2Class m2Class = getClass(className);
-        if (m2Class != null)
-        {
-            List properties = m2Class.getProperties();
-            Iterator iter = properties.iterator();
-            while (iter.hasNext())
-            {
-                M2Property property = (M2Property)iter.next();
-                if (property.getName().equals(propertyName))
-                {
-                    return property;
-                }
-            }
-        }
-        return null;
-    }
-
-
-    public M2PropertyType getPropertyType(QName propertyType)
-    {
-        Map idIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFPropertyType()); 
-        return idIndex == null ? null : (M2PropertyType)idIndex.get(propertyType);
-    }
-    
-    
-    public M2PropertyType createPropertyType(QName typeName)
-    {
-        EmfFactory factory = EmfFactory.eINSTANCE;
-        M2PropertyType type = (M2PropertyType)factory.createEMFPropertyType();
-        type.setName(typeName);
-        resource.getContents().add(type);
-        indexObject((EObject)type);
-        return type;
-    }
-        
-    
-    public M2Type createType(QName typeName)
-    {
-        EmfFactory factory = EmfFactory.eINSTANCE;
-        M2Type type = (M2Type)factory.createEMFType();
-        type.setName(typeName);
-        resource.getContents().add(type);
-        indexObject((EObject)type);
-        return type;
-    }
-
-
-    public M2Aspect createAspect(QName aspectName)
-    {
-        EmfFactory factory = EmfFactory.eINSTANCE;
-        M2Aspect aspect = (M2Aspect)factory.createEMFAspect();
-        aspect.setName(aspectName);
-        resource.getContents().add(aspect);
-        indexObject((EObject)aspect);
-        return aspect;
-    }
-
-    
-    public void save()
-    {
-        try
-        {
-            resource.save(null);
-        }
-        catch(IOException e)
-        {
-            throw new DictionaryException("Failed to save EMF Resource " + resourceURI, e);
-        }
-    }
-
-
-    
 }

@@ -11,14 +11,26 @@ import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.QName;
 
 
-
-
+/**
+ * Default Read-Only Class Definition Implementation
+ * 
+ * @author David Caruana
+ */
 public class M2ClassDefinition implements ClassDefinition
 {
+    /**
+     * Class definition to wrap
+     */
     protected M2Class m2Class;
     
     
-    public static M2ClassDefinition create(M2Class m2Class)
+    /**
+     * Construct Read-Only Class Definition
+     * 
+     * @param m2Class  class definition
+     * @return  read-only class definition
+     */
+    public static ClassDefinition create(M2Class m2Class)
     {
         if (m2Class instanceof M2Type)
         {
@@ -52,30 +64,45 @@ public class M2ClassDefinition implements ClassDefinition
     }
 
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.ClassDefinition#getReference()
+     */
     public ClassRef getReference()
     {
         return m2Class.getReference();
     }
 
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.ClassDefinition#getName()
+     */
     public QName getName()
     {
         return m2Class.getName();
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.ClassDefinition#isAspect()
+     */
     public boolean isAspect()
     {
         return (m2Class instanceof M2Aspect);
     }
 
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.ClassDefinition#getSuperClass()
+     */
     public ClassRef getSuperClass()
     {
         return m2Class.getSuperClass().getReference();
     }
     
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.ClassDefinition#getProperties()
+     */
     public Map getProperties()
     {
         List aggregatedProperties = aggregateProperties();
@@ -89,12 +116,20 @@ public class M2ClassDefinition implements ClassDefinition
     }
 
     
+    /**
+     * Gets the full list of Properties to include in Class Definition
+     * 
+     * @return  properties
+     */
     protected List aggregateProperties()
     {
         return m2Class.getInheritedProperties();
     }
     
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.ClassDefinition#getAssociations()
+     */
     public Map getAssociations()
     {
         List aggregatedAssociations = aggregateAssociations();
@@ -108,10 +143,14 @@ public class M2ClassDefinition implements ClassDefinition
     }
 
 
+    /**
+     * Gets the full list of Associations to include in Class Definition
+     * 
+     * @return  properties
+     */
     protected List aggregateAssociations()
     {
         return m2Class.getInheritedAssociations();
     }
-        
 
 }

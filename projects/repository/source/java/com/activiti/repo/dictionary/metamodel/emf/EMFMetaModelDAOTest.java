@@ -10,6 +10,11 @@ import com.activiti.repo.dictionary.metamodel.M2Property;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.ref.QName;
 
+/**
+ * EMF Meta Model DAO Tests
+ * 
+ * @author David Caruana
+ */
 public class EMFMetaModelDAOTest extends TestCase
 {
 

@@ -292,11 +292,17 @@ public class EMFChildAssociationImpl extends EMFAssociationImpl implements EMFCh
         return eDynamicIsSet(eFeature);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2ChildAssociation#getDefaultType()
+     */
     public M2Type getDefaultType()
     {
         return (M2Type)getEmfDefaultType();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2ChildAssociation#setDefaultType(com.activiti.repo.dictionary.metamodel.M2Type)
+     */
     public void setDefaultType(M2Type defaultType)
     {
         setEmfDefaultType((EMFType)defaultType);

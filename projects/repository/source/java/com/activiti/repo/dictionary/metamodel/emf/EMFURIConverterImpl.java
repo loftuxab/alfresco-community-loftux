@@ -6,6 +6,12 @@ import java.io.InputStream;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.impl.URIConverterImpl;
 
+
+/**
+ * Custom URI Converter to support Classpath resolution of Resources
+ * 
+ * @author David Caruana
+ */
 public class EMFURIConverterImpl extends URIConverterImpl
 {
 

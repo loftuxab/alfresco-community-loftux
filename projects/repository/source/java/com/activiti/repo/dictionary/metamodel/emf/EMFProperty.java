@@ -6,7 +6,8 @@ import org.eclipse.emf.ecore.EObject;
 /**
  * @model
  */
-public interface EMFProperty extends EObject{
+public interface EMFProperty extends EObject
+{
 
     /**
      * @model
@@ -72,7 +73,6 @@ public interface EMFProperty extends EObject{
      * @model
      */
     Boolean getEmfIndexed();
-    
 
     /**
      * Sets the value of the '{@link com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfIndexed <em>Emf Indexed</em>}' attribute.

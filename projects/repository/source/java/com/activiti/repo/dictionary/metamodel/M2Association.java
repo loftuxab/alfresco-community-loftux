@@ -6,6 +6,11 @@ import com.activiti.repo.dictionary.AssociationDefinition;
 import com.activiti.repo.dictionary.AssociationRef;
 
 
+/**
+ * Association Definition
+ * 
+ * @author David Caruana
+ */
 public interface M2Association
 {
 
@@ -31,6 +36,11 @@ public interface M2Association
 
     public List getRequiredToClasses();
     
+    /**
+     * Gets the read-only Association definition
+     * 
+     * @return  read-only association definition
+     */
     public AssociationDefinition getAssociationDefintion();
     
 }

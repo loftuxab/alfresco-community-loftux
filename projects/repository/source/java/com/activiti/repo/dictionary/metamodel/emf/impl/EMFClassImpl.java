@@ -104,8 +104,14 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
      */
     protected EList emfAssociations = null;
 
+    /**
+     * Class Reference
+     */
     protected ClassRef classRef = null;
     
+    /**
+     * Read-only Class Definition
+     */
     protected ClassDefinition classDefinition = null;
     
 
@@ -380,11 +386,9 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         return result.toString();
     }
 
-    //
-    // M2 Class Implementation
-    // 
-    
-
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getReference()
+     */
     public ClassRef getReference()
     {
         if (classRef == null)
@@ -394,32 +398,50 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         return classRef;
     }
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getName()
+     */
     public QName getName()
     {
         return getEmfName();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#setName(com.activiti.repo.ref.QName)
+     */
     public void setName(QName value)
     {
         setEmfName(value);
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getSuperClass()
+     */
     public M2Class getSuperClass()
     {
         return (M2Class)getEmfSuperClass();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#setSuperClass(com.activiti.repo.dictionary.metamodel.M2Class)
+     */
     public void setSuperClass(M2Class superClass)
     {
         setEmfSuperClass((EMFClass)superClass);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getProperties()
+     */
     public List getProperties()
     {
         return getEmfProperties();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#createProperty(java.lang.String)
+     */
     public M2Property createProperty(String propertyName)
     {
         EmfFactory factory = EmfFactory.eINSTANCE;
@@ -429,6 +451,9 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         return property;
     }
         
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getInheritedProperties()
+     */
     public List getInheritedProperties()
     {
         List inheritedProperties = new ArrayList();
@@ -446,11 +471,17 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         properties.addAll(thisClass.getProperties());
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getAssociations()
+     */
     public List getAssociations()
     {
         return getEmfAssociations();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#createAssociation(java.lang.String)
+     */
     public M2Association createAssociation(String associationName)
     {
         EmfFactory factory = EmfFactory.eINSTANCE;
@@ -460,6 +491,9 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         return association;
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#createChildAssociation(java.lang.String)
+     */
     public M2ChildAssociation createChildAssociation(String associationName)
     {
         EmfFactory factory = EmfFactory.eINSTANCE;
@@ -469,6 +503,9 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         return association;
     }
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getInheritedAssociations()
+     */
     public List getInheritedAssociations()
     {
         List inheritedAssociations = new ArrayList();
@@ -485,8 +522,10 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         }
         associations.addAll(thisClass.getAssociations());
     }
-
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getClassDefinition()
+     */
     public ClassDefinition getClassDefinition()
     {
         if (classDefinition == null)
@@ -495,6 +534,5 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         }
         return classDefinition;
     }
-
-                
+    
 } //EMFClassImpl

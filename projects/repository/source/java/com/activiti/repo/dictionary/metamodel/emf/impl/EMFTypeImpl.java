@@ -312,20 +312,28 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
         return result.toString();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Type#getOrderedChildren()
+     */
     public boolean getOrderedChildren()
     {
         return getEmfOrderedChildren();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Type#setOrderedChildren(boolean)
+     */
     public void setOrderedChildren(boolean areChildrenOrdered)
     {
         setEmfOrderedChildren(areChildrenOrdered);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Type#getDefaultAspects()
+     */
     public List getDefaultAspects()
     {
         return (List)getEmfDefaultAspects();
     }
-
     
 } //EMFTypeImpl

@@ -15,21 +15,36 @@ import com.activiti.repo.dictionary.metamodel.M2Property;
 import com.activiti.repo.dictionary.metamodel.M2References;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
-import com.activiti.repo.node.InvalidNodeRefException;
 
 
+/**
+ * Data Dictionary Service Implementation
+ * 
+ * @author David Caruana
+ */
 public class DictionaryServiceImpl implements DictionaryService
 {
 
+    /**
+     * Meta Model DAO
+     */
     private MetaModelDAO metaModelDAO;
 
-    
+
+    /**
+     * Sets the Meta Model DAO
+     * 
+     * @param metaModelDAO  meta model DAO
+     */
     public void setMetaModelDAO(MetaModelDAO metaModelDAO)
     {
         this.metaModelDAO = metaModelDAO;
     }
 
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.DictionaryService#getTypes()
+     */
     public Collection getTypes()
     {
         Collection qnames = metaModelDAO.getTypes();
@@ -38,51 +53,43 @@ public class DictionaryServiceImpl implements DictionaryService
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.DictionaryService#getClass(com.activiti.repo.dictionary.ClassRef)
+     */
     public ClassDefinition getClass(ClassRef classRef)
     {
         M2Class m2Class = metaModelDAO.getClass(classRef.getQName());
-        if (m2Class == null)
-        {
-            throw new InvalidNodeRefException(classRef);
-        }
-        
-        return m2Class.getClassDefinition();
+        return m2Class == null ? null : m2Class.getClassDefinition();
     }
 
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.DictionaryService#getType(com.activiti.repo.dictionary.ClassRef)
+     */
     public TypeDefinition getType(ClassRef typeRef)
     {
         M2Type m2Type = metaModelDAO.getType(typeRef.getQName());
-        if (m2Type == null)
-        {
-            throw new InvalidNodeRefException(typeRef);
-        }
-        
-        return (TypeDefinition)m2Type.getClassDefinition();
+        return m2Type == null ? null : (TypeDefinition)m2Type.getClassDefinition();
     }
 
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.DictionaryService#getAspect(com.activiti.repo.dictionary.ClassRef)
+     */
     public AspectDefinition getAspect(ClassRef aspectRef)
     {
         M2Aspect m2Aspect = metaModelDAO.getAspect(aspectRef.getQName());
-        if (m2Aspect == null)
-        {
-            throw new InvalidNodeRefException(aspectRef);
-        }
-        
-        return (AspectDefinition)m2Aspect.getClassDefinition();
+        return m2Aspect == null ? null : (AspectDefinition)m2Aspect.getClassDefinition();
     }
     
     
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.DictionaryService#getProperty(com.activiti.repo.dictionary.PropertyRef)
+     */
     public PropertyDefinition getProperty(PropertyRef propertyRef)
     {
         M2Property m2Property = metaModelDAO.getProperty(propertyRef.getClassRef().getQName(), propertyRef.getPropertyName());
-        if (m2Property == null)
-        {
-            throw new InvalidNodeRefException(propertyRef);
-        }
-        
-        return m2Property.getPropertyDefinition();
+        return m2Property == null ? null : m2Property.getPropertyDefinition();
     }
     
 }

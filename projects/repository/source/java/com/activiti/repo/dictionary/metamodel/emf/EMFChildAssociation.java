@@ -4,8 +4,8 @@ package com.activiti.repo.dictionary.metamodel.emf;
 /**
  * @model
  */
-public interface EMFChildAssociation extends EMFAssociation{
-
+public interface EMFChildAssociation extends EMFAssociation
+{
 
     /**
      * @model type="EMFType"
