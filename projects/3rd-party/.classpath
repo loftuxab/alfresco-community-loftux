@@ -22,6 +22,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jug.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-1.4.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>

@@ -158,5 +158,86 @@
          </props>
       </property>
    </bean>
+   
+   <bean id="indexerComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.search.Indexer</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.search.IndexerComponent" >
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <bean id="searcherComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.search.Searcher</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.search.SearcherComponent" >
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <bean id="luceneIndexerAndSearcherFactory" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.search.IndexerAndSearcher</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory" factory-method="getInstance">
+			<property name="nodeService">
+				<ref bean="nodeService"/>
+			</property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   
+   <bean id="indexerAndSearcherFactory" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.search.IndexerAndSearcher</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+		<bean class="com.activiti.repo.search.IndexerAndSearcherFactory">
+			<property name="protocolFactories">
+				<map>
+					<entry key="workspace"><ref bean="luceneIndexerAndSearcherFactory"></ref></entry>
+				</map>
+			</property>
+		</bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
 
 </beans>
