@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  * <pre>
  *      com.activiti.util.debug.MethodCallLogAdvice=DEBUG   # activate method logging
  *          AND
- *      x.y.MyClass=DEBUG                           # log debug for all method calls
+ *      x.y.MyClass=DEBUG                           # log debug for all method calls on MyClass
  *      x.y.MyClass.doSomething=DEBUG               # log debug for all doSomething method calls
  *      x.y.MyClass.doSomething.exception=DEBUG     # only log debug for doSomething() upon exception
  * </pre>
@@ -41,6 +41,22 @@ public class MethodCallLogAdvice implements MethodInterceptor
 
     public Object invoke(MethodInvocation invocation) throws Throwable
     {
+        if (logger.isDebugEnabled())
+        {
+            return invokeWithLogging(invocation);
+        }
+        else
+        {
+            // no logging required
+            return invocation.proceed();
+        }
+    }
+    
+    /**
+     * Only executes logging code if logging is required
+     */
+    private Object invokeWithLogging(MethodInvocation invocation) throws Throwable
+    {
         String methodName = invocation.getMethod().getName();
         String className = invocation.getMethod().getDeclaringClass().getName();
         
@@ -50,7 +66,7 @@ public class MethodCallLogAdvice implements MethodInterceptor
             Object ret = invocation.proceed();
             // logging
             Log methodLogger = LogFactory.getLog(className + "." + methodName);
-            if (logger.isDebugEnabled() && methodLogger.isDebugEnabled())
+            if (methodLogger.isDebugEnabled())
             {
                 // log success
                 StringBuffer sb = getInvocationInfo(className, methodName, invocation.getArguments()); 
@@ -63,7 +79,7 @@ public class MethodCallLogAdvice implements MethodInterceptor
         catch (Throwable e)
         {
             Log exceptionLogger = LogFactory.getLog(className + "." + methodName + ".exception");
-            if (logger.isDebugEnabled() && exceptionLogger.isDebugEnabled())
+            if (exceptionLogger.isDebugEnabled())
             {
                 StringBuffer sb = getInvocationInfo(className, methodName, invocation.getArguments()); 
                 sb.append("   Failure: ").append(e.getClass().getName()).append(" - ").append(e.getMessage());
