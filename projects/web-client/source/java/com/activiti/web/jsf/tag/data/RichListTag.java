@@ -38,15 +38,15 @@ public class RichListTag extends BaseComponentTag
    public void release()
    {
       super.release();
-      m_value = null;
-      m_var = null;
-      m_initialSortColumn = null;
-      m_initialSortDirection = null;
-      m_listConfig = null;
-      m_viewModes = null;
-      m_pageSize = null;
-      m_style = null;
-      m_styleClass = null;
+      this.value = null;
+      this.var = null;
+      this.initialSortColumn = null;
+      this.initialSortDirection = null;
+      this.listConfig = null;
+      this.viewModes = null;
+      this.pageSize = null;
+      this.style = null;
+      this.styleClass = null;
    }
    
    /**
@@ -55,17 +55,17 @@ public class RichListTag extends BaseComponentTag
    protected void setProperties(UIComponent component)
    {
       super.setProperties(component);
-      setStringBindingProperty(component, "value", m_value);
-      setStringStaticProperty(component, "var", m_var);
-      setStringProperty(component, "initialSortColumn", m_initialSortColumn);
-      setStringProperty(component, "initialSortDirection", m_initialSortDirection);
-      setStringProperty(component, "listConfig", m_listConfig);
-      setStringProperty(component, "viewModes", m_viewModes);
-      setStringProperty(component, "style", m_style);
-      setStringProperty(component, "styleClass", m_styleClass);
-      setStringProperty(component, "rowStyleClass", m_rowStyleClass);
-      setStringProperty(component, "altRowStyleClass", m_altRowStyleClass);
-      setIntProperty(component, "pageSize", m_pageSize);
+      setStringBindingProperty(component, "value", this.value);
+      setStringStaticProperty(component, "var", this.var);
+      setStringProperty(component, "initialSortColumn", this.initialSortColumn);
+      setStringProperty(component, "initialSortDirection", this.initialSortDirection);
+      setStringProperty(component, "listConfig", this.listConfig);
+      setStringProperty(component, "viewModes", this.viewModes);
+      setStringProperty(component, "style", this.style);
+      setStringProperty(component, "styleClass", this.styleClass);
+      setStringProperty(component, "rowStyleClass", this.rowStyleClass);
+      setStringProperty(component, "altRowStyleClass", this.altRowStyleClass);
+      setIntProperty(component, "pageSize", this.pageSize);
    }
    
    
@@ -79,7 +79,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setViewModes(String viewModes)
    {
-      m_viewModes = viewModes;
+      this.viewModes = viewModes;
    }
    
    /**
@@ -89,7 +89,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setPageSize(String pageSize)
    {
-      m_pageSize = pageSize;
+      this.pageSize = pageSize;
    }
    
    /**
@@ -99,7 +99,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setInitialSortColumn(String initialSortColumn)
    {
-      m_initialSortColumn = initialSortColumn;
+      this.initialSortColumn = initialSortColumn;
    }
    
    /**
@@ -109,7 +109,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setInitialSortDirection(String initialSortDirection)
    {
-      m_initialSortDirection = initialSortDirection;
+      this.initialSortDirection = initialSortDirection;
    }
    
    /**
@@ -119,7 +119,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setListConfig(String listConfig)
    {
-      m_listConfig = listConfig;
+      this.listConfig = listConfig;
    }
 
    /**
@@ -129,7 +129,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setValue(String value)
    {
-      m_value = value;
+      this.value = value;
    }
 
    /**
@@ -139,7 +139,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setVar(String var)
    {
-      m_var = var;
+      this.var = var;
    }
    
    /**
@@ -149,7 +149,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setStyle(String style)
    {
-      m_style = style;
+      this.style = style;
    }
 
    /**
@@ -159,7 +159,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setStyleClass(String styleClass)
    {
-      m_styleClass = styleClass;
+      this.styleClass = styleClass;
    }
    
    /**
@@ -169,7 +169,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setRowStyleClass(String rowStyleClass)
    {
-      m_rowStyleClass = rowStyleClass;
+      this.rowStyleClass = rowStyleClass;
    }
 
    /**
@@ -179,7 +179,7 @@ public class RichListTag extends BaseComponentTag
     */
    public void setAltRowStyleClass(String altRowStyleClass)
    {
-      m_altRowStyleClass = altRowStyleClass;
+      this.altRowStyleClass = altRowStyleClass;
    }
 
 
@@ -187,35 +187,35 @@ public class RichListTag extends BaseComponentTag
    // Private data
    
    /** the row CSS Class */
-   private String m_rowStyleClass;
+   private String rowStyleClass;
 
    /** the alternate row CSS Class */
-   private String m_altRowStyleClass;
+   private String altRowStyleClass;
    
    /** the style */
-   private String m_style;
+   private String style;
 
    /** the styleClass */
-   private String m_styleClass;
+   private String styleClass;
 
    /** the value */
-   private String m_value;
+   private String value;
 
    /** the var */
-   private String m_var;
+   private String var;
 
    /** the viewModes */
-   private String m_viewModes;
+   private String viewModes;
 
    /** the pageSize */
-   private String m_pageSize;
+   private String pageSize;
 
    /** the initialSortColumn */
-   private String m_initialSortColumn;
+   private String initialSortColumn;
 
    /** the initialSortDirection */
-   private String m_initialSortDirection;
+   private String initialSortDirection;
 
    /** the listConfig */
-   private String m_listConfig;
+   private String listConfig;
 }

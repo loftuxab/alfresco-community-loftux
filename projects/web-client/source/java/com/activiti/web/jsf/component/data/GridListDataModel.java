@@ -5,6 +5,8 @@ package com.activiti.web.jsf.component.data;
 
 import java.util.List;
 
+import com.activiti.web.data.QuickSort;
+
 
 /**
  * @author kevinr
@@ -18,20 +20,52 @@ public class GridListDataModel implements IGridDataModel
     */
    public GridListDataModel(List data)
    {
-      m_data = data;
+      this.data = data;
    }
    
+   /**
+    * Get a row object for the specified row index
+    * 
+    * @param index      valid row index
+    * 
+    * @return row object for the specified index
+    */
    public Object getRow(int index)
    {
-      return m_data.get(index);
+      return this.data.get(index);
+   }
+   
+   /**
+    * Return the number of rows in the data model
+    * 
+    * @return row count
+    */
+   public int size()
+   {
+      return this.data.size();
+   }
+   
+   /**
+    * Sort the data set using the specified sort parameters
+    * 
+    * @param column        Column to sort
+    * @param bAscending    True for ascending sort, false for descending
+    * @param mode          Sort mode to use (see IDataContainer constants)
+    */
+   public void sort(String column, boolean bAscending, String mode)
+   {
+      try
+      {
+         QuickSort sorter = new QuickSort(this.data, column, bAscending, mode);
+         sorter.sort();
+      }
+      catch (Exception err)
+      {
+         throw new RuntimeException("Failed to sort data: " + err.getMessage(), err);
+      }
    }
    
    // TODO: allow formatting etc. of strings
    
-   public int size()
-   {
-      return m_data.size();
-   }
-   
-   private List m_data = null;
+   private List data = null;
 }

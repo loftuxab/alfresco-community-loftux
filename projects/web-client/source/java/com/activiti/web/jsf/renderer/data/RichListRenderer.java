@@ -150,7 +150,13 @@ public class RichListRenderer extends BaseRenderer
          for (int i=0; i<columns.length; i++)
          {
             // render column as appropriate for the list type
-            out.write("<th>");
+            out.write("<th");
+            if (richList.getAttributes().get("width") != null)
+            {
+               out.write(" width=");
+               out.write((String)richList.getAttributes().get("width"));
+            }
+            out.write('>');
             
             // output the header facet if any
             UIComponent header = columns[i].getHeader();
@@ -179,7 +185,7 @@ public class RichListRenderer extends BaseRenderer
          out.write("<tr");
          String style = (String)richList.getAttributes().get("rowStyleClass");
          String altStyle = (String)richList.getAttributes().get("altRowStyleClass");
-         if (altStyle != null && m_rowIndex++ % 2 == 1)
+         if (altStyle != null && this.rowIndex++ % 2 == 1)
          {
             style = altStyle;
          }         
@@ -221,7 +227,7 @@ public class RichListRenderer extends BaseRenderer
          out.write("</td></tr>");
       }
       
-      private int m_rowIndex = 0;
+      private int rowIndex = 0;
    }
    
    

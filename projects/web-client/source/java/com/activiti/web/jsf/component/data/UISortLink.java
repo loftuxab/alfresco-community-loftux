@@ -148,9 +148,14 @@ public class UISortLink extends UICommand
          if (getColumn().equals(getDataContainer().getCurrentSortColumn()) == true)
          {
             // reverse sort direction
-            m_bAscending = !m_bAscending;
+            this.bAscending = !this.bAscending;
          }
-         getDataContainer().sort(getColumn(), m_bAscending, getMode());
+         else
+         {
+            // revert to default sort direction
+            this.bAscending = true;
+         }
+         getDataContainer().sort(getColumn(), this.bAscending, getMode());
       }  
    }
    
@@ -186,7 +191,7 @@ public class UISortLink extends UICommand
     */
    public String getMode()
    {
-      return m_mode;
+      return this.mode;
    }
    
    /**
@@ -196,7 +201,7 @@ public class UISortLink extends UICommand
     */
    public void setMode(String sortMode)
    {
-      m_mode = sortMode;
+      this.mode = sortMode;
    }
    
    /**
@@ -206,7 +211,7 @@ public class UISortLink extends UICommand
     */
    public boolean isAscending()
    {
-      return m_bAscending;
+      return this.bAscending;
    }
    
    /**
@@ -217,7 +222,7 @@ public class UISortLink extends UICommand
       Object values[] = (Object[])state;
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
-      m_bAscending = ((Boolean)values[1]).booleanValue();
+      this.bAscending = ((Boolean)values[1]).booleanValue();
    }
    
    /**
@@ -228,7 +233,7 @@ public class UISortLink extends UICommand
       Object values[] = new Object[2];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
-      values[1] = (m_bAscending ? Boolean.TRUE : Boolean.FALSE);
+      values[1] = (this.bAscending ? Boolean.TRUE : Boolean.FALSE);
       return values;
    }
    
@@ -268,6 +273,6 @@ public class UISortLink extends UICommand
    private final static String IMAGE_SORTDOWN   = "/images/sort_down.gif";
    private final static String IMAGE_SORTNONE   = "/images/sort_flat.gif";
    
-   private String m_mode = IDataContainer.SORT_CASEINSENSITIVE;
-   private boolean m_bAscending = true;
+   private String mode = IDataContainer.SORT_CASEINSENSITIVE;
+   private boolean bAscending = true;
 }

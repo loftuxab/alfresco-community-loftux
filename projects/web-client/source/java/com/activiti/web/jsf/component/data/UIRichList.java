@@ -52,9 +52,9 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       Object values[] = (Object[])state;
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
-      m_currentPage = ((Integer)values[1]).intValue();
-      m_sortColumn = (String)values[2];
-      m_sortDirection = ((Boolean)values[3]).booleanValue();
+      this.currentPage = ((Integer)values[1]).intValue();
+      this.sortColumn = (String)values[2];
+      this.sortDirection = ((Boolean)values[3]).booleanValue();
    }
    
    /**
@@ -65,9 +65,9 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       Object values[] = new Object[4];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
-      values[1] = new Integer(m_currentPage);
-      values[2] = m_sortColumn;
-      values[3] = (m_sortDirection ? Boolean.TRUE : Boolean.FALSE);
+      values[1] = new Integer(this.currentPage);
+      values[2] = this.sortColumn;
+      values[3] = (this.sortDirection ? Boolean.TRUE : Boolean.FALSE);
       return (values);
    }
    
@@ -78,15 +78,15 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public Object getValue()
    {
-      if (m_value == null)
+      if (this.value == null)
       {
          ValueBinding vb = getValueBinding("value");
          if (vb != null)
          {
-            m_value = vb.getValue(getFacesContext());
+            this.value = vb.getValue(getFacesContext());
          }
       }
-      return m_value;
+      return this.value;
    }
 
    /**
@@ -96,8 +96,8 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public void setValue(Object value)
    {
-      m_dataModel = null;
-      m_value = value;
+      this.dataModel = null;
+      this.value = value;
    }
    
    
@@ -111,7 +111,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public String getCurrentSortColumn()
    {
-      return m_sortColumn;
+      return this.sortColumn;
    }
    
    /**
@@ -122,7 +122,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public boolean getCurrentSortDirection()
    {
-      return m_sortDirection;
+      return this.sortDirection;
    }
    
    /**
@@ -130,7 +130,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public int getPageSize()
    {
-      return m_pageSize;
+      return this.pageSize;
    }
    
    /**
@@ -141,7 +141,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public void setPageSize(int val)
    {
       // TODO: value binding code
-      m_pageSize = val;
+      this.pageSize = val;
    }
    
    /**
@@ -149,7 +149,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public int getPageCount()
    {
-      return m_pageCount;
+      return this.pageCount;
    }
    
    /**
@@ -159,7 +159,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public int getCurrentPage()
    {
-      return m_currentPage;
+      return this.currentPage;
    }
    
    /**
@@ -167,7 +167,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public void setCurrentPage(int index)
    {
-      m_currentPage = index;
+      this.currentPage = index;
    }
 
    /**
@@ -177,7 +177,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public boolean isDataAvailable()
    {
-      return m_rowIndex < m_maxRowIndex;
+      return this.rowIndex < this.maxRowIndex;
    }
    
    /**
@@ -188,7 +188,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public Object nextRow()
    {
       // get next row and increment row count
-      Object rowData = getDataModel().getRow(m_rowIndex + 1);
+      Object rowData = getDataModel().getRow(this.rowIndex + 1);
       
       // Prepare the data-binding variable "var" ready for the next cycle of
       // renderering for the child components. 
@@ -206,7 +206,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          }
       }
       
-      m_rowIndex++;
+      this.rowIndex++;
       
       return rowData;
    }
@@ -220,10 +220,11 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public void sort(String column, boolean bAscending, String mode)
    {
-      m_sortColumn = column;
-      m_sortDirection = bAscending;
+      this.sortColumn = column;
+      this.sortDirection = bAscending;
       
-      // TODO: implement stable merge sort.
+      // delegate to the data model to sort its contents
+      getDataModel().sort(column, bAscending, mode);
    }
    
    
@@ -237,34 +238,34 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    {
       int rowCount = getDataModel().size();
       // if a page size is specified, then we use that
-      if (m_pageSize != -1)
+      if (this.pageSize != -1)
       {
          // calc start row index based on current page index
-         m_rowIndex = (m_currentPage * m_pageSize) - 1;
+         this.rowIndex = (this.currentPage * this.pageSize) - 1;
          
          // calc total number of pages available
-         m_pageCount = (rowCount / m_pageSize) + 1;
-         if (rowCount % m_pageSize == 0 && m_pageCount != 1)
+         this.pageCount = (rowCount / this.pageSize) + 1;
+         if (rowCount % this.pageSize == 0 && this.pageCount != 1)
          {
-            m_pageCount--;
+            this.pageCount--;
          }
          
          // calc the maximum row index that can be returned
-         m_maxRowIndex = m_rowIndex + m_pageSize;
-         if (m_maxRowIndex >= rowCount)
+         this.maxRowIndex = this.rowIndex + this.pageSize;
+         if (this.maxRowIndex >= rowCount)
          {
-            m_maxRowIndex = rowCount - 1;
+            this.maxRowIndex = rowCount - 1;
          }
       }
       // else we are not paged so show all data from start
       else
       {
-         m_rowIndex = -1;
-         m_pageCount = 1;
-         m_maxRowIndex = (rowCount - 1);
+         this.rowIndex = -1;
+         this.pageCount = 1;
+         this.maxRowIndex = (rowCount - 1);
       }
       if (s_logger.isDebugEnabled())
-         s_logger.debug("Bound datasource: PageSize: " + m_pageSize + "; CurrentPage: " + m_currentPage + "; RowIndex: " + m_rowIndex + "; MaxRowIndex: " + m_maxRowIndex + "; RowCount: " + rowCount);
+         s_logger.debug("Bound datasource: PageSize: " + this.pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
    }
    
    /**
@@ -284,18 +285,18 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    private IGridDataModel getDataModel()
    {
-      if (m_dataModel == null)
+      if (this.dataModel == null)
       {
          // TODO: sort first time on initially sorted column - NOTE: can we
          //       do this here or use a different hook point?
          Object val = getValue();
          if (val instanceof List)
          {
-            m_dataModel = new GridListDataModel((List)val);
+            this.dataModel = new GridListDataModel((List)val);
          }
          else if ( (java.lang.Object[].class).isAssignableFrom(val.getClass()) )
          {
-            m_dataModel = new GridArrayDataModel((Object[])val);
+            this.dataModel = new GridArrayDataModel((Object[])val);
          }
          else
          {
@@ -303,7 +304,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          }
       }
       
-      return m_dataModel;
+      return this.dataModel;
    }
    
    
@@ -311,18 +312,18 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    // Private data
    
    // component state
-   private int m_currentPage = 0;
-   private int m_rowIndex = -1;
-   private String m_sortColumn = null;
-   private boolean m_sortDirection = true;
-   private int m_pageSize = -1;
-   private int m_pageCount = 1;
-   private int m_maxRowIndex = -1;
+   private int currentPage = 0;
+   private int rowIndex = -1;
+   private String sortColumn = null;
+   private boolean sortDirection = true;
+   private int pageSize = -1;
+   private int pageCount = 1;
+   private int maxRowIndex = -1;
    
-   private IGridDataModel m_dataModel = null;
+   private IGridDataModel dataModel = null;
    
    // component properties - NOTE: may use ValueBinding!
-   private Object m_value = null;
+   private Object value = null;
    
    private static Logger s_logger = Logger.getLogger(IDataContainer.class);
 }

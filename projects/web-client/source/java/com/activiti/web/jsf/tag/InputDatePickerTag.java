@@ -45,10 +45,10 @@ public class InputDatePickerTag extends BaseComponentTag
    public void release()
    {
       super.release();
-      m_startYear = "1990";
-      m_yearCount = "10";
-      m_styleClass = null;
-      m_value = null;
+      this.startYear = "1990";
+      this.yearCount = "10";
+      this.styleClass = null;
+      this.value = null;
    }
    
    /**
@@ -59,10 +59,10 @@ public class InputDatePickerTag extends BaseComponentTag
       super.setProperties(component);
       
       // set the properties of tag into the component
-      setIntProperty(component, "startYear", m_startYear);
-      setIntProperty(component, "yearCount", m_yearCount);
-      setStringProperty(component, "styleClass", m_styleClass);
-      setStringProperty(component, "value", m_value);
+      setIntProperty(component, "startYear", this.startYear);
+      setIntProperty(component, "yearCount", this.yearCount);
+      setStringProperty(component, "styleClass", this.styleClass);
+      setStringProperty(component, "value", this.value);
    }
    
    /**
@@ -72,7 +72,7 @@ public class InputDatePickerTag extends BaseComponentTag
     */
    public void setValue(String value)
    {
-      m_value = value;
+      this.value = value;
    }
 
    /**
@@ -82,7 +82,7 @@ public class InputDatePickerTag extends BaseComponentTag
     */
    public void setStartYear(String startYear)
    {
-      m_startYear = startYear;
+      this.startYear = startYear;
    }
    
    /**
@@ -92,7 +92,7 @@ public class InputDatePickerTag extends BaseComponentTag
     */
    public String getYearCount()
    {
-      return m_yearCount;
+      return this.yearCount;
    }
 
    /**
@@ -102,7 +102,7 @@ public class InputDatePickerTag extends BaseComponentTag
     */
    public void setYearCount(String yearCount)
    {
-      m_yearCount = yearCount;
+      this.yearCount = yearCount;
    }
 
    /**
@@ -112,7 +112,7 @@ public class InputDatePickerTag extends BaseComponentTag
     */
    public String getStyleClass()
    {
-      return m_styleClass;
+      return this.styleClass;
    }
 
    /**
@@ -122,12 +122,12 @@ public class InputDatePickerTag extends BaseComponentTag
     */
    public void setStyleClass(String styleClass)
    {
-      m_styleClass = styleClass;
+      this.styleClass = styleClass;
    }
 
    
-   private String m_startYear = "1990";
-   private String m_yearCount = "10";
-   private String m_value = null;
-   private String m_styleClass = null;
+   private String startYear = "1990";
+   private String yearCount = "10";
+   private String value = null;
+   private String styleClass = null;
 }

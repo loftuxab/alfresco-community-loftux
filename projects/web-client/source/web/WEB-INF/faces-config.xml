@@ -47,11 +47,13 @@
       <component-class>com.activiti.web.jsf.component.property.UIPropertySheet</component-class>
    </component>
 
+
    <!-- ==================== CONVERTERS ==================== -->
    <converter>
       <converter-id>converter:StringArray</converter-id>
       <converter-class>com.activiti.web.jsf.converter.StringArrayConverter</converter-class>
    </converter>
+   
    
    <!-- ==================== RENDERERS ==================== -->
    <render-kit>
@@ -103,6 +105,15 @@
       <managed-bean-class>jsftest.UserListBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
+   
+   <managed-bean>
+      <description>
+         Bean for component testing
+      </description>
+      <managed-bean-name>TestList</managed-bean-name>
+      <managed-bean-class>jsftest.TestList</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+   </managed-bean>
 
    <managed-bean>
       <description>
@@ -112,6 +123,7 @@
       <managed-bean-class>jsftest.repository.Repository</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
+   
    
    <!-- ==================== NAVIGATION ==================== -->
    <!-- navigation rules describe the navigation cases between views using the -->

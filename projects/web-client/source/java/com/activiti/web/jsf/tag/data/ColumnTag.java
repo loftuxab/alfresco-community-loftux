@@ -36,9 +36,10 @@ public class ColumnTag extends BaseComponentTag
    public void release()
    {
       super.release();
-      m_value = null;
-      m_label = null;
-      m_primary = null;
+      this.value = null;
+      this.label = null;
+      this.primary = null;
+      this.width = null;
    }
    
    /**
@@ -48,9 +49,10 @@ public class ColumnTag extends BaseComponentTag
    {
       super.setProperties(component);
       
-      setStringBindingProperty(component, "value", m_value);
-      setStringProperty(component, "label", m_label);
-      setBooleanProperty(component, "primary", m_primary);
+      setStringBindingProperty(component, "value", this.value);
+      setStringProperty(component, "label", this.label);
+      setBooleanProperty(component, "primary", this.primary);
+      setStringProperty(component, "width", this.width);
    }
    
    
@@ -64,7 +66,7 @@ public class ColumnTag extends BaseComponentTag
     */
    public void setValue(String value)
    {
-      m_value = value;
+      this.value = value;
    }
 
    /**
@@ -74,7 +76,7 @@ public class ColumnTag extends BaseComponentTag
     */
    public void setLabel(String label)
    {
-      m_label = label;
+      this.label = label;
    }
 
    /**
@@ -84,16 +86,29 @@ public class ColumnTag extends BaseComponentTag
     */
    public void setPrimary(String primary)
    {
-      m_primary = primary;
+      this.primary = primary;
+   }
+   
+   /**
+    * Set the width
+    *
+    * @param width     the width
+    */
+   public void setWidth(String width)
+   {
+      this.width = width;
    }
 
 
+   /** the width */
+   private String width;
+
    /** the primary */
-   private String m_primary;
+   private String primary;
    
    /** the value */
-   private String m_value;
-
+   private String value;
+   
    /** the label */
-   private String m_label;
+   private String label;
 }

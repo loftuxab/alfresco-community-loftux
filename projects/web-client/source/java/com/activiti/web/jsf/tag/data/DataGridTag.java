@@ -10,7 +10,6 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.JspWriter;
 
-import com.activiti.web.data.IDataHandler;
 import com.activiti.web.jsf.tag.BaseComponentTag;
 
 /**
@@ -19,7 +18,7 @@ import com.activiti.web.jsf.tag.BaseComponentTag;
  * Datagrid Tag Handler. The data handler manages the dissemination of data from 
  * the datasrc in rows per page.
  */
-public class DataGridTag extends BaseComponentTag implements IDataProviderTag
+public class DataGridTag extends BaseComponentTag
 {
    // ------------------------------------------------------------------------------
    // Component methods 
@@ -48,14 +47,14 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
    {
       super.setProperties(component);
       
-      //setStringProperty(component, "datasource", m_datasourceName);
-      setStringProperty(component, "cellpadding", m_cellpadding);
-      setStringProperty(component, "cellspacing", m_cellspacing);
-      setStringProperty(component, "styleClass", m_styleClass);
-      setStringProperty(component, "style", m_styleClass);
-      setStringProperty(component, "initialSortedColumn", m_initialSortedColumn);
-      setBooleanProperty(component, "initialSortedDirection", m_initialSortedDirection);
-      setIntProperty(component, "pageSize", m_pageSize);
+      //setStringProperty(component, "datasource", this.datasourceName);
+      setStringProperty(component, "cellpadding", this.cellpadding);
+      setStringProperty(component, "cellspacing", this.cellspacing);
+      setStringProperty(component, "styleClass", this.styleClass);
+      setStringProperty(component, "style", this.style);
+      setStringProperty(component, "initialSortedColumn", this.initialSortedColumn);
+      setBooleanProperty(component, "initialSortedDirection", this.initialSortedDirection);
+      setIntProperty(component, "pageSize", this.pageSize);
    }
    
    
@@ -69,7 +68,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    //public void setDatasource(String datasource)
    //{
-   //   m_datasourceName = datasource;
+   //   this.datasourceName = datasource;
    //}
    
    /**
@@ -79,7 +78,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public String getStyle()
    {
-      return m_style;
+      return this.style;
    }
 
    /**
@@ -89,7 +88,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public void setStyle(String style)
    {
-      m_style = style;
+      this.style = style;
    }
 
    /**
@@ -99,7 +98,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public String getStyleClass()
    {
-      return m_styleClass;
+      return this.styleClass;
    }
 
    /**
@@ -109,7 +108,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public void setStyleClass(String styleClass)
    {
-      m_styleClass = styleClass;
+      this.styleClass = styleClass;
    }
 
    /**
@@ -119,7 +118,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public String getCellspacing()
    {
-      return m_cellspacing;
+      return this.cellspacing;
    }
 
    /**
@@ -129,7 +128,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public void setCellspacing(String cellspacing)
    {
-      m_cellspacing = cellspacing;
+      this.cellspacing = cellspacing;
    }
 
    /**
@@ -139,7 +138,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public String getCellpadding()
    {
-      return m_cellpadding;
+      return this.cellpadding;
    }
 
    /**
@@ -149,7 +148,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public void setCellpadding(String cellpadding)
    {
-      m_cellpadding = cellpadding;
+      this.cellpadding = cellpadding;
    }
 
    /**
@@ -159,7 +158,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public String getInitialSortedColumn()
    {
-      return m_initialSortedColumn;
+      return this.initialSortedColumn;
    }
 
    /**
@@ -169,7 +168,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public void setInitialSortedColumn(String initialSortedColumn)
    {
-      m_initialSortedColumn = initialSortedColumn;
+      this.initialSortedColumn = initialSortedColumn;
    }
 
    /**
@@ -179,7 +178,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public String getInitialSortedDirection()
    {
-      return m_initialSortedDirection;
+      return this.initialSortedDirection;
    }
 
    /**
@@ -189,7 +188,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public void setInitialSortedDirection(String initialSortedDirection)
    {
-      m_initialSortedDirection = initialSortedDirection;
+      this.initialSortedDirection = initialSortedDirection;
    }
 
    /**
@@ -199,7 +198,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public String getPageSize()
    {
-      return m_pageSize;
+      return this.pageSize;
    }
 
    /**
@@ -209,7 +208,7 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public void setPageSize(String pageSize)
    {
-      m_pageSize = pageSize;
+      this.pageSize = pageSize;
    }
    
    
@@ -221,13 +220,11 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
     */
    public void release()
    {
-      m_dataHandler = null;
-      m_pageSize = null;
-      m_cellpadding = null;
-      m_cellspacing = null;
-      //m_datasourceName = null;
-      m_initialSortedColumn = null;
-      m_initialSortedDirection = "true";
+      this.pageSize = null;
+      this.cellpadding = null;
+      this.cellspacing = null;
+      this.initialSortedColumn = null;
+      this.initialSortedDirection = "true";
    }
    
    /**
@@ -254,22 +251,22 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
          
          // start the table grid
          out.print("<table border=0");
-         if (m_styleClass != null && m_styleClass.length() != 0)
+         if (this.styleClass != null && this.styleClass.length() != 0)
          {
             out.print(" class='");
-            out.print(m_styleClass);
+            out.print(this.styleClass);
             out.print('\'');
          }
-         if (m_cellpadding != null && m_cellpadding.length() != 0)
+         if (this.cellpadding != null && this.cellpadding.length() != 0)
          {
             out.print(" cellpadding='");
-            out.print(m_cellpadding);
+            out.print(this.cellpadding);
             out.print('\'');
          }
-         if (m_cellspacing != null && m_cellspacing.length() != 0)
+         if (this.cellspacing != null && this.cellspacing.length() != 0)
          {
             out.print(" cellspacing='");
-            out.print(m_cellspacing);
+            out.print(this.cellspacing);
             out.print('\'');
          }
          out.print('>');
@@ -304,49 +301,6 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
    }*/
    
    
-   // ------------------------------------------------------------------------------
-   // IDataProviderTag implementation
-   
-   /**
-    * Return the object supporting the IDataHandler interface that stores the
-    * current state of this data handler. This stores the state so the tag object
-    * can remain stateless and be used by the app-server.
-    * 
-    * @return the IDataHandler supporting object
-    */
-   public IDataHandler getDataHandler()
-   {
-      if (m_dataHandler == null)
-      {
-         /* // Return the object supporting the IDataHandler interface for us
-         IDataBean bean = (IDataBean)pageContext.getSession().getAttribute(m_beanName);
-         if (bean == null)
-         {
-            bean = (IDataBean)pageContext.getAttribute(m_beanName);
-         }
-         if (bean == null)
-         {
-            throw new IllegalStateException("Unable to find request level state bean: " + m_beanName);
-         }
-         
-         IDataHandler state = bean.lookupDataHandler(getParentForm().getElementId());
-         if (state == null)
-         {
-            // register this datagrid state for the first time
-            state = bean.registerDataHandler(getParentForm().getElementId(), m_datasourceName);
-         }
-         
-         // force reset to first row for current page
-         // needed as the Portlet env seems to render page twice...!
-         state.resetRowIndex();
-         
-         m_dataHandler = state;*/
-      }
-      
-      return m_dataHandler;
-   }
-   
-   
    //------------------------------------------------------------------------------
    // Private methods
    
@@ -367,17 +321,17 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
    {
       // set the mandatory attributes so the data handler can initialise
       IDataHandler handler = getDataHandler();
-      handler.setUniqueName(m_datasourceName);
-      handler.setPageSize(m_nPageSize);
+      handler.setUniqueName(this.datasourceName);
+      handler.setPageSize(this.nPageSize);
       
       // apply initially sorted column if required
-      if (handler.getLastSortedColumn() == -1 && m_initialSortedColumn != null)
+      if (handler.getLastSortedColumn() == -1 && this.initialSortedColumn != null)
       {
-         int column = handler.getDataSource().getMetaData().lookupFieldIndex(m_initialSortedColumn);
+         int column = handler.getDataSource().getMetaData().lookupFieldIndex(this.initialSortedColumn);
          if (column != -1)
          {
             // TODO: add initially sorted mode tag property
-            handler.sort(column, m_initialSortedDirection, IDataHandler.SORT_CASEINS);
+            handler.sort(column, this.initialSortedDirection, IDataHandler.SORT_CASEINS);
          }
       }
    }*/
@@ -386,34 +340,25 @@ public class DataGridTag extends BaseComponentTag implements IDataProviderTag
    //------------------------------------------------------------------------------
    // Private data
    
-   /** form data handler providing the state of the data */
-   private IDataHandler m_dataHandler = null;
-   
-   /** data source name to lookup */
-   //private String m_datasourceName = null;
-   
-   /** state bean name to find in the request */
-   //private String m_beanName = null;
-   
    /** the style */
-   private String m_style;
+   private String style;
 
    /** the CSS Class */
-   private String m_styleClass;
+   private String styleClass;
 
    /** the cellspacing */
-   private String m_cellspacing;
+   private String cellspacing;
 
    /** the cellpadding */
-   private String m_cellpadding;
+   private String cellpadding;
 
    /** the initialSortedColumn */
-   private String m_initialSortedColumn;
+   private String initialSortedColumn;
 
    /** the initialSortedDirection */
-   private String m_initialSortedDirection;
+   private String initialSortedDirection;
 
    /** the page size */
-   private String m_pageSize;
+   private String pageSize;
 
 } // end class DataGridTag

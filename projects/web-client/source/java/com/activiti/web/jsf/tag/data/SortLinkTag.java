@@ -37,9 +37,9 @@ public class SortLinkTag extends HtmlComponentTag
    public void release()
    {
       super.release();
-      m_mode = null;
-      m_value = null;
-      m_label = null;
+      this.mode = null;
+      this.value = null;
+      this.label = null;
    }
    
    /**
@@ -48,9 +48,9 @@ public class SortLinkTag extends HtmlComponentTag
    protected void setProperties(UIComponent component)
    {
       super.setProperties(component);
-      setStringProperty(component, "value", m_value);
-      setStringProperty(component, "label", m_label);
-      setStringProperty(component, "mode", m_mode);
+      setStringProperty(component, "value", this.value);
+      setStringProperty(component, "label", this.label);
+      setStringProperty(component, "mode", this.mode);
    }
    
    /**
@@ -60,7 +60,7 @@ public class SortLinkTag extends HtmlComponentTag
     */
    public void setValue(String value)
    {
-      m_value = value;
+      this.value = value;
    }
 
    /**
@@ -70,7 +70,7 @@ public class SortLinkTag extends HtmlComponentTag
     */
    public void setMode(String mode)
    {
-      m_mode = mode;
+      this.mode = mode;
    }
 
    /**
@@ -80,16 +80,16 @@ public class SortLinkTag extends HtmlComponentTag
     */
    public void setLabel(String label)
    {
-      m_label = label;
+      this.label = label;
    }
 
 
    /** the label */
-   private String m_label;
+   private String label;
 
    /** the value */
-   private String m_value;
+   private String value;
 
    /** the sorting mode */
-   private String m_mode;
+   private String mode;
 }

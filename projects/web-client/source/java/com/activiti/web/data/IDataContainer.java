@@ -77,6 +77,4 @@ public interface IDataContainer
    
    public final static String SORT_CASEINSENSITIVE = "case-insensitive";
    public final static String SORT_CASESENSITIVE   = "case-sensitive";
-   public final static String SORT_NUMERIC         = "numeric";
-   public final static String SORT_DATE            = "date";
 }

@@ -64,6 +64,18 @@ public final class Utils
       return buf.toString();
    }
    
+   /**
+    * Build a context path safe image tag for the supplied image path.
+    * Image path should be supplied with a leading slash '/'.
+    * 
+    * @param context       FacesContext
+    * @param image         The local image path from the web folder with leading slash '/'
+    * @param width         Width in pixels
+    * @param height        Height in pixels
+    * @param alt           Optional alt/title text
+    * 
+    * @return Populated <code>img</code> tag
+    */
    public static String buildImageTag(FacesContext context, String image, int width, int height, String alt)
    {
       StringBuffer buf = new StringBuffer(100);
@@ -91,6 +103,16 @@ public final class Utils
       return buf.toString();
    }
    
+   /**
+    * Build a context path safe image tag for the supplied image path.
+    * Image path should be supplied with a leading slash '/'.
+    * 
+    * @param context       FacesContext
+    * @param image         The local image path from the web folder with leading slash '/'
+    * @param alt           Optional alt/title text
+    * 
+    * @return Populated <code>img</code> tag
+    */
    public static String buildImageTag(FacesContext context, String image, String alt)
    {
       StringBuffer buf = new StringBuffer(100);

@@ -20,10 +20,10 @@ public abstract class HtmlComponentTag extends BaseComponentTag
    {
       super.setProperties(component);
       
-      setStringProperty(component, "style", m_style);
-      setStringProperty(component, "styleClass", m_styleClass);
-      setStringProperty(component, "title", m_title);
-      setBooleanProperty(component, "visible", m_visible);
+      setStringProperty(component, "style", this.style);
+      setStringProperty(component, "styleClass", this.styleClass);
+      setStringProperty(component, "title", this.title);
+      setBooleanProperty(component, "visible", this.visible);
    }
    
    /**
@@ -32,10 +32,10 @@ public abstract class HtmlComponentTag extends BaseComponentTag
    public void release()
    {
       super.release();
-      m_style = null;
-      m_styleClass = null;
-      m_title = null;
-      m_visible = null;
+      this.style = null;
+      this.styleClass = null;
+      this.title = null;
+      this.visible = null;
    }
    
    /**
@@ -45,7 +45,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
     */
    public String getStyle()
    {
-      return m_style;
+      return this.style;
    }
 
    /**
@@ -55,7 +55,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
     */
    public void setStyle(String style)
    {
-      m_style = style;
+      this.style = style;
    }
 
    /**
@@ -65,7 +65,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
     */
    public String getStyleClass()
    {
-      return m_styleClass;
+      return this.styleClass;
    }
 
    /**
@@ -75,7 +75,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
     */
    public void setStyleClass(String styleClass)
    {
-      m_styleClass = styleClass;
+      this.styleClass = styleClass;
    }
 
    /**
@@ -85,7 +85,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
     */
    public String getVisible()
    {
-      return m_visible;
+      return this.visible;
    }
 
    /**
@@ -95,7 +95,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
     */
    public void setVisible(String visible)
    {
-      m_visible = visible;
+      this.visible = visible;
    }
 
    /**
@@ -105,7 +105,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
     */
    public String getTitle()
    {
-      return m_title;
+      return this.title;
    }
 
    /**
@@ -115,19 +115,19 @@ public abstract class HtmlComponentTag extends BaseComponentTag
     */
    public void setTitle(String title)
    {
-      m_title = title;
+      this.title = title;
    }
 
 
    /** the style */
-   protected String m_style;
+   protected String style;
 
    /** the styleClass */
-   protected String m_styleClass;
+   protected String styleClass;
 
    /** the visible */
-   protected String m_visible;
+   protected String visible;
 
    /** the title */
-   protected String m_title;
+   protected String title;
 }

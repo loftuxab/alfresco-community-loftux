@@ -17,20 +17,43 @@ public class GridArrayDataModel implements IGridDataModel
     */
    public GridArrayDataModel(Object[] data)
    {
-      m_data = data;
+      this.data = data;
    }
    
+   /**
+    * Get a row object for the specified row index
+    * 
+    * @param index      valid row index
+    * 
+    * @return row object for the specified index
+    */
    public Object getRow(int index)
    {
-      return m_data[index];
+      return this.data[index];
    }
    
    // TODO: allow formatting etc. of strings
    
+   /**
+    * Return the number of rows in the data model
+    * 
+    * @return row count
+    */
    public int size()
    {
-      return m_data.length;
+      return this.data.length;
    }
    
-   private Object[] m_data = null;
+   /**
+    * Sort the data set using the specified sort parameters
+    * 
+    * @param column        Column to sort
+    * @param bAscending    True for ascending sort, false for descending
+    * @param mode          Sort mode to use (see IDataContainer constants)
+    */
+   public void sort(String column, boolean bAscending, String mode)
+   {
+   }
+   
+   private Object[] data = null;
 }

@@ -14,7 +14,7 @@
    
    <h:form id="userListForm">
    
-      <h2>Users</h2>
+      <h2>Test Components</h2>
       
       <%-- use JSTL as simple example way to list the users --%>
       <%-- TODO: find out how to get this working - currently it can't find the JSF bean
@@ -31,30 +31,56 @@
       --%>
       
       <%-- DataList component test --%>
+      DataList component test
       before datalist table
-      <awc:dataList cellspacing="2" cellpadding="1" styleClass="mycss" style="border:2px">
-         inside datalist table
+      <awc:dataList cellspacing="2" cellpadding="1" styleClass="recordSet">
+         <tr><td>inside datalist table</td></tr>
       </awc:dataList>
       after datalist table
+      
+      <p>
       
       <%-- RichList component test --%>
       <%-- The RichList component is different to the data-grid in that it is
            designed to render it's own child components. This means it is capable
            of rendering the columns in any order and in any kind of layout. Allowing
            the impl of details, icons and list views within a single component. --%>
-      <awc:richList viewModes="list,details,icon" pageSize="2" styleClass="none" style="border-width:1px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
-            value="#{UserListBean.users}" var="u" initialSortColumn="name" initialSortDirection="true">
+      RichList component test, including sortable columns of various data types and paging.
+      <awc:richList viewModes="list,details,icon" pageSize="4" styleClass="none" style="border-width:thin" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
+            value="#{TestList.rows}" var="r" initialSortColumn="name" initialSortDirection="true">
          <awc:column primary="true">
             <f:facet name="header">
-               <awc:sortLink label="#{msg.name}" value="name" mode="case-insensitive" styleClass="header"/>
+               <awc:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
             </f:facet>
-            <h:outputText value="#{u.name}"/>
+            <h:outputText value="#{r.name}"/>
          </awc:column>
+         
          <awc:column>
             <f:facet name="header">
-               <awc:sortLink label="#{msg.joindate}" value="dateJoined" mode="date" styleClass="header"/>
+               <awc:sortLink label="Count" value="count" styleClass="header"/>
             </f:facet>
-            <h:outputText value="#{u.dateJoined}">
+            <h:outputText value="#{r.count}"/>
+         </awc:column>
+         
+         <awc:column>
+            <f:facet name="header">
+               <awc:sortLink label="Valid" value="valid" styleClass="header"/>
+            </f:facet>
+            <h:outputText value="#{r.valid}"/>
+         </awc:column>
+         
+         <awc:column>
+            <f:facet name="header">
+               <awc:sortLink label="Relevance" value="relevance" styleClass="header"/>
+            </f:facet>
+            <h:outputText value="#{r.relevance}"/>
+         </awc:column>
+         
+         <awc:column>
+            <f:facet name="header">
+               <awc:sortLink label="Created Date" value="created" styleClass="header"/>
+            </f:facet>
+            <h:outputText value="#{r.created}">
                <%-- example of a DateTime converter --%>
                <%-- can be used to convert both input and output text --%>
                <f:convertDateTime dateStyle="short" />
@@ -66,8 +92,11 @@
          <awc:dataPager/>
       </awc:richList>
       
+      <p>
+      
       <%-- example of using a JSF DataTable to list the users --%>
       <%-- iterates around the List of User objects in the UserListBean --%>
+      JSF dataTable component test.
       <h:dataTable id="userlist" value="#{UserListBean.usersModel}" var="u">
         <h:column>
           <f:facet name="header">
