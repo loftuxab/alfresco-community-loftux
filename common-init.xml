@@ -1,0 +1,19 @@
+<project name="common-init">
+   
+   <!-- *************************** -->
+   <!-- ** Common initialisation ** -->
+   <!-- *************************** -->
+
+   <target name="common-init">
+      <property environment="env" />
+      <property file="${user.home}/userconfig.properties" />
+      <property file="project.properties" />
+      <property file="${common.dir}/common.properties" />
+      
+      <tstamp>
+         <format property="time" pattern="HH:mm"/>
+      </tstamp>
+      <echo>Starting build for ${ant.project.name} at ${time}</echo>
+   </target>
+
+</project>

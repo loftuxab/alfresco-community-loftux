@@ -1,0 +1,13 @@
+<pages>
+   <portal-name>default</portal-name>
+   <page>
+      <page-name>web-client</page-name>
+      <window>
+         <window-name>JSFTestWindow</window-name>
+         <instance-ref>/web-client.JSFTest.JSFTestInstance</instance-ref>
+         <default>true</default>
+         <region>left</region>
+         <height>0</height>
+      </window>
+   </page>
+</pages>

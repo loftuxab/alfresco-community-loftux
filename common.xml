@@ -1,0 +1,151 @@
+<project name="common">
+   
+   <!-- ****************************************** -->
+   <!-- ** Initialisation/Configuration targets ** -->
+   <!-- ****************************************** -->
+
+   <property name="common.dir" value="${basedir}" />
+   <import file="${common.dir}/common-init.xml" />
+
+   <target name="setup" depends="common-init" description="Creates the initial directory structure for a project">
+      <mkdir dir="${src.java.dir}" />
+      <mkdir dir="${src.webinf.dir}" />
+      <mkdir dir="${local.lib.dir}" />
+      <mkdir dir="${classes.dir}" />
+      <taskdef name="create-web-xml" classname="com.gavincornwell.ant.XmlFileTask" 
+               classpath="${custom.tasks.jar}" />
+      <create-web-xml file="${src.webinf.dir}/web.xml" />
+   </target>
+
+   <target name="init" depends="common-init">
+      <path id="java.classpath">
+         <fileset dir="${common.lib.dir}">
+            <include name="*.jar" />
+         </fileset>
+      </path>
+
+      <mkdir dir="${classes.dir}" />
+      <mkdir dir="${dist.dir}" />
+   </target>
+   
+   <target name="dump-properties" depends="common-init">
+      <echoproperties/>
+   </target>
+
+   <!-- *********************** -->
+   <!-- ** Composite targets ** -->
+   <!-- *********************** -->
+
+   <target name="build" depends="clean, package" 
+           description="Builds the project after cleaning" />
+
+   <target name="incremental" depends="package"
+           description="Incrementally builds the project" />
+
+   <target name="continuous-build" />
+
+   <!-- ************************* -->
+   <!-- ** Compilation targets ** -->
+   <!-- ************************* -->
+
+   <target name="compile-java" depends="init" description="Compiles the Java source code">
+      <mkdir dir="${classes.dir}"/>
+      <javac destdir="${classes.dir}" fork="true" deprecation="on" debug="on">
+         <src path="${src.java.dir}"/>
+         <classpath refid="java.classpath"/>
+      </javac>
+
+      <copy todir="${classes.dir}">
+         <fileset dir="${src.java.dir}">
+            <patternset>
+                <exclude name="**/*.java"/>
+            </patternset>
+         </fileset>
+      </copy>
+   </target>
+   
+   <target name="compile-javadocs" depends="init">
+      <mkdir dir="${javadoc.dir}" />
+      <javadoc sourcepath="${src.java.dir}" destdir="${javadoc.dir}" 
+               packagenames="${javadoc.packages}" author="true" version="true" 
+               windowtitle="${javadoc.title}" />
+   </target>
+
+   <!-- *********************** -->
+   <!-- ** Packaging targets ** -->
+   <!-- *********************** -->
+
+   <target name="package" depends="package-jar, package-war" description="Packages the JAR and WAR files" />
+      
+   <target name="package-jar" depends="compile-java" description="Packages the JAR file">
+      <mkdir dir="${dist.dir}"/>
+      <jar jarfile="${dist.dir}\${jar.name}" basedir="${classes.dir}"/>
+   </target>
+
+   <target name="package-war" depends="package-jar" description="Packages the WAR file">
+      <mkdir dir="${dist.dir}" />
+      <war warfile="${dist.dir}/${war.name}" webxml="${src.web.dir}\WEB-INF\web.xml">
+         <fileset dir="${src.web.dir}" excludes="WEB-INF\web.xml" />
+         <zipfileset dir="${common.lib.dir}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}" 
+                     prefix="WEB-INF\lib" />
+         <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="WEB-INF\lib" />
+      </war>
+   </target>
+
+   <target name="distribute" depends="package-binary, package-source"
+           description="Creates the binary and source distributions" />
+
+   <target name="package-binary" depends="package-binary-zip, package-binary-tar" 
+           description="Creates the binary distribution" />
+
+   <target name="package-source" depends="package-source-zip, package-source-tar" 
+           description="Creates the source distribution" />
+
+   <target name="package-binary-zip" depends="clean, package" 
+           description="Packages the files into a binary distribution in the form of a ZIP file">
+      <zip destfile="${dist.dir}/${zip.binary.name}">
+         <zipfileset dir="${dist.dir}" excludes="*.zip, *.tar"/>
+      </zip>
+   </target>
+
+   <target name="package-binary-tar" depends="clean, package" 
+           description="Packages the files into a binary distribution in the form of a TAR file">
+      <!-- TODO: Do this when I have a Linux box available to test on -->
+   </target>
+
+   <target name="package-source-zip" depends="init" 
+           description="Packages the files into a source distribution in the form of a ZIP file">
+      <zip destfile="${dist.dir}/${zip.source.name}">
+         <zipfileset dir="${basedir}" excludes="build/**" />
+      </zip>
+   </target>
+
+   <target name="package-source-tar" depends="init" 
+           description="Packages the files into a source distribution in the form of a TAR file">
+      <!-- TODO: Do this when I have a Linux box available to test on -->
+   </target>
+
+   <!-- *************************** -->
+   <!-- ** Build control targets ** -->
+   <!-- *************************** -->
+
+   <target name="publish" />
+
+   <!-- ************************ -->
+   <!-- ** Deployment targets ** -->
+   <!-- ************************ -->
+
+   <target name="deploy" depends="init" description="Deploys the WAR file to an application server">
+      <copy file="${dist.dir}/${war.name}" todir="${deploy.dir}" />
+   </target>
+
+   <!-- ********************** -->
+   <!-- ** Cleaning targets ** -->
+   <!-- ********************** -->
+
+   <target name="clean" depends="init" description="Cleans the project">
+      <delete includeEmptyDirs="true" quiet="yes" dir="${classes.dir}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${dist.dir}"/>
+   </target>
+
+</project>

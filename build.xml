@@ -1,0 +1,35 @@
+<project name="company-name" default="incremental-all">
+
+   <property name="common.dir" value="${basedir}" />
+   <import file="${common.dir}/common-init.xml" />
+
+   <!--
+   NOTE: There is no guaranteed order the projects will be executed in the targets below, to define 
+         an explicit order use a filelist instead of a fileset.
+   -->
+
+   <target name="build-all" depends="common-init" description="Builds all the projects after cleaning">
+      <subant target="build">
+         <fileset dir="." includes="**/project-build.xml" />
+      </subant>
+      <antcall target="deploy" />
+   </target>
+
+   <target name="incremental-all" depends="common-init" description="Builds all the projects">
+      <subant target="incremental">
+         <fileset dir="." includes="**/project-build.xml" />
+      </subant>
+      <antcall target="deploy" />
+   </target>
+
+   <target name="clean-all" depends="common-init" description="Cleans all the projects">
+      <subant target="clean">
+         <fileset dir="." includes="**/project-build.xml" />
+      </subant>
+   </target>
+
+   <target name="deploy" depends="common-init" description="Deploys to JBoss">
+      <copy file="${basedir}/projects/web-client/build/dist/web-client.war" todir="${deploy.dir}" />
+   </target>
+
+</project>

@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE faces-config PUBLIC "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.0//EN"
+                                             "http://java.sun.com/dtd/web-facesconfig_1_0.dtd">
+<faces-config>
+
+   <!-- ==================== APPLICATION ==================== -->
+   <application>
+      <locale-config>
+         <default-locale>en</default-locale>
+      </locale-config>
+   </application>
+
+
+   <!-- ==================== COMPONENTS ==================== -->
+   <component>
+      <component-type>awc.faces.DataGrid</component-type>
+      <component-class>com.activiti.web.jsf.component.data.UIDataGrid</component-class>
+   </component>
+   
+   <component>
+      <component-type>awc.faces.RichList</component-type>
+      <component-class>com.activiti.web.jsf.component.data.UIRichList</component-class>
+   </component>
+   
+   <component>
+      <component-type>awc.faces.RichListColumn</component-type>
+      <component-class>com.activiti.web.jsf.component.data.UIColumn</component-class>
+   </component>
+
+
+   <!-- ==================== RENDERERS ==================== -->
+   <render-kit>
+      <!-- custom renderer for a standard UI Input component -->
+      <renderer>
+         <component-family>javax.faces.Input</component-family>
+         <!-- the renderer type is a convention name - not an actual class -->
+         <renderer-type>awc.faces.DatePickerRenderer</renderer-type>
+         <!-- the actual renderer class type -->
+         <renderer-class>com.activiti.web.jsf.renderer.DatePickerRenderer</renderer-class>
+      </renderer>
+      
+      <!-- custom renderer for the rich list UI component -->
+      <renderer>
+         <component-family>awc.faces.Data</component-family>
+         <renderer-type>awc.faces.RichListRenderer</renderer-type>
+         <renderer-class>com.activiti.web.jsf.renderer.data.RichListRenderer</renderer-class>
+      </renderer>
+   </render-kit>
+
+
+   <!-- ==================== MANAGED BEANS ==================== -->
+   <managed-bean>
+      <description>
+         The bean that backs up the jsf-test webapp Login screen
+      </description>
+      <managed-bean-name>LoginBean</managed-bean-name>
+      <managed-bean-class>jsftest.LoginBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <!-- default value forced for a managed property -->
+      <managed-property>
+         <property-name>name</property-name>
+         <property-class>java.lang.String</property-class>
+         <value>admin</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that backs up the jsf-test webapp User List screen
+      </description>
+      <managed-bean-name>UserListBean</managed-bean-name>
+      <managed-bean-class>jsftest.UserListBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+   </managed-bean>
+
+
+   <!-- ==================== NAVIGATION ==================== -->
+   <!-- navigation rules describe the navigation cases between views using the -->
+   <!-- outcomes from action methods or the outcome from a default action impl -->
+   <navigation-rule>
+      <description>
+         The decision rule used by the NavigationHandler to
+         determine which view must be displayed after the
+         current view, login.jsp is processed.
+      </description>
+      <from-view-id>/login.jsp</from-view-id>
+      <navigation-case>
+         <description>
+             Indicates to the NavigationHandler that the userlist.jsp
+             view must be displayed if the Action referenced by a 
+             UICommand component on the login.jsp view returns 
+             the outcome "success".
+         </description>
+         <from-outcome>success</from-outcome>
+         <to-view-id>/userlist.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+
+   <!-- Note that the from-view-id can contain * wildcard to specify an entire dir match -->
+   <!-- e.g. <from-view-id>/myfiles/*</from-view-id> -->
+   <navigation-rule>
+      <from-view-id>/userlist.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>edituser</from-outcome>
+         <to-view-id>/edituser.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>adduser</from-outcome>
+         <to-view-id>/adduser.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/adduser.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>success</from-outcome>
+         <to-view-id>/userlist.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/userlist.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/edituser.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>success</from-outcome>
+         <to-view-id>/userlist.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/userlist.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+
+</faces-config>

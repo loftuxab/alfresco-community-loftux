@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="source/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/standard.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/commons-collections.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/commons-digester.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/jsf-api.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/jsf-impl.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/jsf-portlet.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/jsp.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="W:/company-name/lib/servlet.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

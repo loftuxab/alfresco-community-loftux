@@ -1,0 +1,7 @@
+<project name="web-client" default="build">
+
+   <path id="common.path" path="${basedir}/../.." />
+   <property name="common.dir" refid="common.path" />
+   <import file="${common.dir}/common.xml" />
+   
+</project>
