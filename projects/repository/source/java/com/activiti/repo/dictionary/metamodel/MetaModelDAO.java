@@ -20,7 +20,7 @@ public interface MetaModelDAO
      * 
      * @return  type names
      */
-    public Collection/*<QName>*/ getTypes();
+    public Collection<QName> getTypes();
 
     /**
      * Gets a Class

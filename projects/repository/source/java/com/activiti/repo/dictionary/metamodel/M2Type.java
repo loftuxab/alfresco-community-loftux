@@ -11,7 +11,7 @@ import java.util.List;
 public interface M2Type extends M2Class
 {
     
-    public List getDefaultAspects();
+    public List<M2Aspect> getDefaultAspects();
 
     // TODO: Investigate this option - will we support?, is it in right place?
     public boolean getOrderedChildren();

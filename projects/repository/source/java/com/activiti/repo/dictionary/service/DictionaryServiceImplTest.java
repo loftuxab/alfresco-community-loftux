@@ -46,11 +46,11 @@ public class DictionaryServiceImplTest extends TestCase
         assertEquals(fileRef, fileClass.getReference());
         assertEquals(false, fileClass.isAspect());
         assertEquals(QName.createQName("test", "base"), fileClass.getSuperClass().getQName());
-        Map fileProperties = fileClass.getProperties();
+        Map<PropertyRef,PropertyDefinition> fileProperties = fileClass.getProperties();
         assertNotNull(fileProperties);
         assertEquals(4, fileProperties.size());
         PropertyRef propRef = new PropertyRef(fileRef, "encoding");
-        PropertyDefinition nameProp = (PropertyDefinition)fileProperties.get(propRef);
+        PropertyDefinition nameProp = fileProperties.get(propRef);
         assertNotNull(nameProp);
         assertEquals(propRef, nameProp.getReference());
         
@@ -58,16 +58,16 @@ public class DictionaryServiceImplTest extends TestCase
         ClassDefinition folderClass = service.getClass(folderRef);
         assertNotNull(folderClass);
         assertEquals(folderRef, folderClass.getReference());
-        Map folderAssocs = folderClass.getAssociations();
+        Map<AssociationRef,AssociationDefinition> folderAssocs = folderClass.getAssociations();
         assertNotNull(folderAssocs);
         assertEquals(1, folderAssocs.size());
         AssociationRef assocRef = new AssociationRef(folderRef, "contents");
-        AssociationDefinition contentsAssoc = (AssociationDefinition)folderAssocs.get(assocRef);
+        AssociationDefinition contentsAssoc = folderAssocs.get(assocRef);
         assertNotNull(contentsAssoc);
         assertTrue(contentsAssoc instanceof ChildAssociationDefinition);
         assertEquals(assocRef, contentsAssoc.getReference());
         assertEquals(true, contentsAssoc.isChild());
-        ClassRef toClass = (ClassRef)contentsAssoc.getRequiredToClasses().get(0);
+        ClassRef toClass = contentsAssoc.getRequiredToClasses().get(0);
         assertEquals(QName.createQName("test", "file"), toClass.getQName());
     }
 

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.ref.QName;
 
 
@@ -24,9 +25,9 @@ public class M2References
      * @param m2Classes  list of Class to construct references from
      * @return  list of class references
      */
-    public static List createClassRefList(Collection m2Classes)
+    public static List<ClassRef> createClassRefList(Collection<? extends M2Class> m2Classes)
     {
-        List references = new ArrayList(m2Classes.size());
+        List<ClassRef> references = new ArrayList<ClassRef>(m2Classes.size());
         for (Iterator iter = m2Classes.iterator(); iter.hasNext(); /**/)
         {
             M2Class m2Class = (M2Class)iter.next();
@@ -42,9 +43,9 @@ public class M2References
      * @param m2Properties  list of properties to construct references from
      * @return  list of property references
      */
-    public static List createPropertyRefList(Collection m2Properties)
+    public static List<PropertyRef> createPropertyRefList(Collection<M2Property> m2Properties)
     {
-        List references = new ArrayList(m2Properties.size());
+        List<PropertyRef> references = new ArrayList<PropertyRef>(m2Properties.size());
         for (Iterator iter = m2Properties.iterator(); iter.hasNext(); /**/)
         {
             M2Property m2Property = (M2Property)iter.next();
@@ -60,9 +61,9 @@ public class M2References
      * @param qnames  list of QNames to construct references from
      * @return  list of class references
      */
-    public static Collection createQNameClassRefCollection(Collection/*QName*/ qnames)
+    public static Collection<ClassRef> createQNameClassRefCollection(Collection<QName> qnames)
     {
-        Collection ddrefs = new ArrayList(qnames.size());
+        Collection<ClassRef> ddrefs = new ArrayList<ClassRef>(qnames.size());
         for (Iterator iter = qnames.iterator(); iter.hasNext(); /**/)
         {
             ClassRef classRef = new ClassRef((QName)iter.next());

@@ -18,7 +18,7 @@ public interface DictionaryService
      * 
      * @return collection of Type References
      */
-    Collection/*<ClassRef>*/ getTypes();
+    Collection<ClassRef> getTypes();
     
 //    DDRef[] getTypes(String namespace);
     

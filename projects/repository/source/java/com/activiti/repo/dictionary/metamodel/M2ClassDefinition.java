@@ -6,8 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.activiti.repo.dictionary.AssociationDefinition;
+import com.activiti.repo.dictionary.AssociationRef;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.PropertyDefinition;
+import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.ref.QName;
 
 
@@ -103,10 +107,10 @@ public class M2ClassDefinition implements ClassDefinition
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.ClassDefinition#getProperties()
      */
-    public Map getProperties()
+    public Map<PropertyRef, PropertyDefinition> getProperties()
     {
         List aggregatedProperties = aggregateProperties();
-        Map propertyDefs = new HashMap(aggregatedProperties.size());
+        Map<PropertyRef, PropertyDefinition> propertyDefs = new HashMap<PropertyRef, PropertyDefinition>(aggregatedProperties.size());
         for (Iterator iter = aggregatedProperties.iterator(); iter.hasNext(); /**/)
         {
             M2Property m2Property = (M2Property)iter.next();
@@ -121,7 +125,7 @@ public class M2ClassDefinition implements ClassDefinition
      * 
      * @return  properties
      */
-    protected List aggregateProperties()
+    protected List<M2Property> aggregateProperties()
     {
         return m2Class.getInheritedProperties();
     }
@@ -130,10 +134,10 @@ public class M2ClassDefinition implements ClassDefinition
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.ClassDefinition#getAssociations()
      */
-    public Map getAssociations()
+    public Map<AssociationRef, AssociationDefinition> getAssociations()
     {
         List aggregatedAssociations = aggregateAssociations();
-        Map assocDefs = new HashMap(aggregatedAssociations.size());
+        Map<AssociationRef, AssociationDefinition> assocDefs = new HashMap<AssociationRef, AssociationDefinition>(aggregatedAssociations.size());
         for (Iterator iter = aggregatedAssociations.iterator(); iter.hasNext(); /**/)
         {
             M2Association m2Assoc = (M2Association)iter.next();
@@ -148,7 +152,7 @@ public class M2ClassDefinition implements ClassDefinition
      * 
      * @return  properties
      */
-    protected List aggregateAssociations()
+    protected List<M2Association> aggregateAssociations()
     {
         return m2Class.getInheritedAssociations();
     }

@@ -123,7 +123,7 @@ public class M2AssociationDefinition implements AssociationDefinition
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.AssociationDefinition#getRequiredToClasses()
      */
-    public List getRequiredToClasses()
+    public List<ClassRef> getRequiredToClasses()
     {
         return M2References.createClassRefList(m2Association.getRequiredToClasses());
     }

@@ -7,6 +7,7 @@
 package com.activiti.repo.dictionary.metamodel.emf.impl;
 
 import com.activiti.repo.dictionary.metamodel.emf.EMFAspect;
+import com.activiti.repo.dictionary.metamodel.M2Aspect;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.emf.EMFClass;
 import com.activiti.repo.dictionary.metamodel.emf.EMFType;
@@ -331,7 +332,7 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Type#getDefaultAspects()
      */
-    public List getDefaultAspects()
+    public List<M2Aspect> getDefaultAspects()
     {
         return (List)getEmfDefaultAspects();
     }

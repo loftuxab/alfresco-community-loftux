@@ -15,6 +15,7 @@ import com.activiti.repo.dictionary.metamodel.M2Property;
 import com.activiti.repo.dictionary.metamodel.M2References;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
+import com.activiti.repo.ref.QName;
 
 
 /**
@@ -45,11 +46,11 @@ public class DictionaryServiceImpl implements DictionaryService
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.DictionaryService#getTypes()
      */
-    public Collection getTypes()
+    public Collection<ClassRef> getTypes()
     {
-        Collection qnames = metaModelDAO.getTypes();
-        Collection ddrefs = M2References.createQNameClassRefCollection(qnames);
-        return ddrefs;
+        Collection<QName> qnames = metaModelDAO.getTypes();
+        Collection<ClassRef> classRefs = M2References.createQNameClassRefCollection(qnames);
+        return classRefs;
     }
 
 

@@ -55,7 +55,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
     /**
      * Index of QName to EMF Class
      */
-    private Map classIndex;
+    private Map<EClass,Map<QName,EObject>> classIndex;
     
 
     /**
@@ -140,9 +140,9 @@ public class EMFMetaModelDAO implements MetaModelDAO
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#getTypes()
      */
-    public Collection getTypes()
+    public Collection<QName> getTypes()
     {
-        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFType());
+        Map<QName,EObject> objectIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFType());
         return objectIndex == null ? null : objectIndex.keySet();
     }
 
@@ -153,7 +153,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
      */
     public M2Class getClass(QName className)
     {
-        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFClass()); 
+        Map<QName,EObject> objectIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFClass()); 
         return objectIndex == null ? null : (M2Class)objectIndex.get(className);
     }
 
@@ -163,7 +163,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
      */
     public M2Type getType(QName typeName)
     {
-        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFType()); 
+        Map<QName,EObject> objectIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFType()); 
         return objectIndex == null ? null : (M2Type)objectIndex.get(typeName);
     }
 
@@ -173,7 +173,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
      */
     public M2Aspect getAspect(QName aspectName)
     {
-        Map objectIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFAspect()); 
+        Map<QName,EObject> objectIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFAspect()); 
         return objectIndex == null ? null : (M2Aspect)objectIndex.get(aspectName);
     }
         
@@ -186,11 +186,11 @@ public class EMFMetaModelDAO implements MetaModelDAO
         M2Class m2Class = getClass(className);
         if (m2Class != null)
         {
-            List properties = m2Class.getProperties();
-            Iterator iter = properties.iterator();
+            List<M2Property> properties = m2Class.getProperties();
+            Iterator<M2Property> iter = properties.iterator();
             while (iter.hasNext())
             {
-                M2Property property = (M2Property)iter.next();
+                M2Property property = iter.next();
                 if (property.getName().equals(propertyName))
                 {
                     return property;
@@ -206,7 +206,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
      */
     public M2PropertyType getPropertyType(QName propertyType)
     {
-        Map idIndex = (Map)classIndex.get(EmfPackage.eINSTANCE.getEMFPropertyType()); 
+        Map<QName,EObject> idIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFPropertyType()); 
         return idIndex == null ? null : (M2PropertyType)idIndex.get(propertyType);
     }
     
@@ -276,7 +276,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
     
     private void initIndex(Resource resource)
     {
-        classIndex = new HashMap();
+        classIndex = new HashMap<EClass, Map<QName, EObject>>();
         List objects = resource.getContents();
         for (Iterator iter = objects.iterator(); iter.hasNext(); /**/)
         {
@@ -291,28 +291,28 @@ public class EMFMetaModelDAO implements MetaModelDAO
         if (object instanceof M2Type)
         {
             M2Type m2Type= (M2Type)object;
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFClass()).put(m2Type.getName(), m2Type);
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFType()).put(m2Type.getName(), m2Type);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFClass()).put(m2Type.getName(), object);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFType()).put(m2Type.getName(), object);
         }
         else if (object instanceof M2Aspect)
         {
             M2Aspect m2Aspect = (M2Aspect)object;
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFClass()).put(m2Aspect.getName(), m2Aspect);
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFAspect()).put(m2Aspect.getName(), m2Aspect);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFClass()).put(m2Aspect.getName(), object);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFAspect()).put(m2Aspect.getName(), object);
         }
         else if (object instanceof M2PropertyType)
         {
             M2PropertyType m2PropertyType= (M2PropertyType)object;
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFPropertyType()).put(m2PropertyType.getName(), m2PropertyType);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFPropertyType()).put(m2PropertyType.getName(), object);
         }
     }
 
-    private Map getObjectIndex(EClass eClass)
+    private Map<QName, EObject> getObjectIndex(EClass eClass)
     {
-        Map objectIndex = (Map)classIndex.get(eClass);
+        Map<QName, EObject> objectIndex = classIndex.get(eClass);
         if (objectIndex == null)
         {
-            objectIndex = new HashMap();
+            objectIndex = new HashMap<QName, EObject>();
             classIndex.put(eClass, objectIndex);
         }
         return objectIndex; 

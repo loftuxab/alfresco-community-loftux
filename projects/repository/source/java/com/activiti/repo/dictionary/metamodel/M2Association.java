@@ -34,7 +34,7 @@ public interface M2Association
     
     public void setMultiValued(boolean isMultiValued);
 
-    public List getRequiredToClasses();
+    public List<M2Class> getRequiredToClasses();
     
     /**
      * Gets the read-only Association definition

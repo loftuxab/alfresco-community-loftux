@@ -24,19 +24,19 @@ public interface M2Class
     
     public void setSuperClass(M2Class superClass);
     
-    public List getProperties();
+    public List<M2Property> getProperties();
     
     public M2Property createProperty(String propertyName);
     
-    public List getInheritedProperties();
+    public List<M2Property> getInheritedProperties();
     
-    public List getAssociations();
+    public List<M2Association> getAssociations();
     
     public M2Association createAssociation(String associationName);
     
     public M2ChildAssociation createChildAssociation(String associationName);
     
-    public List getInheritedAssociations();
+    public List<M2Association> getInheritedAssociations();
 
     /**
      * Gets the read-only class definition

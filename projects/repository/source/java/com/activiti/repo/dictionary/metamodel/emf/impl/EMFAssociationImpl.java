@@ -565,7 +565,7 @@ public class EMFAssociationImpl extends EObjectImpl implements EMFAssociation, M
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Association#getRequiredToClasses()
      */
-    public List getRequiredToClasses()
+    public List<M2Class> getRequiredToClasses()
     {
         return (List)getEmfRequiredToClasses();
     }

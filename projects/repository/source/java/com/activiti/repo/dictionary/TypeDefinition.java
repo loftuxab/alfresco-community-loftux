@@ -16,7 +16,7 @@ public interface TypeDefinition extends ClassDefinition
      * 
      * @return  the default aspects
      */
-    public List/*ClassRef*/ getDefaultAspects();
+    public List<ClassRef> getDefaultAspects();
     
     
     /**

@@ -47,7 +47,7 @@ public interface ClassDefinition
      * 
      * @return  properties including inherited
      */
-    public Map/*<PropertyRef, PropertyDefinition>*/ getProperties();
+    public Map<PropertyRef, PropertyDefinition> getProperties();
 
     /**
      * Gets the associations of the Class
@@ -56,6 +56,6 @@ public interface ClassDefinition
      * 
      * @return  associations including inherited
      */
-    public Map/*<AssocRef, AssociationDefinition>*/ getAssociations();
+    public Map<AssociationRef, AssociationDefinition> getAssociations();
     
 }

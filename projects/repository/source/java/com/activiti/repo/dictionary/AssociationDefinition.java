@@ -39,7 +39,7 @@ public interface AssociationDefinition
      * 
      * @return  the class list  
      */
-    public List/*ClassRef*/ getRequiredToClasses();
+    public List<ClassRef> getRequiredToClasses();
     
     /**
      * Is this a child association?

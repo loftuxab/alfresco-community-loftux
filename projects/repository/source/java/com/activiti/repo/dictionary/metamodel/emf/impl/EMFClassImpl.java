@@ -434,7 +434,7 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#getProperties()
      */
-    public List getProperties()
+    public List<M2Property> getProperties()
     {
         return getEmfProperties();
     }
@@ -454,14 +454,14 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#getInheritedProperties()
      */
-    public List getInheritedProperties()
+    public List<M2Property> getInheritedProperties()
     {
-        List inheritedProperties = new ArrayList();
+        List<M2Property> inheritedProperties = new ArrayList<M2Property>();
         deriveInheritedProperties(this, inheritedProperties);
         return inheritedProperties;
     }
 
-    private void deriveInheritedProperties(M2Class thisClass, List properties)
+    private void deriveInheritedProperties(M2Class thisClass, List<M2Property> properties)
     {
         M2Class superClass = thisClass.getSuperClass();
         if (superClass != null)
@@ -474,7 +474,7 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#getAssociations()
      */
-    public List getAssociations()
+    public List<M2Association> getAssociations()
     {
         return getEmfAssociations();
     }
@@ -506,14 +506,14 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#getInheritedAssociations()
      */
-    public List getInheritedAssociations()
+    public List<M2Association> getInheritedAssociations()
     {
-        List inheritedAssociations = new ArrayList();
+        List<M2Association> inheritedAssociations = new ArrayList<M2Association>();
         deriveInheritedAssociations(this, inheritedAssociations);
         return inheritedAssociations;
     }
 
-    private void deriveInheritedAssociations(M2Class thisClass, List associations)
+    private void deriveInheritedAssociations(M2Class thisClass, List<M2Association> associations)
     {
         M2Class superClass = thisClass.getSuperClass();
         if (superClass != null)
