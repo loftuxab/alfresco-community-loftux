@@ -5,6 +5,8 @@
 
 <%@ page isELIgnored="false" %>
 
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
+
 <f:view>
    <%-- load a bundle of properties I18N strings here --%>
    <f:loadBundle basename="messages" var="msg"/>
@@ -39,17 +41,17 @@
            designed to render it's own child components. This means it is capable
            of rendering the columns in any order and in any kind of layout. Allowing
            the impl of details, icons and list views within a single component. --%>
-      <awc:richList viewModes="list,details,icon" pageSize="2" styleClass="mycss" style="border:2px"
+      <awc:richList viewModes="list,details,icon" pageSize="2" styleClass="none" style="border-width:1px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
             value="#{UserListBean.users}" var="u" initialSortColumn="name" initialSortDirection="true">
          <awc:column primary="true">
             <f:facet name="header">
-               <awc:sortLink label="#{msg.name}" value="name" mode="case-insensitive"/>
+               <awc:sortLink label="#{msg.name}" value="name" mode="case-insensitive" styleClass="header"/>
             </f:facet>
             <h:outputText value="#{u.name}"/>
          </awc:column>
          <awc:column>
             <f:facet name="header">
-               <awc:sortLink label="#{msg.joindate}" value="dateJoined" mode="date"/>
+               <awc:sortLink label="#{msg.joindate}" value="dateJoined" mode="date" styleClass="header"/>
             </f:facet>
             <h:outputText value="#{u.dateJoined}">
                <%-- example of a DateTime converter --%>

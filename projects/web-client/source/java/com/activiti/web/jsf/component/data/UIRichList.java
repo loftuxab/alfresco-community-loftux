@@ -30,8 +30,6 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public UIRichList()
    {
       setRendererType("awc.faces.RichListRenderer");
-      
-      // TODO: set the default IRichListRenderer impl - could come from a config?
    }
 
    
@@ -57,7 +55,6 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       m_currentPage = ((Integer)values[1]).intValue();
       m_sortColumn = (String)values[2];
       m_sortDirection = ((Boolean)values[3]).booleanValue();
-      m_pageSize = ((Integer)values[4]).intValue();
    }
    
    /**
@@ -65,13 +62,12 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[5];
+      Object values[] = new Object[4];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = new Integer(m_currentPage);
       values[2] = m_sortColumn;
       values[3] = (m_sortDirection ? Boolean.TRUE : Boolean.FALSE);
-      values[4] = new Integer(m_pageSize);
       return (values);
    }
    
@@ -277,6 +273,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public IRichListRenderer getViewRenderer()
    {
       // get type from current view mode, then create an instance of the renderer
+      // TODO: set the appropriate IRichListRenderer impl - could come from a config?
       return new RichListRenderer.ListViewRenderer();
    }
    

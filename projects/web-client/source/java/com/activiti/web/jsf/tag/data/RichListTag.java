@@ -63,6 +63,8 @@ public class RichListTag extends BaseComponentTag
       setStringProperty(component, "viewModes", m_viewModes);
       setStringProperty(component, "style", m_style);
       setStringProperty(component, "styleClass", m_styleClass);
+      setStringProperty(component, "rowStyleClass", m_rowStyleClass);
+      setStringProperty(component, "altRowStyleClass", m_altRowStyleClass);
       setIntProperty(component, "pageSize", m_pageSize);
    }
    
@@ -159,10 +161,36 @@ public class RichListTag extends BaseComponentTag
    {
       m_styleClass = styleClass;
    }
+   
+   /**
+    * Set the the row CSS Class
+    *
+    * @param rowStyleClass     the the row CSS Class
+    */
+   public void setRowStyleClass(String rowStyleClass)
+   {
+      m_rowStyleClass = rowStyleClass;
+   }
+
+   /**
+    * Set the alternate row CSS Class
+    *
+    * @param altRowStyleClass     the alternate row CSS Class
+    */
+   public void setAltRowStyleClass(String altRowStyleClass)
+   {
+      m_altRowStyleClass = altRowStyleClass;
+   }
 
 
    // ------------------------------------------------------------------------------
    // Private data
+   
+   /** the row CSS Class */
+   private String m_rowStyleClass;
+
+   /** the alternate row CSS Class */
+   private String m_altRowStyleClass;
    
    /** the style */
    private String m_style;

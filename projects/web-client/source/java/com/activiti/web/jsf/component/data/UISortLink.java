@@ -169,21 +169,41 @@ public class UISortLink extends UICommand
       return dataContainer.getClientId(context) + NamingContainer.SEPARATOR_CHAR + "sort";
    }
    
+   /**
+    * Column name referenced by this link
+    * 
+    * @return column name
+    */
    public String getColumn()
    {
       return (String)getValue();
    }
    
+   /**
+    * Sorting mode - see IDataContainer constants
+    * 
+    * @return sorting mode - see IDataContainer constants
+    */
    public String getMode()
    {
       return m_mode;
    }
    
+   /**
+    * Set the sorting mode - see IDataContainer constants
+    * 
+    * @param sortMode      the sorting mode- see IDataContainer constants
+    */
    public void setMode(String sortMode)
    {
       m_mode = sortMode;
    }
    
+   /**
+    * Returns true for ascending sort, false for descending
+    * 
+    * @return true for ascending sort, false for descending
+    */
    public boolean isAscending()
    {
       return m_bAscending;

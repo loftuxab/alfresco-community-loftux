@@ -175,11 +175,20 @@ public class RichListRenderer extends BaseRenderer
       {
          ResponseWriter out = context.getResponseWriter();
          
-         // TODO: output alt row styles here?
-         out.write("<tr>");
+         // output row or alt style row if set
+         out.write("<tr");
+         String style = (String)richList.getAttributes().get("rowStyleClass");
+         String altStyle = (String)richList.getAttributes().get("altRowStyleClass");
+         if (altStyle != null && m_rowIndex++ % 2 == 1)
+         {
+            style = altStyle;
+         }         
+         outputAttribute(out, style, "class");
+         out.write('>');
+         
+         // output each column in turn and render all children
          for (int i=0; i<columns.length; i++)
          {
-            // render column as appropriate for the list type
             out.write("<td>");
             if (columns[i].getChildCount() != 0)
             {
@@ -211,6 +220,8 @@ public class RichListRenderer extends BaseRenderer
          }
          out.write("</td></tr>");
       }
+      
+      private int m_rowIndex = 0;
    }
    
    

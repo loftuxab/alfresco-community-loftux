@@ -1,0 +1,402 @@
+table.moduletable td
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+}
+
+td,tr,p,div
+{
+   color: #1B3557;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: Black;
+}
+
+a:link, a:visited
+{
+	font-size: 11px;
+	color: #1B3557;
+	text-decoration: none;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-weight: normal;
+}
+
+a:hover
+{
+	color: #4272B4;
+	text-decoration: underline;
+	font-weight: normal;
+}
+
+a.path:link, a.path:visited
+{
+	font-size: 14px;
+	color: #666666;
+	text-decoration: none;
+	font-weight: normal;
+}
+
+a.path:hover
+{
+   font-size: 14px;
+	color: #666666;
+	text-decoration: underline;
+	font-weight: normal;
+}
+
+a.header:link, a.header:visited
+{
+	font-weight: bold;
+}
+
+a.header:hover
+{
+	font-weight: bold;
+}
+
+a.moreactions:link, a.moreactions:visited
+{
+   vertical-align: 30%;
+	font-size: 10px;
+}
+
+a.moreactions:hover
+{
+   vertical-align: 30%;
+	font-size: 10px;
+}
+
+a.small:link, a.small:visited
+{
+   font-weight: normal;
+   color: #666666;
+}
+
+a.small:hover
+{
+   font-weight: normal;
+   color: #666666;
+}
+
+.pageTitle
+{
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   color: #666666;
+   font-size: 14px;
+}
+
+.main
+{
+   color: #1B3557;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+}
+
+.mainTitle
+{
+   color: #666666;
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 16px;
+   font-weight: bold;
+   vertical-align: middle;
+}
+
+.mainSubTitle
+{
+   color: #666666;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+   font-weight: bold;
+}
+
+.mainSubText
+{
+   color: #666666;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+}
+
+.mainSubTextLarge
+{
+   color: #666666;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 12px;
+}
+
+.dialogTitleText
+{
+   color: #666666;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 12px;
+   font-weight: bold;
+}
+
+.mainSubTextSmall
+{
+   color: #666666;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 10px;
+}
+
+.welcomeHeader
+{
+   background-color: #eeeeee;
+   border-top: thin solid #666666;
+   border-bottom: thin solid #cccccc;
+}
+
+.headerTopActions
+{
+   background-color: #CCCCCC;
+   border-top: thin solid #FFFFFF;
+   border-bottom: thin solid #999999;
+}
+
+.headerMainActions
+{
+   background-color: #CCCCCC;
+   border-top: thin solid #FFFFFF;
+   border-bottom: thin solid #999999;
+}
+
+.headerTopDetail
+{
+   background-color: #EEEEEE;
+   border-top: thin solid #FFFFFF;
+   border-bottom: thin solid #999999;
+}
+
+.headerTopDetailNoActions
+{
+   background-color: #EEEEEE;
+   border-top: thin solid #FFFFFF;
+   border-bottom: thin solid #999999;
+}
+
+.contentsListActions
+{
+   background-color: #FFFFFF;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+}
+
+.infoText
+{
+   background-color: #FFFFCC;
+   color: #1B3557;
+}
+
+.recordSet
+{
+   width: 100%;
+}
+
+.recordSetRow
+{
+   background-color: #EEF3F8;
+}
+
+.recordSetRowAlt
+{
+   background-color: #FFFFFF;
+}
+
+.recordSetHeader
+{
+   background-color: #C6D8EB;
+   color: #1B3557;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-weight: bold;
+}
+
+.recordSetCell
+{
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+.errorMessage
+{
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+   color: #e00028;
+}
+
+.userInputForm
+{
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 10px;
+}
+
+.dialogControls
+{
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+}
+
+.dialogSectionHeader
+{
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+   font-weight: bold;
+   background-color: #C6D8EB;
+}
+
+.dialogButtons
+{
+   background-color: #cccccc;
+   text-align: center;
+}
+
+.dialogButtonsSpacing
+{
+   margin: 3px;
+}
+
+.dialogTitle
+{
+   background-color: #EEEEEE;
+   border-top: thin solid #CCCCCC;
+   border-bottom: thin solid #CCCCCC;
+}
+
+.headerSiteDirectory
+{
+   background-color: #FFD97D;
+   border-top: thin solid #FCF3DF;
+   border-bottom: thin solid #CC9933;
+}
+
+.headerProjectDirectory
+{
+   background-color: #99BAA1;
+   border-top: thin solid #AFD1B6;
+   border-bottom: thin solid #64876C;
+}
+
+.detailSiteDirectory
+{
+   background-color: #EEEEEE;
+}
+
+.detailProjectDirectory
+{
+   background-color: #EEEEEE;
+}
+
+.stackedBreadcrumbTitle
+{
+   background-color: #ffffcc;
+   border-top: thin solid #AFAFAF;
+   border-bottom: thin solid #CCCC99;
+   padding: 1px;
+}
+
+.stackedBreadcrumbRow
+{
+   border-top: thin solid white;
+   border-bottom: thin solid #999999;
+   background-color: #dddddd;
+   padding: 1px;
+}
+
+.stackedBreadcrumbRowInset
+{
+   border-top: thin solid white;
+   border-bottom: thin solid #999999;
+   background-color: #EEEEEE;
+   padding: 1px;
+}
+
+.stackedBreadcrumbLink
+{
+   text-decoration: none;
+}
+
+.stackedBreadcrumbLink:hover
+{
+   text-decoration: underline;
+}
+
+.directoryStackedRow
+{
+   border-right: thin solid #999999;
+   border-top: thin solid white;
+   border-bottom: thin solid #999999;
+   background-color: #dddddd;
+   padding: 2px;
+   padding-left: 4px;
+}
+
+.directoryStackedRowOpen
+{
+   border-right: thin solid #999999;
+   border-top: thin solid #white;
+   border-bottom: thin solid #CCCC99;
+   background-color: #ffffcc;
+   padding: 2px;
+   padding-left: 4px;
+}
+
+.directoryStackedRowInset
+{
+   border-right: thin solid #999999;
+   border-top: thin solid white;
+   border-bottom: thin solid #999999;
+   background-color: #EEEEEE;
+   padding: 2px;
+   padding-left: 24px;
+}
+
+.siteStackedRow
+{
+   border-right: thin solid #999999;
+   border-top: thin solid white;
+   border-bottom: thin solid #999999;
+   background-color: #FFFFFF;
+   padding: 2px;
+   padding-left: 4px;
+}
+
+.siteStackedRowAlt
+{
+   border-right: thin solid #999999;
+   border-top: thin solid white;
+   border-bottom: thin solid #999999;
+   background-color: #EEEEEE;
+   padding: 2px;
+   padding-left: 4px;
+}
+
+.siteStackedRowDark
+{
+   border-right: thin solid #999999;
+   border-top: thin solid white;
+   border-bottom: thin solid #999999;
+   background-color: #DDDDDD;
+   padding: 2px;
+   padding-left: 24px;
+}
+
+a.getStartedLink
+{
+   color: #0066cc;
+}
+
+a.getStartedLink:visited
+{
+   color: #0066cc;
+}
+
+.getStartedTitle
+{
+   font-size: 11px;
+   font-weight: bold;
+   color: #333333;
+}
+
+.getStartedText
+{
+   font-size: 11px;
+   color: #333333;
+}
