@@ -8,7 +8,7 @@ import com.activiti.repo.ref.NodeRef;
 /**
  * Specific instances of nodes are unique, but may share GUIDs across stores.
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public interface Node
 {
@@ -38,13 +38,13 @@ public interface Node
     
     public void setType(String type);
 
-    public Set getParentAssocs();
+    public Set<ChildAssoc> getParentAssocs();
 
-    public void setParentAssocs(Set parentAssocs);
+    public void setParentAssocs(Set<ChildAssoc> parentAssocs);
 
-    public Map getProperties();
+    public Map<String, String> getProperties();
 
-    public void setProperties(Map properties);
+    public void setProperties(Map<String, String> properties);
     
     /**
      * Convenience method to get the reference to the node

@@ -1,7 +1,7 @@
 package com.activiti.repo.domain;
 
 /**
- * @author derekh
+ * @author Derek Hulley
  */
 public interface RealNode extends Node
 {

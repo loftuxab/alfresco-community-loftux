@@ -8,7 +8,7 @@ import org.hibernate.SessionFactory;
 /**
  * Base test class providing Hibernate sessions
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public abstract class BaseHibernateTest extends BaseSpringTest
 {

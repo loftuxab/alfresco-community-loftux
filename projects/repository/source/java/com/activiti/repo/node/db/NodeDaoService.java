@@ -10,10 +10,28 @@ import com.activiti.repo.domain.Store;
 /**
  * Service layer accessing persistent <b>node</b> entities directly
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public interface NodeDaoService
 {
+    /**
+     * Evicts the persistent entity from the first level cache. 
+     * <p>
+     * Use this method to ensure that the cache size doesn't grow too much
+     * 
+     * @param node an entity no longer required
+     */
+    public void evict(Node node);
+    
+    /**
+     * Evicts the persistent entity from the first level cache.
+     * <p>
+     * Use this method to ensure that the cache size doesn't grow too much
+     * 
+     * @param assoc an entity no longer required
+     */
+    public void evict(ChildAssoc assoc);
+    
     /**
      * @param store the store to which the node must belong
      * @param referencedPath the path to another, possibly non-existent, node in the

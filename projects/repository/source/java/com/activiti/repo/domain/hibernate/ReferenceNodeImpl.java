@@ -3,7 +3,7 @@ package com.activiti.repo.domain.hibernate;
 import com.activiti.repo.domain.ReferenceNode;
 
 /**
- * @author derekh
+ * @author Derek Hulley
  */
 public class ReferenceNodeImpl extends NodeImpl implements ReferenceNode
 {

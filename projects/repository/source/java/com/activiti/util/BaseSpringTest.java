@@ -8,7 +8,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
 /**
  * Base test class providing Hibernate sessions
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public abstract class BaseSpringTest extends AbstractTransactionalDataSourceSpringContextTests
 {

@@ -6,7 +6,7 @@ import com.activiti.repo.ref.NodeRef;
  * Thrown when an operation cannot be performed because the <b>node</b> reference
  * no longer exists.
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class InvalidNodeRefException extends RuntimeException
 {

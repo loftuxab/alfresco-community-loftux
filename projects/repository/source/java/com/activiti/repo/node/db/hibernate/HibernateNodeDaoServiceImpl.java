@@ -23,11 +23,21 @@ import com.activiti.util.GUID;
 /**
  * Hibernate-specific implementation of the persistence-independent <b>node</b> DAO interface
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements NodeDaoService
 {
     private static final Log logger = LogFactory.getLog(HibernateNodeDaoServiceImpl.class);
+
+    public void evict(Node node)
+    {
+        getHibernateTemplate().evict(node);
+    }
+
+    public void evict(ChildAssoc assoc)
+    {
+        getHibernateTemplate().evict(assoc);
+    }
 
     public ReferenceNode newReferenceNode(Store store, String referencedPath)
     {
@@ -85,10 +95,17 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // done
         if (logger.isDebugEnabled())
         {
-            logger.debug("Fetched node: \n" +
-					"   protocol: " + protocol + "\n" +
-					"   identifier: " + identifier + "\n" +
-					"   id: " + id);
+            if (obj == null)
+            {
+                logger.debug("No node found: \n" +
+                        "   protocol: " + protocol + "\n" +
+                        "   identifier: " + identifier + "\n" +
+                        "   id: " + id);
+            }
+            else
+            {
+                logger.debug("Fetched node: " + obj);
+            }
         }
         return (Node) obj;
     }

@@ -15,7 +15,7 @@ import com.activiti.repo.store.db.StoreDaoService;
 /**
  * Hibernate-specific implementation of the entity-aware store service.
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class HibernateStoreDaoServiceImpl
     extends HibernateDaoSupport
@@ -70,10 +70,18 @@ public class HibernateStoreDaoServiceImpl
         // done
         if (logger.isDebugEnabled())
         {
-            logger.debug("getWorkspace results: \n" +
-                    "   protocol: " + protocol + "\n" +
-                    "   identifier: " + identifier + "\n" +
-                    "   result: " + store);
+            if (store == null)
+            {
+                logger.debug("getWorkspace found nothing: \n" +
+                        "   protocol: " + protocol + "\n" +
+                        "   identifier: " + identifier + "\n" +
+                        "   result: " + store);
+                
+            }
+            else
+            {
+                logger.debug("getWorkspace results: " + store);
+            }
         }
         return store;
     }

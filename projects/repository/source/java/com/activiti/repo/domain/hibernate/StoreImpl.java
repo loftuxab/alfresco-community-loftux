@@ -6,7 +6,7 @@ import com.activiti.repo.domain.StoreKey;
 import com.activiti.repo.ref.StoreRef;
 
 /**
- * @author derekh
+ * @author Derek Hulley
  */
 public class StoreImpl implements Store
 {

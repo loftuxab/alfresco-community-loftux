@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 /**
  * @see com.activiti.repo.ref.NodeRef
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class NodeRefTest extends TestCase
 {

@@ -3,11 +3,11 @@ package com.activiti.repo.domain;
 import java.util.Set;
 
 /**
- * @author derekh
+ * @author Derek Hulley
  */
 public interface ContainerNode extends RealNode
 {
-    public Set getChildAssocs();
+    public Set<ChildAssoc> getChildAssocs();
 
-    public void setChildAssocs(Set childAssocs);
+    public void setChildAssocs(Set<ChildAssoc> childAssocs);
 }

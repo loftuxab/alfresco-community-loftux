@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.Store;
@@ -12,7 +13,7 @@ import com.activiti.repo.ref.NodeRef;
 /**
  * Simple named node to test out various features
  * 
- * @author derekh
+ * @author Derek Hulley
  * 
  */
 public class NodeImpl implements Node
@@ -20,8 +21,8 @@ public class NodeImpl implements Node
     private NodeKey key;
     private String type;
     private Store store;
-    private Set parentAssocs;
-    private Map properties;
+    private Set<ChildAssoc> parentAssocs;
+    private Map<String, String> properties;
     private NodeRef nodeRef;
 
     public NodeKey getKey() {
@@ -34,7 +35,7 @@ public class NodeImpl implements Node
 
 	public NodeImpl()
     {
-        parentAssocs = new HashSet(3, 0.75F);
+        parentAssocs = new HashSet<ChildAssoc>(3, 0.75F);
     }
 
     public String getType()
@@ -59,22 +60,22 @@ public class NodeImpl implements Node
         this.nodeRef = null;
     }
 
-    public Set getParentAssocs()
+    public Set<ChildAssoc> getParentAssocs()
     {
         return parentAssocs;
     }
 
-    public void setParentAssocs(Set parentAssocs)
+    public void setParentAssocs(Set<ChildAssoc> parentAssocs)
     {
         this.parentAssocs = parentAssocs;
     }
 
-    public Map getProperties()
+    public Map<String, String> getProperties()
     {
         return properties;
     }
 
-    public void setProperties(Map properties)
+    public void setProperties(Map<String, String> properties)
     {
         this.properties = properties;
     }

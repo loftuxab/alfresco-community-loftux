@@ -5,7 +5,7 @@ import com.activiti.repo.domain.Store;
 /**
  * Provides methods for accessing persistent store entities directly
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public interface StoreDaoService
 {

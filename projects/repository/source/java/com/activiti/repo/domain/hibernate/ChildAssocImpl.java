@@ -5,7 +5,7 @@ import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
 
 /**
- * @author derekh
+ * @author Derek Hulley
  */
 public class ChildAssocImpl implements ChildAssoc
 {

@@ -1,5 +1,6 @@
 package com.activiti.repo.node;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import com.activiti.util.BaseSpringTest;
 /**
  * Tests the default implementation of the {@link com.activiti.repo.service.NodeService}
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class NodeServiceTest extends BaseSpringTest
 {
@@ -143,7 +144,7 @@ public class NodeServiceTest extends BaseSpringTest
         nodeService.addChild(rootNodeRef, nodeRef, "pathB");
         nodeService.addChild(rootNodeRef, nodeRef, "pathC");
         // delete all the associations
-        nodeService.removeChild(rootNodeRef, "pathB");
+        nodeService.removeChildren(rootNodeRef, "pathB");
     }
     
     public void testGetType() throws Exception
@@ -156,7 +157,7 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testProperties() throws Exception
     {
-        Map properties = new HashMap(5);
+        Map<String, String> properties = new HashMap<String, String>(5);
         properties.put("PROPERTY1", "VALUE1");
         // add some properties to the root node
         nodeService.setProperties(rootNodeRef, properties);
@@ -168,5 +169,26 @@ public class NodeServiceTest extends BaseSpringTest
         // now get them back
         Map check = nodeService.getProperties(rootNodeRef);
         assertEquals("Properties were not set/retrieved", properties, check);
+    }
+    
+    public void testGetParents() throws Exception
+    {
+        NodeRef parent1Ref = nodeService.createNode(rootNodeRef, "P1", Node.TYPE_CONTAINER);
+        NodeRef parent2Ref = nodeService.createNode(rootNodeRef, "P2", Node.TYPE_CONTAINER);
+        NodeRef childRef = nodeService.createNode(parent1Ref, "PrimaryChild", Node.TYPE_CONTENT);
+        nodeService.addChild(parent2Ref, childRef, "SecondaryChild");
+        // get the child node's parents
+        Collection<NodeRef> parents = nodeService.getParents(childRef);
+        assertEquals("Incorrect number of parents", 2, parents.size());
+        assertTrue("Expected parent not found", parents.contains(parent1Ref));
+        assertTrue("Expected parent not found", parents.contains(parent2Ref));
+        
+        // check that we can retrieve the primary parent
+        NodeRef primaryParentCheck = nodeService.getPrimaryParent(childRef);
+        assertEquals("Primary parent not retrieved", parent1Ref, primaryParentCheck);
+        
+        // check that the root node returns a null primary parent
+        NodeRef nullParent = nodeService.getPrimaryParent(rootNodeRef);
+        assertNull("Expected null primary parent for root node", nullParent);
     }
 }

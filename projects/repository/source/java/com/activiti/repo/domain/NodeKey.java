@@ -7,7 +7,7 @@ import com.activiti.util.EqualsHelper;
 /**
  * Compound key for persistence of {@link com.activiti.repo.domain.Node}
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class NodeKey implements Serializable
 {

@@ -8,7 +8,7 @@ import com.activiti.util.BaseSpringTest;
  * 
  * @see com.activiti.repo.store.StoreService
  *
- * @author derekh
+ * @author Derek Hulley
  */
 public class StoreServiceTest extends BaseSpringTest
 {

@@ -1,6 +1,8 @@
 package com.activiti.repo.node.db;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +25,7 @@ import com.activiti.repo.store.db.StoreDaoService;
 /**
  * Node service using database persistence layer to fulfill functionality
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class DbNodeServiceImpl implements NodeService
 {
@@ -47,7 +49,7 @@ public class DbNodeServiceImpl implements NodeService
         return this.createNode(parentRef, name, nodeType, null);
     }
 
-    public NodeRef createNode(NodeRef parentRef, String name, String nodeType, Map properties)
+    public NodeRef createNode(NodeRef parentRef, String name, String nodeType, Map<String, String> properties)
     {
         if (logger.isDebugEnabled())
         {
@@ -150,34 +152,69 @@ public class DbNodeServiceImpl implements NodeService
         Node childNode = getNodeNotNull(childRef);
         NodeKey childNodeKey = childNode.getKey();
         // get all the child assocs
-        Set assocs = parentNode.getChildAssocs();
-        for (Iterator iterator = assocs.iterator(); iterator.hasNext(); /**/)
+        boolean deleteChild = false;
+        Set<ChildAssoc> assocs = parentNode.getChildAssocs();
+        for (ChildAssoc assoc : assocs)
         {
-            ChildAssoc assoc = (ChildAssoc) iterator.next();
-            if (assoc.getChild().getKey().equals(childNodeKey))
+            if (!assoc.getChild().getKey().equals(childNodeKey))
             {
-                // we have a match
-                nodeDaoService.deleteChildAssoc(assoc);
+                continue;  // not a matching association
+            }
+            // we have a match
+            nodeDaoService.deleteChildAssoc(assoc);
+            // is this a primary association?
+            if (assoc.getIsPrimary())
+            {
+                deleteChild = true;
             }
         }
+        // must the child be deleted?
+        if (deleteChild)
+        {
+            nodeDaoService.deleteNode(childNode);
+        }
         // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Removed child associations: \n" +
+                    "   parent: " + parentRef + "\n" +
+                    "   child: " + childRef + "\n" +
+                    "   count: " + assocs.size() + "\n" +
+                    "   deleted child: " + deleteChild);
+        }
     }
 
-    public void removeChild(NodeRef parentRef, String name) throws InvalidNodeRefException
+    public void removeChildren(NodeRef parentRef, String name) throws InvalidNodeRefException
     {
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // get all the child assocs
-        Set assocs = parentNode.getChildAssocs();
-        for (Iterator iterator = assocs.iterator(); iterator.hasNext(); /**/)
+        Set<ChildAssoc> assocs = parentNode.getChildAssocs();
+        int childrenDeleted = 0;
+        for (ChildAssoc assoc : assocs)
         {
-            ChildAssoc assoc = (ChildAssoc) iterator.next();
-            if (assoc.getName().equals(name))
+            if (!assoc.getName().equals(name))
             {
-                // we have a match
-                nodeDaoService.deleteChildAssoc(assoc);
+                continue;   // not a matching association
+            }
+            // we have a match
+            nodeDaoService.deleteChildAssoc(assoc);
+            // must we remove the child?
+            if (assoc.getIsPrimary())
+            {
+                Node childNode = assoc.getChild();
+                nodeDaoService.deleteNode(childNode);
+                childrenDeleted++;
             }
         }
         // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Removed child associations: \n" +
+                    "   parent: " + parentRef + "\n" +
+                    "   name: " + name + "\n" +
+                    "   count: " + assocs.size() + "\n" +
+                    "   deleted children: " + childrenDeleted);
+        }
     }
 
     public String getType(NodeRef nodeRef) throws InvalidNodeRefException
@@ -186,15 +223,95 @@ public class DbNodeServiceImpl implements NodeService
         return node.getType();
     }
 
-    public Map getProperties(NodeRef nodeRef) throws InvalidNodeRefException
+    public Map<String, String> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
         return node.getProperties();
     }
     
-    public void setProperties(NodeRef nodeRef, Map properties) throws InvalidNodeRefException
+    public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
         node.setProperties(properties);
+    }
+
+    public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        Node node = getNodeNotNull(nodeRef);
+        // get the assocs pointing to it
+        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
+        // list of results
+        List<NodeRef> results = new ArrayList<NodeRef>(parentAssocs.size());
+        for (ChildAssoc assoc : parentAssocs)
+        {
+            // get the parent
+            Node parentNode = assoc.getParent();
+            results.add(parentNode.getNodeRef());
+        }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Fetched node parents: \n" +
+                    "   node: " + nodeRef + "\n" +
+                    "   parents: " + results);
+        }
+        return results;
+    }
+
+    public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        Node node = getNodeNotNull(nodeRef);
+        // get the assocs pointing to it
+        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
+        Node parentNode = null;
+        for (ChildAssoc assoc : parentAssocs)
+        {
+            // ignore non-primary assocs
+            if (!assoc.getIsPrimary())
+            {
+                continue;
+            }
+            else if (parentNode != null)
+            {
+                // we have more than one somehow
+                throw new DataIntegrityViolationException("Multiple primary associations: \n" +
+                        "   child: " + nodeRef + "\n" +
+                        "   first primary parent: " + parentNode + "\n" +
+                        "   second primary parent: " + assoc.getParent());
+            }
+            parentNode = assoc.getParent();
+            // we keep looping to hunt out data integrity issues
+        }
+        // did we find a primary parent?
+        if (parentNode == null)
+        {
+            // the only condition where this is allowed is if it is a root node
+            Store store = node.getStore();
+            Node rootNode = store.getRootNode();
+            if (!rootNode.equals(node))
+            {
+                // it wasn't the root node
+                throw new DataIntegrityViolationException("Non-root node has no primary parent: \n" +
+                        "   child: " + nodeRef);
+            }
+        }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Retrieved node primary parent: \n" +
+                    "   child: " + nodeRef + "\n" +
+                    "   primary parent: " + parentNode);
+        }
+        return (parentNode == null ? null : parentNode.getNodeRef());
+    }
+
+    /**
+     * This method can pull many objects into the first level cache.  The
+     * {@link NodeDaoService#evict(Node)} method is used to ensure that the cache size
+     * doesn't grow too large.
+     */
+    public String getPath(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        throw new UnsupportedOperationException();
     }
 }

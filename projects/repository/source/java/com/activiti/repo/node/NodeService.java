@@ -1,5 +1,6 @@
 package com.activiti.repo.node;
 
+import java.util.Collection;
 import java.util.Map;
 
 import com.activiti.repo.ref.NodeRef;
@@ -7,7 +8,7 @@ import com.activiti.repo.ref.NodeRef;
 /**
  * Interface for public and internal <b>node</b> operations
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public interface NodeService
 {
@@ -26,7 +27,10 @@ public interface NodeService
      * @return Returns a reference to the newly created node
      * @throws InvalidNodeRefException if the parent reference is invalid
      */
-    public NodeRef createNode(NodeRef parentRef, String name, String nodeType, Map properties) throws InvalidNodeRefException;
+    public NodeRef createNode(NodeRef parentRef,
+            String name,
+            String nodeType,
+            Map<String, String> properties) throws InvalidNodeRefException;
     
     /**
      * Deletes the given node.
@@ -47,23 +51,26 @@ public interface NodeService
     public void addChild(NodeRef parentRef, NodeRef childRef, String name) throws InvalidNodeRefException;
     
     /**
-     * Severs all parent-child relationships between two nodes.  A cascade delete to the child may occur as a result.
+     * Severs all parent-child relationships between two nodes.
+     * <p>
+     * The child node will be cascade deleted if one of the associations was the
+     * primary association, i.e. the one with which the child node was created.
      * 
      * @param parentRef the parent end of the association
      * @param childRef the child end of the association
-     * @return Returns true if the child node was cascade deleted, otherwise false
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
      */
     public void removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException;
 
     /**
+     * Removes named child associations and deletes the children where the association
+     * was the primary association, i.e. the one with which the child node was created.
      * 
      * @param parentRef the parent of the associations to remove
-     * @param name the name of the association to remove
-     * @return Returns true if the chi
+     * @param name the name of the associations to remove
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public void removeChild(NodeRef parentRef, String name) throws InvalidNodeRefException;
+    public void removeChildren(NodeRef parentRef, String name) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef
@@ -77,7 +84,7 @@ public interface NodeService
      * @return Returns all properties
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public Map getProperties(NodeRef nodeRef) throws InvalidNodeRefException;
+    public Map<String, String> getProperties(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * 
@@ -85,5 +92,27 @@ public interface NodeService
      * @param properties all the properties of the node
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public void setProperties(NodeRef nodeRef, Map properties) throws InvalidNodeRefException;
+    public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException;
+    
+    /**
+     * @param nodeRef the child node
+     * @return Returns a collection of <code>NodeRef</code> instances
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException;
+    
+    /**
+     * @param nodeRef
+     * @return Returns Fetches the primary parent of the node unless it is a root node,
+     *      in which case null is returned.
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException;
+    
+    /**
+     * @param nodeRef
+     * @return Returns the path to the node along the primary node path
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    public String getPath(NodeRef nodeRef) throws InvalidNodeRefException;
 }

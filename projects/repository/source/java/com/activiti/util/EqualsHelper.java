@@ -3,7 +3,7 @@ package com.activiti.util;
 /**
  * Utility class providing helper methods for various types of <code>equals</code> functionality
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class EqualsHelper
 {

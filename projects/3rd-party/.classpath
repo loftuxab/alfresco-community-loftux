@@ -12,7 +12,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-0.9.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar"/>
+	<classpathentry exported="true" sourcepath="C:/java/hibernate-3.0/src" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsf-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsf-impl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsf-portlet.jar"/>

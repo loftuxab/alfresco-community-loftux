@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Reference to a node store
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class NodeRef implements Serializable
 {

@@ -22,7 +22,7 @@ import com.activiti.util.GUID;
  * Test persistence and retrieval of Hibernate-specific implementations of the
  * {@link com.activiti.repo.domain.Node} interface
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public class HibernateNodeTest extends BaseHibernateTest
 {
@@ -112,7 +112,7 @@ public class HibernateNodeTest extends BaseHibernateTest
 		node.setKey(key);
         node.setType(Node.TYPE_CONTAINER);
         // give it a property map
-        Map propertyMap = new HashMap(5);
+        Map<String, String> propertyMap = new HashMap<String, String>(5);
         propertyMap.put("A", "AAA");
         node.setProperties(propertyMap);
         // persist it

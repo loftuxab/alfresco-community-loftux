@@ -5,7 +5,7 @@ import com.activiti.repo.ref.StoreRef;
 /**
  * Public interface for <b>store</b> operations
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public interface StoreService
 {

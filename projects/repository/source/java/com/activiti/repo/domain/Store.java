@@ -6,7 +6,7 @@ import com.activiti.repo.ref.StoreRef;
 /**
  * Represents a store entity
  * 
- * @author derekh
+ * @author Derek Hulley
  */
 public interface Store
 {
