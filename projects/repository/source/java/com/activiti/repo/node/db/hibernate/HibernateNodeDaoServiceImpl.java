@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -40,8 +38,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public static final String QUERY_GET_NODE_ASSOC = "node.GetNodeAssoc";
     public static final String QUERY_GET_NODE_ASSOC_TARGETS = "node.GetNodeAssocTargets";
     public static final String QUERY_GET_NODE_ASSOC_SOURCES = "node.GetNodeAssocSources";
-    
-    private static final Log logger = LogFactory.getLog(HibernateNodeDaoServiceImpl.class);
 
     public void evict(Node node)
     {
@@ -64,10 +60,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist the node
         getHibernateTemplate().save(node);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Created new reference node: " + node);
-        }
         return node;
     }
 
@@ -95,10 +87,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist the node
         getHibernateTemplate().save(node);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Created new real node of type " + type + ": " + node);
-        }
         return node;
     }
 
@@ -107,20 +95,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
 		NodeKey nodeKey = new NodeKey(protocol, identifier, id);
         Object obj = getHibernateTemplate().get(NodeImpl.class, nodeKey);
         // done
-        if (logger.isDebugEnabled())
-        {
-            if (obj == null)
-            {
-                logger.debug("No node found: \n" +
-                        "   protocol: " + protocol + "\n" +
-                        "   identifier: " + identifier + "\n" +
-                        "   id: " + id);
-            }
-            else
-            {
-                logger.debug("Fetched node: " + obj);
-            }
-        }
         return (Node) obj;
     }
     
@@ -128,10 +102,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     {
         getHibernateTemplate().delete(node);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Deleted node: " + node);
-        }
     }
     
     public ChildAssoc newChildAssoc(ContainerNode parentNode,
@@ -146,11 +116,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist
         getHibernateTemplate().save(assoc);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Created child association: \n" +
-                    "   assoc: " + assoc);
-        }
         return assoc;
     }
     
@@ -196,12 +161,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
             }
         }
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Retrieved node primary parent assoc: \n" +
-                    "   child: " + node + "\n" +
-                    "   primary parent asoc: " + primaryAssoc);
-        }
         return primaryAssoc;
     }
 
@@ -213,11 +172,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist
         getHibernateTemplate().save(assoc);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Created node association: \n" +
-                    "   assoc: " + assoc);
-        }
         return assoc;
     }
 
@@ -250,14 +204,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         }
         NodeAssoc assoc = (NodeAssoc) queryResult;
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Get node association: \n" +
-                    "   source: " + sourceNode + "\n" +
-                    "   target: " + targetNode + "\n" +
-                    "   assoc name: " + assocName + "\n" +
-                    "   assoc: " + assoc);
-        }
         return assoc;
     }
 
@@ -276,15 +222,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 return query.list();
             }
         };
-        List queryResults = (List) getHibernateTemplate().execute(callback);
+        List<Node> queryResults = (List) getHibernateTemplate().execute(callback);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Get node association targets: \n" +
-                    "   source: " + sourceNode + "\n" +
-                    "   assoc name: " + assocName + "\n" +
-                    "   targets: " + queryResults);
-        }
         return queryResults;
     }
 
@@ -303,15 +242,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 return query.list();
             }
         };
-        List queryResults = (List) getHibernateTemplate().execute(callback);
+        List<RealNode> queryResults = (List) getHibernateTemplate().execute(callback);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Get node association sources: \n" +
-                    "   target: " + targetNode + "\n" +
-                    "   assoc name: " + assocName + "\n" +
-                    "   sources: " + queryResults);
-        }
         return queryResults;
     }
 

@@ -1,8 +1,5 @@
 package com.activiti.repo.store.db;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.NodeRef;
@@ -13,8 +10,6 @@ import com.activiti.repo.store.StoreService;
 
 public class DbStoreServiceImpl implements StoreService
 {
-    private static final Log logger = LogFactory.getLog(DbStoreServiceImpl.class);
-    
     private StoreDaoService storeDaoService;
     
     public void setStoreDaoService(StoreDaoService storeDaoService)
@@ -47,12 +42,6 @@ public class DbStoreServiceImpl implements StoreService
         Store store = storeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
         boolean exists = (store != null);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Store " +
-                    (exists ? ": " : "does not exist: ") +
-                    storeRef);
-        }
         return exists;
     }
     
@@ -78,12 +67,6 @@ public class DbStoreServiceImpl implements StoreService
         Node node = store.getRootNode();
         NodeRef nodeRef = node.getNodeRef();
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Fetched store's root node: " +
-                    "   store: " + storeRef + "\n" +
-                    "   root node: " + nodeRef);
-        }
         return nodeRef;
     }
 }

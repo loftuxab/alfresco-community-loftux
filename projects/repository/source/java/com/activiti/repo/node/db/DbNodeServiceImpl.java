@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.activiti.repo.domain.ChildAssoc;
@@ -35,8 +33,6 @@ import com.activiti.repo.store.db.StoreDaoService;
  */
 public class DbNodeServiceImpl implements NodeService
 {
-    private static final Log logger = LogFactory.getLog(DbNodeServiceImpl.class);
-    
     private NodeDaoService nodeDaoService;
     private StoreDaoService storeDaoService;
 
@@ -57,13 +53,6 @@ public class DbNodeServiceImpl implements NodeService
 
     public NodeRef createNode(NodeRef parentRef, String name, String nodeType, Map<String, String> properties)
     {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Creating node: \n" +
-                    "   parent: " + parentRef + "\n" +
-                    "   name: " + name + "\n" +
-                    "   nodeType: " + nodeType);
-        }
         // get the store that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
         Store store = storeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
@@ -200,14 +189,6 @@ public class DbNodeServiceImpl implements NodeService
             nodeDaoService.deleteNode(childNode);
         }
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Removed child associations: \n" +
-                    "   parent: " + parentRef + "\n" +
-                    "   child: " + childRef + "\n" +
-                    "   count: " + assocs.size() + "\n" +
-                    "   deleted child: " + deleteChild);
-        }
     }
 
     public void removeChildren(NodeRef parentRef, String name) throws InvalidNodeRefException
@@ -233,14 +214,6 @@ public class DbNodeServiceImpl implements NodeService
             }
         }
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Removed child associations: \n" +
-                    "   parent: " + parentRef + "\n" +
-                    "   name: " + name + "\n" +
-                    "   count: " + assocs.size() + "\n" +
-                    "   deleted children: " + childrenDeleted);
-        }
     }
 
     public String getType(NodeRef nodeRef) throws InvalidNodeRefException
@@ -273,12 +246,6 @@ public class DbNodeServiceImpl implements NodeService
         node.getProperties().clear();
         node.getProperties().putAll(properties);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Set node properties: \n" +
-                    "   node: " + nodeRef + "\n" +
-                    "   count: " + properties.size());
-        }
     }
 
     public void setProperty(NodeRef nodeRef, String propertyName, String propertyValue) throws InvalidNodeRefException
@@ -287,13 +254,6 @@ public class DbNodeServiceImpl implements NodeService
         Map<String, String> properties = node.getProperties();
         properties.put(propertyName, propertyValue);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Set node property: \n" +
-                    "   node: " + nodeRef + "\n" +
-                    "   name: " + propertyName + "\n" +
-                    "   value: " + propertyValue);
-        }
     }
 
     public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
@@ -310,12 +270,6 @@ public class DbNodeServiceImpl implements NodeService
             results.add(parentNode.getNodeRef());
         }
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Fetched node parents: \n" +
-                    "   node: " + nodeRef + "\n" +
-                    "   parents: " + results);
-        }
         return results;
     }
 
@@ -333,12 +287,6 @@ public class DbNodeServiceImpl implements NodeService
             results.add(childNode.getNodeRef());
         }
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Fetched node children: \n" +
-                    "   node: " + nodeRef + "\n" +
-                    "   children: " + results);
-        }
         return results;
     }
 
@@ -527,16 +475,6 @@ public class DbNodeServiceImpl implements NodeService
         }
         
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Fetched paths for node: \n" +
-                    "   node: " + node + "\n" +
-                    "   primary only: " + primaryOnly);
-            for (Path path : paths)
-            {
-                logger.debug("   Path >>> " + path);
-            }
-        }
         return paths;
     }
 }

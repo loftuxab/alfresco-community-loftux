@@ -61,6 +61,9 @@
       </property>
    </bean>
 
+   <!-- use around method calls to debug - see class comments for details -->
+   <bean id="methodCallLogAdvice" class="com.activiti.util.debug.MethodCallLogAdvice" />
+
    <!--                    -->
    <!--  INTERNAL SERVICES -->
    <!--                    -->
@@ -87,6 +90,11 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+         </list>
+      </property>
    </bean>
 
    <bean id='nodeDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
@@ -107,6 +115,11 @@
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
+      </property>
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+         </list>
       </property>
    </bean>
 
@@ -133,6 +146,11 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+         </list>
+      </property>
    </bean>
    
    <bean id="nodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -156,6 +174,11 @@
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
+      </property>
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+         </list>
       </property>
    </bean>
    

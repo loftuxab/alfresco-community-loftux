@@ -1,7 +1,5 @@
 package com.activiti.repo.store.db.hibernate;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.activiti.repo.domain.Node;
@@ -21,8 +19,6 @@ public class HibernateStoreDaoServiceImpl
     extends HibernateDaoSupport
     implements StoreDaoService
 {
-    private static final Log logger = LogFactory.getLog(HibernateStoreDaoServiceImpl.class);
-    
     private NodeDaoService nodeDaoService;
     
     public void setNodeDaoService(NodeDaoService nodeDaoService)
@@ -54,10 +50,6 @@ public class HibernateStoreDaoServiceImpl
         RealNode rootNode = nodeDaoService.newRealNode(store, Node.TYPE_CONTAINER);
         store.setRootNode(rootNode);
         // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Created store: " + store);
-        }
         return store;
     }
 
@@ -66,21 +58,6 @@ public class HibernateStoreDaoServiceImpl
 		StoreKey storeKey = new StoreKey(protocol, identifier);
 		Store store = (Store) getHibernateTemplate().get(StoreImpl.class, storeKey);
         // done
-        if (logger.isDebugEnabled())
-        {
-            if (store == null)
-            {
-                logger.debug("getWorkspace found nothing: \n" +
-                        "   protocol: " + protocol + "\n" +
-                        "   identifier: " + identifier + "\n" +
-                        "   result: " + store);
-                
-            }
-            else
-            {
-                logger.debug("getWorkspace results: " + store);
-            }
-        }
         return store;
     }
 }
