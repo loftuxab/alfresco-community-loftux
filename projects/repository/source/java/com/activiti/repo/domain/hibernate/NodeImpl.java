@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.activiti.repo.domain.Node;
-import com.activiti.repo.domain.Workspace;
+import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.NodeRef;
 
 /**
@@ -19,7 +19,7 @@ public class NodeImpl implements Node
     private Long id;
     private String guid;
     private String type;
-    private Workspace workspace;
+    private Store workspace;
     private Set parentAssocs;
     private Map properties;
     private NodeRef nodeRef;
@@ -61,12 +61,12 @@ public class NodeImpl implements Node
         this.nodeRef = null;
     }
 
-    public Workspace getWorkspace()
+    public Store getWorkspace()
     {
         return workspace;
     }
 
-    public synchronized void setWorkspace(Workspace workspace)
+    public synchronized void setWorkspace(Store workspace)
     {
         this.workspace = workspace;
         this.nodeRef = null;

@@ -7,9 +7,9 @@ import com.activiti.repo.ref.StoreRef;
  * 
  * @author derekh
  */
-public interface Workspace
+public interface Store
 {
-    public static final String QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER = "workspace.FindByProtocolAndIdentifier";
+    public static final String QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER = "store.FindByProtocolAndIdentifier";
     
     /**
      * @return Returns the persistence-generated ID

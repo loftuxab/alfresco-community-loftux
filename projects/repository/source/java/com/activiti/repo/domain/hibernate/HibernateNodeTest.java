@@ -11,7 +11,7 @@ import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.ContentNode;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.ReferenceNode;
-import com.activiti.repo.domain.Workspace;
+import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.util.BaseHibernateTest;
 
@@ -23,7 +23,7 @@ import com.activiti.util.BaseHibernateTest;
  */
 public class HibernateNodeTest extends BaseHibernateTest
 {
-    private Workspace workspace;
+    private Store workspace;
     
     public HibernateNodeTest()
     {
@@ -31,7 +31,7 @@ public class HibernateNodeTest extends BaseHibernateTest
     
     protected void onSetUpInTransaction() throws Exception
     {
-        workspace = new WorkspaceImpl();
+        workspace = new StoreImpl();
         // set attributes
         workspace.setProtocol(StoreRef.PROTOCOL_WORKSPACE);
         workspace.setIdentifier("TestWorkspace@" + System.currentTimeMillis());

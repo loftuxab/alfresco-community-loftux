@@ -7,9 +7,9 @@
 <hibernate-mapping>
 
    <class
-         name="com.activiti.repo.domain.hibernate.WorkspaceImpl"
-         proxy="com.activiti.repo.domain.Workspace"
-         table="workspace"
+         name="com.activiti.repo.domain.hibernate.StoreImpl"
+         proxy="com.activiti.repo.domain.Store"
+         table="store"
          dynamic-update="false"
          dynamic-insert="false"
          select-before-update="false"
@@ -31,12 +31,12 @@
             fetch="join" />
    </class>
    
-   <query name="workspace.FindByProtocolAndIdentifier">
+   <query name="store.FindByProtocolAndIdentifier">
       from
-         com.activiti.repo.domain.hibernate.WorkspaceImpl workspace
+         com.activiti.repo.domain.hibernate.StoreImpl store
       where
-         workspace.protocol = :protocol and
-         workspace.identifier = :identifier
+         store.protocol = :protocol and
+         store.identifier = :identifier
    </query>
 
 </hibernate-mapping>

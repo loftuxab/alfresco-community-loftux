@@ -1,4 +1,4 @@
-package com.activiti.repo.workspace;
+package com.activiti.repo.store;
 
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.util.BaseSpringTest;
@@ -6,27 +6,27 @@ import com.activiti.util.BaseSpringTest;
 /**
  * Tests the default implementation of the <code>WorkspaceService</code>
  * 
- * @see com.activiti.repo.workspace.WorkspaceService
+ * @see com.activiti.repo.workspace.StoreService
  *
  * @author derekh
  */
 public class WorkspaceServiceTest extends BaseSpringTest
 {
-    private WorkspaceService workspaceService;
+    private StoreService storeService;
 
-    public void setWorkspaceService(WorkspaceService workspaceService)
+    public void setStoreService(StoreService storeService)
     {
-        this.workspaceService = workspaceService;
+        this.storeService = storeService;
     }
     
     public void testSetUp() throws Exception
     {
-        assertNotNull("workspaceService not set", workspaceService);
+        assertNotNull("workspaceService not set", storeService);
     }
     
     public void testCreateWorkspace() throws Exception
     {
-        StoreRef storeRef = workspaceService.createWorkspace(StoreRef.PROTOCOL_WORKSPACE, "my workspace");
+        StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "my workspace");
         assertNotNull("No reference returned", storeRef);
     }
 }

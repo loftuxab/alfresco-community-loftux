@@ -40,9 +40,9 @@ public interface Node
      */
     public void setGuid(String id);
     
-    public Workspace getWorkspace();
+    public Store getWorkspace();
     
-    public void setWorkspace(Workspace workspace);
+    public void setWorkspace(Store workspace);
     
     public String getType();
     

@@ -1,4 +1,4 @@
-package com.activiti.repo.workspace.hibernate;
+package com.activiti.repo.store.db.hibernate;
 
 import java.util.List;
 
@@ -8,10 +8,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.RealNode;
-import com.activiti.repo.domain.Workspace;
-import com.activiti.repo.domain.hibernate.WorkspaceImpl;
+import com.activiti.repo.domain.Store;
+import com.activiti.repo.domain.hibernate.StoreImpl;
 import com.activiti.repo.node.TypedNodeService;
-import com.activiti.repo.workspace.TypedWorkspaceService;
+import com.activiti.repo.store.db.DbStoreService;
 
 /**
  * Hibernate-specific implementation of the entity-aware workspace service.
@@ -20,7 +20,7 @@ import com.activiti.repo.workspace.TypedWorkspaceService;
  */
 public class TypedWorkspaceServiceImpl
     extends HibernateDaoSupport
-    implements TypedWorkspaceService
+    implements DbStoreService
 {
     private static final Log logger = LogFactory.getLog(TypedWorkspaceServiceImpl.class);
     
@@ -34,10 +34,10 @@ public class TypedWorkspaceServiceImpl
     /**
      * Ensures that the workspace protocol/identifier combination is unique
      */
-    public Workspace createWorkspace(String protocol, String identifier)
+    public Store createWorkspace(String protocol, String identifier)
     {
         // ensure that the name isn't in use
-        Workspace workspace = findWorkspace(protocol, identifier);
+        Store workspace = findWorkspace(protocol, identifier);
         if (workspace != null)
         {
             throw new RuntimeException("A workspace already exists: \n" +
@@ -46,7 +46,7 @@ public class TypedWorkspaceServiceImpl
                     "   workspace: " + workspace);
         }
         
-        workspace = new WorkspaceImpl();
+        workspace = new StoreImpl();
         // set attributes
         workspace.setProtocol(protocol);
         workspace.setIdentifier(identifier);
@@ -63,15 +63,15 @@ public class TypedWorkspaceServiceImpl
         return workspace;
     }
 
-    public Workspace findWorkspace(String protocol, String identifier)
+    public Store findWorkspace(String protocol, String identifier)
     {
-        List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Workspace.QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER,
+        List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Store.QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER,
                 new String[] {"protocol", "identifier"},
                 new Object[] {protocol, identifier});
-        Workspace workspace = null;
+        Store workspace = null;
         if (results.size() > 0)
         {
-            workspace = (Workspace) results.get(0); 
+            workspace = (Store) results.get(0); 
         }
         // done
         if (logger.isDebugEnabled())

@@ -10,10 +10,10 @@ import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.RealNode;
-import com.activiti.repo.domain.Workspace;
+import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.workspace.TypedWorkspaceService;
+import com.activiti.repo.workspace.DbStoreService;
 
 /**
  * Persistent-independent <b>node</b> functionality
@@ -25,14 +25,14 @@ public class NodeServiceImpl implements NodeService
     private static final Log logger = LogFactory.getLog(NodeServiceImpl.class);
     
     private TypedNodeService typedNodeService;
-    private TypedWorkspaceService typedWorkspaceService;
+    private DbStoreService typedWorkspaceService;
     
     public void setTypedNodeService(TypedNodeService typedNodeService)
     {
         this.typedNodeService = typedNodeService;
     }
 
-    public void setTypedWorkspaceService(TypedWorkspaceService typedWorkspaceService)
+    public void setTypedWorkspaceService(DbStoreService typedWorkspaceService)
     {
         this.typedWorkspaceService = typedWorkspaceService;
     }
@@ -53,7 +53,7 @@ public class NodeServiceImpl implements NodeService
         }
         // extract the name of the workspace that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
-        Workspace workspace = typedWorkspaceService.findWorkspace(storeRef.getProtocol(), storeRef.getIdentifier());
+        Store workspace = typedWorkspaceService.findWorkspace(storeRef.getProtocol(), storeRef.getIdentifier());
         if (workspace == null)
         {
             throw new DataIntegrityViolationException("No workspace found for parent node: " + parentRef);

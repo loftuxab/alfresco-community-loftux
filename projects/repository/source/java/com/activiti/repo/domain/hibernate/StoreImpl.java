@@ -1,13 +1,13 @@
 package com.activiti.repo.domain.hibernate;
 
 import com.activiti.repo.domain.RealNode;
-import com.activiti.repo.domain.Workspace;
+import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.StoreRef;
 
 /**
  * @author derekh
  */
-public class WorkspaceImpl implements Workspace
+public class StoreImpl implements Store
 {
     private Long id;
     private String protocol;

@@ -5,7 +5,7 @@ import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.ReferenceNode;
-import com.activiti.repo.domain.Workspace;
+import com.activiti.repo.domain.Store;
 
 /**
  * Service layer interface for entity-aware operations
@@ -20,14 +20,14 @@ public interface TypedNodeService
      *      same workspace
      * @return Returns a new reference node for the given reference and workspace
      */
-    public ReferenceNode newReferenceNode(Workspace workspace, String referencedPath);
+    public ReferenceNode newReferenceNode(Store workspace, String referencedPath);
     
     /**
      * @param workspace the workspace to which the node must belong
      * @param type the type of the node
      * @return Returns a new real node of the given type and attached to the workspace
      */
-    public RealNode newRealNode(Workspace workspace, String type);
+    public RealNode newRealNode(Store workspace, String type);
     
     /**
      * @return Returns the persisted and filled association
@@ -44,5 +44,5 @@ public interface TypedNodeService
      * @param id the unique id of the node
      * @return
      */
-    public Node findNodeInWorkspace(Workspace workspace, String id);
+    public Node findNodeInWorkspace(Store workspace, String id);
 }

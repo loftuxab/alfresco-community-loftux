@@ -11,7 +11,7 @@ import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.ReferenceNode;
-import com.activiti.repo.domain.Workspace;
+import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.hibernate.ChildAssocImpl;
 import com.activiti.repo.domain.hibernate.ContainerNodeImpl;
 import com.activiti.repo.domain.hibernate.ContentNodeImpl;
@@ -29,7 +29,7 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements TypedNo
 {
     private static final Log logger = LogFactory.getLog(TypedNodeServiceImpl.class);
 
-    public ReferenceNode newReferenceNode(Workspace workspace, String referencedPath)
+    public ReferenceNode newReferenceNode(Store workspace, String referencedPath)
     {
         ReferenceNode node = new ReferenceNodeImpl();
         node.setType(Node.TYPE_REFERENCE);
@@ -46,7 +46,7 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements TypedNo
         return node;
     }
 
-    public RealNode newRealNode(Workspace workspace, String type)
+    public RealNode newRealNode(Store workspace, String type)
     {
         RealNode node = null;
         if (type.equals(Node.TYPE_CONTAINER))
@@ -96,7 +96,7 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements TypedNo
         return assoc;
     }
 
-    public Node findNodeInWorkspace(Workspace workspace, String id)
+    public Node findNodeInWorkspace(Store workspace, String id)
     {
         List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Node.QUERY_FIND_NODE_IN_WORKSPACE,
                 new String[] {"nodeGuid", "workspaceProtocol", "workspaceIdentifier"},
