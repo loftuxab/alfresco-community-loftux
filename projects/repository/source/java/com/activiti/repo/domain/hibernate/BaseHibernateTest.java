@@ -20,7 +20,7 @@ public abstract class BaseHibernateTest extends
     }
 
     protected String[] getConfigLocations() {
-        return new String[] { "classpath:applicationContext.xml" };
+        return new String[] { "classpath:applicationContext.xml"};
     }
 
     public void setSessionFactory(SessionFactory sessionFactory) {

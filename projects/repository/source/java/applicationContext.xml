@@ -1,10 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
+<!-- This file must be split up once the number and spread of beans becomes unmanageable -->
 <beans>
    
+   <!--                    -->
+   <!--  PERSISTENCE       -->
+   <!--                    -->
+   
    <!-- load common properties -->
-   <bean id="properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+   <bean id="db-properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
       <property name="location">
          <value>db.properties</value>
       </property>
@@ -53,7 +58,11 @@
       </property>
    </bean>
 
-<!--   
+   <!--                    -->
+   <!--  DAO SERVICES      -->
+   <!--                    -->
+   
+   <!--   
    <bean id='nodeService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
          <value>com.as.core.NodeService</value>
@@ -76,4 +85,8 @@
    </bean>
 -->
 
+   <!--                    -->
+   <!--  PUBLIC SERVICES   -->
+   <!--                    -->
+   
 </beans>
