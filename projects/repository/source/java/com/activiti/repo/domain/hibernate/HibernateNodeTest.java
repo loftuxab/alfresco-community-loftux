@@ -112,7 +112,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         // give it a property map
         Map<String, String> propertyMap = new HashMap<String, String>(5);
         propertyMap.put("A", "AAA");
-        node.setProperties(propertyMap);
+        node.getProperties().putAll(propertyMap);
         // persist it
         Serializable id = getSession().save(node);
 

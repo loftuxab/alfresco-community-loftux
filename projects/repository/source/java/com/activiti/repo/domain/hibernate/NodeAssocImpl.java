@@ -29,6 +29,17 @@ public class NodeAssocImpl implements NodeAssoc
         sourceNode.getTargetNodeAssocs().add(this);
         targetNode.getSourceNodeAssocs().add(this);
     }
+    
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer(32);
+        sb.append("NodeAssoc")
+          .append("[ source=").append(source)
+          .append(", target=").append(target)
+          .append(", name=").append(name)
+          .append("]");
+        return sb.toString();
+    }
 
     public long getId()
     {

@@ -43,15 +43,11 @@ public interface Node
      */
     public Set<NodeAssoc> getSourceNodeAssocs();
 
-    public void setSourceNodeAssocs(Set<NodeAssoc> nodeAssocs);
-
     public Set<ChildAssoc> getParentAssocs();
-
-    public void setParentAssocs(Set<ChildAssoc> parentAssocs);
 
     public Map<String, String> getProperties();
 
-    public void setProperties(Map<String, String> properties);
+//    public void setProperties(Map<String, String> properties);
     
     /**
      * Convenience method to get the reference to the node

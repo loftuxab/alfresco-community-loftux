@@ -23,7 +23,10 @@ public class RealNodeImpl extends NodeImpl implements RealNode
         return targetNodeAssocs;
     }
     
-    public void setTargetNodeAssocs(Set<NodeAssoc> targetNodeAssocs)
+    /**
+     * @return Returns all the regular associations for which this node is a source 
+     */
+    private void setTargetNodeAssocs(Set<NodeAssoc> targetNodeAssocs)
     {
         this.targetNodeAssocs = targetNodeAssocs;
     }

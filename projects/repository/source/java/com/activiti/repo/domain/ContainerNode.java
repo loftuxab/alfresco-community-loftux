@@ -8,6 +8,4 @@ import java.util.Set;
 public interface ContainerNode extends RealNode
 {
     public Set<ChildAssoc> getChildAssocs();
-
-    public void setChildAssocs(Set<ChildAssoc> childAssocs);
 }

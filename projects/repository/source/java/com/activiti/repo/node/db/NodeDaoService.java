@@ -1,8 +1,11 @@
 package com.activiti.repo.node.db;
 
+import java.util.Collection;
+
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
+import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.ReferenceNode;
 import com.activiti.repo.domain.Store;
@@ -73,10 +76,40 @@ public interface NodeDaoService
     public ChildAssoc newChildAssoc(ContainerNode parentNode,
             Node childNode,
             boolean isPrimary,
-            String name);
+            String assocName);
     
     /**
      * @param assoc the child association to remove
      */
     public void deleteChildAssoc(ChildAssoc assoc);
+    
+    /**
+     * @return Returns the persisted and filled association
+     * @see NodeAssoc
+     */
+    public NodeAssoc newNodeAssoc(RealNode sourceNode,
+            Node targetNode,
+            String assocName);
+    
+    /**
+     * @return Returns the node association or null if not found
+     */
+    public NodeAssoc getNodeAssoc(RealNode sourceNode,
+            Node targetNode,
+            String assocName);
+    
+    /**
+     * @return Returns the target nodes for the association
+     */
+    public Collection<Node> getNodeAssocTargets(RealNode sourceNode, String assocName);
+    
+    /**
+     * @return Returns the source nodes for the association
+     */
+    public Collection<RealNode> getNodeAssocSources(Node targetNode, String assocName);
+    
+    /**
+     * @param assoc the node association to remove
+     */
+    public void deleteNodeAssoc(NodeAssoc assoc);
 }

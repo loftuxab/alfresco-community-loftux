@@ -192,18 +192,49 @@
       </many-to-one>
    </class>
    
-<!--
-   <query name="node.GetChildAssocs">
+   <query name="node.GetNodeAssoc">
       select
          assoc
       from
-         com.activiti.repo.domain.hibernate.ContainerNodeImpl as parent
-         join parent.childAssocs as assoc
-         join assoc.child as child
+         com.activiti.repo.domain.hibernate.RealNodeImpl as source
+         join source.targetNodeAssocs as assoc
+         join assoc.target as target
       where
-         parent.key = ? and
-         child.key = ?
+         source.key.protocol = :sourceKeyProtocol and
+         source.key.identifier = :sourceKeyIdentifier and
+         source.key.guid = :sourceKeyGuid and
+         assoc.name = :assocName and
+         target.key.protocol = :targetKeyProtocol and
+         target.key.identifier = :targetKeyIdentifier and
+         target.key.guid = :targetKeyGuid
    </query>
--->
+   
+   <query name="node.GetNodeAssocTargets">
+      select
+         target
+      from
+         com.activiti.repo.domain.hibernate.RealNodeImpl as source
+         join source.targetNodeAssocs as assoc
+         join assoc.target as target
+      where
+         source.key.protocol = :sourceKeyProtocol and
+         source.key.identifier = :sourceKeyIdentifier and
+         source.key.guid = :sourceKeyGuid and
+         assoc.name = :assocName
+   </query>
+
+   <query name="node.GetNodeAssocSources">
+      select
+         source
+      from
+         com.activiti.repo.domain.hibernate.NodeImpl as target
+         join target.sourceNodeAssocs as assoc
+         join assoc.source as source
+      where
+         target.key.protocol = :targetKeyProtocol and
+         target.key.identifier = :targetKeyIdentifier and
+         target.key.guid = :targetKeyGuid and
+         assoc.name = :assocName
+   </query>
 
 </hibernate-mapping>

@@ -74,8 +74,11 @@ public class DbNodeServiceImpl implements NodeService
         // create the association
         ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, name);
         
-        // attach the properties
-        node.setProperties(properties);
+        // set the properties
+        if (properties != null)
+        {
+            node.getProperties().putAll(properties);
+        }
         
         // done
         return node.getNodeRef();
@@ -250,8 +253,14 @@ public class DbNodeServiceImpl implements NodeService
     
     public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException
     {
+        if (properties == null)
+        {
+            throw new IllegalArgumentException("Properties may not be null");
+        }
+        
         Node node = getNodeNotNull(nodeRef);
-        node.setProperties(properties);
+        node.getProperties().clear();
+        node.getProperties().putAll(properties);
     }
 
     public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
@@ -351,28 +360,68 @@ public class DbNodeServiceImpl implements NodeService
             throws InvalidNodeRefException, AssociationExistsException
     {
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
-        // get the current associations from the source
-        Set<NodeAssoc> targetAssocs = sourceNode.getTargetNodeAssocs();
         Node targetNode = getNodeNotNull(targetRef);
-        throw new UnsupportedOperationException();
+        // see if it exists
+        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, assocName);
+        if (assoc != null)
+        {
+            throw new AssociationExistsException(sourceRef, targetRef, assocName);
+        }
+        // we are sure that the association doesn't exist - make it
+        nodeDaoService.newNodeAssoc(sourceNode, targetNode, assocName);
+        // done
     }
 
     public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
             throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException();
+        RealNode sourceNode = getRealNodeNotNull(sourceRef);
+        Node targetNode = getNodeNotNull(targetRef);
+        // get the association
+        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, assocName);
+        // delete it
+        nodeDaoService.deleteNodeAssoc(assoc);
+    }
+    
+    /**
+     * Converts a collection of <code>Node</code> instances into an equivalent
+     * collection of <code>NodeRef</code> instances.
+     * 
+     * @param nodes the <code>Node</code> instances to convert to references
+     * @return Returns a <i>new</i> collection of equivalent <code>NodeRef</code> instances
+     */
+    private Collection<NodeRef> convertToNodeRefs(Collection<? extends Node> nodes)
+    {
+        // build the reference results
+        Collection<NodeRef> nodeRefs = new ArrayList<NodeRef>(nodes.size());
+        for (Node node : nodes)
+        {
+            nodeRefs.add(node.getNodeRef());
+        }
+        // done
+        return nodeRefs;
     }
 
     public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, String assocName)
             throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException();
+        RealNode sourceNode = getRealNodeNotNull(sourceRef);
+        Collection<Node> targets = nodeDaoService.getNodeAssocTargets(sourceNode, assocName);
+        // build the reference results
+        Collection<NodeRef> nodeRefs = convertToNodeRefs(targets);
+        // done
+        return nodeRefs;
     }
 
     public Collection<NodeRef> getAssociationSources(NodeRef targetRef, String assocName)
             throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException();
+        Node targetNode = getNodeNotNull(targetRef);
+        Collection<RealNode> sources = nodeDaoService.getNodeAssocSources(targetNode, assocName);
+        // build the reference results
+        Collection<NodeRef> nodeRefs = convertToNodeRefs(sources);
+        // done
+        return nodeRefs;
     }
 
     /**

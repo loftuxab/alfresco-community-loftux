@@ -23,7 +23,10 @@ public class ContainerNodeImpl extends RealNodeImpl implements ContainerNode
         return childAssocs;
     }
 
-    public void setChildAssocs(Set<ChildAssoc> childAssocs)
+    /**
+     * For Hibernate use
+     */
+    private void setChildAssocs(Set<ChildAssoc> childAssocs)
     {
         this.childAssocs = childAssocs;
     }

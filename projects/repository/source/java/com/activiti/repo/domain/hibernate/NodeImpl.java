@@ -1,5 +1,6 @@
 package com.activiti.repo.domain.hibernate;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +32,7 @@ public class NodeImpl implements Node
     {
         sourceNodeAssocs = new HashSet<NodeAssoc>(3);
         parentAssocs = new HashSet<ChildAssoc>(3);
+        properties = new HashMap<String, String>(5);
     }
 
     public NodeKey getKey() {
@@ -68,7 +70,10 @@ public class NodeImpl implements Node
         return sourceNodeAssocs;
     }
 
-    public void setSourceNodeAssocs(Set<NodeAssoc> sourceNodeAssocs)
+    /**
+     * For Hibernate use
+     */
+    private void setSourceNodeAssocs(Set<NodeAssoc> sourceNodeAssocs)
     {
         this.sourceNodeAssocs = sourceNodeAssocs;
     }
@@ -78,7 +83,10 @@ public class NodeImpl implements Node
         return parentAssocs;
     }
 
-    public void setParentAssocs(Set<ChildAssoc> parentAssocs)
+    /**
+     * For Hibernate use
+     */
+    private void setParentAssocs(Set<ChildAssoc> parentAssocs)
     {
         this.parentAssocs = parentAssocs;
     }
@@ -88,7 +96,10 @@ public class NodeImpl implements Node
         return properties;
     }
 
-    public void setProperties(Map<String, String> properties)
+    /**
+     * For Hibernate use
+     */
+    private void setProperties(Map<String, String> properties)
     {
         this.properties = properties;
     }

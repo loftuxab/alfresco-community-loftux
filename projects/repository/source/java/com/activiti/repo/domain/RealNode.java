@@ -7,10 +7,8 @@ import java.util.Set;
  */
 public interface RealNode extends Node
 {
-    public Set<NodeAssoc> getTargetNodeAssocs();
-
     /**
      * @return Returns all the regular associations for which this node is a source 
      */
-    public void setTargetNodeAssocs(Set<NodeAssoc> nodeAssocs);
+    public Set<NodeAssoc> getTargetNodeAssocs();
 }
