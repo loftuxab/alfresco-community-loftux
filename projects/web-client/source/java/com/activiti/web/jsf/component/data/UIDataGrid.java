@@ -65,6 +65,14 @@ public class UIDataGrid extends SelfRenderingComponent implements IDataContainer
    }
 
    /**
+    * @see com.activiti.web.data.IDataContainer#setCurrentPage(int)
+    */
+   public void setCurrentPage(int index)
+   {
+      // TODO Auto-generated method stub
+   }
+
+   /**
     * @see com.activiti.web.data.IDataContainer#getCurrentSortColumn()
     */
    public String getCurrentSortColumn()
@@ -89,6 +97,15 @@ public class UIDataGrid extends SelfRenderingComponent implements IDataContainer
    {
       // TODO Auto-generated method stub
       return 0;
+   }
+
+   /**
+    * @see com.activiti.web.data.IDataContainer#getPageCount()
+    */
+   public int getPageCount()
+   {
+      // TODO Auto-generated method stub
+      return 1;
    }
 
    /**

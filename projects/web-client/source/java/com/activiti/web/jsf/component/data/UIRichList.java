@@ -10,6 +10,8 @@ import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
+import org.apache.log4j.Logger;
+
 import com.activiti.web.data.IDataContainer;
 import com.activiti.web.jsf.renderer.data.IRichListRenderer;
 import com.activiti.web.jsf.renderer.data.RichListRenderer;
@@ -147,6 +149,14 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    }
    
    /**
+    * @see com.activiti.web.data.IDataContainer#getPageCount()
+    */
+   public int getPageCount()
+   {
+      return m_pageCount;
+   }
+   
+   /**
     * Return the current page the list is displaying
     * 
     * @return current page zero based index
@@ -157,13 +167,21 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    }
    
    /**
+    * @see com.activiti.web.data.IDataContainer#setCurrentPage(int)
+    */
+   public void setCurrentPage(int index)
+   {
+      m_currentPage = index;
+   }
+
+   /**
     * Returns true if a row of data is available
     * 
     * @return true if data is available, false otherwise
     */
    public boolean isDataAvailable()
    {
-      return m_rowIndex < (getDataModel().size() - 1);
+      return m_rowIndex < m_maxRowIndex;
    }
    
    /**
@@ -221,16 +239,36 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public void bind()
    {
+      int rowCount = getDataModel().size();
       // if a page size is specified, then we use that
-      if (getPageSize() != -1)
+      if (m_pageSize != -1)
       {
-         m_rowIndex = (m_currentPage * getPageSize()) - 1;
+         // calc start row index based on current page index
+         m_rowIndex = (m_currentPage * m_pageSize) - 1;
+         
+         // calc total number of pages available
+         m_pageCount = (rowCount / m_pageSize) + 1;
+         if (rowCount % m_pageSize == 0 && m_pageCount != 1)
+         {
+            m_pageCount--;
+         }
+         
+         // calc the maximum row index that can be returned
+         m_maxRowIndex = m_rowIndex + m_pageSize;
+         if (m_maxRowIndex >= rowCount)
+         {
+            m_maxRowIndex = rowCount - 1;
+         }
       }
       // else we are not paged so show all data from start
       else
       {
          m_rowIndex = -1;
+         m_pageCount = 1;
+         m_maxRowIndex = (rowCount - 1);
       }
+      if (s_logger.isDebugEnabled())
+         s_logger.debug("Bound datasource: PageSize: " + m_pageSize + "; CurrentPage: " + m_currentPage + "; RowIndex: " + m_rowIndex + "; MaxRowIndex: " + m_maxRowIndex + "; RowCount: " + rowCount);
    }
    
    /**
@@ -281,9 +319,13 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    private String m_sortColumn = null;
    private boolean m_sortDirection = true;
    private int m_pageSize = -1;
+   private int m_pageCount = 1;
+   private int m_maxRowIndex = -1;
    
    private IGridDataModel m_dataModel = null;
    
    // component properties - NOTE: may use ValueBinding!
    private Object m_value = null;
+   
+   private static Logger s_logger = Logger.getLogger(IDataContainer.class);
 }

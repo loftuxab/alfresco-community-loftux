@@ -3,6 +3,8 @@
  */
 package com.activiti.web.jsf.tag.data;
 
+import javax.faces.component.UIComponent;
+
 import com.activiti.web.jsf.tag.HtmlComponentTag;
 
 
@@ -11,12 +13,15 @@ import com.activiti.web.jsf.tag.HtmlComponentTag;
  */
 public class DataPagerTag extends HtmlComponentTag
 {
+   // ------------------------------------------------------------------------------
+   // Component methods 
+   
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
     */
    public String getComponentType()
    {
-      return null;
+      return "awc.faces.DataPager";
    }
 
    /**
@@ -24,6 +29,23 @@ public class DataPagerTag extends HtmlComponentTag
     */
    public String getRendererType()
    {
+      // UIDataPager is self rendering
       return null;
+   }
+   
+   /**
+    * @see javax.servlet.jsp.tagext.Tag#release()
+    */
+   public void release()
+   {
+      super.release();
+   }
+   
+   /**
+    * @see javax.faces.webapp.UIComponentTag#setProperties(javax.faces.component.UIComponent)
+    */
+   protected void setProperties(UIComponent component)
+   {
+      super.setProperties(component);
    }
 }

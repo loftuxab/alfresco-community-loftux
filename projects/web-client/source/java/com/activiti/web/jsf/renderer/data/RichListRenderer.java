@@ -199,7 +199,17 @@ public class RichListRenderer extends BaseRenderer
       {
          ResponseWriter out = context.getResponseWriter();
          
-         out.write("<tr><td colspan=10>---footer---</td></tr>");
+         out.write("<tr><td colspan=99 align=right>");
+         for (Iterator i=richList.getChildren().iterator(); i.hasNext(); /**/)
+         {
+            // output all remaining child components that are not UIColumn
+            UIComponent child = (UIComponent)i.next();
+            if (child instanceof UIColumn == false)
+            {
+               encodeRecursive(context, child);
+            }
+         }
+         out.write("</td></tr>");
       }
    }
    

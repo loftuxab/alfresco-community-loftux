@@ -39,7 +39,7 @@
            designed to render it's own child components. This means it is capable
            of rendering the columns in any order and in any kind of layout. Allowing
            the impl of details, icons and list views within a single component. --%>
-      <awc:richList viewModes="list,details,icon" pageSize="5" styleClass="mycss" style="border:2px"
+      <awc:richList viewModes="list,details,icon" pageSize="2" styleClass="mycss" style="border:2px"
             value="#{UserListBean.users}" var="u" initialSortColumn="name" initialSortDirection="true">
          <awc:column primary="true">
             <f:facet name="header">
@@ -58,9 +58,9 @@
             </h:outputText>
          </awc:column>
          
-         <%-- could add a data pager or other well known controls to the rich list --%>
-         <%-- these components are expected and specifically renderer by the parent --%>
-         <%-- <awc:data-pager/> --%>
+         <%-- components other than columns added to a RichList will generally
+              be rendered as part of the list footer --%>
+         <awc:dataPager/>
       </awc:richList>
       
       <%-- example of using a JSF DataTable to list the users --%>

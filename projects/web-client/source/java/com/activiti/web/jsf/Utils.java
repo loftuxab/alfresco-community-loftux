@@ -64,6 +64,56 @@ public final class Utils
       return buf.toString();
    }
    
+   public static String buildImageTag(FacesContext context, String image, int width, int height, String alt)
+   {
+      StringBuffer buf = new StringBuffer(100);
+      
+      buf.append("<img src='")
+         .append(context.getExternalContext().getRequestContextPath())
+         .append(image)
+         .append("' width=")
+         .append(width)
+         .append(" height=")
+         .append(height)
+         .append(" border=0");
+      
+      if (alt != null)
+      {
+         buf.append(" alt='")
+            .append(alt)
+            .append("' title='")
+            .append(alt)
+            .append('\'');
+      }
+      
+      buf.append('>');
+      
+      return buf.toString();
+   }
+   
+   public static String buildImageTag(FacesContext context, String image, String alt)
+   {
+      StringBuffer buf = new StringBuffer(100);
+      
+      buf.append("<img src='")
+         .append(context.getExternalContext().getRequestContextPath())
+         .append(image)
+         .append("' border=0");
+      
+      if (alt != null)
+      {
+         buf.append(" alt='")
+            .append(alt)
+            .append("' title='")
+            .append(alt)
+            .append('\'');
+      }
+      
+      buf.append('>');
+      
+      return buf.toString();
+   }
+   
    /**
     * Return the parent UIForm component for the specified UIComponent
     * 

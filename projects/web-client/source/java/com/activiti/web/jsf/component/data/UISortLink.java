@@ -84,25 +84,19 @@ public class UISortLink extends UICommand
       {
          if (bAscending == true)
          {
-            buf.append("&nbsp;<img src='")
-               .append(context.getExternalContext().getRequestContextPath())
-               .append(IMAGE_SORTUP)
-               .append("' width=10 height=6 border=0>");
+            buf.append("&nbsp;")
+               .append(Utils.buildImageTag(context, IMAGE_SORTUP, 10, 6, null));
          }
          else
          {
-            buf.append("&nbsp;<img src='")
-               .append(context.getExternalContext().getRequestContextPath())
-               .append(IMAGE_SORTDOWN)
-               .append("' width=10 height=6 border=0>");
+            buf.append("&nbsp;")
+               .append(Utils.buildImageTag(context, IMAGE_SORTDOWN, 10, 6, null));
          }
       }
       else
       {
-         buf.append("&nbsp;<img src='")
-            .append(context.getExternalContext().getRequestContextPath())
-            .append(IMAGE_SORTNONE)
-            .append("' width=10 height=7 border=0>");
+         buf.append("&nbsp;")
+            .append(Utils.buildImageTag(context, IMAGE_SORTNONE, 10, 7, null));
       }
       buf.append("</a>");
       
@@ -126,7 +120,8 @@ public class UISortLink extends UICommand
       String value = (String)requestMap.get(fieldId);
       if (value != null && value.equals(getClientId(context)))
       {
-         s_logger.debug("Caught sort click using field: " + fieldId + "; for sort link Id: " + getClientId(context));
+         if (s_logger.isDebugEnabled())
+            s_logger.debug("Caught sort click using field: " + fieldId + "; for sort link Id: " + getClientId(context));
          // we were clicked - queue an event to represent the click
          // cannot handle the event here as other components etc. have not had
          // a chance to decode() - we queue an event to be processed later
@@ -148,7 +143,8 @@ public class UISortLink extends UICommand
       else if ( ((SortEvent)event).Column.equals(getColumn()) )
       {
          // found a sort event for us!
-         s_logger.debug("Handling sort event for column: " + ((SortEvent)event).Column);
+         if (s_logger.isDebugEnabled())
+            s_logger.debug("Handling sort event for column: " + ((SortEvent)event).Column);
          if (getColumn().equals(getDataContainer().getCurrentSortColumn()) == true)
          {
             // reverse sort direction
@@ -223,7 +219,7 @@ public class UISortLink extends UICommand
    
    
    // ------------------------------------------------------------------------------
-   // Inner classes 
+   // Inner classes
    
    /**
     * Class representing the clicking of a sortable column.

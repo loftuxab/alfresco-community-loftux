@@ -34,9 +34,23 @@ public interface IDataContainer
    /**
     * Return the current page the list is displaying
     * 
-    * @return current page zero based index
+    * @return Current page with zero based index
     */
    public int getCurrentPage();
+   
+   /**
+    * Set the current page to display.
+    * 
+    * @param index      Zero based page index to display
+    */
+   public void setCurrentPage(int index);
+   
+   /**
+    * Return the count of max available pages
+    * 
+    * @return count of max available pages
+    */
+   public int getPageCount();
    
    /**
     * Returns true if a row of data is available
