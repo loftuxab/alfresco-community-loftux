@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Web Client</name>
+	<name>3rd Party</name>
 	<comment></comment>
 	<projects>
-		<project>3rd Party</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

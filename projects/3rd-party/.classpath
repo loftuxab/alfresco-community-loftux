@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-digester.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsf-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsf-impl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsf-portlet.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jstl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/standard.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
