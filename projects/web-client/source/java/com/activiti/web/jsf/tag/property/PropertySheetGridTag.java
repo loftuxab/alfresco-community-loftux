@@ -11,8 +11,10 @@ import com.activiti.web.jsf.tag.BaseComponentTag;
  */
 public class PropertySheetGridTag extends BaseComponentTag
 {
-   private String m_value;
-   private String m_var;
+   private String value;
+   private String var;
+   private String columns;
+   private String externalConfig;
    
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
@@ -27,8 +29,7 @@ public class PropertySheetGridTag extends BaseComponentTag
     */
    public String getRendererType()
    {
-      // TODO: replace this with the standard javax.faces.Grid
-      return "awc.faces.Grid";
+      return "javax.faces.Grid";
    }
    
    /**
@@ -38,8 +39,23 @@ public class PropertySheetGridTag extends BaseComponentTag
    {
       super.setProperties(component);
       
-      setStringProperty(component, "value", m_value);
-      setStringProperty(component, "var", m_var);
+      setStringProperty(component, "value", this.value);
+      setStringStaticProperty(component, "var", this.var);
+      setIntProperty(component, "columns", this.columns);
+      setBooleanProperty(component, "externalConfig", this.externalConfig);
+   }
+
+   /**
+    * @see javax.faces.webapp.UIComponentTag#release()
+    */
+   public void release()
+   {
+      this.value = null;
+      this.var = null;
+      this.columns = null;
+      this.externalConfig = null;
+      
+      super.release();
    }
 
    /**
@@ -47,7 +63,7 @@ public class PropertySheetGridTag extends BaseComponentTag
     */
    public void setValue(String value)
    {
-      m_value = value;
+      this.value = value;
    }
    
    /**
@@ -55,6 +71,22 @@ public class PropertySheetGridTag extends BaseComponentTag
     */
    public void setVar(String var)
    {
-      m_var = var;
+      this.var = var;
    }
+
+   /**
+    * @param columns The columns to set.
+    */
+   public void setColumns(String columns)
+   {
+      this.columns = columns;
+   }
+
+   /**
+    * @param externalConfig The externalConfig to set.
+    */
+   public void setExternalConfig(String externalConfig)
+   {
+      this.externalConfig = externalConfig;
+   }   
 }

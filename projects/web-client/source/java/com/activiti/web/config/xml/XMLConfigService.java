@@ -1,0 +1,282 @@
+package com.activiti.web.config.xml;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import org.apache.log4j.Logger;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+
+import com.activiti.web.config.BaseConfigService;
+import com.activiti.web.config.ConfigElement;
+import com.activiti.web.config.ConfigException;
+import com.activiti.web.config.ConfigSectionImpl;
+import com.activiti.web.config.xml.elementreader.ConfigElementReader;
+import com.activiti.web.config.xml.elementreader.GenericElementReader;
+
+/**
+ * XML based configuration service
+ * 
+ * @author gavinc
+ */
+public class XMLConfigService extends BaseConfigService implements XMLConfigConstants
+{
+   private static final Logger logger = Logger.getLogger(XMLConfigService.class);
+   
+   private List configFiles;
+   private Map elementReaders;
+   
+   /**
+    * Default constructor
+    * 
+    * @param configFile Comma separated list of files to parse
+    */
+   public XMLConfigService(String configFile)
+   {
+      this.configFiles = new ArrayList();
+      
+      StringTokenizer tokenizer = new StringTokenizer(configFile, ",");
+      while (tokenizer.hasMoreTokens())
+      {
+         String file = tokenizer.nextToken();
+         configFiles.add(file);
+      }
+   }
+   
+   /**
+    * @see com.activiti.web.config.BaseConfigService#init()
+    */
+   public void init()
+   {
+      super.init();
+      
+      this.elementReaders = new HashMap();
+      
+      // TODO: add all the built in element readers
+      
+      parse();
+   }
+
+   /**
+    * Parses all the files passed to this config service
+    */
+   private void parse()
+   {
+      // read and parse the config files 
+      for (Iterator iter = configFiles.iterator(); iter.hasNext();)
+      {
+         parse((String)iter.next());
+      }
+   }
+   
+   /**
+    * Parses the given config file
+    * 
+    * @param file
+    */
+   private void parse(String file)
+   {
+      try
+      {
+         // get the root element
+         SAXReader reader = new SAXReader();
+         Document document = reader.read(file);
+         Element rootElement = document.getRootElement();
+         
+         // parse the global section first
+         Element globalConfig  = rootElement.element(ELEMENT_GLOBAL);
+         parseGlobalElement(globalConfig);
+         
+         // parse each config section in turn
+         Iterator configElements = rootElement.elementIterator(ELEMENT_CONFIG);
+         while (configElements.hasNext())
+         {
+            Element configElement = (Element)configElements.next();
+            parseConfigElement(configElement);
+         }
+      }
+      catch (Throwable e)
+      {
+         throw new ConfigException("Failed to parse config file: " + file, e);
+      }
+   }
+   
+   /**
+    * Parses the global section of a config file
+    * 
+    * @param globalElement The global element
+    */
+   private void parseGlobalElement(Element globalElement)
+   {
+      if (globalElement != null)
+      {
+         // parese the evaluators section
+         parseEvaluatorsElement(globalElement.element(ELEMENT_EVALUATORS));
+         
+         // parse the element readers section
+         parseElementReadersElement(globalElement.element(ELEMENT_ELEMENT_READERS));
+      }
+   }
+   
+   /**
+    * Parses the evaluators element
+    * 
+    * @param evaluatorsElement
+    */
+   private void parseEvaluatorsElement(Element evaluatorsElement)
+   {
+      if (evaluatorsElement != null)
+      {
+         Iterator evaluators = evaluatorsElement.elementIterator();
+         while (evaluators.hasNext())
+         {
+            Element evaluatorElement = (Element)evaluators.next();
+            String evaluatorName = evaluatorElement.attributeValue(ATTR_ID);
+            String evaluatorClass = evaluatorElement.attributeValue(ATTR_CLASS);
+            
+            // TODO: Can these checks be removed if we use a DTD and/or schema??
+            if (evaluatorName == null || evaluatorName.length() == 0 )
+            {
+               throw new ConfigException("All evaluator elements must define an id attribute");
+            }
+            
+            if (evaluatorClass == null || evaluatorClass.length() == 0 )
+            {
+               throw new ConfigException("Evaluator '" + evaluatorName + "' must define a class attribute");
+            }
+            
+            // add the evaluator
+            this.addEvaluator(evaluatorName, evaluatorClass);
+         }
+      }
+   }
+   
+   /**
+    * Parses the element-readers element
+    * 
+    * @param readersElement
+    */
+   private void parseElementReadersElement(Element readersElement)
+   {
+      if (readersElement != null)
+      {
+         Iterator readers = readersElement.elementIterator();
+         while (readers.hasNext())
+         {
+            Element readerElement = (Element)readers.next();
+            String readerElementName = readerElement.attributeValue(ATTR_ELEMENT_NAME);
+            String readerElementClass = readerElement.attributeValue(ATTR_CLASS);
+            
+            // TODO: Can these checks be removed if we use a DTD and/or schema??
+            if (readerElementName == null || readerElementName.length() == 0 )
+            {
+               throw new ConfigException("All element-reader elements must define an element-name attribute");
+            }
+            
+            if (readerElementClass == null || readerElementClass.length() == 0 )
+            {
+               throw new ConfigException("Element-reader '" + readerElementName + "' must define a class attribute");
+            }
+            
+            // add the evaluator
+            addConfigElementReader(readerElementName, readerElementClass);
+            
+            
+         }
+      }
+   }
+   
+   /**
+    * Parses a config element of a config file
+    * 
+    * @param configElement The config element
+    */
+   private void parseConfigElement(Element configElement)
+   {
+      if (configElement != null)
+      {
+         String evaluatorName = configElement.attributeValue(ATTR_EVALUATOR_REF);
+         String condition = configElement.attributeValue(ATTR_CONDITION);
+         
+         // create the section object
+         ConfigSectionImpl section = new ConfigSectionImpl(evaluatorName, condition);
+         
+         // retrieve the config elements for the section
+         Iterator children = configElement.elementIterator();
+         while (children.hasNext())
+         {
+            Element child = (Element)children.next();
+            String elementName = child.getName();
+            
+            // get the element reader for the child
+            ConfigElementReader elementReader = getConfigElementReader(elementName);
+            if (logger.isDebugEnabled())
+               logger.debug("Retrieved element reader " + elementReader + 
+                            " for element named '" + elementName + "'");
+            
+            
+            if (elementReader == null)
+            {
+               elementReader = new GenericElementReader();
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Defaulting to " + elementReader + " as there wasn't an element " +
+                               "reader registered for element '" + elementName + "'");
+            }
+            
+            ConfigElement cfgElement = elementReader.parse(child);
+            section.addConfigElement(cfgElement);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Added " + cfgElement + " to " + section);
+         }
+         
+         // now all the config elements are added, add the section to the config service
+         addConfigSection(section, null);
+      }
+   }
+   
+   /**
+    * Adds the config element reader with the given name and class name 
+    * 
+    * @param elementName Name of the element the reader is for
+    * @param className Class name of element reader implementation
+    */
+   private void addConfigElementReader(String elementName, String className)
+   {
+      ConfigElementReader elementReader = null;
+      
+      try
+      {
+         Class clazz = Class.forName(className);
+         elementReader = (ConfigElementReader)clazz.newInstance();
+      }
+      catch (Throwable e)
+      {
+         throw new ConfigException("Could not instantiate element reader for '" + elementName + 
+                                   "' with class: " + className, e);
+         
+      }
+      
+      this.elementReaders.put(elementName, elementReader);
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Added element reader '" + elementName + "': " + className);
+   }
+   
+   /**
+    * Retrieves the element reader for the given element name
+    * 
+    * @param elementName Name of the element to get the reader for
+    * @return ConfigElementReader object or null if it doesn't exist
+    */
+   private ConfigElementReader getConfigElementReader(String elementName)
+   {
+      return (ConfigElementReader)this.elementReaders.get(elementName);
+   }
+}

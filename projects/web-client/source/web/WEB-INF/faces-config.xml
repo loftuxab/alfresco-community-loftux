@@ -36,17 +36,16 @@
       <component-type>awc.faces.DataPager</component-type>
       <component-class>com.activiti.web.jsf.component.data.UIDataPager</component-class>
    </component>
-
-   <component>
-      <component-type>awc.faces.Property</component-type>
-      <component-class>com.activiti.web.jsf.component.property.UIProperty</component-class>
-   </component>
    
    <component>
       <component-type>awc.faces.PropertySheet</component-type>
       <component-class>com.activiti.web.jsf.component.property.UIPropertySheet</component-class>
    </component>
 
+   <component>
+      <component-type>awc.faces.Property</component-type>
+      <component-class>com.activiti.web.jsf.component.property.UIProperty</component-class>
+   </component>
 
    <!-- ==================== CONVERTERS ==================== -->
    <converter>
@@ -73,11 +72,6 @@
          <renderer-class>com.activiti.web.jsf.renderer.data.RichListRenderer</renderer-class>
       </renderer>
       
-      <renderer>
-         <component-family>activiti:PropertyFamily</component-family>
-         <renderer-type>awc.faces.Grid</renderer-type>
-         <renderer-class>com.activiti.web.jsf.renderer.property.PropertyGridRenderer</renderer-class>
-      </renderer>
    </render-kit>
 
 
@@ -117,13 +111,30 @@
 
    <managed-bean>
       <description>
-         The bean that acts as the Repository
+         The bean that acts as the Node Service
       </description>
-      <managed-bean-name>RepositoryService</managed-bean-name>
-      <managed-bean-class>jsftest.repository.Repository</managed-bean-class>
+      <managed-bean-name>NodeService</managed-bean-name>
+      <managed-bean-class>jsftest.repository.NodeService</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
    
+   <managed-bean>
+      <description>
+         The bean that acts as the Data Dictionary Service
+      </description>
+      <managed-bean-name>DDService</managed-bean-name>
+      <managed-bean-class>jsftest.repository.DataDictionary</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that acts as the navigation aid for the component zoo
+      </description>
+      <managed-bean-name>ZooService</managed-bean-name>
+      <managed-bean-class>jsftest.ZooService</managed-bean-class>
+      <managed-bean-scope>application</managed-bean-scope>
+   </managed-bean>
    
    <!-- ==================== NAVIGATION ==================== -->
    <!-- navigation rules describe the navigation cases between views using the -->
@@ -160,8 +171,8 @@
          <to-view-id>/adduser.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
-         <from-outcome>showproperties</from-outcome>
-         <to-view-id>/property.jsp</to-view-id>
+         <from-outcome>showPropertyZoo</from-outcome>
+         <to-view-id>/zoo/properties.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -189,4 +200,12 @@
       </navigation-case>
    </navigation-rule>
 
+   <navigation-rule>
+      <from-view-id>/zoo/properties.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>showPropertyZoo2</from-outcome>
+         <to-view-id>/zoo/properties-auto.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
 </faces-config>

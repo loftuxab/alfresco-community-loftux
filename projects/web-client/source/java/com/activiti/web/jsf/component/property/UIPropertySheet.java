@@ -1,39 +1,43 @@
 package com.activiti.web.jsf.component.property;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
 import javax.faces.component.NamingContainer;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIInput;
-import javax.faces.component.UIOutput;
-import javax.faces.component.UISelectBoolean;
+import javax.faces.component.UIPanel;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.DateTimeConverter;
 import javax.faces.el.ValueBinding;
-import jsftest.repository.BaseContentObject;
+
 import jsftest.repository.DataDictionary;
-import jsftest.repository.Repository;
+import jsftest.repository.NodeRef;
+import jsftest.repository.NodeService;
 import jsftest.repository.DataDictionary.MetaData;
 import jsftest.repository.DataDictionary.Property;
+
 import org.apache.log4j.Logger;
+
+import com.activiti.web.config.Config;
+import com.activiti.web.config.ConfigElement;
+import com.activiti.web.config.ConfigService;
+import com.activiti.web.config.ConfigServiceFactory;
+import com.activiti.web.repository.Node;
 
 /**
  * Component that represents the properties of an object
  * 
  * @author gavinc
  */
-public class UIPropertySheet extends UIInput implements NamingContainer
+public class UIPropertySheet extends UIPanel implements NamingContainer
 {
-   // *********************************************************
-   // TODO: Try extending the standard Panel then the standard
-   //       javax.faces.Panel family can be used
-   // *********************************************************
+   private static Logger logger = Logger.getLogger(UIPropertySheet.class);
+   private static String DEFAULT_VAR_NAME = "node";
    
-   private static Logger s_logger = Logger.getLogger(UIPropertySheet.class);
-   
-   private BaseContentObject m_obj;
+   private String variable;
+   private NodeRef nodeRef;
+   private Node node;
    
    /**
     * Default constructor
@@ -41,7 +45,7 @@ public class UIPropertySheet extends UIInput implements NamingContainer
    public UIPropertySheet()
    {
       // set the default renderer for a property sheet
-      setRendererType("awc.faces.Grid");
+      setRendererType("javax.faces.Grid");
    }
    
    /**
@@ -49,7 +53,7 @@ public class UIPropertySheet extends UIInput implements NamingContainer
     */
    public String getFamily()
    {
-      return "activiti:PropertyFamily";
+      return "javax.faces.Panel";
    }
 
    /**
@@ -57,41 +61,71 @@ public class UIPropertySheet extends UIInput implements NamingContainer
     */
    public void encodeBegin(FacesContext context) throws IOException
    {
-      s_logger.debug("*** In property sheet component encodeBegin ***");
-      
-      int howManyKids = getChildren().size();
-      String configFile = (String)getAttributes().get("var");
-      BaseContentObject contentObject = getContentObject(); 
       String var = null;
+      int howManyKids = getChildren().size();
+      Boolean externalConfig = (Boolean)getAttributes().get("externalConfig");
       
-      if (configFile != null)
+      // generate a variable name to use if necessary
+      if (this.variable == null)
       {
-         // TODO: configure the component using an external file
+         this.variable = DEFAULT_VAR_NAME;
       }
-      else
+      
+      // force retrieval of node info
+      getNode(); 
+      
+      if (howManyKids == 0)
       {
-         if (howManyKids == 0)
+         DataDictionary dd = new DataDictionary();
+         MetaData metaData = dd.getMetaData(this.node.getType());
+            
+         if (externalConfig != null && externalConfig.booleanValue())
          {
-            var = "obj";
-	         DataDictionary dd = new DataDictionary();
-	         MetaData metaData = dd.getMetaData(contentObject.getType());
-	         createComponents(context, metaData);
+            // configure the component using the config service
+            if (logger.isDebugEnabled())
+               logger.debug("Configuring property sheet using ConfigService");
+            
+            ConfigService configSvc = ConfigServiceFactory.getConfigService();
+            Config configProps = configSvc.getConfig(this.node);
+            ConfigElement propsToDisplay = configProps.getConfigElement("properties");
+            List kids = propsToDisplay.getChildren();
+            List propNames = new ArrayList();
+            for (Iterator iter = kids.iterator(); iter.hasNext();)
+            {
+               ConfigElement propElement = (ConfigElement)iter.next();
+               String propName = propElement.getAttribute("name");
+               propNames.add(propName);
+            }
+            
+            //PropertiesConfigElement propsToDisplay = (PropertiesConfigElement)configProps.getConfigElement("properties");
+            //Map propNames = propsToDisplay.getPropertiesMap();
+            if (logger.isDebugEnabled())
+            {
+               logger.debug("ConfigElement: " + propsToDisplay);
+               logger.debug("Properties to render: " + propNames);
+            }
+            
+            createComponents(context, metaData, propNames);
+         }
+         else
+         {
+            // show all the properties for the current node
+            if (logger.isDebugEnabled())
+               logger.debug("Configuring property sheet using meta data");   
+            
+            createComponents(context, metaData);
          }
       }
       
-      // get the var from the attributes if we don't know it yet
-      if (var == null)
+      // put the node in the session if it is not there already
+      Map sessionMap = getFacesContext().getExternalContext().getSessionMap();
+      Object obj = sessionMap.get(this.variable);
+      if (obj == null)
       {
-         var = (String)getAttributes().get("var");
-      }
-      
-      if (var != null)
-      {
-         Map sessionMap = getFacesContext().getExternalContext().getSessionMap();
-         sessionMap.put(var, contentObject);
+         sessionMap.put(this.variable, this.node);
          
-         if (s_logger.isDebugEnabled())
-            s_logger.debug("Put object into session: " + contentObject);
+         if (logger.isDebugEnabled())
+            logger.debug("Put node into session with key '" + this.variable + "': " + this.node);
       }
       
       super.encodeBegin(context);
@@ -105,7 +139,9 @@ public class UIPropertySheet extends UIInput implements NamingContainer
       Object values[] = (Object[])state;
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
-      m_obj = (BaseContentObject)values[1];
+      this.nodeRef = (NodeRef)values[1];
+      this.node = (Node)values[2];
+      this.variable = (String)values[3];
    }
    
    /**
@@ -116,142 +152,110 @@ public class UIPropertySheet extends UIInput implements NamingContainer
       Object values[] = new Object[8];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
-      values[1] = m_obj;
+      values[1] = this.nodeRef;
+      values[2] = this.node;
+      values[3] = this.variable;
       return (values);
    }
    
    /**
-    * @return Returns the content object
+    * @return Returns the node
     */
-   public BaseContentObject getContentObject()
+   public Node getNode()
    {
       // use the value to get hold of the actual object
-      if (m_obj == null)
+      if (this.node == null)
       {
-         String path = (String)getValue();
-         m_obj = Repository.getObject(path);
+         String path = (String)getAttributes().get("value");
+      
+         if (path == null)
+         {
+            ValueBinding vb = getValueBinding("value");
+            if (vb != null)
+            {
+               path = (String)vb.getValue(getFacesContext());
+            }
+         }
+         
+         this.nodeRef = NodeService.getNodeRef(path);
+         this.node = new Node(NodeService.getType(this.nodeRef));
+         this.node.setProperties(NodeService.getProperties(this.nodeRef));
       }
       
-      return m_obj;
+      return node;
    }
    
    /**
-    * @param obj The content object to set
+    * @param node The node
     */
-   public void setContentObject(BaseContentObject obj)
+   public void setNode(Node node)
    {
-      m_obj = obj;
+      this.node = node;
    }
    
+   /**
+    * @return Returns the variable.
+    */
+   public String getVar()
+   {
+      return this.variable;
+   }
+
+   /**
+    * @param variable The variable to set.
+    */
+   public void setVar(String variable)
+   {
+      this.variable = variable;
+   }
+   
+   /**
+    * Creates components to represent all the properties in the given meta data object
+    * 
+    * @param context
+    * @param metaData
+    * @throws IOException
+    */
    private void createComponents(FacesContext context, MetaData metaData)
    	throws IOException
    {
       Iterator iter = metaData.getProperties().iterator();
       while (iter.hasNext())
       {
-         Property objProp = (Property)iter.next(); 
-            
-         // dynamically add the string props to start with
-         UIComponent prop = context.getApplication().
-                            createComponent("awc.faces.Property");
+         Property property = (Property)iter.next(); 
          
          // generate the label
-         UIOutput label = (UIOutput)context.getApplication().
-                           createComponent("javax.faces.Output");
-         label.setRendererType("javax.faces.Text");
-         label.setValue(objProp.getDisplayName() + ": ");
-         prop.getChildren().add(label);
+         PropertyHelper.generateLabel(context, property.getDisplayName(), this);
          
-         ValueBinding vb = context.getApplication().
-                           createValueBinding("#{obj." + objProp.getName() + "}");
+         // generate the input control
+         PropertyHelper.generateControl(context, property, this.variable, this);
+      }
+   }
+   
+   /**
+    * Creates components to represent the given properties in the given meta data object
+    * 
+    * @param context
+    * @param metaData
+    * @param propNames
+    * @throws IOException
+    */
+   private void createComponents(FacesContext context, MetaData metaData, List propNames)
+      throws IOException
+   {
+      Iterator iter = metaData.getProperties().iterator();
+      while (iter.hasNext())
+      {
+         Property property = (Property)iter.next();
          
-         // generate the appropriate input field 
-         String typeName = objProp.getType();
-         if (typeName.equalsIgnoreCase("string"))
+         if (propNames.contains(property.getName()))
          {
-            UIInput input = (UIInput)context.getApplication().
-                             createComponent("javax.faces.Input");
-	         input.setRendererType("javax.faces.Text");
-	         input.setValueBinding("value", vb);
-	         
-	         if (objProp.isReadOnly())
-	         {
-	            input.getAttributes().put("disabled", new Boolean(true));
-	         }
-	         
-	         prop.getChildren().add(input);
-         }
-         else if (typeName.equalsIgnoreCase("string[]"))
-         {
-            UIInput input = (UIInput)context.getApplication().
-                             createComponent("javax.faces.Input");
-	         input.setRendererType("javax.faces.Text");
-	         input.setValueBinding("value", vb);
-	         
-	         if (objProp.isReadOnly())
-	         {
-	            input.getAttributes().put("disabled", new Boolean(true));
-	         }
-	         
-	         // add a string array converter
-	         Converter conv = (Converter)context.getApplication().
-	                           createConverter("converter:StringArray");
-	         input.setConverter(conv);
-	         
-	         prop.getChildren().add(input);
-         }
-         else if (typeName.equalsIgnoreCase("datetime"))
-         {
-            UIInput input = (UIInput)context.getApplication().
-                             createComponent("javax.faces.Input");
-            input.setRendererType("javax.faces.Text");
-            input.setValueBinding("value", vb);
+            // generate the label
+            PropertyHelper.generateLabel(context, property.getDisplayName(), this);
             
-            if (objProp.isReadOnly())
-	         {
-	            input.getAttributes().put("disabled", new Boolean(true));
-	         }
-            
-            // add a converter for datetime types
-            DateTimeConverter conv = (DateTimeConverter)context.getApplication().
-                                      createConverter("javax.faces.DateTime");
-            conv.setDateStyle("short");
-            conv.setPattern("d/MM/yyyy");
-            input.setConverter(conv);
-            
-            // add a validator if the field is required
-//            if (cntrl.isRequired())
-//            {
-//               uiControl.setRequired(true);
-//               LengthValidator val = (LengthValidator)context.getApplication().
-//                                      createValidator("javax.faces.Length");
-//               val.setMinimum(1);
-//               uiControl.addValidator(val);
-//            }
-
-            prop.getChildren().add(input);
+            // generate the input control
+            PropertyHelper.generateControl(context, property, this.variable, this);
          }
-         else if (typeName.equalsIgnoreCase("boolean"))
-         {
-            UISelectBoolean input = (UISelectBoolean)context.getApplication().
-                                     createComponent("javax.faces.SelectBoolean");
-            input.setRendererType("javax.faces.Checkbox");
-            input.setValueBinding("value", vb);
-            
-            if (objProp.isReadOnly())
-	         {
-	            input.getAttributes().put("disabled", new Boolean(true));
-	         }
-
-            prop.getChildren().add(input);
-         }
-         else if (typeName.equalsIgnoreCase("enum"))
-         {
-            // TODO: Handle lists
-         }
-         
-         // add the property definition to the list of children for this sheet
-         getChildren().add(prop);
       }
    }
 }

@@ -149,6 +149,6 @@
       
       <h:commandButton id="add-user" value="Add" action="adduser" actionListener="#{UserListBean.addUser}"/>
       <br/><br/>
-      <h:commandButton id="show-properties" value="Property Sheet" action="#{RepositoryService.showProperties}" />
+      <h:commandButton id="show-property-zoo" value="Property Zoo" action="#{ZooService.showPropertyZoo}" />
    </h:form>
 </f:view>

@@ -13,11 +13,11 @@ import java.util.Map;
  */
 public class DataDictionary
 {
-   private Map m_types;
+   private Map types;
    
    public DataDictionary()
    {
-      m_types = new HashMap();
+      this.types = new HashMap();
       
       // setup the dictionary
       Property name = new Property("name", "string", "Name", false);
@@ -43,13 +43,13 @@ public class DataDictionary
       sop.addProperty(effective);
       sop.addProperty(approved);
       
-      m_types.put(base.getTypeName(), base);
-      m_types.put(sop.getTypeName(), sop);
+      this.types.put(base.getTypeName(), base);
+      this.types.put(sop.getTypeName(), sop);
    }
    
    public MetaData getMetaData(String type)
    {
-      return (MetaData)m_types.get(type);
+      return (MetaData)this.types.get(type);
    }
    
    /**
@@ -57,7 +57,7 @@ public class DataDictionary
     */
    public Map getTypes()
    {
-      return m_types;
+      return this.types;
    }
    
    
@@ -71,13 +71,15 @@ public class DataDictionary
     */
 	public class MetaData
 	{
-	   private List m_properties;
-	   private String m_typeName;
+      private Map propertiesMap;
+	   private List properties;
+	   private String typeName;
 	   
 	   public MetaData(String typeName)
 	   {
-	      m_properties = new ArrayList();
-	      m_typeName = typeName;
+	      this.properties = new ArrayList();
+         this.propertiesMap = new HashMap();
+	      this.typeName = typeName;
 	   }
 	   
 	   /**
@@ -87,7 +89,8 @@ public class DataDictionary
 	    */
 	   public void addProperty(Property property)
 	   {
-	      m_properties.add(property);
+	      this.properties.add(property);
+         this.propertiesMap.put(property.getName(), property);
 	   }
 	   
       /**
@@ -95,7 +98,7 @@ public class DataDictionary
        */
       public List getProperties()
       {
-         return m_properties;
+         return this.properties;
       }
       
       /**
@@ -103,14 +106,21 @@ public class DataDictionary
        */
       public void setProperties(List properties)
       {
-         m_properties.clear();
+         this.properties.clear();
+         this.propertiesMap.clear();
          
          Iterator iter = properties.iterator();
          while (iter.hasNext())
          {
             Property prop = (Property)iter.next();
-            m_properties.add(prop);
+            this.properties.add(prop);
+            this.propertiesMap.put(prop.getName(), prop);
          }
+      }
+      
+      public Map getPropertiesMap()
+      {
+         return this.propertiesMap;
       }
       
       /**
@@ -118,7 +128,7 @@ public class DataDictionary
        */
       public String getTypeName()
       {
-         return m_typeName;
+         return this.typeName;
       }
 	}
 	
@@ -128,10 +138,10 @@ public class DataDictionary
 	 */
 	public class Property
 	{
-	   private String m_name;
-	   private String m_type;
-	   private String m_displayName;
-	   private boolean m_readOnly;
+	   private String name;
+	   private String type;
+	   private String displayName;
+	   private boolean readOnly;
 	   
       /**
        * @param name
@@ -140,10 +150,10 @@ public class DataDictionary
        */
       public Property(String name, String type, String displayName, boolean readOnly)
       {
-         m_name = name;
-         m_type = type;
-         m_displayName = displayName;
-         m_readOnly = readOnly;
+         this.name = name;
+         this.type = type;
+         this.displayName = displayName;
+         this.readOnly = readOnly;
       }
       
 	   /**
@@ -151,7 +161,7 @@ public class DataDictionary
 	    */
 	   public String getName()
 	   {
-	      return m_name;
+	      return this.name;
 	   }
 	   
 	   /**
@@ -159,7 +169,7 @@ public class DataDictionary
 	    */
 	   public void setName(String name)
 	   {
-	      m_name = name;
+	      this.name = name;
 	   }
 	   
 	   /**
@@ -167,7 +177,7 @@ public class DataDictionary
 	    */
 	   public String getType()
 	   {
-	      return m_type;
+	      return this.type;
 	   }
 	   
 	   /**
@@ -175,7 +185,7 @@ public class DataDictionary
 	    */
 	   public void setType(String type)
 	   {
-	      m_type = type;
+	      this.type = type;
 	   }
 	   
       /**
@@ -183,7 +193,7 @@ public class DataDictionary
        */
       public String getDisplayName()
       {
-         return m_displayName;
+         return this.displayName;
       }
       
       /**
@@ -191,7 +201,7 @@ public class DataDictionary
        */
       public void setDisplayName(String displayName)
       {
-         m_displayName = displayName;
+         this.displayName = displayName;
       }
       
 	   /**
@@ -199,7 +209,7 @@ public class DataDictionary
 	    */
 	   public boolean isReadOnly()
 	   {
-	      return m_readOnly;
+	      return this.readOnly;
 	   }
 	   
 	   /**
@@ -207,7 +217,7 @@ public class DataDictionary
 	    */
 	   public void setReadOnly(boolean readOnly)
 	   {
-	      m_readOnly = readOnly;
+	      this.readOnly = readOnly;
 	   }
 	}
 	

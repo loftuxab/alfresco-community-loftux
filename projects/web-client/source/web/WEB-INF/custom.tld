@@ -283,7 +283,7 @@
    </tag>
 
    <tag>
-      <name>propertySheet</name>
+      <name>propertySheetGrid</name>
       <tagclass>com.activiti.web.jsf.tag.property.PropertySheetGridTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
@@ -304,12 +304,42 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>columns</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>externalConfig</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    </tag>
    
    <tag>
       <name>property</name>
       <tagclass>com.activiti.web.jsf.tag.property.PropertyTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>columns</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    </tag>
 
 </taglib>
