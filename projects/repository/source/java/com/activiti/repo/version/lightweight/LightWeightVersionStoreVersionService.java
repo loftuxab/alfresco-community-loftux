@@ -259,17 +259,17 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
                 String strLocalName = key.getLocalName();
                 String value = (String)nodeProperties.get(key);
                 
-                if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_LABEL) == true)
+                if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_LABEL.getLocalName()) == true)
                 {
                     // Get the version label property
                     versionLabel = value;
                 }
-                else if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_CREATED_DATE))
+                else if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_CREATED_DATE.getLocalName()))
                 {
                     // Get the created date property
                     createdDate = new Date(Long.parseLong(value));
                 }
-                else if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_NUMBER) == false)
+                else if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_NUMBER.getLocalName()) == false)
                 {
                     versionProperties.put(strLocalName, value);
                 }
