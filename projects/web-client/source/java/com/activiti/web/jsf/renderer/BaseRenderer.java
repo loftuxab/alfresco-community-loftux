@@ -74,4 +74,24 @@ public abstract class BaseRenderer extends Renderer
          component.encodeEnd(context);
       }
    }
+   
+   /**
+    * Ensures that the given context and component are not null. This method
+    * should be called by all renderer methods that are given these parameters.
+    * 
+    * @param ctx Faces context
+    * @param component The component
+    */
+   protected void assertParmeters(FacesContext ctx, UIComponent component)
+   {
+      if (ctx == null)
+      {
+         throw new IllegalStateException("context can not be null");
+      }
+      
+      if (component == null)
+      {
+         throw new IllegalStateException("component can not be null");
+      }
+   }
 }
