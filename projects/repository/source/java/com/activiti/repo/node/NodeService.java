@@ -144,41 +144,41 @@ public interface NodeService
      * 
      * @param sourceRef a reference to a <b>real</b> node
      * @param targetRef a reference to a node
-     * @param assocName the name of the associaton
+     * @param qname the qualified name of the association
      * @throws InvalidNodeRefException if either of the nodes could not be found
      * @throws AssociationExistsException
      */
-    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
+    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException, AssociationExistsException;
     
     /**
      * 
      * @param sourceRef the associaton source node
      * @param targetRef the association target node
-     * @param assocName name of the association to remove
+     * @param qname the qualified name of the association
      * @throws InvalidNodeRefException if either of the nodes could not be found
      */
-    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
+    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException;
     
     /**
      * @param sourceRef the association source
-     * @param assocName the name of the association
+     * @param qname the qualified name of the association
      * @return Returns a collection of <code>NodeRef</code> instances at the target end of the
      *      named association for which the given node is a source
      * @throws InvalidNodeRefException if the source node could not be found
      */
-    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, String assocName)
+    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname)
             throws InvalidNodeRefException;
     
     /**
      * @param targetRef the association target
-     * @param assocName the name of the association
+     * @param qname the qualified name of the association
      * @return Returns a collection of <code>NodeRef</code> instances at the source of the
      *      named association for which the given node is a target
      * @throws InvalidNodeRefException
      */
-    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, String assocName)
+    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname)
             throws InvalidNodeRefException;
     
     /**

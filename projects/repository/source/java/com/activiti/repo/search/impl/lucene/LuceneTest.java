@@ -507,26 +507,22 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-      public void createAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
-            throws InvalidNodeRefException, AssociationExistsException
+      public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname) throws InvalidNodeRefException, AssociationExistsException
       {
          throw new UnsupportedOperationException();
       }
 
-      public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
-            throws InvalidNodeRefException
+      public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname) throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
       }
 
-      public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, String assocName)
-            throws InvalidNodeRefException
+      public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname) throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
       }
 
-      public Collection<NodeRef> getAssociationSources(NodeRef targetRef, String assocName)
-            throws InvalidNodeRefException
+      public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname) throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
       }

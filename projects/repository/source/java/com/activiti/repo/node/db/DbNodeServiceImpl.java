@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -177,19 +178,20 @@ public class DbNodeServiceImpl implements NodeService
         // get all the child assocs
         boolean deleteChild = false;
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
+        assocs = new HashSet<ChildAssoc>(assocs.size());   // copy set as we will be modifying it
         for (ChildAssoc assoc : assocs)
         {
             if (!assoc.getChild().getKey().equals(childNodeKey))
             {
                 continue;  // not a matching association
             }
-            // we have a match
-            nodeDaoService.deleteChildAssoc(assoc);
             // is this a primary association?
             if (assoc.getIsPrimary())
             {
                 deleteChild = true;
             }
+            // delete the association instance
+            nodeDaoService.deleteChildAssoc(assoc);
         }
         // must the child be deleted?
         if (deleteChild)
@@ -204,8 +206,7 @@ public class DbNodeServiceImpl implements NodeService
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // get all the child assocs
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
-        // copy the set as we might be 
-        int childrenDeleted = 0;
+        assocs = new HashSet<ChildAssoc>(assocs.size());   // copy set as we will be modifying it
         for (ChildAssoc assoc : assocs)
         {
             if (!assoc.getQName().equals(qname))
@@ -219,7 +220,6 @@ public class DbNodeServiceImpl implements NodeService
             {
                 Node childNode = assoc.getChild();
                 nodeDaoService.deleteNode(childNode);
-                childrenDeleted++;
             }
         }
         // done
@@ -324,31 +324,53 @@ public class DbNodeServiceImpl implements NodeService
         return (assoc == null ? null : assoc.getParent().getNodeRef());
     }
 
-    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
+    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException, AssociationExistsException
     {
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // see if it exists
-        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, assocName);
+        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, qname.toString());
         if (assoc != null)
         {
-            throw new AssociationExistsException(sourceRef, targetRef, assocName);
+            throw new AssociationExistsException(sourceRef, targetRef, qname);
         }
         // we are sure that the association doesn't exist - make it
-        nodeDaoService.newNodeAssoc(sourceNode, targetNode, assocName);
+        nodeDaoService.newNodeAssoc(sourceNode, targetNode, qname.toString());
         // done
     }
 
-    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
+    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException
     {
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // get the association
-        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, assocName);
+        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, qname.toString());
         // delete it
         nodeDaoService.deleteNodeAssoc(assoc);
+    }
+
+    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname)
+            throws InvalidNodeRefException
+    {
+        RealNode sourceNode = getRealNodeNotNull(sourceRef);
+        Collection<Node> targets = nodeDaoService.getNodeAssocTargets(sourceNode, qname.toString());
+        // build the reference results
+        Collection<NodeRef> nodeRefs = convertToNodeRefs(targets);
+        // done
+        return nodeRefs;
+    }
+
+    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname)
+            throws InvalidNodeRefException
+    {
+        Node targetNode = getNodeNotNull(targetRef);
+        Collection<RealNode> sources = nodeDaoService.getNodeAssocSources(targetNode, qname.toString());
+        // build the reference results
+        Collection<NodeRef> nodeRefs = convertToNodeRefs(sources);
+        // done
+        return nodeRefs;
     }
     
     /**
@@ -366,28 +388,6 @@ public class DbNodeServiceImpl implements NodeService
         {
             nodeRefs.add(node.getNodeRef());
         }
-        // done
-        return nodeRefs;
-    }
-
-    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, String assocName)
-            throws InvalidNodeRefException
-    {
-        RealNode sourceNode = getRealNodeNotNull(sourceRef);
-        Collection<Node> targets = nodeDaoService.getNodeAssocTargets(sourceNode, assocName);
-        // build the reference results
-        Collection<NodeRef> nodeRefs = convertToNodeRefs(targets);
-        // done
-        return nodeRefs;
-    }
-
-    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, String assocName)
-            throws InvalidNodeRefException
-    {
-        Node targetNode = getNodeNotNull(targetRef);
-        Collection<RealNode> sources = nodeDaoService.getNodeAssocSources(targetNode, assocName);
-        // build the reference results
-        Collection<NodeRef> nodeRefs = convertToNodeRefs(sources);
         // done
         return nodeRefs;
     }

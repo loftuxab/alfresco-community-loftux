@@ -1,6 +1,7 @@
 package com.activiti.repo.node;
 
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.QName;
 
 /**
  * Thrown when an operation could not be performed because a named association already
@@ -14,19 +15,19 @@ public class AssociationExistsException extends RuntimeException
 
     private NodeRef sourceRef;
     private NodeRef targetRef;
-    private String assoc;
+    private QName qname;
     
     /**
      * @param sourceRef the source of the association
      * @param targetRef the target of the association
-     * @param name the name of the association
+     * @param qname the qualified name of the association
      */
-    public AssociationExistsException(NodeRef sourceRef, NodeRef targetRef, String name)
+    public AssociationExistsException(NodeRef sourceRef, NodeRef targetRef, QName qname)
     {
         super();
         this.sourceRef = sourceRef;
         this.targetRef = targetRef;
-        this.assoc = name;
+        this.qname = qname;
     }
 
     public NodeRef getSourceRef()
@@ -39,8 +40,8 @@ public class AssociationExistsException extends RuntimeException
         return targetRef;
     }
     
-    public String getAssoc()
+    public QName getQName()
     {
-        return assoc;
+        return qname;
     }
 }

@@ -249,10 +249,10 @@ public class NodeServiceTest extends BaseSpringTest
         NodeRef targetRef = nodeService.createNode(rootNodeRef,
                 QName.createQName(null, "N2"),
                 Node.TYPE_REFERENCE);
-        String assocName = "next";
-        nodeService.createAssociation(sourceRef, targetRef, assocName);
+        QName qname = QName.createQName("next");
+        nodeService.createAssociation(sourceRef, targetRef, qname);
         // done
-        Object[] ret = new Object[] {sourceRef, targetRef, assocName};
+        Object[] ret = new Object[] {sourceRef, targetRef, qname};
         return ret;
     }
     
@@ -261,11 +261,11 @@ public class NodeServiceTest extends BaseSpringTest
         Object[] ret = createAssociation();
         NodeRef sourceRef = (NodeRef) ret[0];
         NodeRef targetRef = (NodeRef) ret[1];
-        String assocName = (String) ret[2];
+        QName qname = (QName) ret[2];
         try
         {
             // attempt the association in reverse
-            nodeService.createAssociation(sourceRef, targetRef, assocName);
+            nodeService.createAssociation(sourceRef, targetRef, qname);
             fail("Incorrect node type not detected");
         }
         catch (RuntimeException e)
@@ -275,7 +275,7 @@ public class NodeServiceTest extends BaseSpringTest
         try
         {
             // attempt repeat
-            nodeService.createAssociation(sourceRef, targetRef, assocName);
+            nodeService.createAssociation(sourceRef, targetRef, qname);
             fail("Duplicate assocation not detected");
         }
         catch (AssociationExistsException e)
@@ -289,11 +289,11 @@ public class NodeServiceTest extends BaseSpringTest
         Object[] ret = createAssociation();
         NodeRef sourceRef = (NodeRef) ret[0];
         NodeRef targetRef = (NodeRef) ret[1];
-        String assocName = (String) ret[2];
+        QName qname = (QName) ret[2];
         // remove the association
-        nodeService.removeAssociation(sourceRef, targetRef, assocName);
+        nodeService.removeAssociation(sourceRef, targetRef, qname);
         // remake association
-        nodeService.createAssociation(sourceRef, targetRef, assocName);
+        nodeService.createAssociation(sourceRef, targetRef, qname);
     }
     
     public void testGetAssociationTargets() throws Exception
@@ -301,9 +301,9 @@ public class NodeServiceTest extends BaseSpringTest
         Object[] ret = createAssociation();
         NodeRef sourceRef = (NodeRef) ret[0];
         NodeRef targetRef = (NodeRef) ret[1];
-        String assocName = (String) ret[2];
+        QName qname = (QName) ret[2];
         // get the association targets
-        Collection<NodeRef> targets = nodeService.getAssociationTargets(sourceRef, assocName);
+        Collection<NodeRef> targets = nodeService.getAssociationTargets(sourceRef, qname);
         assertEquals("Incorrect number of targets", 1, targets.size());
         assertTrue("Target not found", targets.contains(targetRef));
     }
@@ -313,9 +313,9 @@ public class NodeServiceTest extends BaseSpringTest
         Object[] ret = createAssociation();
         NodeRef sourceRef = (NodeRef) ret[0];
         NodeRef targetRef = (NodeRef) ret[1];
-        String assocName = (String) ret[2];
+        QName qname = (QName) ret[2];
         // get the association targets
-        Collection<NodeRef> sources = nodeService.getAssociationSources(targetRef, assocName);
+        Collection<NodeRef> sources = nodeService.getAssociationSources(targetRef, qname);
         assertEquals("Incorrect number of sources", 1, sources.size());
         assertTrue("Source not found", sources.contains(sourceRef));
     }

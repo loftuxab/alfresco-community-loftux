@@ -122,6 +122,9 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     
     public void deleteChildAssoc(ChildAssoc assoc)
     {
+        // maintain inverse association sets
+        assoc.removeAssociation();
+        // remove instance
         getHibernateTemplate().delete(assoc);
     }
 
