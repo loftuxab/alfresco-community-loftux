@@ -63,10 +63,8 @@ public interface LockService
     *  
     * @param nodeRefs a list of node references
     * @param userRef a reference to the user that will own the lock(s)
-    * 
-    * TODO can we use a 'generic' list here (ie: List<NodeRef>) ??
     */
-   public void lock(List nodeRefs, String userRef);
+   public void lock(List<NodeRef> nodeRefs, String userRef);
    
    /**
     * Removes the lock on a node.  
