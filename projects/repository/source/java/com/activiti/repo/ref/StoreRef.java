@@ -1,16 +1,21 @@
 package com.activiti.repo.ref;
 
+import java.io.Serializable;
+
 /**
  * Reference to a node store
  * 
  * @author derekh
  */
-public class StoreRef
+public class StoreRef implements Serializable
 {
+    private static final long serialVersionUID = 3258410625464940344L;
+
+    public static final String PROTOCOL_WORKSPACE = "workspace";
+    
     private static final String URI_FILLER = "://";
 
     private String protocol;
-
     private String identifier;
 
     /**
@@ -28,8 +33,7 @@ public class StoreRef
         }
         if (identifier == null)
         {
-            throw new IllegalArgumentException(
-                    "Store identifier may not be null");
+            throw new IllegalArgumentException("Store identifier may not be null");
         }
 
         this.protocol = protocol;
@@ -50,12 +54,20 @@ public class StoreRef
         if (obj instanceof StoreRef)
         {
             StoreRef that = (StoreRef) obj;
-            return (this.protocol.equals(that.protocol) && this.identifier
-                    .equals(that.identifier));
+            return (this.protocol.equals(that.protocol)
+                    && this.identifier.equals(that.identifier));
         } else
         {
             return false;
         }
+    }
+    
+    /**
+     * Creates a hashcode from both the {@link #getProtocol()} and {@link #getIdentifier()}
+     */
+    public int hashCode()
+    {
+        return (protocol.hashCode() + identifier.hashCode());
     }
 
     public String getProtocol()

@@ -21,9 +21,11 @@
          <generator class="increment" />
       </id>
       <discriminator
-            column="type"
+            column="auto_type"
             type="string"
             length="18" />
+      <property name="guid" not-null="true" />
+      <property name="type" not-null="true" />
       <map
             name="properties"
             table="node_properties"
@@ -31,10 +33,17 @@
             sort="unsorted"
             inverse="false"
             cascade="all" >
-         <key column="id" />  <!-- the map must be linked to the Node by the Node id -->
+         <key column="auto_id" />  <!-- the map must be linked to the Node by the Node id -->
          <index column="property_name" type="string" />
          <element column="property_value" type="string" />  <!-- a map of property values keyed by property name -->
       </map>
+      <!-- forward assoc to workspace -->
+      <many-to-one
+            name="workspace"
+            class="com.activiti.repo.domain.hibernate.WorkspaceImpl"
+            not-null="true" >
+         <column name="workspace_id" />
+      </many-to-one>
       <!-- inverse assoc to parent childassocs -->
       <set
             name="parentAssocs"
@@ -43,7 +52,7 @@
          <one-to-many class="com.activiti.repo.domain.hibernate.ChildAssocImpl" />
       </set>
    </class>
-
+   
    <subclass
          name="com.activiti.repo.domain.hibernate.ReferenceNodeImpl"
          proxy="com.activiti.repo.domain.ReferenceNode"
@@ -105,5 +114,17 @@
             column="child_id"
             not-null="true" />
    </class>
+
+   <query name="node.FindNodeInWorkspace" >
+      select
+         node
+      from
+         com.activiti.repo.domain.hibernate.NodeImpl node
+         join node.workspace workspace
+      where
+         node.guid = :nodeGuid and
+         workspace.protocol = :workspaceProtocol and
+         workspace.identifier = :workspaceIdentifier
+   </query>
 
 </hibernate-mapping>

@@ -3,7 +3,10 @@ package com.activiti.repo.domain.hibernate;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import com.activiti.repo.domain.Node;
+import com.activiti.repo.domain.Workspace;
+import com.activiti.repo.ref.NodeRef;
 
 /**
  * Simple named node to test out various features
@@ -14,10 +17,12 @@ import com.activiti.repo.domain.Node;
 public class NodeImpl implements Node
 {
     private Long id;
-
+    private String guid;
+    private String type;
+    private Workspace workspace;
     private Set parentAssocs;
-
     private Map properties;
+    private NodeRef nodeRef;
 
     public NodeImpl()
     {
@@ -32,6 +37,39 @@ public class NodeImpl implements Node
     public void setId(Long id)
     {
         this.id = id;
+    }
+
+    public String getGuid()
+    {
+        return guid;
+    }
+
+    public synchronized void setGuid(String id)
+    {
+        this.guid = id;
+        this.nodeRef = null;
+    }
+    
+    public String getType()
+    {
+        return type;
+    }
+
+    public synchronized void setType(String type)
+    {
+        this.type = type;
+        this.nodeRef = null;
+    }
+
+    public Workspace getWorkspace()
+    {
+        return workspace;
+    }
+
+    public synchronized void setWorkspace(Workspace workspace)
+    {
+        this.workspace = workspace;
+        this.nodeRef = null;
     }
 
     public Set getParentAssocs()
@@ -52,5 +90,25 @@ public class NodeImpl implements Node
     public void setProperties(Map properties)
     {
         this.properties = properties;
+    }
+
+    /**
+     * Thread-safe caching of the reference is provided
+     */
+    public synchronized NodeRef getNodeRef()
+    {
+        if (nodeRef == null)
+        {
+            nodeRef = new NodeRef(getWorkspace().getStoreRef(), getGuid());
+        }
+        return nodeRef;
+    }
+    
+    /**
+     * @see #getNodeRef()
+     */
+    public String toString()
+    {
+        return getNodeRef().toString();
     }
 }

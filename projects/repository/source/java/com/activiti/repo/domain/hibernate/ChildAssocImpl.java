@@ -11,7 +11,7 @@ public class ChildAssocImpl implements ChildAssoc
 {
     private long id;
 
-    private ContainerNode parentNode;
+    private ContainerNode parent;
 
     private Node child;
 
@@ -38,15 +38,27 @@ public class ChildAssocImpl implements ChildAssoc
         parentNode.getChildAssocs().add(this);
         childNode.getParentAssocs().add(this);
     }
+    
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer(32);
+        sb.append("ChildAssoc")
+          .append("[ parent=").append(parent)
+          .append(", child=").append(child)
+          .append(", name=").append(name)
+          .append(", isPrimary=").append(isPrimary)
+          .append("]");
+        return sb.toString();
+    }
 
     public ContainerNode getParent()
     {
-        return parentNode;
+        return parent;
     }
 
     public void setParent(ContainerNode parentNode)
     {
-        this.parentNode = parentNode;
+        this.parent = parentNode;
     }
 
     public Node getChild()

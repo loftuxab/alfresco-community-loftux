@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    '-//Hibernate/Hibernate Mapping DTD 3.0//EN' 
+    'http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd'>
+
+<hibernate-mapping>
+
+   <class
+         name="com.activiti.repo.domain.hibernate.WorkspaceImpl"
+         proxy="com.activiti.repo.domain.Workspace"
+         table="workspace"
+         dynamic-update="false"
+         dynamic-insert="false"
+         select-before-update="false"
+         optimistic-lock="version" >
+      <id
+            name="id"
+            column="id"
+            type="long" >
+         <generator class="increment" />
+      </id>
+      <property name="protocol" not-null="true" />
+      <property name="identifier" not-null="true" />
+      <!-- forward assoc to root node -->
+      <many-to-one
+            name="rootNode"
+            not-null="false"
+            lazy="false"
+            class="com.activiti.repo.domain.hibernate.RealNodeImpl"
+            fetch="join" />
+   </class>
+   
+   <query name="workspace.FindByProtocolAndIdentifier">
+      from
+         com.activiti.repo.domain.hibernate.WorkspaceImpl workspace
+      where
+         workspace.protocol = :protocol and
+         workspace.identifier = :identifier
+   </query>
+
+</hibernate-mapping>

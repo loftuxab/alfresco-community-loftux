@@ -11,6 +11,9 @@ import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.ContentNode;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.ReferenceNode;
+import com.activiti.repo.domain.Workspace;
+import com.activiti.repo.ref.StoreRef;
+import com.activiti.util.BaseHibernateTest;
 
 /**
  * Test persistence and retrieval of Hibernate-specific implementations of the
@@ -20,14 +23,41 @@ import com.activiti.repo.domain.ReferenceNode;
  */
 public class HibernateNodeTest extends BaseHibernateTest
 {
+    private Workspace workspace;
+    
     public HibernateNodeTest()
     {
+    }
+    
+    protected void onSetUpInTransaction() throws Exception
+    {
+        workspace = new WorkspaceImpl();
+        // set attributes
+        workspace.setProtocol(StoreRef.PROTOCOL_WORKSPACE);
+        workspace.setIdentifier("TestWorkspace@" + System.currentTimeMillis());
+        // persist so that it is present in the hibernate cache
+        getSession().save(workspace);
+    }
+    
+    protected void onTearDownInTransaction()
+    {
+        // force a flush to ensure that the database updates succeed
+        getSession().flush();
+        getSession().clear();
+    }
+
+    public void testSetUp() throws Exception
+    {
+        assertNotNull("Workspace not initialised", workspace);
     }
 
     public void testMap() throws Exception
     {
         // create a new Node
         Node node = new NodeImpl();
+        node.setGuid("AAA");
+        node.setWorkspace(workspace);
+        node.setType(Node.TYPE_CONTAINER);
         // give it a property map
         Map propertyMap = new HashMap(5);
         propertyMap.put("A", "AAA");
@@ -49,6 +79,9 @@ public class HibernateNodeTest extends BaseHibernateTest
     {
         // persist a subclass of Node
         Node node = new ContentNodeImpl();
+        node.setGuid("AAA");
+        node.setWorkspace(workspace);
+        node.setType(Node.TYPE_CONTENT);
         Serializable id = getSession().save(node);
         // get the node back
         node = (Node) getSession().get(NodeImpl.class, id);
@@ -61,6 +94,9 @@ public class HibernateNodeTest extends BaseHibernateTest
     {
         // make a reference node
         ReferenceNode refNode = new ReferenceNodeImpl();
+        refNode.setGuid("AAA");
+        refNode.setWorkspace(workspace);
+        refNode.setType(Node.TYPE_REFERENCE);
         refNode.setReferencedPath("/somepath/to/some/node[1]");
         Serializable refNodeId = getSession().save(refNode);
 
@@ -72,10 +108,16 @@ public class HibernateNodeTest extends BaseHibernateTest
     {
         // make a content node
         ContentNode contentNode = new ContentNodeImpl();
+        contentNode.setGuid("AAA");
+        contentNode.setWorkspace(workspace);
+        contentNode.setType(Node.TYPE_CONTENT);
         Serializable contentNodeId = getSession().save(contentNode);
 
         // make a container node
         ContainerNode containerNode = new ContainerNodeImpl();
+        containerNode.setGuid("AAA");
+        containerNode.setWorkspace(workspace);
+        containerNode.setType(Node.TYPE_CONTAINER);
         Serializable containerNodeId = getSession().save(containerNode);
         // create an association to the content
         ChildAssoc assoc = new ChildAssocImpl();

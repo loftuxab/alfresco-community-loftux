@@ -28,5 +28,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jta.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jug.zip"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

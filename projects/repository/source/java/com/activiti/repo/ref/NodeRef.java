@@ -1,43 +1,46 @@
 package com.activiti.repo.ref;
 
+import java.io.Serializable;
+
 /**
  * Reference to a node store
  * 
  * @author derekh
  */
-public class NodeRef
+public class NodeRef implements Serializable
 {
+    private static final long serialVersionUID = 3834308453517833270L;
+
     private static final String URI_FILLER = "/";
 
     private StoreRef storeRef;
-
-    private String id;
+    private String guid;
 
     /**
      * @param storeRef
      * @see StoreRef
-     * @param id
-     *            the unique identifier of the node
+     * @param guid
+     *      the manually assigned unique identifier of the node
      */
-    public NodeRef(StoreRef storeRef, String id)
+    public NodeRef(StoreRef storeRef, String guid)
     {
         if (storeRef == null)
         {
             throw new IllegalArgumentException(
                     "Store reference may not be null");
         }
-        if (id == null)
+        if (guid == null)
         {
             throw new IllegalArgumentException("Node id may not be null");
         }
 
         this.storeRef = storeRef;
-        this.id = id;
+        this.guid = guid;
     }
 
     public String toString()
     {
-        return storeRef.toString() + URI_FILLER + id;
+        return storeRef.toString() + URI_FILLER + guid;
     }
 
     public boolean equals(Object obj)
@@ -49,12 +52,21 @@ public class NodeRef
         if (obj instanceof NodeRef)
         {
             NodeRef that = (NodeRef) obj;
-            return (this.storeRef.equals(that.storeRef) && this.id
-                    .equals(that.id));
-        } else
+            return (this.guid.equals(that.guid)
+                    && this.storeRef.equals(that.storeRef));
+        }
+        else
         {
             return false;
         }
+    }
+    
+    /**
+     * Hashes on ID alone.  As the number of copies of a particular node will be minimal, this is acceptable
+     */
+    public int hashCode()
+    {
+        return guid.hashCode();
     }
 
     public StoreRef getStoreRef()
@@ -62,8 +74,8 @@ public class NodeRef
         return storeRef;
     }
 
-    public String getId()
+    public String getGuid()
     {
-        return id;
+        return guid;
     }
 }

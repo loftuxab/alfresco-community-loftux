@@ -1,30 +1,25 @@
-package com.activiti.repo.domain.hibernate;
+package com.activiti.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
  * Base test class providing Hibernate sessions
  * 
  * @author derekh
  */
-public abstract class BaseHibernateTest extends
-        AbstractTransactionalDataSourceSpringContextTests implements
-        InitializingBean
+public abstract class BaseHibernateTest extends BaseSpringTest
 {
+    private static final Log logger = LogFactory.getLog(BaseHibernateTest.class);
+    
     private SessionFactory sessionFactory;
 
     private Session session;
 
     public BaseHibernateTest()
     {
-    }
-
-    protected String[] getConfigLocations()
-    {
-        return new String[] { "classpath:applicationContext.xml" };
     }
 
     public void setSessionFactory(SessionFactory sessionFactory)
@@ -34,6 +29,10 @@ public abstract class BaseHibernateTest extends
         this.session = sessionFactory.openSession();
     }
 
+    /**
+     * @return Returns a <code>Session</code> that is <b>separate</b> from that provided
+     *      automatically to the test and related beans
+     */
     protected Session getSession()
     {
         return session;

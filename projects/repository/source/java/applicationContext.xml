@@ -37,13 +37,16 @@
          <ref local='dataSource' />
       </property>
       <property name='mappingResources' >
-         <value>com/activiti/repo/domain/hibernate/Node.hbm.xml</value>
+         <list>
+            <value>com/activiti/repo/domain/hibernate/Node.hbm.xml</value>
+            <value>com/activiti/repo/domain/hibernate/Workspace.hbm.xml</value>
+         </list>
       </property>
       <property name='hibernateProperties' >
          <props>
             <prop key='hibernate.dialect' >org.hibernate.dialect.MySQLDialect</prop>
-            <prop key='hibernate.show_sql'>true</prop>
-            <prop key='hibernate.hbm2ddl.auto'>update</prop>
+            <prop key='hibernate.show_sql'>false</prop>
+            <prop key='hibernate.hbm2ddl.auto'>create</prop>
             <prop key='hibernate.cache.use_query_cache'>true</prop>
             <prop key='hibernate.max_fetch_depth'>1</prop>
             <prop key='hibernate.cache.provider_class'>org.hibernate.cache.EhCacheProvider</prop>
@@ -59,21 +62,23 @@
    </bean>
 
    <!--                    -->
-   <!--  DAO SERVICES      -->
+   <!--  INTERNAL SERVICES -->
    <!--                    -->
    
-   <!--   
-   <bean id='nodeService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
+   <bean id='typedWorkspaceService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
-         <value>com.as.core.NodeService</value>
+         <value>com.activiti.repo.workspace.TypedWorkspaceService</value>
       </property>
       <property name='transactionManager'>
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.as.core.HibernateNodeService">
+         <bean class="com.activiti.repo.workspace.hibernate.TypedWorkspaceServiceImpl" >
             <property name="sessionFactory">
-               <ref local="sessionFactory"/>
+               <ref bean="sessionFactory" />
+            </property>
+            <property name="typedNodeService">
+               <ref bean="typedNodeService" />
             </property>
          </bean>
       </property>
@@ -83,24 +88,43 @@
          </props>
       </property>
    </bean>
--->
+
+   <bean id='typedNodeService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
+      <property name='proxyInterfaces'>
+         <value>com.activiti.repo.node.TypedNodeService</value>
+      </property>
+      <property name='transactionManager'>
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.node.hibernate.TypedNodeServiceImpl" >
+            <property name="sessionFactory">
+               <ref bean="sessionFactory" />
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
 
    <!--                    -->
    <!--  PUBLIC SERVICES   -->
    <!--                    -->
    
-   <!--   
-   <bean id="nodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="workspaceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.as.core.NodeService</value>
+         <value>com.activiti.repo.workspace.WorkspaceService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.as.core.HibernateNodeService">
-            <property name="sessionFactory">
-               <ref local="sessionFactory"/>
+         <bean class="com.activiti.repo.workspace.WorkspaceServiceImpl" >
+            <property name="typedWorkspaceService">
+               <ref bean="typedWorkspaceService" />
             </property>
          </bean>
       </property>
@@ -110,6 +134,22 @@
          </props>
       </property>
    </bean>
--->
+   
+   <bean id="nodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.node.NodeService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.node.NodeServiceImpl" autowire="autodetect" />
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
 
 </beans>
