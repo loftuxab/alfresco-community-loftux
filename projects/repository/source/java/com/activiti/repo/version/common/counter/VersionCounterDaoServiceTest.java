@@ -1,0 +1,83 @@
+/**
+ * Created on Mar 31, 2005
+ */
+package com.activiti.repo.version.common.counter;
+
+import javax.sql.DataSource;
+
+import com.activiti.repo.ref.StoreRef;
+import com.activiti.util.BaseSpringTest;
+
+/**
+ * @author Roy Wetherall
+ */
+public class VersionCounterDaoServiceTest extends BaseSpringTest
+{
+    /**
+     * Test store id's
+     */
+    private final static String STORE_ID_1 = "test1_" + System.currentTimeMillis();
+    private final static String STORE_ID_2 = "test2_" + System.currentTimeMillis();
+    
+    /**
+     * Version counter DAO service
+     */
+    private VersionCounterDaoService counter = null;
+    
+    /**
+     * Datasource object
+     */
+    private DataSource dataSource = null;
+    
+    /**
+     * Set the version counter DAO service
+     * 
+     * @param counter 
+     *          the version counter DAO service
+     */
+    public void setCounter(VersionCounterDaoService counter)
+    {
+        this.counter = counter;
+    }   
+    
+    /**
+     * Set the datasource
+     * 
+     * @param dataSource
+     *          a data source
+     */
+    public void setDataSource(DataSource dataSource)
+    {
+        this.dataSource = dataSource;
+    }
+    
+    /**
+     * Test nextVersionNumber
+     */
+    public void testNextVersionNumber()
+    {
+        // Create the store references
+        StoreRef store1 = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, VersionCounterDaoServiceTest.STORE_ID_1);
+        StoreRef store2 = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, VersionCounterDaoServiceTest.STORE_ID_2);
+        
+        int store1Version0 = this.counter.nextVersionNumber(store1);
+        assertEquals(store1Version0, 0);
+        
+        int store1Version1 = this.counter.nextVersionNumber(store1);
+        assertEquals(store1Version1, 1);
+        
+        int store2Version0 = this.counter.nextVersionNumber(store2);
+        assertEquals(store2Version0, 0);
+        
+        int store1Version2 = this.counter.nextVersionNumber(store1);
+        assertEquals(store1Version2, 2);
+        
+        int store2Version1 = this.counter.nextVersionNumber(store2);
+        assertEquals(store2Version1, 1);
+        
+        // Need to clean-up since the version counter works in its own transaction
+        this.counter.resetVersionNumber(store1);
+        this.counter.resetVersionNumber(store2);
+    }
+
+}
