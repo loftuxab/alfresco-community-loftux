@@ -43,13 +43,13 @@
             value="#{UserListBean.users}" var="u" initialSortColumn="name" initialSortDirection="true">
          <awc:column primary="true">
             <f:facet name="header">
-               <awc:sortLink label="#{msg.name}" value="name" type="java.lang.String"/>
+               <awc:sortLink label="#{msg.name}" value="name" mode="case-insensitive"/>
             </f:facet>
             <h:outputText value="#{u.name}"/>
          </awc:column>
          <awc:column>
             <f:facet name="header">
-               <awc:sortLink label="#{msg.joindate}" value="dateJoined" type="java.lang.String"/>
+               <awc:sortLink label="#{msg.joindate}" value="dateJoined" mode="date"/>
             </f:facet>
             <h:outputText value="#{u.dateJoined}">
                <%-- example of a DateTime converter --%>

@@ -63,7 +63,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[8];
+      Object values[] = new Object[5];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = new Integer(m_currentPage);
@@ -71,19 +71,6 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       values[3] = (m_sortDirection ? Boolean.TRUE : Boolean.FALSE);
       values[4] = new Integer(m_pageSize);
       return (values);
-   }
-   
-   /**
-    * @see javax.faces.component.UIComponent#processDecodes(javax.faces.context.FacesContext)
-    */
-   public void processDecodes(FacesContext context)
-   {
-      if (isRendered() == true)
-      {
-         
-      }
-      
-      super.processDecodes(context);
    }
    
    /**
@@ -114,6 +101,10 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       m_dataModel = null;
       m_value = value;
    }
+   
+   
+   // ------------------------------------------------------------------------------
+   // IDataContainer implementation 
    
    /**
     * Return the currently sorted column if any
@@ -155,6 +146,72 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       m_pageSize = val;
    }
    
+   /**
+    * Return the current page the list is displaying
+    * 
+    * @return current page zero based index
+    */
+   public int getCurrentPage()
+   {
+      return m_currentPage;
+   }
+   
+   /**
+    * Returns true if a row of data is available
+    * 
+    * @return true if data is available, false otherwise
+    */
+   public boolean isDataAvailable()
+   {
+      return m_rowIndex < (getDataModel().size() - 1);
+   }
+   
+   /**
+    * Returns the next row of data from the data model
+    * 
+    * @return next row of data as a Bean object
+    */
+   public Object nextRow()
+   {
+      // get next row and increment row count
+      Object rowData = getDataModel().getRow(m_rowIndex + 1);
+      
+      // Prepare the data-binding variable "var" ready for the next cycle of
+      // renderering for the child components. 
+      String var = (String)getAttributes().get("var");
+      if (var != null)
+      {
+         Map requestMap = getFacesContext().getExternalContext().getRequestMap();
+         if (isDataAvailable() == true)
+         {
+            requestMap.put(var, rowData);
+         }
+         else
+         {
+            requestMap.remove(var);
+         }
+      }
+      
+      m_rowIndex++;
+      
+      return rowData;
+   }
+   
+   /**
+    * Sort the dataset using the specified sort parameters
+    * 
+    * @param column        Column to sort
+    * @param bAscending    True for ascending sort, false for descending
+    * @param mode          Sort mode to use (see IDataContainer constants)
+    */
+   public void sort(String column, boolean bAscending, String mode)
+   {
+      m_sortColumn = column;
+      m_sortDirection = bAscending;
+      
+      // TODO: implement stable merge sort.
+   }
+   
    
    // ------------------------------------------------------------------------------
    // UIRichList implementation
@@ -185,46 +242,17 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       return new RichListRenderer.ListViewRenderer();
    }
    
-   public boolean isDataAvailable()
-   {
-      return m_rowIndex < (getDataModel().size() - 1);
-   }
-   
-   public Object nextRow()
-   {
-      // get next row and increment row count
-      Object rowData = getDataModel().getRow(m_rowIndex + 1);
-      
-      // Prepare the data-binding variable "var" ready for the next cycle of
-      // renderering for the child components. 
-      String var = (String)getAttributes().get("var");
-      if (var != null)
-      {
-         Map requestMap = getFacesContext().getExternalContext().getRequestMap();
-         if (isDataAvailable() == true)
-         {
-            requestMap.put(var, rowData);
-         }
-         else
-         {
-            requestMap.remove(var);
-         }
-      }
-      
-      m_rowIndex++;
-      
-      return rowData;
-   }
-   
-   public int getCurrentPage()
-   {
-      return m_currentPage;
-   }
-   
+   /**
+    * Return the data model wrapper
+    * 
+    * @return IGridDataModel 
+    */
    private IGridDataModel getDataModel()
    {
       if (m_dataModel == null)
       {
+         // TODO: sort first time on initially sorted column - NOTE: can we
+         //       do this here or use a different hook point?
          Object val = getValue();
          if (val instanceof List)
          {

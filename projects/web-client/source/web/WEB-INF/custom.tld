@@ -246,7 +246,7 @@
       </attribute>
       
       <attribute>
-         <name>type</name>
+         <name>mode</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -256,6 +256,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+   </tag>
+   
+   <tag>
+      <name>dataPager</name>
+      <tagclass>com.activiti.web.jsf.tag.data.DataPagerTag</tagclass>
+      <bodycontent>JSP</bodycontent>
    </tag>
    
 </taglib>

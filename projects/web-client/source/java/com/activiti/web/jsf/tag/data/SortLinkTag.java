@@ -37,7 +37,7 @@ public class SortLinkTag extends HtmlComponentTag
    public void release()
    {
       super.release();
-      m_type = null;
+      m_mode = null;
       m_value = null;
       m_label = null;
    }
@@ -50,7 +50,7 @@ public class SortLinkTag extends HtmlComponentTag
       super.setProperties(component);
       setStringProperty(component, "value", m_value);
       setStringProperty(component, "label", m_label);
-      setStringProperty(component, "type", m_type);
+      setStringProperty(component, "mode", m_mode);
    }
    
    /**
@@ -64,13 +64,13 @@ public class SortLinkTag extends HtmlComponentTag
    }
 
    /**
-    * Set the type
+    * Set the sorting mode (see IDataContainer constants)
     *
-    * @param type     the type
+    * @param mode     the sort mode
     */
-   public void setType(String type)
+   public void setMode(String mode)
    {
-      m_type = type;
+      m_mode = mode;
    }
 
    /**
@@ -90,6 +90,6 @@ public class SortLinkTag extends HtmlComponentTag
    /** the value */
    private String m_value;
 
-   /** the type */
-   private String m_type;
+   /** the sorting mode */
+   private String m_mode;
 }
