@@ -40,7 +40,7 @@
             <h:outputText value="#{u.name}"/>
          </awc:column>
          <awc:column label="Join Date">
-            <h:commandButton value='#{u.joinDate}"/>
+            <h:commandButton value="#{u.joinDate}"/>
          </awc:column>
       </awc:rich-list>
       
