@@ -20,6 +20,7 @@ import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.CyclicChildRelationshipException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -414,8 +415,11 @@ public class DbNodeServiceImpl implements NodeService
                     continue;
                 }
                 // build a path element
+                NodeRef parentRef = assoc.getParent().getNodeRef();
                 QName qname = QName.createQName(null, assoc.getName());  // TODO: get uri from assoc
-                Path.Element element = new Path.QNameElement(qname, -1);  // TODO: consider ordering
+                NodeRef childRef = assoc.getChild().getNodeRef();
+                ChildAssocRef assocRef = new ChildAssocRef(parentRef, qname, childRef, -1);
+                Path.Element element = new Path.ChildAssocElement(assocRef);  // TODO: consider ordering
                 // create a new path that builds on the current path
                 Path path = new Path();
                 path.append(currentPath);

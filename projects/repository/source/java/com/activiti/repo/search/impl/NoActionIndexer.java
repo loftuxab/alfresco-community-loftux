@@ -7,7 +7,7 @@
  */
 package com.activiti.repo.search.impl;
 
-import com.activiti.repo.ref.ChildRelationshipRef;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.search.Indexer;
 
@@ -21,7 +21,7 @@ import com.activiti.repo.search.Indexer;
 public class NoActionIndexer implements Indexer
 {
 
-   public void createNode(ChildRelationshipRef relationshipRef)
+   public void createNode(ChildAssocRef relationshipRef)
    {
      return;
    }
@@ -31,22 +31,22 @@ public class NoActionIndexer implements Indexer
       return;
    }
 
-   public void deleteNode(ChildRelationshipRef relationshipRef)
+   public void deleteNode(ChildAssocRef relationshipRef)
    {
      return;
    }
 
-   public void createChildRelationship(ChildRelationshipRef relationshipRef)
+   public void createChildRelationship(ChildAssocRef relationshipRef)
    {
       return;
    }
 
-   public void updateChildRelationship(ChildRelationshipRef relationshipBeforeRef, ChildRelationshipRef relationshipAfterRef)
+   public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef)
    {
      return;
    }
 
-   public void deleteChildRelationship(ChildRelationshipRef relationshipRef)
+   public void deleteChildRelationship(ChildAssocRef relationshipRef)
    {
       return;
    }

@@ -3,7 +3,7 @@
  */
 package com.activiti.repo.search;
 
-import com.activiti.repo.ref.ChildRelationshipRef;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 
 /**
@@ -28,7 +28,7 @@ public class IndexerComponent implements Indexer
     * 
     */
    
-   public void createNode(ChildRelationshipRef relationshipRef)
+   public void createNode(ChildAssocRef relationshipRef)
    {
       Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipRef.getParentRef().getStoreRef());
       indexer.createNode(relationshipRef);
@@ -40,25 +40,25 @@ public class IndexerComponent implements Indexer
       indexer.updateNode(nodeRef);
    }
 
-   public void deleteNode(ChildRelationshipRef relationshipRef)
+   public void deleteNode(ChildAssocRef relationshipRef)
    {
       Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipRef.getParentRef().getStoreRef());
       indexer.deleteNode(relationshipRef);
    }
 
-   public void createChildRelationship(ChildRelationshipRef relationshipRef)
+   public void createChildRelationship(ChildAssocRef relationshipRef)
    {
       Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipRef.getParentRef().getStoreRef());
       indexer.createChildRelationship(relationshipRef);
    }
 
-   public void updateChildRelationship(ChildRelationshipRef relationshipBeforeRef, ChildRelationshipRef relationshipAfterRef)
+   public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef)
    {
       Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipBeforeRef.getParentRef().getStoreRef());
       indexer.updateChildRelationship(relationshipBeforeRef, relationshipAfterRef);
    }
 
-   public void deleteChildRelationship(ChildRelationshipRef relationshipRef)
+   public void deleteChildRelationship(ChildAssocRef relationshipRef)
    {
       Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipRef.getParentRef().getStoreRef());
       indexer.deleteChildRelationship(relationshipRef);

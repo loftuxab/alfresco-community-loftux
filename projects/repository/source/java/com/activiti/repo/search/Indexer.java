@@ -7,7 +7,7 @@
  */
 package com.activiti.repo.search;
 
-import com.activiti.repo.ref.ChildRelationshipRef;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 
 /**
@@ -28,7 +28,7 @@ public interface Indexer
     * 
     * @param relationshipRef
     */
-   public void createNode(ChildRelationshipRef relationshipRef);
+   public void createNode(ChildAssocRef relationshipRef);
 
    /**
     * Update an index entry due to property changes on a node. There are no
@@ -46,7 +46,7 @@ public interface Indexer
     * 
     * @param relationshipRef
     */
-   public void deleteNode(ChildRelationshipRef relationshipRef);
+   public void deleteNode(ChildAssocRef relationshipRef);
 
    /**
     * Create a refernce link between a parent and child. Implies only
@@ -54,7 +54,7 @@ public interface Indexer
     * 
     * @param relationshipRef
     */
-   public void createChildRelationship(ChildRelationshipRef relationshipRef);
+   public void createChildRelationship(ChildAssocRef relationshipRef);
 
    /**
     * Alter the relationship between parent and child nodes in the index.
@@ -73,8 +73,8 @@ public interface Indexer
     * @param relationshipBeforeRef
     * @param relationshipAfterRef
     */
-   public void updateChildRelationship(ChildRelationshipRef relationshipBeforeRef,
-         ChildRelationshipRef relationshipAfterRef);
+   public void updateChildRelationship(ChildAssocRef relationshipBeforeRef,
+         ChildAssocRef relationshipAfterRef);
 
    /**
     * Delete a relationship between a parent and child.
@@ -89,6 +89,6 @@ public interface Indexer
     * 
     * @param relationshipRef
     */
-   public void deleteChildRelationship(ChildRelationshipRef relationshipRef);
+   public void deleteChildRelationship(ChildAssocRef relationshipRef);
 
 }

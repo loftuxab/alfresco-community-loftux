@@ -23,7 +23,7 @@ import org.apache.lucene.index.TermDocs;
 
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.node.NodeService;
-import com.activiti.repo.ref.ChildRelationshipRef;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
@@ -157,7 +157,7 @@ public class LuceneIndexer extends LuceneBase implements Indexer
     * Indexer Implementation
     */
    
-   public void createNode(ChildRelationshipRef relationshipRef) throws IndexerException
+   public void createNode(ChildAssocRef relationshipRef) throws IndexerException
    {
       checkAbleToDoWork();
       try
@@ -184,7 +184,7 @@ public class LuceneIndexer extends LuceneBase implements Indexer
       }
    }
 
-   public void deleteNode(ChildRelationshipRef relationshipRef) throws IndexerException
+   public void deleteNode(ChildAssocRef relationshipRef) throws IndexerException
    {
       checkAbleToDoWork();
       try
@@ -197,7 +197,7 @@ public class LuceneIndexer extends LuceneBase implements Indexer
       }
    }
 
-   public void createChildRelationship(ChildRelationshipRef relationshipRef) throws IndexerException
+   public void createChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
    {
       checkAbleToDoWork();
       try
@@ -212,8 +212,8 @@ public class LuceneIndexer extends LuceneBase implements Indexer
       }
    }
 
-   public void updateChildRelationship(ChildRelationshipRef relationshipBeforeRef,
-         ChildRelationshipRef relationshipAfterRef) throws IndexerException
+   public void updateChildRelationship(ChildAssocRef relationshipBeforeRef,
+         ChildAssocRef relationshipAfterRef) throws IndexerException
    {
       checkAbleToDoWork();
       try
@@ -228,7 +228,7 @@ public class LuceneIndexer extends LuceneBase implements Indexer
       }
    }
 
-   public void deleteChildRelationship(ChildRelationshipRef relationshipRef) throws IndexerException
+   public void deleteChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
    {
       checkAbleToDoWork();
       try

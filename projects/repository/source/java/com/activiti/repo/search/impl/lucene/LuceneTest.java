@@ -24,7 +24,7 @@ import com.activiti.repo.domain.Node;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
-import com.activiti.repo.ref.ChildRelationshipRef;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -62,8 +62,8 @@ public class LuceneTest extends TestCase
       LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(NodeServiceStub.storeRef, "delta" + System.currentTimeMillis());
       indexer.setNodeService(new NodeServiceStub());
 
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}one"), NodeServiceStub.n1));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}two"), NodeServiceStub.n2));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.rootNode, QName.createQName("{}one"), NodeServiceStub.n1));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.rootNode, QName.createQName("{}two"), NodeServiceStub.n2));
       //indexer.updateNode(NodeServiceStub.n1);
       // indexer.deleteNode(new ChildRelationshipRef(rootNode, "path",
       // newNode));
@@ -107,18 +107,18 @@ public class LuceneTest extends TestCase
       LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(NodeServiceStub.storeRef, "delta" + System.currentTimeMillis());
       indexer.setNodeService(new NodeServiceStub());
 
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}one"), NodeServiceStub.n1));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}two"), NodeServiceStub.n2));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}three"), NodeServiceStub.n3));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}four"), NodeServiceStub.n4));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n1, QName.createQName("{}five"), NodeServiceStub.n5));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n1, QName.createQName("{}six"), NodeServiceStub.n6));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n2, QName.createQName("{}seven"), NodeServiceStub.n7));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n2, QName.createQName("{}eight"), NodeServiceStub.n8));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n5, QName.createQName("{}nine"), NodeServiceStub.n9));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n5, QName.createQName("{}ten"), NodeServiceStub.n10));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n5, QName.createQName("{}eleven"), NodeServiceStub.n11));
-      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n5, QName.createQName("{}twelve"), NodeServiceStub.n12));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.rootNode, QName.createQName("{}one"), NodeServiceStub.n1));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.rootNode, QName.createQName("{}two"), NodeServiceStub.n2));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.rootNode, QName.createQName("{}three"), NodeServiceStub.n3));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.rootNode, QName.createQName("{}four"), NodeServiceStub.n4));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.n1, QName.createQName("{}five"), NodeServiceStub.n5));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.n1, QName.createQName("{}six"), NodeServiceStub.n6));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.n2, QName.createQName("{}seven"), NodeServiceStub.n7));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.n2, QName.createQName("{}eight"), NodeServiceStub.n8));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.n5, QName.createQName("{}nine"), NodeServiceStub.n9));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.n5, QName.createQName("{}ten"), NodeServiceStub.n10));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.n5, QName.createQName("{}eleven"), NodeServiceStub.n11));
+      indexer.createNode(new ChildAssocRef(NodeServiceStub.n5, QName.createQName("{}twelve"), NodeServiceStub.n12));
       
       // indexer.deleteNode(new ChildRelationshipRef(rootNode, "path",
       // newNode));
@@ -181,9 +181,9 @@ public class LuceneTest extends TestCase
       LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
       indexer.setNodeService(nodeService);
 
-      indexer.createNode(new ChildRelationshipRef(rootNode, QName.createQName("{}path"), newNode));
+      indexer.createNode(new ChildAssocRef(rootNode, QName.createQName("{}path"), newNode));
       indexer.updateNode(newNode);
-      indexer.deleteNode(new ChildRelationshipRef(rootNode, QName.createQName("{}path"), newNode));
+      indexer.deleteNode(new ChildAssocRef(rootNode, QName.createQName("{}path"), newNode));
 
       indexer.commit();
 
@@ -222,13 +222,13 @@ public class LuceneTest extends TestCase
       LuceneIndexer indexer2 = LuceneIndexerAndSearcherFactory.getInstance().getIndexer(storeRef2);
       indexer2.setNodeService(new NodeServiceStub());
 
-      indexer1.createNode(new ChildRelationshipRef(rootNode1, QName.createQName("{}path"), newNode1));
+      indexer1.createNode(new ChildAssocRef(rootNode1, QName.createQName("{}path"), newNode1));
       indexer1.updateNode(newNode1);
-      indexer1.deleteNode(new ChildRelationshipRef(rootNode1, QName.createQName("{}path"), newNode1));
+      indexer1.deleteNode(new ChildAssocRef(rootNode1, QName.createQName("{}path"), newNode1));
 
-      indexer2.createNode(new ChildRelationshipRef(rootNode2, QName.createQName("{}path"), newNode2));
+      indexer2.createNode(new ChildAssocRef(rootNode2, QName.createQName("{}path"), newNode2));
       indexer2.updateNode(newNode2);
-      indexer2.deleteNode(new ChildRelationshipRef(rootNode2, QName.createQName("{}path"), newNode2));
+      indexer2.deleteNode(new ChildAssocRef(rootNode2, QName.createQName("{}path"), newNode2));
 
       LuceneIndexerAndSearcherFactory.getInstance().commit();
 
@@ -560,92 +560,92 @@ public class LuceneTest extends TestCase
          if (nodeRef.getId().equals("1"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("2"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "two")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "two"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("3"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "three")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "three"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("4"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "four")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "four"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("5"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "one")));
-            path.append(new Path.QNameElement(QName.createQName("", "five")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("6"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "one")));
-            path.append(new Path.QNameElement(QName.createQName("", "six")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "six"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("7"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "two")));
-            path.append(new Path.QNameElement(QName.createQName("", "seven")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "two"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "seven"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("8"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "eight-0")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "eight-0"), null)));
             paths.add(path);
             path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "one")));
-            path.append(new Path.QNameElement(QName.createQName("", "eight-1")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "eight-1"), null)));
             paths.add(path);
             path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "two")));
-            path.append(new Path.QNameElement(QName.createQName("", "eight-2")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "two"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "eight-2"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("9"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "one")));
-            path.append(new Path.QNameElement(QName.createQName("", "five")));
-            path.append(new Path.QNameElement(QName.createQName("", "nine")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "nine"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("10"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "one")));
-            path.append(new Path.QNameElement(QName.createQName("", "five")));
-            path.append(new Path.QNameElement(QName.createQName("", "ten")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "ten"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("11"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "one")));
-            path.append(new Path.QNameElement(QName.createQName("", "five")));
-            path.append(new Path.QNameElement(QName.createQName("", "eleven")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "eleven"), null)));
             paths.add(path);
          }
          else if (nodeRef.getId().equals("12"))
          {
             Path path = new Path();
-            path.append(new Path.QNameElement(QName.createQName("", "one")));
-            path.append(new Path.QNameElement(QName.createQName("", "five")));
-            path.append(new Path.QNameElement(QName.createQName("", "twelve")));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "one"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "five"), null)));
+            path.append(new Path.ChildAssocElement(new ChildAssocRef(null, QName.createQName("", "twelve"), null)));
             paths.add(path);
          }
 

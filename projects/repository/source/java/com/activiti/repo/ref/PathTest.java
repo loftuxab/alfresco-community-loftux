@@ -27,10 +27,10 @@ public class PathTest extends TestCase
     public void testQNameElement() throws Exception
     {
         // plain
-        Path.Element element = new Path.QNameElement(qname);
+        Path.Element element = new Path.ChildAssocElement(new ChildAssocRef(null, qname, null));
         assertEquals("Element string incorrect", qname.toString(), element.getElementString());
         // sibling
-        element = new Path.QNameElement(qname, 5);
+        element = new Path.ChildAssocElement(new ChildAssocRef(null, qname, null, 5));
         assertEquals("Element string incorrect", "{http://www.google.com}documentx[5]", element.getElementString());
     }
     
@@ -48,7 +48,7 @@ public class PathTest extends TestCase
     
     public void testAppendingAndPrepending() throws Exception
     {
-        Path.Element element1 = new Path.QNameElement(qname, 4);
+        Path.Element element1 = new Path.ChildAssocElement(new ChildAssocRef(null, qname, null, 4));
         Path.Element element2 = new Path.DescendentOrSelfElement();
         Path.Element element3 = new Path.ParentElement();
         Path.Element element4 = new Path.SelfElement();

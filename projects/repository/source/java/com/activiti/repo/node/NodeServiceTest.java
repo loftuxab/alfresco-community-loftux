@@ -9,6 +9,7 @@ import org.hibernate.Session;
 
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.hibernate.NodeImpl;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
@@ -375,6 +376,21 @@ public class NodeServiceTest extends BaseSpringTest
         // get all paths for n8
         Collection<Path> paths = nodeService.getPaths(n8Ref, false);
         assertEquals("Incorrect path count", 4, paths.size());
+        // check that each path element has parent node ref, qname and child node ref
+        for (Path path : paths)
+        {
+            // get the path elements
+            for (Path.Element element : path.getElements())
+            {
+                assertTrue("Path element of incorrect type", element instanceof Path.ChildAssocElement);
+                Path.ChildAssocElement childAssocElement = (Path.ChildAssocElement) element;
+                ChildAssocRef ref = childAssocElement.getRef();
+                assertNotNull("Parent node ref not set", ref.getParentRef());
+                assertNotNull("QName not set", ref.getName());
+                assertNotNull("Child node ref not set", ref.getChildRef());
+            }
+        }
+
         long after = System.currentTimeMillis();
         long delay = (after - before);
         // no more than 20ms

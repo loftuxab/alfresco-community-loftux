@@ -12,25 +12,19 @@ import java.io.Serializable;
 /**
  * This class represents a child relationship between two nodes. This
  * relationship is named.
- * 
+ * <p>
  * So it requires the parent node ref, the child node ref and the name of the
  * child within the particular parent.
- * 
+ * <p>
  * This combination is not a unique identifier for the relationship with regard
  * to structure. In use this does not matter as we have no concept of order,
  * particularly in the index.
  * 
- * We could add child position to resolve this.
- * 
  * @author andyh
  * 
  */
-public class ChildRelationshipRef implements Serializable
+public class ChildAssocRef implements Serializable
 {
-
-   /**
-    * 
-    */
    private static final long serialVersionUID = 4051322336257127729L;
 
    private NodeRef parentRef;
@@ -38,13 +32,15 @@ public class ChildRelationshipRef implements Serializable
    private QName childQName;
 
    private NodeRef childRef;
+   
+   private int nthSibling;
 
    /**
     * Construct a representation of a parent --- name ----> child relationship.
     * 
     * @param parentRef
     * 
-    * The parent reference. This could be null if we are making the root node.
+    * The parent reference. Not null.
     * 
     * @param childName
     * 
@@ -60,22 +56,34 @@ public class ChildRelationshipRef implements Serializable
     * 
     * @param childRef
     * 
-    * The child reference. This must no be null.
+    * The child reference. This must not be null.
+    * 
+    * @param nthSibling
+    * 
+    * The nth association with the same properties.  Usually -1 to be ignored.
     */
-
-   public ChildRelationshipRef(NodeRef parentRef, QName childQName, NodeRef childRef)
+   public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef, int nthSibling)
    {
       this.parentRef = parentRef;
       this.childQName = childQName;
       this.childRef = childRef;
+      this.nthSibling = nthSibling;
+   }
+   
+   /**
+    * @see ChildAssocRef#ChildRelationshipRef(NodeRef, QName, NodeRef, int) 
+    */
+   public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef)
+   {
+       this(parentRef, childQName, childRef, -1);
    }
 
    /**
-    * Get the name of the child within the parent
+    * Get the name of the parent-child association
     * 
     * @return
     */
-   public QName getChildName()
+   public QName getName()
    {
       return childQName;
    }
@@ -99,6 +107,15 @@ public class ChildRelationshipRef implements Serializable
    {
       return parentRef;
    }
+   
+   /**
+    * 
+    * @return Returns the nth sibling required
+    */
+   public int getNthSibling()
+   {
+       return nthSibling;
+   }
 
    public boolean equals(Object o)
    {
@@ -106,20 +123,20 @@ public class ChildRelationshipRef implements Serializable
       {
          return true;
       }
-      if (!(o instanceof ChildRelationshipRef))
+      if (!(o instanceof ChildAssocRef))
       {
          return false;
       }
-      ChildRelationshipRef other = (ChildRelationshipRef) o;
+      ChildAssocRef other = (ChildAssocRef) o;
 
-      return getParentRef().equals(other.getParentRef()) && getChildName().equals(other.getChildName())
+      return getParentRef().equals(other.getParentRef()) && getName().equals(other.getName())
             && getChildRef().equals(other.getChildRef());
    }
 
    public int hashCode()
    {
       int hashCode = getParentRef().hashCode();
-      hashCode = 37 * hashCode + getChildName().hashCode();
+      hashCode = 37 * hashCode + getName().hashCode();
       hashCode = 37 * hashCode + getChildRef().hashCode();
       return hashCode;
    }
@@ -127,10 +144,9 @@ public class ChildRelationshipRef implements Serializable
    public String toString()
    {
       StringBuffer buffer = new StringBuffer();
-      buffer.append(getParentRef().toString());
-      buffer.append(" --- ").append(getChildName()).append(" ---> ");
-      buffer.append(getChildRef().toString());
+      buffer.append(getParentRef());
+      buffer.append(" --- ").append(getName()).append(" ---> ");
+      buffer.append(getChildRef());
       return buffer.toString();
    }
-
 }

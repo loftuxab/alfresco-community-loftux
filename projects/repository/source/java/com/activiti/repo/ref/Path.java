@@ -129,46 +129,32 @@ public class Path
     }
     
     /**
-     * Represents a qualified path including the sibling to retrieve e.g. <b>/{namespace}name[5]</b> 
+     * Represents a qualified path between a parent and a child node,
+     * including the sibling to retrieve e.g. <b>/{namespace}name[5]</b> 
      */
-    public static class QNameElement extends Element
+    public static class ChildAssocElement extends Element
     {
-        private final QName qname;
-        private final int nthSibling;
+        private ChildAssocRef ref;
         
         /**
-         * @param qname the fully qualified name of the path element
-         * @param nthSibling the nth sibling required
+         * @param ref a reference to the specific parent-child association
          */
-        public QNameElement(QName qname)
+        public ChildAssocElement(ChildAssocRef ref)
         {
-            this(qname, -1);
-        }
-        /**
-         * @param qname the fully qualified name of the path element
-         * @param nthSibling the nth sibling required
-         */
-        public QNameElement(QName qname, int nthSibling)
-        {
-            this.qname = qname;
-            this.nthSibling = nthSibling;
+            this.ref = ref;
         }
         public String getElementString()
         {
-            StringBuffer sb = new StringBuffer(qname.toString());
-            if (nthSibling > -1)
+            StringBuffer sb = new StringBuffer(ref.getName().toString());
+            if (ref.getNthSibling() > -1)
             {
-                sb.append("[").append(nthSibling).append("]");
+                sb.append("[").append(ref.getNthSibling()).append("]");
             }
             return sb.toString();
         }
-        public QName getQname()
+        public ChildAssocRef getRef()
         {
-            return qname;
-        }
-        public int getNthSibling()
-        {
-            return nthSibling;
+            return ref;
         }
     }
 
