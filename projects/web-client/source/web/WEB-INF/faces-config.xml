@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE faces-config PUBLIC "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.0//EN"
-                                             "http://java.sun.com/dtd/web-facesconfig_1_0.dtd">
+                              "http://java.sun.com/dtd/web-facesconfig_1_0.dtd">
 <faces-config>
 
    <!-- ==================== APPLICATION ==================== -->
@@ -46,6 +46,12 @@
       <component-type>awc.faces.Property</component-type>
       <component-class>com.activiti.web.jsf.component.property.UIProperty</component-class>
    </component>
+   
+   <component>
+      <component-type>awc.faces.Panel</component-type>
+      <component-class>com.activiti.web.jsf.component.UIPanel</component-class>
+   </component>
+
 
    <!-- ==================== CONVERTERS ==================== -->
    <converter>
@@ -135,6 +141,7 @@
       <managed-bean-class>jsftest.ZooService</managed-bean-class>
       <managed-bean-scope>application</managed-bean-scope>
    </managed-bean>
+   
    
    <!-- ==================== NAVIGATION ==================== -->
    <!-- navigation rules describe the navigation cases between views using the -->

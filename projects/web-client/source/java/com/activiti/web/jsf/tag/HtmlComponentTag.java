@@ -23,7 +23,6 @@ public abstract class HtmlComponentTag extends BaseComponentTag
       setStringProperty(component, "style", this.style);
       setStringProperty(component, "styleClass", this.styleClass);
       setStringProperty(component, "title", this.title);
-      setBooleanProperty(component, "visible", this.visible);
    }
    
    /**
@@ -35,7 +34,6 @@ public abstract class HtmlComponentTag extends BaseComponentTag
       this.style = null;
       this.styleClass = null;
       this.title = null;
-      this.visible = null;
    }
    
    /**
@@ -79,26 +77,6 @@ public abstract class HtmlComponentTag extends BaseComponentTag
    }
 
    /**
-    * Get the visible
-    *
-    * @return the visible
-    */
-   public String getVisible()
-   {
-      return this.visible;
-   }
-
-   /**
-    * Set the visible
-    *
-    * @param visible     the visible
-    */
-   public void setVisible(String visible)
-   {
-      this.visible = visible;
-   }
-
-   /**
     * Get the title
     *
     * @return the title
@@ -124,9 +102,6 @@ public abstract class HtmlComponentTag extends BaseComponentTag
 
    /** the styleClass */
    protected String styleClass;
-
-   /** the visible */
-   protected String visible;
 
    /** the title */
    protected String title;

@@ -38,6 +38,7 @@ public class ColumnTag extends BaseComponentTag
       super.release();
       this.value = null;
       this.primary = null;
+      this.actions = null;
       this.width = null;
       this.style = null;
       this.styleClass = null;
@@ -52,6 +53,7 @@ public class ColumnTag extends BaseComponentTag
       
       setStringBindingProperty(component, "value", this.value);
       setBooleanProperty(component, "primary", this.primary);
+      setBooleanProperty(component, "actions", this.actions);
       setStringProperty(component, "width", this.width);
       setStringProperty(component, "style", this.style);
       setStringProperty(component, "styleClass", this.styleClass);
@@ -72,9 +74,9 @@ public class ColumnTag extends BaseComponentTag
    }
 
    /**
-    * Set the primary
+    * Set if this is the primary column
     *
-    * @param primary     the primary
+    * @param primary     the primary if "true", otherwise false
     */
    public void setPrimary(String primary)
    {
@@ -110,7 +112,20 @@ public class ColumnTag extends BaseComponentTag
    {
       this.styleClass = styleClass;
    }
+   
+   /**
+    * Set if this is the actions column
+    *
+    * @param actions     the actions if "true", otherwise false
+    */
+   public void setActions(String actions)
+   {
+      this.actions = actions;
+   }
 
+
+   /** the actions */
+   private String actions;
    
    /** the style */
    private String style;

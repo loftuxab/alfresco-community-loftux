@@ -52,16 +52,16 @@
       <awc:richList viewMode="details" pageSize="5" styleClass="" style="border:thin solid #eeeeff; padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
             value="#{TestList.rows}" var="r" initialSortColumn="name" initialSortDescending="true">
          <awc:column primary="true" width="200" style="padding:2px" styleClass="">
-            <f:facet name="header"><%-- TODO: could use a 'header' attribute here - then Icons etc. can display 'label: ' --%>
+            <f:facet name="header">
                <awc:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
             </f:facet>
             <f:facet name="large-icon">
                <%-- this could be a clickable action image etc. --%>
-               <h:graphicImage alt="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
+               <h:graphicImage alt="#{r.name}" title="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
             </f:facet>
             <f:facet name="small-icon">
                <%-- this could be a clickable action image etc. --%>
-               <h:graphicImage alt="#{r.name}" width="15" height="13" url="/images/icons/folder.gif" />
+               <h:graphicImage alt="#{r.name}" title="#{r.name}" width="15" height="13" url="/images/icons/folder.gif" />
             </f:facet>
             <h:outputText value="#{r.name}"/>
          </awc:column>
@@ -98,7 +98,7 @@
             </h:outputText>
          </awc:column>
          
-         <awc:column>
+         <awc:column actions="true">
             <f:facet name="header">
                <h:outputText value="#{msg.actions}"/>
             </f:facet>
@@ -112,8 +112,10 @@
       
       <p>
       
-      Same list shown in a different view mode (Icons)
-      <awc:richList viewMode="icons" pageSize="6" styleClass="" style="border:thin solid #eeeeff; padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
+      <awc:panel border="white" bgcolor="white" progressive="true" label="Progressive Panel Example">
+      
+      Same list shown in a different view mode (Icons). This mode renderer displays the large icon and renderers in a multi-column format. It also chooses not to display the sort header links.
+      <awc:richList viewMode="icons" pageSize="6" styleClass="" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
             value="#{TestList.rows}" var="r" initialSortColumn="name" initialSortDescending="true">
          <awc:column primary="true" width="200" style="padding:2px" styleClass="">
             <f:facet name="header">
@@ -121,11 +123,11 @@
             </f:facet>
             <f:facet name="large-icon">
                <%-- this could be a clickable action image etc. --%>
-               <h:graphicImage alt="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
+               <h:graphicImage alt="#{r.name}" title="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
             </f:facet>
             <f:facet name="small-icon">
                <%-- this could be a clickable action image etc. --%>
-               <h:graphicImage alt="#{r.name}" width="15" height="13" url="/images/icons/folder.gif" />
+               <h:graphicImage alt="#{r.name}" title="#{r.name}" width="15" height="13" url="/images/icons/folder.gif" />
             </f:facet>
             <h:outputText value="#{r.name}"/>
          </awc:column>
@@ -140,7 +142,7 @@
             <f:facet name="header">
                <awc:sortLink label="Count" value="count" styleClass="header"/>
             </f:facet>
-            <h:outputText value="Count: "/><h:outputText value="#{r.count}"/>
+            <h:outputText value="Count: #{r.count}"/>
          </awc:column>
          
          <awc:column>
@@ -155,8 +157,7 @@
             </h:outputText>
          </awc:column>
          
-         <%-- TODO: how to do Actions column for view which only show some? --%>
-         <awc:column>
+         <awc:column actions="true">
             <f:facet name="header">
                <h:outputText value="#{msg.actions}"/>
             </f:facet>
@@ -167,6 +168,63 @@
               be rendered as part of the list footer --%>
          <awc:dataPager/>
       </awc:richList>
+      
+      </awc:panel>
+      
+      <p>
+      
+      <awc:panel border="innergrey" bgcolor="#e8e8e8" progressive="false" label="Panel">
+      
+      Same list shown in a different view mode (List). This mode displays the small icon and uses single column rendering.
+      <awc:richList viewMode="list" pageSize="5" styleClass="" style="padding:4px" width="100%"
+            value="#{TestList.rows}" var="r" initialSortColumn="name" initialSortDescending="true">
+         <awc:column primary="true">
+            <f:facet name="header">
+               <awc:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
+            </f:facet>
+            <f:facet name="large-icon">
+               <%-- this could be a clickable action image etc. --%>
+               <h:graphicImage alt="#{r.name}" title="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
+            </f:facet>
+            <f:facet name="small-icon">
+               <%-- this could be a clickable action image etc. --%>
+               <h:graphicImage alt="#{r.name}" title="#{r.name}" width="15" height="13" url="/images/icons/folder.gif" />
+            </f:facet>
+            <h:outputText value="#{r.name}"/>
+         </awc:column>
+         
+         <awc:column>
+            <f:facet name="header">
+               <awc:sortLink label="Count" value="count" styleClass="header"/>
+            </f:facet>
+            <h:outputText value="Count: #{r.count}"/>
+         </awc:column>
+         
+         <awc:column>
+            <f:facet name="header">
+               <awc:sortLink label="Created Date" value="created" styleClass="header"/>
+            </f:facet>
+            <h:outputText value="Created Date: "/>
+            <h:outputText value="#{r.created}">
+               <%-- example of a DateTime converter --%>
+               <%-- can be used to convert both input and output text --%>
+               <f:convertDateTime dateStyle="short" />
+            </h:outputText>
+         </awc:column>
+         
+         <awc:column actions="true">
+            <f:facet name="header">
+               <h:outputText value="#{msg.actions}"/>
+            </f:facet>
+            <h:outputText value="Action | Action | Action"/>
+         </awc:column>
+         
+         <%-- components other than columns added to a RichList will generally
+              be rendered as part of the list footer --%>
+         <awc:dataPager/>
+      </awc:richList>
+      
+      </awc:panel>
       
       <p>
       

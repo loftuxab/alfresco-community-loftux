@@ -144,7 +144,7 @@ public class RichListRenderer extends BaseRenderer
          {
             UIColumn column = columns[i];
             
-            // render column as appropriate for the list type
+            // render column header tag
             out.write("<th");
             outputAttribute(out, column.getAttributes().get("width"), "width");
             outputAttribute(out, column.getAttributes().get("style"), "style");
@@ -178,13 +178,13 @@ public class RichListRenderer extends BaseRenderer
          
          // output row or alt style row if set
          out.write("<tr");
-         String style = (String)richList.getAttributes().get("rowStyleClass");
+         String rowStyle = (String)richList.getAttributes().get("rowStyleClass");
          String altStyle = (String)richList.getAttributes().get("altRowStyleClass");
          if (altStyle != null && this.rowIndex++ % 2 == 1)
          {
-            style = altStyle;
+            rowStyle = altStyle;
          }         
-         outputAttribute(out, style, "class");
+         outputAttribute(out, rowStyle, "class");
          out.write('>');
          
          // output each column in turn and render all children
@@ -253,13 +253,124 @@ public class RichListRenderer extends BaseRenderer
     */
    public static class ListViewRenderer implements IRichListRenderer
    {
+      // maximum displayable textual lines within a single item cell
+      final static int MAX_DISPLAYABLE_LINES = 3;
+      
       /**
        * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
        */
       public void renderListBefore(FacesContext context, UIRichList richList, UIColumn[] columns)
             throws IOException
       {
-         // TODO Auto-generated method stub
+         ResponseWriter out = context.getResponseWriter();
+         
+         // render column headers as labels
+         out.write("<tr>");
+         for (int i=0; i<columns.length; i++)
+         {
+            UIColumn column = columns[i];
+            
+            out.write("<th>");
+            
+            // output the header facet if any
+            UIComponent header = column.getHeader();
+            if (header != null)
+            {
+               header.encodeBegin(context);
+               header.encodeChildren(context);
+               header.encodeEnd(context);
+            }
+            
+            // we don't render child controls for the header row
+            out.write("</th>");
+         }
+         out.write("</tr>");
+         
+         this.rowIndex = 0;
+      }
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object)
+       */
+      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object row) throws IOException
+      {
+         ResponseWriter out = context.getResponseWriter();
+         
+         // output a new table per row item
+         out.write("<tr><td colspan=99><table cellspacing=0 cellpadding=2 border=0");
+         outputAttribute(out, richList.getAttributes().get("width"), "width");
+         out.write('>');
+         
+         String rowStyle = (String)richList.getAttributes().get("rowStyleClass");
+         String altStyle = (String)richList.getAttributes().get("altRowStyleClass");
+         if (altStyle != null && this.rowIndex++ % 2 == 1)
+         {
+            rowStyle = altStyle;
+         }
+         
+         // first cell contains the small icon
+         if (columns.length != 0)
+         {
+            UIColumn column = columns[0];
+            
+            // output row or alt style row if set
+            out.write("<tr");
+            outputAttribute(out, rowStyle, "class");
+            out.write("><td valign=top rowspan=10 width=20");
+            outputAttribute(out, column.getAttributes().get("style"), "style");
+            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+            out.write('>');
+            
+            // output the small icon for this column
+            UIComponent smallIcon = column.getSmallIcon();
+            if (smallIcon != null)
+            {
+               smallIcon.encodeBegin(context);
+               smallIcon.encodeChildren(context);
+               smallIcon.encodeEnd(context);
+            }
+            out.write("</td>");
+            
+            // start the next cell which contains the first column component
+            out.write("<td align=left valign=top");
+            outputAttribute(out, column.getAttributes().get("style"), "style");
+            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+            out.write('>');
+            if (column.getChildCount() != 0)
+            {
+               // allow child controls inside the columns to render themselves
+               encodeRecursive(context, column);
+            }
+            out.write("</td></tr>");
+         }
+         
+         // render remaining columns as lines of data up to a max display limit
+         for (int i = 1; i < columns.length; i++)
+         {
+            UIColumn column = columns[i];
+            
+            if (i < MAX_DISPLAYABLE_LINES || column.isActionsColumn() == true)
+            {
+               // output row or alt style row if set
+               out.write("<tr");
+               outputAttribute(out, rowStyle, "class");
+               out.write("><td valign=top");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+               out.write('>');
+               if (column.getChildCount() != 0)
+               {
+                  // allow child controls inside the columns to render themselves
+                  encodeRecursive(context, column);
+               }
+               out.write("</td></tr>");
+            }
+         }
+         
+         // end row and output a blank padding row/div
+         out.write("</table></td></tr><tr colspan=99><td height=4><div height=4></div></td></tr>");
+         
+         this.rowIndex++;
       }
       
       /**
@@ -268,16 +379,22 @@ public class RichListRenderer extends BaseRenderer
       public void renderListAfter(FacesContext context, UIRichList richList, UIColumn[] columns)
             throws IOException
       {
-         // TODO Auto-generated method stub
+         ResponseWriter out = context.getResponseWriter();
+         
+         out.write("<tr><td colspan=99 align=right>");
+         for (Iterator i=richList.getChildren().iterator(); i.hasNext(); /**/)
+         {
+            // output all remaining child components that are not UIColumn
+            UIComponent child = (UIComponent)i.next();
+            if (child instanceof UIColumn == false)
+            {
+               encodeRecursive(context, child);
+            }
+         }
+         out.write("</td></tr>");
       }
       
-      /**
-       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object)
-       */
-      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object row) throws IOException
-      {
-         // TODO Auto-generated method stub
-      }
+      private int rowIndex = 0;
    }
    
    
@@ -288,8 +405,14 @@ public class RichListRenderer extends BaseRenderer
     */
    public static class IconViewRenderer implements IRichListRenderer
    {
+      // number of vertical columns to render before starting new row
       final static int COLUMNS = 3;
+      
+      // calculation for percentage of table row per column
       final static String COLUMN_PERCENT = Integer.toString(100/COLUMNS) + "%";
+      
+      // maximum displayable textual lines within a single item cell
+      final static int MAX_DISPLAYABLE_LINES = 3;
       
       /**
        * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
@@ -325,7 +448,7 @@ public class RichListRenderer extends BaseRenderer
          {
             UIColumn column = columns[0];
             
-            out.write("<tr><td rowspan=99");
+            out.write("<tr><td rowspan=10");
             outputAttribute(out, column.getAttributes().get("style"), "style");
             outputAttribute(out, column.getAttributes().get("styleClass"), "class");
             out.write('>');
@@ -341,7 +464,7 @@ public class RichListRenderer extends BaseRenderer
             out.write("</td>");
             
             // start the next cell which contains the first column component
-            out.write("<td align=top");
+            out.write("<td valign=top");
             outputAttribute(out, column.getAttributes().get("style"), "style");
             outputAttribute(out, column.getAttributes().get("styleClass"), "class");
             out.write('>');
@@ -353,28 +476,32 @@ public class RichListRenderer extends BaseRenderer
             out.write("</td></tr>");
          }
          
-         // render remaining columns up to a max reasonable display limit
-         for (int i=1; i<columns.length && i<3; i++)
+         // render remaining columns as lines of data up to a max display limit
+         for (int i=1; i<columns.length; i++)
          {
             UIColumn column = columns[i];
             
-            out.write("<tr><td align=top");
-            outputAttribute(out, column.getAttributes().get("style"), "style");
-            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
-            out.write('>');
-            if (column.getChildCount() != 0)
+            if (i < MAX_DISPLAYABLE_LINES || column.isActionsColumn() == true)
             {
-               // allow child controls inside the columns to render themselves
-               encodeRecursive(context, column);
+               out.write("<tr><td valign=top");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+               out.write('>');
+               if (column.getChildCount() != 0)
+               {
+                  // allow child controls inside the columns to render themselves
+                  encodeRecursive(context, column);
+               }
+               out.write("</td></tr>");
             }
-            out.write("</td></tr>");
          }
          
          out.write("</table></td>");
          
          if (this.rowIndex % COLUMNS == COLUMNS-1)
          {
-            out.write("</tr>");
+            // end row and output a blank padding row/div
+            out.write("</tr><tr><td height=4 colspan=10><div height=4></div></td></tr>");
          }
          
          this.rowIndex++;
@@ -388,10 +515,10 @@ public class RichListRenderer extends BaseRenderer
       {
          ResponseWriter out = context.getResponseWriter();
          
-         // finish last row if required (as we used open-ended column rendering)
+         // finish last row if required (we used an open-ended column rendering algorithm)
          if ((this.rowIndex-1) % COLUMNS != COLUMNS-1)
          {
-            out.write("</tr>");
+            out.write("</tr><tr><td height=4 colspan=10><div height=4></div></td></tr>");
          }
          
          out.write("<tr><td colspan=99 align=right>");

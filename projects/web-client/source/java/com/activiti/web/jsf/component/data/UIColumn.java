@@ -6,7 +6,6 @@ package com.activiti.web.jsf.component.data;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIComponentBase;
 
-
 /**
  * @author kevinr
  */
@@ -59,4 +58,28 @@ public class UIColumn extends UIComponentBase
    {
       return getFacet("small-icon");
    }
+   
+   public boolean isPrimaryColumn()
+   {
+      return this.primary;
+   }
+   
+   public void setPrimary(boolean primary)
+   {
+      this.primary = primary;
+   }
+   
+   public boolean isActionsColumn()
+   {
+      return this.actions;
+   }
+   
+   public void setActions(boolean actions)
+   {
+      this.actions = actions;
+   }
+   
+   
+   private boolean primary = false;
+   private boolean actions = false;
 }
