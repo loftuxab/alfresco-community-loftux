@@ -25,14 +25,14 @@ public class NodeServiceImpl implements NodeService
     private static final Log logger = LogFactory.getLog(NodeServiceImpl.class);
     
     private TypedNodeService typedNodeService;
-    private DbStoreService typedWorkspaceService;
+    private StoreDaoService typedWorkspaceService;
     
     public void setTypedNodeService(TypedNodeService typedNodeService)
     {
         this.typedNodeService = typedNodeService;
     }
 
-    public void setTypedWorkspaceService(DbStoreService typedWorkspaceService)
+    public void setTypedWorkspaceService(StoreDaoService typedWorkspaceService)
     {
         this.typedWorkspaceService = typedWorkspaceService;
     }
@@ -53,7 +53,7 @@ public class NodeServiceImpl implements NodeService
         }
         // extract the name of the workspace that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
-        Store workspace = typedWorkspaceService.findWorkspace(storeRef.getProtocol(), storeRef.getIdentifier());
+        Store workspace = typedWorkspaceService.findStore(storeRef.getProtocol(), storeRef.getIdentifier());
         if (workspace == null)
         {
             throw new DataIntegrityViolationException("No workspace found for parent node: " + parentRef);

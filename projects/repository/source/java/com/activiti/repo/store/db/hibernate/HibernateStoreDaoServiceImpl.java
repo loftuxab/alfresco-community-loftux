@@ -11,18 +11,18 @@ import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.hibernate.StoreImpl;
 import com.activiti.repo.node.TypedNodeService;
-import com.activiti.repo.store.db.DbStoreService;
+import com.activiti.repo.store.db.StoreDaoService;
 
 /**
  * Hibernate-specific implementation of the entity-aware workspace service.
  * 
  * @author derekh
  */
-public class TypedWorkspaceServiceImpl
+public class HibernateStoreDaoServiceImpl
     extends HibernateDaoSupport
-    implements DbStoreService
+    implements StoreDaoService
 {
-    private static final Log logger = LogFactory.getLog(TypedWorkspaceServiceImpl.class);
+    private static final Log logger = LogFactory.getLog(HibernateStoreDaoServiceImpl.class);
     
     private TypedNodeService typedNodeService;
     
@@ -34,10 +34,10 @@ public class TypedWorkspaceServiceImpl
     /**
      * Ensures that the workspace protocol/identifier combination is unique
      */
-    public Store createWorkspace(String protocol, String identifier)
+    public Store createStore(String protocol, String identifier)
     {
         // ensure that the name isn't in use
-        Store workspace = findWorkspace(protocol, identifier);
+        Store workspace = findStore(protocol, identifier);
         if (workspace != null)
         {
             throw new RuntimeException("A workspace already exists: \n" +
@@ -63,7 +63,7 @@ public class TypedWorkspaceServiceImpl
         return workspace;
     }
 
-    public Store findWorkspace(String protocol, String identifier)
+    public Store findStore(String protocol, String identifier)
     {
         List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Store.QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER,
                 new String[] {"protocol", "identifier"},

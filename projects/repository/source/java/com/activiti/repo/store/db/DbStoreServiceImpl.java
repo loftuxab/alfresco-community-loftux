@@ -6,22 +6,22 @@ import com.activiti.repo.store.StoreService;
 
 public class DbStoreServiceImpl implements StoreService
 {
-    private DbStoreService dbStoreService;
+    private StoreDaoService storeDaoService;
     
-    public void setDbStoreService(DbStoreService dbStoreService)
+    public void setStoreDaoService(StoreDaoService storeDaoService)
     {
-        this.dbStoreService = dbStoreService;
+        this.storeDaoService = storeDaoService;
     }
 
     /**
      * Defers to the typed service
-     * @see DbStoreService#createWorkspace(String)
+     * @see StoreDaoService#createWorkspace(String)
      */
     public StoreRef createStore(String protocol, String identifier)
     {
-        Store workspace = dbStoreService.createWorkspace(protocol, identifier);
+        Store store = storeDaoService.createStore(protocol, identifier);
         // done
-        StoreRef storeRef = workspace.getStoreRef();
+        StoreRef storeRef = store.getStoreRef();
         return storeRef;
     }
 }

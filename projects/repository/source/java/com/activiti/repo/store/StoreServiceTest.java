@@ -10,7 +10,7 @@ import com.activiti.util.BaseSpringTest;
  *
  * @author derekh
  */
-public class WorkspaceServiceTest extends BaseSpringTest
+public class StoreServiceTest extends BaseSpringTest
 {
     private StoreService storeService;
 
@@ -21,12 +21,12 @@ public class WorkspaceServiceTest extends BaseSpringTest
     
     public void testSetUp() throws Exception
     {
-        assertNotNull("workspaceService not set", storeService);
+        assertNotNull("storeService not set", storeService);
     }
     
     public void testCreateWorkspace() throws Exception
     {
-        StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "my workspace");
+        StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "my store");
         assertNotNull("No reference returned", storeRef);
     }
 }

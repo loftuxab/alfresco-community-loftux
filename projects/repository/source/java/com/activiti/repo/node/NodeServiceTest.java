@@ -14,11 +14,11 @@ import com.activiti.util.BaseSpringTest;
  */
 public class NodeServiceTest extends BaseSpringTest
 {
-    private DbStoreService typedWorkspaceService;
+    private StoreDaoService typedWorkspaceService;
     private NodeService nodeService;
     private NodeRef rootNodeRef;
 
-    public void setTypedWorkspaceService(DbStoreService typedWorkspaceService)
+    public void setTypedWorkspaceService(StoreDaoService typedWorkspaceService)
     {
         this.typedWorkspaceService = typedWorkspaceService;
     }
@@ -31,7 +31,7 @@ public class NodeServiceTest extends BaseSpringTest
     protected void onSetUpInTransaction() throws Exception
     {
         // create a first workspace directly
-        Store workspace = typedWorkspaceService.createWorkspace(StoreRef.PROTOCOL_WORKSPACE,
+        Store workspace = typedWorkspaceService.createStore(StoreRef.PROTOCOL_WORKSPACE,
                 "Test_" + System.currentTimeMillis());
         StoreRef storeRef = workspace.getStoreRef();
         Node rootNode = workspace.getRootNode();
