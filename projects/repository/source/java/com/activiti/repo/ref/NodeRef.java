@@ -3,7 +3,7 @@ package com.activiti.repo.ref;
 import java.io.Serializable;
 
 /**
- * Reference to a node store
+ * Reference to a node
  * 
  * @author Derek Hulley
  */
