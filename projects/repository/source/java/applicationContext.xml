@@ -64,6 +64,11 @@
    <!-- use around method calls to debug - see class comments for details -->
    <bean id="methodCallLogAdvice" class="com.activiti.util.debug.MethodCallLogAdvice" />
 
+   <!-- use around method calls to debug - see class comments for details -->
+   <bean id="methodPerformanceAdvice"
+      class="com.activiti.util.perf.PerformanceMonitorAdvice" 
+      init-method="init"/>
+
    <!--                    -->
    <!--  INTERNAL SERVICES -->
    <!--                    -->
@@ -93,6 +98,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
+            <ref bean="methodPerformanceAdvice" />
          </list>
       </property>
    </bean>
@@ -119,6 +125,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
+            <ref bean="methodPerformanceAdvice" />
          </list>
       </property>
    </bean>
@@ -170,6 +177,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
+            <ref bean="methodPerformanceAdvice" />
          </list>
       </property>
    </bean>
@@ -199,6 +207,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
+            <ref bean="methodPerformanceAdvice" />
          </list>
       </property>
    </bean>
