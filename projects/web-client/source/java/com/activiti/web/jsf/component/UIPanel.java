@@ -74,11 +74,11 @@ public class UIPanel extends SelfRenderingComponent
       if (isProgressive() == true)
       {
          out.write("<a href='#' onclick=\"");
-         String value = getClientId(context) + NamingContainer.SEPARATOR_CHAR + Boolean.toString(!this.expanded);
+         String value = getClientId(context) + NamingContainer.SEPARATOR_CHAR + Boolean.toString(!isExpanded());
          out.write(Utils.generateFormSubmit(context, this, getHiddenFieldName(), value));
          out.write("\">");
          
-         if (this.expanded == true)
+         if (isExpanded() == true)
          {
             out.write(Utils.buildImageTag(context, EXPANDED_IMG, 7, 6, ""));
          }
@@ -128,7 +128,7 @@ public class UIPanel extends SelfRenderingComponent
       {
          // we were clicked
          // strip out the boolean value from the field contents
-         this.expanded = Boolean.valueOf( value.substring(getClientId(context).length() + 1) ).booleanValue();
+         setExpanded( Boolean.valueOf( value.substring(getClientId(context).length() + 1) ).booleanValue() );
          
          //
          // TODO: See http://forums.java.sun.com/thread.jspa?threadID=524925&start=15&tstart=0
@@ -138,7 +138,7 @@ public class UIPanel extends SelfRenderingComponent
          //       render phase. This occurs in the Panel tag as it must call getComponent()
          //       early to decide whether to allow the tag to render contents or not.
          //
-         //context.getViewRoot().setTransient(true);
+         // context.getViewRoot().setTransient(true);
          //
          //       The other solution is to explicity give ALL child components of the
          //       panel a unique Id rather than a generated one! 
@@ -153,7 +153,7 @@ public class UIPanel extends SelfRenderingComponent
       Object values[] = (Object[])state;
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
-      this.expanded = ((Boolean)values[1]).booleanValue();
+      setExpanded( ((Boolean)values[1]).booleanValue() );
    }
    
    /**
@@ -164,18 +164,26 @@ public class UIPanel extends SelfRenderingComponent
       Object values[] = new Object[2];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
-      values[1] = (this.expanded ? Boolean.TRUE : Boolean.FALSE);
+      values[1] = (isExpanded() ? Boolean.TRUE : Boolean.FALSE);
       return values;
    }
    
    /**
     * Returns whether the component show allow rendering of its child components.
-    * For this component we change this value if the user indicates to change the
-    * hidden/visible state of the progressive panel.
     */
    public boolean isExpanded()
    {
       return this.expanded;
+   }
+   
+   /**
+    * Sets whether the component show allow rendering of its child components.
+    * For this component we change this value if the user indicates to change the
+    * hidden/visible state of the progressive panel.
+    */
+   public void setExpanded(boolean expanded)
+   {
+      this.expanded = expanded;
    }
    
    

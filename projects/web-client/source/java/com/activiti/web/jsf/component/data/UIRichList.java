@@ -33,12 +33,19 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       setRendererType("awc.faces.RichListRenderer");
       
       // the standard set of view renderers
-      this.viewRenderers.put("icons", new RichListRenderer.IconViewRenderer());
-      this.viewRenderers.put("details", new RichListRenderer.DetailsViewRenderer());
-      this.viewRenderers.put("list", new RichListRenderer.ListViewRenderer());
+      IRichListRenderer renderer;
+      
+      renderer = new RichListRenderer.IconViewRenderer();
+      this.viewRenderers.put(renderer.getViewModeID(), renderer);
+      
+      renderer = new RichListRenderer.DetailsViewRenderer();
+      this.viewRenderers.put(renderer.getViewModeID(), renderer);
+      
+      renderer = new RichListRenderer.ListViewRenderer();
+      this.viewRenderers.put(renderer.getViewModeID(), renderer);
    }
 
-   
+
    // ------------------------------------------------------------------------------
    // Component implementation
    
@@ -353,7 +360,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    private String sortColumn = null;
    private boolean sortDescending = true;
    private Object value = null;
-   private final static Map viewRenderers = new HashMap(5);
+   private final static Map<String, IRichListRenderer> viewRenderers = new HashMap<String, IRichListRenderer>(5);
    
    // transient component state that exists during a single page refresh only
    private int rowIndex = -1;

@@ -3,6 +3,8 @@
  */
 package com.activiti.web.jsf.tag;
 
+import java.util.Random;
+
 import javax.faces.component.UIComponent;
 import javax.servlet.jsp.JspException;
 
@@ -63,8 +65,8 @@ public class PanelTag extends HtmlComponentTag
     * 
     * The reason for this solution is to allow any child content (including HTML tags)
     * to be displayed inside the UIPanel component without having to resort to the
-    * awful JSF Component getRendersChildren() mechanism. As this would force the use
-    * of the verbatim tags for ALL child content!
+    * awful JSF Component getRendersChildren() mechanism - as this would force the use
+    * of the verbatim tags for ALL non-JSF child content!
     */
    protected int getDoStartValue() throws JspException
    {

@@ -57,13 +57,13 @@ public class RichListRenderer extends BaseRenderer
       richList.bind();
       
       // collect child column components so they can be passed to the renderer
-      List columnList = new ArrayList(8);
+      List<UIColumn> columnList = new ArrayList<UIColumn>(8);
       for (Iterator i=richList.getChildren().iterator(); i.hasNext(); /**/)
       {
          UIComponent child = (UIComponent)i.next();
          if (child instanceof UIColumn)
          {
-            columnList.add(child);
+            columnList.add((UIColumn)child);
          }
       }
       
@@ -130,6 +130,16 @@ public class RichListRenderer extends BaseRenderer
     */
    public static class DetailsViewRenderer implements IRichListRenderer
    {
+      private static final String VIEWMODEID = "details";
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#getViewModeID()
+       */
+      public String getViewModeID()
+      {
+         return VIEWMODEID;
+      }
+
       /**
        * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
        */
@@ -254,7 +264,17 @@ public class RichListRenderer extends BaseRenderer
    public static class ListViewRenderer implements IRichListRenderer
    {
       // maximum displayable textual lines within a single item cell
-      final static int MAX_DISPLAYABLE_LINES = 3;
+      private final static int MAX_DISPLAYABLE_LINES = 3;
+      
+      private static final String VIEWMODEID = "list";
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#getViewModeID()
+       */
+      public String getViewModeID()
+      {
+         return VIEWMODEID;
+      }
       
       /**
        * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
@@ -368,7 +388,7 @@ public class RichListRenderer extends BaseRenderer
          }
          
          // end row and output a blank padding row/div
-         out.write("</table></td></tr><tr colspan=99><td height=4><div height=4></div></td></tr>");
+         out.write("</table></td></tr><tr colspan=99><td><div style='height:4px'></div></td></tr>");
          
          this.rowIndex++;
       }
@@ -406,13 +426,25 @@ public class RichListRenderer extends BaseRenderer
    public static class IconViewRenderer implements IRichListRenderer
    {
       // number of vertical columns to render before starting new row
-      final static int COLUMNS = 3;
+      private final static int COLUMNS = 3;
       
       // calculation for percentage of table row per column
-      final static String COLUMN_PERCENT = Integer.toString(100/COLUMNS) + "%";
+      private final static String COLUMN_PERCENT = Integer.toString(100/COLUMNS) + "%";
       
       // maximum displayable textual lines within a single item cell
-      final static int MAX_DISPLAYABLE_LINES = 3;
+      private final static int MAX_DISPLAYABLE_LINES = 3;
+      
+      private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='height:4px'></div></td></tr>";
+      
+      private static final String VIEWMODEID = "icons";
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#getViewModeID()
+       */
+      public String getViewModeID()
+      {
+         return VIEWMODEID;
+      }
       
       /**
        * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
@@ -501,7 +533,7 @@ public class RichListRenderer extends BaseRenderer
          if (this.rowIndex % COLUMNS == COLUMNS-1)
          {
             // end row and output a blank padding row/div
-            out.write("</tr><tr><td height=4 colspan=10><div height=4></div></td></tr>");
+            out.write(END_ROW_SEPARATOR);
          }
          
          this.rowIndex++;
@@ -518,7 +550,7 @@ public class RichListRenderer extends BaseRenderer
          // finish last row if required (we used an open-ended column rendering algorithm)
          if ((this.rowIndex-1) % COLUMNS != COLUMNS-1)
          {
-            out.write("</tr><tr><td height=4 colspan=10><div height=4></div></td></tr>");
+            out.write(END_ROW_SEPARATOR);
          }
          
          out.write("<tr><td colspan=99 align=right>");
