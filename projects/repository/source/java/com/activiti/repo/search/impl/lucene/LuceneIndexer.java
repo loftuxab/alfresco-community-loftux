@@ -5,7 +5,9 @@
 package com.activiti.repo.search.impl.lucene;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,9 +25,11 @@ import com.activiti.repo.domain.Node;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildRelationshipRef;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.Indexer;
 import com.activiti.repo.search.IndexerException;
+import com.activiti.repo.search.impl.lucene.analysis.PathTokenFilter;
 
 /**
  * The implementation of the lucene based indexer. Supports basic transactional
@@ -515,7 +519,19 @@ public class LuceneIndexer extends LuceneBase implements Indexer
 
       if (nodeService.getType(nodeRef).equals(Node.TYPE_CONTAINER))
       {
-
+         StringBuffer buffer = new StringBuffer();
+         Collection<Path> paths = nodeService.getPaths(nodeRef, false);
+         for(Iterator<Path> it = paths.iterator(); it.hasNext(); /**/)
+         {
+            Path path = it.next();
+            buffer.append(path.toString());
+            if(it.hasNext())
+            {
+               buffer.append(PathTokenFilter.PATH_SEPARATOR);
+            }
+         }
+         doc.add(new Field("PATH", buffer.toString(), true, true, true));
+         // TODO: Parent nodes for each element in order
       }
 
       return doc;

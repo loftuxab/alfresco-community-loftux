@@ -35,7 +35,7 @@ public class ChildRelationshipRef implements Serializable
 
    private NodeRef parentRef;
 
-   private String childName;
+   private QName childQName;
 
    private NodeRef childRef;
 
@@ -63,10 +63,10 @@ public class ChildRelationshipRef implements Serializable
     * The child reference. This must no be null.
     */
 
-   public ChildRelationshipRef(NodeRef parentRef, String childName, NodeRef childRef)
+   public ChildRelationshipRef(NodeRef parentRef, QName childQName, NodeRef childRef)
    {
       this.parentRef = parentRef;
-      this.childName = childName;
+      this.childQName = childQName;
       this.childRef = childRef;
    }
 
@@ -75,9 +75,9 @@ public class ChildRelationshipRef implements Serializable
     * 
     * @return
     */
-   public String getChildName()
+   public QName getChildName()
    {
-      return childName;
+      return childQName;
    }
 
    /**

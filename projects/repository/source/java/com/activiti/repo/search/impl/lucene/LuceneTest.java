@@ -7,9 +7,11 @@
  */
 package com.activiti.repo.search.impl.lucene;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,64 +53,113 @@ public class LuceneTest extends TestCase
 
    /**
     * Test basic index and search
-    *
+    * 
     */
 
    public void testStandAloneIndexerCommit()
    {
 
-      StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "ws");
-      NodeRef rootNode = new NodeRef(storeRef, "1");
-      NodeRef newNode = new NodeRef(storeRef, "2");
-      
-
-      LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta"+System.currentTimeMillis());
+      LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(NodeServiceStub.storeRef, "delta" + System.currentTimeMillis());
       indexer.setNodeService(new NodeServiceStub());
 
-      indexer.createNode(new ChildRelationshipRef(rootNode, "path", newNode));
-      indexer.updateNode(newNode);
-      //indexer.deleteNode(new ChildRelationshipRef(rootNode, "path", newNode));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}one"), NodeServiceStub.n1));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}two"), NodeServiceStub.n2));
+      //indexer.updateNode(NodeServiceStub.n1);
+      // indexer.deleteNode(new ChildRelationshipRef(rootNode, "path",
+      // newNode));
 
       indexer.commit();
-      
-      
-      Searcher searcher = LuceneSearcher.getSearcher(storeRef);
-      
-      ResultSet results = searcher.query(storeRef, "lucene", "@\\{\\}property-1:value-1", null, null );
+
+      Searcher searcher = LuceneSearcher.getSearcher(NodeServiceStub.storeRef);
+
+      ResultSet results = searcher.query(NodeServiceStub.storeRef, "lucene", "@\\{\\}property-1:value-1", null, null);
       assertEquals(2, results.length());
       assertEquals("1", results.getNodeRef(0).getId());
       assertEquals("2", results.getNodeRef(1).getId());
       assertEquals(1.0f, results.getScore(0));
       assertEquals(1.0f, results.getScore(1));
-      
+
       QName qname = QName.createQName("", "property-1");
-     
-      for(ResultSetRow row: results)
+
+      for (ResultSetRow row : results)
       {
-         System.out.println("Node = "+row.getNodeRef()+" score "+row.getScore());
-         System.out.println("QName <"+qname+"> = "+row.getValue(qname));
+         System.out.println("Node = " + row.getNodeRef() + " score " + row.getScore());
+         System.out.println("QName <" + qname + "> = " + row.getValue(qname));
          System.out.print("\t");
          Value[] values = row.getValues();
-         for(Value value: values)
+         for (Value value : values)
          {
             System.out.print("<");
             System.out.print(value);
             System.out.print(">");
          }
          System.out.println();
-         
+
       }
-      
-      
-      results = searcher.query(storeRef, "lucene", "ID:\"1\"", null, null );
+
+      results = searcher.query(NodeServiceStub.storeRef, "lucene", "ID:\"1\"", null, null);
       assertEquals(1, results.length());
-      
 
    }
    
+   public void testStandAlonePathIndexer()
+   {
+      LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(NodeServiceStub.storeRef, "delta" + System.currentTimeMillis());
+      indexer.setNodeService(new NodeServiceStub());
+
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}one"), NodeServiceStub.n1));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}two"), NodeServiceStub.n2));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}three"), NodeServiceStub.n3));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.rootNode, QName.createQName("{}four"), NodeServiceStub.n4));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n1, QName.createQName("{}five"), NodeServiceStub.n5));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n1, QName.createQName("{}six"), NodeServiceStub.n6));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n2, QName.createQName("{}seven"), NodeServiceStub.n7));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n2, QName.createQName("{}eight"), NodeServiceStub.n8));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n5, QName.createQName("{}nine"), NodeServiceStub.n9));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n5, QName.createQName("{}ten"), NodeServiceStub.n10));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n5, QName.createQName("{}eleven"), NodeServiceStub.n11));
+      indexer.createNode(new ChildRelationshipRef(NodeServiceStub.n5, QName.createQName("{}twelve"), NodeServiceStub.n12));
+      
+      // indexer.deleteNode(new ChildRelationshipRef(rootNode, "path",
+      // newNode));
+
+      indexer.commit();
+
+      Searcher searcher = LuceneSearcher.getSearcher(NodeServiceStub.storeRef);
+
+      ResultSet results = searcher.query(NodeServiceStub.storeRef, "lucene", "@\\{\\}property-1:value-1", null, null);
+      assertEquals(2, results.length());
+      assertEquals("1", results.getNodeRef(0).getId());
+      assertEquals("2", results.getNodeRef(1).getId());
+      assertEquals(1.0f, results.getScore(0));
+      assertEquals(1.0f, results.getScore(1));
+
+      QName qname = QName.createQName("", "property-1");
+
+      for (ResultSetRow row : results)
+      {
+         System.out.println("Node = " + row.getNodeRef() + " score " + row.getScore());
+         System.out.println("QName <" + qname + "> = " + row.getValue(qname));
+         System.out.print("\t");
+         Value[] values = row.getValues();
+         for (Value value : values)
+         {
+            System.out.print("<");
+            System.out.print(value);
+            System.out.print(">");
+         }
+         System.out.println();
+
+      }
+
+      results = searcher.query(NodeServiceStub.storeRef, "lucene", "ID:\"1\"", null, null);
+      assertEquals(1, results.length());
+
+   }
+
    /**
     * Test index and search agaist Hibernate
-    *
+    * 
     */
    public void xtestStandAloneIndexerCommitWithHibernate()
    {
@@ -127,21 +178,20 @@ public class LuceneTest extends TestCase
 
       NodeRef newNode = nodeService.createNode(rootNode, "path", Node.TYPE_CONTENT, testProperties);
 
-      LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta"+System.currentTimeMillis());
+      LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
       indexer.setNodeService(nodeService);
 
-      indexer.createNode(new ChildRelationshipRef(rootNode, "path", newNode));
+      indexer.createNode(new ChildRelationshipRef(rootNode, QName.createQName("{}path"), newNode));
       indexer.updateNode(newNode);
-      indexer.deleteNode(new ChildRelationshipRef(rootNode, "path", newNode));
+      indexer.deleteNode(new ChildRelationshipRef(rootNode, QName.createQName("{}path"), newNode));
 
       indexer.commit();
 
    }
-   
+
    public void testIOC()
    {
-    
-      
+
       ApplicationContext factory = new ClassPathXmlApplicationContext("applicationContext.xml");
       IndexerAndSearcher indexerAndSearcher = (IndexerAndSearcher) factory.getBean("indexerAndSearcherFactory");
       StoreService storeService = (StoreService) factory.getBean("storeService");
@@ -150,36 +200,35 @@ public class LuceneTest extends TestCase
             + System.currentTimeMillis());
 
    }
-   
+
    /**
     * Test thread local transactions and indexing
-    *
+    * 
     */
    public void testThreadLocalTXIndexerCommit()
    {
 
-
       StoreRef storeRef1 = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "ws1");
       NodeRef newNode1 = new NodeRef(storeRef1, "1");
       NodeRef rootNode1 = new NodeRef(storeRef1, "0");
-      
+
       StoreRef storeRef2 = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "ws2");
       NodeRef newNode2 = new NodeRef(storeRef2, "1");
       NodeRef rootNode2 = new NodeRef(storeRef2, "0");
 
       LuceneIndexer indexer1 = LuceneIndexerAndSearcherFactory.getInstance().getIndexer(storeRef1);
       indexer1.setNodeService(new NodeServiceStub());
-      
+
       LuceneIndexer indexer2 = LuceneIndexerAndSearcherFactory.getInstance().getIndexer(storeRef2);
       indexer2.setNodeService(new NodeServiceStub());
 
-      indexer1.createNode(new ChildRelationshipRef(rootNode1, "path", newNode1));
+      indexer1.createNode(new ChildRelationshipRef(rootNode1, QName.createQName("{}path"), newNode1));
       indexer1.updateNode(newNode1);
-      indexer1.deleteNode(new ChildRelationshipRef(rootNode1, "path", newNode1));
-      
-      indexer2.createNode(new ChildRelationshipRef(rootNode2, "path", newNode2));
+      indexer1.deleteNode(new ChildRelationshipRef(rootNode1, QName.createQName("{}path"), newNode1));
+
+      indexer2.createNode(new ChildRelationshipRef(rootNode2, QName.createQName("{}path"), newNode2));
       indexer2.updateNode(newNode2);
-      indexer2.deleteNode(new ChildRelationshipRef(rootNode2, "path", newNode2));
+      indexer2.deleteNode(new ChildRelationshipRef(rootNode2, QName.createQName("{}path"), newNode2));
 
       LuceneIndexerAndSearcherFactory.getInstance().commit();
 
@@ -189,23 +238,219 @@ public class LuceneTest extends TestCase
     * Support for DummyNodeService
     * 
     * @author andyh
-    *
+    * 
     */
 
    private static class NodeServiceStub implements NodeService
    {
 
-      StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "ws");
+      static StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "ws");
 
-      NodeRef n1 = new NodeRef(storeRef, "1");
+      static NodeRef rootNode = new NodeRef(storeRef, "0");
 
-      NodeRef n2 = new NodeRef(storeRef, "2");
+      static NodeRef n1 = new NodeRef(storeRef, "1");
 
-      NodeRef n3 = new NodeRef(storeRef, "3");
+      static NodeRef n2 = new NodeRef(storeRef, "2");
 
-      NodeRef n4 = new NodeRef(storeRef, "4");
+      static NodeRef n3 = new NodeRef(storeRef, "3");
 
-      NodeRef rootNode = new NodeRef(storeRef, "0");
+      static NodeRef n4 = new NodeRef(storeRef, "4");
+
+      static NodeRef n5 = new NodeRef(storeRef, "5");
+
+      static NodeRef n6 = new NodeRef(storeRef, "6");
+
+      static NodeRef n7 = new NodeRef(storeRef, "7");
+
+      static NodeRef n8 = new NodeRef(storeRef, "8");
+
+      static NodeRef n9 = new NodeRef(storeRef, "9");
+
+      static NodeRef n10 = new NodeRef(storeRef, "10");
+
+      static NodeRef n11 = new NodeRef(storeRef, "11");
+
+      static NodeRef n12 = new NodeRef(storeRef, "12");
+
+      public String getType(NodeRef nodeRef) throws InvalidNodeRefException
+      {
+         if (nodeRef.getId().equals("0"))
+         {
+            return Node.TYPE_CONTAINER;
+         }
+         else if (nodeRef.getId().equals("1"))
+         {
+            return Node.TYPE_CONTAINER;
+         }
+         else if (nodeRef.getId().equals("2"))
+         {
+            return Node.TYPE_CONTAINER;
+         }
+         else if (nodeRef.getId().equals("3"))
+         {
+            return Node.TYPE_CONTENT;
+         }
+         else if (nodeRef.getId().equals("4"))
+         {
+            return Node.TYPE_CONTENT;
+         }
+         else if (nodeRef.getId().equals("5"))
+         {
+            return Node.TYPE_CONTAINER;
+         }
+         else if (nodeRef.getId().equals("6"))
+         {
+            return Node.TYPE_CONTAINER;
+         }
+         else if (nodeRef.getId().equals("7"))
+         {
+            return Node.TYPE_CONTENT;
+         }
+         else if (nodeRef.getId().equals("8"))
+         {
+            return Node.TYPE_CONTAINER;
+         }
+         else if (nodeRef.getId().equals("9"))
+         {
+            return Node.TYPE_CONTENT;
+         }
+         else if (nodeRef.getId().equals("10"))
+         {
+            return Node.TYPE_CONTENT;
+         }
+         else if (nodeRef.getId().equals("11"))
+         {
+            return Node.TYPE_CONTENT;
+         }
+         else if (nodeRef.getId().equals("12"))
+         {
+            return Node.TYPE_CONTENT;
+         }
+         else
+         {
+            throw new InvalidNodeRefException(nodeRef);
+         }
+      }
+
+      public Map<String, String> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
+      {
+         Map<String, String> answer = new HashMap<String, String>();
+         answer.put("{}createby", "andy");
+         if (nodeRef.getId().equals("0"))
+         {
+            answer.put("{}does-a-property-on-the-root-make-sense", "no");
+         }
+         if (nodeRef.getId().equals("1"))
+         {
+            answer.put("{}property-1", "value-1");
+         }
+         else if (nodeRef.getId().equals("2"))
+         {
+            answer.put("{}property-1", "value-1");
+            answer.put("{}property-2", "value-2");
+         }
+         else if (nodeRef.getId().equals("3"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("4"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("5"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("6"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("7"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("8"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("9"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("10"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("11"))
+         {
+
+         }
+         else if (nodeRef.getId().equals("12"))
+         {
+
+         }
+         return answer;
+      }
+
+      public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
+      {
+         Set<NodeRef> parents = new HashSet<NodeRef>();
+         if (nodeRef.getId().equals("0"))
+         {
+
+         }
+         if (nodeRef.getId().equals("1"))
+         {
+            parents.add(rootNode);
+         }
+         else if (nodeRef.getId().equals("2"))
+         {
+            parents.add(rootNode);
+         }
+         else if (nodeRef.getId().equals("3"))
+         {
+            parents.add(rootNode);
+         }
+         else if (nodeRef.getId().equals("4"))
+         {
+            parents.add(rootNode);
+         }
+         else if (nodeRef.getId().equals("5"))
+         {
+            parents.add(n1);
+         }
+         else if (nodeRef.getId().equals("6"))
+         {
+            parents.add(n1);
+         }
+         else if (nodeRef.getId().equals("7"))
+         {
+            parents.add(n2);
+         }
+         else if (nodeRef.getId().equals("8"))
+         {
+            parents.add(rootNode);
+            parents.add(n1);
+            parents.add(n2);
+         }
+         else if (nodeRef.getId().equals("9"))
+         {
+            parents.add(n5);
+         }
+         else if (nodeRef.getId().equals("10"))
+         {
+            parents.add(n5);
+         }
+         else if (nodeRef.getId().equals("11"))
+         {
+            parents.add(n5);
+         }
+         else if (nodeRef.getId().equals("12"))
+         {
+            parents.add(n5);
+         }
+         return parents;
+      }
 
       public NodeRef createNode(NodeRef parentRef, String name, String nodeType) throws InvalidNodeRefException
       {
@@ -244,60 +489,10 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-      public String getType(NodeRef nodeRef) throws InvalidNodeRefException
+      public String getProperty(NodeRef nodeRef, String propertyName) throws InvalidNodeRefException
       {
-         if (nodeRef.getId().equals("0"))
-         {
-            return Node.TYPE_CONTAINER;
-         }
-         else if (nodeRef.getId().equals("1"))
-         {
-            return Node.TYPE_CONTENT;
-         }
-         else if (nodeRef.getId().equals("2"))
-         {
-            return Node.TYPE_CONTENT;
-         }
-         else if (nodeRef.getId().equals("3"))
-         {
-            return Node.TYPE_CONTENT;
-         }
-         else if (nodeRef.getId().equals("4"))
-         {
-            return Node.TYPE_CONTENT;
-         }
-         else
-         {
-            throw new InvalidNodeRefException(nodeRef);
-         }
-      }
-
-      public Map<String, String> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
-      {
-         Map<String, String> answer = new HashMap<String, String>();
-         if (nodeRef.getId().equals("1"))
-         {
-            answer.put("{}property-1", "value-1");
-         }
-         else if (nodeRef.getId().equals("2"))
-         {
-            answer.put("{}property-1", "value-1");
-            answer.put("{}property-2", "value-2");
-         }
-         else if (nodeRef.getId().equals("3"))
-         {
-            answer.put("{}property-1", "value-1");
-            answer.put("{}property-2", "value-2");
-            answer.put("{}property-3", "value-3");
-         }
-         else if (nodeRef.getId().equals("4"))
-         {
-            answer.put("{}property-1", "value-1");
-            answer.put("{}property-2", "value-2");
-            answer.put("{}property-3", "value-3");
-            answer.put("{}property-4", "value-4");
-         }
-         return answer;
+         // TODO Auto-generated method stub
+         throw new UnsupportedOperationException();
       }
 
       public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException
@@ -306,26 +501,11 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-      public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
+      public void setProperty(NodeRef nodeRef, String propertyName, String propertyValue)
+            throws InvalidNodeRefException
       {
-         Set<NodeRef> parents = new HashSet<NodeRef>();
-         if (nodeRef.getId().equals("1"))
-         {
-            parents.add(rootNode);
-         }
-         else if (nodeRef.getId().equals("2"))
-         {
-            parents.add(rootNode);
-         }
-         else if (nodeRef.getId().equals("3"))
-         {
-            parents.add(rootNode);
-         }
-         else if (nodeRef.getId().equals("4"))
-         {
-            parents.add(rootNode);
-         }
-         return parents;
+         // TODO Auto-generated method stub
+         throw new UnsupportedOperationException();
       }
 
       public Collection<NodeRef> getChildren(NodeRef nodeRef) throws InvalidNodeRefException
@@ -368,26 +548,6 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-     
-
-      public String getProperty(NodeRef nodeRef, String propertyName) throws InvalidNodeRefException
-      {
-         // TODO Auto-generated method stub
-         throw new UnsupportedOperationException();
-      }
-
-      public void setProperty(NodeRef nodeRef, String propertyName, String propertyValue) throws InvalidNodeRefException
-      {
-         // TODO Auto-generated method stub
-         throw new UnsupportedOperationException();
-      }
-
-      public Collection<Path> getPaths(NodeRef nodeRef) throws InvalidNodeRefException
-      {
-         // TODO Auto-generated method stub
-         throw new UnsupportedOperationException();
-      }
-
       public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
       {
          // TODO Auto-generated method stub
@@ -396,15 +556,107 @@ public class LuceneTest extends TestCase
 
       public Collection<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
-         throw new UnsupportedOperationException();
+         List<Path> paths = new ArrayList<Path>();
+         if (nodeRef.getId().equals("1"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("2"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "two")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("3"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "three")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("4"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "four")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("5"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            path.append(new Path.QNameElement(QName.createQName("", "five")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("6"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            path.append(new Path.QNameElement(QName.createQName("", "six")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("7"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "two")));
+            path.append(new Path.QNameElement(QName.createQName("", "seven")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("8"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "eight-0")));
+            paths.add(path);
+            path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            path.append(new Path.QNameElement(QName.createQName("", "eight-1")));
+            paths.add(path);
+            path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "two")));
+            path.append(new Path.QNameElement(QName.createQName("", "eight-2")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("9"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            path.append(new Path.QNameElement(QName.createQName("", "five")));
+            path.append(new Path.QNameElement(QName.createQName("", "nine")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("10"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            path.append(new Path.QNameElement(QName.createQName("", "five")));
+            path.append(new Path.QNameElement(QName.createQName("", "ten")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("11"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            path.append(new Path.QNameElement(QName.createQName("", "five")));
+            path.append(new Path.QNameElement(QName.createQName("", "eleven")));
+            paths.add(path);
+         }
+         else if (nodeRef.getId().equals("12"))
+         {
+            Path path = new Path();
+            path.append(new Path.QNameElement(QName.createQName("", "one")));
+            path.append(new Path.QNameElement(QName.createQName("", "five")));
+            path.append(new Path.QNameElement(QName.createQName("", "twelve")));
+            paths.add(path);
+         }
+
+         return paths;
       }
 
    }
-   
+
    public static void main(String[] args)
    {
       String guid = GUID.generate();
-      System.out.println("GUID is "+guid+" length is "+guid.length());
+      System.out.println("GUID is " + guid + " length is " + guid.length());
    }
 }

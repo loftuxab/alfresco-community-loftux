@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -251,7 +250,7 @@ public abstract class LuceneBase
          if (!IndexReader.indexExists(deltaDir))
          {
             // Make sure there is something we can read
-            IndexWriter writer = new IndexWriter(deltaDir, new SimpleAnalyzer(), true);
+            IndexWriter writer = new IndexWriter(deltaDir, new LuceneAnalyser(), true);
             writer.close();
          }
          deltaReader = IndexReader.open(deltaDir);
@@ -277,7 +276,7 @@ public abstract class LuceneBase
          if (!IndexReader.indexExists(deltaRamDir))
          {
             // Make sure there is something we can read.
-            IndexWriter writer = new IndexWriter(deltaRamDir, new SimpleAnalyzer(), true);
+            IndexWriter writer = new IndexWriter(deltaRamDir, new LuceneAnalyser(), true);
             writer.close();
          }
          deltaRamReader = IndexReader.open(deltaRamDir);
@@ -344,7 +343,7 @@ public abstract class LuceneBase
 
          try
          {
-            deltaWriter = new IndexWriter(deltaDir, new SimpleAnalyzer(), false);
+            deltaWriter = new IndexWriter(deltaDir, new LuceneAnalyser(), false);
          }
          catch (IOException e)
          {
@@ -384,7 +383,7 @@ public abstract class LuceneBase
 
          try
          {
-            deltaRamWriter = new IndexWriter(deltaRamDir, new SimpleAnalyzer(), overwriteOrCreate);
+            deltaRamWriter = new IndexWriter(deltaRamDir, new LuceneAnalyser(), overwriteOrCreate);
          }
          catch (IOException e)
          {
@@ -514,7 +513,7 @@ public abstract class LuceneBase
       else
       {
          // Create the main index
-         mainWriter = new IndexWriter(baseDir, new SimpleAnalyzer(), true);
+         mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), true);
          try
          {
             mainWriter.close();
@@ -569,7 +568,7 @@ public abstract class LuceneBase
       }
 
       // Do the append
-      mainWriter = new IndexWriter(baseDir, new SimpleAnalyzer(), false);
+      mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), false);
 
       try
       {
