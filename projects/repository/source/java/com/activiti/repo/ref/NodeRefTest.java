@@ -28,10 +28,10 @@ public class NodeRefTest extends TestCase
     public void testNodeRef() throws Exception
     {
         StoreRef storeRef = new StoreRef("ABC", "123");
-        NodeRef nodeRef = new NodeRef(storeRef, "456");
+        NodeRef nodeRef = new NodeRef(storeRef, "456", new Long(1));
         assertEquals("toString failure", "ABC://123/456", nodeRef.toString());
 
-        NodeRef nodeRef2 = new NodeRef(storeRef, "456");
+        NodeRef nodeRef2 = new NodeRef(storeRef, "456", new Long(1));
         assertEquals("equals failure", nodeRef, nodeRef2);
     }
 }

@@ -99,7 +99,7 @@ public class NodeImpl implements Node
     {
         if (nodeRef == null)
         {
-            nodeRef = new NodeRef(getStore().getStoreRef(), getGuid());
+            nodeRef = new NodeRef(getStore().getStoreRef(), getGuid(), getId());
         }
         return nodeRef;
     }

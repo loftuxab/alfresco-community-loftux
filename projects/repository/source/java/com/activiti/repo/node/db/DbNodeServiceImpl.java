@@ -74,13 +74,18 @@ public class DbNodeServiceImpl implements NodeService
         ContainerNode parentNode = (ContainerNode) uncheckedParent;
         // create the association
         ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, name);
+        
+        // attach the properties
+        node.setProperties(properties);
+        
         // done
         return node.getNodeRef();
     }
 
     public void deleteNode(NodeRef nodeRef)
     {
-        throw new UnsupportedOperationException();
+        // get the node
+        Node node = nodeDaoService.getNode(nodeRef.getId());
+        nodeDaoService.deleteNode(node);
     }
-
 }

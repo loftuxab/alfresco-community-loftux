@@ -39,10 +39,26 @@ public interface NodeDaoService
             String name);
     
     /**
-     * 
      * @param store the store to search in
-     * @param id the unique id of the node
-     * @return
+     * @param guid the store-unique, manually assigned GUID
+     * @return Returns the node found in the store, or null if not found
      */
-    public Node findNodeInStore(Store store, String id);
+    public Node findNodeInStore(Store store, String guid);
+    
+    /**
+     * @param id the unique id of the node
+     * @return Returns the <b>node</b> entity
+     */
+    public Node getNode(Long id);
+    
+    /**
+     * Deletes the node instance, taking care of any cascades that are required over
+     * and above those provided by the persistence mechanism.
+     * <p>
+     * A caller must able to delete the node using this method and not have to follow
+     * up with any other ancillary deletes
+     * 
+     * @param node the entity to delete
+     */
+    public void deleteNode(Node node);
 }

@@ -15,14 +15,17 @@ public class NodeRef implements Serializable
 
     private StoreRef storeRef;
     private String guid;
+    private Long id;
 
     /**
      * @param storeRef
      * @see StoreRef
      * @param guid
      *      the manually assigned unique identifier of the node
+     * @param id
+     *      the generated, unique id of the node
      */
-    public NodeRef(StoreRef storeRef, String guid)
+    public NodeRef(StoreRef storeRef, String guid, Long id)
     {
         if (storeRef == null)
         {
@@ -36,6 +39,7 @@ public class NodeRef implements Serializable
 
         this.storeRef = storeRef;
         this.guid = guid;
+        this.id = id;
     }
 
     public String toString()
@@ -77,5 +81,10 @@ public class NodeRef implements Serializable
     public String getGuid()
     {
         return guid;
+    }
+    
+    public Long getId()
+    {
+        return id;
     }
 }

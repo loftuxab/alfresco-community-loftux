@@ -24,8 +24,8 @@
             column="auto_type"
             type="string"
             length="18" />
-      <property name="guid" not-null="true" />
-      <property name="type" not-null="true" />
+      <property name="guid" not-null="true" length="100"/>
+      <property name="type" not-null="true" length="50"/>
       <map
             name="properties"
             table="node_properties"
@@ -47,7 +47,8 @@
       <!-- inverse assoc to parent childassocs -->
       <set
             name="parentAssocs"
-            inverse="true" >
+            inverse="true" 
+            cascade="delete" >
          <key column="child_id" />
          <one-to-many class="com.activiti.repo.domain.hibernate.ChildAssocImpl" />
       </set>
@@ -83,7 +84,8 @@
       <!-- inverse assoc to child childassocs -->
       <set
             name="childAssocs"
-            inverse="true" >
+            inverse="true"
+            cascade="delete" >
          <key column="parent_id" />
          <one-to-many class="com.activiti.repo.domain.hibernate.ChildAssocImpl" />
       </set>
