@@ -16,6 +16,7 @@ import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
+import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
@@ -303,6 +304,30 @@ public class DbNodeServiceImpl implements NodeService
                     "   primary parent: " + parentNode);
         }
         return (parentNode == null ? null : parentNode.getNodeRef());
+    }
+
+    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
+            throws InvalidNodeRefException, AssociationExistsException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
+            throws InvalidNodeRefException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, String assocName)
+            throws InvalidNodeRefException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, String assocName)
+            throws InvalidNodeRefException
+    {
+        throw new UnsupportedOperationException();
     }
 
     /**

@@ -1,5 +1,9 @@
 package com.activiti.repo.domain.hibernate;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.RealNode;
 
 /**
@@ -7,4 +11,20 @@ import com.activiti.repo.domain.RealNode;
  */
 public class RealNodeImpl extends NodeImpl implements RealNode
 {
+    private Set<NodeAssoc> targetNodeAssocs;
+
+    public RealNodeImpl()
+    {
+        targetNodeAssocs = new HashSet<NodeAssoc>(3);
+    }
+
+    public Set<NodeAssoc> getTargetNodeAssocs()
+    {
+        return targetNodeAssocs;
+    }
+    
+    public void setTargetNodeAssocs(Set<NodeAssoc> targetNodeAssocs)
+    {
+        this.targetNodeAssocs = targetNodeAssocs;
+    }
 }

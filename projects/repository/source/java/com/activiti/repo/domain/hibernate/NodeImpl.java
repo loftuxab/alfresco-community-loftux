@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.Node;
+import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.NodeRef;
@@ -21,9 +22,16 @@ public class NodeImpl implements Node
     private NodeKey key;
     private String type;
     private Store store;
+    private Set<NodeAssoc> sourceNodeAssocs;
     private Set<ChildAssoc> parentAssocs;
     private Map<String, String> properties;
     private NodeRef nodeRef;
+
+    public NodeImpl()
+    {
+        sourceNodeAssocs = new HashSet<NodeAssoc>(3);
+        parentAssocs = new HashSet<ChildAssoc>(3);
+    }
 
     public NodeKey getKey() {
 		return key;
@@ -32,11 +40,6 @@ public class NodeImpl implements Node
 	public void setKey(NodeKey key) {
 		this.key = key;
 	}
-
-	public NodeImpl()
-    {
-        parentAssocs = new HashSet<ChildAssoc>(3, 0.75F);
-    }
 
     public String getType()
     {
@@ -58,6 +61,16 @@ public class NodeImpl implements Node
     {
         this.store = store;
         this.nodeRef = null;
+    }
+
+    public Set<NodeAssoc> getSourceNodeAssocs()
+    {
+        return sourceNodeAssocs;
+    }
+
+    public void setSourceNodeAssocs(Set<NodeAssoc> sourceNodeAssocs)
+    {
+        this.sourceNodeAssocs = sourceNodeAssocs;
     }
 
     public Set<ChildAssoc> getParentAssocs()

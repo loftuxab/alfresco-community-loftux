@@ -10,13 +10,9 @@ import com.activiti.repo.domain.Node;
 public class ChildAssocImpl implements ChildAssoc
 {
     private long id;
-
     private ContainerNode parent;
-
     private Node child;
-
     private String name;
-
     private boolean isPrimary;
 
     public long getId()

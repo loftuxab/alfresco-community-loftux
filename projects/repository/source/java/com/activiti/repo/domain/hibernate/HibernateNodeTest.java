@@ -10,7 +10,9 @@ import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.ContentNode;
 import com.activiti.repo.domain.Node;
+import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.NodeKey;
+import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.ReferenceNode;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.StoreKey;
@@ -35,9 +37,8 @@ public class HibernateNodeTest extends BaseHibernateTest
     protected void onSetUpInTransaction() throws Exception
     {
         store = new StoreImpl();
-		StoreKey storeKey = new StoreKey();
-		storeKey.setProtocol(StoreRef.PROTOCOL_WORKSPACE);
-		storeKey.setIdentifier("TestWorkspace@" + System.currentTimeMillis());
+		StoreKey storeKey = new StoreKey(StoreRef.PROTOCOL_WORKSPACE,
+                "TestWorkspace@" + System.currentTimeMillis());
 		store.setKey(storeKey);
         // persist so that it is present in the hibernate cache
         getSession().save(store);
@@ -153,6 +154,53 @@ public class HibernateNodeTest extends BaseHibernateTest
 
         // get the ref node back by ID
         node = (ReferenceNode) getSession().get(NodeImpl.class, refNodeId);
+    }
+    
+    public void testNodeAssoc() throws Exception
+    {
+        // make a real node
+        RealNode sourceNode = new RealNodeImpl();
+        NodeKey sourceKey = new NodeKey(store.getKey(), GUID.generate());
+        sourceNode.setKey(sourceKey);
+        sourceNode.setStore(store);
+        sourceNode.setType(Node.TYPE_REAL);
+        Serializable realNodeKey = getSession().save(sourceNode);
+        
+        // make a container node
+        ContainerNode targetNode = new ContainerNodeImpl();
+        NodeKey targetKey = new NodeKey(store.getKey(), GUID.generate());
+        targetNode.setKey(targetKey);
+        targetNode.setStore(store);
+        targetNode.setType(Node.TYPE_CONTAINER);
+        Serializable containerNodeKey = getSession().save(targetNode);
+        
+        // create an association between them
+        NodeAssoc assoc = new NodeAssocImpl();
+        assoc.setName("next");
+        assoc.buildAssociation(sourceNode, targetNode);
+        getSession().save(assoc);
+        
+        // make another association between the same two nodes
+        assoc = new NodeAssocImpl();
+        assoc.setName("helper");
+        assoc.buildAssociation(sourceNode, targetNode);
+        getSession().save(assoc);
+        
+        // flush and clear the session
+        getSession().flush();
+        getSession().clear();
+        
+        // reload the source
+        sourceNode = (RealNode) getSession().get(RealNodeImpl.class, sourceKey);
+        assertNotNull("Source node not found", sourceNode);
+        // check that the associations are present
+        assertEquals("Expected exactly 2 target assocs", 2, sourceNode.getTargetNodeAssocs().size());
+        
+        // reload the target
+        targetNode = (ContainerNode) getSession().get(NodeImpl.class, targetKey);
+        assertNotNull("Target node not found", targetNode);
+        // check that the associations are present
+        assertEquals("Expected exactly 2 source assocs", 2, targetNode.getSourceNodeAssocs().size());
     }
 
     public void testChildAssoc() throws Exception

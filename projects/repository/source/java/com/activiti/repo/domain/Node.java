@@ -38,6 +38,13 @@ public interface Node
     
     public void setType(String type);
 
+    /**
+     * @return Returns all the regular associations for which this node is a target 
+     */
+    public Set<NodeAssoc> getSourceNodeAssocs();
+
+    public void setSourceNodeAssocs(Set<NodeAssoc> nodeAssocs);
+
     public Set<ChildAssoc> getParentAssocs();
 
     public void setParentAssocs(Set<ChildAssoc> parentAssocs);

@@ -59,7 +59,10 @@ public class StoreKey implements Serializable
         return protocol;
     }
     
-    public void setProtocol(String protocol)
+    /**
+     * Tamper-proof method only to be used by introspectors
+     */
+    private void setProtocol(String protocol)
     {
         this.protocol = protocol;
     }
@@ -69,7 +72,10 @@ public class StoreKey implements Serializable
         return identifier;
     }
     
-    public void setIdentifier(String identifier)
+    /**
+     * Tamper-proof method only to be used by introspectors
+     */
+    private void setIdentifier(String identifier)
     {
         this.identifier = identifier;
     }

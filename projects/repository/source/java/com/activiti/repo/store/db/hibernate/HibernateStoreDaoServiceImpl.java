@@ -63,9 +63,7 @@ public class HibernateStoreDaoServiceImpl
 
     public Store getStore(String protocol, String identifier)
     {
-		StoreKey storeKey = new StoreKey();
-		storeKey.setProtocol(protocol);
-		storeKey.setIdentifier(identifier);
+		StoreKey storeKey = new StoreKey(protocol, identifier);
 		Store store = (Store) getHibernateTemplate().get(StoreImpl.class, storeKey);
         // done
         if (logger.isDebugEnabled())

@@ -26,11 +26,9 @@ public class StoreServiceTest extends BaseSpringTest
     }
     
     /**
-     * A reusable test case
-     * 
      * @return Returns a reference to the created store
      */
-    public StoreRef testCreateStore() throws Exception
+    private StoreRef createStore() throws Exception
     {
         StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "my store");
         assertNotNull("No reference returned", storeRef);
@@ -38,9 +36,14 @@ public class StoreServiceTest extends BaseSpringTest
         return storeRef;
     }
     
+    public void testCreateStore() throws Exception
+    {
+        createStore();
+    }
+    
     public void testExists() throws Exception
     {
-        StoreRef storeRef = testCreateStore();
+        StoreRef storeRef = createStore();
         boolean exists = storeService.exists(storeRef);
         assertEquals("Exists failed", true, exists);
         // create bogus ref
@@ -51,7 +54,7 @@ public class StoreServiceTest extends BaseSpringTest
     
     public void testGetRootNode() throws Exception
     {
-        StoreRef storeRef = testCreateStore();
+        StoreRef storeRef = createStore();
         // get the root node
         NodeRef rootNodeRef = storeService.getRootNode(storeRef);
         assertNotNull("No root node reference returned", rootNodeRef);

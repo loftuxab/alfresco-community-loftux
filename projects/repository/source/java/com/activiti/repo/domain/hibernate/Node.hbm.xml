@@ -62,6 +62,18 @@
          </key>
          <one-to-many class="com.activiti.repo.domain.hibernate.ChildAssocImpl" />
       </set>
+      <!-- inverse assoc to source nodeassocs -->
+      <set
+            name="sourceNodeAssocs"
+            inverse="true" 
+            cascade="delete" >
+         <key>
+            <column name="target_protocol" />
+            <column name="target_identifier" />
+            <column name="target_guid" />
+         </key>
+         <one-to-many class="com.activiti.repo.domain.hibernate.NodeAssocImpl" />
+      </set>
    </class>
    
    <subclass
@@ -77,6 +89,18 @@
          proxy="com.activiti.repo.domain.RealNode"
          extends="com.activiti.repo.domain.hibernate.NodeImpl"
          discriminator-value="REAL" >
+      <!-- inverse assoc to target nodeassocs -->
+      <set
+            name="targetNodeAssocs"
+            inverse="true" 
+            cascade="delete" >
+         <key>
+            <column name="source_protocol" />
+            <column name="source_identifier" />
+            <column name="source_guid" />
+         </key>
+         <one-to-many class="com.activiti.repo.domain.hibernate.NodeAssocImpl" />
+      </set>
    </subclass>
 
    <subclass
@@ -134,6 +158,37 @@
          <column name="child_protocol" />
          <column name="child_identifier" />
          <column name="child_guid" />
+      </many-to-one>
+   </class>
+
+   <class
+         name="com.activiti.repo.domain.hibernate.NodeAssocImpl"
+         proxy="com.activiti.repo.domain.NodeAssoc"
+         table="node_assoc" >
+      <id
+            name="id"
+            column="id"
+            type="long" >
+         <generator class="increment" />
+      </id>
+      <property name="name" />
+      <!-- forward assoc to source node -->
+      <many-to-one
+            name="source"
+            class="com.activiti.repo.domain.hibernate.RealNodeImpl"
+            not-null="true" >
+         <column name="source_protocol" />
+         <column name="source_identifier" />
+         <column name="source_guid" />
+      </many-to-one>
+      <!-- forward assoc to target node -->
+      <many-to-one
+            name="target"
+            class="com.activiti.repo.domain.hibernate.NodeImpl"
+            not-null="true" >
+         <column name="target_protocol" />
+         <column name="target_identifier" />
+         <column name="target_guid" />
       </many-to-one>
    </class>
    
