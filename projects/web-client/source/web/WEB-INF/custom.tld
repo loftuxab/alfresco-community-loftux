@@ -269,11 +269,41 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
-   
+
    <tag>
       <name>dataPager</name>
       <tagclass>com.activiti.web.jsf.tag.data.DataPagerTag</tagclass>
       <bodycontent>JSP</bodycontent>
    </tag>
+
+   <tag>
+      <name>propertySheet</name>
+      <tagclass>com.activiti.web.jsf.tag.property.PropertySheetGridTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>var</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
    
+   <tag>
+      <name>property</name>
+      <tagclass>com.activiti.web.jsf.tag.property.PropertyTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+   </tag>
+
 </taglib>

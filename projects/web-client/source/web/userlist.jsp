@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
 <%@ taglib uri="/WEB-INF/custom.tld" prefix="awc" %>
 
 <%@ page isELIgnored="false" %>
@@ -115,9 +116,10 @@
         </h:column>
       </h:dataTable>
       
-      <p>
+      </p>
       
       <h:commandButton id="add-user" value="Add" action="adduser" actionListener="#{UserListBean.addUser}"/>
-      
+      <br/><br/>
+      <h:commandButton id="show-properties" value="Property Sheet" action="#{RepositoryService.showProperties}" />
    </h:form>
 </f:view>
