@@ -29,6 +29,16 @@
    </target>
    
    <target name="dump-properties" depends="common-init">
+      <echo>ant.project.name = ${ant.project.name}</echo>
+      <echo>basedir = ${basedir}</echo>
+      <echo>common.dir = ${common.dir}</echo>
+      <echo>common.lib.dir = ${common.lib.dir}</echo>
+      <echo>version.number = ${version.number}</echo>
+      <echo>jboss.home = ${jboss.home}</echo>
+      <echo>deploy.dir = ${deploy.dir}</echo>
+   </target>
+   
+   <target name="dump-all-properties" depends="common-init">
       <echoproperties/>
    </target>
 
@@ -69,6 +79,27 @@
       <javadoc sourcepath="${src.java.dir}" destdir="${javadoc.dir}" 
                packagenames="${javadoc.packages}" author="true" version="true" 
                windowtitle="${javadoc.title}" />
+   </target>
+   
+   <target name="run-tests" depends="compile-java"
+           description="Runs the projects unit tests">
+      <mkdir dir="${test.results.dir}" />
+      <junit printsummary="yes" fork="yes" haltonfailure="yes">
+         <!-- TODO: Try and include the previous classpath rather than re-specify -->
+         <classpath>
+            <fileset dir="${common.lib.dir}">
+               <include name="*.jar" />
+            </fileset>
+            <pathelement location="${classes.dir}"/>
+         </classpath>
+         <formatter type="plain"/>
+         <batchtest fork="yes" todir="${test.results.dir}">
+            <fileset dir="${src.java.dir}">
+               <include name="**/*Test.java" />
+               <exclude name="**/Base*Test.java" />
+            </fileset>
+        </batchtest>
+      </junit>
    </target>
 
    <!-- *********************** -->
@@ -146,6 +177,7 @@
    <target name="clean" depends="init" description="Cleans the project">
       <delete includeEmptyDirs="true" quiet="yes" dir="${classes.dir}"/>
       <delete includeEmptyDirs="true" quiet="yes" dir="${dist.dir}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${test.results.dir}"/>
    </target>
 
 </project>

@@ -22,6 +22,12 @@
       <antcall target="deploy" />
    </target>
 
+   <target name="test-all" depends="common-init" description="Runs unit tests for all the projects">
+      <subant target="run-tests">
+         <fileset dir="." includes="**/project-build.xml" />
+      </subant>
+   </target>
+
    <target name="clean-all" depends="common-init" description="Cleans all the projects">
       <subant target="clean">
          <fileset dir="." includes="**/project-build.xml" />
