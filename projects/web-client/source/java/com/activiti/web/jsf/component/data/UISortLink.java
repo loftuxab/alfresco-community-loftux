@@ -267,6 +267,9 @@ public class UISortLink extends UICommand
    private final static String IMAGE_SORTDOWN   = "/images/sort_down.gif";
    private final static String IMAGE_SORTNONE   = "/images/sort_flat.gif";
    
+   /** sorting mode */
    private String mode = IDataContainer.SORT_CASEINSENSITIVE;
+   
+   /** true for descending sort, false for ascending */
    private boolean descending = true;
 }

@@ -32,14 +32,30 @@
       
       <%-- Breadcrumb tests --%>
       <b>Breadcrumbs:</b><br>
-      Default style with modified separator:<br>
+      Default style with modified separator and actionListener handler:<br>
       <awc:breadcrumb id="path1" value="/horse/biscuit/flibble/1234" action="success" actionListener="#{TestList.clickBreadcrumb}" separator="~" />
       <br>
       Path style with default separator:<br>
       <awc:breadcrumb id="path2" styleClass="path"  value="/this/is/a/small/breadcrumb" />
       <br>
       Root should be missing from this breadcrumb:<br>
-      <awc:breadcrumb id="path3" styleClass="path" value="/001/002/003/004/005" showRoot="false" />
+      <awc:panel id="panel0" progressive="true">
+         <awc:breadcrumb id="path3" styleClass="path" value="/001/002/003/004/005" showRoot="false" />
+      </awc:panel>
+      
+      <p>
+      
+      <%-- ActionLink tests --%>
+      <b>ActionLinks:</b><br>
+      <awc:actionLink id="action1" value="Action Link" action="success" actionListener="#{TestList.clickActionLink}" />
+      <br>
+      <awc:actionLink id="action2" value="Action Link With CSS" action="success" actionListener="#{TestList.clickActionLink}" styleClass="header" />
+      <br>
+      Action link with image and text, using vertical alignment property to centre text.<br>
+      <awc:actionLink id="action3" value="Image Action Link" image="/images/icons/BlueArrow.gif" verticalAlign="40%" />
+      <br>
+      Action link with no text, just an image with title/alt text instead:<br>
+      <awc:actionLink id="action4" value="Image Only Action Link" image="/images/icons/link_small.gif" showLink="false"/>
       
       <p>
       
@@ -97,38 +113,42 @@
                <h:graphicImage alt="#{r.name}" title="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
             </f:facet>
             <f:facet name="small-icon">
-               <%-- this could be a clickable action image etc. --%>
-               <h:graphicImage alt="#{r.name}" title="#{r.name}" width="15" height="13" url="/images/icons/folder.gif" />
+               <%-- example of a clickable action image as an icon --%>
+               <awc:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{TestList.clickNameLink}" showLink="false">
+                  <f:param name="name" value="#{r.name}" />
+               </awc:actionLink>
             </f:facet>
-            <h:outputText id="list1-name" value="#{r.name}"/>
+            <awc:actionLink value="#{r.name}" actionListener="#{TestList.clickNameLink}">
+               <f:param name="name" value="#{r.name}" />
+            </awc:actionLink>
          </awc:column>
          
          <awc:column>
             <f:facet name="header">
                <awc:sortLink label="Count" value="count" styleClass="header"/>
             </f:facet>
-            <h:outputText id="list1-count" value="#{r.count}"/>
+            <h:outputText value="#{r.count}"/>
          </awc:column>
          
          <awc:column>
             <f:facet name="header">
                <awc:sortLink label="Valid" value="valid" styleClass="header"/>
             </f:facet>
-            <h:outputText id="list1-valid" value="#{r.valid}"/>
+            <h:outputText value="#{r.valid}"/>
          </awc:column>
          
          <awc:column>
             <f:facet name="header">
                <awc:sortLink label="Relevance" value="relevance" styleClass="header"/>
             </f:facet>
-            <h:outputText id="list1-rel" value="#{r.relevance}"/>
+            <h:outputText value="#{r.relevance}"/>
          </awc:column>
          
          <awc:column>
             <f:facet name="header">
                <awc:sortLink label="Created Date" value="created" styleClass="header"/>
             </f:facet>
-            <h:outputText id="list1-created" value="#{r.created}">
+            <h:outputText value="#{r.created}">
                <%-- example of a DateTime converter --%>
                <%-- can be used to convert both input and output text --%>
                <f:convertDateTime dateStyle="short" />
@@ -139,7 +159,7 @@
             <f:facet name="header">
                <h:outputText value="#{msg.actions}"/>
             </f:facet>
-            <h:outputText id="list1-actions" value="Action | Action | Action"/>
+            <h:outputText value="Action | Action | Action"/>
          </awc:column>
          
          <%-- components other than columns added to a RichList will generally
@@ -162,14 +182,18 @@
                   <awc:sortLink id="list2-sort1" label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                </f:facet>
                <f:facet name="large-icon">
-                  <%-- this could be a clickable action image etc. --%>
-                  <h:graphicImage id="list2-img1" alt="#{r.name}" title="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
+                  <%-- example of a clickable action image as an icon --%>
+                  <awc:actionLink id="list2-img1" value="#{r.name}" image="/images/icons/folder_large.png" actionListener="#{TestList.clickNameLink}" showLink="false">
+                     <f:param id="list2-param1-id" name="name" value="#{r.name}" />
+                  </awc:actionLink>
                </f:facet>
                <f:facet name="small-icon">
-                  <%-- this could be a clickable action image etc. --%>
                   <h:graphicImage id="list2-img2" alt="#{r.name}" title="#{r.name}" width="15" height="13" url="/images/icons/folder.gif" />
                </f:facet>
-               <h:outputText id="list2-out1" value="#{r.name}"/>
+               <%-- example of a clickable action link item --%>
+               <awc:actionLink id="list2-link1" value="#{r.name}" actionListener="#{TestList.clickNameLink}">
+                  <f:param id="list2-param2-id" name="name" value="#{r.name}" />
+               </awc:actionLink>
             </awc:column>
             
             <%-- TODO: need some way to allow columns for specific views
@@ -232,7 +256,9 @@
                   <%-- this could be a clickable action image etc. --%>
                   <h:graphicImage alt="#{r.name}" title="#{r.name}" width="15" height="13" url="/images/icons/folder.gif" />
                </f:facet>
-               <h:outputText value="#{r.name}"/>
+               <awc:actionLink value="#{r.name}" actionListener="#{TestList.clickNameLink}">
+                  <f:param id="list-param-id" name="name" value="#{r.name}" />
+               </awc:actionLink>
             </awc:column>
             
             <awc:column>
@@ -316,8 +342,9 @@
           <%-- inline command link - has an action listener which will decode which
                item in the grid it was clicked using the param tag below
                Then the action listener will delegate to the action view --%>
-          <h:commandLink id="edit" value="Edit" action="edituser" actionListener="#{UserListBean.editUser}"/>
-          <f:param id="userId" name="id" value="#{u.username}" />
+          <h:commandLink id="edit" value="Edit" action="edituser" actionListener="#{UserListBean.editUser}">
+            <f:param id="userId" name="id" value="#{u.username}" />
+          </h:commandLink>
         </h:column>
       </h:dataTable>
       

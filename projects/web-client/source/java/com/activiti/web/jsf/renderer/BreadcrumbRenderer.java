@@ -23,6 +23,9 @@ import com.activiti.web.jsf.component.UIBreadcrumb;
  */
 public class BreadcrumbRenderer extends BaseRenderer
 {
+   // ------------------------------------------------------------------------------
+   // Renderer implementation 
+   
    /**
     * @see javax.faces.render.Renderer#decode(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
     */
@@ -109,6 +112,7 @@ public class BreadcrumbRenderer extends BaseRenderer
       buf.append('>');
       
       // output path element text
+      // TODO: optionally crop text length with ellipses - use title attribute for all
       buf.append(element);
       
       // close tag

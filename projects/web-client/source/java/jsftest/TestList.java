@@ -5,12 +5,16 @@ package jsftest;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import javax.faces.component.UIParameter;
 import javax.faces.event.ActionEvent;
 
 import org.apache.log4j.Logger;
 
+import com.activiti.web.jsf.component.UIActionLink;
 import com.activiti.web.jsf.component.UIBreadcrumb;
 
 /**
@@ -47,6 +51,22 @@ public class TestList
       if (event.getComponent() instanceof UIBreadcrumb)
       {
          s_logger.debug("clickBreadcrumb action listener called, path now: " + ((UIBreadcrumb)event.getComponent()).getValue());
+      }
+   }
+   
+   public void clickActionLink(ActionEvent event)
+   {
+      s_logger.debug("clickActionLink");
+   }
+   
+   public void clickNameLink(ActionEvent event)
+   {
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String value = params.get("name");
+      if (value != null)
+      {
+         s_logger.debug("clicked item in list: " + value);
       }
    }
 

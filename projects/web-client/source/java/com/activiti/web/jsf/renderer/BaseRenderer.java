@@ -4,9 +4,12 @@
 package com.activiti.web.jsf.renderer;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.Renderer;
@@ -82,7 +85,7 @@ public abstract class BaseRenderer extends Renderer
     * @param ctx Faces context
     * @param component The component
     */
-   protected void assertParmeters(FacesContext ctx, UIComponent component)
+   protected static void assertParmeters(FacesContext ctx, UIComponent component)
    {
       if (ctx == null)
       {
@@ -93,5 +96,33 @@ public abstract class BaseRenderer extends Renderer
       {
          throw new IllegalStateException("component can not be null");
       }
+   }
+   
+   /**
+    * Return the map of name/value pairs for any child UIParameter components.
+    * 
+    * @param component to find UIParameter child values for
+    * 
+    * @return a Map of name/value pairs or null if none found
+    */
+   protected static Map<String, String> getParameterMap(UIComponent component)
+   {
+      Map<String, String> params = null;
+      
+      if (component.getChildCount() != 0)
+      {
+         params = new HashMap<String, String>(3, 1.0f);
+         for (Iterator i=component.getChildren().iterator(); i.hasNext(); /**/)
+         {
+            UIComponent child = (UIComponent)i.next();
+            if (child instanceof UIParameter)
+            {
+               UIParameter param = (UIParameter)child;
+               params.put(param.getName(), (String)param.getValue());
+            }
+         }
+      }
+      
+      return params;
    }
 }

@@ -3,6 +3,8 @@
  */
 package com.activiti.web.jsf;
 
+import java.util.Map;
+
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
@@ -32,6 +34,25 @@ public final class Utils
     */
    public static String generateFormSubmit(FacesContext context, UIComponent component, String fieldId, String fieldValue)
    {
+      return generateFormSubmit(context, component, fieldId, fieldValue, null);
+   }
+   
+   /**
+    * Generate the JavaScript to submit set the specified hidden Form field to the
+    * supplied value and submit the parent Form.
+    * 
+    * NOTE: the supplied hidden field name is added to the Form Renderer map for output.
+    * 
+    * @param context       FacesContext
+    * @param component     UIComponent to generate JavaScript for
+    * @param fieldId       Hidden field id to set value for
+    * @param fieldValue    Hidden field value to set hidden field too on submit
+    * @param params        Optional map of param name/values to output
+    * 
+    * @return JavaScript event code
+    */
+   public static String generateFormSubmit(FacesContext context, UIComponent component, String fieldId, String fieldValue, Map<String, String> params)
+   {
       UIForm form = Utils.getParentForm(context, component);
       if (form == null)
       {
@@ -48,9 +69,29 @@ public final class Utils
       buf.append("]['");
       buf.append(fieldId);
       buf.append("'].value='");
-      buf.append(fieldValue);     //component.getClientId(context)
+      buf.append(fieldValue);
       buf.append("';");
-      buf.append(" document.forms[");
+      
+      if (params != null)
+      {
+         for (String name : params.keySet())
+         {
+            buf.append("document.forms[");
+            buf.append("'");
+            buf.append(formClientId);
+            buf.append("'");
+            buf.append("]['");
+            buf.append(name);
+            buf.append("'].value='");
+            buf.append(params.get(name));
+            buf.append("';");
+            
+            // weak, but this seems to be the way Sun RI do it...
+            FormRenderer.addNeededHiddenField(context, name);
+         }
+      }
+      
+      buf.append("document.forms[");
       buf.append("'");
       buf.append(formClientId);
       buf.append("'");

@@ -56,6 +56,11 @@
       <component-type>awc.faces.Breadcrumb</component-type>
       <component-class>com.activiti.web.jsf.component.UIBreadcrumb</component-class>
    </component>
+   
+   <component>
+      <component-type>awc.faces.ActionLink</component-type>
+      <component-class>com.activiti.web.jsf.component.UIActionLink</component-class>
+   </component>
 
 
    <!-- ==================== CONVERTERS ==================== -->
@@ -87,6 +92,12 @@
          <component-family>awc.faces.Controls</component-family>
          <renderer-type>awc.faces.BreadcrumbRenderer</renderer-type>
          <renderer-class>com.activiti.web.jsf.renderer.BreadcrumbRenderer</renderer-class>
+      </renderer>
+      
+      <renderer>
+         <component-family>awc.faces.Controls</component-family>
+         <renderer-type>awc.faces.ActionLinkRenderer</renderer-type>
+         <renderer-class>com.activiti.web.jsf.renderer.ActionLinkRenderer</renderer-class>
       </renderer>
    </render-kit>
 

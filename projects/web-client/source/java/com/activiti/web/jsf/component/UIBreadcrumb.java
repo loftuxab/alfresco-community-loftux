@@ -30,7 +30,7 @@ public class UIBreadcrumb extends UICommand
       setRendererType("awc.faces.BreadcrumbRenderer");
    }
 
-   
+
    // ------------------------------------------------------------------------------
    // Component implementation 
    
@@ -173,10 +173,10 @@ public class UIBreadcrumb extends UICommand
    // ------------------------------------------------------------------------------
    // Private data
    
-   // visible separator value
+   /** visible separator value */
    private String separator = null;
    
-   // true to show the root of the breadcrumb path, false otherwise
+   /** true to show the root of the breadcrumb path, false otherwise */
    private Boolean showRoot = null;
    
    /** the separator for a breadcrumb path value */
