@@ -1,5 +1,5 @@
 <project name="common">
-   
+
    <!-- ****************************************** -->
    <!-- ** Initialisation/Configuration targets ** -->
    <!-- ****************************************** -->
@@ -12,7 +12,7 @@
       <mkdir dir="${src.webinf.dir}" />
       <mkdir dir="${local.lib.dir}" />
       <mkdir dir="${classes.dir}" />
-      <taskdef name="create-web-xml" classname="com.gavincornwell.ant.XmlFileTask" 
+      <taskdef name="create-web-xml" classname="com.gavincornwell.ant.XmlFileTask"
                classpath="${custom.tasks.jar}" />
       <create-web-xml file="${src.webinf.dir}/web.xml" />
    </target>
@@ -20,14 +20,14 @@
    <target name="init" depends="common-init">
       <path id="java.classpath">
          <fileset dir="${common.lib.dir}">
-            <include name="*.jar" />
+            <include name="**/*.jar" />
          </fileset>
       </path>
 
       <mkdir dir="${classes.dir}" />
       <mkdir dir="${dist.dir}" />
    </target>
-   
+
    <target name="dump-properties" depends="common-init">
       <echo>ant.project.name = ${ant.project.name}</echo>
       <echo>basedir = ${basedir}</echo>
@@ -37,7 +37,7 @@
       <echo>jboss.home = ${jboss.home}</echo>
       <echo>deploy.dir = ${deploy.dir}</echo>
    </target>
-   
+
    <target name="dump-all-properties" depends="common-init">
       <echoproperties/>
    </target>
@@ -46,7 +46,7 @@
    <!-- ** Composite targets ** -->
    <!-- *********************** -->
 
-   <target name="build" depends="clean, package" 
+   <target name="build" depends="clean, package"
            description="Builds the project after cleaning" />
 
    <target name="incremental" depends="package"
@@ -86,9 +86,10 @@
       <mkdir dir="${test.results.dir}" />
       <junit printsummary="yes" fork="yes" haltonfailure="yes">
          <!-- TODO: Try and include the previous classpath rather than re-specify -->
+<!--         <classpath refid="java.classpath"/> -->
          <classpath>
             <fileset dir="${common.lib.dir}">
-               <include name="*.jar" />
+               <include name="**/*.jar" />
             </fileset>
             <pathelement location="${classes.dir}"/>
          </classpath>
