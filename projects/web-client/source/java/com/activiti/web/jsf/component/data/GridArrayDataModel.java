@@ -14,21 +14,16 @@ public class GridArrayDataModel implements IGridDataModel
    /**
     * Constructor
     * 
-    * @param data    Array of Object[] row data
+    * @param data    Array of Object (beans) row data 
     */
    public GridArrayDataModel(Object[] data)
    {
       m_data = data;
    }
    
-   public Object[] getRow(int index)
+   public Object getRow(int index)
    {
-      return (Object[])m_data[index];
-   }
-   
-   public Object getColumnForRow(int row, int column)
-   {
-      return ((Object[])m_data[row])[column];
+      return m_data[index];
    }
    
    // TODO: allow formatting etc. of strings

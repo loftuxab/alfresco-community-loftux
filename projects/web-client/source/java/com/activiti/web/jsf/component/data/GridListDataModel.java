@@ -21,14 +21,9 @@ public class GridListDataModel implements IGridDataModel
       m_data = data;
    }
    
-   public Object[] getRow(int index)
+   public Object getRow(int index)
    {
-      return (Object[])m_data.get(index);
-   }
-   
-   public Object getColumnForRow(int row, int column)
-   {
-      return ((Object[])m_data.get(row))[column];
+      return m_data.get(index);
    }
    
    // TODO: allow formatting etc. of strings

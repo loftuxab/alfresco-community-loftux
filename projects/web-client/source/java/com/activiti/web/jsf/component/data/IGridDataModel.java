@@ -11,9 +11,7 @@ import java.util.List;
  */
 public interface IGridDataModel
 {
-   public Object[] getRow(int index);
-   
-   public Object getColumnForRow(int row, int column);
+   public Object getRow(int index);
    
    public int size();
 }

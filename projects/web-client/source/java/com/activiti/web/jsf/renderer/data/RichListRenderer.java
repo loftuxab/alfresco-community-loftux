@@ -152,9 +152,9 @@ public class RichListRenderer extends BaseRenderer
       }
       
       /**
-       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object[])
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object)
        */
-      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object[] row)
+      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object row)
             throws IOException
       {
          ResponseWriter out = context.getResponseWriter();
@@ -214,10 +214,9 @@ public class RichListRenderer extends BaseRenderer
       }
       
       /**
-       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object[])
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object)
        */
-      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns,
-            Object[] row) throws IOException
+      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object row) throws IOException
       {
          // TODO Auto-generated method stub
       }
@@ -248,12 +247,11 @@ public class RichListRenderer extends BaseRenderer
       {
          // TODO Auto-generated method stub
       }
-      
+
       /**
-       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object[])
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object)
        */
-      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns,
-            Object[] row) throws IOException
+      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object row) throws IOException
       {
          // TODO Auto-generated method stub
       }

@@ -35,7 +35,7 @@
       after datagrid table
       
       <%-- rich list test --%>
-      <awc:rich-list viewModes="list,details,icon" filtering="true" sorting="true" pageSize="5" styleClass="mycss" style="border:2px" value="#{UserListBean.usersModel}" var="u">
+      <awc:rich-list viewModes="list,details,icon" filtering="true" sorting="true" pageSize="5" styleClass="mycss" style="border:2px" value="#{UserListBean.users}" var="u">
          <awc:column label="Name" primary="true">
             <h:outputText value="#{u.name}"/>
          </awc:column>

@@ -21,7 +21,7 @@ public interface IRichListRenderer
    public void renderListBefore(FacesContext context, UIRichList richList, UIColumn[] columns)
       throws IOException;
    
-   public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object[] row)
+   public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object row)
       throws IOException;
    
    public void renderListAfter(FacesContext context, UIRichList richList, UIColumn[] columns)

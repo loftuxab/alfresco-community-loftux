@@ -101,7 +101,7 @@ public class UIRichList extends UIComponentBase
       return m_rowIndex < (getDataModel().size() - 1);
    }
    
-   public Object[] nextRow()
+   public Object nextRow()
    {
       return getDataModel().getRow(++m_rowIndex);
    }
