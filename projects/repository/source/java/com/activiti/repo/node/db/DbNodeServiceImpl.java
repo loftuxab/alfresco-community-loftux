@@ -25,17 +25,17 @@ public class DbNodeServiceImpl implements NodeService
 {
     private static final Log logger = LogFactory.getLog(DbNodeServiceImpl.class);
     
-    private NodeDaoService typedNodeService;
-    private StoreDaoService typedWorkspaceService;
+    private NodeDaoService nodeDaoService;
+    private StoreDaoService storeDaoService;
     
-    public void setTypedNodeService(NodeDaoService typedNodeService)
+    public void setNodeDaoService(NodeDaoService nodeDaoService)
     {
-        this.typedNodeService = typedNodeService;
+        this.nodeDaoService = nodeDaoService;
     }
 
-    public void setTypedWorkspaceService(StoreDaoService typedWorkspaceService)
+    public void setStoreDaoService(StoreDaoService storeDaoService)
     {
-        this.typedWorkspaceService = typedWorkspaceService;
+        this.storeDaoService = storeDaoService;
     }
 
     public NodeRef createNode(NodeRef parentRef, String name, String nodeType)
@@ -54,15 +54,15 @@ public class DbNodeServiceImpl implements NodeService
         }
         // extract the name of the workspace that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
-        Store workspace = typedWorkspaceService.findStore(storeRef.getProtocol(), storeRef.getIdentifier());
-        if (workspace == null)
+        Store store = storeDaoService.findStore(storeRef.getProtocol(), storeRef.getIdentifier());
+        if (store == null)
         {
-            throw new DataIntegrityViolationException("No workspace found for parent node: " + parentRef);
+            throw new DataIntegrityViolationException("No store found for parent node: " + parentRef);
         }
         // create the node instance
-        RealNode node = typedNodeService.newRealNode(workspace, nodeType);
+        RealNode node = nodeDaoService.newRealNode(store, nodeType);
         // get the parent node
-        Node uncheckedParent = typedNodeService.findNodeInWorkspace(workspace, parentRef.getGuid());
+        Node uncheckedParent = nodeDaoService.findNodeInStore(store, parentRef.getGuid());
         if (uncheckedParent == null)
         {
             throw new IllegalArgumentException("Parent node must exist: " + parentRef);
@@ -73,7 +73,7 @@ public class DbNodeServiceImpl implements NodeService
         }
         ContainerNode parentNode = (ContainerNode) uncheckedParent;
         // create the association
-        ChildAssoc assoc = typedNodeService.newChildAssoc(parentNode, node, true, name);
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, name);
         // done
         return node.getNodeRef();
     }

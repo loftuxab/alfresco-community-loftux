@@ -19,7 +19,7 @@ public class NodeImpl implements Node
     private Long id;
     private String guid;
     private String type;
-    private Store workspace;
+    private Store store;
     private Set parentAssocs;
     private Map properties;
     private NodeRef nodeRef;
@@ -61,14 +61,14 @@ public class NodeImpl implements Node
         this.nodeRef = null;
     }
 
-    public Store getWorkspace()
+    public Store getStore()
     {
-        return workspace;
+        return store;
     }
 
-    public synchronized void setWorkspace(Store workspace)
+    public synchronized void setStore(Store store)
     {
-        this.workspace = workspace;
+        this.store = store;
         this.nodeRef = null;
     }
 
@@ -99,7 +99,7 @@ public class NodeImpl implements Node
     {
         if (nodeRef == null)
         {
-            nodeRef = new NodeRef(getWorkspace().getStoreRef(), getGuid());
+            nodeRef = new NodeRef(getStore().getStoreRef(), getGuid());
         }
         return nodeRef;
     }

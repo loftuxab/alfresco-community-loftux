@@ -21,20 +21,20 @@ import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.util.GUID;
 
 /**
- * Hibernate-specific implementation
+ * Hibernate-specific implementation of the persistence-independent <b>node</b> DAO interface
  * 
  * @author derekh
  */
-public class TypedNodeServiceImpl extends HibernateDaoSupport implements NodeDaoService
+public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements NodeDaoService
 {
-    private static final Log logger = LogFactory.getLog(TypedNodeServiceImpl.class);
+    private static final Log logger = LogFactory.getLog(HibernateNodeDaoServiceImpl.class);
 
-    public ReferenceNode newReferenceNode(Store workspace, String referencedPath)
+    public ReferenceNode newReferenceNode(Store store, String referencedPath)
     {
         ReferenceNode node = new ReferenceNodeImpl();
         node.setType(Node.TYPE_REFERENCE);
         node.setGuid(GUID.generate());
-        node.setWorkspace(workspace);
+        node.setStore(store);
         node.setReferencedPath(referencedPath);
         // persist the node
         getHibernateTemplate().save(node);
@@ -46,7 +46,7 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements NodeDao
         return node;
     }
 
-    public RealNode newRealNode(Store workspace, String type)
+    public RealNode newRealNode(Store store, String type)
     {
         RealNode node = null;
         if (type.equals(Node.TYPE_CONTAINER))
@@ -65,7 +65,7 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements NodeDao
             node.setType(Node.TYPE_REAL);
         }
         node.setGuid(GUID.generate());
-        node.setWorkspace(workspace);
+        node.setStore(store);
         // persist the node
         getHibernateTemplate().save(node);
         // done
@@ -99,7 +99,7 @@ public class TypedNodeServiceImpl extends HibernateDaoSupport implements NodeDao
     public Node findNodeInStore(Store store, String id)
     {
         List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Node.QUERY_FIND_NODE_IN_STORE,
-                new String[] {"nodeGuid", "workspaceProtocol", "workspaceIdentifier"},
+                new String[] {"nodeGuid", "storeProtocol", "storeIdentifier"},
                 new Object[] {id, store.getProtocol(), store.getIdentifier()});
         Node node = null;
         if (results.size() == 0)

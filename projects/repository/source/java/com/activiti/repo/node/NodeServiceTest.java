@@ -4,7 +4,7 @@ import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.workspace.DbStoreService;
+import com.activiti.repo.store.db.StoreDaoService;
 import com.activiti.util.BaseSpringTest;
 
 /**
@@ -14,13 +14,13 @@ import com.activiti.util.BaseSpringTest;
  */
 public class NodeServiceTest extends BaseSpringTest
 {
-    private StoreDaoService typedWorkspaceService;
+    private StoreDaoService storeDaoService;
     private NodeService nodeService;
     private NodeRef rootNodeRef;
 
-    public void setTypedWorkspaceService(StoreDaoService typedWorkspaceService)
+    public void setStoreDaoService(StoreDaoService storeDaoService)
     {
-        this.typedWorkspaceService = typedWorkspaceService;
+        this.storeDaoService = storeDaoService;
     }
 
     public void setNodeService(NodeService nodeService)
@@ -30,11 +30,11 @@ public class NodeServiceTest extends BaseSpringTest
     
     protected void onSetUpInTransaction() throws Exception
     {
-        // create a first workspace directly
-        Store workspace = typedWorkspaceService.createStore(StoreRef.PROTOCOL_WORKSPACE,
+        // create a first store directly
+        Store store = storeDaoService.createStore(StoreRef.PROTOCOL_WORKSPACE,
                 "Test_" + System.currentTimeMillis());
-        StoreRef storeRef = workspace.getStoreRef();
-        Node rootNode = workspace.getRootNode();
+        StoreRef storeRef = store.getStoreRef();
+        Node rootNode = store.getRootNode();
         rootNodeRef = rootNode.getNodeRef();
     }
     

@@ -6,7 +6,7 @@ import java.util.Set;
 import com.activiti.repo.ref.NodeRef;
 
 /**
- * Specific instances of nodes are unique, but may share GUIDs across workspaces.
+ * Specific instances of nodes are unique, but may share GUIDs across stores.
  * 
  * @author derekh
  */
@@ -40,9 +40,9 @@ public interface Node
      */
     public void setGuid(String id);
     
-    public Store getWorkspace();
+    public Store getStore();
     
-    public void setWorkspace(Store workspace);
+    public void setStore(Store store);
     
     public String getType();
     

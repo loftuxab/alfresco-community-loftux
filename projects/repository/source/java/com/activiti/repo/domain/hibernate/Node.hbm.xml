@@ -37,12 +37,12 @@
          <index column="property_name" type="string" />
          <element column="property_value" type="string" />  <!-- a map of property values keyed by property name -->
       </map>
-      <!-- forward assoc to workspace -->
+      <!-- forward assoc to store -->
       <many-to-one
-            name="workspace"
-            class="com.activiti.repo.domain.hibernate.WorkspaceImpl"
+            name="store"
+            class="com.activiti.repo.domain.hibernate.StoreImpl"
             not-null="true" >
-         <column name="workspace_id" />
+         <column name="store_id" />
       </many-to-one>
       <!-- inverse assoc to parent childassocs -->
       <set
