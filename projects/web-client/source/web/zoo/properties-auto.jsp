@@ -32,9 +32,6 @@
       <br/>
       <h:commandButton value="Update Properties" action="#{node4.persist}"/>
    
-      <br/><br/><hr/><br/>
-      <h:commandButton value="Manual Configured Property Zoo" action="#{ZooService.showPropertyZoo}" />
-   
    </h:form>
       
 </f:view>
