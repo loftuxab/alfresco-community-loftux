@@ -65,8 +65,8 @@ public class QNameTest extends TestCase
       try
       {
          QName qname = QName.createQName("{namespace}name");
-         assertEquals("namespace", qname.getNamespace());
-         assertEquals("name", qname.getName());
+         assertEquals("namespace", qname.getNamespaceURI());
+         assertEquals("name", qname.getLocalName());
       }
       catch (InvalidQNameException e)
       {
@@ -75,7 +75,7 @@ public class QNameTest extends TestCase
 
       try
       {
-         QName qname = QName.createQName(null, null);
+         QName qname = QName.createQName((String)null, (String)null);
          fail("Null name was not caught");
       }
       catch (InvalidQNameException e)
@@ -84,7 +84,7 @@ public class QNameTest extends TestCase
 
       try
       {
-         QName qname = QName.createQName(null, "");
+         QName qname = QName.createQName((String)null, "");
          fail("Empty name was not caught");
       }
       catch (InvalidQNameException e)
@@ -96,24 +96,24 @@ public class QNameTest extends TestCase
    public void testConstruction()
    {
       QName qname1 = QName.createQName("namespace1", "name1");
-      assertEquals("namespace1", qname1.getNamespace());
-      assertEquals("name1", qname1.getName());
+      assertEquals("namespace1", qname1.getNamespaceURI());
+      assertEquals("name1", qname1.getLocalName());
       
       QName qname2 = QName.createQName("{namespace2}name2");
-      assertEquals("namespace2", qname2.getNamespace());
-      assertEquals("name2", qname2.getName());
+      assertEquals("namespace2", qname2.getNamespaceURI());
+      assertEquals("name2", qname2.getLocalName());
       
       QName qname3 = QName.createQName(null, "name3");
-      assertEquals("", qname3.getNamespace());
+      assertEquals("", qname3.getNamespaceURI());
       
       QName qname4 = QName.createQName("", "name4");
-      assertEquals("", qname4.getNamespace());
+      assertEquals("", qname4.getNamespaceURI());
 
       QName qname5 = QName.createQName("{}name5");
-      assertEquals("", qname5.getNamespace());
+      assertEquals("", qname5.getNamespaceURI());
 
       QName qname6 = QName.createQName("name6");
-      assertEquals("", qname6.getNamespace());
+      assertEquals("", qname6.getNamespaceURI());
    }
 
    
