@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/datadictionary/src"
+    editDirectory="/datadictionary.edit/src" editorDirectory="/datadictionary.editor/src"
+    modelPluginID="datadictionary" runtimeJar="true" modelName="datadictionary" editPluginClass="com.activiti.repo.dictionary.metamodel.emf.provider.datadictionaryEditPlugin"
+    editorPluginClass="com.activiti.repo.dictionary.metamodel.emf.presentation.datadictionaryEditorPlugin"
+    runtimeCompatibility="false">
+  <foreignModel>@model</foreignModel>
+  <genPackages prefix="Emf" basePackage="com.activiti.repo.dictionary.metamodel" ecorePackage="emf.ecore#/">
+    <genDataTypes ecoreDataType="emf.ecore#//QName"/>
+    <genClasses ecoreClass="emf.ecore#//EMFClass">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFClass/emfName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference emf.ecore#//EMFClass/emfProperties"/>
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFClass/emfSuperClass"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference emf.ecore#//EMFClass/emfAssociations"/>
+    </genClasses>
+    <genClasses ecoreClass="emf.ecore#//EMFProperty">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFProperty/emfContainerClass"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFProperty/emfName"/>
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFProperty/emfType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFProperty/emfProtected"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFProperty/emfMandatory"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFProperty/emfMultiple"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFProperty/emfIndexed"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFProperty/emfStoredInIndex"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFProperty/emfIndexTokeniserClassName"/>
+    </genClasses>
+    <genClasses ecoreClass="emf.ecore#//EMFAspect"/>
+    <genClasses ecoreClass="emf.ecore#//EMFAssociation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFAssociation/emfName"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFAssociation/emfContainerClass"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFAssociation/emfProtected"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFAssociation/emfMandatory"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFAssociation/emfMultiple"/>
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFAssociation/emfRequiredToClasses"/>
+    </genClasses>
+    <genClasses ecoreClass="emf.ecore#//EMFChildAssociation">
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFChildAssociation/emfDefaultType"/>
+    </genClasses>
+    <genClasses ecoreClass="emf.ecore#//EMFPropertyType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFPropertyType/name"/>
+    </genClasses>
+    <genClasses ecoreClass="emf.ecore#//EMFType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFType/emfOrderedChildren"/>
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFType/emfDefaultAspects"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

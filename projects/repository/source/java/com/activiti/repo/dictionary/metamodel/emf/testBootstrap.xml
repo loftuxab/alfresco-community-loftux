@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:datadictionary="http://www.activiti.com/repo/datadictionary">
+  <datadictionary:EMFPropertyType name="{activiti}string"/>
+  <datadictionary:EMFPropertyType name="{activiti}date"/>
+  <datadictionary:EMFPropertyType name="{activiti}name"/>
+  <datadictionary:EMFPropertyType name="{activiti}guid"/>
+  <datadictionary:EMFAspect emfName="{test}referenceable">
+    <emfProperties emfName="id" emfType="/3" emfProtected="false" emfMandatory="true" emfMultiple="false"/>
+  </datadictionary:EMFAspect>
+  <datadictionary:EMFType emfName="{test}base">
+    <emfProperties emfName="primaryType" emfType="/2" emfProtected="true" emfMandatory="true" emfMultiple="false"/>
+    <emfProperties emfName="aspects" emfType="/2" emfProtected="true" emfMandatory="true" emfMultiple="true"/>
+  </datadictionary:EMFType>
+  <datadictionary:EMFType emfName="{test}file" emfSuperClass="/5" emfDefaultAspects="/4">
+    <emfProperties emfName="encoding" emfType="/0" emfMandatory="true" emfMultiple="false"/>
+    <emfProperties emfName="mimetype" emfType="/0" emfMandatory="true" emfMultiple="false"/>
+  </datadictionary:EMFType>
+  <datadictionary:EMFType emfName="{test}folder" emfSuperClass="/5" emfDefaultAspects="/4">
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="contents" emfMandatory="false" emfMultiple="true" emfRequiredToClasses="/6"/>
+  </datadictionary:EMFType>
+</xmi:XMI>
