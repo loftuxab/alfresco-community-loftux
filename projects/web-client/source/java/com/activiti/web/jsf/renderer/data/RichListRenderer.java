@@ -14,6 +14,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
 import com.activiti.web.jsf.component.data.UIColumn;
+import com.activiti.web.jsf.component.data.UIRichList;
 import com.activiti.web.jsf.renderer.BaseRenderer;
 
 /**
@@ -21,6 +22,9 @@ import com.activiti.web.jsf.renderer.BaseRenderer;
  */
 public class RichListRenderer extends BaseRenderer
 {
+   // ------------------------------------------------------------------------------
+   // Renderer implemenation 
+   
    /**
     * @see javax.faces.render.Renderer#encodeBegin(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
     */
@@ -45,24 +49,47 @@ public class RichListRenderer extends BaseRenderer
    public void encodeChildren(FacesContext context, UIComponent component)
          throws IOException
    {
-      for (Iterator i=component.getChildren().iterator(); i.hasNext(); /**/)
+      // the RichList component we are working with
+      UIRichList richList = (UIRichList)component;
+      
+      // collect child column components so they can be passed to the renderer
+      List columnList = new ArrayList(8);
+      for (Iterator i=richList.getChildren().iterator(); i.hasNext(); /**/)
       {
          UIComponent child = (UIComponent)i.next();
-         
-         // get column components here
-         // then render the view as appropriate
-         List columnList = new ArrayList(8);
          if (child instanceof UIColumn)
          {
             columnList.add(child);
          }
-         
-         UIColumn[] columns = new UIColumn[columnList.size()];
-         columnList.toArray(columns);
-         
-         IRichListRenderer renderer = (IRichListRenderer)component.getAttributes().get("viewRenderer");
-         renderer.renderList(context, columns);
       }
+      
+      UIColumn[] columns = new UIColumn[columnList.size()];
+      columnList.toArray(columns);
+      
+      // get the renderer instance
+      IRichListRenderer renderer = (IRichListRenderer)richList.getViewRenderer();
+      if (renderer == null)
+      {
+         throw new IllegalStateException("IRichListRenderer must be available in UIRichList!");
+      }
+      
+      // TODO: set the row index as appropriate for the paging state?
+      //       the component should be responsible for this!
+      
+      // TODO: how to render paging controls? e.g. prob don't delegate to the
+      //       list render for this - probably a single solution ok
+      
+      // TODO: rendering sort links etc. - how to wire up events for sort clicks...?
+      
+      // call render-before to output headers if required
+      renderer.renderListBefore(context, richList, columns);
+      while (richList.isDataAvailable() == true)
+      {
+         // render each row in turn
+         renderer.renderListRow(context, richList, columns, richList.nextRow());
+      }
+      // call render-after to output footers if required
+      renderer.renderListAfter(context, richList, columns);
    }
    
    /**
@@ -92,49 +119,143 @@ public class RichListRenderer extends BaseRenderer
    }
    
    
+   // ------------------------------------------------------------------------------
+   // Inner classes
+   
+   /**
+    * Class to implement a List view for the RichList component
+    * 
+    * @author kevinr
+    */
    public static class ListViewRenderer implements IRichListRenderer
    {
       /**
-       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderList(com.activiti.web.jsf.component.data.UIColumn[])
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
        */
-      public void renderList(FacesContext context, UIColumn[] columns)
-         throws IOException
+      public void renderListBefore(FacesContext context, UIRichList richList, UIColumn[] columns)
+            throws IOException
       {
          ResponseWriter out = context.getResponseWriter();
          
+         // render column headers as labels
+         // TODO: render as sort links!
+         out.write("<th>");
          for (int i=0; i<columns.length; i++)
          {
             // render column as appropriate for the list type
+            out.write("<td><b>");
             out.write( (String)columns[i].getAttributes().get("label") );
-            
+            // we don't render child controls for the header row
+            out.write("</b></td>");
+         }
+         out.write("</th>");
+      }
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object[])
+       */
+      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object[] row)
+            throws IOException
+      {
+         ResponseWriter out = context.getResponseWriter();
+         
+         // TODO: output alt row styles here?
+         out.write("<tr>");
+         for (int i=0; i<columns.length; i++)
+         {
+            // render column as appropriate for the list type
+            out.write("<td>");
             if (columns[i].getChildCount() != 0)
             {
-               // allow child controls inside the columns to render
+               // allow child controls inside the columns to render themselves
                encodeRecursive(context, columns[i]);
             }
+            out.write("</td>");
          }
+         out.write("</tr>");
+      }
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListAfter(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
+       */
+      public void renderListAfter(FacesContext context, UIRichList richList, UIColumn[] columns)
+            throws IOException
+      {
+         ResponseWriter out = context.getResponseWriter();
+         
+         out.write("<tr><td colspan=10>---footer---</td></tr>");
       }
    }
    
+   
+   /**
+    * Class to implement a Details view for the RichList component
+    * 
+    * @author kevinr
+    */
    public static class DetailsViewRenderer implements IRichListRenderer
    {
       /**
-       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderList(com.activiti.web.jsf.component.data.UIColumn[])
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
        */
-      public void renderList(FacesContext context, UIColumn[] columns)
-         throws IOException
+      public void renderListBefore(FacesContext context, UIRichList richList, UIColumn[] columns)
+            throws IOException
       {
+         // TODO Auto-generated method stub
+      }
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListAfter(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
+       */
+      public void renderListAfter(FacesContext context, UIRichList richList, UIColumn[] columns)
+            throws IOException
+      {
+         // TODO Auto-generated method stub
+      }
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object[])
+       */
+      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns,
+            Object[] row) throws IOException
+      {
+         // TODO Auto-generated method stub
       }
    }
    
+   
+   /**
+    * Class to implement an Icon view for the RichList component
+    * 
+    * @author kevinr
+    */
    public static class IconViewRenderer implements IRichListRenderer
    {
       /**
-       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderList(com.activiti.web.jsf.component.data.UIColumn[])
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
        */
-      public void renderList(FacesContext context, UIColumn[] columns)
-         throws IOException
+      public void renderListBefore(FacesContext context, UIRichList richList, UIColumn[] columns)
+            throws IOException
       {
+         // TODO Auto-generated method stub
+      }
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListAfter(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[])
+       */
+      public void renderListAfter(FacesContext context, UIRichList richList, UIColumn[] columns)
+            throws IOException
+      {
+         // TODO Auto-generated method stub
+      }
+      
+      /**
+       * @see com.activiti.web.jsf.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, com.activiti.web.jsf.component.data.UIColumn[], java.lang.Object[])
+       */
+      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns,
+            Object[] row) throws IOException
+      {
+         // TODO Auto-generated method stub
       }
    }
 }

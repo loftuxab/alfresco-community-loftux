@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.faces.context.FacesContext;
 
 import com.activiti.web.jsf.component.data.UIColumn;
+import com.activiti.web.jsf.component.data.UIRichList;
 
 /**
  * Contract for implementations capable of rendering the columns for a Rich List
@@ -17,6 +18,12 @@ import com.activiti.web.jsf.component.data.UIColumn;
  */
 public interface IRichListRenderer
 {
-   public void renderList(FacesContext context, UIColumn[] columns)
+   public void renderListBefore(FacesContext context, UIRichList richList, UIColumn[] columns)
+      throws IOException;
+   
+   public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object[] row)
+      throws IOException;
+   
+   public void renderListAfter(FacesContext context, UIRichList richList, UIColumn[] columns)
       throws IOException;
 }

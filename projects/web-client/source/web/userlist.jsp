@@ -35,9 +35,13 @@
       after datagrid table
       
       <%-- rich list test --%>
-      <awc:rich-list viewModes="details,icon" filtering="true" sorting="true" pageSize="5" styleClass="mycss" style="border:2px" value="#{UserListBean.usersModel}" var="u">
-         <awc:column value="#{u.name}" label="Name" primary="true"/>
-         <awc:column value="#{u.joindate}" label="Join Date"/>
+      <awc:rich-list viewModes="list,details,icon" filtering="true" sorting="true" pageSize="5" styleClass="mycss" style="border:2px" value="#{UserListBean.usersModel}" var="u">
+         <awc:column label="Name" primary="true">
+            <h:outputText value="#{u.name}"/>
+         </awc:column>
+         <awc:column label="Join Date">
+            <h:commandButton value='#{u.joinDate}"/>
+         </awc:column>
       </awc:rich-list>
       
       <%-- example of using a JSF DataTable to list the users --%>
