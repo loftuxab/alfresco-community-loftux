@@ -24,7 +24,7 @@ public class StoreServiceTest extends BaseSpringTest
         assertNotNull("storeService not set", storeService);
     }
     
-    public void testCreateWorkspace() throws Exception
+    public void testCreateStore() throws Exception
     {
         StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "my store");
         assertNotNull("No reference returned", storeRef);
