@@ -3,6 +3,7 @@
  */
 package com.activiti.web.jsf.component.data;
 
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIComponentBase;
 
 
@@ -19,6 +20,15 @@ public class UIColumn extends UIComponentBase
       return "awc.faces.Data";
    }
    
+   public UIComponent getHeader()
+   {
+      return getFacet("header");
+   }
+   
+   public UIComponent getFooter()
+   {
+      return getFacet("footer");
+   }
    
    // ===========================================================================
    // Strongly typed Getters for Component attributes
@@ -34,5 +44,6 @@ public class UIColumn extends UIComponentBase
    //       and the comp to resolve the value bindings during the getter call - but
    //       then you would HAVE to use the specific getter call not getAttributes()
    //       as that would not have the attribute in it!
-   //       Therefore strongly typed getters should be avoided for JSF components...
+   //       Therefore strongly typed getters should be used carefully for JSF
+   //       component impls.
 }
