@@ -31,7 +31,8 @@ public class NodeServiceTest extends BaseSpringTest
     protected void onSetUpInTransaction() throws Exception
     {
         // create a first workspace directly
-        Workspace workspace = typedWorkspaceService.createWorkspace(StoreRef.PROTOCOL_WORKSPACE, "Test123");
+        Workspace workspace = typedWorkspaceService.createWorkspace(StoreRef.PROTOCOL_WORKSPACE,
+                "Test_" + System.currentTimeMillis());
         StoreRef storeRef = workspace.getStoreRef();
         Node rootNode = workspace.getRootNode();
         rootNodeRef = rootNode.getNodeRef();
