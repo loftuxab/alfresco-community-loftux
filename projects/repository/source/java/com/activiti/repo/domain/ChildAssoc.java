@@ -1,6 +1,7 @@
 package com.activiti.repo.domain;
 
 import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.QName;
 
 /**
  * Represents a special type of association between nodes, that of the
@@ -43,14 +44,16 @@ public interface ChildAssoc
     public Node getChild();
 
     public void setChild(Node node);
+    
+    /**
+     * @return Returns the qualified name of this association 
+     */
+    public QName getQName();
 
-    public String getNamespaceUri();
-
-    public void setNamespaceUri(String namespaceUri);
-
-    public String getName();
-
-    public void setName(String name);
+    /**
+     * @param qname the qualified name of the association
+     */
+    public void setQName(QName qname);
 
     public boolean getIsPrimary();
 

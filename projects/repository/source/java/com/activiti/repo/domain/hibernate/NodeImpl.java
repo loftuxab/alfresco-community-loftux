@@ -1,5 +1,6 @@
 package com.activiti.repo.domain.hibernate;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,14 +26,14 @@ public class NodeImpl implements Node
     private Store store;
     private Set<NodeAssoc> sourceNodeAssocs;
     private Set<ChildAssoc> parentAssocs;
-    private Map<String, String> properties;
+    private Map<String, Serializable> properties;
     private NodeRef nodeRef;
 
     public NodeImpl()
     {
         sourceNodeAssocs = new HashSet<NodeAssoc>(3);
         parentAssocs = new HashSet<ChildAssoc>(3);
-        properties = new HashMap<String, String>(5);
+        properties = new HashMap<String, Serializable>(5);
     }
     
     public boolean equals(Object obj)
@@ -114,7 +115,7 @@ public class NodeImpl implements Node
         this.parentAssocs = parentAssocs;
     }
 
-    public Map<String, String> getProperties()
+    public Map<String, Serializable> getProperties()
     {
         return properties;
     }
@@ -122,7 +123,7 @@ public class NodeImpl implements Node
     /**
      * For Hibernate use
      */
-    private void setProperties(Map<String, String> properties)
+    private void setProperties(Map<String, Serializable> properties)
     {
         this.properties = properties;
     }

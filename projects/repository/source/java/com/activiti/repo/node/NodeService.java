@@ -1,11 +1,13 @@
 package com.activiti.repo.node;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
+import com.activiti.repo.ref.QName;
 
 /**
  * Interface for public and internal <b>node</b> operations
@@ -15,29 +17,26 @@ import com.activiti.repo.ref.Path;
 public interface NodeService
 {
     /**
-     * @see #createNode(NodeRef, String, String, String, Map<String,String>)
+     * @see #createNode(NodeRef, QName, String, Map<String,String>)
      */
     public NodeRef createNode(NodeRef parentRef,
-            String namespaceUri,
-            String name,
+            QName qname,
             String nodeType) throws InvalidNodeRefException;
     
     /**
      * Creates a new, non-abstract, real node as a primary child of the given parent node.
      * 
      * @param parentRef the parent node
-     * @param namespaceUri the namespace of the association - may be null
-     * @param name the name of the child association between the parent and the new child
+     * @param qname the qualified name of the association
      * @param nodeType a predefined node type
-     * @param properties optional map of properties to assign to the node
+     * @param properties optional map of properties to keyed by their qualified names
      * @return Returns a reference to the newly created node
      * @throws InvalidNodeRefException if the parent reference is invalid
      */
     public NodeRef createNode(NodeRef parentRef,
-            String namespaceUri,
-            String name,
+            QName qname,
             String nodeType,
-            Map<String, String> properties) throws InvalidNodeRefException;
+            Map<QName, Serializable> properties) throws InvalidNodeRefException;
     
     /**
      * Deletes the given node.
@@ -52,14 +51,12 @@ public interface NodeService
      * 
      * @param parentRef
      * @param childRef 
-     * @param namespaceUri the namespace of the association - may be null
-     * @param name the name of the association
+     * @param qname the qualified name of the association
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
      */
     public void addChild(NodeRef parentRef,
             NodeRef childRef,
-            String namespaceUri,
-            String name) throws InvalidNodeRefException;
+            QName qname) throws InvalidNodeRefException;
     
     /**
      * Severs all parent-child relationships between two nodes.
@@ -78,11 +75,10 @@ public interface NodeService
      * was the primary association, i.e. the one with which the child node was created.
      * 
      * @param parentRef the parent of the associations to remove
-     * @param namespaceUri the namespace of the association - may be null
-     * @param name the name of the associations to remove
+     * @param qname the qualified name of the association
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public void removeChildren(NodeRef parentRef, String namespaceUri, String name) throws InvalidNodeRefException;
+    public void removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef
@@ -93,34 +89,34 @@ public interface NodeService
     
     /**
      * @param nodeRef
-     * @return Returns all properties
+     * @return Returns all properties keyed by their qualified name
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public Map<String, String> getProperties(NodeRef nodeRef) throws InvalidNodeRefException;
+    public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef
-     * @param propertyName the fully qualified name of the property
+     * @param qname the qualified name of the property
      * @return Returns the value of the property, or null if not yet set
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public String getProperty(NodeRef nodeRef, String propertyName) throws InvalidNodeRefException;
+    public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException;
     
     /**
      * 
      * @param nodeRef
-     * @param properties all the properties of the node
+     * @param properties all the properties of the node keyed by their qualified names
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException;
+    public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef
-     * @param propertyName the fully qualified name of the property
+     * @param qname the fully qualified name of the property
      * @param propertyValue the value of the property
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public void setProperty(NodeRef nodeRef, String propertyName, String propertyValue) throws InvalidNodeRefException;
+    public void setProperty(NodeRef nodeRef, QName qame, Serializable value) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef the child node

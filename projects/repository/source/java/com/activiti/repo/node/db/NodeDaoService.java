@@ -9,6 +9,7 @@ import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.ReferenceNode;
 import com.activiti.repo.domain.Store;
+import com.activiti.repo.ref.QName;
 
 /**
  * Service layer accessing persistent <b>node</b> entities directly
@@ -70,15 +71,13 @@ public interface NodeDaoService
     public void deleteNode(Node node);
     
     /**
-     * @param assocNamespaceUri TODO
      * @return Returns the persisted and filled association
      * @see ChildAssoc
      */
     public ChildAssoc newChildAssoc(ContainerNode parentNode,
             Node childNode,
             boolean isPrimary,
-            String assocNamespaceUri,
-            String assocName);
+            QName qname);
     
     /**
      * @param assoc the child association to remove

@@ -17,6 +17,7 @@ import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.ReferenceNode;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.StoreKey;
+import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.util.BaseHibernateTest;
 import com.activiti.util.GUID;
@@ -111,8 +112,8 @@ public class HibernateNodeTest extends BaseHibernateTest
 		node.setKey(key);
         node.setType(Node.TYPE_CONTAINER);
         // give it a property map
-        Map<String, String> propertyMap = new HashMap<String, String>(5);
-        propertyMap.put("A", "AAA");
+        Map<String, Serializable> propertyMap = new HashMap<String, Serializable>(5);
+        propertyMap.put("{}A", "AAA");
         node.getProperties().putAll(propertyMap);
         // persist it
         Serializable id = getSession().save(node);
@@ -124,7 +125,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         propertyMap = node.getProperties();
         assertNotNull("Map not persisted", propertyMap);
         // ensure that the value is present
-        assertNotNull("Property value not present in map", propertyMap.get("A"));
+        assertNotNull("Property value not present in map", propertyMap.get("{}A"));
     }
 
     public void testSubclassing() throws Exception
@@ -224,14 +225,14 @@ public class HibernateNodeTest extends BaseHibernateTest
         // create an association to the content
         ChildAssoc assoc1 = new ChildAssocImpl();
         assoc1.setIsPrimary(true);
-        assoc1.setName("number1");
+        assoc1.setQName(QName.createQName(null, "number1"));
         assoc1.buildAssociation(containerNode, contentNode);
         getSession().save(assoc1);
 
         // make another association between the same two parent and child nodes
         ChildAssoc assoc2 = new ChildAssocImpl();
         assoc2.setIsPrimary(true);
-        assoc2.setName("number2");
+        assoc2.setQName(QName.createQName(null, "number2"));
         assoc2.buildAssociation(containerNode, contentNode);
         getSession().save(assoc2);
 

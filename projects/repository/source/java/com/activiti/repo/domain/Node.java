@@ -1,5 +1,6 @@
 package com.activiti.repo.domain;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,10 +46,8 @@ public interface Node
 
     public Set<ChildAssoc> getParentAssocs();
 
-    public Map<String, String> getProperties();
+    public Map<String, Serializable> getProperties();
 
-//    public void setProperties(Map<String, String> properties);
-    
     /**
      * Convenience method to get the reference to the node
      * 

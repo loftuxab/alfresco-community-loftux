@@ -37,8 +37,8 @@
             <column name="identifier" length="100" />
             <column name="guid" length="36" />
          </key>
-         <index column="property_name" type="string" length="100" />
-         <element column="property_value" type="string" />
+         <map-key column="qname" type="string" length="100" />
+         <element column="property_value" type="serializable" />
       </map>
       <!-- forward assoc to store -->
       <many-to-one
@@ -139,8 +139,8 @@
             type="long" >
          <generator class="increment" />
       </id>
-      <property name="namespaceUri" column="namespace_uri" length="100" />
-      <property name="name" length="100" />
+      <property name="namespaceUri" column="namespace_uri" length="100" not-null="false" />
+      <property name="localName" length="100" not-null="true" />
       <property name="isPrimary" />
       <!-- forward assoc to parent node -->
       <many-to-one

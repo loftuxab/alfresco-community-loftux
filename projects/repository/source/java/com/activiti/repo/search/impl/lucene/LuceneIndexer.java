@@ -5,6 +5,7 @@
 package com.activiti.repo.search.impl.lucene;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,6 +28,7 @@ import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
+import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.Indexer;
 import com.activiti.repo.search.IndexerException;
@@ -500,14 +502,13 @@ public class LuceneIndexer extends LuceneBase implements Indexer
       doc.add(new Field("ID", nodeRef.getId(), true, true, false));
 
       // Properties
-      Map<String, String> properties = nodeService.getProperties(nodeRef);
-      for (String propertyName : properties.keySet())
+      Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+      for (QName propertyQName : properties.keySet())
       {
-         String value = properties.get(propertyName);
-         if (propertyName != null)
-         {
-            doc.add(new Field("@" + propertyName, value, true, true, false));
-         }
+         Serializable value = properties.get(propertyQName);
+         // convert value to String
+         String strValue = value.toString();   // TODO:  Need converter here
+         doc.add(new Field("@" + propertyQName, strValue, true, true, false));
       }
 
       // Parents

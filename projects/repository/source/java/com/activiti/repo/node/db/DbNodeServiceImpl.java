@@ -1,7 +1,9 @@
 package com.activiti.repo.node.db;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,18 +50,16 @@ public class DbNodeServiceImpl implements NodeService
     }
 
     public NodeRef createNode(NodeRef parentRef,
-            String namespaceUri,
-            String name,
+            QName qname,
             String nodeType)
     {
-        return this.createNode(parentRef, namespaceUri, name, nodeType, null);
+        return this.createNode(parentRef, qname, nodeType, null);
     }
 
     public NodeRef createNode(NodeRef parentRef,
-            String namespaceUri,
-            String name,
+            QName qname,
             String nodeType,
-            Map<String, String> properties)
+            Map<QName, Serializable> properties)
     {
         // get the store that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
@@ -73,12 +73,12 @@ public class DbNodeServiceImpl implements NodeService
         // get the parent node
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // create the association
-        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, namespaceUri, name);
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, qname);
         
-        // set the properties
+        // set the properties - it is a new node so only do it if there are properties present
         if (properties != null)
         {
-            node.getProperties().putAll(properties);
+            this.setProperties(node.getNodeRef(), properties);
         }
         
         // done
@@ -148,7 +148,7 @@ public class DbNodeServiceImpl implements NodeService
         nodeDaoService.deleteNode(node);
     }
 
-    public void addChild(NodeRef parentRef, NodeRef childRef, String namespaceUri, String name) throws InvalidNodeRefException
+    public void addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
     {
         // check that both nodes belong to the same store
         if (!parentRef.getStoreRef().equals(childRef.getStoreRef()))
@@ -165,7 +165,7 @@ public class DbNodeServiceImpl implements NodeService
         // get the child node
         Node childNode = getNodeNotNull(childRef);
         // make the association
-        nodeDaoService.newChildAssoc(parentNode, childNode, false, namespaceUri, name);
+        nodeDaoService.newChildAssoc(parentNode, childNode, false, qname);
         // done
     }
 
@@ -199,7 +199,7 @@ public class DbNodeServiceImpl implements NodeService
         // done
     }
 
-    public void removeChildren(NodeRef parentRef, String namespaceUri, String name) throws InvalidNodeRefException
+    public void removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
     {
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // get all the child assocs
@@ -208,7 +208,7 @@ public class DbNodeServiceImpl implements NodeService
         int childrenDeleted = 0;
         for (ChildAssoc assoc : assocs)
         {
-            if (!assoc.getName().equals(name))
+            if (!assoc.getQName().equals(qname))
             {
                 continue;   // not a matching association
             }
@@ -231,20 +231,31 @@ public class DbNodeServiceImpl implements NodeService
         return node.getType();
     }
 
-    public Map<String, String> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
+    public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
-        return node.getProperties();
+        Map<String, Serializable> nodeProperties = node.getProperties();
+        Map<QName, Serializable> ret = new HashMap<QName, Serializable>(nodeProperties.size());
+        // copy values
+        for (Map.Entry entry: nodeProperties.entrySet())
+        {
+            String key = (String) entry.getKey();
+            Serializable value = (Serializable) entry.getValue();
+            QName qname = QName.createQName(key.toString());
+            // copy across
+            ret.put(qname, value);
+        }
+        return ret;
     }
     
-    public String getProperty(NodeRef nodeRef, String propertyName) throws InvalidNodeRefException
+    public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
-        Map<String, String> properties = node.getProperties();
-        return properties.get(propertyName);
+        Map<String, Serializable> properties = node.getProperties();
+        return properties.get(qname.toString());
     }
 
-    public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException
+    public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
         if (properties == null)
         {
@@ -252,16 +263,21 @@ public class DbNodeServiceImpl implements NodeService
         }
         
         Node node = getNodeNotNull(nodeRef);
-        node.getProperties().clear();
-        node.getProperties().putAll(properties);
+        Map<String, Serializable> nodeProperties = node.getProperties();
+        nodeProperties.clear();
+        // copy all the values across
+        for (QName qname : properties.keySet())
+        {
+            nodeProperties.put(qname.toString(), properties.get(qname));
+        }
         // done
     }
 
-    public void setProperty(NodeRef nodeRef, String propertyName, String propertyValue) throws InvalidNodeRefException
+    public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
-        Map<String, String> properties = node.getProperties();
-        properties.put(propertyName, propertyValue);
+        Map<String, Serializable> properties = node.getProperties();
+        properties.put(qname.toString(), value);
         // done
     }
 
@@ -423,7 +439,7 @@ public class DbNodeServiceImpl implements NodeService
                 }
                 // build a path element
                 NodeRef parentRef = assoc.getParent().getNodeRef();
-                QName qname = QName.createQName(assoc.getNamespaceUri(), assoc.getName());
+                QName qname = assoc.getQName();
                 NodeRef childRef = assoc.getChild().getNodeRef();
                 ChildAssocRef assocRef = new ChildAssocRef(parentRef, qname, childRef, -1);
                 Path.Element element = new Path.ChildAssocElement(assocRef);  // TODO: consider ordering

@@ -26,6 +26,7 @@ import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.domain.hibernate.RealNodeImpl;
 import com.activiti.repo.domain.hibernate.ReferenceNodeImpl;
 import com.activiti.repo.node.db.NodeDaoService;
+import com.activiti.repo.ref.QName;
 import com.activiti.util.GUID;
 
 /**
@@ -107,13 +108,11 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public ChildAssoc newChildAssoc(ContainerNode parentNode,
             Node childNode,
             boolean isPrimary,
-            String assocNamespaceUri,
-            String assocName)
+            QName qname)
     {
         ChildAssoc assoc = new ChildAssocImpl();
         assoc.setIsPrimary(isPrimary);
-        assoc.setNamespaceUri(assocNamespaceUri);
-        assoc.setName(assocName);
+        assoc.setQName(qname);
         assoc.buildAssociation(parentNode, childNode);
         // persist
         getHibernateTemplate().save(assoc);

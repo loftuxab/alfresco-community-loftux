@@ -1,12 +1,6 @@
-/*
- * Created on Mar 31, 2005
- * 
- * TODO Comment this class
- * 
- * 
- */
 package com.activiti.repo.search.impl.lucene;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -173,10 +167,13 @@ public class LuceneTest extends TestCase
 
       NodeRef rootNode = storeService.getRootNode(storeRef);
 
-      Map<String, String> testProperties = new HashMap<String, String>();
-      testProperties.put("property", "value");
+      Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
+      testProperties.put(QName.createQName("property"), "value");
 
-      NodeRef newNode = nodeService.createNode(rootNode, null, "path", Node.TYPE_CONTENT, testProperties);
+      NodeRef newNode = nodeService.createNode(rootNode,
+              QName.createQName(null, "path"),
+              Node.TYPE_CONTENT,
+              testProperties);
 
       LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
       indexer.setNodeService(nodeService);
@@ -334,22 +331,22 @@ public class LuceneTest extends TestCase
          }
       }
 
-      public Map<String, String> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
+      public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
       {
-         Map<String, String> answer = new HashMap<String, String>();
-         answer.put("{}createby", "andy");
+         Map<QName, Serializable> answer = new HashMap<QName, Serializable>();
+         answer.put(QName.createQName("{}createby"), "andy");
          if (nodeRef.getId().equals("0"))
          {
-            answer.put("{}does-a-property-on-the-root-make-sense", "no");
+            answer.put(QName.createQName("{}does-a-property-on-the-root-make-sense"), "no");
          }
          if (nodeRef.getId().equals("1"))
          {
-            answer.put("{}property-1", "value-1");
+            answer.put(QName.createQName("{}property-1"), "value-1");
          }
          else if (nodeRef.getId().equals("2"))
          {
-            answer.put("{}property-1", "value-1");
-            answer.put("{}property-2", "value-2");
+            answer.put(QName.createQName("{}property-1"), "value-1");
+            answer.put(QName.createQName("{}property-2"), "value-2");
          }
          else if (nodeRef.getId().equals("3"))
          {
@@ -454,105 +451,88 @@ public class LuceneTest extends TestCase
          return parents;
       }
 
-      public NodeRef createNode(NodeRef parentRef, String namespaceUri, String name, String nodeType) throws InvalidNodeRefException
+      public NodeRef createNode(NodeRef parentRef, QName qname, String nodeType) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
-      public NodeRef createNode(NodeRef parentRef, String namespaceUri, String name, String nodeType, Map<String, String> properties)
+      public NodeRef createNode(NodeRef parentRef, QName qname, String nodeType, Map<QName, Serializable> properties)
             throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public void deleteNode(NodeRef nodeRef) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
-      public void addChild(NodeRef parentRef, NodeRef childRef, String namespaceUri, String name) throws InvalidNodeRefException
+      public void addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public void removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
-      public void removeChildren(NodeRef parentRef, String namespaceUri, String name) throws InvalidNodeRefException
+      public void removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
-      public String getProperty(NodeRef nodeRef, String propertyName) throws InvalidNodeRefException
+      public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
-      public void setProperties(NodeRef nodeRef, Map<String, String> properties) throws InvalidNodeRefException
+      public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
-      public void setProperty(NodeRef nodeRef, String propertyName, String propertyValue)
-            throws InvalidNodeRefException
+      public void setProperty(NodeRef nodeRef, QName qame, Serializable value) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public void createAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
             throws InvalidNodeRefException, AssociationExistsException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, String assocName)
             throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, String assocName)
             throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public Collection<NodeRef> getAssociationSources(NodeRef targetRef, String assocName)
             throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 
       public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
       {
-         // TODO Auto-generated method stub
          throw new UnsupportedOperationException();
       }
 

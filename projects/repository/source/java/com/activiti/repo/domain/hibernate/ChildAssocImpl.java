@@ -15,7 +15,7 @@ public class ChildAssocImpl implements ChildAssoc
     private ContainerNode parent;
     private Node child;
     private String namespaceUri;
-    private String name;
+    private String localName;
     private boolean isPrimary;
     private ChildAssocRef childAssocRef;
 
@@ -42,7 +42,7 @@ public class ChildAssocImpl implements ChildAssoc
         if (childAssocRef == null)
         {
             childAssocRef = new ChildAssocRef(getParent().getNodeRef(),
-                    QName.createQName(getNamespaceUri(), getName()),
+                    QName.createQName(getNamespaceUri(), getLocalName()),
                     getChild().getNodeRef());
         }
         return childAssocRef;
@@ -54,7 +54,7 @@ public class ChildAssocImpl implements ChildAssoc
         sb.append("ChildAssoc")
           .append("[ parent=").append(parent)
           .append(", child=").append(child)
-          .append(", name=").append(name)
+          .append(", name=").append(localName)
           .append(", isPrimary=").append(isPrimary)
           .append("]");
         return sb.toString();
@@ -89,25 +89,56 @@ public class ChildAssocImpl implements ChildAssoc
     {
         child = node;
     }
+    
+    /**
+     * @see #getNamespaceUri()
+     * @see #getLocalName()
+     */
+    public QName getQName()
+    {
+        return QName.createQName(getNamespaceUri(), getLocalName());
+    }
 
-    public String getNamespaceUri()
+    /**
+     * @see #setNamespaceUri(String)
+     * @see #setLocalName(String)
+     */
+    public void setQName(QName qname)
+    {
+        setNamespaceUri(qname.getNamespaceURI());
+        setLocalName(qname.getLocalName());
+    }
+
+    /**
+     * For Hibernate use only
+     */
+    private String getNamespaceUri()
     {
         return namespaceUri;
     }
 
-    public void setNamespaceUri(String namespaceUri)
+    /**
+     * For Hibernate use only
+     */
+    private void setNamespaceUri(String namespaceUri)
     {
         this.namespaceUri = namespaceUri;
     }
 
-    public String getName()
+    /**
+     * For Hibernate use only
+     */
+    private String getLocalName()
     {
-        return name;
+        return localName;
     }
 
-    public void setName(String name)
+    /**
+     * For Hibernate use only
+     */
+    private void setLocalName(String name)
     {
-        this.name = name;
+        this.localName = name;
     }
 
     public boolean getIsPrimary()
