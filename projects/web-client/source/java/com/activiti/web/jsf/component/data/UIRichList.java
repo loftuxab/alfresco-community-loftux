@@ -295,8 +295,8 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          this.pageCount = 1;
          this.maxRowIndex = (rowCount - 1);
       }
-      if (s_logger.isDebugEnabled())
-         s_logger.debug("Bound datasource: PageSize: " + this.pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
+      //if (s_logger.isDebugEnabled())
+      //   s_logger.debug("Bound datasource: PageSize: " + this.pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
    }
    
    /**

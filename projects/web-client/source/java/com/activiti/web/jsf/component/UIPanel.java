@@ -39,7 +39,6 @@ public class UIPanel extends SelfRenderingComponent
    {
       ResponseWriter out = context.getResponseWriter();
       
-      String border = getBorder();
       String bgcolor = getBgcolor();
       if (bgcolor == null)
       {
@@ -47,12 +46,12 @@ public class UIPanel extends SelfRenderingComponent
       }
       
       // output first part of border table
-      if (border != null)
+      if (getBorder() != null)
       {
          PanelGenerator.generatePanelStart(
                out,
                context.getExternalContext().getRequestContextPath(),
-               border,
+               getBorder(),
                bgcolor);
       }
       
@@ -106,13 +105,12 @@ public class UIPanel extends SelfRenderingComponent
       ResponseWriter out = context.getResponseWriter();
       
       // output final part of border table
-      String border = getBorder();
-      if (border != null)
+      if (getBorder() != null)
       {
          PanelGenerator.generatePanelEnd(
                out,
                context.getExternalContext().getRequestContextPath(),
-               border);
+               getBorder());
       }
    }
    
@@ -131,6 +129,19 @@ public class UIPanel extends SelfRenderingComponent
          // we were clicked
          // strip out the boolean value from the field contents
          this.expanded = Boolean.valueOf( value.substring(getClientId(context).length() + 1) ).booleanValue();
+         
+         //
+         // TODO: See http://forums.java.sun.com/thread.jspa?threadID=524925&start=15&tstart=0
+         //       Bug/known issue in JSF 1.1 RI
+         //       This causes a problem where the View attempts to assign duplicate Ids
+         //       to components when createUniqueId() on UIViewRoot is called before the
+         //       render phase. This occurs in the Panel tag as it must call getComponent()
+         //       early to decide whether to allow the tag to render contents or not.
+         //
+         //context.getViewRoot().setTransient(true);
+         //
+         //       The other solution is to explicity give ALL child components of the
+         //       panel a unique Id rather than a generated one! 
       }
    }
    

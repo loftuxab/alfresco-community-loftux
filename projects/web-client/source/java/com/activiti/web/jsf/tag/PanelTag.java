@@ -66,7 +66,7 @@ public class PanelTag extends HtmlComponentTag
     * awful JSF Component getRendersChildren() mechanism. As this would force the use
     * of the verbatim tags for ALL child content!
     */
-   /*protected int getDoStartValue() throws JspException
+   protected int getDoStartValue() throws JspException
    {
       UIComponent component = getComponentInstance();
       if (component instanceof UIPanel)
@@ -81,22 +81,6 @@ public class PanelTag extends HtmlComponentTag
          }
       }
       return EVAL_BODY_INCLUDE;
-   }*/
-   
-   /**
-    * @see javax.faces.webapp.UIComponentTag#doEndTag()
-    */
-   public int doEndTag() throws JspException
-   {
-      return super.doEndTag();
-   }
-
-   /**
-    * @see javax.faces.webapp.UIComponentTag#doStartTag()
-    */
-   public int doStartTag() throws JspException
-   {
-      return super.doStartTag();
    }
 
    /**

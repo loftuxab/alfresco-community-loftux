@@ -361,7 +361,7 @@
       
       <attribute>
          <name>id</name>
-         <required>false</required>
+         <required>true</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       

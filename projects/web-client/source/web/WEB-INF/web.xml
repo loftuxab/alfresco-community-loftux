@@ -23,7 +23,7 @@
 
     <context-param>
         <param-name>com.sun.faces.validateXml</param-name>
-        <param-value>true</param-value>
+        <param-value>false</param-value>
     </context-param>
 
     <!-- Faces Servlet -->
