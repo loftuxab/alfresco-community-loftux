@@ -98,6 +98,16 @@ public class VersionImpl implements Version
     {
         return this.versionLabel;
     }
+    
+    /**
+     * Get the map containing the version property values
+     * 
+     * @return  the map containing the version properties
+     */
+    public Map<String, String> getVersionProperties()
+    {
+        return this.versionProperties;
+    }
 
     /**
      * Gets the value of a named version property.

@@ -5,8 +5,7 @@
  */
 package com.activiti.repo.lock;
 
-import java.util.List;
-
+import java.util.Collection;
 import com.activiti.repo.ref.NodeRef;
 
 
@@ -64,7 +63,7 @@ public interface LockService
     * @param nodeRefs a list of node references
     * @param userRef a reference to the user that will own the lock(s)
     */
-   public void lock(List<NodeRef> nodeRefs, String userRef);
+   public void lock(Collection<NodeRef> nodeRefs, String userRef);
    
    /**
     * Removes the lock on a node.  
@@ -100,9 +99,6 @@ public interface LockService
     * 
     * @param nodeRef a node reference
     * @return true is the node is locked, false otherwise
-    * 
-    * TODO do we need this method since the data on a locked node will indicate
-    * its locked state ??
     */
    public boolean isLocked(NodeRef nodeRef);
    

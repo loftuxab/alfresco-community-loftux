@@ -19,29 +19,60 @@ import com.activiti.repo.version.common.counter.VersionCounterDaoService;
 public class DbVersionCounterDaoServiceImpl implements VersionCounterDaoService
 {
     /**
-     * SQL statements
-     * 
-     * TODO these need to moves into some sort of query register to ensure isolation 
-     * from MySQL
+     * SQL - create table
      */
     private final static String SQL_CREATE_TABLE = 
         "create table if not exists version_counter" +
         "(" +
         "    store_protocol varchar(255)," +
         "    store_id varchar(255)," +
-        "    next_version int" +
+        "    current_version int" +
         ")";
-    private final static String SQL_SELECT = "select next_version from version_counter where store_protocol = ? and store_id = ?";
-    private final static String SQL_UPDATE = "update version_counter set next_version=? where store_protocol = ? and store_id=?";
-    private final static String SQL_INSERT = "insert into version_counter (store_protocol, store_id, next_version) values (?, ?, 1)";
-    private final static String SQL_DELETE = "delete from version_counter where store_protocol = ? and store_id =?";
     
     /**
+     * SQL - select current version
+     */
+    private final static String SQL_SELECT = 
+        "select " +
+        "   current_version " +
+        "from " +
+        "   version_counter " +
+        "where " +
+        "   store_protocol = ? and store_id = ?";
+    
+    /**
+     * SQL - update current version
+     */
+    private final static String SQL_UPDATE = 
+        "update " +
+        "   version_counter " +
+        "set " +
+        "   current_version = ? " +
+        "where " +
+        "   store_protocol = ? and store_id=?";
+    
+    /**
+     * SQL - insert current version
+     */
+    private final static String SQL_INSERT = 
+        "insert into version_counter (store_protocol, store_id, current_version) " +
+        "values (?, ?, 1)";
+    
+    /**
+     * SQL - delete version counter data
+     */
+    private final static String SQL_DELETE = 
+        "delete from " +
+        "   version_counter " +
+        "where " +
+        "   store_protocol = ? and store_id =?";
+    
+    /*
      * The data source
      */
     private DataSource dataSource = null;
     
-    /**
+    /*
      * Set the datasource
      * 
      * @param dataSource the datasource
@@ -63,18 +94,18 @@ public class DbVersionCounterDaoServiceImpl implements VersionCounterDaoService
     /**
      * Get the next available version number for the specified store.
      * 
-     * @param storeRef the version store id
-     * @return the next version number
+     * @param storeRef  the version store id
+     * @return          the next version number
      */
     public synchronized int nextVersionNumber(StoreRef storeRef)
     {
-        int nextVersion = 0;
+        int currentVersion = 0;
         JdbcTemplate template = new JdbcTemplate(this.dataSource);   
                 
         try
         {
             // Get the next version number from the database
-            nextVersion = template.queryForInt(
+            currentVersion = template.queryForInt(
                 DbVersionCounterDaoServiceImpl.SQL_SELECT, 
                 new Object[]{storeRef.getProtocol(), storeRef.getIdentifier()});
         }
@@ -84,7 +115,7 @@ public class DbVersionCounterDaoServiceImpl implements VersionCounterDaoService
             // unknown store to be inserted
         }
         
-        if (nextVersion == 0)
+        if (currentVersion == 0)
         {
             // Since we did not have an entry for the specified store id, insert one indicating the
             // next version number
@@ -97,10 +128,38 @@ public class DbVersionCounterDaoServiceImpl implements VersionCounterDaoService
             // Update the next version number
             template.update(
                     DbVersionCounterDaoServiceImpl.SQL_UPDATE,
-                    new Object[]{nextVersion+1, storeRef.getProtocol(), storeRef.getIdentifier()});
+                    new Object[]{currentVersion+1, storeRef.getProtocol(), storeRef.getIdentifier()});
         }
         
-        return nextVersion;
+        return currentVersion+1;
+    }
+    
+    /**
+     * Gets the current version number for the specified store.
+     * 
+     * @param storeRef  the store reference
+     * @return          the current version number, zero if no version yet allocated.
+     */
+    public int currentVersionNumber(StoreRef storeRef)
+    {
+        int currentVersion = 0;
+        
+        JdbcTemplate template = new JdbcTemplate(this.dataSource);   
+        
+        try
+        {
+            // Get the next version number from the database
+            currentVersion = template.queryForInt(
+                DbVersionCounterDaoServiceImpl.SQL_SELECT, 
+                new Object[]{storeRef.getProtocol(), storeRef.getIdentifier()});
+        }
+        catch (IncorrectResultSizeDataAccessException exception)
+        {
+            // Ignore since the version will be 0 indicating that there is not yet a counter
+            // for this store
+        }
+        
+        return currentVersion;
     }
     
     /**
@@ -109,8 +168,7 @@ public class DbVersionCounterDaoServiceImpl implements VersionCounterDaoService
      * WARNING: calling this method will completely reset the current 
      * version count for the specified store and cannot be undone.  
      *
-     * @param storeRef
-     *          the store reference
+     * @param storeRef  the store reference
      */
     public synchronized void resetVersionNumber(StoreRef storeRef)
     {

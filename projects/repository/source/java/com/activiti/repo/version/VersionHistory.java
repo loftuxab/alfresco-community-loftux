@@ -23,6 +23,16 @@ public interface VersionHistory extends Serializable
      * @return  the root version
      */
     public Version getRootVersion();
+    
+    /**
+     * Gets a collection containing all the versions within the
+     * version history.
+     * <p>
+     * The order of the versions is not guarenteed.
+     * 
+     * @return  collection containing all the versions
+     */
+    public Collection<Version> getAllVersions();
 
     /**
      * Gets the predecessor of a specified version

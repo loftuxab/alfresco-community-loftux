@@ -94,6 +94,18 @@ public class VersionHistoryImplTest extends TestCase
     }
     
     /**
+     * Test getAllVersions
+     */
+    public void testGetAllVersions()
+    {
+        VersionHistoryImpl vh = testAddVersionImpl();
+        
+        Collection<Version> allVersions = vh.getAllVersions();
+        assertNotNull(allVersions);
+        assertEquals(allVersions.size(), 3);
+    }
+    
+    /**
      * Test addVersion
      * 
      * @return version history

@@ -15,11 +15,18 @@ public interface VersionCounterDaoService
     /**
      * Get the next available version number for the specified store.
      * 
-     * @param storeRef 
-     *          the store reference
-     * @return the next version number
+     * @param storeRef  the store reference
+     * @return          the next version number
      */
     public int nextVersionNumber(StoreRef storeRef);   
+    
+    /**
+     * Gets the current version number for the specified store.
+     * 
+     * @param storeRef  the store reference
+     * @return          the current versio number
+     */
+    public int currentVersionNumber(StoreRef storeRef);
     
     /**
      * Resets the version number for a the specified store.
@@ -27,8 +34,7 @@ public interface VersionCounterDaoService
      * WARNING: calling this method will completely reset the current 
      * version count for the specified store and cannot be undone.  
      *
-     * @param storeRef
-     *          the store reference
+     * @param storeRef  the store reference
      */
     public void resetVersionNumber(StoreRef storeRef);
 }

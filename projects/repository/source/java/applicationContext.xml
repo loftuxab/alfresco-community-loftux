@@ -212,7 +212,7 @@
       </property>
    </bean>
    
-   <bean id='lightWeightVersionStore' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.version.VersionService</value>
       </property>
@@ -220,7 +220,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.version.lightweight.LightWeightVersionService" init-method="initialise">
+         <bean class="com.activiti.repo.version.lightweight.LightWeightVersionStoreVersionService" init-method="initialise">
             <property name="nodeService">
                <ref bean="dbNodeService" />
             </property>
@@ -229,6 +229,9 @@
 			</property>
 			<property name="versionCounterDaoService">
 				<ref bean="versionCounterDaoService"/>
+			</property>
+			<property name="searcher">
+				<ref bean="searcherComponent"/>
 			</property>
          </bean>
       </property>

@@ -77,6 +77,19 @@ public class VersionHistoryImpl implements VersionHistory
     }
     
     /**
+     * Gets a collection containing all the versions within the
+     * version history.
+     * <p>
+     * The order of the versions is not guarenteed.
+     * 
+     * @return  collection containing all the versions
+     */
+    public Collection<Version> getAllVersions()
+    {
+        return this.versions.values();
+    }
+    
+    /**
      * Gets the predecessor of a specified version
      * 
      * @param version  the version object

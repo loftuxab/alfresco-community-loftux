@@ -8,6 +8,7 @@ package com.activiti.repo.version;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import com.activiti.repo.ref.NodeRef;
 
@@ -25,22 +26,29 @@ public interface Version extends Serializable
     /**
      * Helper method to get the created date from the version property data.
      * 
-     * @return the date the version was created
+     * @return  the date the version was created
      */
     public Date getCreatedDate();
 
     /**
      * Helper method to get the version label from the version property data.
      * 
-     * @return the version label
+     * @return  the version label
      */
     public String getVersionLabel();
 
     /**
+     * Get the map containing the version property values
+     * 
+     * @return  the map containing the version properties
+     */
+    public Map<String, String> getVersionProperties();
+    
+    /**
      * Gets the value of a named version property.
      * 
-     * @param name the name of the property
-     * @return the value of the property
+     * @param name  the name of the property
+     * @return      the value of the property
      * 
      */
     public String getVersionProperty(String name);
@@ -49,7 +57,7 @@ public interface Version extends Serializable
      * Gets the reference to the node that contains the frozen state of the
      * version.
      * 
-     * @return a node reference
+     * @return  a node reference
      */
     public NodeRef getNodeRef();
 }

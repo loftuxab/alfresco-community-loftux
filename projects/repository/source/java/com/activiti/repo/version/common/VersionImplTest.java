@@ -84,6 +84,17 @@ public class VersionImplTest extends TestCase
         String versionLabel1 = this.version.getVersionLabel();
         assertEquals(VersionImplTest.VERSION_1, versionLabel1);
     }
+    
+    /**
+     * Test getVersionProperties
+     *
+     */
+    public void testGetVersionProperties()
+    {
+        Map<String, String> versionProperties = version.getVersionProperties();
+        assertNotNull(versionProperties);
+        assertEquals(this.versionProperties.size(), versionProperties.size());
+    }
 
     /**
      * Test getVersionProperty

@@ -2,12 +2,14 @@ package com.activiti.repo.dictionary.bootstrap;
 
 import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.metamodel.M2Aspect;
+import com.activiti.repo.dictionary.metamodel.M2Association;
 import com.activiti.repo.dictionary.metamodel.M2ChildAssociation;
 import com.activiti.repo.dictionary.metamodel.M2Property;
 import com.activiti.repo.dictionary.metamodel.M2PropertyType;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
 import com.activiti.repo.ref.QName;
+import com.activiti.repo.version.lightweight.LightWeightVersionStoreBase;
 
 
 /**
@@ -35,6 +37,11 @@ public class DictionaryBootstrap
      * Create test model definitions during bootstrap
      */
     private boolean createTestModel = false;
+    
+    /**
+     * Create light weight version store model defintions during bootstrap
+     */
+    private boolean createVersionModel = true;
     
     /**
      * Sets the Meta Model DAO to boostrap with
@@ -65,6 +72,17 @@ public class DictionaryBootstrap
     {
         this.createTestModel = createTestModel;
     }
+    
+    /**
+     * Sets whether to create the light weight version store model
+     * during bootstrap
+     * 
+     * @param createVersionModel
+     */
+    public void setCreateVersionModel(boolean createVersionModel)
+    {
+        this.createVersionModel = createVersionModel;
+    }
 
     /**
      * Create bootstrap meta-data definitions. 
@@ -79,6 +97,10 @@ public class DictionaryBootstrap
         if (createTestModel)
         {
             createTestModel();
+        }
+        if (createVersionModel)
+        {
+            createVersionModel();
         }
         metaModelDAO.save();
     }
@@ -155,6 +177,74 @@ public class DictionaryBootstrap
         contentsAssoc.setMandatory(false);
         contentsAssoc.setMultiValued(true);
     }
-   
     
+    /**
+     * Create the model to support the light weight version store implementation     
+     */
+    private void createVersionModel()
+    {
+        // TODO these type should extend the base type
+        
+        // Create version type
+        M2Type versionType = metaModelDAO.createType(
+                QName.createQName(
+                        LightWeightVersionStoreBase.LW_VERSION_STORE_NAMESPACE,
+                        LightWeightVersionStoreBase.TYPE_VERSION));
+        
+        // Create verison number property
+        M2Property versionNumber = versionType.createProperty(
+                LightWeightVersionStoreBase.ATTR_VERSION_NUMBER.getLocalName());
+        versionNumber.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.STRING));  // TODO Should be INT
+        versionNumber.setMandatory(true);
+        versionNumber.setMultiValued(false);
+        
+        // Create verison label property
+        M2Property versionLabel = versionType.createProperty(
+                LightWeightVersionStoreBase.ATTR_VERSION_LABEL.getLocalName());
+        versionLabel.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.STRING));  
+        versionLabel.setMandatory(true);
+        versionLabel.setMultiValued(false);
+        
+        // Create created date property
+        M2Property createdDate = versionType.createProperty(
+                LightWeightVersionStoreBase.ATTR_VERSION_CREATED_DATE.getLocalName());
+        createdDate.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.DATE));  
+        createdDate.setMandatory(true);
+        createdDate.setMultiValued(false);
+        
+        // Add the successor association
+        M2Association successorAssoc = versionType.createAssociation(
+                LightWeightVersionStoreBase.ASSOC_SUCCESSOR.getLocalName());
+        successorAssoc.getRequiredToClasses().add(versionType);
+        successorAssoc.setMandatory(false);
+        successorAssoc.setMultiValued(true);
+        
+        // Create version history type
+        M2Type versionHistoryType = metaModelDAO.createType(
+                QName.createQName(
+                        LightWeightVersionStoreBase.LW_VERSION_STORE_NAMESPACE, 
+                        LightWeightVersionStoreBase.TYPE_VERSION_HISTORY));
+        
+        // Create versioned node id property
+        M2Property nodeIdProperty = versionHistoryType.createProperty(
+                LightWeightVersionStoreBase.ATTR_VERSIONED_NODE_ID.getLocalName());
+        nodeIdProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
+        nodeIdProperty.setMandatory(true);
+        nodeIdProperty.setMultiValued(false);
+        
+        // Add the child assoc
+        M2ChildAssociation versionChildAssoc = versionHistoryType.createChildAssociation(
+                LightWeightVersionStoreBase.CHILD_VERSIONS.getLocalName());
+        versionChildAssoc.getRequiredToClasses().add(versionType);
+        versionChildAssoc.setMandatory(true);
+        versionChildAssoc.setMultiValued(true);
+        
+        // Add the root version association
+        M2Association rootVersionAssoc = versionHistoryType.createAssociation(
+                LightWeightVersionStoreBase.ASSOC_ROOT_VERSION.getLocalName());
+        rootVersionAssoc.getRequiredToClasses().add(versionType);
+        rootVersionAssoc.setMandatory(true);
+        rootVersionAssoc.setMultiValued(false);
+        
+    }
 }
