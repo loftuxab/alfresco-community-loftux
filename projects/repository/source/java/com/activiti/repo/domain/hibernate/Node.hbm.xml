@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    '-//Hibernate/Hibernate Mapping DTD 3.0//EN' 
+    'http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd'>
+
+<hibernate-mapping>
+   <class
+         name='com.activiti.repo.domain.hibernate.NodeImpl'
+         proxy='com.activiti.repo.domain.Node'
+         table='node'
+         dynamic-update='false'
+         dynamic-insert='false'
+         select-before-update='false'
+         optimistic-lock='version'
+         discriminator-value='GENERIC' >
+      <id
+            name='id'
+            column='id'
+            type='long' >
+         <generator class='increment' />
+      </id>
+      <discriminator
+            column='type'
+            type='string'
+            length='18' />
+      <map
+            name='properties'
+            table='node_properties'
+            lazy='true'
+            sort='unsorted'
+            inverse='false'
+            cascade='all' >
+         <key column='id' />  <!-- the map must be linked to the Node by the Node id -->
+         <index column='property_name' type='string' />
+         <element column='property_value' type='string' />  <!-- a map of property values keyed by property name -->
+      </map>
+      <!-- inverse assoc to parent childassocs -->
+      <set
+            name='parentAssocs'
+            inverse='true' >
+         <key column='child_id' />
+         <one-to-many class='com.activiti.repo.domain.ChildAssocImpl' />
+      </set>
+   </class>
+
+   <subclass
+         name='com.activiti.repo.domain.hibernate.ReferenceNodeImpl'
+         proxy='com.activiti.repo.domain.ReferenceNode'
+         extends='com.activiti.repo.domain.NodeImpl'
+         discriminator-value='REFERENCE' >
+      <property name='referencedPath' not-null='true' />
+   </subclass>
+
+   <subclass
+         name='com.activiti.repo.domain.hibernate.RealNodeImpl'
+         proxy='com.activiti.repo.domain.RealNode'
+         extends='com.activiti.repo.domain.NodeImpl'
+         discriminator-value='REAL' >
+   </subclass>
+
+   <subclass
+         name='com.activiti.repo.domain.hibernate.ContentNodeImpl'
+         proxy='com.activiti.repo.domain.ContentNode'
+         extends='com.activiti.repo.domain.RealNodeImpl'
+         discriminator-value='CONTENT' >
+   </subclass>
+
+   <subclass
+         name='com.activiti.repo.domain.hibernate.ContainerNodeImpl'
+         proxy='com.activiti.repo.domain.ContainerNode'
+         extends='com.activiti.repo.domain.RealNodeImpl'
+         discriminator-value='CONTAINER' >
+      <!-- inverse assoc to child childassocs -->
+      <set
+            name='childAssocs'
+            inverse='true' >
+         <key column='parent_id' />
+         <one-to-many class='com.activiti.repo.domain.ChildAssocImpl' />
+      </set>
+   </subclass>
+
+   <class
+         name='com.activiti.repo.domain.hibernate.ChildAssocImpl'
+         proxy='com.activiti.repo.domain.ChildAssoc'
+         table='child_assoc' >
+      <id
+            name='id'
+            column='id'
+            type='long' >
+         <generator class='increment' />
+      </id>
+      <property name='name' />
+      <property name='isPrimary' />
+      <!-- forward assoc to parent node -->
+      <many-to-one
+            name='parent'
+            class='com.activiti.repo.domain.ContainerNodeImpl'
+            column='parent_id'
+            not-null='true' />
+      <!-- forward assoc to child node -->
+      <many-to-one
+            name='child'
+            class='com.activiti.repo.domain.NodeImpl'
+            column='child_id'
+            not-null='true' />
+   </class>
+
+</hibernate-mapping>

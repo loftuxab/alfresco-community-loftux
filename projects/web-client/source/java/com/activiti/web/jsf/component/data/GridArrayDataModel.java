@@ -3,7 +3,6 @@
  */
 package com.activiti.web.jsf.component.data;
 
-import java.util.List;
 
 
 /**

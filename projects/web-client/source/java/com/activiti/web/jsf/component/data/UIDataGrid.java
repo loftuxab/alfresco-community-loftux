@@ -1,13 +1,8 @@
-/*
- * Created on Mar 7, 2005
- */
 package com.activiti.web.jsf.component.data;
 
 import java.io.IOException;
 import java.util.Map;
 
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 

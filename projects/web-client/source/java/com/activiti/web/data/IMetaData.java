@@ -1,6 +1,5 @@
 package com.activiti.web.data;
 
-import java.util.List;
 
 /**
  * IMetaData

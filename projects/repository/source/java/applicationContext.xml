@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <!-- construct the datasource to work with -->
+   <!-- TODO -->
+   
+   <bean id='sessionFactory' class='org.springframework.orm.hibernate.LocalSessionFactoryBean'>
+      <property name='configLocation' >
+         <value>classpath:hibernate.cfg.xml</value>
+      </property>
+   </bean>
+   
+   <!-- create a transaction manager to handle the Hibernate sessions -->
+   <bean id='transactionManager' class='org.springframework.orm.hibernate.HibernateTransactionManager'>
+      <property name='sessionFactory'>
+         <ref local='sessionFactory'/>
+      </property>
+   </bean>
+   
+   <bean id='nodeServiceTarget' class='com.as.core.HibernateNodeService'>
+      <property name='sessionFactory'>
+         <ref local='sessionFactory'/>
+      </property>
+   </bean>
+   
+   <bean id='nodeService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
+      <property name='proxyInterfaces'>
+         <value>com.as.core.NodeService</value>
+      </property>
+      <property name='transactionManager'>
+         <ref bean='transactionManager'/>
+      </property>
+      <property name='target'>
+         <ref bean='nodeServiceTarget'/>
+      </property>
+      <property name='transactionAttributes'>
+         <props>
+            <prop key='*'>PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+
+</beans>
