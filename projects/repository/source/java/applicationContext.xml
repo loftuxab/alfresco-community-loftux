@@ -122,7 +122,28 @@
          </list>
       </property>
    </bean>
-
+   
+   <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
+      <property name='proxyInterfaces'>
+         <value>com.activiti.repo.version.common.counter.VersionCounterDaoService</value>
+      </property>
+      <property name='transactionManager'>
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.version.common.counter.db.DbVersionCounterDaoServiceImpl" init-method="initialise">
+            <property name="dataSource">
+               <ref bean="dataSource" />
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRES_NEW</prop>
+         </props>
+      </property>
+   </bean>
+   
    <!--                    -->
    <!--  PUBLIC SERVICES   -->
    <!--                    -->
@@ -179,6 +200,33 @@
          <list>
             <ref bean="methodCallLogAdvice" />
          </list>
+      </property>
+   </bean>
+   
+   <bean id='lightWeightVersionStore' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.version.VersionService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.version.lightweight.LightWeightVersionService" init-method="initialise">
+            <property name="nodeService">
+               <ref bean="nodeService" />
+            </property>
+			<property name="storeService">
+				<ref bean="storeService"/>
+			</property>
+			<property name="versionCounterDaoService">
+				<ref bean="versionCounterDaoService"/>
+			</property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
       </property>
    </bean>
    
