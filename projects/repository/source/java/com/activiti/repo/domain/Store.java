@@ -1,5 +1,6 @@
 package com.activiti.repo.domain;
 
+import com.activiti.repo.domain.StoreKey;
 import com.activiti.repo.ref.StoreRef;
 
 /**
@@ -12,34 +13,14 @@ public interface Store
     public static final String QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER = "store.FindByProtocolAndIdentifier";
     
     /**
-     * @return Returns the persistence-generated ID
+     * @return Returns the key for the class
      */
-    public Long getId();
+    public StoreKey getKey();
 
     /**
-     * @param id set automatically by persistence
+     * @param key the key uniquely identifying this store
      */
-    public void setId(Long id);
-    
-    /**
-     * @return Returns the protocol applicable to this store
-     */
-    public String getProtocol();
-    
-    /**
-     * @param protocol the specific protocol that the store is supporting
-     */
-    public void setProtocol(String protocol);
-    
-    /**
-     * @return Returns the protocol unique identifier of the store
-     */
-    public String getIdentifier();
-    
-    /**
-     * @param identifier manually assigned protocol-unique identifier
-     */
-    public void setIdentifier(String identifier);
+    public void setKey(StoreKey key);
     
     /**
      * @return Returns the root of the store

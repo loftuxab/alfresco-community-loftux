@@ -30,26 +30,12 @@ public interface NodeDaoService
     public RealNode newRealNode(Store store, String type);
     
     /**
-     * @return Returns the persisted and filled association
-     * @see ChildAssoc
-     */
-    public ChildAssoc newChildAssoc(ContainerNode parentNode,
-            Node childNode,
-            boolean isPrimary,
-            String name);
-    
-    /**
-     * @param store the store to search in
-     * @param guid the store-unique, manually assigned GUID
-     * @return Returns the node found in the store, or null if not found
-     */
-    public Node findNodeInStore(Store store, String guid);
-    
-    /**
-     * @param id the unique id of the node
+     * @param protocol the store protocol
+     * @param identifier the store identifier for the given protocol
+     * @param id the store-specific node identifier
      * @return Returns the <b>node</b> entity
      */
-    public Node getNode(Long id);
+    public Node getNode(String protocol, String identifier, String id);
     
     /**
      * Deletes the node instance, taking care of any cascades that are required over
@@ -61,4 +47,18 @@ public interface NodeDaoService
      * @param node the entity to delete
      */
     public void deleteNode(Node node);
+    
+    /**
+     * @return Returns the persisted and filled association
+     * @see ChildAssoc
+     */
+    public ChildAssoc newChildAssoc(ContainerNode parentNode,
+            Node childNode,
+            boolean isPrimary,
+            String name);
+    
+    /**
+     * @param assoc the child association to remove
+     */
+    public void deleteChildAssoc(ChildAssoc assoc);
 }

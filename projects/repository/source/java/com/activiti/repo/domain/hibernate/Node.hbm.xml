@@ -14,17 +14,16 @@
          select-before-update="false"
          optimistic-lock="version"
          discriminator-value="GENERIC" >
-      <id
-            name="id"
-            column="id"
-            type="long" >
-         <generator class="increment" />
-      </id>
+      <!-- composite PK -->
+      <composite-id name="key" class="com.activiti.repo.domain.NodeKey">
+         <key-property name="protocol" />
+         <key-property name="identifier" />
+         <key-property name="guid"/>
+      </composite-id>
       <discriminator
             column="auto_type"
             type="string"
             length="18" />
-      <property name="guid" not-null="true" length="100"/>
       <property name="type" not-null="true" length="50"/>
       <map
             name="properties"
@@ -33,23 +32,34 @@
             sort="unsorted"
             inverse="false"
             cascade="all" >
-         <key column="auto_id" />  <!-- the map must be linked to the Node by the Node id -->
+         <key>
+            <column name="protocol" />
+            <column name="identifier" />
+            <column name="guid" />
+         </key>
          <index column="property_name" type="string" />
-         <element column="property_value" type="string" />  <!-- a map of property values keyed by property name -->
+         <element column="property_value" type="string" />
       </map>
       <!-- forward assoc to store -->
       <many-to-one
             name="store"
             class="com.activiti.repo.domain.hibernate.StoreImpl"
-            not-null="true" >
-         <column name="store_id" />
+            not-null="true"
+            insert="false"
+            update="false" >
+         <column name="protocol" />
+         <column name="identifier" />
       </many-to-one>
       <!-- inverse assoc to parent childassocs -->
       <set
             name="parentAssocs"
             inverse="true" 
             cascade="delete" >
-         <key column="child_id" />
+         <key>
+            <column name="child_protocol" />
+            <column name="child_identifier" />
+            <column name="child_guid" />
+         </key>
          <one-to-many class="com.activiti.repo.domain.hibernate.ChildAssocImpl" />
       </set>
    </class>
@@ -84,9 +94,13 @@
       <!-- inverse assoc to child childassocs -->
       <set
             name="childAssocs"
-            inverse="true"
+            inverse="true" 
             cascade="delete" >
-         <key column="parent_id" />
+         <key>
+            <column name="parent_protocol" />
+            <column name="parent_identifier" />
+            <column name="parent_guid" />
+         </key>
          <one-to-many class="com.activiti.repo.domain.hibernate.ChildAssocImpl" />
       </set>
    </subclass>
@@ -107,26 +121,34 @@
       <many-to-one
             name="parent"
             class="com.activiti.repo.domain.hibernate.ContainerNodeImpl"
-            column="parent_id"
-            not-null="true" />
+            not-null="true" >
+         <column name="parent_protocol" />
+         <column name="parent_identifier" />
+         <column name="parent_guid" />
+      </many-to-one>
       <!-- forward assoc to child node -->
       <many-to-one
             name="child"
             class="com.activiti.repo.domain.hibernate.NodeImpl"
-            column="child_id"
-            not-null="true" />
+            not-null="true" >
+         <column name="child_protocol" />
+         <column name="child_identifier" />
+         <column name="child_guid" />
+      </many-to-one>
    </class>
-
-   <query name="node.FindNodeInStore" >
+   
+<!--
+   <query name="node.GetChildAssocs">
       select
-         node
+         assoc
       from
-         com.activiti.repo.domain.hibernate.NodeImpl node
-         join node.store store
+         com.activiti.repo.domain.hibernate.ContainerNodeImpl as parent
+         join parent.childAssocs as assoc
+         join assoc.child as child
       where
-         node.guid = :nodeGuid and
-         store.protocol = :storeProtocol and
-         store.identifier = :storeIdentifier
+         parent.key = ? and
+         child.key = ?
    </query>
+-->
 
 </hibernate-mapping>

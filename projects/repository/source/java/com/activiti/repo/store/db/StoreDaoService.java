@@ -23,5 +23,5 @@ public interface StoreDaoService
      * @param identifier the protocol-specific identifer
      * @return Returns a store with the given values or null if one doesn't exist
      */
-    public Store findStore(String protocol, String identifier);
+    public Store getStore(String protocol, String identifier);
 }

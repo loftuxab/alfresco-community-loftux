@@ -1,7 +1,5 @@
 package com.activiti.repo.store.db.hibernate;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -9,6 +7,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
+import com.activiti.repo.domain.StoreKey;
 import com.activiti.repo.domain.hibernate.StoreImpl;
 import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.repo.store.db.StoreDaoService;
@@ -37,7 +36,7 @@ public class HibernateStoreDaoServiceImpl
     public Store createStore(String protocol, String identifier)
     {
         // ensure that the name isn't in use
-        Store store = findStore(protocol, identifier);
+        Store store = getStore(protocol, identifier);
         if (store != null)
         {
             throw new RuntimeException("A store already exists: \n" +
@@ -47,9 +46,8 @@ public class HibernateStoreDaoServiceImpl
         }
         
         store = new StoreImpl();
-        // set attributes
-        store.setProtocol(protocol);
-        store.setIdentifier(identifier);
+        // set key
+		store.setKey(new StoreKey(protocol, identifier));
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(store);
         // create and assign a root node
@@ -63,16 +61,12 @@ public class HibernateStoreDaoServiceImpl
         return store;
     }
 
-    public Store findStore(String protocol, String identifier)
+    public Store getStore(String protocol, String identifier)
     {
-        List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Store.QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER,
-                new String[] {"protocol", "identifier"},
-                new Object[] {protocol, identifier});
-        Store store = null;
-        if (results.size() > 0)
-        {
-            store = (Store) results.get(0); 
-        }
+		StoreKey storeKey = new StoreKey();
+		storeKey.setProtocol(protocol);
+		storeKey.setIdentifier(identifier);
+		Store store = (Store) getHibernateTemplate().get(StoreImpl.class, storeKey);
         // done
         if (logger.isDebugEnabled())
         {

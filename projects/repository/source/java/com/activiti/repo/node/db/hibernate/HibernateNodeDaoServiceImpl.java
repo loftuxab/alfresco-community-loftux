@@ -1,7 +1,5 @@
 package com.activiti.repo.node.db.hibernate;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -16,6 +14,7 @@ import com.activiti.repo.domain.hibernate.ChildAssocImpl;
 import com.activiti.repo.domain.hibernate.ContainerNodeImpl;
 import com.activiti.repo.domain.hibernate.ContentNodeImpl;
 import com.activiti.repo.domain.hibernate.NodeImpl;
+import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.hibernate.RealNodeImpl;
 import com.activiti.repo.domain.hibernate.ReferenceNodeImpl;
 import com.activiti.repo.node.db.NodeDaoService;
@@ -33,8 +32,9 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public ReferenceNode newReferenceNode(Store store, String referencedPath)
     {
         ReferenceNode node = new ReferenceNodeImpl();
+		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
+		node.setKey(key);
         node.setType(Node.TYPE_REFERENCE);
-        node.setGuid(GUID.generate());
         node.setStore(store);
         node.setReferencedPath(referencedPath);
         // persist the node
@@ -65,7 +65,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
             node = new RealNodeImpl();
             node.setType(Node.TYPE_REAL);
         }
-        node.setGuid(GUID.generate());
+		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
+		node.setKey(key);
         node.setStore(store);
         // persist the node
         getHibernateTemplate().save(node);
@@ -75,6 +76,31 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
             logger.debug("Created new real node of type " + type + ": " + node);
         }
         return node;
+    }
+
+    public Node getNode(String protocol, String identifier, String id)
+    {
+		NodeKey nodeKey = new NodeKey(protocol, identifier, id);
+        Object obj = getHibernateTemplate().get(NodeImpl.class, nodeKey);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Fetched node: \n" +
+					"   protocol: " + protocol + "\n" +
+					"   identifier: " + identifier + "\n" +
+					"   id: " + id);
+        }
+        return (Node) obj;
+    }
+    
+    public void deleteNode(Node node)
+    {
+        getHibernateTemplate().delete(node);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Deleted node: " + node);
+        }
     }
     
     public ChildAssoc newChildAssoc(ContainerNode parentNode,
@@ -96,57 +122,9 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         }
         return assoc;
     }
-
-    public Node findNodeInStore(Store store, String guid)
-    {
-        List results = getHibernateTemplate().findByNamedQueryAndNamedParam(Node.QUERY_FIND_NODE_IN_STORE,
-                new String[] {"nodeGuid", "storeProtocol", "storeIdentifier"},
-                new Object[] {guid, store.getProtocol(), store.getIdentifier()});
-        Node node = null;
-        if (results.size() == 0)
-        {
-            node = null;
-        }
-        else if (results.size() > 1)
-        {
-            throw new RuntimeException("Multiple node ID matches in store: \n" +
-                    "   store: " + store + "\n" +
-                    "   node id: " + guid + "\n" +
-                    "   results: " + results);
-        }
-        else
-        {
-            node = (Node) results.get(0);
-        }
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Finding node in store: \n" +
-                    "   store: " + store + "\n" +
-                    "   node id: " + guid + "\n" +
-                    "   result: " + node);
-        }
-        return node;
-    }
     
-    public Node getNode(Long id)
+    public void deleteChildAssoc(ChildAssoc assoc)
     {
-        Object obj = getHibernateTemplate().get(NodeImpl.class, id);
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Fetched node by id " + id + ": " + obj);
-        }
-        return (Node) obj;
-    }
-    
-    public void deleteNode(Node node)
-    {
-        getHibernateTemplate().delete(node);
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Deleted node: " + node);
-        }
+        getHibernateTemplate().delete(assoc);
     }
 }

@@ -12,7 +12,7 @@ import com.activiti.repo.ref.NodeRef;
  */
 public interface Node
 {
-    public static final String QUERY_FIND_NODE_IN_STORE = "node.FindNodeInStore";
+    public static final String QUERY_GET_CHILD_ASSOCS = "node.GetChildAssocs";
     
     // TODO: Remove this in favour of the Data Dictionary
     public static final String TYPE_REFERENCE = "reference";
@@ -21,24 +21,14 @@ public interface Node
     public static final String TYPE_CONTENT = "content";
     
     /**
-     * @return Returns the persistence-assigned ID
+     * @return Returns the unique key for this node
      */
-    public Long getId();
+    public NodeKey getKey();
 
     /**
-     * @param id automatically assigned ID
+     * @param key the unique node key
      */
-    public void setId(Long id);
-    
-    /**
-     * @return Returns the manually assigned GUID
-     */
-    public String getGuid();
-    
-    /**
-     * @param manually assigned GUID
-     */
-    public void setGuid(String id);
+    public void setKey(NodeKey key);
     
     public Store getStore();
     

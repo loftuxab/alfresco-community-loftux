@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.activiti.repo.domain.Node;
+import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.NodeRef;
 
@@ -16,40 +17,26 @@ import com.activiti.repo.ref.NodeRef;
  */
 public class NodeImpl implements Node
 {
-    private Long id;
-    private String guid;
+    private NodeKey key;
     private String type;
     private Store store;
     private Set parentAssocs;
     private Map properties;
     private NodeRef nodeRef;
 
-    public NodeImpl()
+    public NodeKey getKey() {
+		return key;
+	}
+
+	public void setKey(NodeKey key) {
+		this.key = key;
+	}
+
+	public NodeImpl()
     {
         parentAssocs = new HashSet(3, 0.75F);
     }
 
-    public Long getId()
-    {
-        return id;
-    }
-
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
-
-    public String getGuid()
-    {
-        return guid;
-    }
-
-    public synchronized void setGuid(String id)
-    {
-        this.guid = id;
-        this.nodeRef = null;
-    }
-    
     public String getType()
     {
         return type;
@@ -97,9 +84,9 @@ public class NodeImpl implements Node
      */
     public synchronized NodeRef getNodeRef()
     {
-        if (nodeRef == null)
+        if (nodeRef == null && key != null)
         {
-            nodeRef = new NodeRef(getStore().getStoreRef(), getGuid(), getId());
+            nodeRef = new NodeRef(getStore().getStoreRef(), getKey().getGuid());
         }
         return nodeRef;
     }

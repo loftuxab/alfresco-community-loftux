@@ -14,29 +14,22 @@
          dynamic-insert="false"
          select-before-update="false"
          optimistic-lock="version" >
-      <id
-            name="id"
-            column="id"
-            type="long" >
-         <generator class="increment" />
-      </id>
-      <property name="protocol" not-null="true" />
-      <property name="identifier" not-null="true" />
+      <!-- composite PK -->
+      <composite-id name="key" class="com.activiti.repo.domain.StoreKey">
+         <key-property name="protocol"/>
+         <key-property name="identifier"/>
+      </composite-id>
       <!-- forward assoc to root node -->
       <many-to-one
             name="rootNode"
             not-null="false"
             lazy="false"
             class="com.activiti.repo.domain.hibernate.RealNodeImpl"
-            fetch="join" />
+            fetch="join" >
+         <column name="root_protocol" />
+         <column name="root_identifier" />
+         <column name="root_guid" />
+      </many-to-one>
    </class>
    
-   <query name="store.FindByProtocolAndIdentifier">
-      from
-         com.activiti.repo.domain.hibernate.StoreImpl store
-      where
-         store.protocol = :protocol and
-         store.identifier = :identifier
-   </query>
-
 </hibernate-mapping>

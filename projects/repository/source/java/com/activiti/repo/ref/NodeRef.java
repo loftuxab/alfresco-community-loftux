@@ -14,37 +14,33 @@ public class NodeRef implements Serializable
     private static final String URI_FILLER = "/";
 
     private StoreRef storeRef;
-    private String guid;
-    private Long id;
+    private String id;
 
     /**
      * @param storeRef
      * @see StoreRef
-     * @param guid
-     *      the manually assigned unique identifier of the node
      * @param id
-     *      the generated, unique id of the node
+     *      the manually assigned identifier of the node
      */
-    public NodeRef(StoreRef storeRef, String guid, Long id)
+    public NodeRef(StoreRef storeRef, String id)
     {
         if (storeRef == null)
         {
             throw new IllegalArgumentException(
                     "Store reference may not be null");
         }
-        if (guid == null)
+        if (id == null)
         {
             throw new IllegalArgumentException("Node id may not be null");
         }
 
         this.storeRef = storeRef;
-        this.guid = guid;
         this.id = id;
     }
 
     public String toString()
     {
-        return storeRef.toString() + URI_FILLER + guid;
+        return storeRef.toString() + URI_FILLER + id;
     }
 
     public boolean equals(Object obj)
@@ -56,7 +52,7 @@ public class NodeRef implements Serializable
         if (obj instanceof NodeRef)
         {
             NodeRef that = (NodeRef) obj;
-            return (this.guid.equals(that.guid)
+            return (this.id.equals(that.id)
                     && this.storeRef.equals(that.storeRef));
         }
         else
@@ -70,7 +66,7 @@ public class NodeRef implements Serializable
      */
     public int hashCode()
     {
-        return guid.hashCode();
+        return id.hashCode();
     }
 
     public StoreRef getStoreRef()
@@ -78,12 +74,7 @@ public class NodeRef implements Serializable
         return storeRef;
     }
 
-    public String getGuid()
-    {
-        return guid;
-    }
-    
-    public Long getId()
+    public String getId()
     {
         return id;
     }

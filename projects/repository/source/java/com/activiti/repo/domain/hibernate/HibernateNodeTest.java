@@ -10,10 +10,13 @@ import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.ContentNode;
 import com.activiti.repo.domain.Node;
+import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.ReferenceNode;
 import com.activiti.repo.domain.Store;
+import com.activiti.repo.domain.StoreKey;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.util.BaseHibernateTest;
+import com.activiti.util.GUID;
 
 /**
  * Test persistence and retrieval of Hibernate-specific implementations of the
@@ -32,9 +35,13 @@ public class HibernateNodeTest extends BaseHibernateTest
     protected void onSetUpInTransaction() throws Exception
     {
         store = new StoreImpl();
-        // set attributes
-        store.setProtocol(StoreRef.PROTOCOL_WORKSPACE);
-        store.setIdentifier("TestWorkspace@" + System.currentTimeMillis());
+//        // set attributes
+//        store.setProtocol(StoreRef.PROTOCOL_WORKSPACE);
+//        store.setIdentifier("TestWorkspace@" + System.currentTimeMillis());
+		StoreKey storeKey = new StoreKey();
+		storeKey.setProtocol(StoreRef.PROTOCOL_WORKSPACE);
+		storeKey.setIdentifier("TestWorkspace@" + System.currentTimeMillis());
+		store.setKey(storeKey);
         // persist so that it is present in the hibernate cache
         getSession().save(store);
     }
@@ -51,12 +58,58 @@ public class HibernateNodeTest extends BaseHibernateTest
         assertNotNull("Workspace not initialised", store);
     }
 
+	public void testGetStore() throws Exception
+	{
+        // create a new Node
+        Node node = new NodeImpl();
+		NodeKey key = new NodeKey("Random Protocol", "Random Identifier", "AAA");
+		node.setKey(key);
+        node.setStore(store);   // not meaningful as it contradicts the key
+        node.setType(Node.TYPE_CONTAINER);
+        // persist it
+		try
+		{
+			Serializable id = getSession().save(node);
+			fail("No store exists");
+		}
+		catch (Throwable e)
+		{
+			// expected
+		}
+		// this should not solve the problem
+        node.setStore(store);
+        // persist it
+		try
+		{
+			Serializable id = getSession().save(node);
+			fail("Setting store does not persist protocol and identifier attributes");
+		}
+		catch (Throwable e)
+		{
+			// expected
+		}
+		
+		// fix the key
+		key = new NodeKey(store.getKey().getProtocol(), store.getKey().getIdentifier(), "AAA");
+		node.setKey(key);
+		// now it should work
+		Serializable id = getSession().save(node);
+
+        // throw the reference away and get the a new one for the id
+        node = (Node) getSession().load(NodeImpl.class, id);
+        assertNotNull("Node not found", node);
+		// check that the store has been loaded
+		Store loadedStore = node.getStore();
+		assertNotNull("Store not present on node", loadedStore);
+		assertEquals("Incorrect store key", store, loadedStore);
+	}
+	
     public void testMap() throws Exception
     {
         // create a new Node
         Node node = new NodeImpl();
-        node.setGuid("AAA");
-        node.setStore(store);
+		NodeKey key = new NodeKey(store.getKey(), "AAA");
+		node.setKey(key);
         node.setType(Node.TYPE_CONTAINER);
         // give it a property map
         Map propertyMap = new HashMap(5);
@@ -79,8 +132,8 @@ public class HibernateNodeTest extends BaseHibernateTest
     {
         // persist a subclass of Node
         Node node = new ContentNodeImpl();
-        node.setGuid("AAA");
-        node.setStore(store);
+		NodeKey key = new NodeKey(store.getKey(), "AAA");
+		node.setKey(key);
         node.setType(Node.TYPE_CONTENT);
         Serializable id = getSession().save(node);
         // get the node back
@@ -93,32 +146,35 @@ public class HibernateNodeTest extends BaseHibernateTest
     public void testReferenceNode() throws Exception
     {
         // make a reference node
-        ReferenceNode refNode = new ReferenceNodeImpl();
-        refNode.setGuid("AAA");
-        refNode.setStore(store);
-        refNode.setType(Node.TYPE_REFERENCE);
-        refNode.setReferencedPath("/somepath/to/some/node[1]");
-        Serializable refNodeId = getSession().save(refNode);
+        ReferenceNode node = new ReferenceNodeImpl();
+		NodeKey key = new NodeKey(store.getKey(), "AAA");
+		node.setKey(key);
+        node.setStore(store);
+        node.setType(Node.TYPE_REFERENCE);
+        node.setReferencedPath("/somepath/to/some/node[1]");
+        Serializable refNodeId = getSession().save(node);
 
         // get the ref node back by ID
-        refNode = (ReferenceNode) getSession().get(NodeImpl.class, refNodeId);
+        node = (ReferenceNode) getSession().get(NodeImpl.class, refNodeId);
     }
 
     public void testChildAssoc() throws Exception
     {
         // make a content node
         ContentNode contentNode = new ContentNodeImpl();
-        contentNode.setGuid("AAA");
+		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
+		contentNode.setKey(key);
         contentNode.setStore(store);
         contentNode.setType(Node.TYPE_CONTENT);
-        Serializable contentNodeId = getSession().save(contentNode);
+        Serializable contentNodeKey = getSession().save(contentNode);
 
         // make a container node
         ContainerNode containerNode = new ContainerNodeImpl();
-        containerNode.setGuid("AAA");
+		key = new NodeKey(store.getKey(), GUID.generate());
+		containerNode.setKey(key);
         containerNode.setStore(store);
         containerNode.setType(Node.TYPE_CONTAINER);
-        Serializable containerNodeId = getSession().save(containerNode);
+        Serializable containerNodeKey = getSession().save(containerNode);
         // create an association to the content
         ChildAssoc assoc = new ChildAssocImpl();
         assoc.setIsPrimary(true);
@@ -137,20 +193,17 @@ public class HibernateNodeTest extends BaseHibernateTest
         getSession().clear();
 
         // reload the container
-        containerNode = (ContainerNode) getSession().get(
-                ContainerNodeImpl.class, containerNodeId);
+        containerNode = (ContainerNode) getSession().get(ContainerNodeImpl.class, containerNodeKey);
         assertNotNull("Node not found", containerNode);
         // check
-        assertEquals("Expected exactly 2 children", 2, containerNode
-                .getChildAssocs().size());
-        for (Iterator iterator = containerNode.getChildAssocs().iterator(); iterator
-                .hasNext(); /**/)
+        assertEquals("Expected exactly 2 children", 2, containerNode.getChildAssocs().size());
+        for (Iterator iterator = containerNode.getChildAssocs().iterator(); iterator.hasNext(); /**/)
         {
             assoc = (ChildAssoc) iterator.next();
             // the node id must be known
             assertNotNull("Node not populated on assoc", assoc.getChild());
-            assertEquals("Node ID on child assoc is incorrect", contentNodeId,
-                    assoc.getChild().getId());
+            assertEquals("Node key on child assoc is incorrect", contentNodeKey,
+                    assoc.getChild().getKey());
         }
 
         // check that we can traverse the association from the child
