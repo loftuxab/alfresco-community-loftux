@@ -7,7 +7,8 @@ import com.activiti.repo.domain.Node;
 /**
  * @author derekh
  */
-public class ChildAssocImpl implements ChildAssoc {
+public class ChildAssocImpl implements ChildAssoc
+{
     private long id;
 
     private ContainerNode parentNode;
@@ -18,15 +19,18 @@ public class ChildAssocImpl implements ChildAssoc {
 
     private boolean isPrimary;
 
-    public long getId() {
+    public long getId()
+    {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(long id)
+    {
         this.id = id;
     }
 
-    public void buildAssociation(ContainerNode parentNode, Node childNode) {
+    public void buildAssociation(ContainerNode parentNode, Node childNode)
+    {
         // add the forward associations
         this.setParent(parentNode);
         this.setChild(childNode);
@@ -35,35 +39,43 @@ public class ChildAssocImpl implements ChildAssoc {
         childNode.getParentAssocs().add(this);
     }
 
-    public ContainerNode getParent() {
+    public ContainerNode getParent()
+    {
         return parentNode;
     }
 
-    public void setParent(ContainerNode parentNode) {
+    public void setParent(ContainerNode parentNode)
+    {
         this.parentNode = parentNode;
     }
 
-    public Node getChild() {
+    public Node getChild()
+    {
         return child;
     }
 
-    public void setChild(Node node) {
+    public void setChild(Node node)
+    {
         child = node;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public boolean getIsPrimary() {
+    public boolean getIsPrimary()
+    {
         return isPrimary;
     }
 
-    public void setIsPrimary(boolean isPrimary) {
+    public void setIsPrimary(boolean isPrimary)
+    {
         this.isPrimary = isPrimary;
     }
 }

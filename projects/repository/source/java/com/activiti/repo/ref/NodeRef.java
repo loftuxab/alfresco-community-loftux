@@ -5,7 +5,8 @@ package com.activiti.repo.ref;
  * 
  * @author derekh
  */
-public class NodeRef {
+public class NodeRef
+{
     private static final String URI_FILLER = "/";
 
     private StoreRef storeRef;
@@ -14,15 +15,19 @@ public class NodeRef {
 
     /**
      * @param storeRef
-     *            @see StoreRef
+     * @see StoreRef
      * @param id
      *            the unique identifier of the node
      */
-    public NodeRef(StoreRef storeRef, String id) {
-        if (storeRef == null) {
-            throw new IllegalArgumentException("Store reference may not be null");
+    public NodeRef(StoreRef storeRef, String id)
+    {
+        if (storeRef == null)
+        {
+            throw new IllegalArgumentException(
+                    "Store reference may not be null");
         }
-        if (id == null) {
+        if (id == null)
+        {
             throw new IllegalArgumentException("Node id may not be null");
         }
 
@@ -30,28 +35,35 @@ public class NodeRef {
         this.id = id;
     }
 
-    public String toString() {
+    public String toString()
+    {
         return storeRef.toString() + URI_FILLER + id;
     }
 
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
             return true;
         }
-        if (obj instanceof NodeRef) {
+        if (obj instanceof NodeRef)
+        {
             NodeRef that = (NodeRef) obj;
-            return (this.storeRef.equals(that.storeRef)
-                    && this.id.equals(that.id));
-        } else {
+            return (this.storeRef.equals(that.storeRef) && this.id
+                    .equals(that.id));
+        } else
+        {
             return false;
         }
     }
 
-    public StoreRef getStoreRef() {
+    public StoreRef getStoreRef()
+    {
         return storeRef;
     }
 
-    public String getId() {
+    public String getId()
+    {
         return id;
     }
 }

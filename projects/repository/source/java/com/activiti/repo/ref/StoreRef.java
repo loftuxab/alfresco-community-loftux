@@ -5,7 +5,8 @@ package com.activiti.repo.ref;
  * 
  * @author derekh
  */
-public class StoreRef {
+public class StoreRef
+{
     private static final String URI_FILLER = "://";
 
     private String protocol;
@@ -19,11 +20,14 @@ public class StoreRef {
      * @param identifier
      *            the identifier, which may be specific to the protocol
      */
-    public StoreRef(String protocol, String identifier) {
-        if (protocol == null) {
+    public StoreRef(String protocol, String identifier)
+    {
+        if (protocol == null)
+        {
             throw new IllegalArgumentException("Store protocol may not be null");
         }
-        if (identifier == null) {
+        if (identifier == null)
+        {
             throw new IllegalArgumentException(
                     "Store identifier may not be null");
         }
@@ -32,28 +36,35 @@ public class StoreRef {
         this.identifier = identifier;
     }
 
-    public String toString() {
+    public String toString()
+    {
         return protocol + URI_FILLER + identifier;
     }
 
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
             return true;
         }
-        if (obj instanceof StoreRef) {
+        if (obj instanceof StoreRef)
+        {
             StoreRef that = (StoreRef) obj;
-            return (this.protocol.equals(that.protocol)
-                    && this.identifier.equals(that.identifier));
-        } else {
+            return (this.protocol.equals(that.protocol) && this.identifier
+                    .equals(that.identifier));
+        } else
+        {
             return false;
         }
     }
 
-    public String getProtocol() {
+    public String getProtocol()
+    {
         return protocol;
     }
 
-    public String getIdentifier() {
+    public String getIdentifier()
+    {
         return identifier;
     }
 }

@@ -12,28 +12,35 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  */
 public abstract class BaseHibernateTest extends
         AbstractTransactionalDataSourceSpringContextTests implements
-        InitializingBean {
+        InitializingBean
+{
     private SessionFactory sessionFactory;
+
     private Session session;
 
-    public BaseHibernateTest() {
+    public BaseHibernateTest()
+    {
     }
 
-    protected String[] getConfigLocations() {
-        return new String[] { "classpath:applicationContext.xml"};
+    protected String[] getConfigLocations()
+    {
+        return new String[] { "classpath:applicationContext.xml" };
     }
 
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public void setSessionFactory(SessionFactory sessionFactory)
+    {
         this.sessionFactory = sessionFactory;
         // construct a session at the same time
         this.session = sessionFactory.openSession();
     }
 
-    protected Session getSession() {
+    protected Session getSession()
+    {
         return session;
     }
 
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() throws Exception
+    {
         throw new UnsupportedOperationException();
     }
 }

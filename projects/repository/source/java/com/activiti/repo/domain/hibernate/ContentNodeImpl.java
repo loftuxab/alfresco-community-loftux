@@ -5,5 +5,6 @@ import com.activiti.repo.domain.ContentNode;
 /**
  * @author derekh
  */
-public class ContentNodeImpl extends RealNodeImpl implements ContentNode {
+public class ContentNodeImpl extends RealNodeImpl implements ContentNode
+{
 }

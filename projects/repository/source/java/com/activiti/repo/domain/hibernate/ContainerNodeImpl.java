@@ -7,18 +7,22 @@ import com.activiti.repo.domain.ContainerNode;
 /**
  * @author derekh
  */
-public class ContainerNodeImpl extends RealNodeImpl implements ContainerNode {
+public class ContainerNodeImpl extends RealNodeImpl implements ContainerNode
+{
     private Set childAssocs;
 
-    public ContainerNodeImpl() {
+    public ContainerNodeImpl()
+    {
         childAssocs = new HashSet(3, 0.75F);
     }
 
-    public Set getChildAssocs() {
+    public Set getChildAssocs()
+    {
         return childAssocs;
     }
 
-    public void setChildAssocs(Set childAssocs) {
+    public void setChildAssocs(Set childAssocs)
+    {
         this.childAssocs = childAssocs;
     }
 }

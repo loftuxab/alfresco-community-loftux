@@ -5,5 +5,6 @@ import com.activiti.repo.domain.RealNode;
 /**
  * @author derekh
  */
-public class RealNodeImpl extends NodeImpl implements RealNode {
+public class RealNodeImpl extends NodeImpl implements RealNode
+{
 }

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
-<!-- This file must be split up once the number and spread of beans becomes unmanageable -->
+<!-- This file must be split up once the number and spread of beans increases -->
 <beans>
    
    <!--                    -->
@@ -68,18 +68,18 @@
          <value>com.as.core.NodeService</value>
       </property>
       <property name='transactionManager'>
-         <ref bean='transactionManager'/>
+         <ref bean="transactionManager"/>
       </property>
-      <property name='target'>
-         <bean class='com.as.core.HibernateNodeService'>
-            <property name='sessionFactory'>
-               <ref local='sessionFactory'/>
+      <property name="target">
+         <bean class="com.as.core.HibernateNodeService">
+            <property name="sessionFactory">
+               <ref local="sessionFactory"/>
             </property>
          </bean>
       </property>
-      <property name='transactionAttributes'>
+      <property name="transactionAttributes">
          <props>
-            <prop key='*'>PROPAGATION_REQUIRED</prop>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
    </bean>
@@ -89,4 +89,27 @@
    <!--  PUBLIC SERVICES   -->
    <!--                    -->
    
+   <!--   
+   <bean id="nodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.as.core.NodeService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.as.core.HibernateNodeService">
+            <property name="sessionFactory">
+               <ref local="sessionFactory"/>
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+-->
+
 </beans>

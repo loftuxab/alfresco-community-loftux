@@ -6,7 +6,8 @@ import java.util.Set;
 /**
  * @author derekh
  */
-public interface Node {
+public interface Node
+{
     public Long getId();
 
     public void setId(Long id);

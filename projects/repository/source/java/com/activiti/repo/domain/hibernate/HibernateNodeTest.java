@@ -18,11 +18,14 @@ import com.activiti.repo.domain.ReferenceNode;
  * 
  * @author derekh
  */
-public class HibernateNodeTest extends BaseHibernateTest {
-    public HibernateNodeTest() {
+public class HibernateNodeTest extends BaseHibernateTest
+{
+    public HibernateNodeTest()
+    {
     }
 
-    public void testMap() throws Exception {
+    public void testMap() throws Exception
+    {
         // create a new Node
         Node node = new NodeImpl();
         // give it a property map
@@ -42,7 +45,8 @@ public class HibernateNodeTest extends BaseHibernateTest {
         assertNotNull("Property value not present in map", propertyMap.get("A"));
     }
 
-    public void testSubclassing() throws Exception {
+    public void testSubclassing() throws Exception
+    {
         // persist a subclass of Node
         Node node = new ContentNodeImpl();
         Serializable id = getSession().save(node);
@@ -53,7 +57,8 @@ public class HibernateNodeTest extends BaseHibernateTest {
         assertTrue("Subtype not retrieved", node instanceof ContentNode);
     }
 
-    public void testReferenceNode() throws Exception {
+    public void testReferenceNode() throws Exception
+    {
         // make a reference node
         ReferenceNode refNode = new ReferenceNodeImpl();
         refNode.setReferencedPath("/somepath/to/some/node[1]");
@@ -63,7 +68,8 @@ public class HibernateNodeTest extends BaseHibernateTest {
         refNode = (ReferenceNode) getSession().get(NodeImpl.class, refNodeId);
     }
 
-    public void testChildAssoc() throws Exception {
+    public void testChildAssoc() throws Exception
+    {
         // make a content node
         ContentNode contentNode = new ContentNodeImpl();
         Serializable contentNodeId = getSession().save(contentNode);
@@ -96,7 +102,8 @@ public class HibernateNodeTest extends BaseHibernateTest {
         assertEquals("Expected exactly 2 children", 2, containerNode
                 .getChildAssocs().size());
         for (Iterator iterator = containerNode.getChildAssocs().iterator(); iterator
-                .hasNext(); /**/) {
+                .hasNext(); /**/)
+        {
             assoc = (ChildAssoc) iterator.next();
             // the node id must be known
             assertNotNull("Node not populated on assoc", assoc.getChild());

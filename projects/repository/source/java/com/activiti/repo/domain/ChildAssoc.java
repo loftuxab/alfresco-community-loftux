@@ -3,7 +3,8 @@ package com.activiti.repo.domain;
 /**
  * @author derekh
  */
-public interface ChildAssoc {
+public interface ChildAssoc
+{
     public long getId();
 
     public void setId(long id);
