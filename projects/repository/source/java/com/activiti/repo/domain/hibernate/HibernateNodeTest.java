@@ -35,9 +35,6 @@ public class HibernateNodeTest extends BaseHibernateTest
     protected void onSetUpInTransaction() throws Exception
     {
         store = new StoreImpl();
-//        // set attributes
-//        store.setProtocol(StoreRef.PROTOCOL_WORKSPACE);
-//        store.setIdentifier("TestWorkspace@" + System.currentTimeMillis());
 		StoreKey storeKey = new StoreKey();
 		storeKey.setProtocol(StoreRef.PROTOCOL_WORKSPACE);
 		storeKey.setIdentifier("TestWorkspace@" + System.currentTimeMillis());
