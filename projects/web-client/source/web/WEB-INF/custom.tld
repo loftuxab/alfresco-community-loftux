@@ -142,6 +142,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>width</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    
       <attribute>
          <name>var</name>
@@ -156,7 +162,7 @@
       </attribute>
    
       <attribute>
-         <name>initialSortDirection</name>
+         <name>initialSortDescending</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -168,7 +174,7 @@
       </attribute>
    
       <attribute>
-         <name>viewModes</name>
+         <name>viewMode</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -204,7 +210,13 @@
       </attribute>
       
       <attribute>
-         <name>label</name>
+         <name>styleClass</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>style</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>

@@ -24,7 +24,7 @@ public interface IDataContainer
     * 
     * @return true for descending sort, false for accending sort
     */
-   public boolean getCurrentSortDirection();
+   public boolean isCurrentSortDescending();
    
    /**
     * Returns the current page size used for this list, or -1 for no paging.
@@ -70,10 +70,10 @@ public interface IDataContainer
     * Sort the dataset using the specified sort parameters
     * 
     * @param column        Column to sort
-    * @param bAscending    True for ascending sort, false for descending
+    * @param descending    True for descending sort, false for ascending
     * @param mode          Sort mode to use (see IDataContainer constants)
     */
-   public void sort(String column, boolean bAscending, String mode);
+   public void sort(String column, boolean descending, String mode);
    
    public final static String SORT_CASEINSENSITIVE = "case-insensitive";
    public final static String SORT_CASESENSITIVE   = "case-sensitive";

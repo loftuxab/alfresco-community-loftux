@@ -40,11 +40,11 @@ public class UISortLink extends UICommand
       
       // swap sort direction if we were last sorted column
       boolean bPreviouslySorted = false;
-      boolean bAscending = true;
+      boolean descending = true;
       String lastSortedColumn = dataContainer.getCurrentSortColumn();
       if (lastSortedColumn == (String)getValue())
       {
-         bAscending = !dataContainer.getCurrentSortDirection();
+         descending = !dataContainer.isCurrentSortDescending();
          bPreviouslySorted = true;
       }
       
@@ -82,7 +82,7 @@ public class UISortLink extends UICommand
       
       if (bPreviouslySorted == true)
       {
-         if (bAscending == true)
+         if (descending == true)
          {
             buf.append("&nbsp;")
                .append(Utils.buildImageTag(context, IMAGE_SORTUP, 10, 6, null));
@@ -98,7 +98,7 @@ public class UISortLink extends UICommand
          buf.append("&nbsp;")
             .append(Utils.buildImageTag(context, IMAGE_SORTNONE, 10, 7, null));
       }
-      buf.append("</a>");
+      buf.append("</a>&nbsp;");
       
       out.write(buf.toString());
    }
@@ -145,17 +145,18 @@ public class UISortLink extends UICommand
          // found a sort event for us!
          if (s_logger.isDebugEnabled())
             s_logger.debug("Handling sort event for column: " + ((SortEvent)event).Column);
+         
          if (getColumn().equals(getDataContainer().getCurrentSortColumn()) == true)
          {
             // reverse sort direction
-            this.bAscending = !this.bAscending;
+            this.descending = !this.descending;
          }
          else
          {
             // revert to default sort direction
-            this.bAscending = true;
+            this.descending = true;
          }
-         getDataContainer().sort(getColumn(), this.bAscending, getMode());
+         getDataContainer().sort(getColumn(), this.descending, getMode());
       }  
    }
    
@@ -205,13 +206,13 @@ public class UISortLink extends UICommand
    }
    
    /**
-    * Returns true for ascending sort, false for descending
+    * Returns true for descending sort, false for ascending
     * 
-    * @return true for ascending sort, false for descending
+    * @return true for descending sort, false for ascending
     */
-   public boolean isAscending()
+   public boolean isDescending()
    {
-      return this.bAscending;
+      return this.descending;
    }
    
    /**
@@ -222,7 +223,7 @@ public class UISortLink extends UICommand
       Object values[] = (Object[])state;
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
-      this.bAscending = ((Boolean)values[1]).booleanValue();
+      this.descending = ((Boolean)values[1]).booleanValue();
    }
    
    /**
@@ -233,10 +234,13 @@ public class UISortLink extends UICommand
       Object values[] = new Object[2];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
-      values[1] = (this.bAscending ? Boolean.TRUE : Boolean.FALSE);
+      values[1] = (this.descending ? Boolean.TRUE : Boolean.FALSE);
       return values;
    }
    
+   /**
+    * Return the parent data container for this component
+    */
    private IDataContainer getDataContainer()
    {
       return Utils.getParentDataContainer(getFacesContext(), this);
@@ -264,9 +268,6 @@ public class UISortLink extends UICommand
    // ------------------------------------------------------------------------------
    // Constants
    
-   /** separator between encoded sort values */
-   public final static char SEPARATOR = ',';
-   
    private static Logger s_logger = Logger.getLogger(IDataContainer.class);
    
    private final static String IMAGE_SORTUP     = "/images/sort_up.gif";
@@ -274,5 +275,5 @@ public class UISortLink extends UICommand
    private final static String IMAGE_SORTNONE   = "/images/sort_flat.gif";
    
    private String mode = IDataContainer.SORT_CASEINSENSITIVE;
-   private boolean bAscending = true;
+   private boolean descending = true;
 }

@@ -37,9 +37,10 @@ public class ColumnTag extends BaseComponentTag
    {
       super.release();
       this.value = null;
-      this.label = null;
       this.primary = null;
       this.width = null;
+      this.style = null;
+      this.styleClass = null;
    }
    
    /**
@@ -50,9 +51,10 @@ public class ColumnTag extends BaseComponentTag
       super.setProperties(component);
       
       setStringBindingProperty(component, "value", this.value);
-      setStringProperty(component, "label", this.label);
       setBooleanProperty(component, "primary", this.primary);
       setStringProperty(component, "width", this.width);
+      setStringProperty(component, "style", this.style);
+      setStringProperty(component, "styleClass", this.styleClass);
    }
    
    
@@ -67,16 +69,6 @@ public class ColumnTag extends BaseComponentTag
    public void setValue(String value)
    {
       this.value = value;
-   }
-
-   /**
-    * Set the label
-    *
-    * @param label     the label
-    */
-   public void setLabel(String label)
-   {
-      this.label = label;
    }
 
    /**
@@ -98,7 +90,33 @@ public class ColumnTag extends BaseComponentTag
    {
       this.width = width;
    }
+   
+   /**
+    * Set the style
+    *
+    * @param style     the style
+    */
+   public void setStyle(String style)
+   {
+      this.style = style;
+   }
 
+   /**
+    * Set the styleClass
+    *
+    * @param styleClass     the styleClass
+    */
+   public void setStyleClass(String styleClass)
+   {
+      this.styleClass = styleClass;
+   }
+
+   
+   /** the style */
+   private String style;
+
+   /** the styleClass */
+   private String styleClass;
 
    /** the width */
    private String width;
@@ -108,7 +126,4 @@ public class ColumnTag extends BaseComponentTag
    
    /** the value */
    private String value;
-   
-   /** the label */
-   private String label;
 }

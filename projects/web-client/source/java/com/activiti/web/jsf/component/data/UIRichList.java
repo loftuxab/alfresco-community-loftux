@@ -3,6 +3,7 @@
  */
 package com.activiti.web.jsf.component.data;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,11 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public UIRichList()
    {
       setRendererType("awc.faces.RichListRenderer");
+      
+      // the standard set of view renderers
+      this.viewRenderers.put("icons", new RichListRenderer.IconViewRenderer());
+      this.viewRenderers.put("details", new RichListRenderer.DetailsViewRenderer());
+      this.viewRenderers.put("list", new RichListRenderer.ListViewRenderer());
    }
 
    
@@ -54,7 +60,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       super.restoreState(context, values[0]);
       this.currentPage = ((Integer)values[1]).intValue();
       this.sortColumn = (String)values[2];
-      this.sortDirection = ((Boolean)values[3]).booleanValue();
+      this.sortDescending = ((Boolean)values[3]).booleanValue();
    }
    
    /**
@@ -67,7 +73,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       values[0] = super.saveState(context);
       values[1] = new Integer(this.currentPage);
       values[2] = this.sortColumn;
-      values[3] = (this.sortDirection ? Boolean.TRUE : Boolean.FALSE);
+      values[3] = (this.sortDescending ? Boolean.TRUE : Boolean.FALSE);
       return (values);
    }
    
@@ -100,6 +106,34 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       this.value = value;
    }
    
+   /**
+    * Get the view mode for this Rich List
+    * 
+    * @return view mode as a String
+    */
+   public String getViewMode()
+   {
+      if (this.viewMode == null)
+      {
+         ValueBinding vb = getValueBinding("viewMode");
+         if (vb != null)
+         {
+            this.viewMode = (String)vb.getValue(getFacesContext());
+         }
+      }
+      return this.viewMode;
+   }
+   
+   /**
+    * Set the current view mode for this Rich List
+    * 
+    * @param viewMode      the view mode as a String
+    */
+   public void setViewMode(String viewMode)
+   {
+      this.viewMode = viewMode;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // IDataContainer implementation 
@@ -115,14 +149,11 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    }
    
    /**
-    * Returns the current sort direction. Only valid if a sort column is set.
-    * True is returned for descending sort, false for accending sort.
-    * 
-    * @return true for descending sort, false for accending sort
+    * @see com.activiti.web.data.IDataContainer#isCurrentSortDescending()
     */
-   public boolean getCurrentSortDirection()
+   public boolean isCurrentSortDescending()
    {
-      return this.sortDirection;
+      return this.sortDescending;
    }
    
    /**
@@ -221,7 +252,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public void sort(String column, boolean bAscending, String mode)
    {
       this.sortColumn = column;
-      this.sortDirection = bAscending;
+      this.sortDescending = bAscending;
       
       // delegate to the data model to sort its contents
       getDataModel().sort(column, bAscending, mode);
@@ -275,7 +306,13 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    {
       // get type from current view mode, then create an instance of the renderer
       // TODO: set the appropriate IRichListRenderer impl - could come from a config?
-      return new RichListRenderer.ListViewRenderer();
+      //       should allow custom views to be specified in config etc.
+      IRichListRenderer renderer = null;
+      if (getViewMode() != null)
+      {
+         renderer = (IRichListRenderer)this.viewRenderers.get(getViewMode());
+      }
+      return renderer;
    }
    
    /**
@@ -313,17 +350,20 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    
    // component state
    private int currentPage = 0;
-   private int rowIndex = -1;
    private String sortColumn = null;
-   private boolean sortDirection = true;
-   private int pageSize = -1;
-   private int pageCount = 1;
-   private int maxRowIndex = -1;
+   private boolean sortDescending = true;
+   private Object value = null;
+   private final static Map viewRenderers = new HashMap(5);
    
+   // transient component state that exists during a single page refresh only
+   private int rowIndex = -1;
+   private int maxRowIndex = -1;
    private IGridDataModel dataModel = null;
    
-   // component properties - NOTE: may use ValueBinding!
-   private Object value = null;
+   // component settings
+   private int pageSize = -1;
+   private int pageCount = 1;
+   private String viewMode = null;
    
    private static Logger s_logger = Logger.getLogger(IDataContainer.class);
 }

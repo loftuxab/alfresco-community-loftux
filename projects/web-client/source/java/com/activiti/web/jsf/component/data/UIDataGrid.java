@@ -82,12 +82,12 @@ public class UIDataGrid extends SelfRenderingComponent implements IDataContainer
    }
 
    /**
-    * @see com.activiti.web.data.IDataContainer#getCurrentSortDirection()
+    * @see com.activiti.web.data.IDataContainer#isCurrentSortDescending()
     */
-   public boolean getCurrentSortDirection()
+   public boolean isCurrentSortDescending()
    {
       // TODO Auto-generated method stub
-      return false;
+      return true;
    }
 
    /**

@@ -41,12 +41,13 @@ public class RichListTag extends BaseComponentTag
       this.value = null;
       this.var = null;
       this.initialSortColumn = null;
-      this.initialSortDirection = null;
+      this.initialSortDescending = null;
       this.listConfig = null;
-      this.viewModes = null;
+      this.viewMode = null;
       this.pageSize = null;
       this.style = null;
       this.styleClass = null;
+      this.width = null;
    }
    
    /**
@@ -58,13 +59,14 @@ public class RichListTag extends BaseComponentTag
       setStringBindingProperty(component, "value", this.value);
       setStringStaticProperty(component, "var", this.var);
       setStringProperty(component, "initialSortColumn", this.initialSortColumn);
-      setStringProperty(component, "initialSortDirection", this.initialSortDirection);
+      setStringProperty(component, "initialSortDescending", this.initialSortDescending);
       setStringProperty(component, "listConfig", this.listConfig);
-      setStringProperty(component, "viewModes", this.viewModes);
+      setStringProperty(component, "viewMode", this.viewMode);
       setStringProperty(component, "style", this.style);
       setStringProperty(component, "styleClass", this.styleClass);
       setStringProperty(component, "rowStyleClass", this.rowStyleClass);
       setStringProperty(component, "altRowStyleClass", this.altRowStyleClass);
+      setStringProperty(component, "width", this.width);
       setIntProperty(component, "pageSize", this.pageSize);
    }
    
@@ -73,13 +75,13 @@ public class RichListTag extends BaseComponentTag
    // Bean implementation 
    
    /**
-    * Set the viewModes
+    * Set the viewMode
     *
-    * @param viewModes     the viewModes
+    * @param viewMode     the viewMode
     */
-   public void setViewModes(String viewModes)
+   public void setViewMode(String viewMode)
    {
-      this.viewModes = viewModes;
+      this.viewMode = viewMode;
    }
    
    /**
@@ -103,13 +105,13 @@ public class RichListTag extends BaseComponentTag
    }
    
    /**
-    * Set the initialSortDirection
+    * Set the initialSortDescending
     *
-    * @param initialSortDirection     the initialSortDirection
+    * @param initialSortDescending     the initialSortDescending
     */
-   public void setInitialSortDirection(String initialSortDirection)
+   public void setInitialSortDescending(String initialSortDescending)
    {
-      this.initialSortDirection = initialSortDirection;
+      this.initialSortDescending = initialSortDescending;
    }
    
    /**
@@ -181,6 +183,16 @@ public class RichListTag extends BaseComponentTag
    {
       this.altRowStyleClass = altRowStyleClass;
    }
+   
+   /**
+    * Set the width
+    *
+    * @param width     the width
+    */
+   public void setWidth(String width)
+   {
+      this.width = width;
+   }
 
 
    // ------------------------------------------------------------------------------
@@ -197,6 +209,9 @@ public class RichListTag extends BaseComponentTag
 
    /** the styleClass */
    private String styleClass;
+   
+   /** the width */
+   private String width;
 
    /** the value */
    private String value;
@@ -204,8 +219,8 @@ public class RichListTag extends BaseComponentTag
    /** the var */
    private String var;
 
-   /** the viewModes */
-   private String viewModes;
+   /** the viewMode */
+   private String viewMode;
 
    /** the pageSize */
    private String pageSize;
@@ -213,8 +228,8 @@ public class RichListTag extends BaseComponentTag
    /** the initialSortColumn */
    private String initialSortColumn;
 
-   /** the initialSortDirection */
-   private String initialSortDirection;
+   /** the initialSortDescending */
+   private String initialSortDescending;
 
    /** the listConfig */
    private String listConfig;

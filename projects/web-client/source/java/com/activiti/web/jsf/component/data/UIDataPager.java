@@ -40,6 +40,8 @@ public class UIDataPager extends UICommand
          throw new IllegalStateException("Must nest UISortLink inside component implementing IDataContainer!"); 
       }
       
+      // this component will only render itself if the parent DataContainer is setup
+      // with a valid "pageSize" property
       if (isRendered() == false || dataContainer.getPageSize() == -1)
       {
          return;
@@ -171,6 +173,9 @@ public class UIDataPager extends UICommand
    // ------------------------------------------------------------------------------
    // Private helpers
    
+   /**
+    * Return the parent data container for this component
+    */
    private IDataContainer getDataContainer()
    {
       return Utils.getParentDataContainer(getFacesContext(), this);
