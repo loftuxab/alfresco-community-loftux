@@ -8,11 +8,10 @@ import java.util.Map;
 import org.hibernate.Session;
 
 import com.activiti.repo.domain.Node;
-import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.store.db.StoreDaoService;
+import com.activiti.repo.store.StoreService;
 import com.activiti.util.BaseSpringTest;
 
 /**
@@ -22,13 +21,13 @@ import com.activiti.util.BaseSpringTest;
  */
 public class NodeServiceTest extends BaseSpringTest
 {
-    private StoreDaoService storeDaoService;
+    private StoreService storeService;
     private NodeService nodeService;
     private NodeRef rootNodeRef;
 
-    public void setStoreDaoService(StoreDaoService storeDaoService)
+    public void setStoreService(StoreService storeService)
     {
-        this.storeDaoService = storeDaoService;
+        this.storeService = storeService;
     }
 
     public void setNodeService(NodeService nodeService)
@@ -39,11 +38,9 @@ public class NodeServiceTest extends BaseSpringTest
     protected void onSetUpInTransaction() throws Exception
     {
         // create a first store directly
-        Store store = storeDaoService.createStore(StoreRef.PROTOCOL_WORKSPACE,
+        StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE,
                 "Test_" + System.currentTimeMillis());
-        StoreRef storeRef = store.getStoreRef();
-        Node rootNode = store.getRootNode();
-        rootNodeRef = rootNode.getNodeRef();
+        rootNodeRef = storeService.getRootNode(storeRef);
     }
     
     public void testSetUp() throws Exception
