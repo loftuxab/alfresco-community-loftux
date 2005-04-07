@@ -19,6 +19,7 @@ import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -170,10 +171,11 @@ public class LuceneTest extends TestCase
       Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
       testProperties.put(QName.createQName("property"), "value");
 
-      NodeRef newNode = nodeService.createNode(rootNode,
+      ChildAssocRef assoc = nodeService.createNode(rootNode,
               QName.createQName(null, "path"),
               Node.TYPE_CONTENT,
               testProperties);
+      NodeRef newNode = assoc.getChildRef();
 
       LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
       indexer.setNodeService(nodeService);
@@ -451,12 +453,12 @@ public class LuceneTest extends TestCase
          return parents;
       }
 
-      public NodeRef createNode(NodeRef parentRef, QName qname, String nodeType) throws InvalidNodeRefException
+      public ChildAssocRef createNode(NodeRef parentRef, QName qname, String nodeType) throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
       }
 
-      public NodeRef createNode(NodeRef parentRef, QName qname, String nodeType, Map<QName, Serializable> properties)
+      public ChildAssocRef createNode(NodeRef parentRef, QName qname, String nodeType, Map<QName, Serializable> properties)
             throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
@@ -467,17 +469,17 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-      public void addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
+      public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
       }
 
-      public void removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
+      public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
       }
 
-      public void removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
+      public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
       }

@@ -24,6 +24,7 @@ import com.activiti.repo.node.CyclicChildRelationshipException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -50,14 +51,14 @@ public class DbNodeServiceImpl implements NodeService
         this.storeDaoService = storeDaoService;
     }
 
-    public NodeRef createNode(NodeRef parentRef,
+    public ChildAssocRef createNode(NodeRef parentRef,
             QName qname,
             String nodeType)
     {
         return this.createNode(parentRef, qname, nodeType, null);
     }
 
-    public NodeRef createNode(NodeRef parentRef,
+    public ChildAssocRef createNode(NodeRef parentRef,
             QName qname,
             String nodeType,
             Map<QName, Serializable> properties)
@@ -83,7 +84,7 @@ public class DbNodeServiceImpl implements NodeService
         }
         
         // done
-        return node.getNodeRef();
+        return assoc.getChildAssocRef();
     }
 
     /**
@@ -149,7 +150,7 @@ public class DbNodeServiceImpl implements NodeService
         nodeDaoService.deleteNode(node);
     }
 
-    public void addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
+    public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
     {
         // check that both nodes belong to the same store
         if (!parentRef.getStoreRef().equals(childRef.getStoreRef()))
@@ -166,15 +167,20 @@ public class DbNodeServiceImpl implements NodeService
         // get the child node
         Node childNode = getNodeNotNull(childRef);
         // make the association
-        nodeDaoService.newChildAssoc(parentNode, childNode, false, qname);
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, childNode, false, qname);
         // done
+        return assoc.getChildAssocRef();
     }
 
-    public void removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
+    public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
     {
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         Node childNode = getNodeNotNull(childRef);
         NodeKey childNodeKey = childNode.getKey();
+        
+        // maintain a list of deleted entities
+        Collection<EntityRef> deletedRefs = new ArrayList<EntityRef>(5);
+        
         // get all the child assocs
         boolean deleteChild = false;
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
@@ -192,18 +198,25 @@ public class DbNodeServiceImpl implements NodeService
             }
             // delete the association instance
             nodeDaoService.deleteChildAssoc(assoc);
+            deletedRefs.add(assoc.getChildAssocRef());    // save for return value
         }
         // must the child be deleted?
         if (deleteChild)
         {
             nodeDaoService.deleteNode(childNode);
+            deletedRefs.add(childNode.getNodeRef());    // save for return value
         }
         // done
+        return deletedRefs;
     }
 
-    public void removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
+    public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
     {
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
+
+        // maintain a list of deleted entities
+        Collection<EntityRef> deletedRefs = new ArrayList<EntityRef>(5);
+        
         // get all the child assocs
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
         assocs = new HashSet<ChildAssoc>(assocs.size());   // copy set as we will be modifying it
@@ -215,14 +228,17 @@ public class DbNodeServiceImpl implements NodeService
             }
             // we have a match
             nodeDaoService.deleteChildAssoc(assoc);
+            deletedRefs.add(assoc.getChildAssocRef());    // save for return value
             // must we remove the child?
             if (assoc.getIsPrimary())
             {
                 Node childNode = assoc.getChild();
                 nodeDaoService.deleteNode(childNode);
+                deletedRefs.add(childNode.getNodeRef());    // save for return value
             }
         }
         // done
+        return deletedRefs;
     }
 
     public String getType(NodeRef nodeRef) throws InvalidNodeRefException

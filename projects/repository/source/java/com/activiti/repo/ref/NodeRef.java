@@ -7,7 +7,7 @@ import java.io.Serializable;
  * 
  * @author Derek Hulley
  */
-public class NodeRef implements Serializable
+public class NodeRef implements EntityRef, Serializable
 {
     private static final long serialVersionUID = 3834308453517833270L;
 

@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -71,9 +72,10 @@ public class NodeServiceTest extends BaseSpringTest
     public void testCreateNodeNoProperties() throws Exception
     {
         // flush to ensure that the pure JDBC query will work
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef,
+        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("path1"),
                 Node.TYPE_CONTAINER);
+        NodeRef nodeRef = assocRef.getChildRef();
         // count the nodes with the given id
         int count = countNodesById(nodeRef);
         assertEquals("Unexpected number of nodes present", 1, count);
@@ -81,9 +83,10 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testDelete() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef,
+        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("path1"),
                 Node.TYPE_CONTAINER);
+        NodeRef nodeRef = assocRef.getChildRef();
         int countBefore = countNodesById(nodeRef);
         assertEquals("Node not created", 1, countBefore);
         // delete it
@@ -124,13 +127,13 @@ public class NodeServiceTest extends BaseSpringTest
         {
             // expected
         }
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef,
+        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("pathA"),
                 Node.TYPE_CONTAINER);
 //        int countBefore = countChildrenOfNode(rootNodeRef);
 //        assertEquals("Root children count incorrect", 1, countBefore);
         // associate the two nodes
-        nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("pathB"));
+        nodeService.addChild(rootNodeRef, assocRef.getChildRef(), QName.createQName("pathB"));
         // there should now be 2 child assocs on the root
 //        int countAfter = countChildrenOfNode(rootNodeRef);
 //        assertEquals("Root children count incorrect", 2, countAfter);
@@ -138,20 +141,26 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testRemoveChildByRef() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef,
+        ChildAssocRef pathARef = nodeService.createNode(rootNodeRef,
                 QName.createQName("pathA"),
                 Node.TYPE_CONTAINER);
-        nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("pathB"));
-        nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("pathC"));
+        NodeRef nodeRef = pathARef.getChildRef();
+        ChildAssocRef pathBRef = nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("pathB"));
+        ChildAssocRef pathCRef = nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("pathC"));
         // delete all the associations
-        nodeService.removeChild(rootNodeRef, nodeRef);
+        Collection<EntityRef> deletedRefs = nodeService.removeChild(rootNodeRef, nodeRef);
+        assertTrue("Primary child not deleted", deletedRefs.contains(nodeRef));
+        assertTrue("Primary A path not deleted", deletedRefs.contains(pathARef));
+        assertTrue("Secondary B path not deleted", deletedRefs.contains(pathBRef));
+        assertTrue("Secondary C path not deleted", deletedRefs.contains(pathCRef));
     }
     
     public void testRemoveChildByName() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef,
+        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("nsA", "pathA"),
                 Node.TYPE_CONTAINER);
+        NodeRef nodeRef = assocRef.getChildRef();
         nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("nsB1", "pathB"));
         nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("nsB2", "pathB"));
         nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("nsC", "pathC"));
@@ -172,9 +181,10 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testGetType() throws Exception
     {
-        NodeRef nodeRef = nodeService.createNode(rootNodeRef,
+        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("pathA"),
                 Node.TYPE_CONTAINER);
+        NodeRef nodeRef = assocRef.getChildRef();
         // get the type
         String type = nodeService.getType(nodeRef);
         assertEquals("Type mismatch", Node.TYPE_CONTAINER, type);
@@ -207,11 +217,11 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testGetParents() throws Exception
     {
-        Map<String, NodeRef> nodeRefs = buildNodeGraph();
-        NodeRef n6Ref = nodeRefs.get("n6");
-        NodeRef n7Ref = nodeRefs.get("n7");
+        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        NodeRef n6Ref = assocRefs.get(QName.createQName("n3_p_n6")).getChildRef();
+        NodeRef n7Ref = assocRefs.get(QName.createQName("n5_p_n7")).getChildRef();
         // get a child node's parents
-        NodeRef n8Ref = nodeRefs.get("n8");
+        NodeRef n8Ref = assocRefs.get(QName.createQName("n6_p_n8")).getChildRef();
         Collection<NodeRef> parents = nodeService.getParents(n8Ref);
         assertEquals("Incorrect number of parents", 2, parents.size());
         assertTrue("Expected parent not found", parents.contains(n6Ref));
@@ -228,8 +238,8 @@ public class NodeServiceTest extends BaseSpringTest
     
     public void testGetChildAssocs() throws Exception
     {
-        Map<String, NodeRef> nodeRefs = buildNodeGraph();
-        NodeRef n1Ref = nodeRefs.get("n1");
+        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        NodeRef n1Ref = assocRefs.get(QName.createQName("root_p_n1")).getChildRef();
         
         // get the parent node's children
         Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
@@ -243,12 +253,15 @@ public class NodeServiceTest extends BaseSpringTest
      */
     private Object[] createAssociation() throws Exception
     {
-        NodeRef sourceRef = nodeService.createNode(rootNodeRef,
+        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName(null, "N1"),
                 Node.TYPE_REAL);
-        NodeRef targetRef = nodeService.createNode(rootNodeRef,
+        NodeRef sourceRef = assocRef.getChildRef();
+        assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName(null, "N2"),
                 Node.TYPE_REFERENCE);
+        NodeRef targetRef = assocRef.getChildRef();
+        
         QName qname = QName.createQName("next");
         nodeService.createAssociation(sourceRef, targetRef, qname);
         // done
@@ -321,9 +334,17 @@ public class NodeServiceTest extends BaseSpringTest
     }
     
     /**
-     * Builds a web of nodes paths
+     * Builds a graph of child associations as follows:
+     * <pre>
+     * Level 0:     root
+     * Level 1:     root_p_n1   root_p_n2
+     * Level 2:     n1_p_n3     n2_p_n4     n1_n4       n2_p_n5
+     * Level 3:     n3_p_n6     n4_n6       n5_p_n7
+     * Level 4:     n6_p_n8     n7_n8
+     * </pre>
+     * The namespace URI for all associations is <b>http://x</b>.
      * <p>
-     * Naming convention is:
+     * The naming convention is:
      * <pre>
      * n2_p_n5
      * n4_n5
@@ -332,69 +353,77 @@ public class NodeServiceTest extends BaseSpringTest
      *      n2 is the primary parent node number
      *      n4 is any other non-primary parent
      * </pre>
-     * The following structure is used to name associations in the test:
-     * <pre>
-     * Level 0:     root
-     * Level 1:     root_p_n1   root_p_n2
-     * Level 2:     n1_p_n3     n2_p_n4     n1_n4       n2_p_n5
-     * Level 3:     n3_p_n6     n4_n6       n5_p_n7
-     * Level 4:     n6_p_n8     n7_n8
-     * </pre>
-     * <p>
-     * The namespace URI for all associations is <b>http://x</b>.
      * <p>
      * The session is flushed to ensure that persistence occurs correctly.  It is
      * cleared to ensure that fetches against the created data are correct.
      * 
-     * @return Returns a map <code>NodeRef</code> instances keyed by node name
+     * @return Returns a map <code>ChildAssocRef</code> instances keyed by qualified assoc name
      */
-    private Map<String, NodeRef> buildNodeGraph() throws Exception
+    private Map<QName, ChildAssocRef> buildNodeGraph() throws Exception
     {
         String ns = "http://x";
-        // LEVEL 0
-        // LEVEL 1
-        NodeRef n1 = nodeService.createNode(rootNodeRef,
-                QName.createQName(ns, "root_p_n1"),
-                Node.TYPE_CONTAINER);
-        NodeRef n2 = nodeService.createNode(rootNodeRef,
-                QName.createQName(ns, "root_p_n2"),
-                Node.TYPE_CONTAINER);
-        // LEVEL 2
-        NodeRef n3 = nodeService.createNode(n1,
-                QName.createQName(ns, "n1_p_n3"),
-                Node.TYPE_CONTAINER);
-        NodeRef n4 = nodeService.createNode(n2,
-                QName.createQName(ns, "n2_p_n4"),
-                Node.TYPE_CONTAINER);
-        nodeService.addChild(n1, n4, QName.createQName(ns, "n1_n4"));
-        NodeRef n5 = nodeService.createNode(n2,
-                QName.createQName(ns, "n2_p_n5"),
-                Node.TYPE_CONTAINER);
-        // LEVEL 3
-        NodeRef n6 = nodeService.createNode(n3,
-                QName.createQName(ns, "n3_p_n6"),
-                Node.TYPE_CONTAINER);
-        nodeService.addChild(n4, n6, QName.createQName(ns, "n4_n6"));
-        NodeRef n7 = nodeService.createNode(n5,
-                QName.createQName(ns, "n5_p_n7"),
-                Node.TYPE_CONTAINER);
-        // LEVEL 4
-        NodeRef n8 = nodeService.createNode(n6,
-                QName.createQName(ns, "n6_p_n8"),
-                Node.TYPE_CONTAINER);
-        nodeService.addChild(n7, n8, QName.createQName(ns, "n7_n8"));
-        // compile the map
-        Map<String, NodeRef> ret = new HashMap<String, NodeRef>(13);
-        ret.put("root", rootNodeRef);
-        ret.put("n1", n1);
-        ret.put("n2", n2);
-        ret.put("n3", n3);
-        ret.put("n4", n4);
-        ret.put("n5", n5);
-        ret.put("n6", n6);
-        ret.put("n7", n7);
-        ret.put("n8", n8);
+        QName qname = null;
+        ChildAssocRef assoc = null;
+        Map<QName, ChildAssocRef> ret = new HashMap<QName, ChildAssocRef>(13);
         
+        // LEVEL 0
+
+        // LEVEL 1
+        qname = QName.createQName(ns, "root_p_n1");
+        assoc = nodeService.createNode(rootNodeRef, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n1 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "root_p_n2");
+        assoc = nodeService.createNode(rootNodeRef, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n2 = assoc.getChildRef();
+
+        // LEVEL 2
+        qname = QName.createQName(ns, "n1_p_n3");
+        assoc = nodeService.createNode(n1, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n3 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "n2_p_n4");
+        assoc = nodeService.createNode(n2, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n4 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "n1_n4");
+        assoc = nodeService.addChild(n1, n4, qname);
+        ret.put(qname, assoc);
+
+        qname = QName.createQName(ns, "n2_p_n5");
+        assoc = nodeService.createNode(n2, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n5 = assoc.getChildRef();
+
+        // LEVEL 3
+        qname = QName.createQName(ns, "n3_p_n6");
+        assoc = nodeService.createNode(n3, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n6 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "n4_n6");
+        assoc = nodeService.addChild(n4, n6, qname);
+        ret.put(qname, assoc);
+
+        qname = QName.createQName(ns, "n5_p_n7");
+        assoc = nodeService.createNode(n5, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n7 = assoc.getChildRef();
+
+        // LEVEL 4
+        qname = QName.createQName(ns, "n6_p_n8");
+        assoc = nodeService.createNode(n6, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n8 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "n7_n8");
+        assoc = nodeService.addChild(n7, n8, qname);
+        ret.put(qname, assoc);
+
         // flush and clear
         getSession().flush();
         getSession().clear();
@@ -408,8 +437,8 @@ public class NodeServiceTest extends BaseSpringTest
      */
     public void testGetPath() throws Exception
     {
-        Map<String, NodeRef> nodes = buildNodeGraph();
-        NodeRef n8Ref = nodes.get("n8");
+        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        NodeRef n8Ref = assocRefs.get(QName.createQName("n6_p_n8")).getChildRef();
 
         // get the primary node path for n8
         Path path = nodeService.getPath(n8Ref);
@@ -423,8 +452,9 @@ public class NodeServiceTest extends BaseSpringTest
      */
     public void testGetPaths() throws Exception
     {
-        Map<String, NodeRef> nodes = buildNodeGraph();
-        NodeRef n8Ref = nodes.get("n8");
+        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        NodeRef n6Ref = assocRefs.get(QName.createQName("n3_p_n6")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName("n6_p_n8")).getChildRef();
 
         // get all paths for n8
         Collection<Path> paths = nodeService.getPaths(n8Ref, false);
@@ -449,7 +479,6 @@ public class NodeServiceTest extends BaseSpringTest
         assertEquals("Incorrect path count", 1, paths.size());
         
         // check that a cyclic path is detected - make n8_n2
-        NodeRef n6Ref = nodes.get("n6");
         nodeService.addChild(n8Ref, n6Ref, QName.createQName("n8_n6"));
         try
         {

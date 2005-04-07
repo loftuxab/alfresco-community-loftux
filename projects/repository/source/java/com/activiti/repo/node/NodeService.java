@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -19,7 +20,7 @@ public interface NodeService
     /**
      * @see #createNode(NodeRef, QName, String, Map<String,String>)
      */
-    public NodeRef createNode(NodeRef parentRef,
+    public ChildAssocRef createNode(NodeRef parentRef,
             QName qname,
             String nodeType) throws InvalidNodeRefException;
     
@@ -30,10 +31,10 @@ public interface NodeService
      * @param qname the qualified name of the association
      * @param nodeType a predefined node type
      * @param properties optional map of properties to keyed by their qualified names
-     * @return Returns a reference to the newly created node
+     * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent reference is invalid
      */
-    public NodeRef createNode(NodeRef parentRef,
+    public ChildAssocRef createNode(NodeRef parentRef,
             QName qname,
             String nodeType,
             Map<QName, Serializable> properties) throws InvalidNodeRefException;
@@ -52,9 +53,10 @@ public interface NodeService
      * @param parentRef
      * @param childRef 
      * @param qname the qualified name of the association
+     * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
      */
-    public void addChild(NodeRef parentRef,
+    public ChildAssocRef addChild(NodeRef parentRef,
             NodeRef childRef,
             QName qname) throws InvalidNodeRefException;
     
@@ -66,9 +68,10 @@ public interface NodeService
      * 
      * @param parentRef the parent end of the association
      * @param childRef the child end of the association
+     * @return Returns a collection of deleted entities - both associations and node references.
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
      */
-    public void removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException;
+    public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException;
 
     /**
      * Removes named child associations and deletes the children where the association
@@ -76,9 +79,10 @@ public interface NodeService
      * 
      * @param parentRef the parent of the associations to remove
      * @param qname the qualified name of the association
+     * @return Returns a collection of references to all deleted entities
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public void removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException;
+    public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef

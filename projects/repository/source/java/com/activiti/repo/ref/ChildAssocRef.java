@@ -23,7 +23,7 @@ import java.io.Serializable;
  * @author andyh
  * 
  */
-public class ChildAssocRef implements Serializable
+public class ChildAssocRef implements EntityRef, Serializable
 {
    private static final long serialVersionUID = 4051322336257127729L;
 

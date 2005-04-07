@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
@@ -123,11 +124,13 @@ public class LightWeightVersionServiceTest extends BaseSpringTest
         nodeProperties.put(LightWeightVersionServiceTest.PROP_3, LightWeightVersionServiceTest.VALUE_3);
             
         // Create the versionable node
-        NodeRef versionableNode = nodeService.createNode(
+        ChildAssocRef assoc = nodeService.createNode(
                 rootNodeRef, 
                 QName.createQName("{}MyVersionableNode"), 
                 Node.TYPE_REAL,
                 nodeProperties);
+        assertNotNull(assoc);
+        NodeRef versionableNode = assoc.getChildRef();
         assertNotNull(versionableNode);
         
         // Version the node for the first time

@@ -172,10 +172,11 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
         if (versionHistoryRef == null)
         {
             // Create a new version history node
-            versionHistoryRef = this.dbNodeService.createNode(
+            ChildAssocRef newAssoc = this.dbNodeService.createNode(
                     this.versionStoreRootNodeRef, 
                     LightWeightVersionStoreBase.CHILD_VERSION_HISTORIES, 
                     Node.TYPE_CONTAINER);
+            versionHistoryRef = newAssoc.getChildRef();
             
             // Store the id of the origional node on the version history node 
             this.dbNodeService.setProperty(
@@ -290,10 +291,11 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
     private NodeRef createNewVersion(NodeRef versionHistoryRef, NodeRef preceedingNode, Map<String, String> versionProperties, int versionNumber)
     {
         // Create the new version
-        NodeRef newVersion = this.dbNodeService.createNode(
+        ChildAssocRef newAssoc = this.dbNodeService.createNode(
                 versionHistoryRef, 
                 LightWeightVersionStoreVersionService.CHILD_VERSIONS, 
                 Node.TYPE_CONTAINER);
+        NodeRef newVersion = newAssoc.getChildRef();
         
         // Set the version number for the new version
         this.dbNodeService.setProperty(
