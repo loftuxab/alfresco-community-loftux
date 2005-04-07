@@ -11,17 +11,14 @@ import com.activiti.repo.ref.QName;
 public interface PropertyTypeDefinition
 {
 
-    // TODO: Default Namespaces
-    
-
     //
     // Property Types
     //
-    public QName STRING = QName.createQName("activiti", "string");
-    public QName DATE = QName.createQName("activiti", "date");
-    public QName BOOLEAN = QName.createQName("activiti", "boolean");
-    public QName QNAME = QName.createQName("activiti", "name");
-    public QName GUID = QName.createQName("activiti", "guid");
+    public QName STRING = QName.createQName(NamespaceService.ACTIVITI_URI, "string");
+    public QName DATE = QName.createQName(NamespaceService.ACTIVITI_URI, "date");
+    public QName BOOLEAN = QName.createQName(NamespaceService.ACTIVITI_URI, "boolean");
+    public QName QNAME = QName.createQName(NamespaceService.ACTIVITI_URI, "name");
+    public QName GUID = QName.createQName(NamespaceService.ACTIVITI_URI, "guid");
     // TODO: Complete rest of property types
 
     

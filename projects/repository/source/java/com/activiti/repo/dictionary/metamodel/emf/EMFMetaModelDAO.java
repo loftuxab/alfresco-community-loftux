@@ -1,19 +1,14 @@
 package com.activiti.repo.dictionary.metamodel.emf;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
 import com.activiti.repo.dictionary.DictionaryException;
 import com.activiti.repo.dictionary.metamodel.M2Aspect;
@@ -22,7 +17,6 @@ import com.activiti.repo.dictionary.metamodel.M2Property;
 import com.activiti.repo.dictionary.metamodel.M2PropertyType;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
-import com.activiti.repo.dictionary.metamodel.emf.impl.EmfPackageImpl;
 import com.activiti.repo.ref.QName;
 
 
@@ -31,21 +25,8 @@ import com.activiti.repo.ref.QName;
  * 
  * @author David Caruana
  */
-/**
- * @author David Caruana
- *
- */
 public class EMFMetaModelDAO implements MetaModelDAO
 {
-    /**
-     * Default Resource URI
-     */
-    private static final String DEFAULT_RESOURCEURI = "metamodel.xml";
-
-    /**
-     * Resource URI for Model Definitions
-     */
-    private String resourceURI = DEFAULT_RESOURCEURI;
     
     /**
      * Resource that holds Model Definitions
@@ -59,81 +40,28 @@ public class EMFMetaModelDAO implements MetaModelDAO
     
 
     /**
-     * Sets the Resource URI
+     * Sets the Resource
      * 
-     * @param resourceURI  the resource URI
+     * @param resource  the emf resource
      */
-    public void setResourceURI(String resourceURI)
+    public void setResource(EMFResource resource)
     {
-        this.resourceURI = resourceURI;
+        this.resource = resource.getResource();
     }
     
 
     /**
      * Initialise EMF DAO
-     * 
-     * Note: A new Resource is created, even if one already exists.
-     */
-    public void initCreate()
-    {
-        initEMF();
-        
-        // Perform Validation
-        URI uri;
-        try
-        {
-            uri = URI.createFileURI(resourceURI);
-        }
-        catch(IllegalArgumentException e)
-        {
-            throw new DictionaryException("Cannot create the resource " + resourceURI + " as it is not a file.");
-        }
-        
-        // Create EMF Resource
-        ResourceSet resourceSet = new ResourceSetImpl();
-        resourceSet.setURIConverter(new EMFURIConverterImpl());
-        resource = resourceSet.createResource(uri);
-        
-        // Initialise Object Index (for lookup)
-        initIndex(resource);
-    }
-
-
-    /**
-     * Initialise EMF DAO
-     * 
-     * Note: Resource must already exist
      */
     public void init()
     {
-        initEMF();
-        
-        // Load EMF Resource
-        URI uri = URI.createURI(resourceURI);
-        ResourceSet resourceSet = new ResourceSetImpl();
-        resourceSet.setURIConverter(new EMFURIConverterImpl());
-        resource = resourceSet.getResource(uri, true);
+        if (resource == null)
+        {
+            throw new DictionaryException("EMF Resource has not been provided");
+        }
         
         // Initialise Object Index (for lookup)
         initIndex(resource);
-    }
-
-
-    /**
-     * Initialise EMF Framework
-     */
-    private void initEMF()
-    {
-        // Initialise EMF Package
-        EmfPackageImpl.init();
-
-        // Register Resource Factories for classpath protocol and xml
-        Resource.Factory.Registry reg = Resource.Factory.Registry.INSTANCE;
-        Map protocol = reg.getProtocolToFactoryMap();
-        protocol.put("file", new XMIResourceFactoryImpl());
-        protocol.put("classpath", new XMIResourceFactoryImpl());
-        Map ext = reg.getExtensionToFactoryMap();
-        ext.put("xml", new XMIResourceFactoryImpl());
     }
 
 
@@ -251,23 +179,6 @@ public class EMFMetaModelDAO implements MetaModelDAO
         indexObject((EObject)aspect);
         return aspect;
     }
-
-    
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.metamodel.MetaModelDAO#save()
-     */
-    public void save()
-    {
-        try
-        {
-            resource.save(null);
-        }
-        catch(IOException e)
-        {
-            throw new DictionaryException("Failed to save EMF Resource " + resourceURI, e);
-        }
-    }
-
 
     
     //

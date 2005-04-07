@@ -10,6 +10,8 @@ import com.activiti.repo.dictionary.metamodel.emf.EMFAspect;
 import com.activiti.repo.dictionary.metamodel.emf.EMFAssociation;
 import com.activiti.repo.dictionary.metamodel.emf.EMFChildAssociation;
 import com.activiti.repo.dictionary.metamodel.emf.EMFClass;
+import com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix;
+import com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI;
 import com.activiti.repo.dictionary.metamodel.emf.EMFProperty;
 import com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType;
 import com.activiti.repo.dictionary.metamodel.emf.EMFType;
@@ -82,6 +84,20 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
      * @generated
      */
     private EClass emfTypeEClass = null;
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    private EClass emfNamespacePrefixEClass = null;
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    private EClass emfNamespaceURIEClass = null;
 
     /**
      * <!-- begin-user-doc -->
@@ -465,6 +481,66 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
      * <!-- end-user-doc -->
      * @generated
      */
+    public EClass getEMFNamespacePrefix()
+    {
+        return emfNamespacePrefixEClass;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getEMFNamespacePrefix_EmfPrefix()
+    {
+        return (EAttribute)emfNamespacePrefixEClass.getEStructuralFeatures().get(0);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EReference getEMFNamespacePrefix_EmfURI()
+    {
+        return (EReference)emfNamespacePrefixEClass.getEStructuralFeatures().get(1);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EClass getEMFNamespaceURI()
+    {
+        return emfNamespaceURIEClass;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getEMFNamespaceURI_EmfURI()
+    {
+        return (EAttribute)emfNamespaceURIEClass.getEStructuralFeatures().get(0);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EReference getEMFNamespaceURI_EmfPrefixes()
+    {
+        return (EReference)emfNamespaceURIEClass.getEStructuralFeatures().get(1);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
     public EDataType getQName()
     {
         return qNameEDataType;
@@ -537,6 +613,14 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
         createEAttribute(emfTypeEClass, EMF_TYPE__EMF_ORDERED_CHILDREN);
         createEReference(emfTypeEClass, EMF_TYPE__EMF_DEFAULT_ASPECTS);
 
+        emfNamespacePrefixEClass = createEClass(EMF_NAMESPACE_PREFIX);
+        createEAttribute(emfNamespacePrefixEClass, EMF_NAMESPACE_PREFIX__EMF_PREFIX);
+        createEReference(emfNamespacePrefixEClass, EMF_NAMESPACE_PREFIX__EMF_URI);
+
+        emfNamespaceURIEClass = createEClass(EMF_NAMESPACE_URI);
+        createEAttribute(emfNamespaceURIEClass, EMF_NAMESPACE_URI__EMF_URI);
+        createEReference(emfNamespaceURIEClass, EMF_NAMESPACE_URI__EMF_PREFIXES);
+
         // Create data types
         qNameEDataType = createEDataType(QNAME);
     }
@@ -607,6 +691,14 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
         initEClass(emfTypeEClass, EMFType.class, "EMFType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getEMFType_EmfOrderedChildren(), ecorePackage.getEBooleanObject(), "emfOrderedChildren", null, 0, 1, EMFType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEReference(getEMFType_EmfDefaultAspects(), this.getEMFAspect(), null, "emfDefaultAspects", null, 0, -1, EMFType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+        initEClass(emfNamespacePrefixEClass, EMFNamespacePrefix.class, "EMFNamespacePrefix", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+        initEAttribute(getEMFNamespacePrefix_EmfPrefix(), ecorePackage.getEString(), "emfPrefix", null, 0, 1, EMFNamespacePrefix.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEReference(getEMFNamespacePrefix_EmfURI(), this.getEMFNamespaceURI(), this.getEMFNamespaceURI_EmfPrefixes(), "emfURI", null, 0, 1, EMFNamespacePrefix.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+        initEClass(emfNamespaceURIEClass, EMFNamespaceURI.class, "EMFNamespaceURI", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+        initEAttribute(getEMFNamespaceURI_EmfURI(), ecorePackage.getEString(), "emfURI", null, 0, 1, EMFNamespaceURI.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEReference(getEMFNamespaceURI_EmfPrefixes(), this.getEMFNamespacePrefix(), this.getEMFNamespacePrefix_EmfURI(), "emfPrefixes", null, 0, -1, EMFNamespaceURI.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         // Initialize data types
         initEDataType(qNameEDataType, QName.class, "QName", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);

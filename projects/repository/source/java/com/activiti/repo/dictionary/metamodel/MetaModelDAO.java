@@ -86,10 +86,5 @@ public interface MetaModelDAO
      * @return  the property type
      */
     public M2PropertyType createPropertyType(QName typeName);
-    
-    /**
-     * Save all changes
-     */
-    public void save();
-    
+        
 }

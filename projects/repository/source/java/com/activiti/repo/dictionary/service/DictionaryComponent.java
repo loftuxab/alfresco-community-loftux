@@ -23,7 +23,7 @@ import com.activiti.repo.ref.QName;
  * 
  * @author David Caruana
  */
-public class DictionaryServiceImpl implements DictionaryService
+public class DictionaryComponent implements DictionaryService
 {
 
     /**

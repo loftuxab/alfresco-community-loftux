@@ -140,6 +140,20 @@ public class EmfSwitch {
                 if (result == null) result = defaultCase(theEObject);
                 return result;
             }
+            case EmfPackage.EMF_NAMESPACE_PREFIX:
+            {
+                EMFNamespacePrefix emfNamespacePrefix = (EMFNamespacePrefix)theEObject;
+                Object result = caseEMFNamespacePrefix(emfNamespacePrefix);
+                if (result == null) result = defaultCase(theEObject);
+                return result;
+            }
+            case EmfPackage.EMF_NAMESPACE_URI:
+            {
+                EMFNamespaceURI emfNamespaceURI = (EMFNamespaceURI)theEObject;
+                Object result = caseEMFNamespaceURI(emfNamespaceURI);
+                if (result == null) result = defaultCase(theEObject);
+                return result;
+            }
             default: return defaultCase(theEObject);
         }
     }
@@ -252,6 +266,38 @@ public class EmfSwitch {
      * @generated
      */
     public Object caseEMFType(EMFType object)
+    {
+        return null;
+    }
+
+    /**
+     * Returns the result of interpretting the object as an instance of '<em>EMF Namespace Prefix</em>'.
+     * <!-- begin-user-doc -->
+     * This implementation returns null;
+     * returning a non-null result will terminate the switch.
+     * <!-- end-user-doc -->
+     * @param object the target of the switch.
+     * @return the result of interpretting the object as an instance of '<em>EMF Namespace Prefix</em>'.
+     * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+     * @generated
+     */
+    public Object caseEMFNamespacePrefix(EMFNamespacePrefix object)
+    {
+        return null;
+    }
+
+    /**
+     * Returns the result of interpretting the object as an instance of '<em>EMF Namespace URI</em>'.
+     * <!-- begin-user-doc -->
+     * This implementation returns null;
+     * returning a non-null result will terminate the switch.
+     * <!-- end-user-doc -->
+     * @param object the target of the switch.
+     * @return the result of interpretting the object as an instance of '<em>EMF Namespace URI</em>'.
+     * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+     * @generated
+     */
+    public Object caseEMFNamespaceURI(EMFNamespaceURI object)
     {
         return null;
     }

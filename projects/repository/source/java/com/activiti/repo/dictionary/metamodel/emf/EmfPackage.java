@@ -26,8 +26,7 @@ import org.eclipse.emf.ecore.EReference;
  * @see com.activiti.repo.dictionary.metamodel.emf.EmfFactory
  * @generated
  */
-public interface EmfPackage extends EPackage
-{
+public interface EmfPackage extends EPackage{
     /**
      * The package name.
      * <!-- begin-user-doc -->
@@ -527,6 +526,80 @@ public interface EmfPackage extends EPackage
     int EMF_TYPE_FEATURE_COUNT = EMF_CLASS_FEATURE_COUNT + 2;
 
     /**
+     * The meta object id for the '{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFNamespacePrefixImpl <em>EMF Namespace Prefix</em>}' class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see com.activiti.repo.dictionary.metamodel.emf.impl.EMFNamespacePrefixImpl
+     * @see com.activiti.repo.dictionary.metamodel.emf.impl.EmfPackageImpl#getEMFNamespacePrefix()
+     * @generated
+     */
+    int EMF_NAMESPACE_PREFIX = 7;
+
+    /**
+     * The feature id for the '<em><b>Emf Prefix</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_NAMESPACE_PREFIX__EMF_PREFIX = 0;
+
+    /**
+     * The feature id for the '<em><b>Emf URI</b></em>' reference.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_NAMESPACE_PREFIX__EMF_URI = 1;
+
+    /**
+     * The number of structural features of the the '<em>EMF Namespace Prefix</em>' class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_NAMESPACE_PREFIX_FEATURE_COUNT = 2;
+
+    /**
+     * The meta object id for the '{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFNamespaceURIImpl <em>EMF Namespace URI</em>}' class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see com.activiti.repo.dictionary.metamodel.emf.impl.EMFNamespaceURIImpl
+     * @see com.activiti.repo.dictionary.metamodel.emf.impl.EmfPackageImpl#getEMFNamespaceURI()
+     * @generated
+     */
+    int EMF_NAMESPACE_URI = 8;
+
+    /**
+     * The feature id for the '<em><b>Emf URI</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_NAMESPACE_URI__EMF_URI = 0;
+
+    /**
+     * The feature id for the '<em><b>Emf Prefixes</b></em>' reference list.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_NAMESPACE_URI__EMF_PREFIXES = 1;
+
+    /**
+     * The number of structural features of the the '<em>EMF Namespace URI</em>' class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_NAMESPACE_URI_FEATURE_COUNT = 2;
+
+    /**
      * The meta object id for the '<em>QName</em>' data type.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -534,7 +607,7 @@ public interface EmfPackage extends EPackage
      * @see com.activiti.repo.dictionary.metamodel.emf.impl.EmfPackageImpl#getQName()
      * @generated
      */
-    int QNAME = 7;
+    int QNAME = 9;
 
 
     /**
@@ -859,6 +932,70 @@ public interface EmfPackage extends EPackage
      * @generated
      */
     EReference getEMFType_EmfDefaultAspects();
+
+    /**
+     * Returns the meta object for class '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix <em>EMF Namespace Prefix</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for class '<em>EMF Namespace Prefix</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix
+     * @generated
+     */
+    EClass getEMFNamespacePrefix();
+
+    /**
+     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix#getEmfPrefix <em>Emf Prefix</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the attribute '<em>Emf Prefix</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix#getEmfPrefix()
+     * @see #getEMFNamespacePrefix()
+     * @generated
+     */
+    EAttribute getEMFNamespacePrefix_EmfPrefix();
+
+    /**
+     * Returns the meta object for the reference '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix#getEmfURI <em>Emf URI</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the reference '<em>Emf URI</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix#getEmfURI()
+     * @see #getEMFNamespacePrefix()
+     * @generated
+     */
+    EReference getEMFNamespacePrefix_EmfURI();
+
+    /**
+     * Returns the meta object for class '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI <em>EMF Namespace URI</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for class '<em>EMF Namespace URI</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI
+     * @generated
+     */
+    EClass getEMFNamespaceURI();
+
+    /**
+     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI#getEmfURI <em>Emf URI</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the attribute '<em>Emf URI</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI#getEmfURI()
+     * @see #getEMFNamespaceURI()
+     * @generated
+     */
+    EAttribute getEMFNamespaceURI_EmfURI();
+
+    /**
+     * Returns the meta object for the reference list '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI#getEmfPrefixes <em>Emf Prefixes</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the reference list '<em>Emf Prefixes</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI#getEmfPrefixes()
+     * @see #getEMFNamespaceURI()
+     * @generated
+     */
+    EReference getEMFNamespaceURI_EmfPrefixes();
 
     /**
      * Returns the meta object for data type '{@link com.activiti.repo.ref.QName <em>QName</em>}'.

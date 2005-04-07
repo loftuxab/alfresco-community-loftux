@@ -1,9 +1,11 @@
 package com.activiti.repo.ref;
 
+import java.util.Collection;
+
 
 /**
  * The <code>NamespacePrefixResolver</code> provides a mapping between
- * QName prefixes and namespace URIs.
+ * namespace prefixes and namespace URIs.
  * 
  * @author David Caruana
  */
@@ -11,24 +13,24 @@ public interface NamespacePrefixResolver
 {
 
     /**
-     * Gets the registered namespace URI for the given prefix
+     * Gets the namespace URI registered for the given prefix
      * 
      * @param prefix  prefix to lookup
      * @return  the namespace
-     * @throws NamespaceException  prefix has not been registered
+     * @throws NamespaceException  if prefix has not been registered  
      */
     public String getNamespaceURI(String prefix)
         throws NamespaceException;
     
 
     /**
-     * Gets the registered prefix for the given namespace URI
+     * Gets the registered prefixes for the given namespace URI
      * 
      * @param namespaceURI  namespace URI to lookup
-     * @return  the prefix
-     * @throws NamespaceException  prefix has not been registered for URI
+     * @return  the prefixes (or empty collection, if no prefixes registered against URI)
+     * @throws NamespaceException  if URI has not been registered 
      */
-    public String getPrefix(String namespaceURI)
+    public Collection<String> getPrefixes(String namespaceURI)
         throws NamespaceException;
     
 }

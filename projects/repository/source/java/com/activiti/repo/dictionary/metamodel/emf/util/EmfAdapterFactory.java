@@ -105,6 +105,14 @@ public class EmfAdapterFactory extends AdapterFactoryImpl
             {
                 return createEMFTypeAdapter();
             }
+            public Object caseEMFNamespacePrefix(EMFNamespacePrefix object)
+            {
+                return createEMFNamespacePrefixAdapter();
+            }
+            public Object caseEMFNamespaceURI(EMFNamespaceURI object)
+            {
+                return createEMFNamespaceURIAdapter();
+            }
             public Object defaultCase(EObject object)
             {
                 return createEObjectAdapter();
@@ -226,6 +234,36 @@ public class EmfAdapterFactory extends AdapterFactoryImpl
      * @generated
      */
     public Adapter createEMFTypeAdapter()
+    {
+        return null;
+    }
+
+    /**
+     * Creates a new adapter for an object of class '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix <em>EMF Namespace Prefix</em>}'.
+     * <!-- begin-user-doc -->
+     * This default implementation returns null so that we can easily ignore cases;
+     * it's useful to ignore a case when inheritance will catch all the cases anyway.
+     * <!-- end-user-doc -->
+     * @return the new adapter.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix
+     * @generated
+     */
+    public Adapter createEMFNamespacePrefixAdapter()
+    {
+        return null;
+    }
+
+    /**
+     * Creates a new adapter for an object of class '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI <em>EMF Namespace URI</em>}'.
+     * <!-- begin-user-doc -->
+     * This default implementation returns null so that we can easily ignore cases;
+     * it's useful to ignore a case when inheritance will catch all the cases anyway.
+     * <!-- end-user-doc -->
+     * @return the new adapter.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceURI
+     * @generated
+     */
+    public Adapter createEMFNamespaceURIAdapter()
     {
         return null;
     }

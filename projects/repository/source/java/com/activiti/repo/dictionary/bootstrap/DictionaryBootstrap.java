@@ -1,13 +1,18 @@
 package com.activiti.repo.dictionary.bootstrap;
 
+import com.activiti.repo.dictionary.DictionaryException;
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.metamodel.M2Aspect;
 import com.activiti.repo.dictionary.metamodel.M2Association;
 import com.activiti.repo.dictionary.metamodel.M2ChildAssociation;
+import com.activiti.repo.dictionary.metamodel.M2NamespacePrefix;
+import com.activiti.repo.dictionary.metamodel.M2NamespaceURI;
 import com.activiti.repo.dictionary.metamodel.M2Property;
 import com.activiti.repo.dictionary.metamodel.M2PropertyType;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
+import com.activiti.repo.dictionary.metamodel.NamespaceDAO;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.version.lightweight.LightWeightVersionStoreBase;
 
@@ -24,6 +29,11 @@ public class DictionaryBootstrap
 {
 
     /**
+     * Namespace DAO
+     */
+    private NamespaceDAO namespaceDAO = null;
+    
+    /**
      * Meta Model DAO
      */
     private MetaModelDAO metaModelDAO = null;
@@ -37,11 +47,22 @@ public class DictionaryBootstrap
      * Create test model definitions during bootstrap
      */
     private boolean createTestModel = false;
-    
+
     /**
      * Create light weight version store model defintions during bootstrap
      */
-    private boolean createVersionModel = true;
+    private boolean createVersionModel = false;
+
+    
+    /**
+     * Sets the Namespace DAO to boostrap with
+     * 
+     * @param namespaceDAO  the namespace DAO
+     */
+    public void setNamespaceDAO(NamespaceDAO namespaceDAO)
+    {
+        this.namespaceDAO = namespaceDAO;
+    }
     
     /**
      * Sets the Meta Model DAO to boostrap with
@@ -84,12 +105,26 @@ public class DictionaryBootstrap
         this.createVersionModel = createVersionModel;
     }
 
+    
     /**
      * Create bootstrap meta-data definitions. 
      */
     public void bootstrap()
     {
+        if (namespaceDAO == null)
+        {
+            throw new DictionaryException("Namespace DAO has not been provided");
+        }
+        if (metaModelDAO == null)
+        {
+            throw new DictionaryException("Meta Model DAO has not been provided");
+        }
+        
+        // Create core definitions
+        createNamespaces();
         createPropertyTypes();
+        
+        // Create optional definitions
         if (createMetaModel)
         {
             createMetaModel();
@@ -102,10 +137,31 @@ public class DictionaryBootstrap
         {
             createVersionModel();
         }
-        metaModelDAO.save();
     }
     
-
+    
+    /**
+     * Create bootstrap Namespace definitions
+     */
+    private void createNamespaces()
+    {
+        // Default Namespace
+        M2NamespaceURI defaultURI = namespaceDAO.createURI(NamespaceService.DEFAULT_URI);
+        M2NamespacePrefix defaultPrefix = namespaceDAO.createPrefix(NamespaceService.DEFAULT_PREFIX);
+        defaultPrefix.setURI(defaultURI);
+        
+        // Activiti Namespace
+        M2NamespaceURI activitiURI = namespaceDAO.createURI(NamespaceService.ACTIVITI_URI);
+        M2NamespacePrefix activitiPrefix = namespaceDAO.createPrefix(NamespaceService.ACTIVITI_PREFIX);
+        activitiPrefix.setURI(activitiURI);
+        
+        // Activiti Test Namespace
+        M2NamespaceURI activitiTestURI = namespaceDAO.createURI(NamespaceService.ACTIVITI_TEST_URI);
+        M2NamespacePrefix activitiTestPrefix = namespaceDAO.createPrefix(NamespaceService.ACTIVITI_TEST_PREFIX);
+        activitiTestPrefix.setURI(activitiTestURI);
+    }
+    
+    
     /**
      * Create bootstrap Property Type definitions.
      */
@@ -116,6 +172,7 @@ public class DictionaryBootstrap
         M2PropertyType booleanType = metaModelDAO.createPropertyType(PropertyTypeDefinition.BOOLEAN);
         M2PropertyType qnameType = metaModelDAO.createPropertyType(PropertyTypeDefinition.QNAME);
         M2PropertyType idType = metaModelDAO.createPropertyType(PropertyTypeDefinition.GUID);
+        // TODO: Create other property types...
     }
     
 
@@ -135,7 +192,7 @@ public class DictionaryBootstrap
     private void createTestModel()
     {
         // Create Test Referencable Aspect
-        M2Aspect referenceAspect = metaModelDAO.createAspect(QName.createQName("test", "referenceable"));
+        M2Aspect referenceAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "referenceable"));
         M2Property idProp = referenceAspect.createProperty("id");
         idProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
         idProp.setMandatory(true);
@@ -143,7 +200,7 @@ public class DictionaryBootstrap
         idProp.setMultiValued(false);
         
         // Create Test Base Type
-        M2Type baseType = metaModelDAO.createType(QName.createQName("test", "base"));
+        M2Type baseType = metaModelDAO.createType(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "base"));
         M2Property primaryTypeProp = baseType.createProperty("primaryType");
         primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         primaryTypeProp.setMandatory(true);
@@ -156,7 +213,7 @@ public class DictionaryBootstrap
         aspectsProp.setMultiValued(true);
 
         // Create Test File Type
-        M2Type fileType = metaModelDAO.createType(QName.createQName("test", "file"));
+        M2Type fileType = metaModelDAO.createType(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file"));
         fileType.setSuperClass(baseType);
         fileType.getDefaultAspects().add(referenceAspect);
         M2Property encodingProp = fileType.createProperty("encoding");
@@ -169,7 +226,7 @@ public class DictionaryBootstrap
         mimetypeProp.setMultiValued(false);
         
         // Create Test Folder Type
-        M2Type folderType = metaModelDAO.createType(QName.createQName("test", "folder"));
+        M2Type folderType = metaModelDAO.createType(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder"));
         folderType.setSuperClass(baseType);
         folderType.getDefaultAspects().add(referenceAspect);
         M2ChildAssociation contentsAssoc = folderType.createChildAssociation("contents");

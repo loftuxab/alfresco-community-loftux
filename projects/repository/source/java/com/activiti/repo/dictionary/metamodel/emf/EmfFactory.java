@@ -10,8 +10,7 @@ import org.eclipse.emf.ecore.EFactory;
  * @see com.activiti.repo.dictionary.metamodel.emf.EmfPackage
  * @generated
  */
-public interface EmfFactory extends EFactory
-{
+public interface EmfFactory extends EFactory{
     /**
      * The singleton instance of the factory.
      * <!-- begin-user-doc -->
@@ -73,6 +72,24 @@ public interface EmfFactory extends EFactory
      * @generated
      */
     EMFType createEMFType();
+
+    /**
+     * Returns a new object of class '<em>EMF Namespace Prefix</em>'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return a new object of class '<em>EMF Namespace Prefix</em>'.
+     * @generated
+     */
+    EMFNamespacePrefix createEMFNamespacePrefix();
+
+    /**
+     * Returns a new object of class '<em>EMF Namespace URI</em>'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return a new object of class '<em>EMF Namespace URI</em>'.
+     * @generated
+     */
+    EMFNamespaceURI createEMFNamespaceURI();
 
     /**
      * Returns the package supported by this factory.

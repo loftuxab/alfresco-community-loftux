@@ -12,17 +12,17 @@ import java.io.Serializable;
 public final class QName implements Serializable
 {
 
-    private static final long serialVersionUID = 246716213529037024L;
+    private static final long serialVersionUID = 3977016258204348976L;
 
-    private String prefix;
     private String namespaceURI;
     private String localName;
     private int hashCode;
+    private String prefix;
 
     private static char NAMESPACE_BEGIN = '{';
     private static char NAMESPACE_END = '}';
 
-
+    
     /**
      * Create a QName
      * 
@@ -44,7 +44,7 @@ public final class QName implements Serializable
     /**
      * Create a QName
      * 
-     * @param prefix  namespace prefix
+     * @param prefix  namespace prefix (maybe null or empty string)
      * @param localName  local name
      * @param prefixResolver  lookup to resolve mappings between prefix and namespace
      * @return  the QName
@@ -52,7 +52,23 @@ public final class QName implements Serializable
     public static QName createQName(String prefix, String localName, NamespacePrefixResolver prefixResolver)
         throws InvalidQNameException, NamespaceException
     {
-        throw new UnsupportedOperationException();
+        // Validate Arguments
+        if (localName == null || localName.length() == 0)
+        {
+            throw new InvalidQNameException("A QName must consist of a local name");
+        }
+        if (prefixResolver == null)
+        {
+            throw new IllegalArgumentException("A Prefix Resolver must be specified"); 
+        }
+        if (prefix == null)
+        {
+            prefix = ""; 
+        }
+        
+        // Calculate namespace URI and create QName
+        String uri = prefixResolver.getNamespaceURI(prefix);
+        return new QName(uri, localName, prefix);
     }
 
 
@@ -120,6 +136,30 @@ public final class QName implements Serializable
     }
 
 
+    /**
+     * Construct QName
+     * 
+     * @param namespace  qualifying namespace (maybe null or empty string)
+     * @param name  qualified name
+     * @param prefix  prefix (maybe null or empty string)
+     */
+    private QName(String namespace, String name, String prefix)
+    {
+        this.namespaceURI = (namespace == null) ? "" : namespace;
+        this.prefix = prefix;
+        this.localName = name;
+        this.hashCode = 0;
+    }
+
+
+    /**
+     * Default Constructor
+     */
+    private QName()
+    {
+    }
+
+    
     /**
      * Gets the name
      * 
@@ -190,31 +230,5 @@ public final class QName implements Serializable
         return NAMESPACE_BEGIN + namespaceURI + NAMESPACE_END + localName;
     }
 
-
-    /**
-     * Construct QName
-     * 
-     * @param namespace
-     *            qualifying namespace (maybe null or empty string)
-     * @param name
-     *            qualified name
-     * @param prefix
-     *            prefix (maybe null or empty string)
-     */
-    private QName(String namespace, String name, String prefix)
-    {
-        this.namespaceURI = (namespace == null) ? "" : namespace;
-        this.localName = name;
-        this.prefix = prefix;
-        this.hashCode = 0;
-    }
-
-
-    /**
-     * Default Constructor
-     */
-    private QName()
-    {
-    }
 
 }

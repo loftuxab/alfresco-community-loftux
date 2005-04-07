@@ -9,10 +9,12 @@ import com.activiti.repo.dictionary.AssociationRef;
 import com.activiti.repo.dictionary.ChildAssociationDefinition;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.dictionary.metamodel.emf.EMFMetaModelDAO;
+import com.activiti.repo.dictionary.metamodel.emf.EMFResource;
 import com.activiti.repo.ref.QName;
 
 
@@ -21,31 +23,34 @@ import com.activiti.repo.ref.QName;
  * 
  * @author David Caruana
  */
-public class DictionaryServiceImplTest extends TestCase
+public class DictionaryComponentTest extends TestCase
 {
 
-    private DictionaryServiceImpl service;
+    private DictionaryComponent service;
     
     
     protected void setUp() throws Exception
     {
+        EMFResource resource = new EMFResource();
+        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testModel.xml");
+        resource.init();
         EMFMetaModelDAO dao = new EMFMetaModelDAO();
-        dao.setResourceURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testModel.xml");
+        dao.setResource(resource);
         dao.init();
-        service = new DictionaryServiceImpl();
+        service = new DictionaryComponent();
         service.setMetaModelDAO(dao);
     }
 
     
     public void testGetClassDefinition()
     {
-        ClassRef fileRef = new ClassRef(QName.createQName("test", "file"));
+        ClassRef fileRef = new ClassRef(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file"));
         ClassDefinition fileClass = service.getClass(fileRef);
         assertNotNull(fileClass);
         assertTrue(fileClass instanceof TypeDefinition);
         assertEquals(fileRef, fileClass.getReference());
         assertEquals(false, fileClass.isAspect());
-        assertEquals(QName.createQName("test", "base"), fileClass.getSuperClass().getQName());
+        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "base"), fileClass.getSuperClass().getQName());
         Map<PropertyRef,PropertyDefinition> fileProperties = fileClass.getProperties();
         assertNotNull(fileProperties);
         assertEquals(4, fileProperties.size());
@@ -54,7 +59,7 @@ public class DictionaryServiceImplTest extends TestCase
         assertNotNull(nameProp);
         assertEquals(propRef, nameProp.getReference());
         
-        ClassRef folderRef = new ClassRef(QName.createQName("test", "folder"));
+        ClassRef folderRef = new ClassRef(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder"));
         ClassDefinition folderClass = service.getClass(folderRef);
         assertNotNull(folderClass);
         assertEquals(folderRef, folderClass.getReference());
@@ -68,7 +73,7 @@ public class DictionaryServiceImplTest extends TestCase
         assertEquals(assocRef, contentsAssoc.getReference());
         assertEquals(true, contentsAssoc.isChild());
         ClassRef toClass = contentsAssoc.getRequiredToClasses().get(0);
-        assertEquals(QName.createQName("test", "file"), toClass.getQName());
+        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file"), toClass.getQName());
     }
 
     

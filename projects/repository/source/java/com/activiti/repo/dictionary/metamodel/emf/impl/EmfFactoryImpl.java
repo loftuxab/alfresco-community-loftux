@@ -50,6 +50,8 @@ public class EmfFactoryImpl extends EFactoryImpl implements EmfFactory
             case EmfPackage.EMF_CHILD_ASSOCIATION: return createEMFChildAssociation();
             case EmfPackage.EMF_PROPERTY_TYPE: return createEMFPropertyType();
             case EmfPackage.EMF_TYPE: return createEMFType();
+            case EmfPackage.EMF_NAMESPACE_PREFIX: return createEMFNamespacePrefix();
+            case EmfPackage.EMF_NAMESPACE_URI: return createEMFNamespaceURI();
             default:
                 throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
         }
@@ -151,6 +153,28 @@ public class EmfFactoryImpl extends EFactoryImpl implements EmfFactory
     {
         EMFTypeImpl emfType = new EMFTypeImpl();
         return emfType;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EMFNamespacePrefix createEMFNamespacePrefix()
+    {
+        EMFNamespacePrefixImpl emfNamespacePrefix = new EMFNamespacePrefixImpl();
+        return emfNamespacePrefix;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EMFNamespaceURI createEMFNamespaceURI()
+    {
+        EMFNamespaceURIImpl emfNamespaceURI = new EMFNamespaceURIImpl();
+        return emfNamespaceURI;
     }
 
     /**
