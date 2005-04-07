@@ -623,5 +623,83 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
+   
+   <tag>
+      <name>booleanEvaluator</name>
+      <tagclass>com.activiti.web.jsf.tag.evaluator.BooleanEvaluatorTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>binding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
+   
+   <tag>
+      <name>valueSetEvaluator</name>
+      <tagclass>com.activiti.web.jsf.tag.evaluator.ValueSetEvaluatorTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>binding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
+   
+   <tag>
+      <name>stringEqualsEvaluator</name>
+      <tagclass>com.activiti.web.jsf.tag.evaluator.StringEqualsEvaluatorTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>binding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>condition</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
 
 </taglib>

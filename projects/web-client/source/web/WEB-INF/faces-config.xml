@@ -61,6 +61,21 @@
       <component-type>awc.faces.ActionLink</component-type>
       <component-class>com.activiti.web.jsf.component.UIActionLink</component-class>
    </component>
+   
+   <component>
+      <component-type>awc.faces.BooleanEvaluator</component-type>
+      <component-class>com.activiti.web.jsf.component.evaluator.BooleanEvaluator</component-class>
+   </component>
+   
+   <component>
+      <component-type>awc.faces.ValueSetEvaluator</component-type>
+      <component-class>com.activiti.web.jsf.component.evaluator.ValueSetEvaluator</component-class>
+   </component>
+   
+   <component>
+      <component-type>awc.faces.StringEqualsEvaluator</component-type>
+      <component-class>com.activiti.web.jsf.component.evaluator.StringEqualsEvaluator</component-class>
+   </component>
 
 
    <!-- ==================== CONVERTERS ==================== -->

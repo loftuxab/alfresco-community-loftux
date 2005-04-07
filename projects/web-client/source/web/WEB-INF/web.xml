@@ -41,6 +41,10 @@
         <url-pattern>/jsf-test/*</url-pattern>
     </servlet-mapping>
     -->
+    
+    <session-config>
+       <session-timeout>120</session-timeout>
+    </session-config>
 
     <security-constraint>
    	 <!-- This security constraint illustrates how JSP pages 

@@ -348,7 +348,40 @@
         </h:column>
       </h:dataTable>
       
-      </p>
+      <p>
+      
+      <b>Test Evaluators</b><br>
+      1a. Boolean Evaluator - you should see the next line of text:<br>
+      <awc:booleanEvaluator value="#{TestList.rows != null}">
+         <h:outputText value="Component inside an evaluator"/>
+      </awc:booleanEvaluator>
+      <br><br>
+      1b. Boolean Evaluator - you should <i>not</i> see the next line of text:<br>
+      <awc:booleanEvaluator value="#{TestList.rows == null}">
+         <h:outputText value="Component inside an evaluator"/>
+      </awc:booleanEvaluator>
+      <br><br>
+      2a. Value Set Evaluator - you should see the next line of text:<br>
+      <awc:valueSetEvaluator value="#{TestList.rows}">
+         <h:outputText value="Component inside an evaluator"/>
+      </awc:valueSetEvaluator> 
+      <br><br>
+      2b. Value Set Evaluator - you should <i>not</i> see the next line of text:<br>
+      <awc:valueSetEvaluator value="#{null}">
+         <h:outputText value="Component inside an evaluator"/>
+      </awc:valueSetEvaluator>
+      <br><br>
+      3a. String Equals Evaluator - you should see the next line of text:<br>
+      <awc:stringEqualsEvaluator value="some string" condition="some string">
+         <h:outputText value="Component inside an evaluator"/>
+      </awc:stringEqualsEvaluator>
+      <br><br>
+      3b. String Equals Evaluator - you should <i>not</i> see the next line of text:<br>
+      <awc:stringEqualsEvaluator value="some string" condition="some string123">
+         <h:outputText value="Component inside an evaluator"/>
+      </awc:stringEqualsEvaluator>
+      
+      <p>
       
       <h:commandButton id="add-user" value="Add" action="adduser" actionListener="#{UserListBean.addUser}"/>
       <br/><br/>
