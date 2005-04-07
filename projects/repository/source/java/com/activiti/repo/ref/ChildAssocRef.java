@@ -9,6 +9,8 @@ package com.activiti.repo.ref;
 
 import java.io.Serializable;
 
+import com.activiti.util.EqualsHelper;
+
 /**
  * This class represents a child relationship between two nodes. This
  * relationship is named.
@@ -38,29 +40,10 @@ public class ChildAssocRef implements EntityRef, Serializable
    /**
     * Construct a representation of a parent --- name ----> child relationship.
     * 
-    * @param parentRef
-    * 
-    * The parent reference. Not null.
-    * 
-    * @param childName
-    * 
-    * The child name. Must be non null, length greater then zero and following a
-    * name convention. This should be enforced elsewhere.
-    * 
-    * We mandate:
-    * <OL>
-    * <LI> not null,
-    * <LI> greater then zero length,
-    * <LI> and can not contain '/'.
-    * </OL>
-    * 
-    * @param childRef
-    * 
-    * The child reference. This must not be null.
-    * 
-    * @param nthSibling
-    * 
-    * The nth association with the same properties.  Usually -1 to be ignored.
+    * @param parentRef the parent reference
+    * @param childQName the qualified name of the association
+    * @param childRef the child node reference. This must not be null.
+    * @param nthSibling the nth association with the same properties.  Usually -1 to be ignored.
     */
    public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef, int nthSibling)
    {
@@ -68,6 +51,12 @@ public class ChildAssocRef implements EntityRef, Serializable
       this.childQName = childQName;
       this.childRef = childRef;
       this.nthSibling = nthSibling;
+      
+      // check
+      if (childRef == null)
+      {
+          throw new IllegalArgumentException("Child reference may not be null");
+      }
    }
    
    /**
@@ -79,7 +68,7 @@ public class ChildAssocRef implements EntityRef, Serializable
    }
 
    /**
-    * Get the name of the parent-child association
+    * Get the qualified name of the parent-child association
     * 
     * @return
     */
@@ -129,8 +118,10 @@ public class ChildAssocRef implements EntityRef, Serializable
       }
       ChildAssocRef other = (ChildAssocRef) o;
 
-      return getParentRef().equals(other.getParentRef()) && getName().equals(other.getName())
-            && getChildRef().equals(other.getChildRef());
+      return (EqualsHelper.nullSafeEquals(this.parentRef, other.parentRef)
+              && EqualsHelper.nullSafeEquals(this.childQName, other.childQName)
+              && EqualsHelper.nullSafeEquals(this.childRef, other.childRef)
+              && this.nthSibling == other.nthSibling);
    }
 
    public int hashCode()

@@ -20,38 +20,168 @@ import com.activiti.repo.store.StoreService;
 import com.activiti.util.BaseSpringTest;
 
 /**
- * Tests the default implementation of the {@link com.activiti.repo.service.NodeService}
+ * Provides a base set of tests of the various {@link com.activiti.repo.node.NodeService}
+ * implementations.
+ * <p>
+ * To test a specific incarnation of the service, the methods {@link #getStoreService()} and
+ * {@link #getNodeService()} must be implemented. 
+ * 
+ * @see #storeService
+ * @see #nodeService
+ * @see #rootNodeRef
+ * @see #buildNodeGraph()
  * 
  * @author Derek Hulley
  */
-public class NodeServiceTest extends BaseSpringTest
+public abstract class BaseNodeServiceTest extends BaseSpringTest
 {
-    private StoreService storeService;
-    private NodeService nodeService;
-    private NodeRef rootNodeRef;
+    protected StoreService storeService;
+    protected NodeService nodeService;
+    /** populated during setup */
+    protected NodeRef rootNodeRef;
 
-    public void setStoreService(StoreService storeService)
-    {
-        this.storeService = storeService;
-    }
-
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-    
     protected void onSetUpInTransaction() throws Exception
     {
+        storeService = getStoreService();
+        nodeService = getNodeService();
+        
         // create a first store directly
-        StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE,
+        StoreRef storeRef = storeService.createStore(
+                StoreRef.PROTOCOL_WORKSPACE,
                 "Test_" + System.currentTimeMillis());
         rootNodeRef = storeService.getRootNode(storeRef);
     }
     
+    /**
+     * Usually just implemented by fetching the bean directly from the bean factory,
+     * for example:
+     * <p>
+     * <pre>
+     *      return (StoreService) applicationContext.getBean("dbStoreService");
+     * </pre>
+     * 
+     * @return Returns the implementation of <code>StoreService</code> to be
+     *      used for this test
+     */
+    protected abstract StoreService getStoreService();
+
+    /**
+     * Usually just implemented by fetching the bean directly from the bean factory,
+     * for example:
+     * <p>
+     * <pre>
+     *      return (NodeService) applicationContext.getBean("dbNodeService");
+     * </pre>
+     * 
+     * @return Returns the implementation of <code>NodeService</code> to be
+     *      used for this test
+     */
+    protected abstract NodeService getNodeService();
+    
     public void testSetUp() throws Exception
     {
-        assertNotNull("Node Service not set", nodeService);
+        assertNotNull("StoreService not set", nodeService);
+        assertNotNull("NodeService not set", nodeService);
         assertNotNull("rootNodeRef not created", rootNodeRef);
+    }
+    
+    /**
+     * Builds a graph of child associations as follows:
+     * <pre>
+     * Level 0:     root
+     * Level 1:     root_p_n1   root_p_n2
+     * Level 2:     n1_p_n3     n2_p_n4     n1_n4       n2_p_n5
+     * Level 3:     n3_p_n6     n4_n6       n5_p_n7
+     * Level 4:     n6_p_n8     n7_n8
+     * </pre>
+     * The namespace URI for all associations is <b>http://x</b>.
+     * <p>
+     * The naming convention is:
+     * <pre>
+     * n2_p_n5
+     * n4_n5
+     * where
+     *      n5 is the node number of the node
+     *      n2 is the primary parent node number
+     *      n4 is any other non-primary parent
+     * </pre>
+     * <p>
+     * The session is flushed to ensure that persistence occurs correctly.  It is
+     * cleared to ensure that fetches against the created data are correct.
+     * 
+     * @return Returns a map <code>ChildAssocRef</code> instances keyed by qualified assoc name
+     */
+    protected Map<QName, ChildAssocRef> buildNodeGraph() throws Exception
+    {
+        String ns = "http://x";
+        QName qname = null;
+        ChildAssocRef assoc = null;
+        Map<QName, ChildAssocRef> ret = new HashMap<QName, ChildAssocRef>(13);
+        
+        // LEVEL 0
+
+        // LEVEL 1
+        qname = QName.createQName(ns, "root_p_n1");
+        assoc = nodeService.createNode(rootNodeRef, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n1 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "root_p_n2");
+        assoc = nodeService.createNode(rootNodeRef, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n2 = assoc.getChildRef();
+
+        // LEVEL 2
+        qname = QName.createQName(ns, "n1_p_n3");
+        assoc = nodeService.createNode(n1, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n3 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "n2_p_n4");
+        assoc = nodeService.createNode(n2, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n4 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "n1_n4");
+        assoc = nodeService.addChild(n1, n4, qname);
+        ret.put(qname, assoc);
+
+        qname = QName.createQName(ns, "n2_p_n5");
+        assoc = nodeService.createNode(n2, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n5 = assoc.getChildRef();
+
+        // LEVEL 3
+        qname = QName.createQName(ns, "n3_p_n6");
+        assoc = nodeService.createNode(n3, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n6 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "n4_n6");
+        assoc = nodeService.addChild(n4, n6, qname);
+        ret.put(qname, assoc);
+
+        qname = QName.createQName(ns, "n5_p_n7");
+        assoc = nodeService.createNode(n5, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n7 = assoc.getChildRef();
+
+        // LEVEL 4
+        qname = QName.createQName(ns, "n6_p_n8");
+        assoc = nodeService.createNode(n6, qname, Node.TYPE_CONTAINER);
+        ret.put(qname, assoc);
+        NodeRef n8 = assoc.getChildRef();
+
+        qname = QName.createQName(ns, "n7_n8");
+        assoc = nodeService.addChild(n7, n8, qname);
+        ret.put(qname, assoc);
+
+        // flush and clear
+        getSession().flush();
+        getSession().clear();
+        
+        // done
+        return ret;
     }
     
     private int countNodesById(NodeRef nodeRef)
@@ -218,10 +348,10 @@ public class NodeServiceTest extends BaseSpringTest
     public void testGetParents() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n6Ref = assocRefs.get(QName.createQName("n3_p_n6")).getChildRef();
-        NodeRef n7Ref = assocRefs.get(QName.createQName("n5_p_n7")).getChildRef();
+        NodeRef n6Ref = assocRefs.get(QName.createQName("{http://x}n3_p_n6")).getChildRef();
+        NodeRef n7Ref = assocRefs.get(QName.createQName("{http://x}n5_p_n7")).getChildRef();
         // get a child node's parents
-        NodeRef n8Ref = assocRefs.get(QName.createQName("n6_p_n8")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName("{http://x}n6_p_n8")).getChildRef();
         Collection<NodeRef> parents = nodeService.getParents(n8Ref);
         assertEquals("Incorrect number of parents", 2, parents.size());
         assertTrue("Expected parent not found", parents.contains(n6Ref));
@@ -239,7 +369,7 @@ public class NodeServiceTest extends BaseSpringTest
     public void testGetChildAssocs() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n1Ref = assocRefs.get(QName.createQName("root_p_n1")).getChildRef();
+        NodeRef n1Ref = assocRefs.get(QName.createQName("{http://x}root_p_n1")).getChildRef();
         
         // get the parent node's children
         Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
@@ -334,111 +464,12 @@ public class NodeServiceTest extends BaseSpringTest
     }
     
     /**
-     * Builds a graph of child associations as follows:
-     * <pre>
-     * Level 0:     root
-     * Level 1:     root_p_n1   root_p_n2
-     * Level 2:     n1_p_n3     n2_p_n4     n1_n4       n2_p_n5
-     * Level 3:     n3_p_n6     n4_n6       n5_p_n7
-     * Level 4:     n6_p_n8     n7_n8
-     * </pre>
-     * The namespace URI for all associations is <b>http://x</b>.
-     * <p>
-     * The naming convention is:
-     * <pre>
-     * n2_p_n5
-     * n4_n5
-     * where
-     *      n5 is the node number of the node
-     *      n2 is the primary parent node number
-     *      n4 is any other non-primary parent
-     * </pre>
-     * <p>
-     * The session is flushed to ensure that persistence occurs correctly.  It is
-     * cleared to ensure that fetches against the created data are correct.
-     * 
-     * @return Returns a map <code>ChildAssocRef</code> instances keyed by qualified assoc name
-     */
-    private Map<QName, ChildAssocRef> buildNodeGraph() throws Exception
-    {
-        String ns = "http://x";
-        QName qname = null;
-        ChildAssocRef assoc = null;
-        Map<QName, ChildAssocRef> ret = new HashMap<QName, ChildAssocRef>(13);
-        
-        // LEVEL 0
-
-        // LEVEL 1
-        qname = QName.createQName(ns, "root_p_n1");
-        assoc = nodeService.createNode(rootNodeRef, qname, Node.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n1 = assoc.getChildRef();
-
-        qname = QName.createQName(ns, "root_p_n2");
-        assoc = nodeService.createNode(rootNodeRef, qname, Node.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n2 = assoc.getChildRef();
-
-        // LEVEL 2
-        qname = QName.createQName(ns, "n1_p_n3");
-        assoc = nodeService.createNode(n1, qname, Node.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n3 = assoc.getChildRef();
-
-        qname = QName.createQName(ns, "n2_p_n4");
-        assoc = nodeService.createNode(n2, qname, Node.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n4 = assoc.getChildRef();
-
-        qname = QName.createQName(ns, "n1_n4");
-        assoc = nodeService.addChild(n1, n4, qname);
-        ret.put(qname, assoc);
-
-        qname = QName.createQName(ns, "n2_p_n5");
-        assoc = nodeService.createNode(n2, qname, Node.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n5 = assoc.getChildRef();
-
-        // LEVEL 3
-        qname = QName.createQName(ns, "n3_p_n6");
-        assoc = nodeService.createNode(n3, qname, Node.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n6 = assoc.getChildRef();
-
-        qname = QName.createQName(ns, "n4_n6");
-        assoc = nodeService.addChild(n4, n6, qname);
-        ret.put(qname, assoc);
-
-        qname = QName.createQName(ns, "n5_p_n7");
-        assoc = nodeService.createNode(n5, qname, Node.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n7 = assoc.getChildRef();
-
-        // LEVEL 4
-        qname = QName.createQName(ns, "n6_p_n8");
-        assoc = nodeService.createNode(n6, qname, Node.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n8 = assoc.getChildRef();
-
-        qname = QName.createQName(ns, "n7_n8");
-        assoc = nodeService.addChild(n7, n8, qname);
-        ret.put(qname, assoc);
-
-        // flush and clear
-        getSession().flush();
-        getSession().clear();
-        
-        // done
-        return ret;
-    }
-    
-    /**
      * @see #buildNodeGraph() 
      */
     public void testGetPath() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n8Ref = assocRefs.get(QName.createQName("n6_p_n8")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName("{http://x}n6_p_n8")).getChildRef();
 
         // get the primary node path for n8
         Path path = nodeService.getPath(n8Ref);
@@ -453,11 +484,18 @@ public class NodeServiceTest extends BaseSpringTest
     public void testGetPaths() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n6Ref = assocRefs.get(QName.createQName("n3_p_n6")).getChildRef();
-        NodeRef n8Ref = assocRefs.get(QName.createQName("n6_p_n8")).getChildRef();
+        NodeRef n6Ref = assocRefs.get(QName.createQName("{http://x}n3_p_n6")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName("{http://x}n6_p_n8")).getChildRef();
+        
+        // get all paths for the root node
+        Collection<Path> paths = nodeService.getPaths(rootNodeRef, false);
+        assertEquals("Root node must have exactly 1 path", 1, paths.size());
+        Path rootPath = paths.toArray(new Path[1])[0];
+        assertNotNull("Root node path must have 1 element", rootPath.last());
+        assertEquals("Root node path must have 1 element", rootPath.first(), rootPath.last());
 
         // get all paths for n8
-        Collection<Path> paths = nodeService.getPaths(n8Ref, false);
+        paths = nodeService.getPaths(n8Ref, false);
         assertEquals("Incorrect path count", 4, paths.size());
         // check that each path element has parent node ref, qname and child node ref
         for (Path path : paths)
@@ -468,8 +506,12 @@ public class NodeServiceTest extends BaseSpringTest
                 assertTrue("Path element of incorrect type", element instanceof Path.ChildAssocElement);
                 Path.ChildAssocElement childAssocElement = (Path.ChildAssocElement) element;
                 ChildAssocRef ref = childAssocElement.getRef();
-                assertNotNull("Parent node ref not set", ref.getParentRef());
-                assertNotNull("QName not set", ref.getName());
+                if (childAssocElement != path.first())
+                {
+                    // for all but the first element, the parent and assoc qname must be set
+                    assertNotNull("Parent node ref not set", ref.getParentRef());
+                    assertNotNull("QName not set", ref.getName());
+                }
                 assertNotNull("Child node ref not set", ref.getChildRef());
             }
         }

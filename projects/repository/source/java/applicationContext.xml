@@ -155,6 +155,7 @@
    <!--  PUBLIC SERVICES   -->
    <!--                    -->
    
+   <!-- StoreService implemented to persist to Database -->
    <bean id="dbStoreService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.store.StoreService</value>
@@ -182,6 +183,38 @@
       </property>
    </bean>
    
+   <!-- StoreService implemented to call a delegate and ensure that root nodes get indexed -->
+   <bean id="indexingStoreService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.store.StoreService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.store.index.IndexingStoreServiceImpl" >
+            <property name="storeServiceDelegate">
+               <ref bean="dbStoreService" />
+            </property>
+            <property name="indexer">
+               <ref bean="indexerComponent" />
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+            <ref bean="methodPerformanceAdvice" />
+         </list>
+      </property>
+   </bean>
+   
+   <!-- NodeService implemented to persist to Database -->
    <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.node.NodeService</value>
@@ -207,6 +240,36 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
+            <ref bean="methodPerformanceAdvice" />
+         </list>
+      </property>
+   </bean>
+   
+   <!-- NodeService implemented to call a delegate and ensure that nodes get indexed -->
+   <bean id="indexingNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.node.NodeService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.node.index.IndexingNodeServiceImpl" >
+            <property name="nodeServiceDelegate">
+               <ref bean="dbNodeService" />
+            </property>
+            <property name="indexer">
+               <ref bean="indexerComponent" />
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+      <property name="postInterceptors">
+         <list>
             <ref bean="methodPerformanceAdvice" />
          </list>
       </property>

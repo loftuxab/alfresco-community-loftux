@@ -186,6 +186,10 @@ public interface NodeService
             throws InvalidNodeRefException;
     
     /**
+     * The root node has an entry in the path(s) returned.  For this reason, there
+     * will always be <b>at least one</b> path element in the returned path(s).
+     * The first element will have a null parent reference and qname.
+     * 
      * @param nodeRef
      * @return Returns the path to the node along the primary node path
      * @throws InvalidNodeRefException if the node could not be found
@@ -195,6 +199,10 @@ public interface NodeService
     public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
+     * The root node has an entry in the path(s) returned.  For this reason, there
+     * will always be <b>at least one</b> path element in the returned path(s).
+     * The first element will have a null parent reference and qname.
+     * 
      * @param nodeRef
      * @param primaryOnly true if only the primary path must be retrieved.  If true, the
      *      result will have exactly one entry.

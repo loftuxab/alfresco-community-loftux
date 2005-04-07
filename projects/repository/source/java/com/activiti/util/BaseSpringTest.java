@@ -12,12 +12,17 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  */
 public abstract class BaseSpringTest extends AbstractTransactionalDataSourceSpringContextTests
 {
-    private SessionFactory sessionFactory;
+    /** protected so that it gets populated if autowiring is done by variable name **/
+    protected SessionFactory sessionFactory;
     
     public BaseSpringTest()
     {
     }
     
+    /**
+     * Setter present for in case autowiring is done by type
+     * @param sessionFactory
+     */
     public void setSessionFactory(SessionFactory sessionFactory)
     {
         this.sessionFactory = sessionFactory;

@@ -430,7 +430,12 @@ public class DbNodeServiceImpl implements NodeService
         Set<ChildAssoc> parentAssocs = currentNode.getParentAssocs();
         if (parentAssocs.size() == 0)
         {
-            // there are no parents so we must be at the root - save the current path
+            // there are no parents so we must be at the root
+            // create a one-sided assoc ref for the root node and prepend to the stack
+            ChildAssocRef assocRef = new ChildAssocRef(null, null, currentNode.getNodeRef());
+            Path.Element element = new Path.ChildAssocElement(assocRef);
+            currentPath.prepend(element);
+            // save the current path
             completedPaths.add(currentPath);
         }
         else // we have some parents

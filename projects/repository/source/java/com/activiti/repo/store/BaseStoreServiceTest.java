@@ -5,20 +5,38 @@ import com.activiti.repo.ref.StoreRef;
 import com.activiti.util.BaseSpringTest;
 
 /**
- * Tests the default implementation of the <code>WorkspaceService</code>
+ * Provides basic tests for implementations of <code>StoreService</code>.
+ * <p>
+ * Derived classes can work against any implementation of the <code>StoreService</code>
+ * and be sure that the comprehensive set of tests is being run.
  * 
+ * @see #storeService
+ * @see #getStoreService()
  * @see com.activiti.repo.store.StoreService
  *
  * @author Derek Hulley
  */
-public class StoreServiceTest extends BaseSpringTest
+public abstract class BaseStoreServiceTest extends BaseSpringTest
 {
     private StoreService storeService;
 
-    public void setStoreService(StoreService storeService)
+    protected void onSetUpInTransaction() throws Exception
     {
-        this.storeService = storeService;
+        storeService = getStoreService();
     }
+
+    /**
+     * Usually just implemented by fetching the bean directly from the bean factory,
+     * for example:
+     * <p>
+     * <pre>
+     *      return (StoreService) applicationContext.getBean("dbStoreService");
+     * </pre>
+     * 
+     * @return Returns the implementation of <code>StoreService</code> to be
+     *      used for this test
+     */
+    protected abstract StoreService getStoreService();
     
     public void testSetUp() throws Exception
     {

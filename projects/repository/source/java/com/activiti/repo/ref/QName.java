@@ -37,6 +37,10 @@ public final class QName implements Serializable
         {
             throw new InvalidQNameException("A QName must consist of a local name");
         }
+        if (localName.indexOf('/') > -1)
+        {
+            throw new InvalidQNameException("The local part of a QName may not contain '/'");
+        }
         return new QName(namespaceURI, localName, null);
     }
 
