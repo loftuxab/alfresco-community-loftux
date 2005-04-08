@@ -312,21 +312,33 @@ public class EMFNamespacePrefixImpl extends EObjectImpl implements EMFNamespaceP
         return result.toString();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2NamespacePrefix#getPrefix()
+     */
     public String getPrefix()
     {
         return getEmfPrefix();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2NamespacePrefix#setPrefix(java.lang.String)
+     */
     public void setPrefix(String prefix)
     {
         setEmfPrefix(prefix);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2NamespacePrefix#getURI()
+     */
     public M2NamespaceURI getURI()
     {
         return (M2NamespaceURI)getEmfURI();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2NamespacePrefix#setURI(com.activiti.repo.dictionary.metamodel.M2NamespaceURI)
+     */
     public void setURI(M2NamespaceURI uri)
     {
         setEmfURI((EMFNamespaceURI)uri);

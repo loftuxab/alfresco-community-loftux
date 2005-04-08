@@ -167,12 +167,19 @@ public class DictionaryBootstrap
      */
     private void createPropertyTypes()
     {
-        M2PropertyType stringType = metaModelDAO.createPropertyType(PropertyTypeDefinition.STRING);
-        M2PropertyType dateType = metaModelDAO.createPropertyType(PropertyTypeDefinition.DATE);
-        M2PropertyType booleanType = metaModelDAO.createPropertyType(PropertyTypeDefinition.BOOLEAN);
-        M2PropertyType qnameType = metaModelDAO.createPropertyType(PropertyTypeDefinition.QNAME);
-        M2PropertyType idType = metaModelDAO.createPropertyType(PropertyTypeDefinition.GUID);
-        // TODO: Create other property types...
+        M2PropertyType ANY = metaModelDAO.createPropertyType(PropertyTypeDefinition.ANY);
+        M2PropertyType TEXT = metaModelDAO.createPropertyType(PropertyTypeDefinition.TEXT);
+        M2PropertyType CONTENT = metaModelDAO.createPropertyType(PropertyTypeDefinition.CONTENT);
+        M2PropertyType INT = metaModelDAO.createPropertyType(PropertyTypeDefinition.INT);
+        M2PropertyType LONG = metaModelDAO.createPropertyType(PropertyTypeDefinition.LONG);
+        M2PropertyType FLOAT = metaModelDAO.createPropertyType(PropertyTypeDefinition.FLOAT);
+        M2PropertyType DOUBLE = metaModelDAO.createPropertyType(PropertyTypeDefinition.DOUBLE);
+        M2PropertyType DATE = metaModelDAO.createPropertyType(PropertyTypeDefinition.DATE);
+        M2PropertyType DATETIME = metaModelDAO.createPropertyType(PropertyTypeDefinition.DATETIME);
+        M2PropertyType BOOLEAN = metaModelDAO.createPropertyType(PropertyTypeDefinition.BOOLEAN);
+        M2PropertyType NAME = metaModelDAO.createPropertyType(PropertyTypeDefinition.NAME);
+        M2PropertyType GUID = metaModelDAO.createPropertyType(PropertyTypeDefinition.GUID);
+        M2PropertyType CATEGORY = metaModelDAO.createPropertyType(PropertyTypeDefinition.CATEGORY);
     }
     
 
@@ -202,13 +209,13 @@ public class DictionaryBootstrap
         // Create Test Base Type
         M2Type baseType = metaModelDAO.createType(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "base"));
         M2Property primaryTypeProp = baseType.createProperty("primaryType");
-        primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
+        primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
         primaryTypeProp.setMandatory(true);
         primaryTypeProp.setProtected(true);
         primaryTypeProp.setMultiValued(false);
         M2Property aspectsProp = baseType.createProperty("aspects");
-        aspectsProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
-        aspectsProp.setMandatory(true);
+        aspectsProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
+        aspectsProp.setMandatory(false);
         aspectsProp.setProtected(true);
         aspectsProp.setMultiValued(true);
 
@@ -217,11 +224,11 @@ public class DictionaryBootstrap
         fileType.setSuperClass(baseType);
         fileType.getDefaultAspects().add(referenceAspect);
         M2Property encodingProp = fileType.createProperty("encoding");
-        encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.STRING));
+        encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         encodingProp.setMandatory(true);
         encodingProp.setMultiValued(false);
         M2Property mimetypeProp = fileType.createProperty("mimetype");
-        mimetypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.STRING));
+        mimetypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         mimetypeProp.setMandatory(true);
         mimetypeProp.setMultiValued(false);
         
@@ -251,14 +258,14 @@ public class DictionaryBootstrap
         // Create verison number property
         M2Property versionNumber = versionType.createProperty(
                 LightWeightVersionStoreBase.ATTR_VERSION_NUMBER.getLocalName());
-        versionNumber.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.STRING));  // TODO Should be INT
+        versionNumber.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.INT));
         versionNumber.setMandatory(true);
         versionNumber.setMultiValued(false);
         
         // Create verison label property
         M2Property versionLabel = versionType.createProperty(
                 LightWeightVersionStoreBase.ATTR_VERSION_LABEL.getLocalName());
-        versionLabel.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.STRING));  
+        versionLabel.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));  
         versionLabel.setMandatory(true);
         versionLabel.setMultiValued(false);
         

@@ -24,7 +24,7 @@ public class EMFNamespaceDAOTest extends TestCase
     {
         // Create Resource
         EMFResource resource = new EMFResource();
-        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testModel.xml");
+        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testBootstrap.xml");
         resource.init();
         
         // Create DAO

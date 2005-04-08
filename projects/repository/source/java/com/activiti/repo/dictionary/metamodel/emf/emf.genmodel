@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <genmodel:GenModel xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
-    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/datadictionary/src"
-    editDirectory="/datadictionary.edit/src" editorDirectory="/datadictionary.editor/src"
-    modelPluginID="datadictionary" runtimeJar="true" modelName="datadictionary" editPluginClass="com.activiti.repo.dictionary.metamodel.emf.provider.datadictionaryEditPlugin"
-    editorPluginClass="com.activiti.repo.dictionary.metamodel.emf.presentation.datadictionaryEditorPlugin"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/repository/source/java"
+    editDirectory="/repository.edit/source/java" editorDirectory="/repository.editor/source/java"
+    modelPluginID="repository" runtimeJar="true" modelName="emf" editPluginClass="com.activiti.repo.dictionary.metamodel.emf.provider.emfEditPlugin"
+    editorPluginClass="com.activiti.repo.dictionary.metamodel.emf.presentation.emfEditorPlugin"
     runtimeCompatibility="false">
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Emf" basePackage="com.activiti.repo.dictionary.metamodel" ecorePackage="emf.ecore#/">
@@ -44,6 +44,15 @@
     <genClasses ecoreClass="emf.ecore#//EMFType">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFType/emfOrderedChildren"/>
       <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFType/emfDefaultAspects"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFType/emfStrict"/>
+    </genClasses>
+    <genClasses ecoreClass="emf.ecore#//EMFNamespacePrefix">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFNamespacePrefix/emfPrefix"/>
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFNamespacePrefix/emfURI"/>
+    </genClasses>
+    <genClasses ecoreClass="emf.ecore#//EMFNamespaceURI">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute emf.ecore#//EMFNamespaceURI/emfURI"/>
+      <genFeatures notify="false" createChild="false" ecoreFeature="ecore:EReference emf.ecore#//EMFNamespaceURI/emfPrefixes"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

@@ -3,7 +3,6 @@ package com.activiti.repo.dictionary.metamodel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.activiti.repo.dictionary.ClassRef;
@@ -28,9 +27,8 @@ public class M2References
     public static List<ClassRef> createClassRefList(Collection<? extends M2Class> m2Classes)
     {
         List<ClassRef> references = new ArrayList<ClassRef>(m2Classes.size());
-        for (Iterator iter = m2Classes.iterator(); iter.hasNext(); /**/)
+        for (M2Class m2Class : m2Classes)
         {
-            M2Class m2Class = (M2Class)iter.next();
             references.add(m2Class.getReference());
         }
         return Collections.unmodifiableList(references);
@@ -46,9 +44,8 @@ public class M2References
     public static List<PropertyRef> createPropertyRefList(Collection<M2Property> m2Properties)
     {
         List<PropertyRef> references = new ArrayList<PropertyRef>(m2Properties.size());
-        for (Iterator iter = m2Properties.iterator(); iter.hasNext(); /**/)
+        for (M2Property m2Property : m2Properties)
         {
-            M2Property m2Property = (M2Property)iter.next();
             references.add(m2Property.getReference());
         }
         return Collections.unmodifiableList(references);
@@ -64,9 +61,9 @@ public class M2References
     public static Collection<ClassRef> createQNameClassRefCollection(Collection<QName> qnames)
     {
         Collection<ClassRef> ddrefs = new ArrayList<ClassRef>(qnames.size());
-        for (Iterator iter = qnames.iterator(); iter.hasNext(); /**/)
+        for (QName qname : qnames)
         {
-            ClassRef classRef = new ClassRef((QName)iter.next());
+            ClassRef classRef = new ClassRef(qname);
             ddrefs.add(classRef);
         }
         

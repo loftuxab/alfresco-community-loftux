@@ -517,13 +517,22 @@ public interface EmfPackage extends EPackage{
     int EMF_TYPE__EMF_DEFAULT_ASPECTS = EMF_CLASS_FEATURE_COUNT + 1;
 
     /**
+     * The feature id for the '<em><b>Emf Strict</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_TYPE__EMF_STRICT = EMF_CLASS_FEATURE_COUNT + 2;
+
+    /**
      * The number of structural features of the the '<em>EMF Type</em>' class.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      * @ordered
      */
-    int EMF_TYPE_FEATURE_COUNT = EMF_CLASS_FEATURE_COUNT + 2;
+    int EMF_TYPE_FEATURE_COUNT = EMF_CLASS_FEATURE_COUNT + 3;
 
     /**
      * The meta object id for the '{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFNamespacePrefixImpl <em>EMF Namespace Prefix</em>}' class.
@@ -932,6 +941,17 @@ public interface EmfPackage extends EPackage{
      * @generated
      */
     EReference getEMFType_EmfDefaultAspects();
+
+    /**
+     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFType#getEmfStrict <em>Emf Strict</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the attribute '<em>Emf Strict</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFType#getEmfStrict()
+     * @see #getEMFType()
+     * @generated
+     */
+    EAttribute getEMFType_EmfStrict();
 
     /**
      * Returns the meta object for class '{@link com.activiti.repo.dictionary.metamodel.emf.EMFNamespacePrefix <em>EMF Namespace Prefix</em>}'.

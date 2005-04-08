@@ -25,7 +25,7 @@ public interface EMFProperty extends EObject
     void setEmfName(String value);
 
     /**
-     * @model
+     * @model default="false"
      */
     Boolean getEmfProtected();
     
@@ -40,7 +40,7 @@ public interface EMFProperty extends EObject
     void setEmfProtected(Boolean value);
 
     /**
-     * @model
+     * @model default="false"
      */
     Boolean getEmfMandatory();
 
@@ -55,7 +55,7 @@ public interface EMFProperty extends EObject
     void setEmfMandatory(Boolean value);
 
     /**
-     * @model
+     * @model default="false"
      */
     Boolean getEmfMultiple();
     
@@ -70,7 +70,7 @@ public interface EMFProperty extends EObject
     void setEmfMultiple(Boolean value);
 
     /**
-     * @model
+     * @model default="true"
      */
     Boolean getEmfIndexed();
 
@@ -85,7 +85,7 @@ public interface EMFProperty extends EObject
     void setEmfIndexed(Boolean value);
 
     /**
-     * @model
+     * @model default="false"
      */
     Boolean getEmfStoredInIndex();
     

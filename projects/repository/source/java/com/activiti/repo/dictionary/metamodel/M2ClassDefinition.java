@@ -2,7 +2,6 @@ package com.activiti.repo.dictionary.metamodel;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -109,11 +108,10 @@ public class M2ClassDefinition implements ClassDefinition
      */
     public Map<PropertyRef, PropertyDefinition> getProperties()
     {
-        List aggregatedProperties = aggregateProperties();
+        List<M2Property> aggregatedProperties = aggregateProperties();
         Map<PropertyRef, PropertyDefinition> propertyDefs = new HashMap<PropertyRef, PropertyDefinition>(aggregatedProperties.size());
-        for (Iterator iter = aggregatedProperties.iterator(); iter.hasNext(); /**/)
+        for (M2Property m2Property : aggregatedProperties)
         {
-            M2Property m2Property = (M2Property)iter.next();
             propertyDefs.put(m2Property.getPropertyDefinition().getReference(), m2Property.getPropertyDefinition());
         }
         return Collections.unmodifiableMap(propertyDefs);
@@ -136,11 +134,10 @@ public class M2ClassDefinition implements ClassDefinition
      */
     public Map<AssociationRef, AssociationDefinition> getAssociations()
     {
-        List aggregatedAssociations = aggregateAssociations();
+        List<M2Association> aggregatedAssociations = aggregateAssociations();
         Map<AssociationRef, AssociationDefinition> assocDefs = new HashMap<AssociationRef, AssociationDefinition>(aggregatedAssociations.size());
-        for (Iterator iter = aggregatedAssociations.iterator(); iter.hasNext(); /**/)
+        for (M2Association m2Assoc : aggregatedAssociations)
         {
-            M2Association m2Assoc = (M2Association)iter.next();
             assocDefs.put(m2Assoc.getAssociationDefintion().getReference(), m2Assoc.getAssociationDefintion());
         }
         return Collections.unmodifiableMap(assocDefs);

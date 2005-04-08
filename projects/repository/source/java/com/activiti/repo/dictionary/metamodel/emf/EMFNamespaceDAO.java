@@ -2,7 +2,6 @@ package com.activiti.repo.dictionary.metamodel.emf;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -120,10 +119,9 @@ public class EMFNamespaceDAO implements NamespaceDAO
         uriIndex = new HashMap<String,M2NamespaceURI>();
         prefixIndex = new HashMap<String,M2NamespacePrefix>();
         
-        List objects = resource.getContents();
-        for (Iterator iter = objects.iterator(); iter.hasNext(); /**/)
+        List<EObject> objects = resource.getContents();
+        for (EObject eObject : objects)
         {
-            EObject eObject = (EObject)iter.next();
             indexObject(eObject);
         }
     }

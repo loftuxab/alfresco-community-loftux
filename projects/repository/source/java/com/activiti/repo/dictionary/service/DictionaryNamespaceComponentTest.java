@@ -17,22 +17,23 @@ import com.activiti.repo.ref.NamespaceException;
  */
 public class DictionaryNamespaceComponentTest extends TestCase
 {
+    protected NamespaceService service;
 
-    private DictionaryNamespaceComponent service;
-    
     
     protected void setUp() throws Exception
     {
         EMFResource resource = new EMFResource();
-        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testModel.xml");
+        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testBootstrap.xml");
         resource.init();
         EMFNamespaceDAO dao = new EMFNamespaceDAO();
         dao.setResource(resource);
         dao.init();
-        service = new DictionaryNamespaceComponent();
-        service.setNamespaceDAO(dao);
+        DictionaryNamespaceComponent component = new DictionaryNamespaceComponent();
+        component.setNamespaceDAO(dao);
+        service = component;
     }
     
+
     public void testGetPrefixes()
     {
         Collection<String> prefixes = service.getPrefixes();

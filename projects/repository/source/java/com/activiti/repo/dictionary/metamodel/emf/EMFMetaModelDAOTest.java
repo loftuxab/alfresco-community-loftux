@@ -26,7 +26,7 @@ public class EMFMetaModelDAOTest extends TestCase
     {
         // Create Resource
         EMFResource resource = new EMFResource();
-        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testModel.xml");
+        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testBootstrap.xml");
         resource.init();
         
         // Create DAO
@@ -89,7 +89,7 @@ public class EMFMetaModelDAOTest extends TestCase
         QName fileQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
         M2Property m2Property = dao.getProperty(fileQName, "encoding");
         assertNotNull(m2Property);
-        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file/encoding"), m2Property.getReference().getQName());
+        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file-encoding"), m2Property.getReference().getQName());
     }
 
 }

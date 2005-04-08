@@ -91,7 +91,7 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_PROTECTED_EDEFAULT = null;
+    protected static final Boolean EMF_PROTECTED_EDEFAULT = new Boolean(false);
 
     /**
      * The cached value of the '{@link #getEmfProtected() <em>Emf Protected</em>}' attribute.
@@ -111,7 +111,7 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_MANDATORY_EDEFAULT = null;
+    protected static final Boolean EMF_MANDATORY_EDEFAULT = new Boolean(false);
 
     /**
      * The cached value of the '{@link #getEmfMandatory() <em>Emf Mandatory</em>}' attribute.
@@ -131,7 +131,7 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_MULTIPLE_EDEFAULT = null;
+    protected static final Boolean EMF_MULTIPLE_EDEFAULT = new Boolean(false);
 
     /**
      * The cached value of the '{@link #getEmfMultiple() <em>Emf Multiple</em>}' attribute.
@@ -151,7 +151,7 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_INDEXED_EDEFAULT = null;
+    protected static final Boolean EMF_INDEXED_EDEFAULT = new Boolean(true);
 
     /**
      * The cached value of the '{@link #getEmfIndexed() <em>Emf Indexed</em>}' attribute.
@@ -171,7 +171,7 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_STORED_IN_INDEX_EDEFAULT = null;
+    protected static final Boolean EMF_STORED_IN_INDEX_EDEFAULT = new Boolean(false);
 
     /**
      * The cached value of the '{@link #getEmfStoredInIndex() <em>Emf Stored In Index</em>}' attribute.

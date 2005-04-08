@@ -264,16 +264,25 @@ public class EMFNamespaceURIImpl extends EObjectImpl implements EMFNamespaceURI,
         return result.toString();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2NamespaceURI#getURI()
+     */
     public String getURI()
     {
         return getEmfURI();
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2NamespaceURI#setURI(java.lang.String)
+     */
     public void setURI(String uri)
     {
         setEmfURI(uri);
     }
 
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2NamespaceURI#getPrefixes()
+     */
     public List<M2NamespacePrefix> getPrefixes()
     {
         return (List)getEmfPrefixes();

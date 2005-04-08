@@ -25,7 +25,7 @@ public interface EMFAssociation extends EObject
     void setEmfName(String value);
 
     /**
-     * @model
+     * @model default="false"
      */
     Boolean getEmfProtected();
     
@@ -40,7 +40,7 @@ public interface EMFAssociation extends EObject
     void setEmfProtected(Boolean value);
 
     /**
-     * @model
+     * @model default="false"
      */
     Boolean getEmfMandatory();
 
@@ -55,7 +55,7 @@ public interface EMFAssociation extends EObject
     void setEmfMandatory(Boolean value);
 
     /**
-     * @model
+     * @model default="true"
      */
     Boolean getEmfMultiple();
 

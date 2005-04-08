@@ -9,6 +9,7 @@ import com.activiti.repo.dictionary.AssociationRef;
 import com.activiti.repo.dictionary.ChildAssociationDefinition;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.PropertyRef;
@@ -25,23 +26,23 @@ import com.activiti.repo.ref.QName;
  */
 public class DictionaryComponentTest extends TestCase
 {
+    protected DictionaryService service;
+    
 
-    private DictionaryComponent service;
-    
-    
     protected void setUp() throws Exception
     {
         EMFResource resource = new EMFResource();
-        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testModel.xml");
+        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testBootstrap.xml");
         resource.init();
         EMFMetaModelDAO dao = new EMFMetaModelDAO();
         dao.setResource(resource);
         dao.init();
-        service = new DictionaryComponent();
-        service.setMetaModelDAO(dao);
+        DictionaryComponent component = new DictionaryComponent();
+        component.setMetaModelDAO(dao);
+        service = component;
     }
 
-    
+
     public void testGetClassDefinition()
     {
         ClassRef fileRef = new ClassRef(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file"));
@@ -75,6 +76,7 @@ public class DictionaryComponentTest extends TestCase
         ClassRef toClass = contentsAssoc.getRequiredToClasses().get(0);
         assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file"), toClass.getQName());
     }
+
 
     
 }

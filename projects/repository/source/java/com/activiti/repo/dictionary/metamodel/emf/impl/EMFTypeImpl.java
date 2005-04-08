@@ -41,6 +41,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFTypeImpl#getEmfOrderedChildren <em>Emf Ordered Children</em>}</li>
  *   <li>{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFTypeImpl#getEmfDefaultAspects <em>Emf Default Aspects</em>}</li>
+ *   <li>{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFTypeImpl#getEmfStrict <em>Emf Strict</em>}</li>
  * </ul>
  * </p>
  *
@@ -56,7 +57,7 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_ORDERED_CHILDREN_EDEFAULT = null;
+    protected static final Boolean EMF_ORDERED_CHILDREN_EDEFAULT = new Boolean(false);
 
     /**
      * The cached value of the '{@link #getEmfOrderedChildren() <em>Emf Ordered Children</em>}' attribute.
@@ -77,6 +78,26 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
      * @ordered
      */
     protected EList emfDefaultAspects = null;
+
+    /**
+     * The default value of the '{@link #getEmfStrict() <em>Emf Strict</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see #getEmfStrict()
+     * @generated
+     * @ordered
+     */
+    protected static final Boolean EMF_STRICT_EDEFAULT = new Boolean(true);
+
+    /**
+     * The cached value of the '{@link #getEmfStrict() <em>Emf Strict</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see #getEmfStrict()
+     * @generated
+     * @ordered
+     */
+    protected Boolean emfStrict = EMF_STRICT_EDEFAULT;
 
     /**
      * <!-- begin-user-doc -->
@@ -133,6 +154,29 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
             emfDefaultAspects = new EObjectResolvingEList(EMFAspect.class, this, EmfPackage.EMF_TYPE__EMF_DEFAULT_ASPECTS);
         }
         return emfDefaultAspects;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public Boolean getEmfStrict()
+    {
+        return emfStrict;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public void setEmfStrict(Boolean newEmfStrict)
+    {
+        Boolean oldEmfStrict = emfStrict;
+        emfStrict = newEmfStrict;
+        if (eNotificationRequired())
+            eNotify(new ENotificationImpl(this, Notification.SET, EmfPackage.EMF_TYPE__EMF_STRICT, oldEmfStrict, emfStrict));
     }
 
     /**
@@ -203,6 +247,8 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
                 return getEmfOrderedChildren();
             case EmfPackage.EMF_TYPE__EMF_DEFAULT_ASPECTS:
                 return getEmfDefaultAspects();
+            case EmfPackage.EMF_TYPE__EMF_STRICT:
+                return getEmfStrict();
         }
         return eDynamicGet(eFeature, resolve);
     }
@@ -237,6 +283,9 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
                 getEmfDefaultAspects().clear();
                 getEmfDefaultAspects().addAll((Collection)newValue);
                 return;
+            case EmfPackage.EMF_TYPE__EMF_STRICT:
+                setEmfStrict((Boolean)newValue);
+                return;
         }
         eDynamicSet(eFeature, newValue);
     }
@@ -268,6 +317,9 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
             case EmfPackage.EMF_TYPE__EMF_DEFAULT_ASPECTS:
                 getEmfDefaultAspects().clear();
                 return;
+            case EmfPackage.EMF_TYPE__EMF_STRICT:
+                setEmfStrict(EMF_STRICT_EDEFAULT);
+                return;
         }
         eDynamicUnset(eFeature);
     }
@@ -293,6 +345,8 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
                 return EMF_ORDERED_CHILDREN_EDEFAULT == null ? emfOrderedChildren != null : !EMF_ORDERED_CHILDREN_EDEFAULT.equals(emfOrderedChildren);
             case EmfPackage.EMF_TYPE__EMF_DEFAULT_ASPECTS:
                 return emfDefaultAspects != null && !emfDefaultAspects.isEmpty();
+            case EmfPackage.EMF_TYPE__EMF_STRICT:
+                return EMF_STRICT_EDEFAULT == null ? emfStrict != null : !EMF_STRICT_EDEFAULT.equals(emfStrict);
         }
         return eDynamicIsSet(eFeature);
     }
@@ -309,6 +363,8 @@ public class EMFTypeImpl extends EMFClassImpl implements EMFType, M2Type
         StringBuffer result = new StringBuffer(super.toString());
         result.append(" (emfOrderedChildren: ");
         result.append(emfOrderedChildren);
+        result.append(", emfStrict: ");
+        result.append(emfStrict);
         result.append(')');
         return result.toString();
     }

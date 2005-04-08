@@ -76,9 +76,9 @@ public class DictionaryBootstrapTest extends TestCase
         metaModelDAO.init();
         
         // Ensure Property Types exist
-        M2PropertyType propString = metaModelDAO.getPropertyType(PropertyTypeDefinition.STRING);
+        M2PropertyType propString = metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT);
         assertNotNull(propString);
-        assertEquals(PropertyTypeDefinition.STRING, propString.getName());
+        assertEquals(PropertyTypeDefinition.TEXT, propString.getName());
         M2PropertyType propDate = metaModelDAO.getPropertyType(PropertyTypeDefinition.DATE);
         assertNotNull(propDate);
         assertEquals(PropertyTypeDefinition.DATE, propDate.getName());

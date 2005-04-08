@@ -76,7 +76,7 @@ public class EMFAssociationImpl extends EObjectImpl implements EMFAssociation, M
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_PROTECTED_EDEFAULT = null;
+    protected static final Boolean EMF_PROTECTED_EDEFAULT = new Boolean(false);
 
     /**
      * The cached value of the '{@link #getEmfProtected() <em>Emf Protected</em>}' attribute.
@@ -96,7 +96,7 @@ public class EMFAssociationImpl extends EObjectImpl implements EMFAssociation, M
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_MANDATORY_EDEFAULT = null;
+    protected static final Boolean EMF_MANDATORY_EDEFAULT = new Boolean(false);
 
     /**
      * The cached value of the '{@link #getEmfMandatory() <em>Emf Mandatory</em>}' attribute.
@@ -116,7 +116,7 @@ public class EMFAssociationImpl extends EObjectImpl implements EMFAssociation, M
      * @generated
      * @ordered
      */
-    protected static final Boolean EMF_MULTIPLE_EDEFAULT = null;
+    protected static final Boolean EMF_MULTIPLE_EDEFAULT = new Boolean(true);
 
     /**
      * The cached value of the '{@link #getEmfMultiple() <em>Emf Multiple</em>}' attribute.

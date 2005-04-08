@@ -8,7 +8,7 @@ import org.eclipse.emf.common.util.EList;
 public interface EMFType extends EMFClass{
 
     /**
-     * @model
+     * @model default="false"
      */
     Boolean getEmfOrderedChildren();
     
@@ -21,6 +21,21 @@ public interface EMFType extends EMFClass{
      * @generated
      */
     void setEmfOrderedChildren(Boolean value);
+
+    /**
+     * @model default="true"
+     */
+    Boolean getEmfStrict();
+    
+    /**
+     * Sets the value of the '{@link com.activiti.repo.dictionary.metamodel.emf.EMFType#getEmfStrict <em>Emf Strict</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @param value the new value of the '<em>Emf Strict</em>' attribute.
+     * @see #getEmfStrict()
+     * @generated
+     */
+    void setEmfStrict(Boolean value);
 
     /**
      * @model type="EMFAspect"

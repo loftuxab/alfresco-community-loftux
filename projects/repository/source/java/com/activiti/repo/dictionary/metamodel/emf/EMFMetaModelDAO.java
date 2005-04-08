@@ -2,7 +2,6 @@ package com.activiti.repo.dictionary.metamodel.emf;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -115,10 +114,8 @@ public class EMFMetaModelDAO implements MetaModelDAO
         if (m2Class != null)
         {
             List<M2Property> properties = m2Class.getProperties();
-            Iterator<M2Property> iter = properties.iterator();
-            while (iter.hasNext())
+            for (M2Property property: properties)
             {
-                M2Property property = iter.next();
                 if (property.getName().equals(propertyName))
                 {
                     return property;
@@ -188,10 +185,9 @@ public class EMFMetaModelDAO implements MetaModelDAO
     private void initIndex(Resource resource)
     {
         classIndex = new HashMap<EClass, Map<QName, EObject>>();
-        List objects = resource.getContents();
-        for (Iterator iter = objects.iterator(); iter.hasNext(); /**/)
+        List<EObject> objects = resource.getContents();
+        for (EObject eObject : objects)
         {
-            EObject eObject = (EObject)iter.next();
             indexObject(eObject);
         }
     }

@@ -34,7 +34,7 @@
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="contents" emfRequiredToClasses="/21"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{uri://com.activiti/lightWeightVersionStore}version">
-    <emfProperties emfName="versionNumber" emfType="/9" emfMandatory="true"/>
+    <emfProperties emfName="versionNumber" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="versionLabel" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="createdDate" emfType="/13" emfMandatory="true"/>
     <emfAssociations emfName="successor" emfRequiredToClasses="/23"/>
