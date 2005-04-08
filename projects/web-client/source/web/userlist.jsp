@@ -350,6 +350,7 @@
       
       <p>
       
+      <%-- component evaluators --%>
       <b>Test Evaluators</b><br>
       1a. Boolean Evaluator - you should see the next line of text:<br>
       <awc:booleanEvaluator value="#{TestList.rows != null}">
@@ -380,6 +381,18 @@
       <awc:stringEqualsEvaluator value="some string" condition="some string123">
          <h:outputText value="Component inside an evaluator"/>
       </awc:stringEqualsEvaluator>
+      
+      <p>
+      
+      <%-- Date Picker Component --%>
+      <%-- Example of a tag utilising an Input Component with a custom renderer.
+              The renderer handles encoding and decoding of date values to UI elements --%>
+      <b>Date Picker Components</b><br>
+      Basic date picker:<br>
+      <awc:inputDatePicker id="date1" value="#{TestList.rows[0].created}" startYear="1996" yearCount="10"/>
+      <br>
+      Date Picker with CSS style applied:<br>
+      <awc:inputDatePicker id="date2" startYear="2000" yearCount="5" styleClass="userInputForm" />
       
       <p>
       

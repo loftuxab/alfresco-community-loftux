@@ -28,7 +28,7 @@ import javax.faces.render.Renderer;
  * of input field params that we use to generate a Date object. This object is held
  * in our component and the renderer will output it to the page.
  */
-public class DatePickerRenderer extends Renderer
+public class DatePickerRenderer extends BaseRenderer
 {
    /**
     * @see javax.faces.render.Renderer#decode(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
@@ -130,28 +130,41 @@ public class DatePickerRenderer extends Renderer
          String clientId = component.getClientId(context);
          ResponseWriter out = context.getResponseWriter();
          
-         String styleClass = (String)component.getAttributes().get("styleClass");
          // note that we build a client id for our form elements that we are then
          // able to decode() as above.
-         renderMenu(out, component, getDays(), date.getDate(),
-               clientId + "_day", styleClass);
-         renderMenu(out, component, getMonths(), date.getMonth() + 1,
-               clientId + "_month", styleClass);
-         renderMenu(out, component, getYears(nStartYear, nYearCount), date.getYear() + 1900,
-               clientId + "_year", styleClass);
+         renderMenu(out, component, getDays(), date.getDate(), clientId + "_day");
+         renderMenu(out, component, getMonths(), date.getMonth() + 1, clientId + "_month");
+         renderMenu(out, component, getYears(nStartYear, nYearCount), date.getYear() + 1900, clientId + "_year");
       }
    }
    
+   /**
+    * Render a drop-down menu to represent an element for the date picker.
+    * 
+    * @param out              Response Writer to output too
+    * @param component        The compatible component
+    * @param items            To display in the drop-down list
+    * @param selected         Which item index is selected
+    * @param clientId         Client Id to use
+    * 
+    * @throws IOException
+    */
    private void renderMenu(ResponseWriter out, UIComponent component, List items,
-         int selected, String clientId, String styleClass)
+         int selected, String clientId)
       throws IOException
    {
       out.startElement("select", component);
       out.writeAttribute("name", clientId, "id");
-      if (styleClass != null)
+      
+      if (component.getAttributes().get("styleClass") != null)
       {
-         out.writeAttribute("class", styleClass, "styleClass");
+         out.writeAttribute("class", component.getAttributes().get("styleClass"), "styleClass");
       }
+      if (component.getAttributes().get("style") != null)
+      {
+         out.writeAttribute("style", component.getAttributes().get("style"), "style");
+      }
+      
       for (Iterator i=items.iterator(); i.hasNext(); /**/)
       {
          SelectItem item = (SelectItem)i.next();

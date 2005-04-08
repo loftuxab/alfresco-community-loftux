@@ -17,7 +17,7 @@ import javax.faces.el.ValueBinding;
  * the user to enter a date. It specifies the renderer as below to be our Date
  * specific renderer. This renderer is configured in the faces-config.xml.  
  */
-public class InputDatePickerTag extends BaseComponentTag
+public class InputDatePickerTag extends HtmlComponentTag
 {
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
@@ -47,7 +47,6 @@ public class InputDatePickerTag extends BaseComponentTag
       super.release();
       this.startYear = "1990";
       this.yearCount = "10";
-      this.styleClass = null;
       this.value = null;
    }
    
@@ -61,7 +60,6 @@ public class InputDatePickerTag extends BaseComponentTag
       // set the properties of tag into the component
       setIntProperty(component, "startYear", this.startYear);
       setIntProperty(component, "yearCount", this.yearCount);
-      setStringProperty(component, "styleClass", this.styleClass);
       setStringProperty(component, "value", this.value);
    }
    
@@ -84,16 +82,6 @@ public class InputDatePickerTag extends BaseComponentTag
    {
       this.startYear = startYear;
    }
-   
-   /**
-    * Get the yearCount
-    *
-    * @return the yearCount
-    */
-   public String getYearCount()
-   {
-      return this.yearCount;
-   }
 
    /**
     * Set the yearCount
@@ -105,29 +93,8 @@ public class InputDatePickerTag extends BaseComponentTag
       this.yearCount = yearCount;
    }
 
-   /**
-    * Get the styleClass
-    *
-    * @return the styleClass
-    */
-   public String getStyleClass()
-   {
-      return this.styleClass;
-   }
-
-   /**
-    * Set the styleClass
-    *
-    * @param styleClass     the styleClass
-    */
-   public void setStyleClass(String styleClass)
-   {
-      this.styleClass = styleClass;
-   }
-
    
    private String startYear = "1990";
    private String yearCount = "10";
    private String value = null;
-   private String styleClass = null;
 }
