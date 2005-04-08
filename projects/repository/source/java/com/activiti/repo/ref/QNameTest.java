@@ -96,6 +96,24 @@ public class QNameTest extends TestCase
         catch (InvalidQNameException e)
         {
         }
+        
+        try
+        {
+            QName qname = QName.createQName((String) null, "in.valid");
+            fail("Invalid local name character '.' not caught");
+        }
+        catch (InvalidQNameException e)
+        {
+        }
+        
+        try
+        {
+            QName qname = QName.createQName((String) null, "in/valid");
+            fail("Invalid local name character '/' not caught");
+        }
+        catch (InvalidQNameException e)
+        {
+        }
     }
 
 

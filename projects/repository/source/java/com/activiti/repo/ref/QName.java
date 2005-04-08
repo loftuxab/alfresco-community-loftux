@@ -2,6 +2,8 @@ package com.activiti.repo.ref;
 
 import java.io.Serializable;
 
+import com.activiti.repo.dictionary.NamespaceService;
+
 /**
  * <code>QName</code> represents the qualified name of a Repository item. Each
  * QName consists of a local name qualified by a namespace.
@@ -19,8 +21,9 @@ public final class QName implements Serializable
     private int hashCode;
     private String prefix;
 
-    private static char NAMESPACE_BEGIN = '{';
-    private static char NAMESPACE_END = '}';
+    private static final char NAMESPACE_BEGIN = '{';
+    private static final char NAMESPACE_END = '}';
+    private static final char[] INVALID_CHARS = { '/', '.' };
 
     
     /**
@@ -36,10 +39,6 @@ public final class QName implements Serializable
         if (localName == null || localName.length() == 0)
         {
             throw new InvalidQNameException("A QName must consist of a local name");
-        }
-        if (localName.indexOf('/') > -1)
-        {
-            throw new InvalidQNameException("The local part of a QName may not contain '/'");
         }
         return new QName(namespaceURI, localName, null);
     }
@@ -67,7 +66,7 @@ public final class QName implements Serializable
         }
         if (prefix == null)
         {
-            prefix = ""; 
+            prefix = NamespaceService.DEFAULT_PREFIX; 
         }
         
         // Calculate namespace URI and create QName
@@ -132,7 +131,7 @@ public final class QName implements Serializable
         localName = qname.substring(namespaceEnd + 1);
         if (localName == null || localName.length() == 0)
         {
-            throw new InvalidQNameException("QName '" + qname + "' must specify a local name");
+            throw new InvalidQNameException("QName '" + qname + "' must consist of a local name");
         }
 
         // Construct QName
@@ -149,7 +148,16 @@ public final class QName implements Serializable
      */
     private QName(String namespace, String name, String prefix)
     {
-        this.namespaceURI = (namespace == null) ? "" : namespace;
+        // Validate local name
+        for (char invalidChar : INVALID_CHARS)
+        {
+            if (name.indexOf(invalidChar) > -1)
+            {
+                throw new InvalidQNameException("The local part of a QName may not contain '" + invalidChar + "'");
+            }
+        }
+        
+        this.namespaceURI = (namespace == null) ? NamespaceService.DEFAULT_URI : namespace;
         this.prefix = prefix;
         this.localName = name;
         this.hashCode = 0;
@@ -233,6 +241,5 @@ public final class QName implements Serializable
     {
         return NAMESPACE_BEGIN + namespaceURI + NAMESPACE_END + localName;
     }
-
 
 }
