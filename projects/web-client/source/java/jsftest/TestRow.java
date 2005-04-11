@@ -47,6 +47,11 @@ public class TestRow
       return created;
    }
    
+   public void setCreated(Date date)
+   {
+      this.created = date;
+   }
+   
    public TestRow getObject()
    {
       return this;
