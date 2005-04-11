@@ -58,9 +58,9 @@ public class UISortLink extends UICommand
       
       if (getAttributes().get("style") != null)
       {
-         buf.append(" style='")
+         buf.append(" style=\"")
             .append(getAttributes().get("style"))
-            .append('\'');
+            .append('"');
       }
       if (getAttributes().get("styleClass") != null)
       {

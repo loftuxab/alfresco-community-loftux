@@ -110,9 +110,9 @@ public class BreadcrumbRenderer extends BaseRenderer
       
       if (bc.getAttributes().get("style") != null)
       {
-         buf.append(" style='")
+         buf.append(" style=\"")
             .append(bc.getAttributes().get("style"))
-            .append('\'');
+            .append('"');
       }
       if (bc.getAttributes().get("styleClass") != null)
       {
