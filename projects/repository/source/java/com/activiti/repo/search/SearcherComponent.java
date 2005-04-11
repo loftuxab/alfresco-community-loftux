@@ -1,39 +1,33 @@
-/*
- * Created on Mar 24, 2005
- *
- * TODO Comment this class
- * 
- * 
- */
 package com.activiti.repo.search;
 
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
 
 /**
- * Component API for searching.
+ * Component API for searching.  Delegates to the real {@link com.activiti.repo.search.Searcher searcher}
+ * from the {@link #indexerAndSearcherFactory}.
  * 
- * Transactional support is free
- * 
- * @see Searcher
- * 
- * TODO: Support for Spring and IOC. Avoid the singleton pattern.
+ * Transactional support is free.
  * 
  * @author andyh
- *
+ * 
  */
 public class SearcherComponent implements Searcher
 {
-   /*
-    * Searcher implementation
-    */
+    private IndexerAndSearcher indexerAndSearcherFactory;
+    
+    public void setIndexerAndSearcherFactory(IndexerAndSearcher indexerAndSearcherFactory)
+    {
+        this.indexerAndSearcherFactory = indexerAndSearcherFactory;
+    }
 
-   public ResultSet query(StoreRef store, String language, String query, Path[] queryOptions, QueryParameter[] queryParameters)
-   {
-      Searcher searcher = IndexerAndSearcherFactory.getInstance().getSearcher(store, false );
-      return searcher.query(store, language, query, queryOptions, queryParameters);
-   }
-
- 
-
+    public ResultSet query(StoreRef store,
+            String language,
+            String query,
+            Path[] queryOptions,
+            QueryParameter[] queryParameters)
+    {
+        Searcher searcher = indexerAndSearcherFactory.getSearcher(store, false);
+        return searcher.query(store, language, query, queryOptions, queryParameters);
+    }
 }

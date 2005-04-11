@@ -16,15 +16,9 @@ import com.activiti.repo.ref.StoreRef;
  * Factory to find indexers based on store id.
  * 
  * IndexerAndSerachers are registered against the protocol or store.
- * TODO: IOC registration
  */
 public class IndexerAndSearcherFactory implements IndexerAndSearcher
 {
-   /**
-    * This factory
-    */
-   private static IndexerAndSearcherFactory factory = new IndexerAndSearcherFactory();
-
    /**
     * IndexersAndSearchers registered by protocol
     */
@@ -45,15 +39,6 @@ public class IndexerAndSearcherFactory implements IndexerAndSearcher
    private IndexerAndSearcherFactory()
    {
       super();
-   }
-
-   /**
-    * Sigleton instance
-    * @return
-    */
-   public static IndexerAndSearcherFactory getInstance()
-   {
-      return factory;
    }
 
    /**

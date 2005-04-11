@@ -1,68 +1,67 @@
-/*
- * Created on Mar 24, 2005
- */
 package com.activiti.repo.search;
 
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 
 /**
- * Component API for indexing.
+ * Component API for indexing. Delegates to the real index retrieved from the
+ * {@link #indexerAndSearcherFactory}
  * 
  * Transactional support is free.
  * 
  * @see Indexer
  * 
- * TODO: Support for Spring and IOC. Avoid the singleton pattern.
- * 
  * @author andyh
- *
+ * 
  */
 public class IndexerComponent implements Indexer
 {
+    private IndexerAndSearcher indexerAndSearcherFactory;
 
-   /*
-    * Indexer implementation
-    * 
-    * All just get the real index and delegate
-    * 
-    */
-   
-   public void createNode(ChildAssocRef relationshipRef)
-   {
-      Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipRef.getParentRef().getStoreRef());
-      indexer.createNode(relationshipRef);
-   }
+    public void setIndexerAndSearcherFactory(IndexerAndSearcher indexerAndSearcherFactory)
+    {
+        this.indexerAndSearcherFactory = indexerAndSearcherFactory;
+    }
 
-   public void updateNode(NodeRef nodeRef)
-   {
-      Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(nodeRef.getStoreRef());
-      indexer.updateNode(nodeRef);
-   }
+    public void createNode(ChildAssocRef relationshipRef)
+    {
+        Indexer indexer = indexerAndSearcherFactory.getIndexer(
+                relationshipRef.getChildRef().getStoreRef());
+        indexer.createNode(relationshipRef);
+    }
 
-   public void deleteNode(ChildAssocRef relationshipRef)
-   {
-      Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipRef.getParentRef().getStoreRef());
-      indexer.deleteNode(relationshipRef);
-   }
+    public void updateNode(NodeRef nodeRef)
+    {
+        Indexer indexer = indexerAndSearcherFactory.getIndexer(nodeRef.getStoreRef());
+        indexer.updateNode(nodeRef);
+    }
 
-   public void createChildRelationship(ChildAssocRef relationshipRef)
-   {
-      Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipRef.getParentRef().getStoreRef());
-      indexer.createChildRelationship(relationshipRef);
-   }
+    public void deleteNode(ChildAssocRef relationshipRef)
+    {
+        Indexer indexer = indexerAndSearcherFactory.getIndexer(
+                relationshipRef.getChildRef().getStoreRef());
+        indexer.deleteNode(relationshipRef);
+    }
 
-   public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef)
-   {
-      Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipBeforeRef.getParentRef().getStoreRef());
-      indexer.updateChildRelationship(relationshipBeforeRef, relationshipAfterRef);
-   }
+    public void createChildRelationship(ChildAssocRef relationshipRef)
+    {
+        Indexer indexer = indexerAndSearcherFactory.getIndexer(
+                relationshipRef.getChildRef().getStoreRef());
+        indexer.createChildRelationship(relationshipRef);
+    }
 
-   public void deleteChildRelationship(ChildAssocRef relationshipRef)
-   {
-      Indexer indexer = IndexerAndSearcherFactory.getInstance().getIndexer(relationshipRef.getParentRef().getStoreRef());
-      indexer.deleteChildRelationship(relationshipRef);
-   }
+    public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef)
+    {
+        Indexer indexer = indexerAndSearcherFactory.getIndexer(
+                relationshipBeforeRef.getChildRef().getStoreRef());
+        indexer.updateChildRelationship(relationshipBeforeRef, relationshipAfterRef);
+    }
 
- 
+    public void deleteChildRelationship(ChildAssocRef relationshipRef)
+    {
+        Indexer indexer = indexerAndSearcherFactory.getIndexer(
+                relationshipRef.getChildRef().getStoreRef());
+        indexer.deleteChildRelationship(relationshipRef);
+    }
+
 }

@@ -314,6 +314,9 @@
       </property>
       <property name="target">
          <bean class="com.activiti.repo.search.IndexerComponent" >
+            <property name="indexerAndSearcherFactory">
+               <ref bean="indexerAndSearcherFactory"/>
+            </property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -332,6 +335,9 @@
       </property>
       <property name="target">
          <bean class="com.activiti.repo.search.SearcherComponent" >
+            <property name="indexerAndSearcherFactory">
+               <ref bean="indexerAndSearcherFactory"/>
+            </property>
          </bean>
       </property>
       <property name="transactionAttributes">

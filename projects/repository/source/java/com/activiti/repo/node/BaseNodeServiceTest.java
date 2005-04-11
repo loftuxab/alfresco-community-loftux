@@ -512,6 +512,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                     assertNotNull("Parent node ref not set", ref.getParentRef());
                     assertNotNull("QName not set", ref.getName());
                 }
+                // all associations must have a child ref
                 assertNotNull("Child node ref not set", ref.getChildRef());
             }
         }
@@ -521,9 +522,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals("Incorrect path count", 1, paths.size());
         
         // check that a cyclic path is detected - make n8_n2
-        nodeService.addChild(n8Ref, n6Ref, QName.createQName("n8_n6"));
         try
         {
+            nodeService.addChild(n8Ref, n6Ref, QName.createQName("n8_n6"));
             nodeService.getPaths(n8Ref, false);
             fail("Cyclic relationship not detected");
         }

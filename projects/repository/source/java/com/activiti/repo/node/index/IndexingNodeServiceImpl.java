@@ -121,12 +121,21 @@ public class IndexingNodeServiceImpl implements NodeService
         // update index
         for (EntityRef ref : entityRefs)
         {
-            if (ref instanceof NodeRef)
+            if (ref instanceof ChildAssocRef)
             {
-                //indexer.deleteNode()
+                ChildAssocRef assoc = (ChildAssocRef) ref;
+                if (assoc.isPrimary())
+                {
+                    // the node will have been deleted as well
+                    indexer.deleteNode(assoc);
+                }
+                else
+                {
+                    indexer.deleteChildRelationship(assoc);
+                }
             }
         }
-        throw new UnsupportedOperationException();
+        return entityRefs;
     }
 
     /**
@@ -138,7 +147,26 @@ public class IndexingNodeServiceImpl implements NodeService
      */
     public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException();
+        // call delegate
+        Collection<EntityRef> entityRefs = nodeServiceDelegate.removeChildren(parentRef, qname);
+        // update index
+        for (EntityRef ref : entityRefs)
+        {
+            if (ref instanceof ChildAssocRef)
+            {
+                ChildAssocRef assoc = (ChildAssocRef) ref;
+                if (assoc.isPrimary())
+                {
+                    // the node will have been deleted as well
+                    indexer.deleteNode(assoc);
+                }
+                else
+                {
+                    indexer.deleteChildRelationship(assoc);
+                }
+            }
+        }
+        return entityRefs;
     }
 
     /**
@@ -149,7 +177,10 @@ public class IndexingNodeServiceImpl implements NodeService
      */
     public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException();
+        // call delegate
+        nodeServiceDelegate.setProperties(nodeRef, properties);
+        // update index
+        indexer.updateNode(nodeRef);
     }
 
     /**
@@ -158,9 +189,12 @@ public class IndexingNodeServiceImpl implements NodeService
      * 
      * @see IndexerComponent#updateNode(NodeRef)
      */
-    public void setProperty(NodeRef nodeRef, QName qame, Serializable value) throws InvalidNodeRefException
+    public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException();
+        // call delegate
+        nodeServiceDelegate.setProperty(nodeRef, qname, value);
+        // update index
+        indexer.updateNode(nodeRef);
     }
 
     /**

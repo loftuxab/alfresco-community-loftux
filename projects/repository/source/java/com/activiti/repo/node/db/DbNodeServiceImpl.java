@@ -462,7 +462,8 @@ public class DbNodeServiceImpl implements NodeService
                 NodeRef parentRef = assoc.getParent().getNodeRef();
                 QName qname = assoc.getQName();
                 NodeRef childRef = assoc.getChild().getNodeRef();
-                ChildAssocRef assocRef = new ChildAssocRef(parentRef, qname, childRef, -1);
+                boolean isPrimary = assoc.getIsPrimary();
+                ChildAssocRef assocRef = new ChildAssocRef(parentRef, qname, childRef, isPrimary, -1);
                 Path.Element element = new Path.ChildAssocElement(assocRef);  // TODO: consider ordering
                 // create a new path that builds on the current path
                 Path path = new Path();

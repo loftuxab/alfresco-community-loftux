@@ -494,7 +494,7 @@ public class LuceneTest extends TestCase
          throw new UnsupportedOperationException();
       }
 
-      public void setProperty(NodeRef nodeRef, QName qame, Serializable value) throws InvalidNodeRefException
+      public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException
       {
          throw new UnsupportedOperationException();
       }

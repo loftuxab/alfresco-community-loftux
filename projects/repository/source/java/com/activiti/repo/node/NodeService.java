@@ -120,7 +120,7 @@ public interface NodeService
      * @param propertyValue the value of the property
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public void setProperty(NodeRef nodeRef, QName qame, Serializable value) throws InvalidNodeRefException;
+    public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef the child node

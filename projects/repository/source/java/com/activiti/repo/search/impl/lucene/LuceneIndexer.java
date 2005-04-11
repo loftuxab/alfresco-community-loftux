@@ -165,7 +165,10 @@ public class LuceneIndexer extends LuceneBase implements Indexer
       checkAbleToDoWork();
       try
       {
-         reindex(relationshipRef.getParentRef());
+          if (relationshipRef.getParentRef() != null)
+          {
+              reindex(relationshipRef.getParentRef());
+          }
          reindex(relationshipRef.getChildRef());
       }
       catch (IOException e)
@@ -539,6 +542,11 @@ public class LuceneIndexer extends LuceneBase implements Indexer
                   throw new IndexerException("Confused path: "+path);
                }
                Path.ChildAssocElement cae = (Path.ChildAssocElement)element;
+               if (cae.getRef().getParentRef() == null)
+               {
+                   // no parent reference - the child is the root
+                   continue;
+               }
                parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getParentRef());
                if(!elit.hasNext())
                {

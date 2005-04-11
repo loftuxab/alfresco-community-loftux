@@ -35,6 +35,8 @@ public class ChildAssocRef implements EntityRef, Serializable
 
    private NodeRef childRef;
    
+   private boolean isPrimary;
+   
    private int nthSibling;
 
    /**
@@ -43,13 +45,19 @@ public class ChildAssocRef implements EntityRef, Serializable
     * @param parentRef the parent reference
     * @param childQName the qualified name of the association
     * @param childRef the child node reference. This must not be null.
+    * @param isPrimary true if this represents the primary parent-child relationship
     * @param nthSibling the nth association with the same properties.  Usually -1 to be ignored.
     */
-   public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef, int nthSibling)
+   public ChildAssocRef(NodeRef parentRef,
+           QName childQName,
+           NodeRef childRef,
+           boolean isPrimary,
+           int nthSibling)
    {
       this.parentRef = parentRef;
       this.childQName = childQName;
       this.childRef = childRef;
+      this.isPrimary = isPrimary;
       this.nthSibling = nthSibling;
       
       // check
@@ -60,17 +68,20 @@ public class ChildAssocRef implements EntityRef, Serializable
    }
    
    /**
+    * Constructs a <b>non-primary</b>, -1th sibling parent-child association reference.
+    * 
     * @see ChildAssocRef#ChildRelationshipRef(NodeRef, QName, NodeRef, int) 
     */
    public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef)
    {
-       this(parentRef, childQName, childRef, -1);
+       this(parentRef, childQName, childRef, false, -1);
    }
 
    /**
     * Get the qualified name of the parent-child association
     * 
-    * @return
+    * @return Returns the qualified name of the parent-child association.
+    *       It may be null if this is the imaginary association to a root node.
     */
    public QName getName()
    {
@@ -78,9 +89,7 @@ public class ChildAssocRef implements EntityRef, Serializable
    }
 
    /**
-    * Get the child node reference;
-    * 
-    * @return
+    * @return Returns the child node reference - never null
     */
    public NodeRef getChildRef()
    {
@@ -88,9 +97,8 @@ public class ChildAssocRef implements EntityRef, Serializable
    }
 
    /**
-    * Get the parent node reference
-    * 
-    * @return
+    * @return Returns the parent node reference, which may be null if this
+    *       represents the imaginary reference to the root node
     */
    public NodeRef getParentRef()
    {
@@ -98,7 +106,14 @@ public class ChildAssocRef implements EntityRef, Serializable
    }
    
    /**
-    * 
+    * @return Returns true if this represents a primary association
+    */
+   public boolean isPrimary()
+   {
+       return isPrimary;
+   }
+
+   /**
     * @return Returns the nth sibling required
     */
    public int getNthSibling()
