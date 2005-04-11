@@ -36,7 +36,6 @@ public class ColumnTag extends BaseComponentTag
    public void release()
    {
       super.release();
-      this.value = null;
       this.primary = null;
       this.actions = null;
       this.width = null;
@@ -51,7 +50,6 @@ public class ColumnTag extends BaseComponentTag
    {
       super.setProperties(component);
       
-      setStringBindingProperty(component, "value", this.value);
       setBooleanProperty(component, "primary", this.primary);
       setBooleanProperty(component, "actions", this.actions);
       setStringProperty(component, "width", this.width);
@@ -62,16 +60,6 @@ public class ColumnTag extends BaseComponentTag
    
    // ------------------------------------------------------------------------------
    // Tag properties
-
-   /**
-    * Set the value
-    *
-    * @param value     the value
-    */
-   public void setValue(String value)
-   {
-      this.value = value;
-   }
 
    /**
     * Set if this is the primary column
@@ -138,7 +126,4 @@ public class ColumnTag extends BaseComponentTag
 
    /** the primary */
    private String primary;
-   
-   /** the value */
-   private String value;
 }

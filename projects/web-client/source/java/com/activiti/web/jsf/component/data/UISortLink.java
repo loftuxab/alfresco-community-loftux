@@ -69,11 +69,9 @@ public class UISortLink extends UICommand
       }
       if (getAttributes().get("title") != null)
       {
-         buf.append(" title='")
+         buf.append(" title=\"")
             .append(getAttributes().get("title"))
-            .append("' alt='")
-            .append(getAttributes().get("title"))
-            .append('\'');
+            .append('"');
       }
       buf.append('>');
       

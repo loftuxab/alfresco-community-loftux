@@ -79,6 +79,16 @@ public class BreadcrumbRenderer extends BaseRenderer
    // ------------------------------------------------------------------------------
    // Private helpers
    
+   /**
+    * Render a single breadcrumb element as a link on the page
+    * 
+    * @param context
+    * @param bc
+    * @param element
+    * @param index
+    * @param first
+    * @return
+    */
    private String renderBreadcrumb(FacesContext context, UIBreadcrumb bc, String element, int index, boolean first)
    {
       // render breadcrumb link element
@@ -108,6 +118,12 @@ public class BreadcrumbRenderer extends BaseRenderer
       {
          buf.append(" class=")
             .append(bc.getAttributes().get("styleClass"));
+      }
+      if (bc.getAttributes().get("title") != null)
+      {
+         buf.append(" title=\"")
+         .append(bc.getAttributes().get("title"))
+         .append('"');
       }
       buf.append('>');
       
