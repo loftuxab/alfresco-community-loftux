@@ -32,7 +32,7 @@ public abstract class SelfRenderingComponent extends UIComponentBase
     * 
     * @param out        ResponseWriter
     * @param attr       attribute value object (cannot be null)
-    * @param mapping    mapping to output as e.g. style='...'
+    * @param mapping    mapping to output as e.g. style="..."
     * 
     * @throws IOException
     */
@@ -43,9 +43,9 @@ public abstract class SelfRenderingComponent extends UIComponentBase
       {
          out.write(' ');
          out.write(mapping);
-         out.write("='");
+         out.write("=\"");
          out.write(attr.toString());
-         out.write('\'');
+         out.write('"');
       }
    }
    

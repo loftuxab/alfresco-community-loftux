@@ -26,7 +26,7 @@ public abstract class BaseRenderer extends Renderer
     * 
     * @param out        ResponseWriter
     * @param attr       attribute value object (cannot be null)
-    * @param mapping    mapping to output as e.g. style='...'
+    * @param mapping    mapping to output as e.g. style="..."
     * 
     * @throws IOException
     */
@@ -37,9 +37,9 @@ public abstract class BaseRenderer extends Renderer
       {
          out.write(' ');
          out.write(mapping);
-         out.write("='");
+         out.write("=\"");
          out.write(attr.toString());
-         out.write('\'');
+         out.write('"');
       }
    }
    

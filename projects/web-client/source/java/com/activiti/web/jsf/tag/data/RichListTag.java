@@ -59,7 +59,7 @@ public class RichListTag extends BaseComponentTag
       setStringBindingProperty(component, "value", this.value);
       setStringStaticProperty(component, "var", this.var);
       setStringProperty(component, "initialSortColumn", this.initialSortColumn);
-      setStringProperty(component, "initialSortDescending", this.initialSortDescending);
+      setBooleanProperty(component, "initialSortDescending", this.initialSortDescending);
       setStringProperty(component, "listConfig", this.listConfig);
       setStringProperty(component, "viewMode", this.viewMode);
       setStringProperty(component, "style", this.style);

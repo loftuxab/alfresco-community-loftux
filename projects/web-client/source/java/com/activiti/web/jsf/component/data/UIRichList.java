@@ -253,16 +253,16 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     * Sort the dataset using the specified sort parameters
     * 
     * @param column        Column to sort
-    * @param bAscending    True for ascending sort, false for descending
+    * @param descending    True for descending sort, false for ascending
     * @param mode          Sort mode to use (see IDataContainer constants)
     */
-   public void sort(String column, boolean bAscending, String mode)
+   public void sort(String column, boolean descending, String mode)
    {
       this.sortColumn = column;
-      this.sortDescending = bAscending;
+      this.sortDescending = descending;
       
       // delegate to the data model to sort its contents
-      getDataModel().sort(column, bAscending, mode);
+      getDataModel().sort(column, descending, mode);
    }
    
    
@@ -331,8 +331,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    {
       if (this.dataModel == null)
       {
-         // TODO: sort first time on initially sorted column - NOTE: can we
-         //       do this here or use a different hook point?
+         // build the appropriate data-model wrapper object
          Object val = getValue();
          if (val instanceof List)
          {
@@ -345,6 +344,23 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          else
          {
             throw new IllegalStateException("UIRichList 'value' attribute binding should specify data model of a supported type!"); 
+         }
+         
+         // sort first time on initially sorted column if set
+         String initialSortColumn = (String)getAttributes().get("initialSortColumn");
+         if (initialSortColumn != null && initialSortColumn.length() != 0)
+         {
+            boolean descending = true;
+            if (getAttributes().get("initialSortDescending") != null)
+            {
+               descending = ((Boolean)getAttributes().get("initialSortDescending")).booleanValue();
+            }
+            // TODO: add support for retrieving correct column sort mode here
+            this.sortColumn = initialSortColumn;
+            this.sortDescending = descending;
+            
+            // delegate to the data model to sort its contents
+            this.dataModel.sort(initialSortColumn, descending, IDataContainer.SORT_CASEINSENSITIVE);
          }
       }
       
@@ -367,7 +383,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    private int maxRowIndex = -1;
    private IGridDataModel dataModel = null;
    
-   // component settings
+   // component settings set by tag
    private int pageSize = -1;
    private int pageCount = 1;
    private String viewMode = null;
