@@ -1,6 +1,6 @@
 /*
  * Created on Mar 24, 2005
- *
+ * 
  * TODO Comment this class
  * 
  * 
@@ -18,85 +18,83 @@ import javax.transaction.TransactionManager;
 
 public class SimpleTransactionManager implements TransactionManager
 {
-   private static SimpleTransactionManager manager = new SimpleTransactionManager();
-   private int timeout;
+    private static SimpleTransactionManager manager = new SimpleTransactionManager();
 
-   private SimpleTransactionManager()
-   {
-      super();
-   }
-   
-   public static SimpleTransactionManager getInstance()
-   {
-      return manager;
-   }
-   
-   public void begin() throws NotSupportedException, SystemException
-   {
-      SimpleTransaction.begin();
-      
-   }
+    private int timeout;
 
-   public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException
-   {
-      SimpleTransaction transaction = getTransactionChecked();
-      transaction.commit();
-   }
+    private SimpleTransactionManager()
+    {
+        super();
+    }
 
-   public int getStatus() throws SystemException
-   {
-      SimpleTransaction transaction = getTransactionChecked();
-      return transaction.getStatus();
-   }
+    public static SimpleTransactionManager getInstance()
+    {
+        return manager;
+    }
 
-   public SimpleTransaction getTransaction() throws SystemException
-   {
-      return SimpleTransaction.getTransaction();
-   }
-   
-   private SimpleTransaction getTransactionChecked() throws SystemException, IllegalStateException
-   {
-      SimpleTransaction tx = SimpleTransaction.getTransaction();
-      if(tx == null)
-      {
-         throw new IllegalStateException("The thread is not bound to a transaction.");
-      }
-      return tx;
-   }
-   
-   
-   public void resume(Transaction tx) throws InvalidTransactionException, IllegalStateException, SystemException
-   {
-      if(!(tx instanceof SimpleTransaction))
-      {
-         throw new IllegalStateException("Transaction must be a SimpleTransaction to resume");
-      }
-      SimpleTransaction.resume((SimpleTransaction)tx);
-   }
+    public void begin() throws NotSupportedException, SystemException
+    {
+        SimpleTransaction.begin();
 
-   public void rollback() throws IllegalStateException, SecurityException, SystemException
-   {
-      SimpleTransaction transaction =  getTransactionChecked();
-      transaction.rollback();
-   }
+    }
 
-   public void setRollbackOnly() throws IllegalStateException, SystemException
-   {
-      SimpleTransaction transaction =  getTransactionChecked();
-      transaction.setRollbackOnly();
-   }
+    public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException,
+            SecurityException, IllegalStateException, SystemException
+    {
+        SimpleTransaction transaction = getTransactionChecked();
+        transaction.commit();
+    }
 
-   public void setTransactionTimeout(int timeout) throws SystemException
-   {
-    this.timeout = timeout;  
-   }
+    public int getStatus() throws SystemException
+    {
+        SimpleTransaction transaction = getTransactionChecked();
+        return transaction.getStatus();
+    }
 
-   public SimpleTransaction suspend() throws SystemException
-   {
-      return SimpleTransaction.suspend();
-   }
+    public SimpleTransaction getTransaction() throws SystemException
+    {
+        return SimpleTransaction.getTransaction();
+    }
 
+    private SimpleTransaction getTransactionChecked() throws SystemException, IllegalStateException
+    {
+        SimpleTransaction tx = SimpleTransaction.getTransaction();
+        if (tx == null)
+        {
+            throw new IllegalStateException("The thread is not bound to a transaction.");
+        }
+        return tx;
+    }
 
-   
-   
+    public void resume(Transaction tx) throws InvalidTransactionException, IllegalStateException, SystemException
+    {
+        if (!(tx instanceof SimpleTransaction))
+        {
+            throw new IllegalStateException("Transaction must be a SimpleTransaction to resume");
+        }
+        SimpleTransaction.resume((SimpleTransaction) tx);
+    }
+
+    public void rollback() throws IllegalStateException, SecurityException, SystemException
+    {
+        SimpleTransaction transaction = getTransactionChecked();
+        transaction.rollback();
+    }
+
+    public void setRollbackOnly() throws IllegalStateException, SystemException
+    {
+        SimpleTransaction transaction = getTransactionChecked();
+        transaction.setRollbackOnly();
+    }
+
+    public void setTransactionTimeout(int timeout) throws SystemException
+    {
+        this.timeout = timeout;
+    }
+
+    public SimpleTransaction suspend() throws SystemException
+    {
+        return SimpleTransaction.suspend();
+    }
+
 }

@@ -1,6 +1,6 @@
 /*
  * Created on Mar 24, 2005
- *
+ * 
  * TODO Comment this class
  * 
  * 
@@ -19,12 +19,11 @@ import com.activiti.repo.search.Searcher;
 public class JCR170Searcher implements Searcher
 {
 
-   public ResultSet query(StoreRef store, String language, String query, Path[] queryOptions, QueryParameter[] queryParameters)
-   {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException();
-   }
-
-  
+    public ResultSet query(StoreRef store, String language, String query, Path[] queryOptions,
+            QueryParameter[] queryParameters)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
 
 }

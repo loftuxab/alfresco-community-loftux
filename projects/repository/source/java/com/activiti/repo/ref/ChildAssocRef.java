@@ -141,8 +141,8 @@ public class ChildAssocRef implements EntityRef, Serializable
 
    public int hashCode()
    {
-      int hashCode = getParentRef().hashCode();
-      hashCode = 37 * hashCode + getName().hashCode();
+      int hashCode = (getParentRef() == null) ? 0 :  getParentRef().hashCode();
+      hashCode = 37 * hashCode + ((getName() == null) ? 0 : getName().hashCode());
       hashCode = 37 * hashCode + getChildRef().hashCode();
       return hashCode;
    }

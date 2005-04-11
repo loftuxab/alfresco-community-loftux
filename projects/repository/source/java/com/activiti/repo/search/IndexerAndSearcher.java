@@ -17,24 +17,24 @@ import com.activiti.repo.ref.StoreRef;
  */
 public interface IndexerAndSearcher
 {
-   /**
-    * Get an indexer for a store
-    * 
-    * @param storeRef
-    * @return
-    * @throws IndexerException
-    */
-   public abstract Indexer getIndexer(StoreRef storeRef) throws IndexerException;
+    /**
+     * Get an indexer for a store
+     * 
+     * @param storeRef
+     * @return
+     * @throws IndexerException
+     */
+    public abstract Indexer getIndexer(StoreRef storeRef) throws IndexerException;
 
-   /**
-    * Get a searcher for a store
-    * 
-    * @param storeRef
-    * @param searchDelta -
-    *           serach the in progress transaction as well as the main index
-    *           (this is ignored for searches that do full text)
-    * @return
-    * @throws SearcherException
-    */
-   public abstract Searcher getSearcher(StoreRef storeRef, boolean searchDelta) throws SearcherException;
+    /**
+     * Get a searcher for a store
+     * 
+     * @param storeRef
+     * @param searchDelta -
+     *            serach the in progress transaction as well as the main index
+     *            (this is ignored for searches that do full text)
+     * @return
+     * @throws SearcherException
+     */
+    public abstract Searcher getSearcher(StoreRef storeRef, boolean searchDelta) throws SearcherException;
 }

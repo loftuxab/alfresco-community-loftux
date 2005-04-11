@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +34,6 @@ import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.Indexer;
 import com.activiti.repo.search.IndexerException;
-import com.activiti.repo.search.impl.lucene.analysis.PathTokenFilter;
 
 /**
  * The implementation of the lucene based indexer. Supports basic transactional
@@ -43,547 +44,654 @@ import com.activiti.repo.search.impl.lucene.analysis.PathTokenFilter;
  */
 public class LuceneIndexer extends LuceneBase implements Indexer
 {
-   /**
-    * The node service we use to get information about nodes
-    */
-   private NodeService nodeService;
+    /**
+     * The node service we use to get information about nodes
+     */
+    private NodeService nodeService;
 
-   /**
-    * A list of all deletoins we have made - at merge these deletions need to be
-    * made against the main index.
-    * 
-    * TODO: Consider if this informantion needs to be persisted for recovery
-    */
+    /**
+     * A list of all deletoins we have made - at merge these deletions need to
+     * be made against the main index.
+     * 
+     * TODO: Consider if this informantion needs to be persisted for recovery
+     */
 
-   private Set<NodeRef> deletions = new HashSet<NodeRef>();
+    private Set<NodeRef> deletions = new HashSet<NodeRef>();
 
-   /**
-    * A list of all nodes we have altered This list is used to drive the
-    * background full text seach index which is to time consuming to do as part
-    * of the transaction. The commit of the list of nodes to reindex is done as
-    * part of the transaction.
-    * 
-    * TODO: Condsider persistence and recovery
-    */
+    /**
+     * A list of all nodes we have altered This list is used to drive the
+     * background full text seach index which is to time consuming to do as part
+     * of the transaction. The commit of the list of nodes to reindex is done as
+     * part of the transaction.
+     * 
+     * TODO: Condsider persistence and recovery
+     */
 
-   private Set<NodeRef> fts = new HashSet<NodeRef>();
+    private Set<NodeRef> fts = new HashSet<NodeRef>();
 
-   /**
-    * The status of this index - follows javax.transaction.Status
-    */
-   
-   private int status = Status.STATUS_UNKNOWN;
+    /**
+     * The status of this index - follows javax.transaction.Status
+     */
 
-   /**
-    * Has this index been modified?
-    */
-   
-   private boolean isModified = false;
-   
-   /**
-    * Setter for getting the node service via IOC
-    * Used in the Spring container
-    * 
-    * @param nodeService
-    */
+    private int status = Status.STATUS_UNKNOWN;
 
-   public void setNodeService(NodeService nodeService)
-   {
-      this.nodeService = nodeService;
-   }
+    /**
+     * Has this index been modified?
+     */
 
-   /**
-    * Utility method to check we are in the correct state to do work 
-    * Also keeps track of the dirty flag.
-    *
-    */
-   
-   private void checkAbleToDoWork()
-   {
-      switch (status)
-      {
-      case Status.STATUS_UNKNOWN:
-         status = Status.STATUS_ACTIVE;
-         break;
-      case Status.STATUS_ACTIVE:
-         // OK
-         break;
-      default:
-         // All other states are a problem
-         throw new IndexerException(buildErrorString());
-      }
-      isModified = true;
-   }
+    private boolean isModified = false;
 
-   /**
-    * Utility method to report errors about invalid state.
-    * 
-    * @return
-    */
-   private String buildErrorString()
-   {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append("The indexer is unable to accept more work: ");
-      switch (status)
-      {
-      case Status.STATUS_COMMITTED:
-         buffer.append("The indexer has been committed");
-         break;
-      case Status.STATUS_COMMITTING:
-         buffer.append("The indexer is committing");
-         break;
-      case Status.STATUS_MARKED_ROLLBACK:
-         buffer.append("The indexer is marked for rollback");
-         break;
-      case Status.STATUS_PREPARED:
-         buffer.append("The indexer is prepared to commit");
-         break;
-      case Status.STATUS_PREPARING:
-         buffer.append("The indexer is preparing to commit");
-         break;
-      case Status.STATUS_ROLLEDBACK:
-         buffer.append("The indexer has been rolled back");
-         break;
-      case Status.STATUS_ROLLING_BACK:
-         buffer.append("The indexer is rolling back");
-         break;
-      case Status.STATUS_UNKNOWN:
-         buffer.append("The indexer is in an unknown state");
-         break;
-      default:
-         break;
-      }
-      return buffer.toString();
-   }
+    /**
+     * Setter for getting the node service via IOC Used in the Spring container
+     * 
+     * @param nodeService
+     */
+
+
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
 
    /*
     * Indexer Implementation
     */
-   
-   public void createNode(ChildAssocRef relationshipRef) throws IndexerException
-   {
-      checkAbleToDoWork();
-      try
-      {
-          if (relationshipRef.getParentRef() != null)
-          {
-              reindex(relationshipRef.getParentRef());
-          }
-         reindex(relationshipRef.getChildRef());
-      }
-      catch (IOException e)
-      {
-         throw new IndexerException(e);
-      }
-   }
 
-   public void updateNode(NodeRef nodeRef) throws IndexerException
-   {
-      checkAbleToDoWork();
-      try
-      {
-         reindex(nodeRef);
-      }
-      catch (IOException e)
-      {
-         throw new IndexerException(e);
-      }
-   }
+    /**
+     * Utility method to check we are in the correct state to do work Also keeps
+     * track of the dirty flag.
+     * 
+     */
 
-   public void deleteNode(ChildAssocRef relationshipRef) throws IndexerException
-   {
-      checkAbleToDoWork();
-      try
-      {
-         delete(relationshipRef.getChildRef());
-      }
-      catch (IOException e)
-      {
-         throw new IndexerException(e);
-      }
-   }
+    private void checkAbleToDoWork()
+    {
+        switch (status)
+        {
+        case Status.STATUS_UNKNOWN:
+            status = Status.STATUS_ACTIVE;
+            break;
+        case Status.STATUS_ACTIVE:
+            // OK
+            break;
+        default:
+            // All other states are a problem
+            throw new IndexerException(buildErrorString());
+        }
+        isModified = true;
+    }
 
-   public void createChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
-   {
-      checkAbleToDoWork();
-      try
-      {
-         // TODO: Optimise
-         reindex(relationshipRef.getParentRef());
-         reindex(relationshipRef.getChildRef());
-      }
-      catch (IOException e)
-      {
-         throw new IndexerException(e);
-      }
-   }
+    /**
+     * Utility method to report errors about invalid state.
+     * 
+     * @return
+     */
+    private String buildErrorString()
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("The indexer is unable to accept more work: ");
+        switch (status)
+        {
+        case Status.STATUS_COMMITTED:
+            buffer.append("The indexer has been committed");
+            break;
+        case Status.STATUS_COMMITTING:
+            buffer.append("The indexer is committing");
+            break;
+        case Status.STATUS_MARKED_ROLLBACK:
+            buffer.append("The indexer is marked for rollback");
+            break;
+        case Status.STATUS_PREPARED:
+            buffer.append("The indexer is prepared to commit");
+            break;
+        case Status.STATUS_PREPARING:
+            buffer.append("The indexer is preparing to commit");
+            break;
+        case Status.STATUS_ROLLEDBACK:
+            buffer.append("The indexer has been rolled back");
+            break;
+        case Status.STATUS_ROLLING_BACK:
+            buffer.append("The indexer is rolling back");
+            break;
+        case Status.STATUS_UNKNOWN:
+            buffer.append("The indexer is in an unknown state");
+            break;
+        default:
+            break;
+        }
+        return buffer.toString();
+    }
 
-   public void updateChildRelationship(ChildAssocRef relationshipBeforeRef,
-         ChildAssocRef relationshipAfterRef) throws IndexerException
-   {
-      checkAbleToDoWork();
-      try
-      {
-         // TODO: Optimise
-         reindex(relationshipBeforeRef.getParentRef());
-         reindex(relationshipBeforeRef.getChildRef());
-      }
-      catch (IOException e)
-      {
-         throw new IndexerException(e);
-      }
-   }
+    /*
+     * Indexer Implementation
+     */
 
-   public void deleteChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
-   {
-      checkAbleToDoWork();
-      try
-      {
-         // TODO: Optimise
-         reindex(relationshipRef.getParentRef());
-         reindex(relationshipRef.getChildRef());
-      }
-      catch (IOException e)
-      {
-         throw new IndexerException(e);
-      }
-   }
-
-   /**
-    * Generate an indexer 
-    * 
-    * @param storeRef
-    * @param deltaId
-    * @return
-    */
-   public static LuceneIndexer getUpdateIndexer(StoreRef storeRef, String deltaId)
-   {
-      LuceneIndexer indexer = new LuceneIndexer();
-      try
-      {
-         indexer.initialise(storeRef, deltaId);
-      }
-      catch (IOException e)
-      {
-         throw new IndexerException(e);
-      }
-      return indexer;
-   }
-
-   /*
-    * Transactional support
-    * Used by the resource mananger for indexers.
-    */
-   
-   /**
-    * Commit this index
-    */
-   
-   public void commit()
-   {
-      switch (status)
-      {
-      case Status.STATUS_COMMITTING:
-         throw new IndexerException("Unable to commit: Transaction is committing");
-      case Status.STATUS_COMMITTED:
-         throw new IndexerException("Unable to commit: Transaction is commited ");
-      case Status.STATUS_ROLLING_BACK:
-         throw new IndexerException("Unable to commit: Transaction is rolling back");
-      case Status.STATUS_ROLLEDBACK:
-         throw new IndexerException("Unable to commit: Transaction is aleady rolled back");
-      case Status.STATUS_MARKED_ROLLBACK:
-         throw new IndexerException("Unable to commit: Transaction is marked for roll back");
-      case Status.STATUS_PREPARING:
-         throw new IndexerException("Unable to commit: Transaction is preparing");
-      case Status.STATUS_ACTIVE:
-         // special case - commit from active
-         prepare();
-      // drop through to do the commit;
-      default:
-         status = Status.STATUS_COMMITTING;
-         try
-         {
-            // Build the deletion terms
-            Set<Term> terms = new HashSet<Term>();
-            for (NodeRef nodeRef : deletions)
+    public void createNode(ChildAssocRef relationshipRef) throws IndexerException
+    {
+        checkAbleToDoWork();
+        try
+        {
+            if (relationshipRef.getParentRef() != null)
             {
-               terms.add(new Term("ID", nodeRef.getId()));
+                reindex(relationshipRef.getParentRef());
             }
-            // Merge
-            mergeDeltaIntoMain(terms);
-            status = Status.STATUS_COMMITTED;
-         }
-         catch (IOException e)
-         {
-            // If anything goes wrong we try and do a roll back
-            rollback();
+            reindex(relationshipRef.getChildRef());
+        }
+        catch (IOException e)
+        {
             throw new IndexerException(e);
-         }
-         finally
-         {
-            // Make sure we tidy up 
+        }
+    }
+
+    public void updateNode(NodeRef nodeRef) throws IndexerException
+    {
+        checkAbleToDoWork();
+        try
+        {
+            reindex(nodeRef);
+        }
+        catch (IOException e)
+        {
+            throw new IndexerException(e);
+        }
+    }
+
+    public void deleteNode(ChildAssocRef relationshipRef) throws IndexerException
+    {
+        checkAbleToDoWork();
+        try
+        {
+            delete(relationshipRef.getChildRef());
+        }
+        catch (IOException e)
+        {
+            throw new IndexerException(e);
+        }
+    }
+
+    public void createChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
+    {
+        checkAbleToDoWork();
+        try
+        {
+            // TODO: Optimise
+            reindex(relationshipRef.getParentRef());
+            reindex(relationshipRef.getChildRef());
+        }
+        catch (IOException e)
+        {
+            throw new IndexerException(e);
+        }
+    }
+
+    public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef) throws IndexerException
+    {
+        checkAbleToDoWork();
+        try
+        {
+            // TODO: Optimise
+            if (relationshipBeforeRef.getParentRef() != null)
+            {
+                reindex(relationshipBeforeRef.getParentRef());
+            }
+            reindex(relationshipBeforeRef.getChildRef());
+        }
+        catch (IOException e)
+        {
+            throw new IndexerException(e);
+        }
+    }
+
+    public void deleteChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
+    {
+        checkAbleToDoWork();
+        try
+        {
+            // TODO: Optimise
+            if (relationshipRef.getParentRef() != null)
+            {
+                reindex(relationshipRef.getParentRef());
+            }
+            reindex(relationshipRef.getChildRef());
+        }
+        catch (IOException e)
+        {
+            throw new IndexerException(e);
+        }
+    }
+
+    /**
+     * Generate an indexer
+     * 
+     * @param storeRef
+     * @param deltaId
+     * @return
+     */
+    public static LuceneIndexer getUpdateIndexer(StoreRef storeRef, String deltaId)
+    {
+        LuceneIndexer indexer = new LuceneIndexer();
+        try
+        {
+            indexer.initialise(storeRef, deltaId);
+        }
+        catch (IOException e)
+        {
+            throw new IndexerException(e);
+        }
+        return indexer;
+    }
+
+    /*
+     * Transactional support Used by the resource mananger for indexers.
+     */
+
+    /**
+     * Commit this index
+     */
+
+    public void commit()
+    {
+        switch (status)
+        {
+        case Status.STATUS_COMMITTING:
+            throw new IndexerException("Unable to commit: Transaction is committing");
+        case Status.STATUS_COMMITTED:
+            throw new IndexerException("Unable to commit: Transaction is commited ");
+        case Status.STATUS_ROLLING_BACK:
+            throw new IndexerException("Unable to commit: Transaction is rolling back");
+        case Status.STATUS_ROLLEDBACK:
+            throw new IndexerException("Unable to commit: Transaction is aleady rolled back");
+        case Status.STATUS_MARKED_ROLLBACK:
+            throw new IndexerException("Unable to commit: Transaction is marked for roll back");
+        case Status.STATUS_PREPARING:
+            throw new IndexerException("Unable to commit: Transaction is preparing");
+        case Status.STATUS_ACTIVE:
+            // special case - commit from active
+            prepare();
+        // drop through to do the commit;
+        default:
+            status = Status.STATUS_COMMITTING;
+            try
+            {
+                // Build the deletion terms
+                Set<Term> terms = new HashSet<Term>();
+                for (NodeRef nodeRef : deletions)
+                {
+                    terms.add(new Term("ID", nodeRef.getId()));
+                }
+                // Merge
+                mergeDeltaIntoMain(terms);
+                status = Status.STATUS_COMMITTED;
+            }
+            catch (IOException e)
+            {
+                // If anything goes wrong we try and do a roll back
+                rollback();
+                throw new IndexerException(e);
+            }
+            finally
+            {
+                // Make sure we tidy up
+                deleteDelta();
+            }
+            break;
+        }
+    }
+
+    /**
+     * Prepare to commit
+     * 
+     * At the moment this makes sure we have all the locks
+     * 
+     * TODO: This is not doing proper serialisation against the index as would a
+     * data base transaction.
+     * 
+     * @return
+     */
+    public int prepare()
+    {
+
+        switch (status)
+        {
+        case Status.STATUS_COMMITTING:
+            throw new IndexerException("Unable to prepare: Transaction is committing");
+        case Status.STATUS_COMMITTED:
+            throw new IndexerException("Unable to prepare: Transaction is commited ");
+        case Status.STATUS_ROLLING_BACK:
+            throw new IndexerException("Unable to prepare: Transaction is rolling back");
+        case Status.STATUS_ROLLEDBACK:
+            throw new IndexerException("Unable to prepare: Transaction is aleady rolled back");
+        case Status.STATUS_MARKED_ROLLBACK:
+            throw new IndexerException("Unable to prepare: Transaction is marked for roll back");
+        case Status.STATUS_PREPARING:
+            throw new IndexerException("Unable to prepare: Transaction is already preparing");
+        case Status.STATUS_PREPARED:
+            throw new IndexerException("Unable to prepare: Transaction is already prepared");
+        default:
+            status = Status.STATUS_PREPARING;
+            try
+            {
+                saveDelta();
+                prepareToMergeIntoMain();
+                status = Status.STATUS_PREPARED;
+                return XAResource.XA_OK;
+            }
+            catch (IOException e)
+            {
+                status = Status.STATUS_MARKED_ROLLBACK;
+                throw new IndexerException(e);
+            }
+        }
+    }
+
+    /**
+     * Has this index been modified?
+     * 
+     * @return
+     */
+    public boolean isModified()
+    {
+        return isModified;
+    }
+
+    /**
+     * Return the javax.transaction.Status integer status code
+     * 
+     * @return
+     */
+    public int getStatus()
+    {
+        return status;
+    }
+
+    /**
+     * Roll back the index changes (this just means they are never added)
+     * 
+     */
+
+    public void rollback()
+    {
+        switch (status)
+        {
+        case Status.STATUS_COMMITTING:
+            throw new IndexerException("Unable to roll back: Transaction is committing");
+        case Status.STATUS_COMMITTED:
+            throw new IndexerException("Unable to roll back: Transaction is commited ");
+        case Status.STATUS_ROLLING_BACK:
+            throw new IndexerException("Unable to roll back: Transaction is rolling back");
+        case Status.STATUS_ROLLEDBACK:
+            throw new IndexerException("Unable to roll back: Transaction is aleady rolled back");
+        default:
+            status = Status.STATUS_ROLLING_BACK;
             deleteDelta();
-         }
-         break;
-      }
-   }
+            status = Status.STATUS_ROLLEDBACK;
+            break;
+        }
+    }
 
-   /**
-    * Prepare to commit 
-    * 
-    * At the moment this makes sure we have all the locks
-    * 
-    * TODO: This is not doing proper serialisation against the index as would 
-    * a data base transaction.
-    * 
-    * @return
-    */
-   public int prepare()
-   {
+    /**
+     * Mark this index for roll back only. This action can not be reversed. It
+     * will reject all other work and only allow roll back.
+     * 
+     */
 
-      switch (status)
-      {
-      case Status.STATUS_COMMITTING:
-         throw new IndexerException("Unable to prepare: Transaction is committing");
-      case Status.STATUS_COMMITTED:
-         throw new IndexerException("Unable to prepare: Transaction is commited ");
-      case Status.STATUS_ROLLING_BACK:
-         throw new IndexerException("Unable to prepare: Transaction is rolling back");
-      case Status.STATUS_ROLLEDBACK:
-         throw new IndexerException("Unable to prepare: Transaction is aleady rolled back");
-      case Status.STATUS_MARKED_ROLLBACK:
-         throw new IndexerException("Unable to prepare: Transaction is marked for roll back");
-      case Status.STATUS_PREPARING:
-         throw new IndexerException("Unable to prepare: Transaction is already preparing");
-      case Status.STATUS_PREPARED:
-         throw new IndexerException("Unable to prepare: Transaction is already prepared");
-      default:
-         status = Status.STATUS_PREPARING;
-         try
-         {
-            saveDelta();
-            prepareToMergeIntoMain();
-            status = Status.STATUS_PREPARED;
-            return XAResource.XA_OK;
-         }
-         catch (IOException e)
-         {
+    public void setRollbackOnly()
+    {
+        switch (status)
+        {
+        case Status.STATUS_COMMITTING:
+            throw new IndexerException("Unable to mark for rollback: Transaction is committing");
+        case Status.STATUS_COMMITTED:
+            throw new IndexerException("Unable to mark for rollback: Transaction is commited");
+        default:
             status = Status.STATUS_MARKED_ROLLBACK;
-            throw new IndexerException(e);
-         }
-      }
-   }
+            break;
+        }
+    }
 
-   /**
-    * Has this index been modified?
-    * @return
-    */
-   public boolean isModified()
-   {
-      return isModified;
-   }
+    /*
+     * Implementation
+     */
 
-   /**
-    * Return the javax.transaction.Status
-    * integer status code
-    * 
-    * @return
-    */
-   public int getStatus()
-   {
-      return status;
-   }
+    private void reindex(NodeRef nodeRef) throws IOException
+    {
+        Set<NodeRef> refs = delete(nodeRef);
+        index(refs, false);
+    }
 
-   /**
-    * Roll back the index changes (this just means they are never added)
-    *
-    */
-   
-   public void rollback()
-   {
-      switch (status)
-      {
-      case Status.STATUS_COMMITTING:
-         throw new IndexerException("Unable to roll back: Transaction is committing");
-      case Status.STATUS_COMMITTED:
-         throw new IndexerException("Unable to roll back: Transaction is commited ");
-      case Status.STATUS_ROLLING_BACK:
-         throw new IndexerException("Unable to roll back: Transaction is rolling back");
-      case Status.STATUS_ROLLEDBACK:
-         throw new IndexerException("Unable to roll back: Transaction is aleady rolled back");
-      default:
-         status = Status.STATUS_ROLLING_BACK;
-         deleteDelta();
-         status = Status.STATUS_ROLLEDBACK;
-         break;
-      }
-   }
+    private Set<NodeRef> delete(NodeRef nodeRef) throws IOException
+    {
+        Set<NodeRef> refs = new HashSet<NodeRef>();
 
-   /**
-    * Mark this index for roll back only.
-    * This action can not be reversed.
-    * It will reject all other work and only allow roll back.
-    *
-    */
-   
-   public void setRollbackOnly()
-   {
-      switch (status)
-      {
-      case Status.STATUS_COMMITTING:
-         throw new IndexerException("Unable to mark for rollback: Transaction is committing");
-      case Status.STATUS_COMMITTED:
-         throw new IndexerException("Unable to mark for rollback: Transaction is commited");
-      default:
-         status = Status.STATUS_MARKED_ROLLBACK;
-         break;
-      }
-   }  
-   
-   /*
-    * Implementation
-    */
-   
-   private void reindex(NodeRef nodeRef) throws IOException
-   {
-      Set<NodeRef> refs = delete(nodeRef);
-      index(refs);
-   }
+        refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaRamReader()));
+        refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader()));
 
-   private Set<NodeRef> delete(NodeRef nodeRef) throws IOException
-   {
-      Set<NodeRef> refs = new HashSet<NodeRef>();
+        deletions.addAll(refs);
+        return refs;
+    }
 
-      refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaRamReader()));
-      refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader()));
+    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader) throws IOException
+    {
+        Set<NodeRef> refs = new HashSet<NodeRef>();
 
-      deletions.addAll(refs);
-      return refs;
-   }
+        int count = reader.delete(new Term("ID", nodeRef.getId()));
+        refs.add(nodeRef);
 
-   private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader) throws IOException
-   {
-      Set<NodeRef> refs = new HashSet<NodeRef>();
+        TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.getId()));
+        while (td.next())
+        {
+            int doc = td.doc();
+            Document document = reader.document(doc);
+            String id = document.get("ID");
+            NodeRef ref = new NodeRef(store, id);
+            refs.add(ref);
+            reader.delete(doc);
+        }
+        return refs;
+    }
 
-      int count = reader.delete(new Term("ID", nodeRef.getId()));
-      refs.add(nodeRef);
+    private void index(Set<NodeRef> nodeRefs, boolean isNew) throws IOException
+    {
+        for (NodeRef ref : nodeRefs)
+        {
+            index(ref, isNew);
+        }
+    }
 
-      TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.getId()));
-      while (td.next())
-      {
-         int doc = td.doc();
-         Document document = reader.document(doc);
-         String id = document.get("ID");
-         NodeRef ref = new NodeRef(store, id);
-         refs.add(ref);
-         reader.delete(doc);
-      }
-      return refs;
-   }
+    private void index(NodeRef nodeRef, boolean isNew) throws IOException
+    {
+        List<Document> docs = createDocuments(nodeRef, isNew);
+        IndexWriter writer = getDeltaRamWriter();
+        for (Document doc : docs)
+        {
+            writer.addDocument(doc);
+        }
+        chechAndMergeToDisk(10000);
+    }
 
-   private void index(Set<NodeRef> nodeRefs) throws IOException
-   {
-      for (NodeRef ref : nodeRefs)
-      {
-         index(ref);
-      }
-   }
+    static class Counter
+    {
+        int countInParent = 0;
 
-   private void index(NodeRef nodeRef) throws IOException
-   {
-      Document doc = createDocument(nodeRef);
-      IndexWriter writer = getDeltaRamWriter();
-      writer.addDocument(doc);
-      chechAndMergeToDisk(10000);
-   }
+        int count = -1;
 
-   private Document createDocument(NodeRef nodeRef)
-   {
-      // Lucene flags in order are: Stored, indexed, tokenised
-      // ID
-      Document doc = new Document();
-      doc.add(new Field("ID", nodeRef.getId(), true, true, false));
+        int getCountInParent()
+        {
+            return countInParent;
+        }
 
-      // Properties
-      Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-      for (QName propertyQName : properties.keySet())
-      {
-         Serializable value = properties.get(propertyQName);
-         // convert value to String
-         String strValue = value.toString();   // TODO:  Need converter here
-         doc.add(new Field("@" + propertyQName, strValue, true, true, false));
-      }
+        int getRepeat()
+        {
+            return (count / countInParent) + 1;
+        }
 
-      // Parents
-      for (NodeRef parent : nodeService.getParents(nodeRef))
-      {
-         doc.add(new Field("PARENT", parent.getId(), true, true, false));
-      }
+        void incrementParentCount()
+        {
+            countInParent++;
+        }
 
-      // Paths
+        void increment()
+        {
+            count++;
+        }
 
-      if (nodeService.getType(nodeRef).equals(Node.TYPE_CONTAINER))
-      {
-         StringBuffer pathBuffer = new StringBuffer();
-         StringBuffer parentBuffer = new StringBuffer();
-         
-         ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>();
-         Collection<Path> paths = nodeService.getPaths(nodeRef, false);
-         for(Iterator<Path> it = paths.iterator(); it.hasNext(); /**/)
-         {
+    }
+
+    private List<Document> createDocuments(NodeRef nodeRef, boolean isNew)
+    {
+        // Create mutiple containers
+        // For each node and directory create a copy for each parent in which it
+        // occurs
+
+        Map<ChildAssocRef, Counter> nodeCounts = new HashMap<ChildAssocRef, Counter>(5);
+
+        List<Document> docs = new ArrayList<Document>();
+
+        ChildAssocRef qNameRef = null;
+
+        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+
+        Collection<Path> paths = nodeService.getPaths(nodeRef, false);
+
+        for (NodeRef parent : nodeService.getParents(nodeRef))
+        {
+            for (ChildAssocRef cae : nodeService.getChildAssocs(parent))
+            {
+                if (cae.getChildRef().equals(nodeRef))
+                {
+                    Counter counter = nodeCounts.get(cae);
+                    if (counter == null)
+                    {
+                        counter = new Counter();
+                        nodeCounts.put(cae, counter);
+                    }
+                    counter.incrementParentCount();
+                }
+            }
+        }
+
+        int containerCount = 0;
+        for (Iterator<Path> it = paths.iterator(); it.hasNext(); /**/)
+        {
+
             Path path = it.next();
-            pathBuffer.append(path.toString());
-            
-            for(Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
+
+            // Lucene flags in order are: Stored, indexed, tokenised
+            // ID
+            Document doc = new Document();
+            doc.add(new Field("ID", nodeRef.getId(), true, true, false));
+
+            // Properties
+
+            for (QName propertyQName : properties.keySet())
             {
-               Path.Element element = elit.next();
-               if(!(element instanceof Path.ChildAssocElement))
-               {
-                  throw new IndexerException("Confused path: "+path);
-               }
-               Path.ChildAssocElement cae = (Path.ChildAssocElement)element;
-               if (cae.getRef().getParentRef() == null)
-               {
-                   // no parent reference - the child is the root
-                   continue;
-               }
-               parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getParentRef());
-               if(!elit.hasNext())
-               {
-                  parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getChildRef());
-               }
+
+                Serializable value = properties.get(propertyQName);
+                // convert value to String
+                String strValue = value.toString(); // TODO: Need converter here
+                doc.add(new Field("@" + propertyQName, strValue, true, true, false));
+
             }
-            
-            for(NodeRef ref: parentsInDepthOrderStartingWithSelf)
+
+            // Paths
+
+            StringBuffer qNameBuffer = new StringBuffer();
+            StringBuffer pathBuffer = new StringBuffer();
+            StringBuffer parentBuffer = new StringBuffer();
+
+            ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>();
+
+            int pathLength = 0;
+            for (Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
             {
-               if(parentBuffer.length() > 0)
-               {
-                  parentBuffer.append(" ");
-               }
-               parentBuffer.append(ref.getId());
+                Path.Element element = elit.next();
+                if (!(element instanceof Path.ChildAssocElement))
+                {
+                    throw new IndexerException("Confused path: " + path);
+                }
+                Path.ChildAssocElement cae = (Path.ChildAssocElement) element;
+                parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getChildRef());
+                if (!elit.hasNext())
+                {
+                    if (cae.getRef().getName() != null)
+                    {
+                        qNameBuffer.append(cae.getRef().getName().toString());
+                    }
+                    if (cae.getRef().getParentRef() != null)
+                    {
+                        doc.add(new Field("PARENT", cae.getRef().getParentRef().getId(), true, true, false));
+                    }
+                    qNameRef = cae.getRef();
+                }
+
+                if (pathBuffer.length() > 0)
+                {
+                    pathBuffer.append("/");
+                }
+                if (cae.getRef().getName() != null)
+                {
+                    pathBuffer.append(cae.getRef().getName().toString());
+                }
+                pathLength++;
             }
-            
+
+            for (NodeRef ref : parentsInDepthOrderStartingWithSelf)
+            {
+                if (parentBuffer.length() > 0)
+                {
+                    parentBuffer.append(" ");
+                }
+                parentBuffer.append(ref.getId());
+            }
+
             parentsInDepthOrderStartingWithSelf.clear();
-            
-            if(it.hasNext())
+
+            // Root Node
+            if (pathLength == 1)
             {
-               pathBuffer.append(PathTokenFilter.PATH_SEPARATOR);
-               if(parentBuffer.length() > 0)
-               {
-                  parentBuffer.append(" ");
-               }
-               parentBuffer.append(PathTokenFilter.PATH_SEPARATOR);
+                // TODO: Does the root element have a QName?
+                doc.add(new Field("ISCONTAINER", "T", true, true, false));
+                doc.add(new Field("PATH", ";", true, true, true));
+                doc.add(new Field("ISROOT", "T", true, true, false));
+                doc.add(new Field("ISNODE", "T", true, true, false));
+                docs.add(doc);
             }
-            
-            
-         }
-         doc.add(new Field("PATH", pathBuffer.toString(), true, true, true));
-         doc.add(new Field("ANCESTOR", parentBuffer.toString(), true, true, true));
-         
-      }
+            else
+            {
+                doc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
+                if (nodeService.getType(nodeRef).equalsIgnoreCase(Node.TYPE_CONTAINER))
+                {
+                    Document directoryEntry = new Document();
+                    directoryEntry.add(new Field("ID", nodeRef.getId(), true, true, false));
+                    directoryEntry.add(new Field("PATH", pathBuffer.toString(), true, true, true));
+                    directoryEntry.add(new Field("ANCESTOR", parentBuffer.toString(), true, true, true));
+                    directoryEntry.add(new Field("ISCONTAINER", "T", true, true, false));
+                    docs.add(directoryEntry);
+                    doc.add(new Field("ANCESTOR", parentBuffer.toString(), true, true, true));
+                }
 
-      return doc;
-   }
+                Counter counter = nodeCounts.get(qNameRef);
+                counter.increment();
 
- 
+                doc.add(new Field("ISROOT", "F", true, true, false));
+                doc.add(new Field("ISNODE", "T", true, true, false));
+                if (isNew)
+                {
+                    doc.add(new Field("FTSSTATUS", "New", true, true, true));
+                }
+                else
+                {
+                    doc.add(new Field("FTSSTATUS", "Dirty", true, true, true));
+                }
+
+                if (counter.getRepeat() == 1)
+                {
+                    docs.add(doc);
+                }
+
+            }
+        }
+
+        return docs;
+    }
+
 }

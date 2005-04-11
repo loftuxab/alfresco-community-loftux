@@ -1,6 +1,6 @@
 /*
  * Created on Mar 30, 2005
- *
+ * 
  * TODO Comment this class
  * 
  * 
@@ -10,29 +10,29 @@ package com.activiti.repo.search.transaction;
 public class XidException extends RuntimeException
 {
 
-   /**
-    * 
-    */
-   private static final long serialVersionUID = 3257847696969840185L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3257847696969840185L;
 
-   public XidException()
-   {
-      super();
-   }
+    public XidException()
+    {
+        super();
+    }
 
-   public XidException(String message)
-   {
-      super(message);
-   }
+    public XidException(String message)
+    {
+        super(message);
+    }
 
-   public XidException(String message, Throwable cause)
-   {
-      super(message, cause);
-   }
+    public XidException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
-   public XidException(Throwable cause)
-   {
-      super(cause);
-   }
+    public XidException(Throwable cause)
+    {
+        super(cause);
+    }
 
 }

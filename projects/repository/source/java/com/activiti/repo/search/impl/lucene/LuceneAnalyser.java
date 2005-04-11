@@ -28,61 +28,65 @@ import com.activiti.repo.search.impl.lucene.analysis.PathAnalyser;
 public class LuceneAnalyser extends Analyzer
 {
 
-   private Analyzer defaultAnalyser;
+    private Analyzer defaultAnalyser;
 
-   private Map<String, Analyzer> analysers = new HashMap<String, Analyzer>();
+    private Map<String, Analyzer> analysers = new HashMap<String, Analyzer>();
 
-   /**
-    * Constructs with a default standard analyser
-    * 
-    * @param defaultAnalyzer
-    *           Any fields not specifically defined to use a different analyzer
-    *           will use the one provided here.
-    */
-   public LuceneAnalyser()
-   {
-      this(new StandardAnalyzer());
-   }
+    /**
+     * Constructs with a default standard analyser
+     * 
+     * @param defaultAnalyzer
+     *            Any fields not specifically defined to use a different
+     *            analyzer will use the one provided here.
+     */
+    public LuceneAnalyser()
+    {
+        this(new StandardAnalyzer());
+    }
 
-   /**
-    * Constructs with default analyzer.
-    * 
-    * @param defaultAnalyzer
-    *           Any fields not specifically defined to use a different analyzer
-    *           will use the one provided here.
-    */
-   public LuceneAnalyser(Analyzer defaultAnalyser)
-   {
-      this.defaultAnalyser = defaultAnalyser;
-   }
-   
-   public TokenStream tokenStream(String fieldName, Reader reader)
-   {
-      Analyzer analyser = (Analyzer) analysers.get(fieldName);
-      if(analyser == null)
-      {
-        analyser = findAnalyser(fieldName);
-      }
-      return analyser.tokenStream(fieldName, reader);
-   }
+    /**
+     * Constructs with default analyzer.
+     * 
+     * @param defaultAnalyzer
+     *            Any fields not specifically defined to use a different
+     *            analyzer will use the one provided here.
+     */
+    public LuceneAnalyser(Analyzer defaultAnalyser)
+    {
+        this.defaultAnalyser = defaultAnalyser;
+    }
 
-   private Analyzer findAnalyser(String fieldName)
-   {
-      Analyzer analyser;
-      if(fieldName.equals("PATH"))
-      {
-         analyser = new PathAnalyser();
-      }
-      else if(fieldName.equals("ANCESTOR"))
-      {
-         analyser = new WhitespaceAnalyzer();
-      }
-      else
-      {
-         analyser = defaultAnalyser;
-      }
-      analysers.put(fieldName, analyser);
-      return analyser;
-   }
-   
+    public TokenStream tokenStream(String fieldName, Reader reader)
+    {
+        Analyzer analyser = (Analyzer) analysers.get(fieldName);
+        if (analyser == null)
+        {
+            analyser = findAnalyser(fieldName);
+        }
+        return analyser.tokenStream(fieldName, reader);
+    }
+
+    private Analyzer findAnalyser(String fieldName)
+    {
+        Analyzer analyser;
+        if (fieldName.equals("PATH"))
+        {
+            analyser = new PathAnalyser();
+        }
+        else  if (fieldName.equals("QNAME"))
+        {
+            analyser = new PathAnalyser();
+        }
+        else if (fieldName.equals("ANCESTOR"))
+        {
+            analyser = new WhitespaceAnalyzer();
+        }
+        else
+        {
+            analyser = defaultAnalyser;
+        }
+        analysers.put(fieldName, analyser);
+        return analyser;
+    }
+
 }

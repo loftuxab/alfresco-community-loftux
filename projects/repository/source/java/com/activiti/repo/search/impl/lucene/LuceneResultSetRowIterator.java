@@ -10,94 +10,96 @@ import com.activiti.repo.search.ResultSetRowIterator;
  * Iterate over the rows in a LuceneResultSet
  * 
  * @author andyh
- *
+ * 
  */
 public class LuceneResultSetRowIterator implements ResultSetRowIterator
 {
-   /**
-    * The result set
-    */
-   private LuceneResultSet resultSet;
-   /**
-    * The current position
-    */
-   private int position = -1;
-   /**
-    * The maximum position
-    */
-   private int max;
-   
-   /**
-    * Create an iterator over the result set.
-    * Follows stadard ListIterator conventions
-    * 
-    * @param resultSet
-    */
-   public LuceneResultSetRowIterator(LuceneResultSet resultSet)
-   {
-      super();
-      this.resultSet = resultSet;
-      this.max = resultSet.length();
-   }
+    /**
+     * The result set
+     */
+    private LuceneResultSet resultSet;
 
-   /*
-    * ListIterator implementation 
-    */
-   public boolean hasNext()
-   {
-      return position < (max - 1);
-   }
+    /**
+     * The current position
+     */
+    private int position = -1;
 
-   public boolean allowsReverse()
-   {
-      return true;
-   }
+    /**
+     * The maximum position
+     */
+    private int max;
 
-   public boolean hasPrevious()
-   {
-      return position > 0;
-   }
+    /**
+     * Create an iterator over the result set. Follows stadard ListIterator
+     * conventions
+     * 
+     * @param resultSet
+     */
+    public LuceneResultSetRowIterator(LuceneResultSet resultSet)
+    {
+        super();
+        this.resultSet = resultSet;
+        this.max = resultSet.length();
+    }
 
-   public ResultSetRow next()
-   {
-      return new LuceneResultSetRow(resultSet, ++position);
-   }
+    /*
+     * ListIterator implementation
+     */
+    public boolean hasNext()
+    {
+        return position < (max - 1);
+    }
 
-   public ResultSetRow previous()
-   {
-      return new LuceneResultSetRow(resultSet, --position);
-   }
+    public boolean allowsReverse()
+    {
+        return true;
+    }
 
-   public int nextIndex()
-   {
-      return position+1;
-   }
+    public boolean hasPrevious()
+    {
+        return position > 0;
+    }
 
-   public int previousIndex()
-   {
-      return position-1;
-   }
+    public ResultSetRow next()
+    {
+        return new LuceneResultSetRow(resultSet, ++position);
+    }
 
-   /*
-    * Mutation is not supported
-    */
-   
-   public void remove()
-   {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException();
-   }
+    public ResultSetRow previous()
+    {
+        return new LuceneResultSetRow(resultSet, --position);
+    }
 
-   public void set(ResultSetRow o)
-   {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException();
-   }
+    public int nextIndex()
+    {
+        return position + 1;
+    }
 
-   public void add(ResultSetRow o)
-   {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException();
-   }
+    public int previousIndex()
+    {
+        return position - 1;
+    }
+
+    /*
+     * Mutation is not supported
+     */
+
+    public void remove()
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public void set(ResultSetRow o)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public void add(ResultSetRow o)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
 
 }

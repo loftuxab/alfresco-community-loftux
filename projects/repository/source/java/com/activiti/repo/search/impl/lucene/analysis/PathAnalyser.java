@@ -15,10 +15,10 @@ import org.apache.lucene.analysis.TokenStream;
  */
 public class PathAnalyser extends Analyzer
 {
-   public TokenStream tokenStream(String fieldName, Reader reader)
-   {
-      return new PathTokenFilter(new PathTokeniser(reader), PathTokenFilter.PATH_SEPARATOR,
-            PathTokenFilter.SEPARATOR_TOKEN_TEXT, PathTokenFilter.NO_NS_TOKEN_TEXT,
-            PathTokenFilter.NAMESPACE_START_DELIMITER, PathTokenFilter.NAMESPACE_END_DELIMITER, true);
-   }
+    public TokenStream tokenStream(String fieldName, Reader reader)
+    {
+        return new PathTokenFilter(new PathTokeniser(reader), PathTokenFilter.PATH_SEPARATOR,
+                PathTokenFilter.SEPARATOR_TOKEN_TEXT, PathTokenFilter.NO_NS_TOKEN_TEXT,
+                PathTokenFilter.NAMESPACE_START_DELIMITER, PathTokenFilter.NAMESPACE_END_DELIMITER, true);
+    }
 }

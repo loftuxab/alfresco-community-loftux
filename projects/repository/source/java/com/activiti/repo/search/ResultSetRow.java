@@ -18,48 +18,49 @@ import com.activiti.repo.ref.QName;
  */
 public interface ResultSetRow
 {
-   /**
-    * Get the values of all available node properties
-    * 
-    * @return
-    */
-   public Value[] getValues();
+    /**
+     * Get the values of all available node properties
+     * 
+     * @return
+     */
+    public Value[] getValues();
 
-   /**
-    * Get a node property by path
-    * 
-    * @param path
-    * @return
-    */
-   public Value getValue(Path path);
+    /**
+     * Get a node property by path
+     * 
+     * @param path
+     * @return
+     */
+    public Value getValue(Path path);
 
-   /**
-    * Get a node value by name
-    * 
-    * @param qname
-    * @return
-    */
-   public Value getValue(QName qname);
+    /**
+     * Get a node value by name
+     * 
+     * @param qname
+     * @return
+     */
+    public Value getValue(QName qname);
 
-   /**
-    * The refernce to the node that equates to this row in the result set
-    * 
-    * @return
-    */
-   public NodeRef getNodeRef();
+    /**
+     * The refernce to the node that equates to this row in the result set
+     * 
+     * @return
+     */
+    public NodeRef getNodeRef();
 
-   /**
-    * Get the score for this row in the result set
-    * 
-    * @return
-    */
-   public float getScore(); // Score is score + rank + potentially other stuff
+    /**
+     * Get the score for this row in the result set
+     * 
+     * @return
+     */
+    public float getScore(); // Score is score + rank + potentially other
+                                // stuff
 
-   /**
-    * Get the containing result set
-    * 
-    * @return
-    */
-   public ResultSet getResultSet();
+    /**
+     * Get the containing result set
+     * 
+     * @return
+     */
+    public ResultSet getResultSet();
 
 }
