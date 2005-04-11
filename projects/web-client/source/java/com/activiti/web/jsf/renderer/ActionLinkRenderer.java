@@ -78,9 +78,9 @@ public class ActionLinkRenderer extends BaseRenderer
          Map attrs = link.getAttributes();
          if (attrs.get("style") != null)
          {
-            buf.append(" style='")
+            buf.append(" style=\"")
                .append(attrs.get("style"))
-               .append('\'');
+               .append('"');
          }
          if (attrs.get("styleClass") != null)
          {
