@@ -128,28 +128,7 @@
             <ref bean="methodPerformanceAdvice" />
          </list>
       </property>
-   </bean>
-   
-   <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
-      <property name='proxyInterfaces'>
-         <value>com.activiti.repo.version.common.counter.VersionCounterDaoService</value>
-      </property>
-      <property name='transactionManager'>
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="com.activiti.repo.version.common.counter.db.DbVersionCounterDaoServiceImpl" init-method="initialise">
-            <property name="dataSource">
-               <ref bean="dataSource" />
-            </property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRES_NEW</prop>
-         </props>
-      </property>
-   </bean>
+   </bean>   
    
    <!--                    -->
    <!--  PUBLIC SERVICES   -->
@@ -243,7 +222,7 @@
             <ref bean="methodPerformanceAdvice" />
          </list>
       </property>
-   </bean>
+   </bean>   
    
    <!-- NodeService implemented to call a delegate and ensure that nodes get indexed -->
    <bean id="indexingNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -274,37 +253,7 @@
          </list>
       </property>
    </bean>
-   
-   <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>com.activiti.repo.version.VersionService</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="com.activiti.repo.version.lightweight.LightWeightVersionStoreVersionService" init-method="initialise">
-            <property name="nodeService">
-               <ref bean="dbNodeService" />
-            </property>
-			<property name="storeService">
-				<ref bean="dbStoreService"/>
-			</property>
-			<property name="versionCounterDaoService">
-				<ref bean="versionCounterDaoService"/>
-			</property>
-			<property name="searcher">
-				<ref bean="searcherComponent"/>
-			</property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean>
-   
+      
    <bean id="indexerComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.search.Indexer</value>
@@ -380,6 +329,7 @@
 			<property name="protocolFactories">
 				<map>
 					<entry key="workspace"><ref bean="luceneIndexerAndSearcherFactory"></ref></entry>
+					<entry key="versionStore"><ref bean="luceneIndexerAndSearcherFactory"></ref></entry>
 				</map>
 			</property>
 		</bean>
@@ -387,6 +337,96 @@
       <property name="transactionAttributes">
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <!--                               -->
+   <!--  Light Weight Version Store   -->
+   <!--                               -->
+   
+   <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.version.VersionService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.version.lightweight.VersionStoreVersionServiceImpl" init-method="initialise">
+            <property name="nodeService">
+			   <!-- TODO This should point to the general node service -->	
+               <ref bean="dbNodeService" />
+            </property>
+			<property name="dbNodeService">
+               <ref bean="dbNodeService" />
+            </property>
+			<property name="storeService">
+				<ref bean="dbStoreService"/>
+			</property>
+			<property name="versionCounterDaoService">
+				<ref bean="versionCounterDaoService"/>
+			</property>
+			<property name="searcher">
+				<ref bean="searcherComponent"/>
+			</property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <bean id='lightWeightVersionStoreNodeService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.node.NodeService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.version.lightweight.VersionStoreNodeServiceImpl" init-method="initialise">
+			<property name="nodeService">
+			   <!-- TODO This should point to the general node service -->	
+               <ref bean="dbNodeService" />
+            </property>
+            <property name="dbNodeService">
+               <ref bean="dbNodeService" />
+            </property>
+			<property name="storeService">
+				<ref bean="dbStoreService"/>
+			</property>
+			<property name="searcher">
+				<ref bean="searcherComponent"/>
+			</property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
+      <property name='proxyInterfaces'>
+         <value>com.activiti.repo.version.common.counter.VersionCounterDaoService</value>
+      </property>
+      <property name='transactionManager'>
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.version.common.counter.db.DbVersionCounterDaoServiceImpl" init-method="initialise">
+            <property name="dataSource">
+               <ref bean="dataSource" />
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRES_NEW</prop>
          </props>
       </property>
    </bean>

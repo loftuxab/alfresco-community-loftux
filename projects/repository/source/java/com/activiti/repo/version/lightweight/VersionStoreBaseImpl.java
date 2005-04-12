@@ -3,15 +3,17 @@
  */
 package com.activiti.repo.version.lightweight;
 
-import java.text.MessageFormat;
+import java.util.Collection;
 
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.Searcher;
 import com.activiti.repo.store.StoreService;
+import com.activiti.repo.version.VersionLabelPolicy;
 import com.activiti.repo.version.VersionService;
 import com.activiti.repo.version.VersionServiceException;
 
@@ -21,7 +23,7 @@ import com.activiti.repo.version.VersionServiceException;
  * 
  * @author Roy Wetherall
  */
-public abstract class LightWeightVersionStoreBase
+public abstract class VersionStoreBaseImpl
 {
     /**
      * Namespace
@@ -37,14 +39,22 @@ public abstract class LightWeightVersionStoreBase
     /**
      * Attribute names
      */
-    // The version label, set on a version node
+    // The versioned node id, set on a version history node
+    public static final QName ATTR_VERSIONED_NODE_ID = QName.createQName(LW_VERSION_STORE_NAMESPACE, "versionedNodeId");
+	// The version label, set on a version node
     public static final QName ATTR_VERSION_LABEL = QName.createQName(LW_VERSION_STORE_NAMESPACE, "versionLabel");
     // The version number, set on a verison node
     public static final QName ATTR_VERSION_NUMBER = QName.createQName(LW_VERSION_STORE_NAMESPACE, "versionNumber");
     // The created date, set on a version node
     public static final QName ATTR_VERSION_CREATED_DATE = QName.createQName(LW_VERSION_STORE_NAMESPACE, "createdDate");
-    // The versioned node id, set on a version history node
-    public static final QName ATTR_VERSIONED_NODE_ID = QName.createQName(LW_VERSION_STORE_NAMESPACE, "versionedNodeId");
+    // The origional id of the versioned node
+	public static final QName ATTR_FROZEN_NODE_ID = QName.createQName(LW_VERSION_STORE_NAMESPACE, "frozenNodeId");
+	// The node type of the versioned node
+	public static final QName ATTR_FROZEN_NODE_TYPE = QName.createQName(LW_VERSION_STORE_NAMESPACE, "frozenNodeType");
+	// The protocol of the store that the versioned node origionated from
+	public static final QName ATTR_FROZEN_NODE_STORE_PROTOCOL = QName.createQName(LW_VERSION_STORE_NAMESPACE, "frozenNodeStoreProtocol");
+	// The identifier of the store that the versioned node origionated from
+	public static final QName ATTR_FROZEN_NODE_STORE_ID = QName.createQName(LW_VERSION_STORE_NAMESPACE, "frozenNodeStoreId");
     
     /**
      * Association names
@@ -74,7 +84,12 @@ public abstract class LightWeightVersionStoreBase
     private static final String ERR_MSG = "Error retrieving version history from light weight version store.";
     
     /**
-     * The node service
+     * The common node service
+     */
+    protected NodeService nodeService = null;
+    
+    /**
+     * The db node service, used as the version store implementation
      */
     protected NodeService dbNodeService = null;
 
@@ -109,11 +124,21 @@ public abstract class LightWeightVersionStoreBase
     }
     
     /**
-     * Sets the db node service
+     * Sets the general node service
+     * 
+     * @param nodeService   the node service
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+    
+    /**
+     * Sets the db node service, used as the version store implementation
      * 
      * @param nodeService  the node service
      */
-    public void setNodeService(NodeService nodeService)
+    public void setDbNodeService(NodeService nodeService)
     {
         this.dbNodeService = nodeService;
     }
@@ -158,31 +183,45 @@ public abstract class LightWeightVersionStoreBase
     {
         NodeRef result = null;
         
-        // Buuild the query string
-        String strQueryString = MessageFormat.format(
-                "@\\{?\\}?:?",
-                new Object[]{
-                        LW_VERSION_STORE_NAMESPACE, 
-                        ATTR_VERSIONED_NODE_ID, 
-                        nodeRef.getId()});
+        // TODO for now get the version history node by hand, since objects added in this transaction
+        //      can not be found 
+        
+        //String strQueryString = 
+        //    "@\\{" +
+        //    LW_VERSION_STORE_NAMESPACE +
+        //    "\\}" +
+        //    ATTR_VERSIONED_NODE_ID.getLocalName() +
+        //    ":" +
+        //    nodeRef.getId();
         
         // Execute query to find the verison history object
-        ResultSet results = searcher.query(
-                getVersionStoreReference(), 
-                "lucene", 
-                strQueryString, 
-                null, 
-                null);
+        //ResultSet results = searcher.query(
+        //        getVersionStoreReference(), 
+        //        "lucene", 
+        //        strQueryString, 
+        //        null, 
+        //        null);
         
-        if (results.length() == 1)
-        {
+        //if (results.length() == 1)
+        //{
             // Get a reference to the version history node
-            result = results.getNodeRef(0);
-        }
-        else if (results.length() > 1)
-        {
+        //    result = results.getNodeRef(0);
+        //}
+        //else if (results.length() > 1)
+        //{
             // Error since there should only be one version history node per node id
-            throw new VersionServiceException(ERR_MSG);
+        //    throw new VersionServiceException(ERR_MSG);
+        //}
+        
+        Collection<ChildAssocRef> versionHistories = this.dbNodeService.getChildAssocs(this.versionStoreRootNodeRef);
+        for (ChildAssocRef versionHistory : versionHistories)
+        {
+            String nodeId = (String)this.dbNodeService.getProperty(versionHistory.getChildRef(), ATTR_VERSIONED_NODE_ID);
+            if (nodeId != null && nodeId.equals(nodeRef.getId()) == true)
+            {
+                result = versionHistory.getChildRef();
+                break;
+            }
         }
         
         return result;
@@ -199,7 +238,20 @@ public abstract class LightWeightVersionStoreBase
      */
     protected NodeRef getCurrentVersionNodeRef(NodeRef versionHistory, NodeRef nodeRef)
     {
-        // TOOD
-        return null;
+        NodeRef result = null;
+        String versionLabel = (String)this.nodeService.getProperty(nodeRef, VersionService.ATTR_CURRENT_VERSION_LABEL);
+        
+        Collection<ChildAssocRef> versions = this.dbNodeService.getChildAssocs(versionHistory);
+        for (ChildAssocRef version : versions)
+        {
+            String tempLabel = (String)this.dbNodeService.getProperty(version.getChildRef(), ATTR_VERSION_LABEL);
+            if (tempLabel != null && tempLabel.equals(versionLabel) == true)
+            {
+                result = version.getChildRef(); 
+                break;
+            }
+        }
+        
+        return result;
     }
 }

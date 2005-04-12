@@ -16,6 +16,8 @@ import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionHistory;
 import com.activiti.repo.version.VersionLabelPolicy;
 import com.activiti.repo.version.VersionService;
+import com.activiti.repo.version.VersionServiceException;
+import com.activiti.repo.version.common.VersionHistoryImpl;
 import com.activiti.repo.version.common.VersionImpl;
 import com.activiti.repo.version.common.counter.VersionCounterDaoService;
 
@@ -26,7 +28,7 @@ import com.activiti.repo.version.common.counter.VersionCounterDaoService;
  * 
  * @author Roy Wetheral
  */
-public class LightWeightVersionStoreVersionService extends LightWeightVersionStoreBase implements VersionService
+public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl implements VersionService
 {
     /**
      * The version counter service
@@ -166,22 +168,22 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
         //      can take place untill the versioning process is complete
         
         // Check the repository for the version history for this node
-        NodeRef versionHistoryRef = null; 
+        NodeRef versionHistoryRef = getVersionHistoryNodeRef(nodeRef); 
         NodeRef currentVersionRef = null;
         
         if (versionHistoryRef == null)
         {
             // Create a new version history node
-            ChildAssocRef newAssoc = this.dbNodeService.createNode(
+            ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                     this.versionStoreRootNodeRef, 
-                    LightWeightVersionStoreBase.CHILD_VERSION_HISTORIES, 
+                    VersionStoreBaseImpl.CHILD_VERSION_HISTORIES, 
                     Node.TYPE_CONTAINER);
-            versionHistoryRef = newAssoc.getChildRef();
+            versionHistoryRef = childAssocRef.getChildRef();
             
             // Store the id of the origional node on the version history node 
             this.dbNodeService.setProperty(
                     versionHistoryRef, 
-                    LightWeightVersionStoreBase.ATTR_VERSIONED_NODE_ID, 
+					VersionStoreBaseImpl.ATTR_VERSIONED_NODE_ID, 
                     nodeRef.getId());
         }
         else
@@ -192,7 +194,7 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
         }
         
         // Create the new version node (child of the version history)
-        NodeRef newVersionRef = createNewVersion(versionHistoryRef, currentVersionRef, versionProperties, versionNumber);
+        NodeRef newVersionRef = createNewVersion(nodeRef, versionHistoryRef, currentVersionRef, versionProperties, versionNumber);
         
         // 'Freeze' the current nodes state in the new version node
         freezeNodeState(nodeRef, newVersionRef);
@@ -203,7 +205,7 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
             this.dbNodeService.createAssociation(
                     versionHistoryRef, 
                     newVersionRef, 
-                    LightWeightVersionStoreVersionService.ASSOC_ROOT_VERSION);
+                    VersionStoreVersionServiceImpl.ASSOC_ROOT_VERSION);
         }
         else
         {
@@ -211,7 +213,7 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
             this.dbNodeService.createAssociation(
                     currentVersionRef, 
                     newVersionRef, 
-                    LightWeightVersionStoreVersionService.ASSOC_SUCCESSOR);
+                    VersionStoreVersionServiceImpl.ASSOC_SUCCESSOR);
             
             // TODO what do we do about branches (if anything) are we going to support them to begin with ??
         }
@@ -230,11 +232,54 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
     }
 
     /**
-     * 
+     * TODO need to check performance
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef)
     {
-        throw new UnsupportedOperationException();
+        // TODO could definatly do with a cache since these are read-only objects ... maybe not 
+        //      since they are dependant on the workspace of the node passed
+        
+        // TODO need to scope version history by work space ....
+        
+        VersionHistory versionHistory = null;
+        
+        NodeRef versionHistoryRef = getVersionHistoryNodeRef(nodeRef);
+        if (versionHistoryRef != null)
+        {
+            NodeRef rootVersion = null;
+            Collection<NodeRef> rootNodes = this.dbNodeService.getAssociationTargets(versionHistoryRef, ASSOC_ROOT_VERSION);
+            if (rootNodes.size() == 1)
+            {
+                // Get the root version
+                rootVersion = (NodeRef)rootNodes.toArray()[0];
+            }
+            else
+            {
+                // Error since there should be one and only one root nodes
+                throw new VersionServiceException("There should only be one root node in a version history tree.");
+            }
+            
+            versionHistory = new VersionHistoryImpl(getVersion(rootVersion));
+            buildVersionHistory(versionHistory, rootVersion);
+        }
+        
+        return versionHistory;
+    }
+    
+    /**
+     * 
+     * 
+     * @param versionHistory
+     * @param nodeRef
+     */
+    private void buildVersionHistory(VersionHistory versionHistory, NodeRef nodeRef)
+    {
+        Collection<NodeRef> successors = this.dbNodeService.getAssociationTargets(nodeRef, ASSOC_SUCCESSOR);
+        for (NodeRef successor : successors)
+        {
+            ((VersionHistoryImpl)versionHistory).addVersion(getVersion(successor), getVersion(nodeRef));
+            buildVersionHistory(versionHistory, successor);
+        }
     }
     
     /**
@@ -245,7 +290,9 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
      */
     private Version getVersion(NodeRef versionRef)
     {
+        // TODO could definatly do with a cache since these are read only objects ...
         // TODO this needs a little sorting out ....
+        // TODO store the date and label in the versionProperies map
         
         String versionLabel = null;
         Date createdDate = null;
@@ -255,22 +302,26 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
         Map<QName, Serializable> nodeProperties = this.dbNodeService.getProperties(versionRef);
         for (QName key : nodeProperties.keySet())
         {
-            if (key.getNamespaceURI().equals(LightWeightVersionStoreVersionService.LW_VERSION_STORE_NAMESPACE) == true)
+            if (key.getNamespaceURI().equals(VersionStoreVersionServiceImpl.LW_VERSION_STORE_NAMESPACE) == true)
             {   
                 String strLocalName = key.getLocalName();
                 String value = (String)nodeProperties.get(key);
                 
-                if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_LABEL.getLocalName()) == true)
+                if (strLocalName.equals(VersionStoreBaseImpl.ATTR_VERSION_LABEL.getLocalName()) == true)
                 {
                     // Get the version label property
                     versionLabel = value;
                 }
-                else if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_CREATED_DATE.getLocalName()))
+                else if (strLocalName.equals(VersionStoreBaseImpl.ATTR_VERSION_CREATED_DATE.getLocalName()))
                 {
                     // Get the created date property
                     createdDate = new Date(Long.parseLong(value));
                 }
-                else if (strLocalName.equals(LightWeightVersionStoreBase.ATTR_VERSION_NUMBER.getLocalName()) == false)
+				// TODO need to find a better way to sort this out ...
+                else if (strLocalName.equals(VersionStoreBaseImpl.ATTR_VERSION_NUMBER.getLocalName()) == false &&
+						 strLocalName.equals(VersionStoreBaseImpl.ATTR_FROZEN_NODE_ID.getLocalName()) == false &&
+						 strLocalName.equals(VersionStoreBaseImpl.ATTR_FROZEN_NODE_STORE_ID.getLocalName()) == false &&
+						 strLocalName.equals(VersionStoreBaseImpl.ATTR_FROZEN_NODE_STORE_PROTOCOL.getLocalName()) == false)
                 {
                     versionProperties.put(strLocalName, value);
                 }
@@ -284,38 +335,66 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
     /**
      * Creates a new version node, setting the properties both calculated and specified.
      * 
-     * @param versionHistoryRef  version history node reference
-     * @param versionProperties  version properties
-     * @return                   the version node reference
+     * @param versionableNodeRef  the reference to the node being versioned
+     * @param versionHistoryRef   version history node reference
+     * @param preceedingNodeRef   the version node preceeding this in the version history
+     * 							  , null if none
+     * @param versionProperties   version properties
+     * @param versionNumber		  the version number
+     * @return                    the version node reference
      */
-    private NodeRef createNewVersion(NodeRef versionHistoryRef, NodeRef preceedingNode, Map<String, String> versionProperties, int versionNumber)
+    private NodeRef createNewVersion(
+			NodeRef versionableNodeRef, 
+			NodeRef versionHistoryRef, 
+			NodeRef preceedingNodeRef, 
+			Map<String, String> 
+			versionProperties, 
+			int versionNumber)
     {
         // Create the new version
-        ChildAssocRef newAssoc = this.dbNodeService.createNode(
+        ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                 versionHistoryRef, 
-                LightWeightVersionStoreVersionService.CHILD_VERSIONS, 
+				VersionStoreBaseImpl.CHILD_VERSIONS, 
                 Node.TYPE_CONTAINER);
-        NodeRef newVersion = newAssoc.getChildRef();
+        NodeRef newVersion = childAssocRef.getChildRef();
         
         // Set the version number for the new version
         this.dbNodeService.setProperty(
                 newVersion, 
-                LightWeightVersionStoreVersionService.ATTR_VERSION_NUMBER, 
+				VersionStoreBaseImpl.ATTR_VERSION_NUMBER, 
                 Integer.toString(versionNumber));
         
         // Set the created date
         Date createdDate = new Date();
         this.dbNodeService.setProperty(
                 newVersion, 
-                LightWeightVersionStoreVersionService.ATTR_VERSION_CREATED_DATE, 
+				VersionStoreBaseImpl.ATTR_VERSION_CREATED_DATE, 
                 Long.toString(createdDate.getTime()));
-        
+		
+		// Set the versionable node id
+		this.dbNodeService.setProperty(
+				newVersion,
+				VersionStoreBaseImpl.ATTR_FROZEN_NODE_ID,
+				versionableNodeRef.getId());
+		
+		// Set the versionable node store protocol
+		this.dbNodeService.setProperty(
+				newVersion,
+				VersionStoreBaseImpl.ATTR_FROZEN_NODE_STORE_PROTOCOL,
+				versionableNodeRef.getStoreRef().getProtocol());
+		
+		// Set the versionable node store id
+		this.dbNodeService.setProperty(
+				newVersion,
+				VersionStoreBaseImpl.ATTR_FROZEN_NODE_STORE_ID,
+				versionableNodeRef.getStoreRef().getIdentifier());
+		
         // Calculate the version label
         String versionLabel = null;
         if (this.versionLabelPolicy != null)
         {
             // Use the policy to create the version label
-            Version preceedingVersion = getVersion(preceedingNode);
+            Version preceedingVersion = getVersion(preceedingNodeRef);
             versionLabel = this.versionLabelPolicy.getVersionLabelValue(preceedingVersion, versionNumber, versionProperties);
         }
         else
@@ -325,7 +404,7 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
         }
         this.dbNodeService.setProperty(
                 newVersion, 
-                LightWeightVersionStoreVersionService.ATTR_VERSION_LABEL, 
+                VersionStoreVersionServiceImpl.ATTR_VERSION_LABEL, 
                 versionLabel);
         
         // TODO any other calculated properties ...
@@ -335,7 +414,7 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
         {
             // Apply the namespace to the verison property
             QName propertyName = QName.createQName(
-                    LightWeightVersionStoreVersionService.LW_VERSION_STORE_NAMESPACE,
+                    VersionStoreVersionServiceImpl.LW_VERSION_STORE_NAMESPACE,
                     key);
             
             // Set the property value on the node
@@ -358,26 +437,55 @@ public class LightWeightVersionStoreVersionService extends LightWeightVersionSto
      */
     private void freezeNodeState(NodeRef nodeRef, NodeRef versionRef)
     {
+        // TODO this will chage when we integrate with the data dictionary
+        // Store the current node type
+        String nodeType = this.nodeService.getType(nodeRef);
+        this.dbNodeService.setProperty(versionRef, ATTR_FROZEN_NODE_TYPE, nodeType);
+        
         // Copy the current values of the node onto the version node, thus taking a snap shot of the values
-        Map<QName, Serializable> nodeProperties = this.dbNodeService.getProperties(nodeRef);
+        Map<QName, Serializable> nodeProperties = this.nodeService.getProperties(nodeRef);
         if (nodeProperties != null)
         {
             // Copy the property values from the node onto the version node
             for (QName propertyName : nodeProperties.keySet())
             {
-                // Set the property value's
-                this.dbNodeService.setProperty(versionRef, propertyName, nodeProperties.get(propertyName));
+                // TODO there will be certain properties that will be common (id, type ...) these
+                //      need to be stored specifically
                 
-                // TODO Ignore the common properties (id, type ...).  Are these identifies by a namespace ??
+                // Set the property value's
+                this.dbNodeService.setProperty(versionRef, propertyName, nodeProperties.get(propertyName));                
             }
         }
         
         // TODO here we need to deal with any content that might be on the node
         
-        // TODO here we need to deal with the children of the node
-            // if not versionable the copy as reference to the version history
-            // if not versionable then copy
-            // can also ignore
+        // TODO the following behaviour is default and should overrideable (ie: can choose when to ignore, version or reference children
+        
+        // Get the children of the versioned node
+        Collection<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
+        for (ChildAssocRef childAssocRef : childAssocRefs)
+        {
+            // Need to determine whether the child is versioned or not
+            NodeRef versionHistoryRef = getVersionHistoryNodeRef(childAssocRef.getChildRef());
+            if (versionHistoryRef == null)
+            {
+                // TODO this should be a node of type reference ...
+                
+                // The child node is not versioned so we associate to a node reference
+                NodeRef referenceRef = this.dbNodeService.createNode(versionRef, childAssocRef.getName(), Node.TYPE_REAL).getChildRef();
+                
+                // Set the reference string
+                // TODO this needs to be inline with the reference type
+                this.dbNodeService.setProperty(referenceRef, QName.createQName("{referenceNode}referenceString"), nodeRef.toString());                
+            }
+            else
+            {
+                // Associate the version with the version history object of hte child
+                this.dbNodeService.addChild(versionRef, versionHistoryRef, childAssocRef.getName());
+            }
+        }
+        
+        // TODO What do we do about the associations???
         
         // TODO how do we override the above default behaviour ??
     }    

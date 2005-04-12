@@ -1,0 +1,401 @@
+/**
+ * Created on Apr 7, 2005
+ */
+package com.activiti.repo.version.lightweight;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.activiti.repo.node.NodeService;
+import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.QName;
+import com.activiti.repo.version.Version;
+
+/**
+ * @author Roy Wetherall
+ */
+public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest 
+{
+	/**
+	 * Light weight version store node service
+	 */
+	protected NodeService lightWeightVersionStoreNodeService = null;
+	
+	/**
+	 * Error message
+	 */
+	private final static String MSG_ERR = 
+        "This operation is not supported by a version store implementation of the node service.";
+	
+	/**
+	 * Dummy data used in failure tests
+	 */
+	private NodeRef dummyNodeRef = null;
+	private QName dummyQName = null;
+	
+	/**
+     * Called during the transaction setup
+     */
+    protected void onSetUpInTransaction() throws Exception
+    {
+		super.onSetUpInTransaction();
+		
+        this.dummyNodeRef = new NodeRef(
+				this.lightWeightVersionStoreVersionService.getVersionStoreReference(),
+				"dummy");
+		this.dummyQName = QName.createQName("{dummy}dummy");
+    }
+	
+	public void testGetType()
+    {
+		// should work
+    }
+    
+    /**
+     * Test getProperties
+     */
+    public void testGetProperties()
+    {
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+        
+        // Get the properties of the versioned state 
+        Map<QName, Serializable> versionedProperties = this.lightWeightVersionStoreNodeService.getProperties(version.getNodeRef());
+        assertEquals(this.nodeProperties.size(), versionedProperties.size());
+        for (QName key : this.nodeProperties.keySet())
+        {
+            assertTrue(versionedProperties.containsKey(key));
+            assertEquals(this.nodeProperties.get(key), versionedProperties.get(key));
+        }
+        
+        // TODO do futher versioning and check by changing values
+    }
+    
+    /**
+     * Test getProperty
+     */
+    public void testGetProperty()
+    {
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+        
+        // Check the property values can be retrieved
+        Serializable value1 = this.lightWeightVersionStoreNodeService.getProperty(
+                version.getNodeRef(),
+                PROP_1);
+        assertEquals(VALUE_1, value1);
+    }
+    
+    public void testGetChildAssocs()
+    {
+        // should work
+    }
+    
+    public void testGetAssociationTargets()
+    {
+        // should work
+    }
+	
+	/** ================================================
+	 *  These test ensure that the following operations
+	 *  are not supported as expected.
+	 */
+	
+	/**
+	 * Test createNode
+	 */
+	public void testCreateNode()
+    {
+		try
+		{
+			this.lightWeightVersionStoreNodeService.createNode(
+					dummyNodeRef,
+					dummyQName,
+					"");
+			fail("This operation is not supported.");
+		}
+		catch (UnsupportedOperationException exception)
+		{
+			if (exception.getMessage() != MSG_ERR)
+			{
+				fail("Unexpected exception raised during method excution: " + exception.getMessage());
+			}
+		}
+    }
+    
+	/**
+	 * Test delete node
+	 */
+    public void testDeleteNode()
+    {
+		try
+		{
+			this.lightWeightVersionStoreNodeService.deleteNode(this.dummyNodeRef);
+			fail("This operation is not supported.");
+		}
+		catch (UnsupportedOperationException exception)
+		{
+			if (exception.getMessage() != MSG_ERR)
+			{
+				fail("Unexpected exception raised during method excution: " + exception.getMessage());
+			}
+		}
+    }
+    
+	/**
+	 * Test addChild
+	 */
+    public void testAddChild()
+    {
+		try
+		{
+			this.lightWeightVersionStoreNodeService.addChild(
+					this.dummyNodeRef,
+					this.dummyNodeRef,
+					this.dummyQName);
+			fail("This operation is not supported.");
+		}
+		catch (UnsupportedOperationException exception)
+		{
+			if (exception.getMessage() != MSG_ERR)
+			{
+				fail("Unexpected exception raised during method excution: " + exception.getMessage());
+			}
+		}
+    }
+    
+	/**
+	 * Test removeChild
+	 */
+    public void testRemoveChild()
+    {
+		try
+		{
+			this.lightWeightVersionStoreNodeService.removeChild(
+					this.dummyNodeRef, 
+					this.dummyNodeRef);
+			fail("This operation is not supported.");
+		}
+		catch (UnsupportedOperationException exception)
+		{
+			if (exception.getMessage() != MSG_ERR)
+			{
+				fail("Unexpected exception raised during method excution: " + exception.getMessage());
+			}
+		}	
+    }
+
+    /**
+     * Test removeChildren
+     */
+    public void testRemoveChildren()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.removeChildren(
+                    this.dummyNodeRef,
+                    this.dummyQName);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test setProperties
+     */
+    public void testSetProperties()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.setProperties(
+                    this.dummyNodeRef,
+                    new HashMap<QName, Serializable>());
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test setProperty
+     */
+    public void testSetProperty()
+	{
+        try
+        {
+            this.lightWeightVersionStoreNodeService.setProperty(
+                    this.dummyNodeRef,
+                    this.dummyQName,
+                    "dummy");
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test getParents
+     */
+    public void testGetParents()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.getParents(this.dummyNodeRef);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test getPrimaryParent
+     */
+    public void testGetPrimaryParent()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.getPrimaryParent(this.dummyNodeRef);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test createAssociation
+     */
+    public void testCreateAssociation()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.createAssociation(
+                    this.dummyNodeRef,
+                    this.dummyNodeRef,
+                    this.dummyQName);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test removeAssociation
+     */
+    public void testRemoveAssociation()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.removeAssociation(
+                    this.dummyNodeRef,
+                    this.dummyNodeRef,
+                    this.dummyQName);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }       
+    
+    /**
+     * Test getAssociationSources
+     */
+    public void testGetAssociationSources()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.getAssociationSources(
+                    this.dummyNodeRef,
+                    this.dummyQName);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test getPath
+     */
+    public void testGetPath()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.getPath(this.dummyNodeRef);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test getPaths
+     */
+    public void testGetPaths()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.getPaths(
+                    this.dummyNodeRef,
+                    false);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+}

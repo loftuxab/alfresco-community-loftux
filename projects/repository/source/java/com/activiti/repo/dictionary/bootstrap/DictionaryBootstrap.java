@@ -14,7 +14,7 @@ import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
 import com.activiti.repo.dictionary.metamodel.NamespaceDAO;
 import com.activiti.repo.ref.QName;
-import com.activiti.repo.version.lightweight.LightWeightVersionStoreBase;
+import com.activiti.repo.version.lightweight.VersionStoreBaseImpl;
 
 
 /**
@@ -252,33 +252,33 @@ public class DictionaryBootstrap
         // Create version type
         M2Type versionType = metaModelDAO.createType(
                 QName.createQName(
-                        LightWeightVersionStoreBase.LW_VERSION_STORE_NAMESPACE,
-                        LightWeightVersionStoreBase.TYPE_VERSION));
+                        VersionStoreBaseImpl.LW_VERSION_STORE_NAMESPACE,
+                        VersionStoreBaseImpl.TYPE_VERSION));
         
         // Create verison number property
         M2Property versionNumber = versionType.createProperty(
-                LightWeightVersionStoreBase.ATTR_VERSION_NUMBER.getLocalName());
+                VersionStoreBaseImpl.ATTR_VERSION_NUMBER.getLocalName());
         versionNumber.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.INT));
         versionNumber.setMandatory(true);
         versionNumber.setMultiValued(false);
         
         // Create verison label property
         M2Property versionLabel = versionType.createProperty(
-                LightWeightVersionStoreBase.ATTR_VERSION_LABEL.getLocalName());
+                VersionStoreBaseImpl.ATTR_VERSION_LABEL.getLocalName());
         versionLabel.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));  
         versionLabel.setMandatory(true);
         versionLabel.setMultiValued(false);
         
         // Create created date property
         M2Property createdDate = versionType.createProperty(
-                LightWeightVersionStoreBase.ATTR_VERSION_CREATED_DATE.getLocalName());
+                VersionStoreBaseImpl.ATTR_VERSION_CREATED_DATE.getLocalName());
         createdDate.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.DATE));  
         createdDate.setMandatory(true);
         createdDate.setMultiValued(false);
         
         // Add the successor association
         M2Association successorAssoc = versionType.createAssociation(
-                LightWeightVersionStoreBase.ASSOC_SUCCESSOR.getLocalName());
+                VersionStoreBaseImpl.ASSOC_SUCCESSOR.getLocalName());
         successorAssoc.getRequiredToClasses().add(versionType);
         successorAssoc.setMandatory(false);
         successorAssoc.setMultiValued(true);
@@ -286,26 +286,26 @@ public class DictionaryBootstrap
         // Create version history type
         M2Type versionHistoryType = metaModelDAO.createType(
                 QName.createQName(
-                        LightWeightVersionStoreBase.LW_VERSION_STORE_NAMESPACE, 
-                        LightWeightVersionStoreBase.TYPE_VERSION_HISTORY));
+                        VersionStoreBaseImpl.LW_VERSION_STORE_NAMESPACE, 
+                        VersionStoreBaseImpl.TYPE_VERSION_HISTORY));
         
         // Create versioned node id property
         M2Property nodeIdProperty = versionHistoryType.createProperty(
-                LightWeightVersionStoreBase.ATTR_VERSIONED_NODE_ID.getLocalName());
+                VersionStoreBaseImpl.ATTR_VERSIONED_NODE_ID.getLocalName());
         nodeIdProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
         nodeIdProperty.setMandatory(true);
         nodeIdProperty.setMultiValued(false);
         
         // Add the child assoc
         M2ChildAssociation versionChildAssoc = versionHistoryType.createChildAssociation(
-                LightWeightVersionStoreBase.CHILD_VERSIONS.getLocalName());
+                VersionStoreBaseImpl.CHILD_VERSIONS.getLocalName());
         versionChildAssoc.getRequiredToClasses().add(versionType);
         versionChildAssoc.setMandatory(true);
         versionChildAssoc.setMultiValued(true);
         
         // Add the root version association
         M2Association rootVersionAssoc = versionHistoryType.createAssociation(
-                LightWeightVersionStoreBase.ASSOC_ROOT_VERSION.getLocalName());
+                VersionStoreBaseImpl.ASSOC_ROOT_VERSION.getLocalName());
         rootVersionAssoc.getRequiredToClasses().add(versionType);
         rootVersionAssoc.setMandatory(true);
         rootVersionAssoc.setMultiValued(false);
