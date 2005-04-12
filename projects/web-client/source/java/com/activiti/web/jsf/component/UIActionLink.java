@@ -24,7 +24,7 @@ public class UIActionLink extends UICommand
    {
       setRendererType("awc.faces.ActionLinkRenderer");
    }
-
+   
    
    // ------------------------------------------------------------------------------
    // Component implementation 
@@ -125,7 +125,7 @@ public class UIActionLink extends UICommand
    // ------------------------------------------------------------------------------
    // Private data
    
-   /** Whether to show the link as well as the image if specified */
+   /** True to show the link as well as the image if specified */
    private Boolean showLink = null;
    
    /** If an image is specified, it is shown in additon to the value text */

@@ -12,12 +12,14 @@ import java.util.StringTokenizer;
 
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIForm;
 import javax.faces.component.UIParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import com.activiti.web.jsf.Utils;
 import com.activiti.web.jsf.component.UIActionLink;
+import com.activiti.web.jsf.component.UIMenu;
 
 /**
  * @author kevinr
@@ -67,55 +69,123 @@ public class ActionLinkRenderer extends BaseRenderer
          
          UIActionLink link = (UIActionLink)component;
          
-         // render sort link
-         StringBuilder buf = new StringBuilder(256);
-         buf.append("<a href='#' onclick=\"");
-         // generate JavaScript to set a hidden form field and submit
-         // a form which request attributes that we can decode
-         buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
-         buf.append('"');
-         
-         Map attrs = link.getAttributes();
-         if (attrs.get("style") != null)
+         if (isInMenu(link) == true)
          {
-            buf.append(" style=\"")
-               .append(attrs.get("style"))
-               .append('"');
-         }
-         if (attrs.get("styleClass") != null)
-         {
-            buf.append(" class=")
-               .append(attrs.get("styleClass"));
-         }
-         buf.append('>');
-         
-         if (link.getImage() != null)
-         {
-            buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue()));
-            if (link.getShowLink() == true)
-            {
-               // text next to an image may need alignment
-               if (attrs.get("verticalAlign") != null)
-               {
-                  buf.append("<span style='vertical-align:")
-                     .append(attrs.get("verticalAlign"))
-                     .append("'>");
-                  buf.append(link.getValue());
-                  buf.append("</span>");
-               }
-               else
-               {
-                  buf.append(link.getValue());
-               }
-            }
+            // render as menu item
+            out.write( renderMenuAction(context, link) );
          }
          else
          {
-            buf.append(link.getValue());
+            // render as action link
+            out.write( renderActionLink(context, link) );
          }
-         
-         out.write( buf.toString() );
       }
+   }
+
+   /**
+    * Render ActionLink as plain link and image
+    * 
+    * @param context
+    * @param link
+    * 
+    * @return action link HTML
+    */
+   private String renderActionLink(FacesContext context, UIActionLink link)
+   {
+      StringBuilder buf = new StringBuilder(256);
+      
+      buf.append("<a href='#' onclick=\"");
+      // generate JavaScript to set a hidden form field and submit
+      // a form which request attributes that we can decode
+      buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
+      buf.append('"');
+      Map attrs = link.getAttributes();
+      if (attrs.get("style") != null)
+      {
+         buf.append(" style=\"")
+            .append(attrs.get("style"))
+            .append('"');
+      }
+      if (attrs.get("styleClass") != null)
+      {
+         buf.append(" class=")
+            .append(attrs.get("styleClass"));
+      }
+      buf.append('>');
+      
+      if (link.getImage() != null)
+      {
+         buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue()));
+         if (link.getShowLink() == true)
+         {
+            // TODO: add horizontal spacing as component property
+            buf.append("<span style='padding-left:2px");
+            
+            // text next to an image may need alignment
+            if (attrs.get("verticalAlign") != null)
+            {
+               buf.append(";vertical-align:")
+                  .append(attrs.get("verticalAlign"));
+            }
+            
+            buf.append("'>")
+               .append(link.getValue())
+               .append("</span>");
+         }
+      }
+      else
+      {
+         buf.append(link.getValue());
+      }
+      
+      return buf.toString();
+   }
+   
+   /**
+    * Render ActionLink as menu image and item link
+    * 
+    * @param context
+    * @param link
+    * 
+    * @return action link HTML
+    */
+   private String renderMenuAction(FacesContext context, UIActionLink link)
+   {
+      StringBuilder buf = new StringBuilder(256);
+      
+      buf.append("<tr><td>");
+      
+      // render image cell first for a menu
+      if (link.getImage() != null)
+      {
+         buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue()));
+      }
+      
+      buf.append("</td><td>");
+      
+      // render text link cell for the menu
+      buf.append("<a href='#' onclick=\"");
+      buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
+      buf.append('"');
+      Map attrs = link.getAttributes();
+      if (attrs.get("style") != null)
+      {
+         buf.append(" style=\"")
+            .append(attrs.get("style"))
+            .append('"');
+      }
+      if (attrs.get("styleClass") != null)
+      {
+         buf.append(" class=")
+            .append(attrs.get("styleClass"));
+      }
+      buf.append('>');
+      buf.append(link.getValue());
+      buf.append("</a>");
+      
+      buf.append("</td><tr>");
+      
+      return buf.toString();
    }
    
    /**
@@ -127,7 +197,10 @@ public class ActionLinkRenderer extends BaseRenderer
       {
          Writer out = context.getResponseWriter();
          
-         out.write("</a>");
+         if (isInMenu((UIActionLink)component) == false)
+         {
+            out.write("</a>");
+         }
       }
    }
    
@@ -144,5 +217,26 @@ public class ActionLinkRenderer extends BaseRenderer
    private String getHiddenFieldName(FacesContext context, UIComponent component)
    {
       return Utils.getParentForm(context, component).getClientId(context) + NamingContainer.SEPARATOR_CHAR + "act";
+   }
+   
+   /**
+    * Return true if the action link is present within a UIMenu component container
+    * 
+    * @param link    The ActionLink to test
+    * 
+    * @return true if the action link is present within a UIMenu component
+    */
+   private boolean isInMenu(UIActionLink link)
+   {
+      UIComponent parent = link.getParent();
+      while (parent != null)
+      {
+         if (parent instanceof UIMenu)
+         {
+            break;
+         }
+         parent = parent.getParent();
+      }
+      return (parent != null);
    }
 }

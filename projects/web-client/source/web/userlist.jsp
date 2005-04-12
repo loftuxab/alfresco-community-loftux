@@ -30,13 +30,34 @@
       <p>
       --%>
       
+      <%-- Menu tests --%>
+      <b>Menus:</b><br>
+      Basic menu:<br>
+      <awc:menu id="menu1" menuStyle="background-color:#FFFFFF; border:thin solid #AAAAAA;"
+         itemSpacing="4" label="Menu" title="I am a menu tooltip">
+         <awc:actionLink value="Item 001" />
+         <awc:actionLink value="Item 002" />
+         <awc:actionLink value="Item 003" />
+         <awc:actionLink value="Should not see this" rendered="false" />
+      </awc:menu>
+      <br>
+      Menu with image, styles and actions with icons:<br>
+      <awc:menu id="menu2" styleClass="header" menuStyle="background-color:#eeeeee; border-top:thin solid #FFFFFF; border-left:thin solid #FFFFFF; border-right:thin solid #444444; border-bottom:thin solid #444444;"
+         itemSpacing="2" label="More..." image="/images/arrow_expanded.gif" title="Click Me">
+         <awc:actionLink value="Menu Action Link" image="/images/icons/BlueArrow.gif" />
+         <awc:actionLink value="Click Me" image="/images/icons/link_small.gif" action="success" actionListener="#{TestList.clickActionLink}" styleClass="header" />
+         <awc:actionLink value="No Image here" />
+      </awc:menu>
+      
+      <p>
+      
       <%-- Breadcrumb tests --%>
       <b>Breadcrumbs:</b><br>
       Default style with modified separator and actionListener handler:<br>
       <awc:breadcrumb id="path1" value="/horse/biscuit/flibble/1234" action="success" actionListener="#{TestList.clickBreadcrumb}" separator="~" />
       <br>
       Path style with default separator:<br>
-      <awc:breadcrumb id="path2" styleClass="path"  value="/this/is/a/small/breadcrumb" />
+      <awc:breadcrumb id="path2" styleClass="path"  value="/this/is/a/small/breadcrumb" title="I am a tooltip" />
       <br>
       Root should be missing from this breadcrumb:<br>
       <awc:panel id="panel0" progressive="true">
@@ -381,13 +402,21 @@
       <awc:stringEqualsEvaluator value="some string" condition="some string123">
          <h:outputText value="Component inside an evaluator"/>
       </awc:stringEqualsEvaluator>
+      <br><br>
+      Test evaluators around menu actions:<br>
+      <awc:menu id="menuX" menuStyle="background-color:#FFFFFF; border:thin solid #AAAAAA;" itemSpacing="2" label="More...">
+         <awc:actionLink value="You should only see this one item" />
+         <awc:booleanEvaluator value="#{TestList.rows == null}">
+            <awc:actionLink value="You should NOT see this second item" />
+         </awc:booleanEvaluator>
+      </awc:menu>
       
       <p>
       
       <%-- Date Picker Component --%>
       <%-- Example of a tag utilising an Input Component with a custom renderer.
               The renderer handles encoding and decoding of date values to UI elements --%>
-      <b>Date Picker Components</b><br>
+      <b>Date Picker Components:</b><br>
       Basic date picker:<br>
       <awc:inputDatePicker id="date1" value="#{TestList.rows[0].created}" startYear="1996" yearCount="10"/>
       <br>

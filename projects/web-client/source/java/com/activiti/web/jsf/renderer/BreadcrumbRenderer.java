@@ -82,12 +82,13 @@ public class BreadcrumbRenderer extends BaseRenderer
    /**
     * Render a single breadcrumb element as a link on the page
     * 
-    * @param context
-    * @param bc
-    * @param element
-    * @param index
-    * @param first
-    * @return
+    * @param context    FacesContext
+    * @param bc         The current UIBreadcrumb component
+    * @param element    Text for the breadcrumb element
+    * @param index      The index of the element into the original breadcrumb path
+    * @param first      True is this is the root element
+    * 
+    * @return HTML for this breadcrumb element
     */
    private String renderBreadcrumb(FacesContext context, UIBreadcrumb bc, String element, int index, boolean first)
    {

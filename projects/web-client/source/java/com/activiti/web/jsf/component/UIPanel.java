@@ -37,6 +37,11 @@ public class UIPanel extends SelfRenderingComponent
     */
    public void encodeBegin(FacesContext context) throws IOException
    {
+      if (isRendered() == false)
+      {
+         return;
+      }
+      
       ResponseWriter out = context.getResponseWriter();
       
       String bgcolor = getBgcolor();
@@ -102,6 +107,11 @@ public class UIPanel extends SelfRenderingComponent
     */
    public void encodeEnd(FacesContext context) throws IOException
    {
+      if (isRendered() == false)
+      {
+         return;
+      }
+      
       ResponseWriter out = context.getResponseWriter();
       
       // output final part of border table

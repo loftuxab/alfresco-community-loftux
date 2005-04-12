@@ -63,6 +63,11 @@
    </component>
    
    <component>
+      <component-type>awc.faces.Menu</component-type>
+      <component-class>com.activiti.web.jsf.component.UIMenu</component-class>
+   </component>
+   
+   <component>
       <component-type>awc.faces.BooleanEvaluator</component-type>
       <component-class>com.activiti.web.jsf.component.evaluator.BooleanEvaluator</component-class>
    </component>
