@@ -41,20 +41,8 @@ public class UIMenu extends SelfRenderingComponent
       
       ResponseWriter out = context.getResponseWriter();
       
-      // output javascript to drop-down a menu
-      // TODO: move this to a common "controls" javascript include file
-      // TODO: add a function to close all other menus on drop-down
-      out.write("<script>");
-      out.write("function _dropMenu(menuId) {" +
-            "if (document.getElementById(menuId).style.display == 'none') {" + 
-            " document.getElementById(menuId).style.display = '';" + 
-            "} else {" + 
-            " document.getElementById(menuId).style.display = 'none';" + 
-            "}}");
-      out.write("</script>");
-      
       // output a textual label with an optional icon to show the menu
-      out.write("<a href='#' onclick=\"javascript:_dropMenu('");
+      out.write("<a href='#' onclick=\"javascript:_toggleMenu('");
       out.write(getClientId(context));
       out.write("');return false;\"");
       outputAttribute(out, getAttributes().get("style"), "style");
