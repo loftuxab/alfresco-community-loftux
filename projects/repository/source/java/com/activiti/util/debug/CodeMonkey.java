@@ -83,6 +83,7 @@ public final class CodeMonkey
         Lock lock = new ReentrantLock();
         try
         {
+            lock.lock();
             if (elements.get(msg) != null)
             {
                 // this message has been logged
