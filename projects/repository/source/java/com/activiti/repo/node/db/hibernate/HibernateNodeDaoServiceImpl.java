@@ -10,13 +10,16 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
+import com.activiti.repo.dictionary.ClassDefinition;
+import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryService;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.RealNode;
-import com.activiti.repo.domain.ReferenceNode;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.hibernate.ChildAssocImpl;
 import com.activiti.repo.domain.hibernate.ContainerNodeImpl;
@@ -24,7 +27,7 @@ import com.activiti.repo.domain.hibernate.ContentNodeImpl;
 import com.activiti.repo.domain.hibernate.NodeAssocImpl;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.domain.hibernate.RealNodeImpl;
-import com.activiti.repo.domain.hibernate.ReferenceNodeImpl;
+import com.activiti.repo.node.InvalidNodeTypeException;
 import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.repo.ref.QName;
 import com.activiti.util.GUID;
@@ -40,6 +43,16 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public static final String QUERY_GET_NODE_ASSOC_TARGETS = "node.GetNodeAssocTargets";
     public static final String QUERY_GET_NODE_ASSOC_SOURCES = "node.GetNodeAssocSources";
 
+    private DictionaryService dictionaryService;
+    
+    /**
+     * @param dictionaryService the dictionary service to use
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+
     public void evict(Node node)
     {
         getHibernateTemplate().evict(node);
@@ -50,40 +63,41 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         getHibernateTemplate().evict(assoc);
     }
 
-    public ReferenceNode newReferenceNode(Store store, String referencedPath)
+    public RealNode newRealNode(Store store, ClassRef classRef)
     {
-        ReferenceNode node = new ReferenceNodeImpl();
-		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
-		node.setKey(key);
-        node.setType(Node.TYPE_REFERENCE);
-        node.setStore(store);
-        node.setReferencedPath(referencedPath);
-        // persist the node
-        getHibernateTemplate().save(node);
-        // done
-        return node;
-    }
-
-    public RealNode newRealNode(Store store, String type)
-    {
+        ClassDefinition classDef = dictionaryService.getClass(classRef);
+        if (classDef == null)
+        {
+            throw new InvalidNodeTypeException(classRef);
+        }
+        ClassRef baseClassRef = classDef.getBootstrapClass();
+        // build a concrete node based on a bootstrap type
         RealNode node = null;
-        if (type.equals(Node.TYPE_CONTAINER))
+        if (baseClassRef.equals(DictionaryBootstrap.TYPE_FOLDER))
         {
             node = new ContainerNodeImpl();
-            node.setType(Node.TYPE_CONTAINER);
         }
-        else if (type.equals(Node.TYPE_CONTENT))
+        else if (baseClassRef.equals(DictionaryBootstrap.TYPE_FILE))
         {
             node = new ContentNodeImpl();
-            node.setType(Node.TYPE_CONTENT);
+        }
+        else if (baseClassRef.equals(DictionaryBootstrap.TYPE_REFERENCE))
+        {
+            node = new RealNodeImpl();
+        }
+        else if (baseClassRef.equals(DictionaryBootstrap.TYPE_BASE))
+        {
+            node = new RealNodeImpl();
         }
         else
         {
-            node = new RealNodeImpl();
-            node.setType(Node.TYPE_REAL);
+            throw new InvalidNodeTypeException("Unable to retrieve a valid concrete node type",
+                    classRef);
         }
+        // set other required properties
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
 		node.setKey(key);
+        node.setTypeQName(classRef.getQName());
         node.setStore(store);
         // persist the node
         getHibernateTemplate().save(node);

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
@@ -30,32 +31,25 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     private final static String MSG_UNSUPPORTED = 
         "This operation is not supported by a version store implementation of the node service.";
 	
-	 /**
-     * @see #createNode(NodeRef, QName, String, Map<String,String>)
+    /**
+     * @throws UnsupportedOperationException always
      */
     public ChildAssocRef createNode(
 			NodeRef parentRef,
             QName qname,
-            String nodeType) throws InvalidNodeRefException
+            ClassRef tyepRef) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }
     
     /**
-     * Creates a new, non-abstract, real node as a primary child of the given parent node.
-     * 
-     * @param parentRef the parent node
-     * @param qname the qualified name of the association
-     * @param nodeType a predefined node type
-     * @param properties optional map of properties to keyed by their qualified names
-     * @return returns a chlid assoc reference
-     * @throws InvalidNodeRefException if the parent reference is invalid
+     * @throws UnsupportedOperationException always
      */
     public ChildAssocRef createNode(
 			NodeRef parentRef,
             QName qname,
-            String nodeType,
+            ClassRef typeRef,
             Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
@@ -63,10 +57,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * Deletes the given node.
-     * 
-     * @param nodeRef reference to a node within a store
-     * @throws InvalidNodeRefException if the reference given is invalid
+     * @throws UnsupportedOperationException always
      */
     public void deleteNode(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -75,13 +66,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * Makes a parent-child association between the given nodes.  Both nodes must belong to the same store.
-     * 
-     * @param parentRef
-     * @param childRef 
-     * @param qname     the qualified name of the association
-     * @return          a child assoc reference
-     * @throws InvalidNodeRefException if the parent or child nodes could not be found
+     * @throws UnsupportedOperationException always
      */
     public ChildAssocRef addChild(NodeRef parentRef,
             NodeRef childRef,
@@ -92,15 +77,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * Severs all parent-child relationships between two nodes.
-     * <p>
-     * The child node will be cascade deleted if one of the associations was the
-     * primary association, i.e. the one with which the child node was created.
-     * 
-     * @param parentRef the parent end of the association
-     * @param childRef the child end of the association
-     * @return Returns a collection of deleted entities - both associations and node references.
-     * @throws InvalidNodeRefException if the parent or child nodes could not be found
+     * @throws UnsupportedOperationException always
      */
     public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
     {
@@ -109,13 +86,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
 
     /**
-     * Removes named child associations and deletes the children where the association
-     * was the primary association, i.e. the one with which the child node was created.
-     * 
-     * @param parentRef the parent of the associations to remove
-     * @param qname the qualified name of the association
-     * @return Returns a collection of deleted entities - both associations and node references.
-     * @throws InvalidNodeRefException if the parent or child nodes could not be found
+     * @throws UnsupportedOperationException always
      */
     public Collection<EntityRef>  removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
     {
@@ -124,20 +95,16 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param nodeRef
-     * @return Returns the type of the node
-     * @throws InvalidNodeRefException if the node could not be found
+     * @throws UnsupportedOperationException always
      */
-    public String getType(NodeRef nodeRef) throws InvalidNodeRefException
+    public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
 		// TODO
         throw new UnsupportedOperationException();
     }
     
     /**
-     * @param nodeRef
-     * @return Returns all properties keyed by their qualified name
-     * @throws InvalidNodeRefException if the node could not be found
+     * Property translation for version store
      */
     public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -155,10 +122,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param nodeRef
-     * @param qname the qualified name of the property
-     * @return Returns the value of the property, or null if not yet set
-     * @throws InvalidNodeRefException if the node could not be found
+     * Property translation for version store
      */
     public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException
     {
@@ -174,10 +138,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * 
-     * @param nodeRef
-     * @param properties all the properties of the node keyed by their qualified names
-     * @throws InvalidNodeRefException if the node could not be found
+     * @throws UnsupportedOperationException always
      */
     public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
@@ -186,10 +147,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param nodeRef
-     * @param qname the fully qualified name of the property
-     * @param propertyValue the value of the property
-     * @throws InvalidNodeRefException if the node could not be found
+     * @throws UnsupportedOperationException always
      */
     public void setProperty(NodeRef nodeRef, QName qame, Serializable value) throws InvalidNodeRefException
     {
@@ -198,9 +156,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param nodeRef the child node
-     * @return Returns a collection of <code>NodeRef</code> instances
-     * @throws InvalidNodeRefException if the node could not be found
+     * @throws UnsupportedOperationException always
      */
     public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -209,9 +165,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param nodeRef the parent node - must be a <b>container</b>
-     * @return Returns a collection of <code>ChildAssocRef</code> instances
-     * @throws InvalidNodeRefException if the node could not be found
+     * @throws UnsupportedOperationException always
      */
     public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -220,10 +174,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param nodeRef
-     * @return Returns Fetches the primary parent of the node unless it is a root node,
-     *      in which case null is returned.
-     * @throws InvalidNodeRefException if the node could not be found
+     * @throws UnsupportedOperationException always
      */
     public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -232,12 +183,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * 
-     * @param sourceRef a reference to a <b>real</b> node
-     * @param targetRef a reference to a node
-     * @param qname the qualified name of the association
-     * @throws InvalidNodeRefException if either of the nodes could not be found
-     * @throws AssociationExistsException
+     * @throws UnsupportedOperationException always
      */
     public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException, AssociationExistsException
@@ -247,11 +193,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * 
-     * @param sourceRef the associaton source node
-     * @param targetRef the association target node
-     * @param qname the qualified name of the association
-     * @throws InvalidNodeRefException if either of the nodes could not be found
+     * @throws UnsupportedOperationException always
      */
     public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException
@@ -261,11 +203,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param sourceRef the association source
-     * @param qname the qualified name of the association
-     * @return Returns a collection of <code>NodeRef</code> instances at the target end of the
-     *      named association for which the given node is a source
-     * @throws InvalidNodeRefException if the source node could not be found
+     * @throws UnsupportedOperationException always
      */
     public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname)
             throws InvalidNodeRefException
@@ -275,11 +213,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param targetRef the association target
-     * @param qname the qualified name of the association
-     * @return Returns a collection of <code>NodeRef</code> instances at the source of the
-     *      named association for which the given node is a target
-     * @throws InvalidNodeRefException
+     * @throws UnsupportedOperationException always
      */
     public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname)
             throws InvalidNodeRefException
@@ -289,11 +223,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param nodeRef
-     * @return Returns the path to the node along the primary node path
-     * @throws InvalidNodeRefException if the node could not be found
-     * 
-     * @see #getPaths(NodeRef, boolean)
+     * @throws UnsupportedOperationException always
      */
     public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -302,11 +232,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @param nodeRef
-     * @param primaryOnly true if only the primary path must be retrieved.  If true, the
-     *      result will have exactly one entry.
-     * @return Returns a collection of all possible paths to the given node
-     * @throws InvalidNodeRefException if the node could not be found
+     * @throws UnsupportedOperationException always
      */
     public Collection<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
     {

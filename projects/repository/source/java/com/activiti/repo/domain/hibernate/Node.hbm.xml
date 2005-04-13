@@ -24,7 +24,8 @@
             column="auto_type"
             type="string"
             length="18" />
-      <property name="type" not-null="true" length="50"/>
+      <property name="typeNamespaceUri" column="type_namespace_uri" length="100" not-null="false" />
+      <property name="typeLocalName" column="type_local_name" length="100" not-null="true" />
       <map
             name="properties"
             table="node_properties"
@@ -76,14 +77,6 @@
       </set>
    </class>
    
-   <subclass
-         name="com.activiti.repo.domain.hibernate.ReferenceNodeImpl"
-         proxy="com.activiti.repo.domain.ReferenceNode"
-         extends="com.activiti.repo.domain.hibernate.NodeImpl"
-         discriminator-value="REFERENCE" >
-      <property name="referencedPath" not-null="true" />
-   </subclass>
-
    <subclass
          name="com.activiti.repo.domain.hibernate.RealNodeImpl"
          proxy="com.activiti.repo.domain.RealNode"

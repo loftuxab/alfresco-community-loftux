@@ -11,6 +11,7 @@ import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.PropertyRef;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.QName;
 
 
@@ -102,6 +103,25 @@ public class M2ClassDefinition implements ClassDefinition
         return m2Class.getSuperClass().getReference();
     }
     
+    public ClassRef getBootstrapClass()
+    {
+        ClassRef baseClassRef = null;
+        ClassRef superClassRef = this.getReference();
+        while (superClassRef != null)
+        {
+            if (superClassRef.equals(DictionaryBootstrap.TYPE_FOLDER) ||
+                    superClassRef.equals(DictionaryBootstrap.TYPE_FILE) ||
+                    superClassRef.equals(DictionaryBootstrap.TYPE_REFERENCE) ||
+                    superClassRef.equals(DictionaryBootstrap.TYPE_BASE))
+            {
+                baseClassRef = superClassRef;
+                break;
+            }
+            // move up the hierarchy
+            throw new RuntimeException("There is no way to go from a ref to a def here");
+        }
+        return baseClassRef;
+    }
     
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.ClassDefinition#getProperties()

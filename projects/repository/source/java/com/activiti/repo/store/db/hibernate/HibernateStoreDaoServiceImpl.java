@@ -2,7 +2,7 @@ package com.activiti.repo.store.db.hibernate;
 
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-import com.activiti.repo.domain.Node;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.StoreKey;
@@ -47,7 +47,7 @@ public class HibernateStoreDaoServiceImpl
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(store);
         // create and assign a root node
-        RealNode rootNode = nodeDaoService.newRealNode(store, Node.TYPE_CONTAINER);
+        RealNode rootNode = nodeDaoService.newRealNode(store, DictionaryBootstrap.TYPE_FOLDER);
         store.setRootNode(rootNode);
         // done
         return store;

@@ -32,6 +32,14 @@ public interface ClassDefinition
      * @return  the super class (or null, if this is the root)
      */
     public ClassRef getSuperClass();
+    
+    /**
+     * @return the first basic bootstrap type, or null if the type doesn't derive
+     *      (either directly or indirectly) from any of the bootstrap types
+     * 
+     * @see com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap#TYPE_BASE
+     */
+    public ClassRef getBootstrapClass();
 
     /**
      * Is this an Aspect definition?

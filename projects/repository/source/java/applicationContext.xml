@@ -55,24 +55,24 @@
    </bean>
    
    <!-- create a transaction manager to handle the Hibernate sessions -->
-	<bean id='transactionManager' 
-		class='com.activiti.repo.search.transaction.LuceneTransactionManager'>
-		<property name='sessionFactory'>
-			<ref local='sessionFactory'/>
-		</property>
-		<property name='luceneIndexerAndSearchFactory'>
-			<ref bean='luceneIndexerAndSearcherFactory'/>
-		</property>
-	</bean>
-
+   <bean id='transactionManager' 
+      class='com.activiti.repo.search.transaction.LuceneTransactionManager'>
+      <property name='sessionFactory'>
+         <ref local='sessionFactory'/>
+      </property>
+      <property name='luceneIndexerAndSearchFactory'>
+         <ref bean='luceneIndexerAndSearcherFactory'/>
+      </property>
+   </bean>
+   
    <!-- use around method calls to debug - see class comments for details -->
    <bean id="methodCallLogAdvice" class="com.activiti.util.debug.MethodCallLogAdvice" />
-
+   
    <!-- use around method calls to debug - see class comments for details -->
    <bean id="methodPerformanceAdvice"
       class="com.activiti.util.perf.PerformanceMonitorAdvice" 
       init-method="init"/>
-
+   
    <!--                    -->
    <!--  INTERNAL SERVICES -->
    <!--                    -->
@@ -106,7 +106,7 @@
          </list>
       </property>
    </bean>
-
+   
    <bean id='nodeDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
          <value>com.activiti.repo.node.db.NodeDaoService</value>
@@ -118,6 +118,9 @@
          <bean class="com.activiti.repo.node.db.hibernate.HibernateNodeDaoServiceImpl" >
             <property name="sessionFactory">
                <ref bean="sessionFactory" />
+            </property>
+            <property name="dictionaryService">
+               <ref bean="dictionaryService" />
             </property>
          </bean>
       </property>
@@ -300,30 +303,33 @@
       </property>
    </bean>
    
-	<bean id="luceneIndexerAndSearcherFactory" class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
-		<property name="nodeService">
-			<ref bean="dbNodeService"/>
-		</property>
-		<property name="nameSpaceService">
-			<ref bean="namespaceService"/>
-		</property>
-	</bean>
+   <bean id="luceneIndexerAndSearcherFactory" class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
+      <property name="nodeService">
+         <ref bean="dbNodeService"/>
+      </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService"/>
+      </property>
+      <property name="nameSpaceService">
+         <ref bean="namespaceService"/>
+      </property>
+   </bean>
    
-
-	<bean id="indexerAndSearcherFactory" 
-		class="com.activiti.repo.search.IndexerAndSearcherFactory">
-		<property name="protocolFactories">
-			<map>
-				<entry key="workspace">
-					<ref bean="luceneIndexerAndSearcherFactory"></ref>
-				</entry>
-				<entry key="versionStore">
-					<ref bean="luceneIndexerAndSearcherFactory"></ref>
-				</entry>
-			</map>
-		</property>
-	</bean>
-
+   
+   <bean id="indexerAndSearcherFactory" 
+      class="com.activiti.repo.search.IndexerAndSearcherFactory">
+      <property name="protocolFactories">
+         <map>
+            <entry key="workspace">
+               <ref bean="luceneIndexerAndSearcherFactory"></ref>
+            </entry>
+            <entry key="versionStore">
+               <ref bean="luceneIndexerAndSearcherFactory"></ref>
+            </entry>
+         </map>
+      </property>
+   </bean>
+   
    
    <!--                               -->
    <!--  Light Weight Version Store   -->
@@ -339,21 +345,21 @@
       <property name="target">
          <bean class="com.activiti.repo.version.lightweight.VersionStoreVersionServiceImpl" init-method="initialise">
             <property name="nodeService">
-			   <!-- TODO This should point to the general node service -->	
+            <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
             </property>
-			<property name="dbNodeService">
+         <property name="dbNodeService">
                <ref bean="dbNodeService" />
             </property>
-			<property name="storeService">
-				<ref bean="dbStoreService"/>
-			</property>
-			<property name="versionCounterDaoService">
-				<ref bean="versionCounterDaoService"/>
-			</property>
-			<property name="searcher">
-				<ref bean="searcherComponent"/>
-			</property>
+         <property name="storeService">
+            <ref bean="dbStoreService"/>
+         </property>
+         <property name="versionCounterDaoService">
+            <ref bean="versionCounterDaoService"/>
+         </property>
+         <property name="searcher">
+            <ref bean="searcherComponent"/>
+         </property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -372,19 +378,19 @@
       </property>
       <property name="target">
          <bean class="com.activiti.repo.version.lightweight.VersionStoreNodeServiceImpl" init-method="initialise">
-			<property name="nodeService">
-			   <!-- TODO This should point to the general node service -->	
+         <property name="nodeService">
+            <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
             </property>
             <property name="dbNodeService">
                <ref bean="dbNodeService" />
             </property>
-			<property name="storeService">
-				<ref bean="dbStoreService"/>
-			</property>
-			<property name="searcher">
-				<ref bean="searcherComponent"/>
-			</property>
+         <property name="storeService">
+            <ref bean="dbStoreService"/>
+         </property>
+         <property name="searcher">
+            <ref bean="searcherComponent"/>
+         </property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -414,22 +420,22 @@
          </props>
       </property>
    </bean>
-
+   
    <!--                 -->
    <!-- Data Dictionary -->
    <!--                 -->
-
+   
    <bean id="emfResource" class="com.activiti.repo.dictionary.metamodel.emf.EMFResource" init-method="init">
    </bean>
    
    <bean id="metaModelDAO" class="com.activiti.repo.dictionary.metamodel.emf.EMFMetaModelDAO" init-method="init">
       <property name='resource'><ref bean="emfResource"/></property>
    </bean>
-
+   
    <bean id="namespaceDAO" class="com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceDAO" init-method="init">
       <property name='resource'><ref bean="emfResource"/></property>
    </bean>
-
+   
    <bean id="dictionaryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.dictionary.DictionaryService</value>
@@ -452,7 +458,7 @@
          </list>
       </property>
    </bean>
-
+   
    <bean id="namespaceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.dictionary.NamespaceService</value>

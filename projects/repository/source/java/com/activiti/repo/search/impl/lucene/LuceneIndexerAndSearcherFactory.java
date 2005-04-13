@@ -13,6 +13,7 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.StoreRef;
@@ -37,6 +38,8 @@ import com.activiti.util.GUID;
 
 public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher, XAResource
 {
+    private NodeService nodeService;
+    private DictionaryService dictionaryService;
     private NamespaceService nameSpaceService;
     
     /**
@@ -75,12 +78,6 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private static final int DEFAULT_TIMEOUT = 600000;
 
     /**
-     * The node service we use to get information about nodes
-     */
-
-    private NodeService nodeService;
-
-    /**
      * Private constructor for the singleton TODO: FIt in with IOC
      */
 
@@ -109,6 +106,11 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
     }
 
     public void setNameSpaceService(NamespaceService nameSpaceService)
@@ -251,6 +253,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     {
         LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, deltaId);
         indexer.setNodeService(nodeService);
+        indexer.setDictionaryService(dictionaryService);
         return indexer;
     }
 

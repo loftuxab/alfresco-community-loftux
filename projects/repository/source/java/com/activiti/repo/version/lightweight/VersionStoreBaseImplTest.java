@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.activiti.repo.domain.Node;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
@@ -99,7 +99,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
                 QName.createQName("{}MyVersionableNode"), 
-                Node.TYPE_CONTAINER,
+                DictionaryBootstrap.TYPE_FOLDER,
                 this.nodeProperties).getChildRef();
         assertNotNull(nodeRef);
         
@@ -168,7 +168,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         assertEquals(this.lightWeightVersionStoreVersionService.getVersionStoreReference(), nodeRef.getStoreRef());
         assertNotNull(nodeRef.getId());        
         
-        // TODO How do we check the frozen attributes ??
+        // TODO: How do we check the frozen attributes ??
         
         // Check the node ref for the current version
         String currentVersionLabel = (String)this.dbNodeService.getProperty(

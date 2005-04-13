@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.activiti.repo.domain.Node;
+import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
@@ -177,7 +178,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
             ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                     this.versionStoreRootNodeRef, 
                     VersionStoreBaseImpl.CHILD_VERSION_HISTORIES, 
-                    Node.TYPE_CONTAINER);
+                    DictionaryBootstrap.TYPE_FOLDER);
             versionHistoryRef = childAssocRef.getChildRef();
             
             // Store the id of the origional node on the version history node 
@@ -355,7 +356,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                 versionHistoryRef, 
 				VersionStoreBaseImpl.CHILD_VERSIONS, 
-                Node.TYPE_CONTAINER);
+                DictionaryBootstrap.TYPE_FOLDER);
         NodeRef newVersion = childAssocRef.getChildRef();
         
         // Set the version number for the new version
@@ -439,7 +440,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
     {
         // TODO this will chage when we integrate with the data dictionary
         // Store the current node type
-        String nodeType = this.nodeService.getType(nodeRef);
+        ClassRef nodeType = this.nodeService.getType(nodeRef);
         this.dbNodeService.setProperty(versionRef, ATTR_FROZEN_NODE_TYPE, nodeType);
         
         // Copy the current values of the node onto the version node, thus taking a snap shot of the values
@@ -469,10 +470,10 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
             NodeRef versionHistoryRef = getVersionHistoryNodeRef(childAssocRef.getChildRef());
             if (versionHistoryRef == null)
             {
-                // TODO this should be a node of type reference ...
-                
                 // The child node is not versioned so we associate to a node reference
-                NodeRef referenceRef = this.dbNodeService.createNode(versionRef, childAssocRef.getName(), Node.TYPE_REAL).getChildRef();
+                NodeRef referenceRef = this.dbNodeService.createNode(versionRef,
+                        childAssocRef.getName(),
+                        DictionaryBootstrap.TYPE_REFERENCE).getChildRef();
                 
                 // Set the reference string
                 // TODO this needs to be inline with the reference type

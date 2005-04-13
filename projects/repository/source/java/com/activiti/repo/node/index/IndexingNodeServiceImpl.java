@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
@@ -49,9 +50,11 @@ public class IndexingNodeServiceImpl implements NodeService
     /**
      * @see #createNode(NodeRef, QName, String, Map<QName,Serializable>)
      */
-    public ChildAssocRef createNode(NodeRef parentRef, QName qname, String nodeType) throws InvalidNodeRefException
+    public ChildAssocRef createNode(NodeRef parentRef,
+            QName qname,
+            ClassRef typeRef) throws InvalidNodeRefException
     {
-        return this.createNode(parentRef, qname, nodeType, null);
+        return this.createNode(parentRef, qname, typeRef, null);
     }
 
     /**
@@ -60,16 +63,27 @@ public class IndexingNodeServiceImpl implements NodeService
      * 
      * @see IndexerComponent#createNode(ChildAssocRef)
      */
-    public ChildAssocRef createNode(NodeRef parentRef, QName qname, String nodeType, Map<QName, Serializable> properties) throws InvalidNodeRefException
+    public ChildAssocRef createNode(NodeRef parentRef,
+            QName qname,
+            ClassRef typeRef,
+            Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
         // call delegate
-        ChildAssocRef assocRef = nodeServiceDelegate.createNode(parentRef, qname, nodeType, properties);
+        ChildAssocRef assocRef = nodeServiceDelegate.createNode(parentRef, qname, typeRef, properties);
         // update index
         indexer.createNode(assocRef);
         // done
         return assocRef;
     }
 
+    /**
+     * Direct delegation to assigned {@link #nodeServiceDelegate}
+     */
+    public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        return nodeServiceDelegate.getType(nodeRef);
+    }
+    
     /**
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
@@ -283,13 +297,5 @@ public class IndexingNodeServiceImpl implements NodeService
     public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException
     {
         return nodeServiceDelegate.getProperty(nodeRef, qname);
-    }
-
-    /**
-     * Direct delegation to assigned {@link #nodeServiceDelegate}
-     */
-    public String getType(NodeRef nodeRef) throws InvalidNodeRefException
-    {
-        return nodeServiceDelegate.getType(nodeRef);
     }
 }

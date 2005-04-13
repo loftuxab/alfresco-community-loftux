@@ -26,22 +26,25 @@
     <emfProperties emfName="primaryType" emfType="/16" emfProtected="true" emfMandatory="true"/>
     <emfProperties emfName="aspects" emfType="/16" emfProtected="true" emfMultiple="true"/>
   </datadictionary:EMFType>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/test/1.0}reference" emfSuperClass="/20" emfDefaultAspects="/19">
+    <emfProperties emfName="reference" emfType="/7" emfMandatory="true"/>
+  </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.activiti.com/test/1.0}file" emfSuperClass="/20" emfDefaultAspects="/19">
     <emfProperties emfName="encoding" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="mimetype" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.activiti.com/test/1.0}folder" emfSuperClass="/20" emfDefaultAspects="/19">
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="contents" emfRequiredToClasses="/21"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="contents" emfRequiredToClasses="/22"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{uri://com.activiti/lightWeightVersionStore}version">
     <emfProperties emfName="versionNumber" emfType="/9" emfMandatory="true"/>
     <emfProperties emfName="versionLabel" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="createdDate" emfType="/13" emfMandatory="true"/>
-    <emfAssociations emfName="successor" emfRequiredToClasses="/23"/>
+    <emfAssociations emfName="successor" emfRequiredToClasses="/24"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{uri://com.activiti/lightWeightVersionStore}versionHistory">
     <emfProperties emfName="versionedNodeId" emfType="/17" emfMandatory="true"/>
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/23"/>
-    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/23"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/24"/>
+    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/24"/>
   </datadictionary:EMFType>
 </xmi:XMI>

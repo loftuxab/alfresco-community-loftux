@@ -25,7 +25,10 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 
-import com.activiti.repo.domain.Node;
+import com.activiti.repo.dictionary.ClassDefinition;
+import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryService;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
@@ -49,6 +52,8 @@ public class LuceneIndexer extends LuceneBase implements Indexer
      */
     private NodeService nodeService;
 
+    private DictionaryService dictionaryService;
+    
     /**
      * A list of all deletoins we have made - at merge these deletions need to
      * be made against the main index.
@@ -91,6 +96,11 @@ public class LuceneIndexer extends LuceneBase implements Indexer
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
     }
 
    /*
@@ -658,7 +668,10 @@ public class LuceneIndexer extends LuceneBase implements Indexer
             else
             {
                 doc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
-                if (nodeService.getType(nodeRef).equalsIgnoreCase(Node.TYPE_CONTAINER))
+                ClassRef nodeTypeRef = nodeService.getType(nodeRef);
+                ClassDefinition nodeClassDef = dictionaryService.getClass(nodeTypeRef);
+                nodeTypeRef = nodeClassDef.getBootstrapClass();
+                if (nodeTypeRef != null && nodeTypeRef.equals(DictionaryBootstrap.TYPE_FOLDER))
                 {
                     Document directoryEntry = new Document();
                     directoryEntry.add(new Field("ID", nodeRef.getId(), true, true, false));

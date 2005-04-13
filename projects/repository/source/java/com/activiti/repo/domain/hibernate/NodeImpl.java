@@ -12,6 +12,7 @@ import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.QName;
 
 /**
  * Simple named node to test out various features
@@ -22,7 +23,8 @@ import com.activiti.repo.ref.NodeRef;
 public class NodeImpl implements Node
 {
     private NodeKey key;
-    private String type;
+    private String typeNamespaceUri;
+    private String typeLocalName;
     private Store store;
     private Set<NodeAssoc> sourceNodeAssocs;
     private Set<ChildAssoc> parentAssocs;
@@ -66,15 +68,57 @@ public class NodeImpl implements Node
 	public void setKey(NodeKey key) {
 		this.key = key;
 	}
-
-    public String getType()
+    
+    /**
+     * @see #getTypeNamespaceUri()
+     * @see #getTypeLocalName()
+     */
+    public QName getTypeQName()
     {
-        return type;
+        return QName.createQName(typeNamespaceUri, typeLocalName);
     }
 
-    public synchronized void setType(String type)
+    /**
+     * @see #setTypeNamespaceUri(String)
+     * @see #setTypeLocalName(String)
+     */
+    public void setTypeQName(QName qname)
     {
-        this.type = type;
+        setTypeNamespaceUri(qname.getNamespaceURI());
+        setTypeLocalName(qname.getLocalName());
+    }
+
+    /**
+     * For Hibernate use
+     */
+    private String getTypeNamespaceUri()
+    {
+        return typeNamespaceUri;
+    }
+
+    /**
+     * For Hibernate use
+     */
+    private synchronized void setTypeNamespaceUri(String namespaceUri)
+    {
+        this.typeNamespaceUri = namespaceUri;
+        this.nodeRef = null;
+    }
+
+    /**
+     * For Hibernate use
+     */
+    private String getTypeLocalName()
+    {
+        return typeLocalName;
+    }
+
+    /**
+     * For Hibernate use
+     */
+    private synchronized void setTypeLocalName(String localName)
+    {
+        this.typeLocalName = localName;
         this.nodeRef = null;
     }
 

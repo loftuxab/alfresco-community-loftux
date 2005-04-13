@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
@@ -118,7 +119,7 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
 			this.lightWeightVersionStoreNodeService.createNode(
 					dummyNodeRef,
 					dummyQName,
-					"");
+					DictionaryBootstrap.TYPE_FILE);
 			fail("This operation is not supported.");
 		}
 		catch (UnsupportedOperationException exception)

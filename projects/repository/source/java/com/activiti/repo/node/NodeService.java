@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
@@ -22,22 +23,36 @@ public interface NodeService
      */
     public ChildAssocRef createNode(NodeRef parentRef,
             QName qname,
-            String nodeType) throws InvalidNodeRefException;
+            ClassRef typeRef)
+            throws InvalidNodeRefException, InvalidNodeTypeException;
     
     /**
      * Creates a new, non-abstract, real node as a primary child of the given parent node.
      * 
      * @param parentRef the parent node
      * @param qname the qualified name of the association
-     * @param nodeType a predefined node type
+     * @param typeRef a reference to the node type
      * @param properties optional map of properties to keyed by their qualified names
      * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent reference is invalid
+     * @throws InvalidNodeTypeException if the node type reference is not recognised
+     * 
+     * @see com.activiti.repo.dictionary.DictionaryService
      */
     public ChildAssocRef createNode(NodeRef parentRef,
             QName qname,
-            String nodeType,
-            Map<QName, Serializable> properties) throws InvalidNodeRefException;
+            ClassRef typeRef,
+            Map<QName, Serializable> properties)
+            throws InvalidNodeRefException, InvalidNodeTypeException;
+    
+    /**
+     * @param nodeRef
+     * @return Returns a class reference to the node type
+     * @throws InvalidNodeRefException if the node could not be found
+     * 
+     * @see com.activiti.repo.dictionary.DictionaryService
+     */
+    public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * Deletes the given node.
@@ -83,13 +98,6 @@ public interface NodeService
      * @throws InvalidNodeRefException if the node could not be found
      */
     public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException;
-    
-    /**
-     * @param nodeRef
-     * @return Returns the type of the node
-     * @throws InvalidNodeRefException if the node could not be found
-     */
-    public String getType(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * @param nodeRef

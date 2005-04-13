@@ -4,7 +4,10 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.QName;
 
 /**
  * Specific instances of nodes are unique, but may share GUIDs across stores.
@@ -14,12 +17,6 @@ import com.activiti.repo.ref.NodeRef;
 public interface Node
 {
     public static final String QUERY_GET_CHILD_ASSOCS = "node.GetChildAssocs";
-    
-    // TODO: Remove this in favour of the Data Dictionary
-    public static final String TYPE_REFERENCE = "reference";
-    public static final String TYPE_REAL = "real";
-    public static final String TYPE_CONTAINER = "container";
-    public static final String TYPE_CONTENT = "content";
     
     /**
      * @return Returns the unique key for this node
@@ -35,9 +32,9 @@ public interface Node
     
     public void setStore(Store store);
     
-    public String getType();
+    public QName getTypeQName();
     
-    public void setType(String type);
+    public void setTypeQName(QName qname);
 
     /**
      * @return Returns all the regular associations for which this node is a target 

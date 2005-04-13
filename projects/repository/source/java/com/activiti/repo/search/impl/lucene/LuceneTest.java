@@ -12,7 +12,8 @@ import junit.framework.TestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.activiti.repo.domain.Node;
+import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
@@ -182,7 +183,7 @@ public class LuceneTest extends TestCase
         Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
         testProperties.put(QName.createQName("property"), "value");
 
-        ChildAssocRef assoc = nodeService.createNode(rootNode, QName.createQName(null, "path"), Node.TYPE_CONTENT, testProperties);
+        ChildAssocRef assoc = nodeService.createNode(rootNode, QName.createQName(null, "path"), DictionaryBootstrap.TYPE_FILE, testProperties);
         NodeRef newNode = assoc.getChildRef();
 
         LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
@@ -495,67 +496,67 @@ public class LuceneTest extends TestCase
 
         static NodeRef n14 = new NodeRef(storeRef, "14");
 
-        public String getType(NodeRef nodeRef) throws InvalidNodeRefException
+        public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
         {
             if (nodeRef.getId().equals("0"))
             {
-                return Node.TYPE_CONTAINER;
+                return DictionaryBootstrap.TYPE_FOLDER;
             }
             else if (nodeRef.getId().equals("1"))
             {
-                return Node.TYPE_CONTAINER;
+                return DictionaryBootstrap.TYPE_FOLDER;
             }
             else if (nodeRef.getId().equals("2"))
             {
-                return Node.TYPE_CONTAINER;
+                return DictionaryBootstrap.TYPE_FOLDER;
             }
             else if (nodeRef.getId().equals("3"))
             {
-                return Node.TYPE_CONTENT;
+                return DictionaryBootstrap.TYPE_FILE;
             }
             else if (nodeRef.getId().equals("4"))
             {
-                return Node.TYPE_CONTENT;
+                return DictionaryBootstrap.TYPE_FILE;
             }
             else if (nodeRef.getId().equals("5"))
             {
-                return Node.TYPE_CONTAINER;
+                return DictionaryBootstrap.TYPE_FOLDER;
             }
             else if (nodeRef.getId().equals("6"))
             {
-                return Node.TYPE_CONTAINER;
+                return DictionaryBootstrap.TYPE_FOLDER;
             }
             else if (nodeRef.getId().equals("7"))
             {
-                return Node.TYPE_CONTENT;
+                return DictionaryBootstrap.TYPE_FILE;
             }
             else if (nodeRef.getId().equals("8"))
             {
-                return Node.TYPE_CONTAINER;
+                return DictionaryBootstrap.TYPE_FOLDER;
             }
             else if (nodeRef.getId().equals("9"))
             {
-                return Node.TYPE_CONTENT;
+                return DictionaryBootstrap.TYPE_FILE;
             }
             else if (nodeRef.getId().equals("10"))
             {
-                return Node.TYPE_CONTENT;
+                return DictionaryBootstrap.TYPE_FILE;
             }
             else if (nodeRef.getId().equals("11"))
             {
-                return Node.TYPE_CONTENT;
+                return DictionaryBootstrap.TYPE_FILE;
             }
             else if (nodeRef.getId().equals("12"))
             {
-                return Node.TYPE_CONTAINER;
+                return DictionaryBootstrap.TYPE_FOLDER;
             }
             else if (nodeRef.getId().equals("13"))
             {
-                return Node.TYPE_CONTAINER;
+                return DictionaryBootstrap.TYPE_FOLDER;
             }
             else if (nodeRef.getId().equals("14"))
             {
-                return Node.TYPE_CONTENT;
+                return DictionaryBootstrap.TYPE_FILE;
             }
             else
             {
@@ -697,12 +698,12 @@ public class LuceneTest extends TestCase
             return parents;
         }
 
-        public ChildAssocRef createNode(NodeRef parentRef, QName qname, String nodeType) throws InvalidNodeRefException
+        public ChildAssocRef createNode(NodeRef parentRef, QName qname, ClassRef typeRef) throws InvalidNodeRefException
         {
             throw new UnsupportedOperationException();
         }
 
-        public ChildAssocRef createNode(NodeRef parentRef, QName qname, String nodeType, Map<QName, Serializable> properties) throws InvalidNodeRefException
+        public ChildAssocRef createNode(NodeRef parentRef, QName qname, ClassRef typeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
         {
             throw new UnsupportedOperationException();
         }

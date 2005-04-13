@@ -57,4 +57,17 @@ public class DictionaryRef extends NodeRef
         return this.metaQName;
     }
     
+    public boolean equals(Object obj)
+    {
+        if (obj == this)
+        {
+            return true;
+        }
+        else if (obj == null || !(obj instanceof DictionaryRef))
+        {
+            return false;
+        }
+        DictionaryRef that = (DictionaryRef) obj;
+        return this.getQName().equals(that.getQName());
+    }
 }

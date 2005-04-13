@@ -12,6 +12,7 @@ import java.util.Stack;
 
 import org.springframework.dao.DataIntegrityViolationException;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
@@ -51,41 +52,6 @@ public class DbNodeServiceImpl implements NodeService
         this.storeDaoService = storeDaoService;
     }
 
-    public ChildAssocRef createNode(NodeRef parentRef,
-            QName qname,
-            String nodeType)
-    {
-        return this.createNode(parentRef, qname, nodeType, null);
-    }
-
-    public ChildAssocRef createNode(NodeRef parentRef,
-            QName qname,
-            String nodeType,
-            Map<QName, Serializable> properties)
-    {
-        // get the store that the parent belongs to
-        StoreRef storeRef = parentRef.getStoreRef();
-        Store store = storeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
-        if (store == null)
-        {
-            throw new DataIntegrityViolationException("No store found for parent node: " + parentRef);
-        }
-        // create the node instance
-        RealNode node = nodeDaoService.newRealNode(store, nodeType);
-        // get the parent node
-        ContainerNode parentNode = getContainerNodeNotNull(parentRef);
-        // create the association
-        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, qname);
-        
-        // set the properties - it is a new node so only do it if there are properties present
-        if (properties != null)
-        {
-            this.setProperties(node.getNodeRef(), properties);
-        }
-        
-        // done
-        return assoc.getChildAssocRef();
-    }
 
     /**
      * Performs a null- and type-safe check before returning the <b>container</b> node
@@ -99,7 +65,8 @@ public class DbNodeServiceImpl implements NodeService
         Node unchecked = getNodeNotNull(nodeRef);
         if (!(unchecked instanceof ContainerNode))
         {
-            throw new RuntimeException("Node must be of type " + Node.TYPE_CONTAINER + ": " + nodeRef);
+            throw new RuntimeException("Node must be of type " +
+                    ContainerNode.class.getName() + ": " + nodeRef);
         }
         return (ContainerNode) unchecked;
     }
@@ -116,7 +83,8 @@ public class DbNodeServiceImpl implements NodeService
         Node unchecked = getNodeNotNull(nodeRef);
         if (!(unchecked instanceof RealNode))
         {
-            throw new RuntimeException("Node must be of type " + Node.TYPE_REAL + ": " + nodeRef);
+            throw new RuntimeException("Node must be of type " +
+                    RealNode.class.getName() + ": " + nodeRef);
         }
         return (RealNode) unchecked;
     }
@@ -140,6 +108,48 @@ public class DbNodeServiceImpl implements NodeService
         return unchecked;
     }
 
+    public ChildAssocRef createNode(NodeRef parentRef,
+            QName qname,
+            ClassRef typeRef)
+    {
+        return this.createNode(parentRef, qname, typeRef, null);
+    }
+
+    public ChildAssocRef createNode(NodeRef parentRef,
+            QName qname,
+            ClassRef typeRef,
+            Map<QName, Serializable> properties)
+    {
+        // get the store that the parent belongs to
+        StoreRef storeRef = parentRef.getStoreRef();
+        Store store = storeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
+        if (store == null)
+        {
+            throw new DataIntegrityViolationException("No store found for parent node: " + parentRef);
+        }
+        // create the node instance
+        RealNode node = nodeDaoService.newRealNode(store, typeRef);
+        // get the parent node
+        ContainerNode parentNode = getContainerNodeNotNull(parentRef);
+        // create the association
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, qname);
+        
+        // set the properties - it is a new node so only do it if there are properties present
+        if (properties != null)
+        {
+            this.setProperties(node.getNodeRef(), properties);
+        }
+        
+        // done
+        return assoc.getChildAssocRef();
+    }
+
+    public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        Node node = getNodeNotNull(nodeRef);
+        ClassRef classRef = new ClassRef(node.getTypeQName());
+        return  classRef;
+    }
     public void deleteNode(NodeRef nodeRef)
     {
 		// get the store
@@ -239,12 +249,6 @@ public class DbNodeServiceImpl implements NodeService
         }
         // done
         return deletedRefs;
-    }
-
-    public String getType(NodeRef nodeRef) throws InvalidNodeRefException
-    {
-        Node node = getNodeNotNull(nodeRef);
-        return node.getType();
     }
 
     public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException

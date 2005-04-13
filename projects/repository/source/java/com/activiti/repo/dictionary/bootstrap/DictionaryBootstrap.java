@@ -1,5 +1,6 @@
 package com.activiti.repo.dictionary.bootstrap;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryException;
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.PropertyTypeDefinition;
@@ -27,6 +28,15 @@ import com.activiti.repo.version.lightweight.VersionStoreBaseImpl;
  */
 public class DictionaryBootstrap
 {
+    public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "base");
+    public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "reference");
+    public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder");
+    public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
+
+    public static final ClassRef TYPE_BASE = new ClassRef(TYPE_QNAME_BASE); 
+    public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE); 
+    public static final ClassRef TYPE_FOLDER = new ClassRef(TYPE_QNAME_FOLDER);
+    public static final ClassRef TYPE_FILE = new ClassRef(TYPE_QNAME_FILE);
 
     /**
      * Namespace DAO
@@ -207,7 +217,7 @@ public class DictionaryBootstrap
         idProp.setMultiValued(false);
         
         // Create Test Base Type
-        M2Type baseType = metaModelDAO.createType(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "base"));
+        M2Type baseType = metaModelDAO.createType(TYPE_QNAME_BASE);
         M2Property primaryTypeProp = baseType.createProperty("primaryType");
         primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
         primaryTypeProp.setMandatory(true);
@@ -219,8 +229,17 @@ public class DictionaryBootstrap
         aspectsProp.setProtected(true);
         aspectsProp.setMultiValued(true);
 
+        // Create Test Reference Type
+        M2Type referenceType = metaModelDAO.createType(TYPE_QNAME_REFERENCE);
+        referenceType.setSuperClass(baseType);
+        referenceType.getDefaultAspects().add(referenceAspect);
+        M2Property referenceProp = referenceType.createProperty("reference");
+        referenceProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        referenceProp.setMandatory(true);
+        referenceProp.setMultiValued(false);
+
         // Create Test File Type
-        M2Type fileType = metaModelDAO.createType(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file"));
+        M2Type fileType = metaModelDAO.createType(TYPE_QNAME_FILE);
         fileType.setSuperClass(baseType);
         fileType.getDefaultAspects().add(referenceAspect);
         M2Property encodingProp = fileType.createProperty("encoding");
@@ -233,7 +252,7 @@ public class DictionaryBootstrap
         mimetypeProp.setMultiValued(false);
         
         // Create Test Folder Type
-        M2Type folderType = metaModelDAO.createType(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder"));
+        M2Type folderType = metaModelDAO.createType(TYPE_QNAME_FOLDER);
         folderType.setSuperClass(baseType);
         folderType.getDefaultAspects().add(referenceAspect);
         M2ChildAssociation contentsAssoc = folderType.createChildAssociation("contents");
