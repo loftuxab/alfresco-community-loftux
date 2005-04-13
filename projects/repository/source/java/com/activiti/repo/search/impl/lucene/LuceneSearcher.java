@@ -11,6 +11,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
 import org.saxpath.SAXPathException;
 
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.QueryParameter;
@@ -40,6 +41,7 @@ public class LuceneSearcher extends LuceneBase implements Searcher
      * Default field name
      */
     private static final String DEFAULT_FIELD = "FTS";
+    private NamespaceService nameSpaceService;
 
     /*
      * Searcher implementation
@@ -126,5 +128,10 @@ public class LuceneSearcher extends LuceneBase implements Searcher
     public static LuceneSearcher getSearcher(StoreRef storeRef)
     {
         return getSearcher(storeRef, null);
+    }
+    
+    public void setNameSpaceService(NamespaceService nameSpaceService)
+    {
+        this.nameSpaceService = nameSpaceService;
     }
 }

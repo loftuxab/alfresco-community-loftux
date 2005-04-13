@@ -6,7 +6,6 @@ package com.activiti.repo.search.impl.lucene.query;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
-import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Scorer;

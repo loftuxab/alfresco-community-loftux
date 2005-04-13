@@ -55,11 +55,15 @@
    </bean>
    
    <!-- create a transaction manager to handle the Hibernate sessions -->
-   <bean id='transactionManager' class='org.springframework.orm.hibernate3.HibernateTransactionManager'>
-      <property name='sessionFactory'>
-         <ref local='sessionFactory'/>
-      </property>
-   </bean>
+	<bean id='transactionManager' 
+		class='com.activiti.repo.search.transaction.LuceneTransactionManager'>
+		<property name='sessionFactory'>
+			<ref local='sessionFactory'/>
+		</property>
+		<property name='luceneIndexerAndSearchFactory'>
+			<ref bean='luceneIndexerAndSearcherFactory'/>
+		</property>
+	</bean>
 
    <!-- use around method calls to debug - see class comments for details -->
    <bean id="methodCallLogAdvice" class="com.activiti.util.debug.MethodCallLogAdvice" />
@@ -296,50 +300,30 @@
       </property>
    </bean>
    
-   <bean id="luceneIndexerAndSearcherFactory" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>com.activiti.repo.search.IndexerAndSearcher</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory" factory-method="getInstance">
-			<property name="nodeService">
-				<ref bean="dbNodeService"/>
-			</property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean>
+	<bean id="luceneIndexerAndSearcherFactory" class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
+		<property name="nodeService">
+			<ref bean="dbNodeService"/>
+		</property>
+		<property name="nameSpaceService">
+			<ref bean="namespaceService"/>
+		</property>
+	</bean>
    
-   <bean id="indexerAndSearcherFactory" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>com.activiti.repo.search.IndexerAndSearcher</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-		<bean class="com.activiti.repo.search.IndexerAndSearcherFactory">
-			<property name="protocolFactories">
-				<map>
-					<entry key="workspace"><ref bean="luceneIndexerAndSearcherFactory"></ref></entry>
-					<entry key="versionStore"><ref bean="luceneIndexerAndSearcherFactory"></ref></entry>
-				</map>
-			</property>
-		</bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean>
+
+	<bean id="indexerAndSearcherFactory" 
+		class="com.activiti.repo.search.IndexerAndSearcherFactory">
+		<property name="protocolFactories">
+			<map>
+				<entry key="workspace">
+					<ref bean="luceneIndexerAndSearcherFactory"></ref>
+				</entry>
+				<entry key="versionStore">
+					<ref bean="luceneIndexerAndSearcherFactory"></ref>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
    
    <!--                               -->
    <!--  Light Weight Version Store   -->

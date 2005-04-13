@@ -27,7 +27,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saxpath.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring.jar"/>
+	<classpathentry exported="true" sourcepath="W:/spring-1.2-rc1/spring-framework-1.2-rc1/src" kind="lib" path="lib/spring.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-aop.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-mock.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/standard.jar"/>

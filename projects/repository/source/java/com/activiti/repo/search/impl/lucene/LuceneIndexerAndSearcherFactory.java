@@ -13,9 +13,9 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.search.IndexerAndSearcher;
 import com.activiti.repo.search.IndexerException;
 import com.activiti.repo.search.SearcherException;
 import com.activiti.repo.search.transaction.SimpleTransaction;
@@ -35,8 +35,10 @@ import com.activiti.util.GUID;
  * 
  */
 
-public class LuceneIndexerAndSearcherFactory implements IndexerAndSearcher, XAResource
+public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher, XAResource
 {
+    private NamespaceService nameSpaceService;
+    
     /**
      * The factory instance
      */
@@ -109,6 +111,11 @@ public class LuceneIndexerAndSearcherFactory implements IndexerAndSearcher, XARe
         this.nodeService = nodeService;
     }
 
+    public void setNameSpaceService(NamespaceService nameSpaceService)
+    {
+        this.nameSpaceService = nameSpaceService;
+    }
+    
     /**
      * Check if we are in a global transactoin according to the transaction
      * manager
@@ -258,6 +265,7 @@ public class LuceneIndexerAndSearcherFactory implements IndexerAndSearcher, XARe
             deltaId = getTransactionId(getTransaction());
         }
         LuceneSearcher searcher = getSearcher(storeRef, deltaId);
+        searcher.setNameSpaceService(nameSpaceService);
         return searcher;
     }
 
@@ -532,7 +540,7 @@ public class LuceneIndexerAndSearcherFactory implements IndexerAndSearcher, XARe
      * Commit the transaction
      */
 
-    public void commit()
+    public void commit() throws IndexerException
     {
         try
         {
@@ -555,7 +563,10 @@ public class LuceneIndexerAndSearcherFactory implements IndexerAndSearcher, XARe
         }
         finally
         {
-            threadLocalIndexers.get().clear();
+            if( threadLocalIndexers.get() != null)
+            {
+               threadLocalIndexers.get().clear();
+            }
         }
     }
 
@@ -564,7 +575,7 @@ public class LuceneIndexerAndSearcherFactory implements IndexerAndSearcher, XARe
      * 
      * @return
      */
-    public int prepare()
+    public int prepare() throws IndexerException
     {
         boolean isPrepared = true;
         boolean isModified = false;
@@ -622,6 +633,11 @@ public class LuceneIndexerAndSearcherFactory implements IndexerAndSearcher, XARe
                 }
             }
         }
-        threadLocalIndexers.get().clear();
+        
+        if( threadLocalIndexers.get() != null)
+        {
+           threadLocalIndexers.get().clear();
+        }
+        
     }
 }

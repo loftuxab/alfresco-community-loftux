@@ -385,6 +385,10 @@ public abstract class LuceneBase
 
             try
             {
+                if(deltaRamDir == null)
+                {
+                    throw new IOException("No directory for the in memory delta: the delta has been deleted");
+                }
                 deltaRamWriter = new IndexWriter(deltaRamDir, new LuceneAnalyser(), overwriteOrCreate);
             }
             catch (IOException e)
