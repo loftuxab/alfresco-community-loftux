@@ -38,6 +38,12 @@ public interface NodeService
     public boolean exists(StoreRef storeRef);
     
     /**
+     * @param nodeRef a reference to the node to look for
+     * @return Returns true if the node exists, otherwise false
+     */
+    public boolean exists(NodeRef nodeRef);
+    
+    /**
      * @param storeRef a reference to an existing store
      * @return Returns a reference to the root node of the store
      * @throws InvalidStoreRefException if the store could not be found

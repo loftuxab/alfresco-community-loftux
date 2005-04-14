@@ -491,6 +491,11 @@ public class LuceneTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
+        public boolean exists(NodeRef nodeRef)
+        {
+            throw new UnsupportedOperationException();
+        }
+
         public NodeRef getRootNode(StoreRef storeRef)
         {
             throw new UnsupportedOperationException();

@@ -508,6 +508,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void index(NodeRef nodeRef, boolean isNew) throws IOException
     {
+        // avoid attempting to index nodes that don't exist
+        if (!nodeService.exists(nodeRef))
+        {
+            return;
+        }
         List<Document> docs = createDocuments(nodeRef, isNew);
         IndexWriter writer = getDeltaRamWriter();
         for (Document doc : docs)

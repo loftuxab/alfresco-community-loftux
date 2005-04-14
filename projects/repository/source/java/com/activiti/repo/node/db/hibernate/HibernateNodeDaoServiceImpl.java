@@ -4,8 +4,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.ObjectDeletedException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -144,10 +146,22 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
 
     public Node getNode(String protocol, String identifier, String id)
     {
-		NodeKey nodeKey = new NodeKey(protocol, identifier, id);
-        Object obj = getHibernateTemplate().get(NodeImpl.class, nodeKey);
-        // done
-        return (Node) obj;
+        try
+        {
+    		NodeKey nodeKey = new NodeKey(protocol, identifier, id);
+            Object obj = getHibernateTemplate().get(NodeImpl.class, nodeKey);
+            // done
+            return (Node) obj;
+        }
+        catch (DataAccessException e)
+        {
+            if (e.contains(ObjectDeletedException.class))
+            {
+                // the object no loner exists
+                return null;
+            }
+            throw e;
+        }
     }
     
     public void deleteNode(Node node)
@@ -177,6 +191,10 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         assoc.removeAssociation();
         // remove instance
         getHibernateTemplate().delete(assoc);
+        
+        // enforce the cascade
+        getHibernateTemplate().flush();
+        getHibernateTemplate().clear();
     }
 
     public ChildAssoc getPrimaryParentAssoc(Node node)

@@ -51,6 +51,14 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     /**
      * Delegates to the <code>NodeService</code> used as the version store implementation
      */
+    public boolean exists(NodeRef nodeRef)
+    {
+        return dbNodeService.exists(nodeRef);
+    }
+
+    /**
+     * Delegates to the <code>NodeService</code> used as the version store implementation
+     */
     public NodeRef getRootNode(StoreRef storeRef)
     {
         return dbNodeService.getRootNode(storeRef);

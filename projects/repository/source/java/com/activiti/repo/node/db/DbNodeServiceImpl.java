@@ -117,6 +117,25 @@ public class DbNodeServiceImpl implements NodeService
         return unchecked;
     }
 
+    public boolean exists(StoreRef storeRef)
+    {
+        Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
+        boolean exists = (store != null);
+        // done
+        return exists;
+    }
+    
+    public boolean exists(NodeRef nodeRef)
+    {
+        StoreRef storeRef = nodeRef.getStoreRef();
+        Node node = nodeDaoService.getNode(storeRef.getProtocol(),
+                storeRef.getIdentifier(),
+                nodeRef.getId());
+        boolean exists = (node != null);
+        // done
+        return exists;
+    }
+    
     /**
      * Defers to the typed service
      * @see StoreDaoService#createWorkspace(String)
@@ -137,14 +156,6 @@ public class DbNodeServiceImpl implements NodeService
         return storeRef;
     }
 
-    public boolean exists(StoreRef storeRef)
-    {
-        Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
-        boolean exists = (store != null);
-        // done
-        return exists;
-    }
-    
     public NodeRef getRootNode(StoreRef storeRef) throws InvalidStoreRefException
     {
         Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
@@ -241,7 +252,7 @@ public class DbNodeServiceImpl implements NodeService
         // get all the child assocs
         boolean deleteChild = false;
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
-        assocs = new HashSet<ChildAssoc>(assocs.size());   // copy set as we will be modifying it
+        assocs = new HashSet<ChildAssoc>(assocs);   // copy set as we will be modifying it
         for (ChildAssoc assoc : assocs)
         {
             if (!assoc.getChild().getKey().equals(childNodeKey))
@@ -276,7 +287,7 @@ public class DbNodeServiceImpl implements NodeService
         
         // get all the child assocs
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
-        assocs = new HashSet<ChildAssoc>(assocs.size());   // copy set as we will be modifying it
+        assocs = new HashSet<ChildAssoc>(assocs);   // copy set as we will be modifying it
         for (ChildAssoc assoc : assocs)
         {
             if (!assoc.getQName().equals(qname))

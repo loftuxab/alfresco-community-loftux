@@ -79,6 +79,14 @@ public class IndexingNodeServiceImpl implements NodeService
     /**
      * Direct delegation to assigned {@link #storeServiceDelegate}
      */
+    public boolean exists(NodeRef nodeRef)
+    {
+        return nodeServiceDelegate.exists(nodeRef);
+    }
+    
+    /**
+     * Direct delegation to assigned {@link #storeServiceDelegate}
+     */
     public NodeRef getRootNode(StoreRef storeRef) throws InvalidStoreRefException
     {
         return nodeServiceDelegate.getRootNode(storeRef);
