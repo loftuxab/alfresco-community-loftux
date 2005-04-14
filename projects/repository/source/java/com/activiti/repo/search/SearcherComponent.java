@@ -1,5 +1,6 @@
 package com.activiti.repo.search;
 
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
 
@@ -29,5 +30,11 @@ public class SearcherComponent implements Searcher
     {
         Searcher searcher = indexerAndSearcherFactory.getSearcher(store, false);
         return searcher.query(store, language, query, queryOptions, queryParameters);
+    }
+
+    public void setNameSpaceService(NamespaceService nameSpaceService)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
     }
 }

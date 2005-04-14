@@ -18,6 +18,7 @@ import org.apache.lucene.store.RAMDirectory;
 
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.IndexerException;
+import com.activiti.repo.search.transaction.LuceneIndexLock;
 
 /**
  * Common support for abstracting the lucene indexer from its configuration and
@@ -49,7 +50,7 @@ import com.activiti.repo.search.IndexerException;
  * 
  */
 
-public abstract class LuceneBase
+public abstract class LuceneBase implements Lockable
 {
     /*
      * TODO: Should make the delta directories etc on the fly so we do not build
@@ -142,6 +143,8 @@ public abstract class LuceneBase
 
     protected String deltaId;
 
+    private LuceneIndexLock luceneIndexLock;
+
     /**
      * Initiase the configuration elements of the lucene store indexers and
      * searchers.
@@ -161,8 +164,7 @@ public abstract class LuceneBase
         {
             String deltaPath = getDeltaPath();
             deltaDir = initialiseFSDirectory(deltaPath, true);
-            undoDir = initialiseFSDirectory(basePath + File.separator + "undo" + File.separator + deltaId
-                    + File.separator, true);
+            undoDir = initialiseFSDirectory(basePath + File.separator + "undo" + File.separator + deltaId + File.separator, true);
             deltaRamDir = new RAMDirectory();
             undoRamDir = new RAMDirectory();
         }
@@ -187,8 +189,7 @@ public abstract class LuceneBase
      */
     private String getBasePath()
     {
-        String basePath = File.separator + "lucene-indexes" + File.separator + store.getProtocol() + File.separator
-                + store.getIdentifier() + File.separator;
+        String basePath = File.separator + "lucene-indexes" + File.separator + store.getProtocol() + File.separator + store.getIdentifier() + File.separator;
         return basePath;
     }
 
@@ -385,7 +386,7 @@ public abstract class LuceneBase
 
             try
             {
-                if(deltaRamDir == null)
+                if (deltaRamDir == null)
                 {
                     throw new IOException("No directory for the in memory delta: the delta has been deleted");
                 }
@@ -508,28 +509,39 @@ public abstract class LuceneBase
             throw new IndexerException("Can not merge as main reader is active");
         }
 
-        getDeltaReader();
-        // Must have the read lock;
+        getWriteLock();
+        try
+        {
+            getDeltaReader();
+            // Must have the read lock;
 
-        if (IndexReader.indexExists(baseDir))
-        {
-            mainReader = IndexReader.open(baseDir);
-            // If exists lock for deletes
+            if (IndexReader.indexExists(baseDir))
+            {
+
+                mainReader = IndexReader.open(baseDir);
+                // If exists lock for deletes
+
+            }
+            else
+            {
+                // Create the main index
+                mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), true);
+                try
+                {
+                    mainWriter.close();
+                }
+                finally
+                {
+                    mainWriter = null;
+                }
+                // Lock the reader
+                mainReader = IndexReader.open(baseDir);
+            }
         }
-        else
+        catch (IOException e)
         {
-            // Create the main index
-            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), true);
-            try
-            {
-                mainWriter.close();
-            }
-            finally
-            {
-                mainWriter = null;
-            }
-            // Lock the reader
-            mainReader = IndexReader.open(baseDir);
+            releaseWriteLock();
+            throw e;
         }
 
     }
@@ -545,55 +557,62 @@ public abstract class LuceneBase
      */
     protected void mergeDeltaIntoMain(Set<Term> terms) throws IOException
     {
-        if (mainReader == null)
-        {
-            throw new IOException("No main index reader lock - not prepared");
-        }
-
-        // Do the deletions
         try
         {
-            if (terms.size() > 0)
+            if (mainReader == null)
             {
-                for (Term term : terms)
+                throw new IOException("No main index reader lock - not prepared");
+            }
+
+            // Do the deletions
+            try
+            {
+                if (terms.size() > 0)
                 {
-                    mainReader.delete(term);
+                    for (Term term : terms)
+                    {
+                        mainReader.delete(term);
+                    }
+                }
+            }
+            finally
+            {
+                try
+                {
+                    mainReader.close();
+                }
+                finally
+                {
+                    mainReader = null;
+                }
+            }
+
+            // Do the append
+            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), false);
+
+            try
+            {
+
+                IndexReader reader = getDeltaReader();
+                IndexReader[] readers = new IndexReader[] { reader };
+                mainWriter.addIndexes(readers);
+                closeDeltaReader();
+            }
+            finally
+            {
+                try
+                {
+                    mainWriter.close();
+                }
+                finally
+                {
+                    mainWriter = null;
                 }
             }
         }
         finally
         {
-            try
-            {
-                mainReader.close();
-            }
-            finally
-            {
-                mainReader = null;
-            }
-        }
-
-        // Do the append
-        mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), false);
-
-        try
-        {
-
-            IndexReader reader = getDeltaReader();
-            IndexReader[] readers = new IndexReader[] { reader };
-            mainWriter.addIndexes(readers);
-            closeDeltaReader();
-        }
-        finally
-        {
-            try
-            {
-                mainWriter.close();
-            }
-            finally
-            {
-                mainWriter = null;
-            }
+            releaseWriteLock();
         }
     }
 
@@ -609,6 +628,8 @@ public abstract class LuceneBase
      */
     protected void deleteDelta()
     {
+        try
+        {
         // Try and close everything
         try
         {
@@ -681,6 +702,11 @@ public abstract class LuceneBase
         File file = new File(deltaPath);
 
         deleteDirectory(file);
+        }
+        finally
+        {
+            releaseWriteLock();
+        }
     }
 
     /**
@@ -708,4 +734,42 @@ public abstract class LuceneBase
         }
         file.delete();
     }
+
+    public LuceneIndexLock getLuceneIndexLock()
+    {
+        return luceneIndexLock;
+    }
+
+    public void setLuceneIndexLock(LuceneIndexLock luceneIndexLock)
+    {
+        this.luceneIndexLock = luceneIndexLock;
+    }
+
+    public void getReadLock()
+    {
+        getLuceneIndexLock().getReadLock(store);
+    }
+
+    public void getWriteLock()
+    {
+        getLuceneIndexLock().getWriteLock(store);
+        hasWriteLock = true;
+    }
+
+    public void releaseReadLock()
+    {
+        getLuceneIndexLock().releaseReadLock(store);
+    }
+
+    public void releaseWriteLock()
+    {
+        if (hasWriteLock)
+        {
+            getLuceneIndexLock().releaseWriteLock(store);
+        }
+        hasWriteLock = false;
+    }
+
+    boolean hasWriteLock = false;
+
 }

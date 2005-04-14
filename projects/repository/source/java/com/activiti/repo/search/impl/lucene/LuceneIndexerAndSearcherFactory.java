@@ -19,6 +19,7 @@ import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.IndexerException;
 import com.activiti.repo.search.SearcherException;
+import com.activiti.repo.search.transaction.LuceneIndexLock;
 import com.activiti.repo.search.transaction.SimpleTransaction;
 import com.activiti.repo.search.transaction.SimpleTransactionManager;
 import com.activiti.util.GUID;
@@ -38,7 +39,6 @@ import com.activiti.util.GUID;
 
 public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher, XAResource
 {
-    private NodeService nodeService;
     private DictionaryService dictionaryService;
     private NamespaceService nameSpaceService;
     
@@ -76,6 +76,14 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      * Default time out value set to 10 minutes.
      */
     private static final int DEFAULT_TIMEOUT = 600000;
+
+    /**
+     * The node service we use to get information about nodes
+     */
+
+    private NodeService nodeService;
+
+    private LuceneIndexLock luceneIndexLock;
 
     /**
      * Private constructor for the singleton TODO: FIt in with IOC
@@ -116,6 +124,11 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     public void setNameSpaceService(NamespaceService nameSpaceService)
     {
         this.nameSpaceService = nameSpaceService;
+    }
+    
+    public void setLuceneIndexLock(LuceneIndexLock luceneIndexLock)
+    {
+        this.luceneIndexLock = luceneIndexLock;
     }
     
     /**
@@ -201,6 +214,8 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                 indexer = createIndexer(storeRef, getTransactionId(tx));
                 indexers.put(storeRef, indexer);
             }
+            indexer.setNodeService(nodeService);
+            indexer.setLuceneIndexLock(luceneIndexLock);
             return indexer;
         }
         else
@@ -218,6 +233,8 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                 indexer = createIndexer(storeRef, GUID.generate());
                 indexers.put(storeRef, indexer);
             }
+            indexer.setNodeService(nodeService);
+            indexer.setLuceneIndexLock(luceneIndexLock);
             return indexer;
         }
 
@@ -249,9 +266,9 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      * @param deltaId
      * @return
      */
-    private LuceneIndexer createIndexer(StoreRef storeRef, String deltaId)
+    private LuceneIndexerImpl createIndexer(StoreRef storeRef, String deltaId)
     {
-        LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, deltaId);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(storeRef, deltaId);
         indexer.setNodeService(nodeService);
         indexer.setDictionaryService(dictionaryService);
         return indexer;
@@ -282,7 +299,9 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      */
     private LuceneSearcher getSearcher(StoreRef storeRef, String deltaId) throws SearcherException
     {
-        LuceneSearcher searcher = LuceneSearcher.getSearcher(storeRef, deltaId);
+        LuceneSearcher searcher = LuceneSearcherImpl.getSearcher(storeRef, deltaId);
+        searcher.setNameSpaceService(nameSpaceService);
+        searcher.setLuceneIndexLock(luceneIndexLock);
         return searcher;
     }
 

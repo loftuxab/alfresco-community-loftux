@@ -7,6 +7,7 @@
  */
 package com.activiti.repo.search.impl;
 
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.QueryParameter;
@@ -21,6 +22,12 @@ public class JCR170Searcher implements Searcher
 
     public ResultSet query(StoreRef store, String language, String query, Path[] queryOptions,
             QueryParameter[] queryParameters)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public void setNameSpaceService(NamespaceService nameSpaceService)
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();

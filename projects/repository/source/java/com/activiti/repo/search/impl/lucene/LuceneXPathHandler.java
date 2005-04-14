@@ -15,6 +15,7 @@ import org.saxpath.Operator;
 import org.saxpath.SAXPathException;
 import org.saxpath.XPathHandler;
 
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.search.impl.lucene.analysis.PathTokenFilter;
 import com.activiti.repo.search.impl.lucene.query.AbsoluteStructuredFieldPosition;
 import com.activiti.repo.search.impl.lucene.query.DescendantAndSelfStructuredFieldPosition;
@@ -31,7 +32,7 @@ public class LuceneXPathHandler implements XPathHandler
 
     int absolutePosition = 0;
 
-    private String defaultNameSpace = "namespace";
+    private NamespaceService nameSpaceService;
 
     public LuceneXPathHandler()
     {
@@ -265,7 +266,7 @@ public class LuceneXPathHandler implements XPathHandler
             throw new UnsupportedOperationException();
         }
     }
-    
+
     private ArrayList<StructuredFieldPosition> getArrayList(StructuredFieldPosition one, StructuredFieldPosition two)
     {
         ArrayList<StructuredFieldPosition> answer = new ArrayList<StructuredFieldPosition>(2);
@@ -336,22 +337,16 @@ public class LuceneXPathHandler implements XPathHandler
         absolutePosition++;
         if ((nameSpace == null) || (nameSpace.length() == 0))
         {
-            if (localName.equals("*"))
+
+            if (nameSpaceService.getNamespaceURI("") == null)
             {
-                answer.add(new AbsoluteStructuredFieldPosition("*", absolutePosition));
+                answer.add(new AbsoluteStructuredFieldPosition(PathTokenFilter.NO_NS_TOKEN_TEXT, absolutePosition));
             }
             else
             {
-                if (defaultNameSpace == null)
-                {
-                    answer.add(new AbsoluteStructuredFieldPosition(PathTokenFilter.NO_NS_TOKEN_TEXT,
-                            absolutePosition));
-                }
-                else
-                {
-                    answer.add(new AbsoluteStructuredFieldPosition(defaultNameSpace, absolutePosition));
-                }
+                answer.add(new AbsoluteStructuredFieldPosition(nameSpaceService.getNamespaceURI(""), absolutePosition));
             }
+
         }
         else
         {
@@ -376,20 +371,13 @@ public class LuceneXPathHandler implements XPathHandler
         ArrayList<StructuredFieldPosition> answer = new ArrayList<StructuredFieldPosition>(2);
         if ((nameSpace == null) || (nameSpace.length() == 0))
         {
-            if (localName.equals("*"))
+            if (nameSpaceService.getNamespaceURI("") == null)
             {
-                answer.add(new RelativeStructuredFieldPosition("*"));
+                answer.add(new RelativeStructuredFieldPosition(PathTokenFilter.NO_NS_TOKEN_TEXT));
             }
             else
             {
-                if (defaultNameSpace == null)
-                {
-                    answer.add(new RelativeStructuredFieldPosition(PathTokenFilter.NO_NS_TOKEN_TEXT));
-                }
-                else
-                {
-                    answer.add(new RelativeStructuredFieldPosition(defaultNameSpace));
-                }
+                answer.add(new RelativeStructuredFieldPosition(nameSpaceService.getNamespaceURI("")));
             }
         }
         else
@@ -465,6 +453,11 @@ public class LuceneXPathHandler implements XPathHandler
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
+    }
+
+    public void setNameSpaceService(NamespaceService nameSpaceService)
+    {
+        this.nameSpaceService = nameSpaceService;
     }
 
 }

@@ -261,6 +261,10 @@
       </property>
    </bean>
       
+   <!--                         -->
+   <!-- Indexing and Search API -->
+   <!--                         -->
+      
    <bean id="indexerComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.search.Indexer</value>
@@ -303,18 +307,11 @@
       </property>
    </bean>
    
-   <bean id="luceneIndexerAndSearcherFactory" class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
-      <property name="nodeService">
-         <ref bean="dbNodeService"/>
-      </property>
-      <property name="dictionaryService">
-         <ref bean="dictionaryService"/>
-      </property>
-      <property name="nameSpaceService">
-         <ref bean="namespaceService"/>
-      </property>
-   </bean>
-   
+
+   <!--                                                                               -->
+   <!-- Generic factory for making indexers and searchers for a given protol or store -->
+   <!--                                                                               -->
+
    
    <bean id="indexerAndSearcherFactory" 
       class="com.activiti.repo.search.IndexerAndSearcherFactory">
@@ -329,6 +326,31 @@
          </map>
       </property>
    </bean>
+   
+
+     <!-- Indexer and searchers for lucene -->
+    <bean id="luceneIndexerAndSearcherFactory" 
+        class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
+        <property name="nodeService">
+            <ref bean="dbNodeService"/>
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService"/>
+        </property>
+        <property name="nameSpaceService">
+            <ref bean="namespaceService"/>
+        </property>
+        <property name="luceneIndexLock">
+            <ref bean="luceneIndexLock"/>
+        </property>
+    </bean>
+    
+    <!-- Support for locking lucene indexes for deletion and update -->
+    
+    <bean id="luceneIndexLock" class="com.activiti.repo.search.transaction.LuceneIndexLock">
+	</bean>
+    
+ 
    
    
    <!--                               -->

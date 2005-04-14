@@ -7,8 +7,10 @@
  */
 package com.activiti.repo.search;
 
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.repo.search.transaction.LuceneIndexLock;
 
 /**
  * Ths encapsultes the execution of search against different indexing
@@ -40,4 +42,5 @@ public interface Searcher
     public ResultSet query(StoreRef store, String language, String query, Path[] queryOptions,
             QueryParameter[] queryParameters);
 
+    public void setNameSpaceService(NamespaceService nameSpaceService);
 }

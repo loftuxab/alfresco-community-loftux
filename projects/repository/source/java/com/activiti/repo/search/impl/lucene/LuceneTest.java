@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -12,13 +13,23 @@ import junit.framework.TestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.activiti.repo.dictionary.AspectDefinition;
+import com.activiti.repo.dictionary.AssociationDefinition;
+import com.activiti.repo.dictionary.AssociationRef;
+import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryService;
+import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.dictionary.PropertyDefinition;
+import com.activiti.repo.dictionary.PropertyRef;
+import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
+import com.activiti.repo.ref.NamespaceException;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -28,6 +39,7 @@ import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
 import com.activiti.repo.search.Value;
+import com.activiti.repo.search.transaction.LuceneIndexLock;
 import com.activiti.repo.store.StoreService;
 
 /**
@@ -56,8 +68,10 @@ public class LuceneTest extends TestCase
     public void testStandAloneIndexerCommit()
     {
 
-        LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(NodeServiceStub.storeRef, "delta" + System.currentTimeMillis());
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(NodeServiceStub.storeRef, "delta" + System.currentTimeMillis());
         indexer.setNodeService(new NodeServiceStub());
+        indexer.setLuceneIndexLock(new LuceneIndexLock());
+        indexer.setDictionaryService(new MockDictionaryService());
 
         indexer.createNode(new ChildAssocRef(null, null, NodeServiceStub.rootNode));
         indexer.createNode(new ChildAssocRef(NodeServiceStub.rootNode, QName.createQName("{namespace}one"), NodeServiceStub.n1));
@@ -68,7 +82,7 @@ public class LuceneTest extends TestCase
 
         indexer.commit();
 
-        Searcher searcher = LuceneSearcher.getSearcher(NodeServiceStub.storeRef);
+        Searcher searcher = LuceneSearcherImpl.getSearcher(NodeServiceStub.storeRef);
 
         
         ResultSet results = searcher.query(NodeServiceStub.storeRef, "lucene", "\\@\\{namespace\\}property\\-2:\"value-2\"", null, null);
@@ -106,8 +120,10 @@ public class LuceneTest extends TestCase
 
     public void testStandAlonePathIndexer()
     {
-        LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(NodeServiceStub.storeRef, "delta" + System.currentTimeMillis());
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(NodeServiceStub.storeRef, "delta" + System.currentTimeMillis());
         indexer.setNodeService(new NodeServiceStub());
+        indexer.setLuceneIndexLock(new LuceneIndexLock());
+        indexer.setDictionaryService(new MockDictionaryService());
 
         indexer.createNode(new ChildAssocRef(null, null, NodeServiceStub.rootNode));
         indexer.createNode(new ChildAssocRef(NodeServiceStub.rootNode, QName.createQName("{namespace}one"), NodeServiceStub.n1));
@@ -130,7 +146,7 @@ public class LuceneTest extends TestCase
 
         indexer.commit();
 
-        Searcher searcher = LuceneSearcher.getSearcher(NodeServiceStub.storeRef);
+        Searcher searcher = LuceneSearcherImpl.getSearcher(NodeServiceStub.storeRef);
 
         ResultSet results = searcher.query(NodeServiceStub.storeRef, "lucene", "@\\{namespace\\}property-1:value-1", null, null);
         assertEquals(2, results.length());
@@ -186,7 +202,7 @@ public class LuceneTest extends TestCase
         ChildAssocRef assoc = nodeService.createNode(rootNode, QName.createQName(null, "path"), DictionaryBootstrap.TYPE_FILE, testProperties);
         NodeRef newNode = assoc.getChildRef();
 
-        LuceneIndexer indexer = LuceneIndexer.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
         indexer.setNodeService(nodeService);
 
         indexer.createNode(new ChildAssocRef(rootNode, QName.createQName("{namespace}path"), newNode));
@@ -243,8 +259,9 @@ public class LuceneTest extends TestCase
 
     public void testAllPathSearch()
     {
-        Searcher searcher = LuceneSearcher.getSearcher(NodeServiceStub.storeRef);
-
+        Searcher searcher = LuceneSearcherImpl.getSearcher(NodeServiceStub.storeRef);
+        searcher.setNameSpaceService(new MockNameService());
+        
         // Single
 
         ResultSet results = searcher.query(NodeServiceStub.storeRef, "lucene", "PATH:\"/namespace:one\"", null, null);
@@ -394,7 +411,8 @@ public class LuceneTest extends TestCase
 
     public void testPathSearch()
     {
-        Searcher searcher = LuceneSearcher.getSearcher(NodeServiceStub.storeRef);
+        Searcher searcher = LuceneSearcherImpl.getSearcher(NodeServiceStub.storeRef);
+        searcher.setNameSpaceService(new MockNameService());
 
         // //*
 
@@ -444,7 +462,8 @@ public class LuceneTest extends TestCase
 
     public void testXPathSearch()
     {
-        Searcher searcher = LuceneSearcher.getSearcher(NodeServiceStub.storeRef);
+        Searcher searcher = LuceneSearcherImpl.getSearcher(NodeServiceStub.storeRef);
+        searcher.setNameSpaceService(new MockNameService());
 
         // //*
 
@@ -1021,6 +1040,144 @@ public class LuceneTest extends TestCase
 
     }
 
+    private static class MockNameService implements NamespaceService
+    {
+        private static HashMap<String, String> map = new HashMap<String, String>();
+
+        static
+        {
+            map.put(NamespaceService.ACTIVITI_PREFIX, NamespaceService.ACTIVITI_URI);
+            map.put(NamespaceService.ACTIVITI_TEST_PREFIX, NamespaceService.ACTIVITI_TEST_URI);
+            map.put(NamespaceService.DEFAULT_PREFIX, "namespace");
+            map.put("namespace", "namespace");
+            
+        }
+        
+        public Collection<String> getURIs()
+        {
+            return map.values();
+        }
+
+        public Collection<String> getPrefixes()
+        {
+           return map.keySet();
+        }
+
+        public String getNamespaceURI(String prefix) throws NamespaceException
+        {
+            return map.get(prefix);
+        }
+
+        public Collection<String> getPrefixes(String namespaceURI) throws NamespaceException
+        {
+            HashSet<String> answer = new HashSet<String>();
+            for(String prefix: map.keySet())
+            {
+                String test = map.get(prefix);
+                if(test.equals(namespaceURI))
+                {
+                    answer.add(prefix);
+                }
+            }
+            return answer;
+        }
+        
+    }
+    
+    private class MockDictionaryService implements DictionaryService
+    {
+
+        public Collection<ClassRef> getTypes()
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public ClassDefinition getClass(ClassRef classRef)
+        {
+            if(classRef.equals(DictionaryBootstrap.TYPE_FILE))
+            {
+                return new MockClassDefinition(DictionaryBootstrap.TYPE_FILE);
+            }
+            else if(classRef.equals(DictionaryBootstrap.TYPE_FOLDER))
+            {
+                return new MockClassDefinition(DictionaryBootstrap.TYPE_FOLDER);
+            }
+            throw new UnsupportedOperationException();
+        }
+
+        public TypeDefinition getType(ClassRef typeRef)
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public AspectDefinition getAspect(ClassRef aspectRef)
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public PropertyDefinition getProperty(PropertyRef propertyRef)
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+        
+    }
+    
+    private class MockClassDefinition implements ClassDefinition
+    {
+        ClassRef ref;
+        
+        MockClassDefinition(ClassRef ref)
+        {
+            this.ref = ref;
+        }
+
+        public ClassRef getReference()
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public QName getName()
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public ClassRef getSuperClass()
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public ClassRef getBootstrapClass()
+        {
+           return ref;
+        }
+
+        public boolean isAspect()
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public Map<PropertyRef, PropertyDefinition> getProperties()
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public Map<AssociationRef, AssociationDefinition> getAssociations()
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+        
+    }
+    
     public static void main(String[] args)
     {
         // String guid = GUID.generate();

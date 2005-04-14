@@ -15,10 +15,13 @@ import org.apache.lucene.queryParser.QueryParserTokenManager;
 import org.apache.lucene.search.Query;
 import org.saxpath.SAXPathException;
 
+import com.activiti.repo.dictionary.NamespaceService;
 import com.werken.saxpath.XPathReader;
 
 public class LuceneQueryParser extends QueryParser
 {
+    private NamespaceService nameSpaceService;
+    
     /**
      * Parses a query string, returning a {@link org.apache.lucene.search.Query}.
      * 
@@ -31,11 +34,18 @@ public class LuceneQueryParser extends QueryParser
      * @throws ParseException
      *             if the parsing fails
      */
-    static public Query parse(String query, String field, Analyzer analyzer) throws ParseException
+    static public Query parse(String query, String field, Analyzer analyzer, NamespaceService nameSpaceService) throws ParseException
     {
         LuceneQueryParser parser = new LuceneQueryParser(field, analyzer);
+        parser.setNameSpaceService(nameSpaceService);
         return parser.parse(query);
     }
+
+    public void setNameSpaceService(NamespaceService nameSpaceService)
+    {
+        this.nameSpaceService = nameSpaceService;
+    }
+    
 
     public LuceneQueryParser(String arg0, Analyzer arg1)
     {
@@ -60,6 +70,7 @@ public class LuceneQueryParser extends QueryParser
             {
                 XPathReader reader = new XPathReader();
                 LuceneXPathHandler handler = new LuceneXPathHandler();
+                handler.setNameSpaceService(nameSpaceService);
                 reader.setXPathHandler(handler);
                 reader.parse(queryText);
                 return handler.getQuery();
