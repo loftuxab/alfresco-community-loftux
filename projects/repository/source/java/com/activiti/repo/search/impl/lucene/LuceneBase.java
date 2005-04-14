@@ -771,5 +771,17 @@ public abstract class LuceneBase implements Lockable
     }
 
     boolean hasWriteLock = false;
+    
+    public boolean mainIndexExists()
+    {
+        try
+        {
+            return IndexReader.indexExists(baseDir);
+        }
+        catch (IOException e)
+        {
+         throw new IndexerException("Failed to determine if the index exists", e);
+        }
+    }
 
 }

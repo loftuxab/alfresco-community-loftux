@@ -472,6 +472,20 @@ public class LuceneTest extends TestCase
         results = searcher.query(NodeServiceStub.storeRef, "xpath", "//./*", null, null);
         assertEquals(25, results.length());
     }
+    
+    public void testMissingIndex()
+    {
+        StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "_missing_");
+        Searcher searcher = LuceneSearcherImpl.getSearcher(storeRef);
+        searcher.setNameSpaceService(new MockNameService());
+
+        // //*
+
+        ResultSet
+
+        results = searcher.query(NodeServiceStub.storeRef, "xpath", "//./*", null, null);
+        assertEquals(0, results.length());
+    }
 
     /**
      * Support for DummyNodeService

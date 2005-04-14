@@ -350,7 +350,7 @@ public class LuceneXPathHandler implements XPathHandler
         }
         else
         {
-            answer.add(new AbsoluteStructuredFieldPosition(nameSpace, absolutePosition));
+            answer.add(new AbsoluteStructuredFieldPosition(nameSpaceService.getNamespaceURI(nameSpace), absolutePosition));
         }
 
         absolutePosition++;
@@ -382,7 +382,7 @@ public class LuceneXPathHandler implements XPathHandler
         }
         else
         {
-            answer.add(new RelativeStructuredFieldPosition(nameSpace));
+            answer.add(new RelativeStructuredFieldPosition(nameSpaceService.getNamespaceURI(nameSpace)));
         }
 
         if ((localName == null) || (localName.length() == 0))

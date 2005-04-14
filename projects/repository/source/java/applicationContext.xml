@@ -46,7 +46,7 @@
          <props>
             <prop key='hibernate.dialect' >org.hibernate.dialect.MySQLDialect</prop>
             <prop key='hibernate.show_sql'>false</prop>
-            <prop key='hibernate.hbm2ddl.auto'>create</prop>
+            <prop key='hibernate.hbm2ddl.auto'>update</prop>
             <prop key='hibernate.cache.use_query_cache'>true</prop>
             <prop key='hibernate.max_fetch_depth'>1</prop>
             <prop key='hibernate.cache.provider_class'>org.hibernate.cache.EhCacheProvider</prop>
@@ -283,6 +283,12 @@
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
+      </property>
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+            <ref bean="methodPerformanceAdvice" />
+         </list>
       </property>
    </bean>
    

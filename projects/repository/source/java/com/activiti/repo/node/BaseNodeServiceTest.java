@@ -9,6 +9,7 @@ import java.util.Map;
 import org.hibernate.Session;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -37,7 +38,7 @@ import com.activiti.util.debug.CodeMonkey;
  */
 public abstract class BaseNodeServiceTest extends BaseSpringTest
 {
-    private StoreService storeService;
+    protected StoreService storeService;
     private NodeService nodeService;
     /** populated during setup */
     protected NodeRef rootNodeRef;
@@ -115,7 +116,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     protected Map<QName, ChildAssocRef> buildNodeGraph() throws Exception
     {
-        String ns = "http://x";
+        String ns = NamespaceService.ACTIVITI_TEST_URI;
         QName qname = null;
         ChildAssocRef assoc = null;
         Map<QName, ChildAssocRef> ret = new HashMap<QName, ChildAssocRef>(13);
@@ -349,10 +350,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetParents() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n6Ref = assocRefs.get(QName.createQName("{http://x}n3_p_n6")).getChildRef();
-        NodeRef n7Ref = assocRefs.get(QName.createQName("{http://x}n5_p_n7")).getChildRef();
+        NodeRef n6Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n3_p_n6")).getChildRef();
+        NodeRef n7Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n5_p_n7")).getChildRef();
         // get a child node's parents
-        NodeRef n8Ref = assocRefs.get(QName.createQName("{http://x}n6_p_n8")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n6_p_n8")).getChildRef();
         Collection<NodeRef> parents = nodeService.getParents(n8Ref);
         assertEquals("Incorrect number of parents", 2, parents.size());
         assertTrue("Expected parent not found", parents.contains(n6Ref));
@@ -370,7 +371,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetChildAssocs() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n1Ref = assocRefs.get(QName.createQName("{http://x}root_p_n1")).getChildRef();
+        NodeRef n1Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"root_p_n1")).getChildRef();
         
         // get the parent node's children
         Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
@@ -470,12 +471,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetPath() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n8Ref = assocRefs.get(QName.createQName("{http://x}n6_p_n8")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n6_p_n8")).getChildRef();
 
         // get the primary node path for n8
         Path path = nodeService.getPath(n8Ref);
         assertEquals("Primary path incorrect",
-                "/{http://x}root_p_n1/{http://x}n1_p_n3/{http://x}n3_p_n6/{http://x}n6_p_n8",
+                "/{" + NamespaceService.ACTIVITI_TEST_URI + "}root_p_n1/{" + NamespaceService.ACTIVITI_TEST_URI + "}n1_p_n3/{" + NamespaceService.ACTIVITI_TEST_URI + "}n3_p_n6/{" + NamespaceService.ACTIVITI_TEST_URI + "}n6_p_n8",
                 path.toString());
     }
     
@@ -485,8 +486,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetPaths() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n6Ref = assocRefs.get(QName.createQName("{http://x}n3_p_n6")).getChildRef();
-        NodeRef n8Ref = assocRefs.get(QName.createQName("{http://x}n6_p_n8")).getChildRef();
+        NodeRef n6Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n3_p_n6")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n6_p_n8")).getChildRef();
         
         // get all paths for the root node
         Collection<Path> paths = nodeService.getPaths(rootNodeRef, false);

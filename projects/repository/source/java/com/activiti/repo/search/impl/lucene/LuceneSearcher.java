@@ -11,5 +11,5 @@ import com.activiti.repo.search.Searcher;
 
 public interface LuceneSearcher extends Searcher, Lockable
 {
-   
+   public boolean indexExists();
 }

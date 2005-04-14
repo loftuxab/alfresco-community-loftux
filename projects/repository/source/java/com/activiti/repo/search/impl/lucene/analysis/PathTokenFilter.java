@@ -8,14 +8,14 @@
 package com.activiti.repo.search.impl.lucene.analysis;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.lucene.analysis.Token;
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
 
 /**
  * @author andyh
@@ -23,15 +23,15 @@ import org.apache.lucene.analysis.TokenStream;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
-public class PathTokenFilter extends TokenFilter
+public class PathTokenFilter extends Tokenizer
 {
     public final static String INTEGER_FORMAT = "0000000000";
 
-    public final static String PATH_SEPARATOR = ";";
+    public final static char PATH_SEPARATOR = ';';
 
-    public final static String NAMESPACE_START_DELIMITER = "{";
+    public final static char NAMESPACE_START_DELIMITER = '{';
 
-    public final static String NAMESPACE_END_DELIMITER = "}";
+    public final static char NAMESPACE_END_DELIMITER = '}';
 
     public final static String SEPARATOR_TOKEN_TEXT = ";";
 
@@ -45,17 +45,17 @@ public class PathTokenFilter extends TokenFilter
 
     public final static String TOKEN_TYPE_PATH_ELEMENT_NAMESPACE = "PATH_ELEMENT_NAMESPACE";
 
-    String pathSeparator;
+    char pathSeparator;
 
     String separatorTokenText;
 
     String noNsTokenText;
 
-    String nsStartDelimiter;
+    char nsStartDelimiter;
 
     int nsStartDelimiterLength;
 
-    String nsEndDelimiter;
+    char nsEndDelimiter;
 
     int nsEndDelimiterLength;
 
@@ -65,8 +65,8 @@ public class PathTokenFilter extends TokenFilter
 
     private boolean includeNamespace;
 
-    public PathTokenFilter(TokenStream in, String pathSeparator, String separatorTokenText, String noNsTokenText,
-            String nsStartDelimiter, String nsEndDelimiter, boolean includeNameSpace)
+    public PathTokenFilter(Reader in, char pathSeparator, String separatorTokenText, String noNsTokenText,
+            char nsStartDelimiter, char nsEndDelimiter, boolean includeNameSpace)
     {
         super(in);
         this.pathSeparator = pathSeparator;
@@ -76,8 +76,8 @@ public class PathTokenFilter extends TokenFilter
         this.nsEndDelimiter = nsEndDelimiter;
         this.includeNamespace = includeNameSpace;
 
-        this.nsStartDelimiterLength = nsStartDelimiter.length();
-        this.nsEndDelimiterLength = nsEndDelimiter.length();
+        this.nsStartDelimiterLength = 1;
+        this.nsEndDelimiterLength = 1;
 
     }
 
@@ -118,7 +118,7 @@ public class PathTokenFilter extends TokenFilter
         Token countToken = null;
         Token namespaceToken = null;
         boolean isFirst = true;
-        while ((t = input.next()) != null)
+        while ((t = nextToken()) != null)
         {
             String text = t.termText();
             
@@ -127,7 +127,7 @@ public class PathTokenFilter extends TokenFilter
                 break;
             }
             
-            if (text.endsWith(pathSeparator))
+            if (text.charAt(text.length()-1) == pathSeparator)
             {
                 text = text.substring(0, text.length() - 1);
                 pathSplitToken = new Token(separatorTokenText, t.startOffset(), t.endOffset(), TOKEN_TYPE_PATH_SEP);
@@ -137,7 +137,7 @@ public class PathTokenFilter extends TokenFilter
 
             int split = -1;
 
-            if (text.startsWith(nsStartDelimiter))
+            if ((text.length() > 0) && (text.charAt(0) == nsStartDelimiter))
             {
                 split = text.indexOf(nsEndDelimiter);
             }
@@ -199,5 +199,49 @@ public class PathTokenFilter extends TokenFilter
         }
 
         it = tokens.iterator();
+    }
+    
+    int readerPosition = 0;
+    
+    private Token nextToken() throws IOException
+    {
+        if(readerPosition == -1)
+        {
+            return null;
+        }
+        StringBuffer buffer = new StringBuffer(64);
+        boolean inNameSpace = false;
+        int start = readerPosition;
+        int current;
+        char c;
+        while((current = input.read()) != -1)
+        {
+           c = (char)current;
+           readerPosition++;
+           if(c == nsStartDelimiter)
+           {
+               inNameSpace = true;
+           }
+           else if(c == nsEndDelimiter)
+           {
+               inNameSpace = false;
+           }
+           else if(!inNameSpace && (c == '/'))
+           {
+               return new Token(buffer.toString(), start, readerPosition-1, "QNAME");
+           }
+           buffer.append(c);
+        } 
+        readerPosition = -1;
+        if(!inNameSpace)
+        {
+            return new Token(buffer.toString(), start, readerPosition-1, "QNAME");
+        }
+        else
+        {
+            throw new IllegalStateException("QName terminated incorrectly: "+buffer.toString());
+        }
+        
+        
     }
 }

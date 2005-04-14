@@ -14,6 +14,7 @@ import org.saxpath.SAXPathException;
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.repo.search.EmptyResultSet;
 import com.activiti.repo.search.QueryParameter;
 import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.Searcher;
@@ -35,63 +36,72 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      * Lucence languages key = temporary implementation
      */
     private static final String LUCENE = "lucene";
+
     private static final String XPATH = "xpath";
 
     /**
      * Default field name
      */
     private static final String DEFAULT_FIELD = "FTS";
+
     private NamespaceService nameSpaceService;
 
     /*
      * Searcher implementation
      */
 
-    public ResultSet query(StoreRef store, String language, String queryString, Path[] queryOptions,
-            QueryParameter[] queryParameters) throws SearcherException
+    public ResultSet query(StoreRef store, String language, String queryString, Path[] queryOptions, QueryParameter[] queryParameters) throws SearcherException
     {
-        if (language.equalsIgnoreCase(LUCENE))
+        if (indexExists())
         {
-            try
+            if (language.equalsIgnoreCase(LUCENE))
             {
-                Query query = LuceneQueryParser.parse(queryString, DEFAULT_FIELD, new StandardAnalyzer(), nameSpaceService);
-                Hits hits = getSearcher().search(query);
-                return new LuceneResultSet(store, hits);
+                try
+                {
+                    Query query = LuceneQueryParser.parse(queryString, DEFAULT_FIELD, new StandardAnalyzer(), nameSpaceService);
+                    Hits hits = getSearcher().search(query);
+                    return new LuceneResultSet(store, hits);
+                }
+                catch (ParseException e)
+                {
+                    throw new SearcherException("Failed to parse query: " + queryString, e);
+                }
+                catch (IOException e)
+                {
+                    throw new SearcherException("IO exception during search", e);
+                }
             }
-            catch (ParseException e)
+            else if (language.equalsIgnoreCase(XPATH))
             {
-                throw new SearcherException("Failed to parse query: " + queryString, e);
+                try
+                {
+                    XPathReader reader = new XPathReader();
+                    LuceneXPathHandler handler = new LuceneXPathHandler();
+                    handler.setNameSpaceService(nameSpaceService);
+                    reader.setXPathHandler(handler);
+                    reader.parse(queryString);
+                    Query query = handler.getQuery();
+                    Hits hits = getSearcher().search(query);
+                    return new LuceneResultSet(store, hits);
+                }
+                catch (SAXPathException e)
+                {
+                    throw new SearcherException("Failed to parse query: " + queryString, e);
+                }
+                catch (IOException e)
+                {
+                    throw new SearcherException("IO exception during search", e);
+                }
             }
-            catch (IOException e)
+            else
             {
-                throw new SearcherException("IO exception during search", e);
-            }
-        }
-        else if (language.equalsIgnoreCase(XPATH))
-        {
-            try
-            {
-                XPathReader reader = new XPathReader();
-                LuceneXPathHandler handler = new LuceneXPathHandler();
-                handler.setNameSpaceService(nameSpaceService);
-                reader.setXPathHandler(handler);
-                reader.parse(queryString);
-                Query query = handler.getQuery();
-                Hits hits = getSearcher().search(query);
-                return new LuceneResultSet(store, hits);
-            }
-            catch (SAXPathException e)
-            {
-                throw new SearcherException("Failed to parse query: " + queryString, e);
-            }
-            catch (IOException e)
-            {
-                throw new SearcherException("IO exception during search", e);
+                throw new SearcherException("Unknown query language: " + language);
             }
         }
         else
         {
-            throw new SearcherException("Unknown query language: " + language);
+            // no index return an empty result set
+            return new EmptyResultSet();
         }
     }
 
@@ -130,9 +140,14 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
     {
         return getSearcher(storeRef, null);
     }
-    
+
     public void setNameSpaceService(NamespaceService nameSpaceService)
     {
         this.nameSpaceService = nameSpaceService;
+    }
+
+    public boolean indexExists()
+    {
+        return mainIndexExists();
     }
 }
