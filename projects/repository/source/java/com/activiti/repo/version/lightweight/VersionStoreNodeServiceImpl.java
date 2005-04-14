@@ -17,6 +17,7 @@ import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
+import com.activiti.repo.ref.StoreRef;
 
 /**
  * THe light weight version store node service implementation.
@@ -31,6 +32,30 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     private final static String MSG_UNSUPPORTED = 
         "This operation is not supported by a version store implementation of the node service.";
 	
+    /**
+     * Delegates to the <code>NodeService</code> used as the version store implementation
+     */
+    public StoreRef createStore(String protocol, String identifier)
+    {
+        return dbNodeService.createStore(protocol, identifier);
+    }
+
+    /**
+     * Delegates to the <code>NodeService</code> used as the version store implementation
+     */
+    public boolean exists(StoreRef storeRef)
+    {
+        return dbNodeService.exists(storeRef);
+    }
+
+    /**
+     * Delegates to the <code>NodeService</code> used as the version store implementation
+     */
+    public NodeRef getRootNode(StoreRef storeRef)
+    {
+        return dbNodeService.getRootNode(storeRef);
+    }
+
     /**
      * @throws UnsupportedOperationException always
      */

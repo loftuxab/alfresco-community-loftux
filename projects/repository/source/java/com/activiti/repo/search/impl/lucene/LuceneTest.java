@@ -10,9 +10,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.AssociationDefinition;
 import com.activiti.repo.dictionary.AssociationRef;
@@ -34,13 +31,11 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.search.IndexerAndSearcher;
 import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
 import com.activiti.repo.search.Value;
 import com.activiti.repo.search.transaction.LuceneIndexLock;
-import com.activiti.repo.store.StoreService;
 
 /**
  * @author andyh
@@ -178,49 +173,6 @@ public class LuceneTest extends TestCase
 
         results = searcher.query(NodeServiceStub.storeRef, "lucene", "ID:\"0\"", null, null);
         assertEquals(1, results.length());
-
-    }
-
-    /**
-     * Test index and search agaist Hibernate
-     * 
-     */
-    public void xtestStandAloneIndexerCommitWithHibernate()
-    {
-        ApplicationContext factory = new ClassPathXmlApplicationContext("applicationContext.xml");
-        NodeService nodeService = (NodeService) factory.getBean("nodeService");
-
-        StoreService storeService = (StoreService) factory.getBean("storeService");
-
-        StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "test-workspace" + System.currentTimeMillis());
-
-        NodeRef rootNode = storeService.getRootNode(storeRef);
-
-        Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
-        testProperties.put(QName.createQName("property"), "value");
-
-        ChildAssocRef assoc = nodeService.createNode(rootNode, QName.createQName(null, "path"), DictionaryBootstrap.TYPE_FILE, testProperties);
-        NodeRef newNode = assoc.getChildRef();
-
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(storeRef, "delta" + System.currentTimeMillis());
-        indexer.setNodeService(nodeService);
-
-        indexer.createNode(new ChildAssocRef(rootNode, QName.createQName("{namespace}path"), newNode));
-        indexer.updateNode(newNode);
-        indexer.deleteNode(new ChildAssocRef(rootNode, QName.createQName("{namespace}path"), newNode));
-
-        indexer.commit();
-
-    }
-
-    public void xtestIOC()
-    {
-
-        ApplicationContext factory = new ClassPathXmlApplicationContext("applicationContext.xml");
-        IndexerAndSearcher indexerAndSearcher = (IndexerAndSearcher) factory.getBean("indexerAndSearcherFactory");
-        StoreService storeService = (StoreService) factory.getBean("dbStoreService");
-
-        StoreRef storeRef = storeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "test-workspace" + System.currentTimeMillis());
 
     }
 
@@ -529,7 +481,22 @@ public class LuceneTest extends TestCase
 
         static NodeRef n14 = new NodeRef(storeRef, "14");
 
-        public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
+        public StoreRef createStore(String protocol, String identifier)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean exists(StoreRef storeRef)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public NodeRef getRootNode(StoreRef storeRef)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public ClassRef getType(NodeRef nodeRef)
         {
             if (nodeRef.getId().equals("0"))
             {

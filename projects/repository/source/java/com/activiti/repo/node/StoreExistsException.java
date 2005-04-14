@@ -1,4 +1,4 @@
-package com.activiti.repo.store;
+package com.activiti.repo.node;
 
 import com.activiti.repo.ref.StoreRef;
 

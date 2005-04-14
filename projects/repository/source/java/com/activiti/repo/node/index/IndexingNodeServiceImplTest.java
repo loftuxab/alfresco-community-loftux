@@ -3,7 +3,6 @@ package com.activiti.repo.node.index;
 import java.util.Map;
 
 import com.activiti.repo.dictionary.NamespaceService;
-import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.BaseNodeServiceTest;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -12,8 +11,6 @@ import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.Searcher;
-import com.activiti.repo.store.StoreExistsException;
-import com.activiti.repo.store.StoreService;
 
 /**
  * @see com.activiti.repo.node.index.IndexingNodeServiceImpl
@@ -24,11 +21,9 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
 {
     private Searcher searcher;
     
-    protected StoreService getStoreService()
-    {
-        return (StoreService) applicationContext.getBean("indexingStoreService");
-    }
-
+    private static StoreRef myStoreRef;
+    private static NodeRef myRootNode;
+    
     protected NodeService getNodeService()
     {
         return (NodeService) applicationContext.getBean("indexingNodeService");
@@ -41,15 +36,12 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
        
        if(myStoreRef == null)
        {
-               myStoreRef = storeService.createStore(
+               myStoreRef = nodeService.createStore(
                StoreRef.PROTOCOL_WORKSPACE,
                "Test_Persisted" + System.currentTimeMillis());
-               myRootNode = storeService.getRootNode(myStoreRef);
+               myRootNode = nodeService.getRootNode(myStoreRef);
        }
     }
-    
-    private static StoreRef myStoreRef;
-    private static NodeRef myRootNode;
     
     public void testCommitQueryData() throws Exception
     {   

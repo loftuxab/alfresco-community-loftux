@@ -23,14 +23,15 @@ import com.activiti.repo.domain.Store;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.CyclicChildRelationshipException;
 import com.activiti.repo.node.InvalidNodeRefException;
+import com.activiti.repo.node.InvalidStoreRefException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.node.StoreExistsException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.store.db.StoreDaoService;
 
 /**
  * Node service using database persistence layer to fulfill functionality
@@ -40,18 +41,26 @@ import com.activiti.repo.store.db.StoreDaoService;
 public class DbNodeServiceImpl implements NodeService
 {
     private NodeDaoService nodeDaoService;
-    private StoreDaoService storeDaoService;
 
     public void setNodeDaoService(NodeDaoService nodeDaoService)
     {
         this.nodeDaoService = nodeDaoService;
     }
 
-    public void setStoreDaoService(StoreDaoService storeDaoService)
+    /**
+     * @param storeRef store to search for
+     * @return Returns a non-null <code>Store</code> instance
+     * @throws InvalidStoreRefException if the reference is to a store that doesn't exist
+     */
+    private Store getStoreNotNull(StoreRef storeRef) throws InvalidStoreRefException
     {
-        this.storeDaoService = storeDaoService;
+        Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
+        if (store == null)
+        {
+            throw new InvalidStoreRefException(storeRef);
+        }
+        return store;
     }
-
 
     /**
      * Performs a null- and type-safe check before returning the <b>container</b> node
@@ -108,6 +117,44 @@ public class DbNodeServiceImpl implements NodeService
         return unchecked;
     }
 
+    /**
+     * Defers to the typed service
+     * @see StoreDaoService#createWorkspace(String)
+     */
+    public StoreRef createStore(String protocol, String identifier)
+    {
+        // check that the store does not already exist
+        Store store = nodeDaoService.getStore(protocol, identifier);
+        if (store != null)
+        {
+            throw new StoreExistsException("Unable to create a store that already exists",
+                    new StoreRef(protocol, identifier));
+        }
+        // create a new one
+        store = nodeDaoService.createStore(protocol, identifier);
+        // done
+        StoreRef storeRef = store.getStoreRef();
+        return storeRef;
+    }
+
+    public boolean exists(StoreRef storeRef)
+    {
+        Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
+        boolean exists = (store != null);
+        // done
+        return exists;
+    }
+    
+    public NodeRef getRootNode(StoreRef storeRef) throws InvalidStoreRefException
+    {
+        Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
+        // get the root
+        Node node = store.getRootNode();
+        NodeRef nodeRef = node.getNodeRef();
+        // done
+        return nodeRef;
+    }
+
     public ChildAssocRef createNode(NodeRef parentRef,
             QName qname,
             ClassRef typeRef)
@@ -122,7 +169,7 @@ public class DbNodeServiceImpl implements NodeService
     {
         // get the store that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
-        Store store = storeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
+        Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
         if (store == null)
         {
             throw new DataIntegrityViolationException("No store found for parent node: " + parentRef);

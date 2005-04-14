@@ -21,12 +21,14 @@ import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
+import com.activiti.repo.domain.StoreKey;
 import com.activiti.repo.domain.hibernate.ChildAssocImpl;
 import com.activiti.repo.domain.hibernate.ContainerNodeImpl;
 import com.activiti.repo.domain.hibernate.ContentNodeImpl;
 import com.activiti.repo.domain.hibernate.NodeAssocImpl;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.domain.hibernate.RealNodeImpl;
+import com.activiti.repo.domain.hibernate.StoreImpl;
 import com.activiti.repo.node.InvalidNodeTypeException;
 import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.repo.ref.QName;
@@ -61,6 +63,41 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public void evict(ChildAssoc assoc)
     {
         getHibernateTemplate().evict(assoc);
+    }
+
+    /**
+     * Ensures that the store protocol/identifier combination is unique
+     */
+    public Store createStore(String protocol, String identifier)
+    {
+        // ensure that the name isn't in use
+        Store store = getStore(protocol, identifier);
+        if (store != null)
+        {
+            throw new RuntimeException("A store already exists: \n" +
+                    "   protocol: " + protocol + "\n" +
+                    "   identifier: " + identifier + "\n" +
+                    "   store: " + store);
+        }
+        
+        store = new StoreImpl();
+        // set key
+        store.setKey(new StoreKey(protocol, identifier));
+        // persist so that it is present in the hibernate cache
+        getHibernateTemplate().save(store);
+        // create and assign a root node
+        RealNode rootNode = newRealNode(store, DictionaryBootstrap.TYPE_FOLDER);
+        store.setRootNode(rootNode);
+        // done
+        return store;
+    }
+
+    public Store getStore(String protocol, String identifier)
+    {
+        StoreKey storeKey = new StoreKey(protocol, identifier);
+        Store store = (Store) getHibernateTemplate().get(StoreImpl.class, storeKey);
+        // done
+        return store;
     }
 
     public RealNode newRealNode(Store store, ClassRef classRef)

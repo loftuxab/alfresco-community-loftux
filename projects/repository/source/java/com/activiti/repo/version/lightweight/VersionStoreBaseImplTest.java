@@ -9,7 +9,6 @@ import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.store.StoreService;
 import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionService;
 import com.activiti.repo.version.common.counter.VersionCounterDaoService;
@@ -21,7 +20,6 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
      * Services used by the tests
      */
 	protected NodeService dbNodeService = null;
-	protected StoreService dbStoreService = null;
     protected VersionService lightWeightVersionStoreVersionService = null;
     protected VersionCounterDaoService versionCounterDaoService = null;
 	
@@ -71,10 +69,10 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         this.nodeProperties.put(VersionStoreVersionServiceImplTest.PROP_3, VersionStoreVersionServiceImplTest.VALUE_3);
         
         // Create a workspace that contains the 'live' nodes
-        StoreRef storeRef = this.dbStoreService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        StoreRef storeRef = this.dbNodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         
         // Get a reference to the root node
-        this.rootNodeRef = this.dbStoreService.getRootNode(storeRef);
+        this.rootNodeRef = this.dbNodeService.getRootNode(storeRef);
     }
 	
 	public void testGetVersionStoreReference() 

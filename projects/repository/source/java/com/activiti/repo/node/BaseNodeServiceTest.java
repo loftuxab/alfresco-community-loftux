@@ -18,7 +18,6 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.store.StoreService;
 import com.activiti.util.BaseSpringTest;
 import com.activiti.util.debug.CodeMonkey;
 
@@ -29,7 +28,6 @@ import com.activiti.util.debug.CodeMonkey;
  * To test a specific incarnation of the service, the methods {@link #getStoreService()} and
  * {@link #getNodeService()} must be implemented. 
  * 
- * @see #storeService
  * @see #nodeService
  * @see #rootNodeRef
  * @see #buildNodeGraph()
@@ -38,36 +36,21 @@ import com.activiti.util.debug.CodeMonkey;
  */
 public abstract class BaseNodeServiceTest extends BaseSpringTest
 {
-    protected StoreService storeService;
-    private NodeService nodeService;
+    protected NodeService nodeService;
     /** populated during setup */
     protected NodeRef rootNodeRef;
 
     protected void onSetUpInTransaction() throws Exception
     {
-        storeService = getStoreService();
         nodeService = getNodeService();
         
         // create a first store directly
-        StoreRef storeRef = storeService.createStore(
+        StoreRef storeRef = nodeService.createStore(
                 StoreRef.PROTOCOL_WORKSPACE,
                 "Test_" + System.currentTimeMillis());
-        rootNodeRef = storeService.getRootNode(storeRef);
+        rootNodeRef = nodeService.getRootNode(storeRef);
     }
     
-    /**
-     * Usually just implemented by fetching the bean directly from the bean factory,
-     * for example:
-     * <p>
-     * <pre>
-     *      return (StoreService) applicationContext.getBean("dbStoreService");
-     * </pre>
-     * 
-     * @return Returns the implementation of <code>StoreService</code> to be
-     *      used for this test
-     */
-    protected abstract StoreService getStoreService();
-
     /**
      * Usually just implemented by fetching the bean directly from the bean factory,
      * for example:
@@ -202,6 +185,44 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         return count.intValue();
     }
     
+    /**
+     * @return Returns a reference to the created store
+     */
+    private StoreRef createStore() throws Exception
+    {
+        StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "my store");
+        assertNotNull("No reference returned", storeRef);
+        // done
+        return storeRef;
+    }
+    
+    public void testCreateStore() throws Exception
+    {
+        createStore();
+    }
+    
+    public void testExists() throws Exception
+    {
+        StoreRef storeRef = createStore();
+        boolean exists = nodeService.exists(storeRef);
+        assertEquals("Exists failed", true, exists);
+        // create bogus ref
+        StoreRef bogusRef = new StoreRef("What", "the");
+        exists = nodeService.exists(bogusRef);
+        assertEquals("Exists failed", false, exists);
+    }
+    
+    public void testGetRootNode() throws Exception
+    {
+        StoreRef storeRef = createStore();
+        // get the root node
+        NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
+        assertNotNull("No root node reference returned", rootNodeRef);
+        // get the root node again
+        NodeRef rootNodeRefCheck = nodeService.getRootNode(storeRef);
+        assertEquals("Root nodes returned different refs", rootNodeRef, rootNodeRefCheck);
+    }
+
     public void testGetType() throws Exception
     {
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,

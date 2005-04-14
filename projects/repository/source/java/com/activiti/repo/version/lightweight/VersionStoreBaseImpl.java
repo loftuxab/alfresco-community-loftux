@@ -10,12 +10,8 @@ import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.Searcher;
-import com.activiti.repo.store.StoreService;
-import com.activiti.repo.version.VersionLabelPolicy;
 import com.activiti.repo.version.VersionService;
-import com.activiti.repo.version.VersionServiceException;
 
 /**
  * Helper base class providing common implementation used by the 
@@ -94,11 +90,6 @@ public abstract class VersionStoreBaseImpl
     protected NodeService dbNodeService = null;
 
     /**
-     * The store service
-     */
-    protected StoreService storeService = null;
-    
-    /**
      * The repository searcher
      */
     private Searcher searcher = null;
@@ -114,13 +105,13 @@ public abstract class VersionStoreBaseImpl
     public void initialise()
     {
         // Ensure that the version store has been created
-        if (this.storeService.exists(getVersionStoreReference()) == false)
+        if (this.nodeService.exists(getVersionStoreReference()) == false)
         {
-            this.storeService.createStore(STORE_PROTOCOL, STORE_ID);
+            this.nodeService.createStore(STORE_PROTOCOL, STORE_ID);
         }        
         
         // Get the version store root node reference
-        this.versionStoreRootNodeRef = this.storeService.getRootNode(getVersionStoreReference());
+        this.versionStoreRootNodeRef = this.nodeService.getRootNode(getVersionStoreReference());
     }
     
     /**
@@ -143,16 +134,6 @@ public abstract class VersionStoreBaseImpl
         this.dbNodeService = nodeService;
     }
 
-    /**
-     * Sets the store service
-     * 
-     * @param storeService  the store service
-     */
-    public void setStoreService(StoreService storeService)
-    {
-        this.storeService = storeService;
-    }
-    
     /**
      * Sets the searcher
      * 

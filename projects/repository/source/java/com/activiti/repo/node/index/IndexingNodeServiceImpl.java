@@ -7,12 +7,15 @@ import java.util.Map;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidNodeRefException;
+import com.activiti.repo.node.InvalidStoreRefException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.node.StoreExistsException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
+import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.Indexer;
 import com.activiti.repo.search.IndexerComponent;
 
@@ -47,6 +50,40 @@ public class IndexingNodeServiceImpl implements NodeService
         this.indexer = indexer;
     }
     
+    /**
+     * Delegates to the assigned {@link #storeServiceDelegate} before using the
+     * {@link #indexer} to update the search index.
+     * 
+     * @see IndexerComponent#createNode(ChildAssocRef)
+     */
+    public StoreRef createStore(String protocol, String identifier) throws StoreExistsException
+    {
+        StoreRef storeRef = nodeServiceDelegate.createStore(protocol, identifier);
+        // get the root node
+        NodeRef rootNodeRef = getRootNode(storeRef);
+        // index it
+        ChildAssocRef rootAssocRef = new ChildAssocRef(null, null, rootNodeRef);
+        indexer.createNode(rootAssocRef);
+        // done
+        return storeRef;
+    }
+
+    /**
+     * Direct delegation to assigned {@link #storeServiceDelegate}
+     */
+    public boolean exists(StoreRef storeRef)
+    {
+        return nodeServiceDelegate.exists(storeRef);
+    }
+
+    /**
+     * Direct delegation to assigned {@link #storeServiceDelegate}
+     */
+    public NodeRef getRootNode(StoreRef storeRef) throws InvalidStoreRefException
+    {
+        return nodeServiceDelegate.getRootNode(storeRef);
+    }
+
     /**
      * @see #createNode(NodeRef, QName, String, Map<QName,Serializable>)
      */

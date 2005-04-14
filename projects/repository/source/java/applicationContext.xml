@@ -44,6 +44,7 @@
       </property>
       <property name='hibernateProperties' >
          <props>
+            <prop key='hibernate.jdbc.use_streams_for_binary'>true</prop>
             <prop key='hibernate.dialect' >org.hibernate.dialect.MySQLDialect</prop>
             <prop key='hibernate.show_sql'>false</prop>
             <prop key='hibernate.hbm2ddl.auto'>update</prop>
@@ -76,36 +77,6 @@
    <!--                    -->
    <!--  INTERNAL SERVICES -->
    <!--                    -->
-   
-   <bean id='storeDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
-      <property name='proxyInterfaces'>
-         <value>com.activiti.repo.store.db.StoreDaoService</value>
-      </property>
-      <property name='transactionManager'>
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="com.activiti.repo.store.db.hibernate.HibernateStoreDaoServiceImpl" >
-            <property name="sessionFactory">
-               <ref bean="sessionFactory" />
-            </property>
-            <property name="nodeDaoService">
-               <ref bean="nodeDaoService" />
-            </property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <ref bean="methodPerformanceAdvice" />
-         </list>
-      </property>
-   </bean>
    
    <bean id='nodeDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
@@ -141,65 +112,6 @@
    <!--  PUBLIC SERVICES   -->
    <!--                    -->
    
-   <!-- StoreService implemented to persist to Database -->
-   <bean id="dbStoreService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>com.activiti.repo.store.StoreService</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="com.activiti.repo.store.db.DbStoreServiceImpl" >
-            <property name="storeDaoService">
-               <ref bean="storeDaoService" />
-            </property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <ref bean="methodPerformanceAdvice" />
-         </list>
-      </property>
-   </bean>
-   
-   <!-- StoreService implemented to call a delegate and ensure that root nodes get indexed -->
-   <bean id="indexingStoreService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>com.activiti.repo.store.StoreService</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="com.activiti.repo.store.index.IndexingStoreServiceImpl" >
-            <property name="storeServiceDelegate">
-               <ref bean="dbStoreService" />
-            </property>
-            <property name="indexer">
-               <ref bean="indexerComponent" />
-            </property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <ref bean="methodPerformanceAdvice" />
-         </list>
-      </property>
-   </bean>
-   
    <!-- NodeService implemented to persist to Database -->
    <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
@@ -210,9 +122,6 @@
       </property>
       <property name="target">
          <bean class="com.activiti.repo.node.db.DbNodeServiceImpl" >
-            <property name="storeDaoService">
-               <ref bean="storeDaoService" />
-            </property>
             <property name="nodeDaoService">
                <ref bean="nodeDaoService" />
             </property>
@@ -379,9 +288,6 @@
          <property name="dbNodeService">
                <ref bean="dbNodeService" />
             </property>
-         <property name="storeService">
-            <ref bean="dbStoreService"/>
-         </property>
          <property name="versionCounterDaoService">
             <ref bean="versionCounterDaoService"/>
          </property>
@@ -413,9 +319,6 @@
             <property name="dbNodeService">
                <ref bean="dbNodeService" />
             </property>
-         <property name="storeService">
-            <ref bean="dbStoreService"/>
-         </property>
          <property name="searcher">
             <ref bean="searcherComponent"/>
          </property>

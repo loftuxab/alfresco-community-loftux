@@ -38,6 +38,22 @@ public interface NodeDaoService
     public void evict(ChildAssoc assoc);
     
     /**
+     * Creates a unique store for the given protocol and identifier combination
+     * 
+     * @param protocol a protocol, e.g. {@link com.activiti.repo.ref.StoreRef#PROTOCOL_WORKSPACE}
+     * @param identifier a protocol-specific identifier
+     * @return Returns the new persistent entity
+     */
+    public Store createStore(String protocol, String identifier);
+    
+    /**
+     * @param protocol the protocol that the store serves
+     * @param identifier the protocol-specific identifer
+     * @return Returns a store with the given values or null if one doesn't exist
+     */
+    public Store getStore(String protocol, String identifier);
+
+    /**
      * @param store the store to which the node must belong
      * @param classRef the type of the node
      * @return Returns a new real node of the given type and attached to the store
