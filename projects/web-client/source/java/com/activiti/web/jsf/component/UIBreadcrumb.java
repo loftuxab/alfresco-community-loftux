@@ -52,7 +52,7 @@ public class UIBreadcrumb extends UICommand
          setSelectedPathIndex( ((BreadcrumbEvent)event).SelectedIndex );
       }
       
-      // standard ActionEvent processing for a UICommand
+      // default ActionEvent processing for a UICommand
       super.broadcast(event);
    }
 

@@ -22,7 +22,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
       
       setStringProperty(component, "style", this.style);
       setStringProperty(component, "styleClass", this.styleClass);
-      setStringProperty(component, "title", this.title);
+      setStringProperty(component, "tooltip", this.tooltip);
    }
    
    /**
@@ -33,17 +33,7 @@ public abstract class HtmlComponentTag extends BaseComponentTag
       super.release();
       this.style = null;
       this.styleClass = null;
-      this.title = null;
-   }
-   
-   /**
-    * Get the style
-    *
-    * @return the style
-    */
-   public String getStyle()
-   {
-      return this.style;
+      this.tooltip = null;
    }
 
    /**
@@ -57,16 +47,6 @@ public abstract class HtmlComponentTag extends BaseComponentTag
    }
 
    /**
-    * Get the styleClass
-    *
-    * @return the styleClass
-    */
-   public String getStyleClass()
-   {
-      return this.styleClass;
-   }
-
-   /**
     * Set the styleClass
     *
     * @param styleClass     the styleClass
@@ -77,32 +57,22 @@ public abstract class HtmlComponentTag extends BaseComponentTag
    }
 
    /**
-    * Get the title
+    * Set the tooltip
     *
-    * @return the title
+    * @param tooltip     the tooltip
     */
-   public String getTitle()
+   public void setTooltip(String tooltip)
    {
-      return this.title;
+      this.tooltip = tooltip;
    }
 
-   /**
-    * Set the title
-    *
-    * @param title     the title
-    */
-   public void setTitle(String title)
-   {
-      this.title = title;
-   }
 
+   /** the tooltip */
+   private String tooltip;
 
    /** the style */
-   protected String style;
+   private String style;
 
-   /** the styleClass */
-   protected String styleClass;
-
-   /** the title */
-   protected String title;
+   /** the CSS style class */
+   private String styleClass;
 }

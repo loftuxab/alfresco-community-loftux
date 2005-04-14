@@ -132,11 +132,11 @@ public final class Utils
       
       if (alt != null)
       {
-         buf.append(" alt='")
+         buf.append(" alt=\"")
             .append(alt)
-            .append("' title='")
+            .append("\" title=\"")
             .append(alt)
-            .append('\'');
+            .append('"');
       }
       
       buf.append('>');
@@ -165,11 +165,11 @@ public final class Utils
       
       if (alt != null)
       {
-         buf.append(" alt='")
+         buf.append(" alt=\"")
             .append(alt)
-            .append("' title='")
+            .append("\" title=\"")
             .append(alt)
-            .append('\'');
+            .append('"');
       }
       
       buf.append('>');

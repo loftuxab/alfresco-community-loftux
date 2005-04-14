@@ -120,10 +120,10 @@ public class BreadcrumbRenderer extends BaseRenderer
          buf.append(" class=")
             .append(bc.getAttributes().get("styleClass"));
       }
-      if (bc.getAttributes().get("title") != null)
+      if (bc.getAttributes().get("tooltip") != null)
       {
          buf.append(" title=\"")
-         .append(bc.getAttributes().get("title"))
+         .append(bc.getAttributes().get("tooltip"))
          .append('"');
       }
       buf.append('>');

@@ -13,7 +13,7 @@
    <%-- load a bundle of properties I18N strings here --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <h:form id="userListForm">
+   <h:form id="testForm">
    
       <h2>Test Components</h2>
       
@@ -31,25 +31,50 @@
       <p>
       --%>
       
+      <%-- ModeList tests --%>
+      <b>ModeList component:</b><br>
+      Basic ModeList<br>
+      <awc:modeList itemSpacing="2" iconColumnWidth="0"
+            style="background-color:#EEEEEE" selectedStyle="background-color:#FFFFFF;border:solid #444444;border-width:1px">
+         <awc:modeListItem value="1" label="First Item" tooltip="Item Number 1" />
+         <awc:modeListItem value="2" label="Second Item"  tooltip="Item Number 2" />
+         <awc:modeListItem value="3" label="Third Item"  tooltip="Item Number 3" />
+      </awc:modeList>
+      <br>
+      Modelist with styles applied, icons, title label and the initial value set:<br>
+      <awc:modeList label="Views:" itemSpacing="2" iconColumnWidth="20" width="100"
+            style="background-color:#F3F1EB" itemStyle="font-family:Tahoma;font-size:11px"
+            selectedStyle="background-color:#EBF1FF;font-family:Tahoma;font-size:11px;border:solid #4444FF;border-width:1px"
+            value="1">
+         <awc:modeListItem value="0" label="None" tooltip="No Icon Here" />
+         <awc:modeListItem value="1" label="Details" image="/images/icons/BlueArrow.gif" />
+         <awc:modeListItem value="2" label="Icons" image="/images/icons/BlueArrow.gif" />
+         <awc:modeListItem value="3" label="List" image="/images/icons/BlueArrow.gif" />
+      </awc:modeList>
+      
+      <p>
+      
       <%-- Menu tests --%>
       <b>Menus:</b><br>
-      Basic menu:<br>
+      Simple menu:<br>
+      <br>
       <awc:menu id="menu1" menuStyle="background-color:#FFFFFF; border:thin solid #AAAAAA;"
-         itemSpacing="4" label="Menu" title="I am a menu tooltip">
+            itemSpacing="4" label="Menu" tooltip="I am a menu tooltip">
          <awc:actionLink value="Item 001" />
          <awc:actionLink value="Item 002" />
          <awc:actionLink value="Item 003" />
          <awc:actionLink value="Should not see this" rendered="false" />
       </awc:menu>
-      <br>
+      <p>
       Menu with image, styles and actions with icons:<br>
-      <awc:menu id="menu2" styleClass="header" menuStyle="background-color:#eeeeee; border-top:thin solid #FFFFFF; border-left:thin solid #FFFFFF; border-right:thin solid #444444; border-bottom:thin solid #444444;"
-         itemSpacing="2" label="More..." image="/images/arrow_expanded.gif" title="Click Me">
+      <br>
+      <awc:menu id="menu2" styleClass="header" itemSpacing="2" label="More..." image="/images/arrow_expanded.gif" tooltip="Click Me"
+            menuStyle="background-color:#eeeeee;border-top:thin solid #FFFFFF; border-left:thin solid #FFFFFF; border-right:thin solid #444444; border-bottom:thin solid #444444;">
          <awc:actionLink value="Menu Action Link" image="/images/icons/BlueArrow.gif" />
          <awc:actionLink value="Click Me" image="/images/icons/link_small.gif" action="success" actionListener="#{TestList.clickActionLink}" styleClass="header" />
          <awc:actionLink value="No Image here" />
       </awc:menu>
-      
+
       <p>
       
       <%-- Breadcrumb tests --%>
@@ -58,10 +83,10 @@
       <awc:breadcrumb id="path1" value="/horse/biscuit/flibble/1234" action="success" actionListener="#{TestList.clickBreadcrumb}" separator="~" />
       <br>
       Path style with default separator:<br>
-      <awc:breadcrumb id="path2" styleClass="path"  value="/this/is/a/small/breadcrumb" title="I am a tooltip" />
+      <awc:breadcrumb id="path2" styleClass="path" value="/this/is/a/small/breadcrumb" tooltip="I am a tooltip" />
       <br>
       Root should be missing from this breadcrumb:<br>
-      <awc:panel id="panel0" progressive="true">
+      <awc:panel id="panelCrumb" progressive="true">
          <awc:breadcrumb id="path3" styleClass="path" value="/001/002/003/004/005" showRoot="false" />
       </awc:panel>
       
@@ -81,36 +106,25 @@
       
       <p>
       
-      <%-- Progressive panel test --%>
-      <awc:panel id="panel1" border="mainwhite" bgcolor="white" progressive="true" label="Progressive Panel Test!" styleClass="mainTitle">
+      <%-- Progressive panel tests --%>
+      <b>Progressive Panels:</b><br>
+      <awc:panel id="panel0" border="ballongrey" bgcolor="#EEEEEE" progressive="true" label="Progressive Panel Test 1" styleClass="mainTitle">
+         <p>
+         HTML text inside the Progressive Panel
+         <p>
+         <h:outputText id="out1" value="Text From Component with explicit ID"/>
+      </awc:panel>
+      
+      <br>
+      
+      <awc:panel id="panel1" border="mainwhite" bgcolor="white" progressive="true" label="Progressive Panel Test 2 (SHOULD BREAK WHEN CLOSED)" styleClass="mainTitle">
          <p>
          nothing exciting here
          <b>not at all</b>
-         testing123
          <p>
-         <h:outputText value="Test Text From Outputtest Tag _WITHOUT_ explicit ID (WILL BREAK!)"/>
+         <h:outputText value="Component WITHOUT explicit ID (SHOULD BREAK THE PANEL!)"/>
          <br>
-         <h:commandButton id="panel1-but1" value="Test Button with explicit ID" action="success" />
-      </awc:panel>
-      
-      <p>
-      
-      <%-- DataList component test --%>
-      DataList component test
-      before datalist table
-      <awc:dataList cellspacing="2" cellpadding="1" styleClass="recordSet">
-         <tr><td>inside datalist table</td></tr>
-      </awc:dataList>
-      after datalist table
-      
-      <p>
-      
-      <%-- Progressive panel test --%>
-      <awc:panel id="panelX" border="mainwhite" bgcolor="white" progressive="true" label="Panel Testing again!" styleClass="mainTitle">
-         <p>
-         BLAH BLAH BLAH
-         <p>
-         <h:outputText id="out1" value="Test Text From Outputtest Tag WITH explicit ID"/>
+         <h:commandButton id="panel1-but1" value="Button with explicit ID" action="success" />
       </awc:panel>
       
       <p>
@@ -123,7 +137,8 @@
       <%-- NOTE: Suggest config of each view independantly in the config XML e.g.
                  to allow the icon/details views to use different page sizes or styles.
                  Otherwise you have to pick values "compatible" with all view modes! --%>
-      RichList component test shown in Details view mode, including sortable columns of various data types and paging.
+      <b>RichList:</b><br>
+      RichList component test shown in Details view mode, including sortable columns of various data types and paging.<br>
       <awc:richList viewMode="details" pageSize="5" styleClass="" style="border:thin solid #eeeeff; padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
             value="#{TestList.rows}" var="r" initialSortColumn="name" initialSortDescending="true">
          <awc:column primary="true" width="200" style="padding:2px" styleClass="">
@@ -191,7 +206,7 @@
       
       <p>
       
-      <awc:panel id="panel2" border="white" bgcolor="white" progressive="true" label="Progressive Panel Example 2" styleClass="mainSubTitle">
+      <awc:panel id="panel2" border="white" bgcolor="white" progressive="true" label="Progressive Panel Example 3" styleClass="mainSubTitle">
          NOTE: currently all JSF components within a Progressive Panel MUST be given an explicit ID!
          
          <br>
@@ -263,7 +278,7 @@
       
          <br>
          
-         Same list shown in a different view mode (List). This mode displays the small icon and uses single column rendering.
+         Same list shown in a different view mode (List). This mode displays the small icon and uses single column rendering.<br>
          <awc:richList viewMode="list" pageSize="5" styleClass="" style="padding:4px" width="100%"
                value="#{TestList.rows}" var="r" initialSortColumn="name" initialSortDescending="true">
             <awc:column primary="true">
@@ -320,7 +335,7 @@
       
       <%-- example of using a JSF DataTable to list the users --%>
       <%-- iterates around the List of User objects in the UserListBean --%>
-      JSF dataTable component test.
+      <b>JSF dataTable component test.</b><br>
       <h:dataTable id="userlist" value="#{UserListBean.usersModel}" var="u">
         <h:column>
           <f:facet name="header">
@@ -373,7 +388,7 @@
       <p>
       
       <%-- component evaluators --%>
-      <b>Test Evaluators</b><br>
+      <b>Evaluators:</b><br>
       1a. Boolean Evaluator - you should see the next line of text:<br>
       <awc:booleanEvaluator value="#{TestList.rows != null}">
          <h:outputText value="Component inside an evaluator"/>
@@ -417,7 +432,7 @@
       <%-- Date Picker Component --%>
       <%-- Example of a tag utilising an Input Component with a custom renderer.
               The renderer handles encoding and decoding of date values to UI elements --%>
-      <b>Date Picker Components:</b><br>
+      <b>Date Picker:</b><br>
       Basic date picker:<br>
       <awc:inputDatePicker id="date1" value="#{TestList.rows[0].created}" startYear="1996" yearCount="10"/>
       <br>

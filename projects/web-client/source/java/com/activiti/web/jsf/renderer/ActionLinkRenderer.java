@@ -183,7 +183,7 @@ public class ActionLinkRenderer extends BaseRenderer
       buf.append(link.getValue());
       buf.append("</a>");
       
-      buf.append("</td><tr>");
+      buf.append("</td></tr>");
       
       return buf.toString();
    }

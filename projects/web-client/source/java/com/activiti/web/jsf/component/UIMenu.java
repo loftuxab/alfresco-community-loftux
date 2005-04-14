@@ -47,7 +47,7 @@ public class UIMenu extends SelfRenderingComponent
       out.write("');return false;\"");
       outputAttribute(out, getAttributes().get("style"), "style");
       outputAttribute(out, getAttributes().get("styleClass"), "class");
-      outputAttribute(out, getAttributes().get("title"), "title");
+      outputAttribute(out, getAttributes().get("tooltip"), "title");
       out.write('>');
       
       // output label text
@@ -74,6 +74,7 @@ public class UIMenu extends SelfRenderingComponent
       outputAttribute(out, getAttributes().get("itemSpacing"), "cellspacing");
       outputAttribute(out, getAttributes().get("menuStyle"), "style");
       outputAttribute(out, getAttributes().get("menuStyleClass"), "class");
+      out.write(">");
    }
 
    /**

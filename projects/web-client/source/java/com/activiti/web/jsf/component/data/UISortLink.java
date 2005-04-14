@@ -67,10 +67,10 @@ public class UISortLink extends UICommand
          buf.append(" class=")
             .append(getAttributes().get("styleClass"));
       }
-      if (getAttributes().get("title") != null)
+      if (getAttributes().get("tooltip") != null)
       {
          buf.append(" title=\"")
-            .append(getAttributes().get("title"))
+            .append(getAttributes().get("tooltip"))
             .append('"');
       }
       buf.append('>');
