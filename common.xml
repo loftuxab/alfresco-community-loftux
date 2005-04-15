@@ -60,7 +60,7 @@
 
    <target name="compile-java" depends="init" description="Compiles the Java source code">
       <mkdir dir="${classes.dir}"/>
-      <javac destdir="${classes.dir}" fork="true" deprecation="on" debug="on">
+      <javac destdir="${classes.dir}" fork="true" deprecation="on" debug="on" target="1.5" source="1.5">
          <src path="${src.java.dir}"/>
          <classpath refid="java.classpath"/>
       </javac>
