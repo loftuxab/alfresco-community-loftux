@@ -143,7 +143,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
     {
         EmfFactory factory = EmfFactory.eINSTANCE;
         M2PropertyType type = (M2PropertyType)factory.createEMFPropertyType();
-        type.setName(typeName);
+        type.setQName(typeName);
         resource.getContents().add(type);
         indexObject((EObject)type);
         return type;
@@ -157,7 +157,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
     {
         EmfFactory factory = EmfFactory.eINSTANCE;
         M2Type type = (M2Type)factory.createEMFType();
-        type.setName(typeName);
+        type.setQName(typeName);
         resource.getContents().add(type);
         indexObject((EObject)type);
         return type;
@@ -171,7 +171,7 @@ public class EMFMetaModelDAO implements MetaModelDAO
     {
         EmfFactory factory = EmfFactory.eINSTANCE;
         M2Aspect aspect = (M2Aspect)factory.createEMFAspect();
-        aspect.setName(aspectName);
+        aspect.setQName(aspectName);
         resource.getContents().add(aspect);
         indexObject((EObject)aspect);
         return aspect;
@@ -198,19 +198,19 @@ public class EMFMetaModelDAO implements MetaModelDAO
         if (object instanceof M2Type)
         {
             M2Type m2Type= (M2Type)object;
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFClass()).put(m2Type.getName(), object);
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFType()).put(m2Type.getName(), object);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFClass()).put(m2Type.getQName(), object);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFType()).put(m2Type.getQName(), object);
         }
         else if (object instanceof M2Aspect)
         {
             M2Aspect m2Aspect = (M2Aspect)object;
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFClass()).put(m2Aspect.getName(), object);
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFAspect()).put(m2Aspect.getName(), object);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFClass()).put(m2Aspect.getQName(), object);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFAspect()).put(m2Aspect.getQName(), object);
         }
         else if (object instanceof M2PropertyType)
         {
             M2PropertyType m2PropertyType= (M2PropertyType)object;
-            getObjectIndex(EmfPackage.eINSTANCE.getEMFPropertyType()).put(m2PropertyType.getName(), object);
+            getObjectIndex(EmfPackage.eINSTANCE.getEMFPropertyType()).put(m2PropertyType.getQName(), object);
         }
     }
 

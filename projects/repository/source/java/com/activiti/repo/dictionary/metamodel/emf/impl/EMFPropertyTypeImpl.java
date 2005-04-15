@@ -37,20 +37,20 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 public class EMFPropertyTypeImpl extends EObjectImpl implements EMFPropertyType, M2PropertyType
 {
     /**
-     * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+     * The default value of the '{@link #getQName() <em>Name</em>}' attribute.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getName()
+     * @see #getQName()
      * @generated
      * @ordered
      */
     protected static final QName NAME_EDEFAULT = null;
 
     /**
-     * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+     * The cached value of the '{@link #getQName() <em>Name</em>}' attribute.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getName()
+     * @see #getQName()
      * @generated
      * @ordered
      */
@@ -81,7 +81,7 @@ public class EMFPropertyTypeImpl extends EObjectImpl implements EMFPropertyType,
      * <!-- end-user-doc -->
      * @generated
      */
-    public QName getName()
+    public QName getQName()
     {
         return name;
     }
@@ -91,7 +91,7 @@ public class EMFPropertyTypeImpl extends EObjectImpl implements EMFPropertyType,
      * <!-- end-user-doc -->
      * @generated
      */
-    public void setName(QName newName)
+    public void setQName(QName newName)
     {
         QName oldName = name;
         name = newName;
@@ -109,7 +109,7 @@ public class EMFPropertyTypeImpl extends EObjectImpl implements EMFPropertyType,
         switch (eDerivedStructuralFeatureID(eFeature))
         {
             case EmfPackage.EMF_PROPERTY_TYPE__NAME:
-                return getName();
+                return getQName();
         }
         return eDynamicGet(eFeature, resolve);
     }
@@ -124,7 +124,7 @@ public class EMFPropertyTypeImpl extends EObjectImpl implements EMFPropertyType,
         switch (eDerivedStructuralFeatureID(eFeature))
         {
             case EmfPackage.EMF_PROPERTY_TYPE__NAME:
-                setName((QName)newValue);
+                setQName((QName)newValue);
                 return;
         }
         eDynamicSet(eFeature, newValue);
@@ -140,7 +140,7 @@ public class EMFPropertyTypeImpl extends EObjectImpl implements EMFPropertyType,
         switch (eDerivedStructuralFeatureID(eFeature))
         {
             case EmfPackage.EMF_PROPERTY_TYPE__NAME:
-                setName(NAME_EDEFAULT);
+                setQName(NAME_EDEFAULT);
                 return;
         }
         eDynamicUnset(eFeature);

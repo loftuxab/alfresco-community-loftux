@@ -1,6 +1,5 @@
 package com.activiti.repo.dictionary;
 
-
 /**
  * Read-only definition of a Child Association.
  * 
@@ -10,10 +9,8 @@ package com.activiti.repo.dictionary;
 public interface ChildAssociationDefinition extends AssociationDefinition
 {
     /**
-     * Gets the default child type 
-     * 
-     * @return  the class reference of the child type
+     * @return the class definition of the default child type
      */
-    public ClassRef getDefaultType();
+    public ClassDefinition getDefaultType();
 
 }

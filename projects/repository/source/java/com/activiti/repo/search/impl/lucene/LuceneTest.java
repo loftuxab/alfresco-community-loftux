@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 
 import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.AssociationDefinition;
-import com.activiti.repo.dictionary.AssociationRef;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
@@ -1123,19 +1122,16 @@ public class LuceneTest extends TestCase
 
         public ClassRef getReference()
         {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException();
         }
 
-        public QName getName()
+        public QName getQName()
         {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException();
         }
 
-        public ClassRef getSuperClass()
+        public ClassDefinition getSuperClass()
         {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException();
         }
 
@@ -1146,22 +1142,28 @@ public class LuceneTest extends TestCase
 
         public boolean isAspect()
         {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException();
         }
 
-        public Map<PropertyRef, PropertyDefinition> getProperties()
+        public AssociationDefinition getAssociation(String name)
         {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException();
         }
 
-        public Map<AssociationRef, AssociationDefinition> getAssociations()
+        public List<AssociationDefinition> getAssociations()
         {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException();
         }
-        
+
+        public List<PropertyDefinition> getProperties()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public PropertyDefinition getProperty(String name)
+        {
+            throw new UnsupportedOperationException();
+        }
     }
     
     public static void main(String[] args)

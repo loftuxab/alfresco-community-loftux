@@ -2,7 +2,7 @@ package com.activiti.repo.dictionary.metamodel;
 
 import java.util.List;
 
-import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.TypeDefinition;
 
 
@@ -24,7 +24,7 @@ public class M2TypeDefinition extends M2ClassDefinition
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.TypeDefinition#getDefaultAspects()
      */
-    public List<ClassRef> getDefaultAspects()
+    public List<ClassDefinition> getDefaultAspects()
     {
         List<M2Aspect> defaultAspects = ((M2Type)getM2Class()).getDefaultAspects();
         return M2References.createClassRefList(defaultAspects);

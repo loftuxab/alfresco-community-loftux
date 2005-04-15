@@ -24,7 +24,7 @@ public class EMFResource
     /**
      * Default Resource URI
      */
-    private static final String DEFAULT_RESOURCEURI = "classpath:/com/activiti/repo/dictionary/metamodel/emf/dictionary.xml";
+    public static final String DEFAULT_RESOURCEURI = "classpath:/com/activiti/repo/dictionary/metamodel/emf/dictionary.xml";
 
     /**
      * Resource URI for Model Definitions

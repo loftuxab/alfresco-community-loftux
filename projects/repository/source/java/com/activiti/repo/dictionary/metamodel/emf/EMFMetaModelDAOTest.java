@@ -2,9 +2,8 @@ package com.activiti.repo.dictionary.metamodel.emf;
 
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.dictionary.bootstrap.BaseDictionaryTest;
 import com.activiti.repo.dictionary.metamodel.M2Aspect;
 import com.activiti.repo.dictionary.metamodel.M2Class;
 import com.activiti.repo.dictionary.metamodel.M2Property;
@@ -16,80 +15,58 @@ import com.activiti.repo.ref.QName;
  * 
  * @author David Caruana
  */
-public class EMFMetaModelDAOTest extends TestCase
+public class EMFMetaModelDAOTest extends BaseDictionaryTest
 {
-
-    private EMFMetaModelDAO dao = null;
-    
-    
-    protected void setUp() throws Exception
-    {
-        // Create Resource
-        EMFResource resource = new EMFResource();
-        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testBootstrap.xml");
-        resource.init();
-        
-        // Create DAO
-        dao = new EMFMetaModelDAO();
-        dao.setResource(resource);
-        dao.init();
-    }
-
-
     public void testDAOGetTypes()
     {
-        Collection qnames = dao.getTypes();
+        Collection qnames = metaModelDao.getTypes();
         assertNotNull(qnames);
         assertEquals(3, qnames.size());
     }
-
     
     public void testDAOGetClass()
     {
         QName fileQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
-        M2Class m2FileClass = dao.getClass(fileQName);
+        M2Class m2FileClass = metaModelDao.getClass(fileQName);
         assertNotNull(m2FileClass);
-        assertEquals(fileQName, m2FileClass.getName());
+        assertEquals(fileQName, m2FileClass.getQName());
         
         QName referenceQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "referenceable");
-        M2Class m2ReferenceClass = dao.getClass(referenceQName);
+        M2Class m2ReferenceClass = metaModelDao.getClass(referenceQName);
         assertNotNull(m2ReferenceClass);
-        assertEquals(referenceQName, m2ReferenceClass.getName());
+        assertEquals(referenceQName, m2ReferenceClass.getQName());
     }
-
 
     public void testDAOGetType()
     {
         QName fileQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
-        M2Type m2FileClass = dao.getType(fileQName);
+        M2Type m2FileClass = metaModelDao.getType(fileQName);
         assertNotNull(m2FileClass);
-        assertEquals(fileQName, m2FileClass.getName());
+        assertEquals(fileQName, m2FileClass.getQName());
         
         QName referenceQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "referenceable");
-        M2Type m2ReferenceClass = dao.getType(referenceQName);
+        M2Type m2ReferenceClass = metaModelDao.getType(referenceQName);
         assertNull(m2ReferenceClass);
     }
-
     
     public void testDAOGetAspect()
     {
         QName referenceQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "referenceable");
-        M2Aspect m2ReferenceClass = dao.getAspect(referenceQName);
+        M2Aspect m2ReferenceClass = metaModelDao.getAspect(referenceQName);
         assertNotNull(m2ReferenceClass);
-        assertEquals(referenceQName, m2ReferenceClass.getName());
+        assertEquals(referenceQName, m2ReferenceClass.getQName());
 
         QName fileQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
-        M2Aspect m2FileClass = dao.getAspect(fileQName);
+        M2Aspect m2FileClass = metaModelDao.getAspect(fileQName);
         assertNull(m2FileClass);
     }
 
-    
     public void testDAOGetProperty()
     {
         QName fileQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
-        M2Property m2Property = dao.getProperty(fileQName, "encoding");
+        M2Property m2Property = metaModelDao.getProperty(fileQName, "encoding");
         assertNotNull(m2Property);
-        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file-encoding"), m2Property.getReference().getQName());
+        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file-encoding"),
+                m2Property.getPropertyDefinition().getQName());
     }
-
 }

@@ -42,9 +42,8 @@ public class DictionaryComponent implements DictionaryService
         this.metaModelDAO = metaModelDAO;
     }
 
-    
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.DictionaryService#getTypes()
+    /**
+     * @see MetaModelDAO#getTypes()
      */
     public Collection<ClassRef> getTypes()
     {
@@ -53,9 +52,8 @@ public class DictionaryComponent implements DictionaryService
         return classRefs;
     }
 
-
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.DictionaryService#getClass(com.activiti.repo.dictionary.ClassRef)
+    /**
+     * @see MetaModelDAO#getClass(QName)
      */
     public ClassDefinition getClass(ClassRef classRef)
     {
@@ -63,9 +61,8 @@ public class DictionaryComponent implements DictionaryService
         return m2Class == null ? null : m2Class.getClassDefinition();
     }
 
-    
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.DictionaryService#getType(com.activiti.repo.dictionary.ClassRef)
+    /**
+     * @see MetaModelDAO#getType(QName)
      */
     public TypeDefinition getType(ClassRef typeRef)
     {
@@ -73,9 +70,8 @@ public class DictionaryComponent implements DictionaryService
         return m2Type == null ? null : (TypeDefinition)m2Type.getClassDefinition();
     }
 
-
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.DictionaryService#getAspect(com.activiti.repo.dictionary.ClassRef)
+    /**
+     * @see MetaModelDAO#getAspect(QName)
      */
     public AspectDefinition getAspect(ClassRef aspectRef)
     {
@@ -83,14 +79,13 @@ public class DictionaryComponent implements DictionaryService
         return m2Aspect == null ? null : (AspectDefinition)m2Aspect.getClassDefinition();
     }
     
-    
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.DictionaryService#getProperty(com.activiti.repo.dictionary.PropertyRef)
+    /**
+     * @see MetaModelDAO#getProperty(QName, String)
      */
     public PropertyDefinition getProperty(PropertyRef propertyRef)
     {
-        M2Property m2Property = metaModelDAO.getProperty(propertyRef.getClassRef().getQName(), propertyRef.getPropertyName());
+        M2Property m2Property = metaModelDAO.getProperty(propertyRef.getClassRef().getQName(),
+                propertyRef.getPropertyName());
         return m2Property == null ? null : m2Property.getPropertyDefinition();
     }
-    
 }

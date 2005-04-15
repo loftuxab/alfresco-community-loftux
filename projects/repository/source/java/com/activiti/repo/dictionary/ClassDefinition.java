@@ -1,9 +1,8 @@
 package com.activiti.repo.dictionary;
 
-import java.util.Map;
+import java.util.List;
 
 import com.activiti.repo.ref.QName;
-
 
 /**
  * Read-only definition of a Class.
@@ -13,25 +12,19 @@ import com.activiti.repo.ref.QName;
 public interface ClassDefinition
 {
     /**
-     * Gets the Class Reference
-     * 
      * @return  the class reference
      */
     public ClassRef getReference();
 
     /**
-     * Gets the class qualified name
-     * 
-     * @return  qualified name
+     * @return the qualified name of the class
      */
-    public QName getName();
+    public QName getQName();
     
     /**
-     * Gets the super class
-     * 
      * @return  the super class (or null, if this is the root)
      */
-    public ClassRef getSuperClass();
+    public ClassDefinition getSuperClass();
     
     /**
      * @return the first basic bootstrap type, or null if the type doesn't derive
@@ -42,28 +35,33 @@ public interface ClassDefinition
     public ClassRef getBootstrapClass();
 
     /**
-     * Is this an Aspect definition?
-     * 
-     * @return  true => aspect, false => type
+     * @return Returns true => aspect, false => type
      */
     public boolean isAspect();
 
     /**
-     * Gets the properties of the Class
-     * 
-     * Note: Also includes inherited properties.
-     * 
-     * @return  properties including inherited
+     * @return Returns the properties of the class, including inherited properties
      */
-    public Map<PropertyRef, PropertyDefinition> getProperties();
+    public List<PropertyDefinition> getProperties();
+    
+    /**
+     * @param name the simple name of the property, i.e. not the qualified name
+     * @return Returns the property definition, or null if not found
+     * 
+     * @see PropertyRef#getPropertyName()
+     */
+    public PropertyDefinition getProperty(String name);
 
     /**
-     * Gets the associations of the Class
-     * 
-     * Note: Also includes inherited associations.
-     * 
-     * @return  associations including inherited
+     * @return Returns the associations including inherited ones
      */
-    public Map<AssociationRef, AssociationDefinition> getAssociations();
+    public List<AssociationDefinition> getAssociations();
     
+    /**
+     * @param name the simple name of the association, i.e. not the qualified name
+     * @return Returns the association definition, or null if not found
+     * 
+     * @see AssociationRef#getAssociationName()
+     */
+    public AssociationDefinition getAssociation(String name);
 }

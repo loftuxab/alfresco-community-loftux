@@ -2,11 +2,11 @@ package com.activiti.repo.dictionary.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
+import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
-import com.activiti.repo.dictionary.PropertyRef;
+import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.ref.QName;
 
 
@@ -19,36 +19,36 @@ public class M2References
 {
 
     /**
-     * Construct an immutable list of Class References
+     * Construct an immutable list of Class Definitions
      * 
-     * @param m2Classes  list of Class to construct references from
-     * @return  list of class references
+     * @param m2Classes  list of Class to construct definitions from
+     * @return  list of class definitions
      */
-    public static List<ClassRef> createClassRefList(Collection<? extends M2Class> m2Classes)
+    public static List<ClassDefinition> createClassRefList(Collection<? extends M2Class> m2Classes)
     {
-        List<ClassRef> references = new ArrayList<ClassRef>(m2Classes.size());
+        List<ClassDefinition> defs = new ArrayList<ClassDefinition>(m2Classes.size());
         for (M2Class m2Class : m2Classes)
         {
-            references.add(m2Class.getReference());
+            defs.add(m2Class.getClassDefinition());
         }
-        return Collections.unmodifiableList(references);
+        return defs;
     }
 
 
     /**
-     * Construct an immutable list of Property References
+     * Construct an immutable list of Property definitions
      * 
-     * @param m2Properties  list of properties to construct references from
-     * @return  list of property references
+     * @param m2Properties  list of properties to construct definitions from
+     * @return  list of property defintions
      */
-    public static List<PropertyRef> createPropertyRefList(Collection<M2Property> m2Properties)
+    public static List<PropertyDefinition> createPropertyRefList(Collection<M2Property> m2Properties)
     {
-        List<PropertyRef> references = new ArrayList<PropertyRef>(m2Properties.size());
+        List<PropertyDefinition> defs = new ArrayList<PropertyDefinition>(m2Properties.size());
         for (M2Property m2Property : m2Properties)
         {
-            references.add(m2Property.getReference());
+            defs.add(m2Property.getPropertyDefinition());
         }
-        return Collections.unmodifiableList(references);
+        return defs;
     }
     
 
@@ -66,8 +66,6 @@ public class M2References
             ClassRef classRef = new ClassRef(qname);
             ddrefs.add(classRef);
         }
-        
-        return Collections.unmodifiableCollection(ddrefs);
+        return ddrefs;
     }
-    
 }

@@ -12,9 +12,9 @@ import com.activiti.repo.ref.QName;
 public interface M2PropertyType
 {
 
-    public QName getName();
+    public QName getQName();
     
-    public void setName(QName name);    
+    public void setQName(QName qname);    
     
     // TODO:  public List/*M2ValueConstraint*/ getValueConstraints();
 

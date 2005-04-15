@@ -28,18 +28,14 @@ public interface AssociationDefinition
     public AssociationRef getReference();
 
     /**
-     * Gets the class reference that owns this association
-     * 
-     * @return  the owning class reference
+     * @return  the owning class definition
      */
-    public ClassRef getContainerClass();
+    public ClassDefinition getContainerClass();
 
     /**
-     * Gets the list of classes that this association must refer to
-     * 
-     * @return  the class list  
+     * @return  the list of classes that this association must refer to  
      */
-    public List<ClassRef> getRequiredToClasses();
+    public List<ClassDefinition> getRequiredToClasses();
     
     /**
      * Is this a child association?

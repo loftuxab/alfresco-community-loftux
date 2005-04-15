@@ -1,8 +1,6 @@
 package com.activiti.repo.dictionary.metamodel;
 
 import com.activiti.repo.dictionary.PropertyDefinition;
-import com.activiti.repo.dictionary.PropertyRef;
-
 
 /**
  * Property Definition
@@ -11,8 +9,6 @@ import com.activiti.repo.dictionary.PropertyRef;
  */
 public interface M2Property
 {
-    public PropertyRef getReference();
-    
     public M2Class getContainerClass();
 
     public String getName();
@@ -54,10 +50,7 @@ public interface M2Property
     // TODO: IndexTokenizer Class setter/getters??
     
     /**
-     * Gets the Read-only Property Definition
-     * 
-     * @return  the read-only property definition
+     * @return Returns a read-only property definition
      */
     public PropertyDefinition getPropertyDefinition();
-    
 }

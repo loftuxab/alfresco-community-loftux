@@ -1,16 +1,12 @@
 package com.activiti.repo.dictionary.metamodel;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.activiti.repo.dictionary.AssociationDefinition;
-import com.activiti.repo.dictionary.AssociationRef;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.PropertyDefinition;
-import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.QName;
 
@@ -27,6 +23,7 @@ public class M2ClassDefinition implements ClassDefinition
      */
     protected M2Class m2Class;
     
+    private ClassRef classRef;
     
     /**
      * Construct Read-Only Class Definition
@@ -73,16 +70,20 @@ public class M2ClassDefinition implements ClassDefinition
      */
     public ClassRef getReference()
     {
-        return m2Class.getReference();
+        if (classRef == null)
+        {
+            classRef = new ClassRef(getQName());
+        }
+        return classRef;
     }
 
     
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.ClassDefinition#getName()
      */
-    public QName getName()
+    public QName getQName()
     {
-        return m2Class.getName();
+        return m2Class.getQName();
     }
 
 
@@ -98,9 +99,9 @@ public class M2ClassDefinition implements ClassDefinition
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.ClassDefinition#getSuperClass()
      */
-    public ClassRef getSuperClass()
+    public ClassDefinition getSuperClass()
     {
-        return m2Class.getSuperClass().getReference();
+        return m2Class.getSuperClass().getClassDefinition();
     }
     
     public ClassRef getBootstrapClass()
@@ -123,55 +124,87 @@ public class M2ClassDefinition implements ClassDefinition
         return baseClassRef;
     }
     
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.ClassDefinition#getProperties()
+    /**
+     * @see #getAggregateProperties()()
      */
-    public Map<PropertyRef, PropertyDefinition> getProperties()
+    public List<PropertyDefinition> getProperties()
     {
-        List<M2Property> aggregatedProperties = aggregateProperties();
-        Map<PropertyRef, PropertyDefinition> propertyDefs = new HashMap<PropertyRef, PropertyDefinition>(aggregatedProperties.size());
+        List<M2Property> aggregatedProperties = getAggregateProperties();
+        List<PropertyDefinition> propertyDefs = new ArrayList<PropertyDefinition>(aggregatedProperties.size());
         for (M2Property m2Property : aggregatedProperties)
         {
-            propertyDefs.put(m2Property.getPropertyDefinition().getReference(), m2Property.getPropertyDefinition());
+            propertyDefs.add(m2Property.getPropertyDefinition());
         }
-        return Collections.unmodifiableMap(propertyDefs);
+        return propertyDefs;
     }
 
-    
+    /**
+     * Finds the property name from the list of properties local to this class
+     */
+    public PropertyDefinition getProperty(String name)
+    {
+        List<M2Property> properties = m2Class.getProperties();
+        for (M2Property property : properties)
+        {
+            if (property.getName().equals(name))
+            {
+                // found the property - get the cached defintion
+                return property.getPropertyDefinition();
+            }
+        }
+        // nothing found
+        return null;
+    }
+
     /**
      * Gets the full list of Properties to include in Class Definition
      * 
      * @return  properties
      */
-    protected List<M2Property> aggregateProperties()
+    protected List<M2Property> getAggregateProperties()
     {
         return m2Class.getInheritedProperties();
     }
     
-    
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.ClassDefinition#getAssociations()
+    /**
+     * @see #getAggregateAssociations()
      */
-    public Map<AssociationRef, AssociationDefinition> getAssociations()
+    public List<AssociationDefinition> getAssociations()
     {
-        List<M2Association> aggregatedAssociations = aggregateAssociations();
-        Map<AssociationRef, AssociationDefinition> assocDefs = new HashMap<AssociationRef, AssociationDefinition>(aggregatedAssociations.size());
+        List<M2Association> aggregatedAssociations = getAggregateAssociations();
+        List<AssociationDefinition> assocDefs = new ArrayList<AssociationDefinition>(aggregatedAssociations.size());
         for (M2Association m2Assoc : aggregatedAssociations)
         {
-            assocDefs.put(m2Assoc.getAssociationDefintion().getReference(), m2Assoc.getAssociationDefintion());
+            assocDefs.add(m2Assoc.getAssociationDefintion());
         }
-        return Collections.unmodifiableMap(assocDefs);
+        return assocDefs;
     }
 
+    /**
+     * Finds the association name from the list of associations local to this class
+     */
+    public AssociationDefinition getAssociation(String name)
+    {
+        List<M2Association> assocs = m2Class.getAssociations();
+        for (M2Association assoc : assocs)
+        {
+            if (assoc.getName().equals(name))
+            {
+                // found the association - get the cached defintion
+                return assoc.getAssociationDefintion();
+            }
+        }
+        // nothing found
+        return null;
+    }
 
     /**
      * Gets the full list of Associations to include in Class Definition
      * 
      * @return  properties
      */
-    protected List<M2Association> aggregateAssociations()
+    protected List<M2Association> getAggregateAssociations()
     {
         return m2Class.getInheritedAssociations();
     }
-
 }

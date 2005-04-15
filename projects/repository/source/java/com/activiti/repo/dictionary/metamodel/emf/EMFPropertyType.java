@@ -13,16 +13,16 @@ public interface EMFPropertyType extends EObject
     /**
      * @model
      */
-    QName getName();
+    QName getQName();
     
     /**
      * Sets the value of the '{@link com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType#getName <em>Name</em>}' attribute.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @param value the new value of the '<em>Name</em>' attribute.
-     * @see #getName()
+     * @see #getQName()
      * @generated
      */
-    void setName(QName value);
+    void setQName(QName value);
 
 }

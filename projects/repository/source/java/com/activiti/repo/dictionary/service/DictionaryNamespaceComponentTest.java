@@ -2,11 +2,8 @@ package com.activiti.repo.dictionary.service;
 
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
 import com.activiti.repo.dictionary.NamespaceService;
-import com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceDAO;
-import com.activiti.repo.dictionary.metamodel.emf.EMFResource;
+import com.activiti.repo.dictionary.bootstrap.BaseDictionaryTest;
 import com.activiti.repo.ref.NamespaceException;
 
 
@@ -15,21 +12,17 @@ import com.activiti.repo.ref.NamespaceException;
  * 
  * @author David Caruana
  */
-public class DictionaryNamespaceComponentTest extends TestCase
+public class DictionaryNamespaceComponentTest extends BaseDictionaryTest
 {
     protected NamespaceService service;
-
     
     protected void setUp() throws Exception
     {
-        EMFResource resource = new EMFResource();
-        resource.setURI("classpath:/com/activiti/repo/dictionary/metamodel/emf/testBootstrap.xml");
-        resource.init();
-        EMFNamespaceDAO dao = new EMFNamespaceDAO();
-        dao.setResource(resource);
-        dao.init();
+        // ensure that test model is bootstrapped
+        super.setUp();
+        
         DictionaryNamespaceComponent component = new DictionaryNamespaceComponent();
-        component.setNamespaceDAO(dao);
+        component.setNamespaceDAO(super.namespaceDao);
         service = component;
     }
     

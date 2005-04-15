@@ -684,7 +684,8 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
     {
         if (propertyRef == null)
         {
-            propertyRef = new PropertyRef(getContainerClass().getReference(), getName());
+            propertyRef = new PropertyRef(getContainerClass().getClassDefinition().getReference(),
+                    getName());
         }
         return propertyRef;
     }

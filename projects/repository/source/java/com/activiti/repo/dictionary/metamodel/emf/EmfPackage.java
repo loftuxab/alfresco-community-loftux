@@ -904,7 +904,7 @@ public interface EmfPackage extends EPackage{
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @return the meta object for the attribute '<em>Name</em>'.
-     * @see com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType#getName()
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType#getQName()
      * @see #getEMFPropertyType()
      * @generated
      */

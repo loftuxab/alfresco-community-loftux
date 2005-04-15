@@ -485,7 +485,8 @@ public class EMFAssociationImpl extends EObjectImpl implements EMFAssociation, M
     {
         if (assocRef == null)
         {
-            assocRef = new AssociationRef(getContainerClass().getReference(), getName());
+            assocRef = new AssociationRef(getContainerClass().getClassDefinition().getReference(),
+                    getName());
         }
         return assocRef;
     }

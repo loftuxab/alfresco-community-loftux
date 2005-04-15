@@ -1,5 +1,7 @@
 package com.activiti.repo.dictionary.bootstrap;
 
+import java.io.File;
+
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryException;
 import com.activiti.repo.dictionary.NamespaceService;
@@ -14,60 +16,39 @@ import com.activiti.repo.dictionary.metamodel.M2PropertyType;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
 import com.activiti.repo.dictionary.metamodel.NamespaceDAO;
+import com.activiti.repo.dictionary.metamodel.emf.EMFMetaModelDAO;
+import com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceDAO;
+import com.activiti.repo.dictionary.metamodel.emf.EMFResource;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.version.lightweight.VersionStoreBaseImpl;
-
+import com.activiti.util.debug.CodeMonkey;
 
 /**
- * Dictionary Bootsrap.
- * 
  * Provides support for creating initial set of meta-data.
  * 
  * @author David Caruana
- *
  */
 public class DictionaryBootstrap
 {
-    public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "base");
-    public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "reference");
+    public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ACTIVITI_URI, "base");
+    public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ACTIVITI_URI, "reference");
+    public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ACTIVITI_URI, "container");
+    public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "content");
     public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder");
     public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
 
     public static final ClassRef TYPE_BASE = new ClassRef(TYPE_QNAME_BASE); 
     public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE); 
+    public static final ClassRef TYPE_CONTAINER = new ClassRef(TYPE_QNAME_CONTAINER);
+    public static final ClassRef TYPE_CONTENT = new ClassRef(TYPE_QNAME_CONTENT);
     public static final ClassRef TYPE_FOLDER = new ClassRef(TYPE_QNAME_FOLDER);
     public static final ClassRef TYPE_FILE = new ClassRef(TYPE_QNAME_FILE);
 
-    /**
-     * Namespace DAO
-     */
     private NamespaceDAO namespaceDAO = null;
-    
-    /**
-     * Meta Model DAO
-     */
     private MetaModelDAO metaModelDAO = null;
 
     /**
-     * Create meta-model definitions during bootstrap
-     */
-    private boolean createMetaModel = false;
-    
-    /**
-     * Create test model definitions during bootstrap
-     */
-    private boolean createTestModel = false;
-
-    /**
-     * Create light weight version store model defintions during bootstrap
-     */
-    private boolean createVersionModel = false;
-
-    
-    /**
-     * Sets the Namespace DAO to boostrap with
-     * 
-     * @param namespaceDAO  the namespace DAO
+     * @param namespaceDAO  the namespace DAO to bootstrap with
      */
     public void setNamespaceDAO(NamespaceDAO namespaceDAO)
     {
@@ -75,52 +56,61 @@ public class DictionaryBootstrap
     }
     
     /**
-     * Sets the Meta Model DAO to boostrap with
-     * 
-     * @param metaModelDAO  the meta model DAO
+     * @param metaModelDAO  the meta model DAO to bootstrap with
      */
     public void setMetaModelDAO(MetaModelDAO metaModelDAO)
     {
         this.metaModelDAO = metaModelDAO;
     }
-
-    /**
-     * Sets whether to create meta model definitions during bootstrap
-     *   
-     * @param createMetaModel
-     */
-    public void setCreateMetaModel(boolean createMetaModel)
-    {
-        this.createMetaModel = createMetaModel;
-    }
-
-    /**
-     * Sets whether to create test model definitions during bootstrap
-     * 
-     * @param createTestModel
-     */
-    public void setCreateTestModel(boolean createTestModel)
-    {
-        this.createTestModel = createTestModel;
-    }
     
     /**
-     * Sets whether to create the light weight version store model
-     * during bootstrap
+     * Run this to generate the bootstrap dictionary model to a temp file, which can
+     * be copied to the default resource location
      * 
-     * @param createVersionModel
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFResource#DEFAULT_RESOURCEURI
+     * @see #bootstrapModel()
      */
-    public void setCreateVersionModel(boolean createVersionModel)
+    public static void main(String[] args) throws Exception
     {
-        this.createVersionModel = createVersionModel;
+        // Construct Bootstrap Service
+        EMFResource resource = new EMFResource();
+        File tempFile = File.createTempFile("dictionary", ".xml");
+        resource.setURI(tempFile.getAbsolutePath());
+        resource.initCreate();
+
+        // Construct EMF Namespace DAO
+        EMFNamespaceDAO namespaceDao = new EMFNamespaceDAO();
+        namespaceDao.setResource(resource);
+        namespaceDao.init();
+        
+        // Construct EMF Meta Model DAO
+        EMFMetaModelDAO metaModelDao = new EMFMetaModelDAO();
+        metaModelDao.setResource(resource);
+        metaModelDao.init();
+
+        // Construct Bootstrap Service
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
+        bootstrap.setNamespaceDAO(namespaceDao);
+        bootstrap.setMetaModelDAO(metaModelDao);
+
+        // Create test Bootstrap definitions
+        bootstrap.bootstrapModel();
+        
+        // save it
+        resource.save();
+        
+        // report
+        System.out.print("Generated dictionary model: \n" +
+                "   file: " + tempFile + "\n" +
+                "   default bootstrap location is: " + EMFResource.DEFAULT_RESOURCEURI);
     }
 
-    
     /**
-     * Create bootstrap meta-data definitions. 
+     * Loads the dictionary model into memory
      */
-    public void bootstrap()
+    public void bootstrapModel()
     {
+        CodeMonkey.todo("Read model from a configuration file"); // TODO
         if (namespaceDAO == null)
         {
             throw new DictionaryException("Namespace DAO has not been provided");
@@ -129,26 +119,30 @@ public class DictionaryBootstrap
         {
             throw new DictionaryException("Meta Model DAO has not been provided");
         }
-        
-        // Create core definitions
         createNamespaces();
         createPropertyTypes();
-        
-        // Create optional definitions
-        if (createMetaModel)
-        {
-            createMetaModel();
-        }
-        if (createTestModel)
-        {
-            createTestModel();
-        }
-        if (createVersionModel)
-        {
-            createVersionModel();
-        }
+        createMetaModel();
+        createVersionModel();
     }
     
+    /**
+     * Loads the test dictionary model into memory
+     */
+    public void bootstrapTestModel()
+    {
+        CodeMonkey.todo("Read model from a configuration file"); // TODO
+        if (namespaceDAO == null)
+        {
+            throw new DictionaryException("Namespace DAO has not been provided");
+        }
+        if (metaModelDAO == null)
+        {
+            throw new DictionaryException("Meta Model DAO has not been provided");
+        }
+        createNamespaces();
+        createPropertyTypes();
+        createTestModel();
+    }
     
     /**
      * Create bootstrap Namespace definitions
@@ -198,16 +192,6 @@ public class DictionaryBootstrap
      */
     private void createMetaModel()
     {
-        // TODO: Implement...
-        throw new UnsupportedOperationException();
-    }
-    
-    
-    /**
-     * Create a simple test model.
-     */
-    private void createTestModel()
-    {
         // Create Test Referencable Aspect
         M2Aspect referenceAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "referenceable"));
         M2Property idProp = referenceAspect.createProperty("id");
@@ -237,6 +221,56 @@ public class DictionaryBootstrap
         referenceProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         referenceProp.setMandatory(true);
         referenceProp.setMultiValued(false);
+
+        // Create Test File Type
+        M2Type fileType = metaModelDAO.createType(TYPE_QNAME_FILE);
+        fileType.setSuperClass(baseType);
+        fileType.getDefaultAspects().add(referenceAspect);
+        M2Property encodingProp = fileType.createProperty("encoding");
+        encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        encodingProp.setMandatory(true);
+        encodingProp.setMultiValued(false);
+        M2Property mimetypeProp = fileType.createProperty("mimetype");
+        mimetypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        mimetypeProp.setMandatory(true);
+        mimetypeProp.setMultiValued(false);
+        
+        // Create Test Folder Type
+        M2Type folderType = metaModelDAO.createType(TYPE_QNAME_FOLDER);
+        folderType.setSuperClass(baseType);
+        folderType.getDefaultAspects().add(referenceAspect);
+        M2ChildAssociation contentsAssoc = folderType.createChildAssociation("contents");
+        contentsAssoc.getRequiredToClasses().add(fileType);
+        contentsAssoc.setMandatory(false);
+        contentsAssoc.setMultiValued(true);
+    }
+    
+    
+    /**
+     * Create a simple test model.
+     */
+    private void createTestModel()
+    {
+        // Create Test Referencable Aspect
+        M2Aspect referenceAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "referenceable"));
+        M2Property idProp = referenceAspect.createProperty("id");
+        idProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
+        idProp.setMandatory(true);
+        idProp.setProtected(false);
+        idProp.setMultiValued(false);
+        
+        // Create Test Base Type
+        M2Type baseType = metaModelDAO.createType(TYPE_QNAME_BASE);
+        M2Property primaryTypeProp = baseType.createProperty("primaryType");
+        primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
+        primaryTypeProp.setMandatory(true);
+        primaryTypeProp.setProtected(true);
+        primaryTypeProp.setMultiValued(false);
+        M2Property aspectsProp = baseType.createProperty("aspects");
+        aspectsProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
+        aspectsProp.setMandatory(false);
+        aspectsProp.setProtected(true);
+        aspectsProp.setMultiValued(true);
 
         // Create Test File Type
         M2Type fileType = metaModelDAO.createType(TYPE_QNAME_FILE);

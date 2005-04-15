@@ -105,11 +105,6 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     protected EList emfAssociations = null;
 
     /**
-     * Class Reference
-     */
-    protected ClassRef classRef = null;
-    
-    /**
      * Read-only Class Definition
      */
     protected ClassDefinition classDefinition = null;
@@ -387,21 +382,21 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     }
 
     /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.metamodel.M2Class#getReference()
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getClassDefinition()
      */
-    public ClassRef getReference()
+    public ClassDefinition getClassDefinition()
     {
-        if (classRef == null)
+        if (classDefinition == null)
         {
-            classRef = new ClassRef(getName());
+            classDefinition = M2ClassDefinition.create(this);
         }
-        return classRef;
+        return classDefinition;
     }
     
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#getName()
      */
-    public QName getName()
+    public QName getQName()
     {
         return getEmfName();
     }
@@ -409,9 +404,9 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#setName(com.activiti.repo.ref.QName)
      */
-    public void setName(QName value)
+    public void setQName(QName qname)
     {
-        setEmfName(value);
+        setEmfName(qname);
     }
 
 
@@ -521,18 +516,6 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
             deriveInheritedAssociations(superClass, associations);
         }
         associations.addAll(thisClass.getAssociations());
-    }
-    
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.metamodel.M2Class#getClassDefinition()
-     */
-    public ClassDefinition getClassDefinition()
-    {
-        if (classDefinition == null)
-        {
-            classDefinition = M2ClassDefinition.create(this);
-        }
-        return classDefinition;
     }
     
 } //EMFClassImpl

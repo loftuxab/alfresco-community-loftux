@@ -3,8 +3,6 @@ package com.activiti.repo.dictionary.metamodel;
 import java.util.List;
 
 import com.activiti.repo.dictionary.AssociationDefinition;
-import com.activiti.repo.dictionary.AssociationRef;
-
 
 /**
  * Association Definition
@@ -13,9 +11,6 @@ import com.activiti.repo.dictionary.AssociationRef;
  */
 public interface M2Association
 {
-
-    public AssociationRef getReference();
-    
     public M2Class getContainerClass();
 
     public String getName();
@@ -37,10 +32,7 @@ public interface M2Association
     public List<M2Class> getRequiredToClasses();
     
     /**
-     * Gets the read-only Association definition
-     * 
-     * @return  read-only association definition
+     * @return Returns a read-only association definition
      */
     public AssociationDefinition getAssociationDefintion();
-    
 }

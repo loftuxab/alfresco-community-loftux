@@ -1,5 +1,6 @@
 package com.activiti.repo.dictionary.bootstrap;
 
+import java.io.File;
 import java.util.Collection;
 
 import junit.framework.TestCase;
@@ -10,33 +11,34 @@ import com.activiti.repo.dictionary.metamodel.emf.EMFMetaModelDAO;
 import com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceDAO;
 import com.activiti.repo.dictionary.metamodel.emf.EMFResource;
 
-
 /**
  * Test Dictionary Bootstrap
  * 
  * @author David Caruana
  */
-public class DictionaryBootstrapTest extends TestCase
+public class BaseDictionaryTest extends TestCase
 {
-
-    private EMFResource resource = null;
-    private DictionaryBootstrap bootstrap = null;
-    
+    private File tempFile;
+    protected EMFResource resource;
+    protected DictionaryBootstrap bootstrap;
+    protected EMFNamespaceDAO namespaceDao;
+    protected EMFMetaModelDAO metaModelDao;
     
     protected void setUp() throws Exception
     {
         // Construct Bootstrap Service
         resource = new EMFResource();
-        resource.setURI("W:/company-name/HEAD/projects/repository/source/java/com/activiti/repo/dictionary/metamodel/emf/testBootstrap.xml");
+        tempFile = File.createTempFile("testBootstrap", ".xml");
+        resource.setURI(tempFile.getAbsolutePath());
         resource.initCreate();
 
         // Construct EMF Namespace DAO
-        EMFNamespaceDAO namespaceDao = new EMFNamespaceDAO();
+        namespaceDao = new EMFNamespaceDAO();
         namespaceDao.setResource(resource);
         namespaceDao.init();
         
         // Construct EMF Meta Model DAO
-        EMFMetaModelDAO metaModelDao = new EMFMetaModelDAO();
+        metaModelDao = new EMFMetaModelDAO();
         metaModelDao.setResource(resource);
         metaModelDao.init();
 
@@ -44,18 +46,22 @@ public class DictionaryBootstrapTest extends TestCase
         bootstrap = new DictionaryBootstrap();
         bootstrap.setNamespaceDAO(namespaceDao);
         bootstrap.setMetaModelDAO(metaModelDao);
-        bootstrap.setCreateTestModel(true);
-        bootstrap.setCreateVersionModel(true);
+
+        // Create test Bootstrap definitions
+        bootstrap.bootstrapTestModel();
     }
 
-    
+    /**
+     * Checks that the model can be saved and reloaded
+     */
     public void testBootstrap()
     {
-        // Create Bootstrap definitions
-        bootstrap.bootstrap();
-        
-        // Save EMF Resource
+        // save the resource
         resource.save();
+        // reinitialise
+        resource = new EMFResource();
+        resource.setURI("file://" + tempFile.getAbsolutePath());
+        resource.init();
         
         // Construct DAO (to read boostrap namespace definitions)
         EMFNamespaceDAO namespaceDAO = new EMFNamespaceDAO();
@@ -78,10 +84,9 @@ public class DictionaryBootstrapTest extends TestCase
         // Ensure Property Types exist
         M2PropertyType propString = metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT);
         assertNotNull(propString);
-        assertEquals(PropertyTypeDefinition.TEXT, propString.getName());
+        assertEquals(PropertyTypeDefinition.TEXT, propString.getQName());
         M2PropertyType propDate = metaModelDAO.getPropertyType(PropertyTypeDefinition.DATE);
         assertNotNull(propDate);
-        assertEquals(PropertyTypeDefinition.DATE, propDate.getName());
+        assertEquals(PropertyTypeDefinition.DATE, propDate.getQName());
     }
-    
 }

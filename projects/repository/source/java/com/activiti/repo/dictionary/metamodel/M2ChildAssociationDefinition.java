@@ -1,7 +1,7 @@
 package com.activiti.repo.dictionary.metamodel;
 
 import com.activiti.repo.dictionary.ChildAssociationDefinition;
-import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.ClassDefinition;
 
 
 /**
@@ -25,9 +25,10 @@ public class M2ChildAssociationDefinition extends M2AssociationDefinition
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.ChildAssociationDefinition#getDefaultType()
      */
-    public ClassRef getDefaultType()
+    public ClassDefinition getDefaultType()
     {
-        return ((M2ChildAssociation)getM2Association()).getDefaultType().getReference();
+        M2Type defaultType = ((M2ChildAssociation)getM2Association()).getDefaultType();
+        return defaultType.getClassDefinition();
     }
 
 

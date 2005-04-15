@@ -3,9 +3,7 @@ package com.activiti.repo.dictionary.metamodel;
 import java.util.List;
 
 import com.activiti.repo.dictionary.ClassDefinition;
-import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.QName;
-
 
 /**
  * Class Definition
@@ -14,35 +12,42 @@ import com.activiti.repo.ref.QName;
  */
 public interface M2Class
 {
-    public ClassRef getReference();
-    
-    public QName getName();
+    public QName getQName();
 
-    public void setName(QName value);
+    public void setQName(QName qname);
 
     public M2Class getSuperClass();
     
     public void setSuperClass(M2Class superClass);
     
+    /**
+     * @return Returns a list of properties local to the class
+     */
     public List<M2Property> getProperties();
     
     public M2Property createProperty(String propertyName);
     
+    /**
+     * @return Returns a list of properties including those inherited
+     */
     public List<M2Property> getInheritedProperties();
     
+    /**
+     * @return Returns a list of associations local to the class
+     */
     public List<M2Association> getAssociations();
     
     public M2Association createAssociation(String associationName);
     
     public M2ChildAssociation createChildAssociation(String associationName);
     
+    /**
+     * @return Returns a list of associations local to the class including those inheritied
+     */
     public List<M2Association> getInheritedAssociations();
 
     /**
-     * Gets the read-only class definition
-     * 
-     * @return  read-only class definition
+     * @return Returns a read-only class definition
      */
     public ClassDefinition getClassDefinition();
-    
 }

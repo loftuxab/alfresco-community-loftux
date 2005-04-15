@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.activiti.repo.dictionary.AssociationDefinition;
 import com.activiti.repo.dictionary.AssociationRef;
-import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.ref.QName;
 
 
@@ -20,6 +20,8 @@ public class M2AssociationDefinition implements AssociationDefinition
      * Association definition to wrap
      */
     private M2Association m2Association;
+    
+    private AssociationRef assocRef;
 
     
     /**
@@ -71,16 +73,21 @@ public class M2AssociationDefinition implements AssociationDefinition
      */
     public AssociationRef getReference()
     {
-        return m2Association.getReference();
+        if (assocRef == null)
+        {
+            assocRef = new AssociationRef(getContainerClass().getReference(),
+                    getName().toString());
+        }
+        return assocRef;
     }
 
 
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.AssociationDefinition#getContainerClass()
      */
-    public ClassRef getContainerClass()
+    public ClassDefinition getContainerClass()
     {
-        return m2Association.getContainerClass().getReference();
+        return m2Association.getContainerClass().getClassDefinition();
     }
 
 
@@ -123,7 +130,7 @@ public class M2AssociationDefinition implements AssociationDefinition
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.AssociationDefinition#getRequiredToClasses()
      */
-    public List<ClassRef> getRequiredToClasses()
+    public List<ClassDefinition> getRequiredToClasses()
     {
         return M2References.createClassRefList(m2Association.getRequiredToClasses());
     }
