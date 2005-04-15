@@ -10,7 +10,7 @@
         <init-param>
    	      <description>Portlet init page</description>
             <name>com.sun.faces.portlet.INIT_VIEW</name>
-   	      <value>/login.jsp</value>
+   	      <value>/jsp/login.jsp</value>
         </init-param>
 
         <supports>

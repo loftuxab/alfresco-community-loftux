@@ -209,66 +209,83 @@
          determine which view must be displayed after the
          current view, login.jsp is processed.
       </description>
-      <from-view-id>/login.jsp</from-view-id>
+      <from-view-id>/jsp/login.jsp</from-view-id>
       <navigation-case>
          <description>
-             Indicates to the NavigationHandler that the userlist.jsp
+             Indicates to the NavigationHandler that the jump.jsp
              view must be displayed if the Action referenced by a 
              UICommand component on the login.jsp view returns 
              the outcome "success".
          </description>
          <from-outcome>success</from-outcome>
-         <to-view-id>/userlist.jsp</to-view-id>
+         <to-view-id>/jsp/jump.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- Jump page links -->
+   <navigation-rule>
+      <from-view-id>/jsp/jump.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>showUserlist</from-outcome>
+         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>showComponentsZoo</from-outcome>
+         <to-view-id>/jsp/zoo/components.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>showPropertyZoo</from-outcome>
+         <to-view-id>/jsp/zoo/properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>showBrowse</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
 
    <!-- Note that the from-view-id can contain * wildcard to specify an entire dir match -->
    <!-- e.g. <from-view-id>/myfiles/*</from-view-id> -->
    <navigation-rule>
-      <from-view-id>/userlist.jsp</from-view-id>
+      <from-view-id>/jsp/userlist.jsp</from-view-id>
       <navigation-case>
          <from-outcome>edituser</from-outcome>
-         <to-view-id>/edituser.jsp</to-view-id>
+         <to-view-id>/jsp/test/edituser.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>adduser</from-outcome>
-         <to-view-id>/adduser.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>showPropertyZoo</from-outcome>
-         <to-view-id>/zoo/properties.jsp</to-view-id>
+         <to-view-id>/jsp/test/adduser.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
-      <from-view-id>/adduser.jsp</from-view-id>
+      <from-view-id>/jsp/test/adduser.jsp</from-view-id>
       <navigation-case>
          <from-outcome>success</from-outcome>
-         <to-view-id>/userlist.jsp</to-view-id>
+         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>cancel</from-outcome>
-         <to-view-id>/userlist.jsp</to-view-id>
+         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
-      <from-view-id>/edituser.jsp</from-view-id>
+      <from-view-id>/jsp/test/edituser.jsp</from-view-id>
       <navigation-case>
          <from-outcome>success</from-outcome>
-         <to-view-id>/userlist.jsp</to-view-id>
+         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>cancel</from-outcome>
-         <to-view-id>/userlist.jsp</to-view-id>
+         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
 
    <navigation-rule>
-      <from-view-id>/zoo/properties.jsp</from-view-id>
+      <from-view-id>/jsp/zoo/properties.jsp</from-view-id>
       <navigation-case>
          <from-outcome>showPropertyZoo2</from-outcome>
-         <to-view-id>/zoo/properties-auto.jsp</to-view-id>
+         <to-view-id>/jsp/zoo/properties-auto.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
