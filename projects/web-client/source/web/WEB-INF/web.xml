@@ -25,7 +25,16 @@
         <param-name>com.sun.faces.validateXml</param-name>
         <param-value>false</param-value>
     </context-param>
-
+    
+    <context-param>
+        <param-name>config.files</param-name>
+        <param-value>/WEB-INF/web-client-config.xml</param-value>
+    </context-param>
+        
+    <listener>
+      <listener-class>com.activiti.web.ContextListener</listener-class>
+    </listener>
+    
     <!-- Faces Servlet -->
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>

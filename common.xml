@@ -12,9 +12,6 @@
       <mkdir dir="${src.webinf.dir}" />
       <mkdir dir="${local.lib.dir}" />
       <mkdir dir="${classes.dir}" />
-      <taskdef name="create-web-xml" classname="com.gavincornwell.ant.XmlFileTask"
-               classpath="${custom.tasks.jar}" />
-      <create-web-xml file="${src.webinf.dir}/web.xml" />
    </target>
 
    <target name="init" depends="common-init">

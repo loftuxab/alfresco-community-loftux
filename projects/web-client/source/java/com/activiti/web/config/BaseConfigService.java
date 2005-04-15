@@ -1,5 +1,6 @@
 package com.activiti.web.config;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,13 +33,12 @@ public abstract class BaseConfigService implements ConfigService
 {
    private static final Logger logger = Logger.getLogger(BaseConfigService.class);
    
-   private ConfigSection globalSection;
-   private List sections;
-   private Map evaluators;
-   private Map sectionsByArea;
-   
-   // TODO: remove
-   public List getSections() { return this.sections; }
+   protected ConfigSource configSource;
+   protected ConfigSection globalSection;
+   protected Map evaluators;
+   protected List sections;
+   protected Map sectionsByArea;
+   //protected Map sectionsByEvaluator;
    
    /**
     * @see com.activiti.web.config.ConfigService#init()
@@ -65,6 +65,14 @@ public abstract class BaseConfigService implements ConfigService
       this.globalSection = null;
    }
 
+   /**
+    * @see com.activiti.web.config.ConfigService#setConfigSource(com.activiti.web.config.ConfigSource)
+    */
+   public void setConfigSource(ConfigSource configSource)
+   {
+      this.configSource = configSource;
+   }
+   
    /**
     * @see com.activiti.web.config.ConfigService#getConfig(java.lang.Object)
     */
@@ -154,6 +162,30 @@ public abstract class BaseConfigService implements ConfigService
       return results;
    }
 
+   /**
+    * Parses all the files passed to this config service
+    */
+   protected void parse()
+   {
+      if (this.configSource == null)
+      {
+         throw new ConfigException("ConfigSource has not been set");
+      }
+      
+      // read and parse the config sources
+      while(this.configSource.hasStream())
+      {
+         parse(this.configSource.nextStream());
+      }
+   }
+   
+   /**
+    * Parses the given config stream
+    * 
+    * @param stream The input stream representing the config data
+    */
+   protected abstract void parse(InputStream stream); 
+   
    /**
     * Adds the given config section to the config service and optionally within a named area
     * 

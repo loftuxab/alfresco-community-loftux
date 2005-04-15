@@ -1,11 +1,9 @@
 package com.activiti.web.config.xml;
 
-import java.util.ArrayList;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -16,6 +14,7 @@ import com.activiti.web.config.BaseConfigService;
 import com.activiti.web.config.ConfigElement;
 import com.activiti.web.config.ConfigException;
 import com.activiti.web.config.ConfigSectionImpl;
+import com.activiti.web.config.ConfigSource;
 import com.activiti.web.config.xml.elementreader.ConfigElementReader;
 import com.activiti.web.config.xml.elementreader.GenericElementReader;
 
@@ -27,25 +26,27 @@ import com.activiti.web.config.xml.elementreader.GenericElementReader;
 public class XMLConfigService extends BaseConfigService implements XMLConfigConstants
 {
    private static final Logger logger = Logger.getLogger(XMLConfigService.class);
-   
-   private List configFiles;
+
    private Map elementReaders;
    
    /**
     * Default constructor
-    * 
-    * @param configFile Comma separated list of files to parse
     */
-   public XMLConfigService(String configFile)
+   public XMLConfigService()
    {
-      this.configFiles = new ArrayList();
+      super();
+   }
+   
+   /**
+    * Constructs an XMLConfigService using the given config source
+    * 
+    * @param configSource A ConfigSource
+    */
+   public XMLConfigService(ConfigSource configSource)
+   {
+      super();
       
-      StringTokenizer tokenizer = new StringTokenizer(configFile, ",");
-      while (tokenizer.hasMoreTokens())
-      {
-         String file = tokenizer.nextToken();
-         configFiles.add(file);
-      }
+      this.setConfigSource(configSource);
    }
    
    /**
@@ -61,31 +62,17 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
       
       parse();
    }
-
-   /**
-    * Parses all the files passed to this config service
-    */
-   private void parse()
-   {
-      // read and parse the config files 
-      for (Iterator iter = configFiles.iterator(); iter.hasNext();)
-      {
-         parse((String)iter.next());
-      }
-   }
    
    /**
-    * Parses the given config file
-    * 
-    * @param file
+    * @see com.activiti.web.config.BaseConfigService#parse(java.io.InputStream)
     */
-   private void parse(String file)
+   protected void parse(InputStream stream)
    {
       try
       {
          // get the root element
          SAXReader reader = new SAXReader();
-         Document document = reader.read(file);
+         Document document = reader.read(stream);
          Element rootElement = document.getRootElement();
          
          // parse the global section first
@@ -102,7 +89,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
       }
       catch (Throwable e)
       {
-         throw new ConfigException("Failed to parse config file: " + file, e);
+         throw new ConfigException("Failed to parse config stream", e);
       }
    }
    

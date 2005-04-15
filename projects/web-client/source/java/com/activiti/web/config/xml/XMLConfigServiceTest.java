@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import com.activiti.web.config.Config;
 import com.activiti.web.config.ConfigElement;
 import com.activiti.web.config.ConfigService;
-import com.activiti.web.config.ConfigServiceFactory;
+import com.activiti.web.config.source.FileConfigSource;
 import com.activiti.web.repository.Node;
 
 /**
@@ -24,14 +24,19 @@ import com.activiti.web.repository.Node;
 public class XMLConfigServiceTest extends TestCase
 {
    private static Logger logger = Logger.getLogger(XMLConfigServiceTest.class);
+   private static ConfigService configService;
    
+   /**
+    * Tests the config service by retrieving properties configuration using
+    * the generic interfaces
+    */
    public void testGetPropertiesViaInterfaces()
    {
       NodeRef nodeRef = NodeService.getNodeRef("/gav.doc");
       Node node = new Node(NodeService.getType(nodeRef));
       node.setProperties(NodeService.getProperties(nodeRef));
     
-      ConfigService svc = ConfigServiceFactory.getConfigService();
+      ConfigService svc = XMLConfigServiceTest.getConfigService();
       assertNotNull(svc);
       
       Config configProps = svc.getConfig(node);
@@ -53,6 +58,10 @@ public class XMLConfigServiceTest extends TestCase
       assertEquals(propNames.size() != 0, true);
    }
    
+   /**
+    * Tests the config service by retrieving properties configuration using
+    * the Properties specific config objects
+    */
    public void xtestGetProperties()
    {
 //      NodeRef nodeRef = NodeService.getNodeRef("/gav.doc");
@@ -64,5 +73,20 @@ public class XMLConfigServiceTest extends TestCase
 //      PropertiesConfigElement propsToDisplay = (PropertiesConfigElement)configProps.getConfigElement("properties");
 //      Map propNames = propsToDisplay.getPropertiesMap();
 //      assertEquals(propNames.size() != 0, true);
+   }
+   
+   /**
+    * @return The ConfigService
+    */
+   private static ConfigService getConfigService()
+   {
+      if (configService == null)
+      {
+         String file = "w:\\sandbox\\projects\\web-client\\source\\web\\WEB-INF\\web-client-config.xml";
+         configService = new XMLConfigService(new FileConfigSource(file));
+         configService.init();
+      }
+      
+      return configService;
    }
 }

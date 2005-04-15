@@ -1,5 +1,10 @@
 package com.activiti.web.config;
 
+import java.util.StringTokenizer;
+
+import javax.servlet.ServletContext;
+
+import com.activiti.web.config.source.FileConfigSource;
 import com.activiti.web.config.xml.XMLConfigService;
 
 /**
@@ -13,16 +18,48 @@ public class ConfigServiceFactory
 {
    private static ConfigService configService;
    
+   public static ConfigService getConfigService(ServletContext servletContext)
+   {
+      if (configService == null)
+      {
+         String rawSources = servletContext.getInitParameter("config.files");
+         StringBuffer sources = new StringBuffer();
+         
+         StringTokenizer tokenizer = new StringTokenizer(rawSources, ",");
+         boolean first = true;
+         while (tokenizer.hasMoreTokens())
+         {
+            if (first == false)
+            {
+               sources.append(",");
+            }
+            
+            String source = tokenizer.nextToken();
+            if (source.startsWith("/WEB-INF/"))
+            {
+               String fullPath = servletContext.getRealPath(source);
+               sources.append(fullPath);
+            }
+            else
+            {
+               sources.append(source);
+            }
+         }
+         
+         ConfigSource configSource = new FileConfigSource(sources.toString());
+         configService = new XMLConfigService();
+         configService.setConfigSource(configSource);
+         configService.init();
+      }
+      
+      return configService;
+   }
+   
    public static ConfigService getConfigService()
    {
       if (configService == null)
       {
-         // TODO: get the absolute path for the config file
-         //String configFile = "/WEB-INF/config/web-client-config.xml";
-         String configFile = "w:\\sandbox\\projects\\web-client\\source\\web\\WEB-INF\\web-client-config.xml";
-         
-         configService = new XMLConfigService(configFile);
-         configService.init();
+         throw new IllegalStateException("getServletContext(ServletContext) must be called first");
       }
       
       return configService;
