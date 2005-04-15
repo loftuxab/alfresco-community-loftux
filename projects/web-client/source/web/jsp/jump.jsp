@@ -9,7 +9,7 @@
 
 <f:view>
    
-   <h2>Jalapeno Jump Page</h2>
+   <h2>Jump Page</h2>
    
    <h:form id="jumpForm">
       

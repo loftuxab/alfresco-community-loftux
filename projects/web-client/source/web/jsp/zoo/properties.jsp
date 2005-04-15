@@ -53,5 +53,10 @@
       <br/><br/><hr/><br/>
       <h:commandButton value="Auto Configured Property Zoo" action="#{ZooService.showPropertyZoo2}" />
 
+      <p>
+      
+      <h:commandButton id="show-jump-page" value="Back To Jump Page" action="jumppage" />
+
    </h:form>
+      
 </f:view>

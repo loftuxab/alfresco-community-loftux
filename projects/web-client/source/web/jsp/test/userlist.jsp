@@ -84,5 +84,10 @@
       <p>
       
       <h:commandButton id="add-user" value="Add" action="adduser" actionListener="#{UserListBean.addUser}"/>
+      
+      <p>
+      
+      <h:commandButton id="show-jump-page" value="Back To Jump Page" action="jumppage" />
+      
    </h:form>
 </f:view>

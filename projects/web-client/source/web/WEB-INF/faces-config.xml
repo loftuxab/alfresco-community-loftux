@@ -242,11 +242,19 @@
          <to-view-id>/jsp/browse/browse.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>jumppage</from-outcome>
+         <to-view-id>/jsp/jump.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
 
    <!-- Note that the from-view-id can contain * wildcard to specify an entire dir match -->
    <!-- e.g. <from-view-id>/myfiles/*</from-view-id> -->
    <navigation-rule>
-      <from-view-id>/jsp/userlist.jsp</from-view-id>
+      <from-view-id>/jsp/test/userlist.jsp</from-view-id>
       <navigation-case>
          <from-outcome>edituser</from-outcome>
          <to-view-id>/jsp/test/edituser.jsp</to-view-id>

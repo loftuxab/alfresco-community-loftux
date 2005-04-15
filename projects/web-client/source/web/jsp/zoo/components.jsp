@@ -371,5 +371,9 @@
       Date Picker with CSS style applied:<br>
       <awc:inputDatePicker id="date2" startYear="2000" yearCount="5" styleClass="userInputForm" />
       
+      <p>
+      
+      <h:commandButton id="show-jump-page" value="Back To Jump Page" action="jumppage" />
+      
    </h:form>
 </f:view>
