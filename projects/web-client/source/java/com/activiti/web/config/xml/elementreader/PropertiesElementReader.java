@@ -6,6 +6,7 @@ import org.dom4j.Element;
 
 import com.activiti.web.config.ConfigElement;
 import com.activiti.web.config.ConfigException;
+import com.activiti.web.config.element.PropertiesConfigElement;
 
 /**
  * Element reader that knows how to parse properties config blocks
@@ -23,7 +24,7 @@ public class PropertiesElementReader implements ConfigElementReader
     */
    public ConfigElement parse(Element element)
    {
-      ConfigElement configElement = null;
+      PropertiesConfigElement configElement = null;
       
       if (element != null)
       {
@@ -34,11 +35,14 @@ public class PropertiesElementReader implements ConfigElementReader
                   "the element passed was '" + name + "'");
          }
          
+         configElement = new PropertiesConfigElement();
+         
          Iterator properties = element.elementIterator(ELEMENT_PROPERTY);
          while (properties.hasNext())
          {
             Element property = (Element)properties.next();
             String propName = property.attributeValue(ATTR_NAME);
+            configElement.addProperty(propName);
          }
       }
       

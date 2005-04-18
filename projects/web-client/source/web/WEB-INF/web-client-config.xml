@@ -3,12 +3,14 @@
    <global>
       <evaluators>
          <evaluator id="type-name" class="com.activiti.web.config.evaluator.TypeNameEvaluator" />
-         <evaluator id="aspect" class="com.activiti.web.config.evaluator.AspectEvaluator" />         
+         <evaluator id="aspect" class="com.activiti.web.config.evaluator.AspectEvaluator" />
+         <evaluator id="path" class="com.activiti.web.config.evaluator.PathEvaluator" />
+         <evaluator id="component-type" class="com.activiti.web.config.evaluator.ComponentTypeEvaluator" />
       </evaluators>
       <element-readers>
          <!-- NOTE: This will be a built-in element reader, it's here for testing -->
          <element-reader element-name="properties" 
-                         class="com.activiti.web.config.xml.elementreader.GenericElementReader" />
+                         class="com.activiti.web.config.xml.elementreader.PropertiesElementReader" />
      </element-readers>
    </global>
    
@@ -40,6 +42,12 @@
       <properties>
          <property name="latestversion" />
       </properties>
+   </config>
+   
+   <config evaluator-ref="component-type" condition="com.activiti.web.jsf.component.data.UIRichList">
+      <renderers>
+         <renderer mode="details">com.activiti.web.jsf.renderer.data.RichListRenderer.DetailsViewRenderer</renderer>
+      </renderers>
    </config>
    
 </activiti-config>

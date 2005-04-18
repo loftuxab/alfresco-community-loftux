@@ -1,7 +1,6 @@
 package com.activiti.web.jsf.component.property;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +19,9 @@ import jsftest.repository.DataDictionary.Property;
 import org.apache.log4j.Logger;
 
 import com.activiti.web.config.Config;
-import com.activiti.web.config.ConfigElement;
 import com.activiti.web.config.ConfigService;
 import com.activiti.web.config.ConfigServiceFactory;
+import com.activiti.web.config.element.PropertiesConfigElement;
 import com.activiti.web.repository.Node;
 
 /**
@@ -87,18 +86,19 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
             
             ConfigService configSvc = ConfigServiceFactory.getConfigService();
             Config configProps = configSvc.getConfig(this.node);
-            ConfigElement propsToDisplay = configProps.getConfigElement("properties");
-            List kids = propsToDisplay.getChildren();
-            List propNames = new ArrayList();
-            for (Iterator iter = kids.iterator(); iter.hasNext();)
-            {
-               ConfigElement propElement = (ConfigElement)iter.next();
-               String propName = propElement.getAttribute("name");
-               propNames.add(propName);
-            }
+//            ConfigElement propsToDisplay = configProps.getConfigElement("properties");
+//            List kids = propsToDisplay.getChildren();
+//            List propNames = new ArrayList();
+//            for (Iterator iter = kids.iterator(); iter.hasNext();)
+//            {
+//               ConfigElement propElement = (ConfigElement)iter.next();
+//               String propName = propElement.getAttribute("name");
+//               propNames.add(propName);
+//            }
             
-            //PropertiesConfigElement propsToDisplay = (PropertiesConfigElement)configProps.getConfigElement("properties");
-            //Map propNames = propsToDisplay.getPropertiesMap();
+            PropertiesConfigElement propsToDisplay = (PropertiesConfigElement)configProps.getConfigElement("properties");
+            List propNames = propsToDisplay.getProperties();
+            
             if (logger.isDebugEnabled())
             {
                logger.debug("ConfigElement: " + propsToDisplay);
