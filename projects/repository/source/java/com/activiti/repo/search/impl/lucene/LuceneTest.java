@@ -849,6 +849,21 @@ public class LuceneTest extends TestCase
         assertEquals(3, results.length());
 
     }
+    
+    public void testForKev()
+    {
+        buildBaseIndex();
+        runBaseTests();
+        
+        Searcher searcher = LuceneSearcherImpl.getSearcher(NodeServiceStub.storeRef);
+        searcher.setNameSpaceService(new MockNameService());
+
+        ResultSet results = searcher.query(NodeServiceStub.storeRef, "lucene", "PARENT:\"0\"", null, null);
+        assertEquals(5, results.length());
+        
+        results = searcher.query(NodeServiceStub.storeRef, "lucene", "+PARENT:\"0\" +QNAME:\"one\"", null, null);
+        assertEquals(1, results.length());
+    }
 
     /**
      * Support for DummyNodeService
