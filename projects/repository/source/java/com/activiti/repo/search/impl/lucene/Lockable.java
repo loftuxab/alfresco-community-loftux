@@ -7,9 +7,6 @@
  */
 package com.activiti.repo.search.impl.lucene;
 
-import java.util.concurrent.locks.ReentrantLock;
-
-import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.transaction.LuceneIndexLock;
 
 public interface Lockable

@@ -17,7 +17,6 @@ import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.EmptyResultSet;
 import com.activiti.repo.search.QueryParameter;
 import com.activiti.repo.search.ResultSet;
-import com.activiti.repo.search.Searcher;
 import com.activiti.repo.search.SearcherException;
 import com.werken.saxpath.XPathReader;
 
@@ -119,7 +118,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         LuceneSearcherImpl searcher = new LuceneSearcherImpl();
         try
         {
-            searcher.initialise(storeRef, deltaId);
+            searcher.initialise(storeRef, deltaId, false);
         }
         catch (IOException e)
         {

@@ -47,7 +47,7 @@ import com.activiti.repo.search.IndexerException;
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
     private DictionaryService dictionaryService;
-    
+
     /**
      * The node service we use to get information about nodes
      */
@@ -91,20 +91,19 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * @param nodeService
      */
 
-
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
-    
+
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
     }
 
-   /*
-    * Indexer Implementation
-    */
+    /*
+     * Indexer Implementation
+     */
 
     /**
      * Utility method to check we are in the correct state to do work Also keeps
@@ -181,7 +180,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             if (relationshipRef.getParentRef() != null)
             {
-                reindex(relationshipRef.getParentRef());
+                // reindex(relationshipRef.getParentRef());
             }
             reindex(relationshipRef.getChildRef());
         }
@@ -209,7 +208,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         checkAbleToDoWork();
         try
         {
-            delete(relationshipRef.getChildRef());
+            delete(relationshipRef.getChildRef(), false);
         }
         catch (IOException e)
         {
@@ -223,7 +222,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         try
         {
             // TODO: Optimise
-            reindex(relationshipRef.getParentRef());
+            // reindex(relationshipRef.getParentRef());
             reindex(relationshipRef.getChildRef());
         }
         catch (IOException e)
@@ -240,7 +239,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // TODO: Optimise
             if (relationshipBeforeRef.getParentRef() != null)
             {
-                reindex(relationshipBeforeRef.getParentRef());
+                // reindex(relationshipBeforeRef.getParentRef());
             }
             reindex(relationshipBeforeRef.getChildRef());
         }
@@ -258,7 +257,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // TODO: Optimise
             if (relationshipRef.getParentRef() != null)
             {
-                reindex(relationshipRef.getParentRef());
+                // reindex(relationshipRef.getParentRef());
             }
             reindex(relationshipRef.getChildRef());
         }
@@ -280,7 +279,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         LuceneIndexerImpl indexer = new LuceneIndexerImpl();
         try
         {
-            indexer.initialise(storeRef, deltaId);
+            indexer.initialise(storeRef, deltaId, false);
         }
         catch (IOException e)
         {
@@ -321,14 +320,17 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             status = Status.STATUS_COMMITTING;
             try
             {
-                // Build the deletion terms
-                Set<Term> terms = new HashSet<Term>();
-                for (NodeRef nodeRef : deletions)
+                if (isModified())
                 {
-                    terms.add(new Term("ID", nodeRef.getId()));
+                    // Build the deletion terms
+                    Set<Term> terms = new HashSet<Term>();
+                    for (NodeRef nodeRef : deletions)
+                    {
+                        terms.add(new Term("ID", nodeRef.getId()));
+                    }
+                    // Merge
+                    mergeDeltaIntoMain(terms);
                 }
-                // Merge
-                mergeDeltaIntoMain(terms);
                 status = Status.STATUS_COMMITTED;
             }
             catch (IOException e)
@@ -379,10 +381,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             status = Status.STATUS_PREPARING;
             try
             {
-                saveDelta();
-                prepareToMergeIntoMain();
+                if (isModified())
+                {
+                    saveDelta();
+                    prepareToMergeIntoMain();
+                }
                 status = Status.STATUS_PREPARED;
-                return XAResource.XA_OK;
+                return isModified ? XAResource.XA_OK : XAResource.XA_RDONLY;
             }
             catch (IOException e)
             {
@@ -421,17 +426,21 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     {
         switch (status)
         {
-        case Status.STATUS_COMMITTING:
-            throw new IndexerException("Unable to roll back: Transaction is committing");
+
         case Status.STATUS_COMMITTED:
             throw new IndexerException("Unable to roll back: Transaction is commited ");
         case Status.STATUS_ROLLING_BACK:
             throw new IndexerException("Unable to roll back: Transaction is rolling back");
         case Status.STATUS_ROLLEDBACK:
             throw new IndexerException("Unable to roll back: Transaction is aleady rolled back");
+        case Status.STATUS_COMMITTING:
+        // Can roll back during commit
         default:
             status = Status.STATUS_ROLLING_BACK;
-            deleteDelta();
+            if (isModified())
+            {
+                deleteDelta();
+            }
             status = Status.STATUS_ROLLEDBACK;
             break;
         }
@@ -463,26 +472,104 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void reindex(NodeRef nodeRef) throws IOException
     {
-        Set<NodeRef> refs = delete(nodeRef);
+        Set<NodeRef> refs = delete(nodeRef, true);
         index(refs, false);
     }
 
-    private Set<NodeRef> delete(NodeRef nodeRef) throws IOException
+    private Set<NodeRef> delete(NodeRef nodeRef, boolean forReindex) throws IOException
     {
         Set<NodeRef> refs = new HashSet<NodeRef>();
 
-        refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaRamReader()));
-        refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader()));
+        IndexReader mainReader = getReader();
+        try
+        {
 
-        deletions.addAll(refs);
-        return refs;
+            refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaRamReader(), true));
+            refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader(), true));
+            refs.addAll(deleteContainerAndBelow(nodeRef, mainReader, false));
+
+            if (!forReindex)
+            {
+                Set<NodeRef> leafrefs = new HashSet<NodeRef>();
+
+                leafrefs.addAll(deletePrimary(refs, getDeltaRamReader(), true));
+                leafrefs.addAll(deletePrimary(refs, getDeltaReader(), true));
+                leafrefs.addAll(deletePrimary(refs, mainReader, false));
+
+                leafrefs.addAll(deleteReference(refs, getDeltaRamReader(), true));
+                leafrefs.addAll(deleteReference(refs, getDeltaReader(), true));
+                leafrefs.addAll(deleteReference(refs, mainReader, false));
+
+                refs.addAll(leafrefs);
+            }
+
+            deletions.addAll(refs);
+            return refs;
+        }
+        finally
+        {
+            mainReader.close();
+        }
     }
 
-    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader) throws IOException
+    private Set<NodeRef> deletePrimary(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws IOException
     {
         Set<NodeRef> refs = new HashSet<NodeRef>();
 
-        int count = reader.delete(new Term("ID", nodeRef.getId()));
+        for (NodeRef nodeRef : nodeRefs)
+        {
+
+            TermDocs td = reader.termDocs(new Term("PRIMARYPARENT", nodeRef.getId()));
+            while (td.next())
+            {
+                int doc = td.doc();
+                Document document = reader.document(doc);
+                String id = document.get("ID");
+                NodeRef ref = new NodeRef(store, id);
+                refs.add(ref);
+                if (delete)
+                {
+                    reader.delete(doc);
+                }
+            }
+        }
+        return refs;
+
+    }
+
+    private Set<NodeRef> deleteReference(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws IOException
+    {
+        Set<NodeRef> refs = new HashSet<NodeRef>();
+
+        for (NodeRef nodeRef : nodeRefs)
+        {
+
+            TermDocs td = reader.termDocs(new Term("PARENT", nodeRef.getId()));
+            while (td.next())
+            {
+                int doc = td.doc();
+                Document document = reader.document(doc);
+                String id = document.get("ID");
+                NodeRef ref = new NodeRef(store, id);
+                refs.add(ref);
+                if (delete)
+                {
+                    reader.delete(doc);
+                }
+            }
+        }
+        return refs;
+
+    }
+
+    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader, boolean delete) throws IOException
+    {
+        Set<NodeRef> refs = new HashSet<NodeRef>();
+
+        if (delete)
+        {
+            int count = reader.delete(new Term("ID", nodeRef.getId()));
+        }
         refs.add(nodeRef);
 
         TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.getId()));
@@ -493,7 +580,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             String id = document.get("ID");
             NodeRef ref = new NodeRef(store, id);
             refs.add(ref);
-            reader.delete(doc);
+            if (delete)
+            {
+                reader.delete(doc);
+            }
         }
         return refs;
     }
@@ -684,8 +774,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     directoryEntry.add(new Field("ANCESTOR", parentBuffer.toString(), true, true, true));
                     directoryEntry.add(new Field("ISCONTAINER", "T", true, true, false));
                     docs.add(directoryEntry);
-                    doc.add(new Field("ANCESTOR", parentBuffer.toString(), true, true, true));
                 }
+
+                doc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getId(), true, true, false));
 
                 Counter counter = nodeCounts.get(qNameRef);
                 counter.increment();
@@ -712,4 +803,15 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return docs;
     }
 
+    public void clearIndex()
+    {
+        try
+        {
+            super.clearIndex();
+        }
+        catch (IOException e)
+        {
+            throw new IndexerException(e);
+        }
+    }
 }

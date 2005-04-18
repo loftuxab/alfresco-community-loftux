@@ -10,7 +10,6 @@ package com.activiti.repo.search;
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.search.transaction.LuceneIndexLock;
 
 /**
  * Ths encapsultes the execution of search against different indexing
