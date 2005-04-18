@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-import com.activiti.repo.dictionary.ClassRef;
-import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 

@@ -88,7 +88,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(store);
         // create and assign a root node
-        RealNode rootNode = newRealNode(store, DictionaryBootstrap.TYPE_FOLDER);
+        RealNode rootNode = newRealNode(store, DictionaryBootstrap.TYPE_CONTAINER);
         store.setRootNode(rootNode);
         // done
         return store;
@@ -102,36 +102,40 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return store;
     }
 
-    public RealNode newRealNode(Store store, ClassRef classRef)
+    public RealNode newRealNode(Store store, ClassRef classRef) throws InvalidNodeTypeException
     {
         ClassDefinition classDef = dictionaryService.getClass(classRef);
         if (classDef == null)
         {
             throw new InvalidNodeTypeException(classRef);
         }
-        ClassRef baseClassRef = classDef.getBootstrapClass();
+        ClassDefinition baseClassDef = classDef.getBootstrapClass();
+        if (baseClassDef == null)
+        {
+            throw new InvalidNodeTypeException("Class does not derive from a base type",
+                    classRef);
+        }
         // build a concrete node based on a bootstrap type
         RealNode node = null;
-        if (baseClassRef.equals(DictionaryBootstrap.TYPE_FOLDER))
+        if (baseClassDef.getReference().equals(DictionaryBootstrap.TYPE_CONTAINER))
         {
             node = new ContainerNodeImpl();
         }
-        else if (baseClassRef.equals(DictionaryBootstrap.TYPE_FILE))
+        else if (baseClassDef.getReference().equals(DictionaryBootstrap.TYPE_CONTENT))
         {
             node = new ContentNodeImpl();
         }
-        else if (baseClassRef.equals(DictionaryBootstrap.TYPE_REFERENCE))
+        else if (baseClassDef.getReference().equals(DictionaryBootstrap.TYPE_REFERENCE))
         {
             node = new RealNodeImpl();
         }
-        else if (baseClassRef.equals(DictionaryBootstrap.TYPE_BASE))
+        else if (baseClassDef.getReference().equals(DictionaryBootstrap.TYPE_BASE))
         {
             node = new RealNodeImpl();
         }
         else
         {
-            throw new InvalidNodeTypeException("Unable to retrieve a valid concrete node type",
-                    classRef);
+            throw new InvalidNodeTypeException("Unknown base node type", classRef);
         }
         // set other required properties
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());

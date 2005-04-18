@@ -22,7 +22,6 @@ import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import com.activiti.repo.dictionary.ClassDefinition;
-import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.metamodel.M2Association;
 import com.activiti.repo.dictionary.metamodel.M2ChildAssociation;
 import com.activiti.repo.dictionary.metamodel.M2Class;

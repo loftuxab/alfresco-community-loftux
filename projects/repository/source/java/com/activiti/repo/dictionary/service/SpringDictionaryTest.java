@@ -7,7 +7,7 @@ import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.TypeDefinition;
-import com.activiti.repo.ref.QName;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.util.BaseSpringTest;
 
 public class SpringDictionaryTest extends BaseSpringTest
@@ -30,13 +30,13 @@ public class SpringDictionaryTest extends BaseSpringTest
     
     public void testDictionary()
     {
-        ClassRef fileRef = new ClassRef(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file"));
-        ClassDefinition fileClass = dictionaryService.getClass(fileRef);
+        ClassRef contentRef = DictionaryBootstrap.TYPE_CONTENT;
+        ClassDefinition fileClass = dictionaryService.getClass(contentRef);
         assertNotNull(fileClass);
         assertTrue(fileClass instanceof TypeDefinition);
-        assertEquals(fileRef, fileClass.getReference());
+        assertEquals(contentRef, fileClass.getReference());
         assertEquals(false, fileClass.isAspect());
-        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "base"), fileClass.getSuperClass().getQName());
+        assertEquals(DictionaryBootstrap.TYPE_QNAME_BASE, fileClass.getSuperClass().getQName());
     }
 
     

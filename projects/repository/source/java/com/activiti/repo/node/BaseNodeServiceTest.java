@@ -108,23 +108,23 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
 
         // LEVEL 1
         qname = QName.createQName(ns, "root_p_n1");
-        assoc = nodeService.createNode(rootNodeRef, qname, DictionaryBootstrap.TYPE_FOLDER);
+        assoc = nodeService.createNode(rootNodeRef, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n1 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "root_p_n2");
-        assoc = nodeService.createNode(rootNodeRef, qname, DictionaryBootstrap.TYPE_FOLDER);
+        assoc = nodeService.createNode(rootNodeRef, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n2 = assoc.getChildRef();
 
         // LEVEL 2
         qname = QName.createQName(ns, "n1_p_n3");
-        assoc = nodeService.createNode(n1, qname, DictionaryBootstrap.TYPE_FOLDER);
+        assoc = nodeService.createNode(n1, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n3 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "n2_p_n4");
-        assoc = nodeService.createNode(n2, qname, DictionaryBootstrap.TYPE_FOLDER);
+        assoc = nodeService.createNode(n2, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n4 = assoc.getChildRef();
 
@@ -133,13 +133,13 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         ret.put(qname, assoc);
 
         qname = QName.createQName(ns, "n2_p_n5");
-        assoc = nodeService.createNode(n2, qname, DictionaryBootstrap.TYPE_FOLDER);
+        assoc = nodeService.createNode(n2, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n5 = assoc.getChildRef();
 
         // LEVEL 3
         qname = QName.createQName(ns, "n3_p_n6");
-        assoc = nodeService.createNode(n3, qname, DictionaryBootstrap.TYPE_FOLDER);
+        assoc = nodeService.createNode(n3, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n6 = assoc.getChildRef();
 
@@ -148,13 +148,13 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         ret.put(qname, assoc);
 
         qname = QName.createQName(ns, "n5_p_n7");
-        assoc = nodeService.createNode(n5, qname, DictionaryBootstrap.TYPE_FOLDER);
+        assoc = nodeService.createNode(n5, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n7 = assoc.getChildRef();
 
         // LEVEL 4
         qname = QName.createQName(ns, "n6_p_n8");
-        assoc = nodeService.createNode(n6, qname, DictionaryBootstrap.TYPE_FOLDER);
+        assoc = nodeService.createNode(n6, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n8 = assoc.getChildRef();
 
@@ -227,11 +227,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     {
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("pathA"),
-                DictionaryBootstrap.TYPE_FOLDER);
+                DictionaryBootstrap.TYPE_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
         // get the type
         ClassRef type = nodeService.getType(nodeRef);
-        assertEquals("Type mismatch", DictionaryBootstrap.TYPE_FOLDER, type);
+        assertEquals("Type mismatch", DictionaryBootstrap.TYPE_CONTAINER, type);
     }
 
     public void testCreateNodeNoProperties() throws Exception
@@ -239,7 +239,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // flush to ensure that the pure JDBC query will work
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("path1"),
-                DictionaryBootstrap.TYPE_FOLDER);
+                DictionaryBootstrap.TYPE_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
         // count the nodes with the given id
         int count = countNodesById(nodeRef);
@@ -250,7 +250,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     {
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("path1"),
-                DictionaryBootstrap.TYPE_FOLDER);
+                DictionaryBootstrap.TYPE_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
         int countBefore = countNodesById(nodeRef);
         assertEquals("Node not created", 1, countBefore);
@@ -291,7 +291,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("pathA"),
-                DictionaryBootstrap.TYPE_FOLDER);
+                DictionaryBootstrap.TYPE_CONTAINER);
                 CodeMonkey.todo("Fix test checks");
 //        int countBefore = countChildrenOfNode(rootNodeRef);
 //        assertEquals("Root children count incorrect", 1, countBefore);
@@ -307,7 +307,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     {
         ChildAssocRef pathARef = nodeService.createNode(rootNodeRef,
                 QName.createQName("pathA"),
-                DictionaryBootstrap.TYPE_FOLDER);
+                DictionaryBootstrap.TYPE_CONTAINER);
         NodeRef nodeRef = pathARef.getChildRef();
         ChildAssocRef pathBRef = nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("pathB"));
         ChildAssocRef pathCRef = nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("pathC"));
@@ -323,7 +323,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     {
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName("nsA", "pathA"),
-                DictionaryBootstrap.TYPE_FOLDER);
+                DictionaryBootstrap.TYPE_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
         nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("nsB1", "pathB"));
         nodeService.addChild(rootNodeRef, nodeRef, QName.createQName("nsB2", "pathB"));

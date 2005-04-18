@@ -65,7 +65,7 @@ public class HibernateNodeTest extends BaseHibernateTest
 		NodeKey key = new NodeKey("Random Protocol", "Random Identifier", "AAA");
 		node.setKey(key);
         node.setStore(store);   // not meaningful as it contradicts the key
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_FOLDER);
+        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         // persist it
 		try
 		{
@@ -110,7 +110,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         Node node = new NodeImpl();
 		NodeKey key = new NodeKey(store.getKey(), "AAA");
 		node.setKey(key);
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_FOLDER);
+        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         // give it a property map
         Map<String, Serializable> propertyMap = new HashMap<String, Serializable>(5);
         propertyMap.put("{}A", "AAA");
@@ -134,7 +134,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         Node node = new ContentNodeImpl();
 		NodeKey key = new NodeKey(store.getKey(), "AAA");
 		node.setKey(key);
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_FILE);
+        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTENT);
         Serializable id = getSession().save(node);
         // get the node back
         node = (Node) getSession().get(NodeImpl.class, id);
@@ -174,7 +174,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         NodeKey targetKey = new NodeKey(store.getKey(), GUID.generate());
         targetNode.setKey(targetKey);
         targetNode.setStore(store);
-        targetNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_FOLDER);
+        targetNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         Serializable containerNodeKey = getSession().save(targetNode);
         
         // create an association between them
@@ -213,7 +213,7 @@ public class HibernateNodeTest extends BaseHibernateTest
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
 		contentNode.setKey(key);
         contentNode.setStore(store);
-        contentNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_FILE);
+        contentNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTENT);
         Serializable contentNodeKey = getSession().save(contentNode);
 
         // make a container node
@@ -221,7 +221,7 @@ public class HibernateNodeTest extends BaseHibernateTest
 		key = new NodeKey(store.getKey(), GUID.generate());
 		containerNode.setKey(key);
         containerNode.setStore(store);
-        containerNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_FOLDER);
+        containerNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         Serializable containerNodeKey = getSession().save(containerNode);
         // create an association to the content
         ChildAssoc assoc1 = new ChildAssocImpl();

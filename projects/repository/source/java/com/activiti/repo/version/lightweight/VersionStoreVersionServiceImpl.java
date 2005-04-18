@@ -178,7 +178,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
             ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                     this.versionStoreRootNodeRef, 
                     VersionStoreBaseImpl.CHILD_VERSION_HISTORIES, 
-                    DictionaryBootstrap.TYPE_FOLDER);
+                    DictionaryBootstrap.TYPE_CONTAINER);
             versionHistoryRef = childAssocRef.getChildRef();
             
             // Store the id of the origional node on the version history node 
@@ -356,7 +356,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                 versionHistoryRef, 
 				VersionStoreBaseImpl.CHILD_VERSIONS, 
-                DictionaryBootstrap.TYPE_FOLDER);
+                DictionaryBootstrap.TYPE_CONTAINER);
         NodeRef newVersion = childAssocRef.getChildRef();
         
         // Set the version number for the new version

@@ -119,7 +119,7 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
 			this.lightWeightVersionStoreNodeService.createNode(
 					dummyNodeRef,
 					dummyQName,
-					DictionaryBootstrap.TYPE_FILE);
+					DictionaryBootstrap.TYPE_CONTENT);
 			fail("This operation is not supported.");
 		}
 		catch (UnsupportedOperationException exception)

@@ -97,7 +97,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
                 QName.createQName("{}MyVersionableNode"), 
-                DictionaryBootstrap.TYPE_FOLDER,
+                DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
         assertNotNull(nodeRef);
         

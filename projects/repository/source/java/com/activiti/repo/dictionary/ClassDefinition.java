@@ -27,12 +27,14 @@ public interface ClassDefinition
     public ClassDefinition getSuperClass();
     
     /**
-     * @return the first basic bootstrap type, or null if the type doesn't derive
-     *      (either directly or indirectly) from any of the bootstrap types
+     * @return the first basic bootstrap type found when moving up the hierarchy,
+     *      or null if the type doesn't derive (either directly or indirectly)
+     *      from any of the bootstrap types
      * 
+     * @see #getSuperClass()
      * @see com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap#TYPE_BASE
      */
-    public ClassRef getBootstrapClass();
+    public ClassDefinition getBootstrapClass();
 
     /**
      * @return Returns true => aspect, false => type

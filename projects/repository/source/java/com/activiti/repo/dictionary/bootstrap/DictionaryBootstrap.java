@@ -30,19 +30,21 @@ import com.activiti.util.debug.CodeMonkey;
  */
 public class DictionaryBootstrap
 {
+    // expected bootstrap types
     public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ACTIVITI_URI, "base");
     public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ACTIVITI_URI, "reference");
     public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ACTIVITI_URI, "container");
     public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "content");
-    public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder");
-    public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
-
     public static final ClassRef TYPE_BASE = new ClassRef(TYPE_QNAME_BASE); 
     public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE); 
     public static final ClassRef TYPE_CONTAINER = new ClassRef(TYPE_QNAME_CONTAINER);
     public static final ClassRef TYPE_CONTENT = new ClassRef(TYPE_QNAME_CONTENT);
-    public static final ClassRef TYPE_FOLDER = new ClassRef(TYPE_QNAME_FOLDER);
-    public static final ClassRef TYPE_FILE = new ClassRef(TYPE_QNAME_FILE);
+
+    // test types
+    public static final QName TEST_TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder");
+    public static final QName TEST_TYPE_QNAME_FILE = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
+    public static final ClassRef TEST_TYPE_FOLDER = new ClassRef(TEST_TYPE_QNAME_FOLDER);
+    public static final ClassRef TEST_TYPE_FILE = new ClassRef(TEST_TYPE_QNAME_FILE);
 
     private NamespaceDAO namespaceDAO = null;
     private MetaModelDAO metaModelDAO = null;
@@ -213,7 +215,7 @@ public class DictionaryBootstrap
         aspectsProp.setProtected(true);
         aspectsProp.setMultiValued(true);
 
-        // Create Test Reference Type
+        // Create Reference Type
         M2Type referenceType = metaModelDAO.createType(TYPE_QNAME_REFERENCE);
         referenceType.setSuperClass(baseType);
         referenceType.getDefaultAspects().add(referenceAspect);
@@ -222,29 +224,28 @@ public class DictionaryBootstrap
         referenceProp.setMandatory(true);
         referenceProp.setMultiValued(false);
 
-        // Create Test File Type
-        M2Type fileType = metaModelDAO.createType(TYPE_QNAME_FILE);
-        fileType.setSuperClass(baseType);
-        fileType.getDefaultAspects().add(referenceAspect);
-        M2Property encodingProp = fileType.createProperty("encoding");
+        // Create Content Type
+        M2Type contentType = metaModelDAO.createType(TYPE_QNAME_CONTENT);
+        contentType.setSuperClass(baseType);
+        contentType.getDefaultAspects().add(referenceAspect);
+        M2Property encodingProp = contentType.createProperty("encoding");
         encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         encodingProp.setMandatory(true);
         encodingProp.setMultiValued(false);
-        M2Property mimetypeProp = fileType.createProperty("mimetype");
+        M2Property mimetypeProp = contentType.createProperty("mimetype");
         mimetypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         mimetypeProp.setMandatory(true);
         mimetypeProp.setMultiValued(false);
         
-        // Create Test Folder Type
-        M2Type folderType = metaModelDAO.createType(TYPE_QNAME_FOLDER);
-        folderType.setSuperClass(baseType);
-        folderType.getDefaultAspects().add(referenceAspect);
-        M2ChildAssociation contentsAssoc = folderType.createChildAssociation("contents");
-        contentsAssoc.getRequiredToClasses().add(fileType);
+        // Create Container Type
+        M2Type containerType = metaModelDAO.createType(TYPE_QNAME_CONTAINER);
+        containerType.setSuperClass(baseType);
+        containerType.getDefaultAspects().add(referenceAspect);
+        M2ChildAssociation contentsAssoc = containerType.createChildAssociation("contents");
+        contentsAssoc.getRequiredToClasses().add(contentType);
         contentsAssoc.setMandatory(false);
         contentsAssoc.setMultiValued(true);
     }
-    
     
     /**
      * Create a simple test model.
@@ -273,7 +274,7 @@ public class DictionaryBootstrap
         aspectsProp.setMultiValued(true);
 
         // Create Test File Type
-        M2Type fileType = metaModelDAO.createType(TYPE_QNAME_FILE);
+        M2Type fileType = metaModelDAO.createType(TEST_TYPE_QNAME_FILE);
         fileType.setSuperClass(baseType);
         fileType.getDefaultAspects().add(referenceAspect);
         M2Property encodingProp = fileType.createProperty("encoding");
@@ -286,7 +287,7 @@ public class DictionaryBootstrap
         mimetypeProp.setMultiValued(false);
         
         // Create Test Folder Type
-        M2Type folderType = metaModelDAO.createType(TYPE_QNAME_FOLDER);
+        M2Type folderType = metaModelDAO.createType(TEST_TYPE_QNAME_FOLDER);
         folderType.setSuperClass(baseType);
         folderType.getDefaultAspects().add(referenceAspect);
         M2ChildAssociation contentsAssoc = folderType.createChildAssociation("contents");

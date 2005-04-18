@@ -104,24 +104,24 @@ public class M2ClassDefinition implements ClassDefinition
         return m2Class.getSuperClass().getClassDefinition();
     }
     
-    public ClassRef getBootstrapClass()
+    public ClassDefinition getBootstrapClass()
     {
-        ClassRef baseClassRef = null;
-        ClassRef superClassRef = this.getReference();
-        while (superClassRef != null)
+        ClassDefinition baseClassDef = null;
+        ClassDefinition superClassDef = this;
+        while (superClassDef != null)
         {
-            if (superClassRef.equals(DictionaryBootstrap.TYPE_FOLDER) ||
-                    superClassRef.equals(DictionaryBootstrap.TYPE_FILE) ||
-                    superClassRef.equals(DictionaryBootstrap.TYPE_REFERENCE) ||
-                    superClassRef.equals(DictionaryBootstrap.TYPE_BASE))
+            if (superClassDef.getReference().equals(DictionaryBootstrap.TYPE_CONTAINER) ||
+                    superClassDef.getReference().equals(DictionaryBootstrap.TYPE_CONTENT) ||
+                    superClassDef.getReference().equals(DictionaryBootstrap.TYPE_REFERENCE) ||
+                    superClassDef.getReference().equals(DictionaryBootstrap.TYPE_BASE))
             {
-                baseClassRef = superClassRef;
+                baseClassDef = superClassDef;
                 break;
             }
             // move up the hierarchy
-            throw new RuntimeException("There is no way to go from a ref to a def here");
+            superClassDef = superClassDef.getSuperClass();
         }
-        return baseClassRef;
+        return baseClassDef;
     }
     
     /**

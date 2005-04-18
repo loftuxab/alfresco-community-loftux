@@ -674,8 +674,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 doc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
                 ClassRef nodeTypeRef = nodeService.getType(nodeRef);
                 ClassDefinition nodeClassDef = dictionaryService.getClass(nodeTypeRef);
-                nodeTypeRef = nodeClassDef.getBootstrapClass();
-                if (nodeTypeRef != null && nodeTypeRef.equals(DictionaryBootstrap.TYPE_FOLDER))
+                ClassDefinition nodeBaseClassDef = nodeClassDef.getBootstrapClass();
+                ClassRef nodeBaseTypeRef = nodeBaseClassDef.getReference();
+                if (DictionaryBootstrap.TYPE_CONTAINER.equals(nodeBaseTypeRef))
                 {
                     Document directoryEntry = new Document();
                     directoryEntry.add(new Field("ID", nodeRef.getId(), true, true, false));

@@ -29,11 +29,11 @@
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}reference" emfSuperClass="/20" emfDefaultAspects="/19">
     <emfProperties emfName="reference" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.activiti.com/test/1.0}file" emfSuperClass="/20" emfDefaultAspects="/19">
+  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}content" emfSuperClass="/20" emfDefaultAspects="/19">
     <emfProperties emfName="encoding" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="mimetype" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.activiti.com/test/1.0}folder" emfSuperClass="/20" emfDefaultAspects="/19">
+  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}container" emfSuperClass="/20" emfDefaultAspects="/19">
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="contents" emfRequiredToClasses="/22"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{uri://com.activiti/lightWeightVersionStore}version">

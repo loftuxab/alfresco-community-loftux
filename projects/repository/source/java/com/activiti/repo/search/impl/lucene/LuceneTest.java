@@ -492,7 +492,7 @@ public class LuceneTest extends TestCase
 
         public boolean exists(NodeRef nodeRef)
         {
-            throw new UnsupportedOperationException();
+            return true;
         }
 
         public NodeRef getRootNode(StoreRef storeRef)
@@ -504,63 +504,63 @@ public class LuceneTest extends TestCase
         {
             if (nodeRef.getId().equals("0"))
             {
-                return DictionaryBootstrap.TYPE_FOLDER;
+                return DictionaryBootstrap.TYPE_CONTAINER;
             }
             else if (nodeRef.getId().equals("1"))
             {
-                return DictionaryBootstrap.TYPE_FOLDER;
+                return DictionaryBootstrap.TYPE_CONTAINER;
             }
             else if (nodeRef.getId().equals("2"))
             {
-                return DictionaryBootstrap.TYPE_FOLDER;
+                return DictionaryBootstrap.TYPE_CONTAINER;
             }
             else if (nodeRef.getId().equals("3"))
             {
-                return DictionaryBootstrap.TYPE_FILE;
+                return DictionaryBootstrap.TYPE_CONTENT;
             }
             else if (nodeRef.getId().equals("4"))
             {
-                return DictionaryBootstrap.TYPE_FILE;
+                return DictionaryBootstrap.TYPE_CONTENT;
             }
             else if (nodeRef.getId().equals("5"))
             {
-                return DictionaryBootstrap.TYPE_FOLDER;
+                return DictionaryBootstrap.TYPE_CONTAINER;
             }
             else if (nodeRef.getId().equals("6"))
             {
-                return DictionaryBootstrap.TYPE_FOLDER;
+                return DictionaryBootstrap.TYPE_CONTAINER;
             }
             else if (nodeRef.getId().equals("7"))
             {
-                return DictionaryBootstrap.TYPE_FILE;
+                return DictionaryBootstrap.TYPE_CONTENT;
             }
             else if (nodeRef.getId().equals("8"))
             {
-                return DictionaryBootstrap.TYPE_FOLDER;
+                return DictionaryBootstrap.TYPE_CONTAINER;
             }
             else if (nodeRef.getId().equals("9"))
             {
-                return DictionaryBootstrap.TYPE_FILE;
+                return DictionaryBootstrap.TYPE_CONTENT;
             }
             else if (nodeRef.getId().equals("10"))
             {
-                return DictionaryBootstrap.TYPE_FILE;
+                return DictionaryBootstrap.TYPE_CONTENT;
             }
             else if (nodeRef.getId().equals("11"))
             {
-                return DictionaryBootstrap.TYPE_FILE;
+                return DictionaryBootstrap.TYPE_CONTENT;
             }
             else if (nodeRef.getId().equals("12"))
             {
-                return DictionaryBootstrap.TYPE_FOLDER;
+                return DictionaryBootstrap.TYPE_CONTAINER;
             }
             else if (nodeRef.getId().equals("13"))
             {
-                return DictionaryBootstrap.TYPE_FOLDER;
+                return DictionaryBootstrap.TYPE_CONTAINER;
             }
             else if (nodeRef.getId().equals("14"))
             {
-                return DictionaryBootstrap.TYPE_FILE;
+                return DictionaryBootstrap.TYPE_CONTENT;
             }
             else
             {
@@ -1080,13 +1080,13 @@ public class LuceneTest extends TestCase
 
         public ClassDefinition getClass(ClassRef classRef)
         {
-            if(classRef.equals(DictionaryBootstrap.TYPE_FILE))
+            if(classRef.equals(DictionaryBootstrap.TYPE_CONTENT))
             {
-                return new MockClassDefinition(DictionaryBootstrap.TYPE_FILE);
+                return new MockClassDefinition(DictionaryBootstrap.TYPE_CONTENT);
             }
-            else if(classRef.equals(DictionaryBootstrap.TYPE_FOLDER))
+            else if(classRef.equals(DictionaryBootstrap.TYPE_CONTAINER))
             {
-                return new MockClassDefinition(DictionaryBootstrap.TYPE_FOLDER);
+                return new MockClassDefinition(DictionaryBootstrap.TYPE_CONTAINER);
             }
             throw new UnsupportedOperationException();
         }
@@ -1122,7 +1122,7 @@ public class LuceneTest extends TestCase
 
         public ClassRef getReference()
         {
-            throw new UnsupportedOperationException();
+            return ref;
         }
 
         public QName getQName()
@@ -1135,9 +1135,9 @@ public class LuceneTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public ClassRef getBootstrapClass()
+        public ClassDefinition getBootstrapClass()
         {
-           return ref;
+           return this;
         }
 
         public boolean isAspect()
