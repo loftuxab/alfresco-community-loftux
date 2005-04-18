@@ -13,7 +13,6 @@ import com.activiti.repo.dictionary.NamespaceService;
  */
 public final class QName implements Serializable
 {
-
     private static final long serialVersionUID = 3977016258204348976L;
 
     private String namespaceURI;

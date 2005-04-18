@@ -26,7 +26,6 @@ import com.activiti.repo.domain.Store;
 import com.activiti.repo.domain.StoreKey;
 import com.activiti.repo.domain.hibernate.ChildAssocImpl;
 import com.activiti.repo.domain.hibernate.ContainerNodeImpl;
-import com.activiti.repo.domain.hibernate.ContentNodeImpl;
 import com.activiti.repo.domain.hibernate.NodeAssocImpl;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.domain.hibernate.RealNodeImpl;
@@ -35,6 +34,7 @@ import com.activiti.repo.node.InvalidNodeTypeException;
 import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.repo.ref.QName;
 import com.activiti.util.GUID;
+import com.activiti.util.debug.CodeMonkey;
 
 /**
  * Hibernate-specific implementation of the persistence-independent <b>node</b> DAO interface
@@ -109,6 +109,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         {
             throw new InvalidNodeTypeException(classRef);
         }
+        CodeMonkey.todo("Replace getBootstrapClass with check for presence of children"); // TODO
         ClassDefinition baseClassDef = classDef.getBootstrapClass();
         if (baseClassDef == null)
         {
@@ -121,21 +122,9 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         {
             node = new ContainerNodeImpl();
         }
-        else if (baseClassDef.getReference().equals(DictionaryBootstrap.TYPE_CONTENT))
-        {
-            node = new ContentNodeImpl();
-        }
-        else if (baseClassDef.getReference().equals(DictionaryBootstrap.TYPE_REFERENCE))
-        {
-            node = new RealNodeImpl();
-        }
-        else if (baseClassDef.getReference().equals(DictionaryBootstrap.TYPE_BASE))
-        {
-            node = new RealNodeImpl();
-        }
         else
         {
-            throw new InvalidNodeTypeException("Unknown base node type", classRef);
+            node = new RealNodeImpl();
         }
         // set other required properties
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());

@@ -7,10 +7,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
-import com.activiti.repo.domain.ContentNode;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.NodeKey;
@@ -104,7 +104,10 @@ public class HibernateNodeTest extends BaseHibernateTest
 		assertEquals("Incorrect store key", store, loadedStore);
 	}
 	
-    public void testMap() throws Exception
+    /**
+     * Check that properties can be persisted and retrieved
+     */
+    public void testProperties() throws Exception
     {
         // create a new Node
         Node node = new NodeImpl();
@@ -131,32 +134,54 @@ public class HibernateNodeTest extends BaseHibernateTest
     public void testSubclassing() throws Exception
     {
         // persist a subclass of Node
-        Node node = new ContentNodeImpl();
+        Node node = new ContainerNodeImpl();
 		NodeKey key = new NodeKey(store.getKey(), "AAA");
 		node.setKey(key);
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTENT);
+        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         Serializable id = getSession().save(node);
         // get the node back
         node = (Node) getSession().get(NodeImpl.class, id);
         // check
         assertNotNull("Persisted node not found", id);
-        assertTrue("Subtype not retrieved", node instanceof ContentNode);
+        assertTrue("Subtype not retrieved", node instanceof ContainerNode);
     }
 
-    public void testReferenceNode() throws Exception
+    /**
+     * Check that aspect qnames can be added and removed from a node and that they
+     * are persisted correctly 
+     */
+    public void testAspects() throws Exception
     {
-        // make a reference node
+        // make a real node
         Node node = new RealNodeImpl();
-		NodeKey key = new NodeKey(store.getKey(), "AAA");
-		node.setKey(key);
+        NodeKey nodeKey = new NodeKey(store.getKey(), GUID.generate());
+        node.setKey(nodeKey);
         node.setStore(store);
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_REFERENCE);
-        node.getProperties().put("reference", "/somepath/to/some/node[1]");
-        Serializable refNodeId = getSession().save(node);
-
-        // get the ref node back by ID
-        node = (RealNode) getSession().get(NodeImpl.class, refNodeId);
-        assertNotNull("reference property not set", node.getProperties().get("reference"));
+        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_BASE);
+        
+        // add some aspects
+        QName aspect1 = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "1");
+        QName aspect2 = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "2");
+        QName aspect3 = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "3");
+        QName aspect4 = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "4");
+        Set<QName> aspects = node.getAspects();
+        aspects.add(aspect1);
+        aspects.add(aspect2);
+        aspects.add(aspect3);
+        aspects.add(aspect4);
+        assertFalse("Set did not eliminate duplicate aspect qname", aspects.add(aspect4));
+        
+        // persist
+        Serializable id = getSession().save(node);
+        
+        // flush and clear
+        flushAndClear();
+        
+        // get node and check aspects
+        node = (Node) getSession().get(NodeImpl.class, id);
+        assertNotNull("Node not persisted", node);
+        aspects = node.getAspects();
+        assertEquals("Not all aspects persisted", 4, aspects.size());
     }
     
     public void testNodeAssoc() throws Exception
@@ -209,7 +234,7 @@ public class HibernateNodeTest extends BaseHibernateTest
     public void testChildAssoc() throws Exception
     {
         // make a content node
-        ContentNode contentNode = new ContentNodeImpl();
+        Node contentNode = new RealNodeImpl();
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
 		contentNode.setKey(key);
         contentNode.setStore(store);

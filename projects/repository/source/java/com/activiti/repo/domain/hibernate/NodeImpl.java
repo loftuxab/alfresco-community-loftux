@@ -15,7 +15,10 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 
 /**
- * Simple named node to test out various features
+ * Bean containing all the persistence data representing a <b>node</b>.
+ * <p>
+ * This implementation of the {@link com.activiti.repo.domain.Node Node} interface is
+ * Hibernate specific.
  * 
  * @author Derek Hulley
  * 
@@ -23,9 +26,10 @@ import com.activiti.repo.ref.QName;
 public class NodeImpl implements Node
 {
     private NodeKey key;
+    private Store store;
     private String typeNamespaceUri;
     private String typeLocalName;
-    private Store store;
+    private Set<QName> aspects;
     private Set<NodeAssoc> sourceNodeAssocs;
     private Set<ChildAssoc> parentAssocs;
     private Map<String, Serializable> properties;
@@ -33,6 +37,7 @@ public class NodeImpl implements Node
 
     public NodeImpl()
     {
+        aspects = new HashSet<QName>(5);
         sourceNodeAssocs = new HashSet<NodeAssoc>(3);
         parentAssocs = new HashSet<ChildAssoc>(3);
         properties = new HashMap<String, Serializable>(5);
@@ -69,6 +74,17 @@ public class NodeImpl implements Node
 		this.key = key;
 	}
     
+    public Store getStore()
+    {
+        return store;
+    }
+
+    public synchronized void setStore(Store store)
+    {
+        this.store = store;
+        this.nodeRef = null;
+    }
+
     /**
      * @see #getTypeNamespaceUri()
      * @see #getTypeLocalName()
@@ -121,16 +137,18 @@ public class NodeImpl implements Node
         this.typeLocalName = localName;
         this.nodeRef = null;
     }
-
-    public Store getStore()
+    
+    public Set<QName> getAspects()
     {
-        return store;
+        return aspects;
     }
-
-    public synchronized void setStore(Store store)
+    
+    /**
+     * For Hibernate use
+     */
+    private void setAspects(Set<QName> aspects)
     {
-        this.store = store;
-        this.nodeRef = null;
+        this.aspects = aspects;
     }
 
     public Set<NodeAssoc> getSourceNodeAssocs()

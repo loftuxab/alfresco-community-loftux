@@ -19,32 +19,34 @@
   <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}name"/>
   <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}guid"/>
   <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}category"/>
-  <datadictionary:EMFAspect emfName="{http://www.activiti.com/test/1.0}referenceable">
-    <emfProperties emfName="id" emfType="/17" emfMandatory="true"/>
+  <datadictionary:EMFAspect emfName="{http://www.activiti.com/1.0}aspect_content">
+    <emfProperties emfName="encoding" emfType="/7" emfMandatory="true"/>
+    <emfProperties emfName="mimetype" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFAspect>
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}base">
     <emfProperties emfName="primaryType" emfType="/16" emfProtected="true" emfMandatory="true"/>
     <emfProperties emfName="aspects" emfType="/16" emfProtected="true" emfMultiple="true"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}reference" emfSuperClass="/20" emfDefaultAspects="/19">
+  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}reference" emfSuperClass="/20">
     <emfProperties emfName="reference" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}content" emfSuperClass="/20" emfDefaultAspects="/19">
-    <emfProperties emfName="encoding" emfType="/7" emfMandatory="true"/>
-    <emfProperties emfName="mimetype" emfType="/7" emfMandatory="true"/>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}content" emfSuperClass="/20" emfDefaultAspects="/19"/>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}container" emfSuperClass="/20">
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/20"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfMultiple="false" emfRequiredToClasses="/24"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfMultiple="false" emfRequiredToClasses="/24"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}container" emfSuperClass="/20" emfDefaultAspects="/19">
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="contents" emfRequiredToClasses="/22"/>
-  </datadictionary:EMFType>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}file" emfSuperClass="/22"/>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}folder" emfSuperClass="/20"/>
   <datadictionary:EMFType emfName="{uri://com.activiti/lightWeightVersionStore}version">
     <emfProperties emfName="versionNumber" emfType="/9" emfMandatory="true"/>
     <emfProperties emfName="versionLabel" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="createdDate" emfType="/13" emfMandatory="true"/>
-    <emfAssociations emfName="successor" emfRequiredToClasses="/24"/>
+    <emfAssociations emfName="successor" emfRequiredToClasses="/26"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{uri://com.activiti/lightWeightVersionStore}versionHistory">
     <emfProperties emfName="versionedNodeId" emfType="/17" emfMandatory="true"/>
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/24"/>
-    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/24"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/26"/>
+    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/26"/>
   </datadictionary:EMFType>
 </xmi:XMI>

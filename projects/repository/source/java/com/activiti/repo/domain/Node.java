@@ -33,7 +33,9 @@ public interface Node
     public QName getTypeQName();
     
     public void setTypeQName(QName qname);
-
+    
+    public Set<QName> getAspects();
+    
     /**
      * @return Returns all the regular associations for which this node is a target 
      */

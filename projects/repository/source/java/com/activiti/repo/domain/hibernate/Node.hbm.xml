@@ -41,6 +41,20 @@
          <map-key column="qname" type="string" length="100" />
          <element column="property_value" type="serializable" />
       </map>
+      <set
+            name="aspects"
+            table="node_aspects"
+            lazy="false"
+            sort="unsorted"
+            inverse="false"
+            cascade="all" >
+         <key>
+            <column name="protocol" length="100"  />
+            <column name="identifier" length="100" />
+            <column name="guid" length="36" />
+         </key>
+         <element column="qname" type="serializable" />
+      </set>
       <!-- forward assoc to store -->
       <many-to-one
             name="store"
@@ -94,13 +108,6 @@
          </key>
          <one-to-many class="com.activiti.repo.domain.hibernate.NodeAssocImpl" />
       </set>
-   </subclass>
-
-   <subclass
-         name="com.activiti.repo.domain.hibernate.ContentNodeImpl"
-         proxy="com.activiti.repo.domain.ContentNode"
-         extends="com.activiti.repo.domain.hibernate.RealNodeImpl"
-         discriminator-value="CONTENT" >
    </subclass>
 
    <subclass

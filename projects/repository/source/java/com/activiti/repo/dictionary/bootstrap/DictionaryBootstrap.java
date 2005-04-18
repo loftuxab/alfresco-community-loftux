@@ -39,6 +39,12 @@ public class DictionaryBootstrap
     public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE); 
     public static final ClassRef TYPE_CONTAINER = new ClassRef(TYPE_QNAME_CONTAINER);
     public static final ClassRef TYPE_CONTENT = new ClassRef(TYPE_QNAME_CONTENT);
+    
+    // expected application types
+    public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_URI, "folder");
+    public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ACTIVITI_URI, "file");
+    public static final ClassRef TYPE_FOLDER = new ClassRef(TYPE_QNAME_FOLDER);
+    public static final ClassRef TYPE_FILE = new ClassRef(TYPE_QNAME_FILE);
 
     // test types
     public static final QName TEST_TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder");
@@ -194,14 +200,26 @@ public class DictionaryBootstrap
      */
     private void createMetaModel()
     {
-        // Create Test Referencable Aspect
-        M2Aspect referenceAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "referenceable"));
-        M2Property idProp = referenceAspect.createProperty("id");
-        idProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
-        idProp.setMandatory(true);
-        idProp.setProtected(false);
-        idProp.setMultiValued(false);
+//        // Create Test Referencable Aspect
+//        M2Aspect referenceAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.ACTIVITI_URI, "referenceable"));
+//        M2Property idProp = referenceAspect.createProperty("id");
+//        idProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
+//        idProp.setMandatory(true);
+//        idProp.setProtected(false);
+//        idProp.setMultiValued(false);
+        CodeMonkey.issue("We persist the node ID as a native property - is Referencable required?"); // TODO
         
+        // Create content aspect
+        M2Aspect contentAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.ACTIVITI_URI, "aspect_content"));
+        M2Property encodingProp = contentAspect.createProperty("encoding");
+        encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        encodingProp.setMandatory(true);
+        encodingProp.setMultiValued(false);
+        M2Property mimetypeProp = contentAspect.createProperty("mimetype");
+        mimetypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        mimetypeProp.setMandatory(true);
+        mimetypeProp.setMultiValued(false);
+
         // Create Test Base Type
         M2Type baseType = metaModelDAO.createType(TYPE_QNAME_BASE);
         M2Property primaryTypeProp = baseType.createProperty("primaryType");
@@ -218,33 +236,40 @@ public class DictionaryBootstrap
         // Create Reference Type
         M2Type referenceType = metaModelDAO.createType(TYPE_QNAME_REFERENCE);
         referenceType.setSuperClass(baseType);
-        referenceType.getDefaultAspects().add(referenceAspect);
         M2Property referenceProp = referenceType.createProperty("reference");
         referenceProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         referenceProp.setMandatory(true);
         referenceProp.setMultiValued(false);
 
         // Create Content Type
+        CodeMonkey.todo("Need to add description to the type definition"); // TODO
         M2Type contentType = metaModelDAO.createType(TYPE_QNAME_CONTENT);
         contentType.setSuperClass(baseType);
-        contentType.getDefaultAspects().add(referenceAspect);
-        M2Property encodingProp = contentType.createProperty("encoding");
-        encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
-        encodingProp.setMandatory(true);
-        encodingProp.setMultiValued(false);
-        M2Property mimetypeProp = contentType.createProperty("mimetype");
-        mimetypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
-        mimetypeProp.setMandatory(true);
-        mimetypeProp.setMultiValued(false);
+        contentType.getDefaultAspects().add(contentAspect);
         
         // Create Container Type
         M2Type containerType = metaModelDAO.createType(TYPE_QNAME_CONTAINER);
         containerType.setSuperClass(baseType);
-        containerType.getDefaultAspects().add(referenceAspect);
-        M2ChildAssociation contentsAssoc = containerType.createChildAssociation("contents");
-        contentsAssoc.getRequiredToClasses().add(contentType);
+        M2ChildAssociation contentsAssoc = containerType.createChildAssociation("*");
+        contentsAssoc.getRequiredToClasses().add(baseType);
         contentsAssoc.setMandatory(false);
         contentsAssoc.setMultiValued(true);
+
+        // Create File Type
+        M2Type fileType = metaModelDAO.createType(TYPE_QNAME_FILE);
+        fileType.setSuperClass(contentType);
+        
+        // Create Folder Type
+        M2Type folderType = metaModelDAO.createType(TYPE_QNAME_FOLDER);
+        folderType.setSuperClass(baseType);
+        M2ChildAssociation filesAssoc = containerType.createChildAssociation("*");
+        filesAssoc.getRequiredToClasses().add(fileType);
+        filesAssoc.setMandatory(false);
+        filesAssoc.setMultiValued(false);
+        M2ChildAssociation foldersAssoc = containerType.createChildAssociation("*");
+        foldersAssoc.getRequiredToClasses().add(fileType);
+        foldersAssoc.setMandatory(false);
+        foldersAssoc.setMultiValued(false);
     }
     
     /**
