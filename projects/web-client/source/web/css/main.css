@@ -7,16 +7,24 @@ table.moduletable td
 
 td,tr,p,div
 {
-   color: #1B3557;
+   color: #495F69;
 	font-family: Tahoma, Arial, Helvetica, sans-serif;
 	font-size: 11px;
-	color: Black;
+	color: #495F69;
+}
+
+p.status
+{
+   margin:0px;
+   padding-left:8px;
+   padding-top:4px;
+   padding-bottom:4px;
 }
 
 a:link, a:visited
 {
 	font-size: 11px;
-	color: #1B3557;
+	color: #495F69;
 	text-decoration: none;
 	font-family: Tahoma, Arial, Helvetica, sans-serif;
 	font-weight: normal;
@@ -32,7 +40,7 @@ a:hover
 a.path:link, a.path:visited
 {
 	font-size: 14px;
-	color: #666666;
+	color: #495F69;
 	text-decoration: none;
 	font-weight: normal;
 }
@@ -40,7 +48,7 @@ a.path:link, a.path:visited
 a.path:hover
 {
    font-size: 14px;
-	color: #666666;
+	color: #4272B4;
 	text-decoration: underline;
 	font-weight: normal;
 }
@@ -70,32 +78,32 @@ a.moreactions:hover
 a.small:link, a.small:visited
 {
    font-weight: normal;
-   color: #666666;
+   color: #495F69;
 }
 
 a.small:hover
 {
    font-weight: normal;
-   color: #666666;
+   color: #4272B4;
 }
 
 .pageTitle
 {
    font-family: Tahoma, Arial, Helvetica, sans-serif;
-   color: #666666;
+   color: #495F69;
    font-size: 14px;
 }
 
 .main
 {
-   color: #1B3557;
+   color: #495F69;
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 11px;
 }
 
 .mainTitle
 {
-   color: #666666;
+   color: #495F69;
    font-family: Arial, Helvetica, sans-serif;
    font-size: 16px;
    font-weight: bold;
@@ -104,7 +112,7 @@ a.small:hover
 
 .mainSubTitle
 {
-   color: #666666;
+   color: #495F69;
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 11px;
    font-weight: bold;
@@ -112,21 +120,38 @@ a.small:hover
 
 .mainSubText
 {
-   color: #666666;
+   color: #495F69;
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 11px;
 }
 
 .mainSubTextLarge
 {
-   color: #666666;
+   color: #495F69;
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 12px;
 }
 
+.headbar
+{
+   color: #495F69;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+   font-weight: normal;
+}
+
+.headbarTitle
+{
+   color: #495F69;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+   font-weight: bold;
+   margin-bottom: 5px;
+}
+
 .dialogTitleText
 {
-   color: #666666;
+   color: #495F69;
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 12px;
    font-weight: bold;
@@ -134,7 +159,7 @@ a.small:hover
 
 .mainSubTextSmall
 {
-   color: #666666;
+   color: #495F69;
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 10px;
 }
@@ -258,145 +283,4 @@ a.small:hover
    background-color: #EEEEEE;
    border-top: thin solid #CCCCCC;
    border-bottom: thin solid #CCCCCC;
-}
-
-.headerSiteDirectory
-{
-   background-color: #FFD97D;
-   border-top: thin solid #FCF3DF;
-   border-bottom: thin solid #CC9933;
-}
-
-.headerProjectDirectory
-{
-   background-color: #99BAA1;
-   border-top: thin solid #AFD1B6;
-   border-bottom: thin solid #64876C;
-}
-
-.detailSiteDirectory
-{
-   background-color: #EEEEEE;
-}
-
-.detailProjectDirectory
-{
-   background-color: #EEEEEE;
-}
-
-.stackedBreadcrumbTitle
-{
-   background-color: #ffffcc;
-   border-top: thin solid #AFAFAF;
-   border-bottom: thin solid #CCCC99;
-   padding: 1px;
-}
-
-.stackedBreadcrumbRow
-{
-   border-top: thin solid white;
-   border-bottom: thin solid #999999;
-   background-color: #dddddd;
-   padding: 1px;
-}
-
-.stackedBreadcrumbRowInset
-{
-   border-top: thin solid white;
-   border-bottom: thin solid #999999;
-   background-color: #EEEEEE;
-   padding: 1px;
-}
-
-.stackedBreadcrumbLink
-{
-   text-decoration: none;
-}
-
-.stackedBreadcrumbLink:hover
-{
-   text-decoration: underline;
-}
-
-.directoryStackedRow
-{
-   border-right: thin solid #999999;
-   border-top: thin solid white;
-   border-bottom: thin solid #999999;
-   background-color: #dddddd;
-   padding: 2px;
-   padding-left: 4px;
-}
-
-.directoryStackedRowOpen
-{
-   border-right: thin solid #999999;
-   border-top: thin solid #white;
-   border-bottom: thin solid #CCCC99;
-   background-color: #ffffcc;
-   padding: 2px;
-   padding-left: 4px;
-}
-
-.directoryStackedRowInset
-{
-   border-right: thin solid #999999;
-   border-top: thin solid white;
-   border-bottom: thin solid #999999;
-   background-color: #EEEEEE;
-   padding: 2px;
-   padding-left: 24px;
-}
-
-.siteStackedRow
-{
-   border-right: thin solid #999999;
-   border-top: thin solid white;
-   border-bottom: thin solid #999999;
-   background-color: #FFFFFF;
-   padding: 2px;
-   padding-left: 4px;
-}
-
-.siteStackedRowAlt
-{
-   border-right: thin solid #999999;
-   border-top: thin solid white;
-   border-bottom: thin solid #999999;
-   background-color: #EEEEEE;
-   padding: 2px;
-   padding-left: 4px;
-}
-
-.siteStackedRowDark
-{
-   border-right: thin solid #999999;
-   border-top: thin solid white;
-   border-bottom: thin solid #999999;
-   background-color: #DDDDDD;
-   padding: 2px;
-   padding-left: 24px;
-}
-
-a.getStartedLink
-{
-   color: #0066cc;
-}
-
-a.getStartedLink:visited
-{
-   color: #0066cc;
-}
-
-.getStartedTitle
-{
-   font-size: 11px;
-   font-weight: bold;
-   color: #333333;
-}
-
-.getStartedText
-{
-   font-size: 11px;
-   color: #333333;
 }
