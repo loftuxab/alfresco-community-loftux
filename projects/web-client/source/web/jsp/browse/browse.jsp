@@ -16,6 +16,8 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
+   <h:form id="browse">
+   
    <%-- Main outer table --%>
    <table cellspacing=0 cellpadding=2>
       
@@ -181,5 +183,11 @@
           </td>
        </tr>
     </table>
+    
+    <%-- TEMP! --%>
+    <p>
+    <h:commandButton id="show-jump-page" value="Back To Jump Page" action="jumppage" />
+    
+    </h:form>
     
 </f:view>

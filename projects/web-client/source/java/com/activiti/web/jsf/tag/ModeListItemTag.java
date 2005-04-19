@@ -82,15 +82,15 @@ public class ModeListItemTag extends BaseComponentTag
    }
 
    /**
-    * Set the value
+    * Set the value to be selected initially 
     *
-    * @param value     the value
+    * @param value     the value to be selected initially
     */
    public void setValue(String value)
    {
       this.value = value;
    }
-
+   
 
    /** the tooltip */
    private String tooltip;
@@ -101,6 +101,6 @@ public class ModeListItemTag extends BaseComponentTag
    /** the image */
    private String image;
 
-   /** the value */
+   /** the value to be selected initially */
    private String value;
 }

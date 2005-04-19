@@ -37,6 +37,14 @@
          <awc:modeListItem value="2" label="Icons" image="/images/icons/BlueArrow.gif" />
          <awc:modeListItem value="3" label="List" image="/images/icons/BlueArrow.gif" />
       </awc:modeList>
+      <br>
+      ModeList rendered horizontally with first item selected:<br>
+      <awc:modeList itemSpacing="2" iconColumnWidth="0" horizontal="true" value="1"
+            style="background-color:#EEEEEE" selectedStyle="background-color:#FFFFFF;border:solid #444444;border-width:1px">
+         <awc:modeListItem value="1" label="Item 001" tooltip="Item Number 1" />
+         <awc:modeListItem value="2" label="Item 002"  tooltip="Item Number 2" />
+         <awc:modeListItem value="3" label="Item 003"  tooltip="Item Number 3" />
+      </awc:modeList>
       
       <p>
       

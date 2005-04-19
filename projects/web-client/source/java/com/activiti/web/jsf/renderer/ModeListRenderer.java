@@ -72,12 +72,23 @@ public class ModeListRenderer extends BaseRenderer
       outputAttribute(out, attrs.get("width"), "width");
       out.write('>');
       
+      // horizontal rendering outputs a single row with each item as a column cell
+      if (list.isHorizontal() == true)
+      {
+         out.write("<tr>");
+      }
+      
       // output title row if present
       if (attrs.get("label") != null)
       {
          // each row is an inner table with a single row and 2 columns
-         // first column contains an icon if present, second column contains text 
-         out.write("<tr><td><table cellpadding=0 width=100%");
+         // first column contains an icon if present, second column contains text
+         if (list.isHorizontal() == false)
+         {
+            out.write("<tr>");
+         }
+         
+         out.write("<td><table cellpadding=0 width=100%");
          outputAttribute(out, attrs.get("itemSpacing"), "cellspacing");
          outputAttribute(out, attrs.get("itemStyleClass"), "class");
          outputAttribute(out, attrs.get("itemStyle"), "style");
@@ -86,7 +97,12 @@ public class ModeListRenderer extends BaseRenderer
          // TODO: allow styling of the label text cell
          out.write("></td><td><b>");
          out.write((String)attrs.get("label"));
-         out.write("</b></td></tr></table></td></tr>");
+         out.write("</b></td></tr></table></td>");
+         
+         if (list.isHorizontal() == false)
+         {
+            out.write("</tr>");
+         }
       }
    }
    
@@ -115,8 +131,13 @@ public class ModeListRenderer extends BaseRenderer
             UIModeListItem item = (UIModeListItem)child;
             
             // each row is an inner table with a single row and 2 columns
-            // first column contains an icon if present, second column contains text 
-            out.write("<tr><td><table cellpadding=0 width=100%");
+            // first column contains an icon if present, second column contains text
+            if (list.isHorizontal() == false)
+            {
+               out.write("<tr>");
+            }
+            
+            out.write("<td><table cellpadding=0 width=100%");
             outputAttribute(out, attrs.get("itemSpacing"), "cellspacing");
             
             // if selected value render different style for the item
@@ -152,7 +173,12 @@ public class ModeListRenderer extends BaseRenderer
             outputAttribute(out, child.getAttributes().get("tooltip"), "title");
             out.write('>');
             out.write((String)child.getAttributes().get("label"));
-            out.write("</td></tr></table></td></tr>");
+            out.write("</td></tr></table></td>");
+            
+            if (list.isHorizontal() == false)
+            {
+               out.write("</tr>");
+            }
          }
       }
    }
@@ -170,6 +196,10 @@ public class ModeListRenderer extends BaseRenderer
       ResponseWriter out = context.getResponseWriter();
       
       // end outer table
+      if (((UIModeList)component).isHorizontal() == true)
+      {
+         out.write("</tr>");
+      }
       out.write("</table>");
    }
 

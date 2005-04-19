@@ -59,6 +59,51 @@ public class UIModeList extends UICommand
    
    
    // ------------------------------------------------------------------------------
+   // Strongly typed property accessors 
+   
+   /**
+    * Get the horizontal rendering flag
+    *
+    * @return true for horizontal rendering, false otherwise
+    */
+   public boolean isHorizontal()
+   {
+      if (this.horizontal == null)
+      {
+         ValueBinding vb = getValueBinding("horizontal");
+         if (vb != null)
+         {
+            this.horizontal = (Boolean)vb.getValue(getFacesContext());
+         }
+      }
+      
+      if (this.horizontal != null)
+      {
+         return this.horizontal.booleanValue();
+      }
+      else
+      {
+         // return the default
+         return false;
+      }
+   }
+
+   /**
+    * Set true for horizontal rendering, false otherwise
+    *
+    * @param horizontal       the horizontal
+    */
+   public void setHorizontal(boolean horizontal)
+   {
+      this.horizontal = horizontal;
+   }
+
+
+   /** true for horizontal rendering, false otherwise */
+   private Boolean horizontal = null;
+   
+   
+   // ------------------------------------------------------------------------------
    // Inner classes
    
    /**

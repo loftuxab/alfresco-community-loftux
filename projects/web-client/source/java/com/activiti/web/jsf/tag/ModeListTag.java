@@ -42,6 +42,7 @@ public class ModeListTag extends HtmlComponentTag
       setIntProperty(component, "itemSpacing", this.itemSpacing);
       setIntProperty(component, "iconColumnWidth", this.iconColumnWidth);
       setIntProperty(component, "width", this.width);
+      setBooleanProperty(component, "horizontal", this.horizontal);
       setStringProperty(component, "label", this.label);
       setStringProperty(component, "value", this.value);
    }
@@ -58,6 +59,7 @@ public class ModeListTag extends HtmlComponentTag
       this.selectedStyle = null;
       this.itemSpacing = null;
       this.iconColumnWidth = null;
+      this.horizontal = null;
       this.width = null;
       this.label = null;
       this.action = null;
@@ -174,7 +176,20 @@ public class ModeListTag extends HtmlComponentTag
    {
       this.width = width;
    }
+   
+   /**
+    * Set if this component is rendered horizontally
+    *
+    * @param horizontal     true if rendered horizontally, false to render vertically
+    */
+   public void setHorizontal(String horizontal)
+   {
+      this.horizontal = horizontal;
+   }
 
+
+   /** true if rendered horizontally, false to render vertically */
+   private String horizontal;
 
    /** the width */
    private String width;

@@ -850,6 +850,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>horizontal</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
 
       <attribute>
          <name>iconColumnWidth</name>
