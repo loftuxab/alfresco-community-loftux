@@ -32,7 +32,7 @@ public class XMLConfigServiceTest extends TestCase
     * Tests the config service by retrieving properties configuration using
     * the generic interfaces
     */
-   public void xtestGetPropertiesViaInterfaces()
+   public void testGetPropertiesViaInterfaces()
    {
       NodeRef nodeRef = NodeService.getNodeRef("/gav.doc");
       Node node = new Node(NodeService.getType(nodeRef));
@@ -56,8 +56,13 @@ public class XMLConfigServiceTest extends TestCase
          propNames.add(propName);
       }
       
+      kids = propsToDisplay.getChildren();
+      
       logger.info("propNames = " + propNames);
       assertEquals(propNames.size() != 0, true);
+      
+      logger.info("has attribute id: " + propsToDisplay.hasAttribute("id"));
+      assertEquals(propsToDisplay.hasAttribute("id"), false);
    }
    
    /**
@@ -66,6 +71,8 @@ public class XMLConfigServiceTest extends TestCase
     */
    public void testGetProperties()
    {
+      logger.info("******************************************************");
+      
       NodeRef nodeRef = NodeService.getNodeRef("/gav.doc");
       Node node = new Node(NodeService.getType(nodeRef));
       node.setProperties(NodeService.getProperties(nodeRef));
@@ -79,6 +86,9 @@ public class XMLConfigServiceTest extends TestCase
       
       logger.info("propNames = " + propNames);
       assertEquals(propNames.size() != 0, true);
+      
+      logger.info("has attribute id: " + propsToDisplay.hasAttribute("id"));
+      assertEquals(propsToDisplay.hasAttribute("id"), false);
    }
    
    /**
@@ -86,6 +96,8 @@ public class XMLConfigServiceTest extends TestCase
     */
    public void testGetRenderers()
    {
+      logger.info("******************************************************");
+      
       // create an instance of the component
       UIRichList richList = new UIRichList();
       

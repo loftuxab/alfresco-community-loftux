@@ -31,7 +31,9 @@
       <div style="color:red;"><h:messages/></div>
       <br/>
       <h:commandButton value="Update Properties" action="#{node4.persist}"/>
-   
+      <br/><br/><br/>
+      <h:commandButton value="Property Zoo" action="#{ZooService.showPropertyZoo}" />
    </h:form>
       
+   
 </f:view>

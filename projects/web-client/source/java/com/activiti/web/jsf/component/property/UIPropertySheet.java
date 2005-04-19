@@ -86,16 +86,6 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
             
             ConfigService configSvc = ConfigServiceFactory.getConfigService();
             Config configProps = configSvc.getConfig(this.node);
-//            ConfigElement propsToDisplay = configProps.getConfigElement("properties");
-//            List kids = propsToDisplay.getChildren();
-//            List propNames = new ArrayList();
-//            for (Iterator iter = kids.iterator(); iter.hasNext();)
-//            {
-//               ConfigElement propElement = (ConfigElement)iter.next();
-//               String propName = propElement.getAttribute("name");
-//               propNames.add(propName);
-//            }
-            
             PropertiesConfigElement propsToDisplay = (PropertiesConfigElement)configProps.getConfigElement("properties");
             List propNames = propsToDisplay.getProperties();
             

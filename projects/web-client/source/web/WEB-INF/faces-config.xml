@@ -241,6 +241,10 @@
          <from-outcome>showBrowse</from-outcome>
          <to-view-id>/jsp/browse/browse.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>showNewSpaceWizard</from-outcome>
+         <to-view-id>/jsp/wizard/new-space.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
@@ -294,6 +298,14 @@
       <navigation-case>
          <from-outcome>showPropertyZoo2</from-outcome>
          <to-view-id>/jsp/zoo/properties-auto.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/zoo/properties-auto.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>showPropertyZoo</from-outcome>
+         <to-view-id>/jsp/zoo/properties.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

@@ -38,7 +38,7 @@ public interface ConfigElement
     * @param name Name of the attribute to check existence for
     * @return true if it exists, false otherwise
     */
-   public boolean hasAttrbiute(String name);
+   public boolean hasAttribute(String name);
    
    /**
     * Gets the value of this config element. If this config element has

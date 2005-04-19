@@ -30,7 +30,6 @@ public class GenericConfigElement implements ConfigElement
    public GenericConfigElement(String name)
    {
       this.name = name;
-      this.attributes = new HashMap();
    }
 
    /**
@@ -38,7 +37,14 @@ public class GenericConfigElement implements ConfigElement
     */
    public String getAttribute(String name)
    {
-      return (String)this.attributes.get(name);
+      String attr = null;
+      
+      if (this.attributes != null)
+      {
+         attr = (String)this.attributes.get(name); 
+      }
+      
+      return attr;
    }
    
    /**
@@ -84,11 +90,18 @@ public class GenericConfigElement implements ConfigElement
    }
 
    /**
-    * @see com.activiti.web.config.ConfigElement#hasAttrbiute(java.lang.String)
+    * @see com.activiti.web.config.ConfigElement#hasAttribute(java.lang.String)
     */
-   public boolean hasAttrbiute(String name)
+   public boolean hasAttribute(String name)
    {
-      return this.attributes.containsKey(name);
+      boolean hasAttr = false;
+      
+      if (this.attributes != null)
+      {
+         hasAttr = this.attributes.containsKey(name);
+      }
+      
+      return hasAttr;
    }
 
    /**
@@ -165,6 +178,11 @@ public class GenericConfigElement implements ConfigElement
     */
    public void addAttribute(String name, String value)
    {
+      if (this.attributes == null)
+      {
+         this.attributes = new HashMap();
+      }
+      
       this.attributes.put(name, value);
    }
    

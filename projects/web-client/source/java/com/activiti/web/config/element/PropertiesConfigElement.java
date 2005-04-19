@@ -11,9 +11,10 @@ import com.activiti.web.config.ConfigElement;
  * 
  * @author gavinc
  */
-public class PropertiesConfigElement extends CustomConfigElement
+public class PropertiesConfigElement extends GenericConfigElement
 {
    private List properties = new ArrayList();
+   private boolean kidsPopulated = false;
    
    /**
     * Default constructor
@@ -23,6 +24,37 @@ public class PropertiesConfigElement extends CustomConfigElement
       super("properties");
    }
    
+   /**
+    * @see com.activiti.web.config.element.GenericConfigElement#getChildren()
+    */
+   public List getChildren()
+   {
+      // lazily build the list of generic config elements representing
+      // the properties as the caller may not even call this method
+      
+      List kids = null;
+      
+      if (this.properties.size() > 0)
+      {
+         if (this.kidsPopulated == false)
+         {
+            Iterator props = this.properties.iterator();
+            while (props.hasNext())
+            {
+               GenericConfigElement ce = new GenericConfigElement("property");
+               ce.addAttribute("name", (String)props.next());
+               addChild(ce);
+            }
+            
+            this.kidsPopulated = true;
+         }
+         
+         kids = super.getChildren();
+      }
+      
+      return kids;
+   }
+
    /**
     * @see com.activiti.web.config.ConfigElement#combine(com.activiti.web.config.ConfigElement)
     */
