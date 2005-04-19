@@ -80,9 +80,9 @@
       </tr>
       
       <%-- Main area --%>
-      <tr>
+      <tr valign=top>
          <%-- Shelf area --%>
-         <td valign=top>
+         <td>
             <awc:panel id="shelfPanel">
                <table cellspacing=0 cellpadding=0 width=100% bgcolor='#ffffff'>
                   <tr>
@@ -97,7 +97,7 @@
                      <td height=425 valign=top>
                         
                         <%-- TODO: Shelf components --%>
-                        <img src="<%=request.getContextPath()%>/images/test/shelf.png">
+                        <img src="<%=request.getContextPath()%>/images/test/shelf.png" style="padding-top:4px">
                         
                      </td>
                      <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
@@ -112,7 +112,7 @@
          </td>
          
          <%-- Work area --%>
-         <td width=100% valign=top>
+         <td width=100%>
             <table cellspacing=0 cellpadding=0 width=100%>
                <%-- Breadcrumb --%>
                <tr>
@@ -128,9 +128,9 @@
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width=4></td>
                   <td bgcolor="#ECE9E1">
-                     <table cellspacing=0 cellpadding=4>
-                        <tr>
-                           <td valign=top width=26>
+                     <table cellspacing=4 cellpadding=0 width=100%>
+                        <tr valign=top>
+                           <td width=26>
                               <img src="<%=request.getContextPath()%>/images/ball_big.gif" width=26 height=27>
                            </td>
                            <td>
@@ -138,11 +138,28 @@
                                  Status and actions.
                               </p>
                               <p class="status">
-                                 Several text lines will probably appear here, some will be quite long.
+                                 <%--<awc:panel id="testPanel0" progressive="true">--%>
+                                    Several text lines will probably appear here, some will be quite long. And maybe really long, it's difficult to say really at the start of things.
+                                 <%--</awc:panel>--%>
                               </p>
                               <p class="status">
-                                 So let's have some more text.
+                                 Let's have some more text. And more.
                               </p>
+                           </td>
+                           <td bgcolor="#495F69" width=1></td>
+                           <td width=100>
+                              <%-- Global actions --%>
+                              <span style="padding-left:26px" class="mainSubTitle">Actions</span><br>
+                           </td>
+                           <td bgcolor="#495F69" width=1></td>
+                           <td width=100>
+                              <%-- Global view settings --%>
+                              <span style="padding-left:26px" class="mainSubTitle">View</span><br>
+                              <awc:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" value="0">
+                                 <awc:modeListItem value="0" label="List All Items" image="/images/icons/Details.gif" />
+                                 <awc:modeListItem value="1" label="Dashboard" />
+                                 <awc:modeListItem value="2" label="Browse Items" />
+                              </awc:modeList>
                            </td>
                         </tr>
                      </table>
@@ -174,9 +191,9 @@
                </tr>
                
                <%-- Details --%>
-               <tr>
+               <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
-                  <td valign=top height=310>
+                  <td height=300>
                      ...Details...
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>

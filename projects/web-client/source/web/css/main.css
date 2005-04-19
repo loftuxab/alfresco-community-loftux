@@ -306,3 +306,10 @@ a.topToolbarLinkHighlight
 {
    color:#5D747F;
 }
+
+.statusListHighlight
+{
+   background-color:#FFFFFF;
+   border:solid #71828A;
+   border-width:1px;
+}
