@@ -122,9 +122,12 @@
       </property>
       <property name="target">
          <bean class="com.activiti.repo.node.db.DbNodeServiceImpl" >
-            <property name="nodeDaoService">
+            <constructor-arg>
+               <ref bean="dictionaryService" />
+            </constructor-arg>
+            <constructor-arg>
                <ref bean="nodeDaoService" />
-            </property>
+            </constructor-arg>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -150,12 +153,12 @@
       </property>
       <property name="target">
          <bean class="com.activiti.repo.node.index.IndexingNodeServiceImpl" >
-            <property name="nodeServiceDelegate">
+            <constructor-arg>
                <ref bean="dbNodeService" />
-            </property>
-            <property name="indexer">
+            </constructor-arg>
+            <constructor-arg>
                <ref bean="indexerComponent" />
-            </property>
+            </constructor-arg>
          </bean>
       </property>
       <property name="transactionAttributes">

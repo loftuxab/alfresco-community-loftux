@@ -5,7 +5,6 @@ import java.util.Collection;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionHistory;
-import com.activiti.repo.version.VersionService;
 
 /**
  * LightWeightVersionService test class.

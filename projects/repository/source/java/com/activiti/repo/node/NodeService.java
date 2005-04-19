@@ -3,6 +3,7 @@ package com.activiti.repo.node;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -68,6 +69,7 @@ public interface NodeService
      * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent reference is invalid
      * @throws InvalidNodeTypeException if the node type reference is not recognised
+     * @throws PropertyException if a mandatory property was not set
      * 
      * @see com.activiti.repo.dictionary.DictionaryService
      */
@@ -75,7 +77,7 @@ public interface NodeService
             QName qname,
             ClassRef typeRef,
             Map<QName, Serializable> properties)
-            throws InvalidNodeRefException, InvalidNodeTypeException;
+            throws InvalidNodeRefException, InvalidNodeTypeException, PropertyException;
     
     /**
      * @param nodeRef
@@ -85,6 +87,61 @@ public interface NodeService
      * @see com.activiti.repo.dictionary.DictionaryService
      */
     public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException;
+    
+    /**
+     * Applies an aspect to the given node.  After this method has been called,
+     * the node with have all the aspect-related properties present
+     * 
+     * @param nodeRef
+     * @param aspectRef the aspect to apply to the node
+     * @param aspectProperties a minimum of the mandatory properties required for
+     *      the aspect
+     * @throws InvalidNodeRefException
+     * @throws InvalidAspectException if the class reference is not to a valid aspect
+     * @throws PropertyException if one of the aspect's required
+     *      properties have not been provided
+     *
+     * @see com.activiti.repo.dictionary.DictionaryService#getAspect(ClassRef)
+     * @see com.activiti.repo.dictionary.ClassDefinition#getProperties()
+     */
+    public void addAspect(NodeRef nodeRef,
+            ClassRef aspectRef,
+            Map<QName, Serializable> aspectProperties)
+            throws InvalidNodeRefException, InvalidAspectException, PropertyException;
+    
+    /**
+     * Remove an aspect and all related properties from a node
+     * 
+     * @param nodeRef
+     * @param aspectRef the type of aspect to remove
+     * @throws InvalidNodeRefException if the node could not be found
+     * @throws InvalidAspectException if the the aspect is unknown or if the
+     *      aspect is mandatory for the <b>class</b> of the <b>node</b>
+     */
+    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef)
+            throws InvalidNodeRefException, InvalidAspectException;
+    
+    /**
+     * Determines if a given aspect is present on a node.  Aspects may only be
+     * removed if they are <b>NOT</b> mandatory.
+     * 
+     * @param nodeRef
+     * @param aspectRef
+     * @return Returns true if the aspect has been applied to the given node,
+     *      otherwise false
+     * @throws InvalidNodeRefException if the node could not be found
+     * @throws InvalidAspectException if the aspect reference is invalid
+     */
+    public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef)
+            throws InvalidNodeRefException, InvalidAspectException;
+    
+    /**
+     * @param nodeRef
+     * @return Returns a set of all aspects applied to the node, including mandatory
+     *      aspects
+     * @throws InvalidNodeRefException if the node could not be found
+     */
+    public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * Deletes the given node.

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -22,8 +23,10 @@ import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.AssociationExistsException;
+import com.activiti.repo.node.InvalidAspectException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.node.PropertyException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NamespaceException;
@@ -1197,6 +1200,26 @@ public class LuceneTest extends TestCase
                 parents.add(n13);
             }
             return parents;
+        }
+
+        public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void removeAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
+        {
+            throw new UnsupportedOperationException();
         }
 
         public ChildAssocRef createNode(NodeRef parentRef, QName qname, ClassRef typeRef) throws InvalidNodeRefException

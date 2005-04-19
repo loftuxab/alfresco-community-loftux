@@ -2,6 +2,7 @@ package com.activiti.repo.node.index;
 
 import java.util.Map;
 
+import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.node.BaseNodeServiceTest;
 import com.activiti.repo.node.NodeService;
@@ -24,6 +25,11 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
     private static StoreRef myStoreRef;
     private static NodeRef myRootNode;
     
+    protected DictionaryService getDictionaryService()
+    {
+        return (DictionaryService) applicationContext.getBean("dictionaryService");
+    }
+
     protected NodeService getNodeService()
     {
         return (NodeService) applicationContext.getBean("indexingNodeService");

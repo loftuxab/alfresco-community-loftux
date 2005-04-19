@@ -7,11 +7,14 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.node.AssociationExistsException;
+import com.activiti.repo.node.InvalidAspectException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.node.PropertyException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
 import com.activiti.repo.ref.NodeRef;
@@ -136,6 +139,26 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
         throw new UnsupportedOperationException();
     }
     
+    public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
+    {
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
+    public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    {
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
+    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    {
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
+    public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
     /**
      * Property translation for version store
      */

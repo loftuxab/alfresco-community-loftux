@@ -35,10 +35,12 @@ public class DictionaryBootstrap
     public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ACTIVITI_URI, "reference");
     public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ACTIVITI_URI, "container");
     public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "content");
+    public static final QName ASPECT_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "aspect_content");
     public static final ClassRef TYPE_BASE = new ClassRef(TYPE_QNAME_BASE); 
     public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE); 
     public static final ClassRef TYPE_CONTAINER = new ClassRef(TYPE_QNAME_CONTAINER);
     public static final ClassRef TYPE_CONTENT = new ClassRef(TYPE_QNAME_CONTENT);
+    public static final ClassRef ASPECT_CONTENT = new ClassRef(ASPECT_QNAME_CONTENT);
     
     // expected application types
     public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_URI, "folder");
@@ -210,7 +212,7 @@ public class DictionaryBootstrap
         CodeMonkey.issue("We persist the node ID as a native property - is Referencable required?"); // TODO
         
         // Create content aspect
-        M2Aspect contentAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.ACTIVITI_URI, "aspect_content"));
+        M2Aspect contentAspect = metaModelDAO.createAspect(ASPECT_QNAME_CONTENT);
         M2Property encodingProp = contentAspect.createProperty("encoding");
         encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         encodingProp.setMandatory(true);

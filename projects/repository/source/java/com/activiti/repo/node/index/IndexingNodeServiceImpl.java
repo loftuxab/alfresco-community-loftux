@@ -3,12 +3,15 @@ package com.activiti.repo.node.index;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.node.AssociationExistsException;
+import com.activiti.repo.node.InvalidAspectException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.InvalidStoreRefException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.node.PropertyException;
 import com.activiti.repo.node.StoreExistsException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
@@ -31,22 +34,12 @@ import com.activiti.repo.search.IndexerComponent;
  */
 public class IndexingNodeServiceImpl implements NodeService
 {
-    private NodeService nodeServiceDelegate;
-    private Indexer indexer;
+    private final NodeService nodeServiceDelegate;
+    private final Indexer indexer;
 
-    /**
-     * @param nodeServiceDelegate the <code>NodeService</code> that will do the node work
-     */
-    public void setNodeServiceDelegate(NodeService nodeServiceDelegate)
+    public IndexingNodeServiceImpl(NodeService nodeServiceDelegate, Indexer indexer)
     {
         this.nodeServiceDelegate = nodeServiceDelegate;
-    }
-    
-    /**
-     * @param indexer the component that performs the indexing operations
-     */
-    public void setIndexer(Indexer indexer)
-    {
         this.indexer = indexer;
     }
     
@@ -129,6 +122,57 @@ public class IndexingNodeServiceImpl implements NodeService
         return nodeServiceDelegate.getType(nodeRef);
     }
     
+    /**
+     * Delegates to the assigned {@link #nodeServiceDelegate} before using the
+     * {@link #indexer} to update the search index.
+     * 
+     * @see IndexerComponent#updateNode(NodeRef)
+     */
+    public void addAspect(
+            NodeRef nodeRef,
+            ClassRef aspectRef,
+            Map<QName, Serializable> aspectProperties)
+            throws InvalidNodeRefException, InvalidAspectException, PropertyException
+    {
+        // call delegate
+        nodeServiceDelegate.addAspect(nodeRef, aspectRef, aspectProperties);
+        // update index
+        indexer.updateNode(nodeRef);
+    }
+
+    /**
+     * Delegates to the assigned {@link #nodeServiceDelegate} before using the
+     * {@link #indexer} to update the search index.
+     * 
+     * @see IndexerComponent#updateNode(NodeRef)
+     */
+    public void removeAspect(
+            NodeRef nodeRef,
+            ClassRef aspectRef)
+            throws InvalidNodeRefException, InvalidAspectException
+    {
+        // call delegate
+        nodeServiceDelegate.removeAspect(nodeRef, aspectRef);
+        // update index
+        indexer.updateNode(nodeRef);
+    }
+
+    /**
+     * Direct delegation to assigned {@link #nodeServiceDelegate}
+     */
+    public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    {
+        return nodeServiceDelegate.hasAspect(nodeRef, aspectRef);
+    }
+
+    /**
+     * Direct delegation to assigned {@link #nodeServiceDelegate}
+     */
+    public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        return nodeServiceDelegate.getAspects(nodeRef);
+    }
+
     /**
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.

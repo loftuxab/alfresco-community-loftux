@@ -13,6 +13,7 @@ import java.util.Stack;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
@@ -22,9 +23,11 @@ import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.CyclicChildRelationshipException;
+import com.activiti.repo.node.InvalidAspectException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.InvalidStoreRefException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.node.PropertyException;
 import com.activiti.repo.node.StoreExistsException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
@@ -40,10 +43,14 @@ import com.activiti.repo.ref.StoreRef;
  */
 public class DbNodeServiceImpl implements NodeService
 {
-    private NodeDaoService nodeDaoService;
-
-    public void setNodeDaoService(NodeDaoService nodeDaoService)
+    private final DictionaryService dictionaryService;
+    private final NodeDaoService nodeDaoService;
+    
+    public DbNodeServiceImpl(
+            DictionaryService dictionaryService,
+            NodeDaoService nodeDaoService)
     {
+        this.dictionaryService = dictionaryService;
         this.nodeDaoService = nodeDaoService;
     }
 
@@ -208,6 +215,31 @@ public class DbNodeServiceImpl implements NodeService
         ClassRef classRef = new ClassRef(node.getTypeQName());
         return  classRef;
     }
+    
+    public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties)
+            throws InvalidNodeRefException, InvalidAspectException, PropertyException
+    {
+        Node node = getNodeNotNull(nodeRef);
+        // get the list of properties that are required for the aspect
+        
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        throw new UnsupportedOperationException();
+    }
+
     public void deleteNode(NodeRef nodeRef)
     {
 		// get the store

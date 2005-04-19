@@ -5,11 +5,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Session;
 
+import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -36,12 +40,14 @@ import com.activiti.util.debug.CodeMonkey;
  */
 public abstract class BaseNodeServiceTest extends BaseSpringTest
 {
+    protected DictionaryService dictionaryService;
     protected NodeService nodeService;
     /** populated during setup */
     protected NodeRef rootNodeRef;
 
     protected void onSetUpInTransaction() throws Exception
     {
+        dictionaryService = getDictionaryService();
         nodeService = getNodeService();
         
         // create a first store directly
@@ -50,6 +56,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
     }
+    
+    /**
+     * Usually just implemented by fetching the bean directly from the bean factory.
+
+     * @return Returns the implementation of <code>DictionaryService</code> to be
+     *      used for this test.
+     */
+    protected abstract DictionaryService getDictionaryService();
     
     /**
      * Usually just implemented by fetching the bean directly from the bean factory,
@@ -232,6 +246,84 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // get the type
         ClassRef type = nodeService.getType(nodeRef);
         assertEquals("Type mismatch", DictionaryBootstrap.TYPE_CONTAINER, type);
+    }
+    
+    /**
+     * Checks that aspects can be added, removed and queried.  Failure to detect
+     * inadequate properties is also checked.
+     */
+    public void testAspects() throws Exception
+    {
+        // create a regular base node
+        ChildAssocRef assocRef = nodeService.createNode(
+                rootNodeRef,
+                QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "test-content"),
+                DictionaryBootstrap.TYPE_BASE);
+        NodeRef nodeRef = assocRef.getChildRef();
+        // add the content aspect to the node, but don't supply any properties
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(20);
+        try
+        {
+            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT, properties);
+            fail("Failed to detect inadequate properties for aspect");
+        }
+        catch (PropertyException e)
+        {
+            // expected
+        }
+        // get the properties required for the aspect
+        AspectDefinition aspectDef = dictionaryService.getAspect(DictionaryBootstrap.ASPECT_CONTENT);
+        List<PropertyDefinition> propertyDefs = aspectDef.getProperties();
+        // make up a property value for each property
+        for (PropertyDefinition propertyDef : propertyDefs)
+        {
+            QName qname = propertyDef.getQName();
+            Serializable value = new Long(System.currentTimeMillis());
+            // add it
+            properties.put(qname, value);
+        }
+        // get the node properties before
+        Map<QName, Serializable> propertiesBefore = nodeService.getProperties(nodeRef);
+        // add the aspect
+        nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT, properties);
+        // get the properties after and check
+        Map<QName, Serializable> propertiesAfter = nodeService.getProperties(nodeRef);
+        assertEquals("Aspect properties not added",
+                propertiesBefore.size() + 2,
+                propertiesAfter.size());
+        
+        // attempt to override node properties with insufficient properties
+        propertiesAfter.clear();
+        try
+        {
+            nodeService.setProperties(nodeRef, propertiesAfter);
+            fail("Failed to detect that required properties were missing");
+        }
+        catch (PropertyException e)
+        {
+            // expected
+        }
+        
+        // check that we know that the aspect is present
+        Set<ClassRef> aspects = nodeService.getAspects(nodeRef);
+        assertEquals("Incorrect number of aspects", 1, aspects.size());
+        assertTrue("Content aspect not present",
+                aspects.contains(DictionaryBootstrap.ASPECT_CONTENT));
+        
+        // check that hasAspect works
+        boolean hasAspect = nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT);
+        assertTrue("Aspect not confirmed to be on node", hasAspect);
+        
+        // remove the aspect
+        nodeService.removeAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT);
+        hasAspect = nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT);
+        assertFalse("Aspect not removed from node", hasAspect);
+        
+        // check that the associated properties were removed
+        propertiesAfter = nodeService.getProperties(nodeRef);
+        assertEquals("Aspect properties not removed",
+                propertiesBefore.size(),
+                propertiesAfter.size());
     }
 
     public void testCreateNodeNoProperties() throws Exception
