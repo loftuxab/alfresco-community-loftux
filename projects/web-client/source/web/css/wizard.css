@@ -1,0 +1,74 @@
+.steps-panel
+{
+   color: #49f569;
+}
+
+.steps-heading
+{
+   font-weight: bold;
+   padding-bottom: 7px;
+}
+
+.selected-step
+{
+   border: 1px solid black;
+   background-color: #e9f0f4;
+   -moz-border-radius: 3px;
+}
+
+.unselected-step
+{
+}
+
+.details-panel
+{
+   color: #49f569;
+}
+
+.details-heading
+{
+   font-weight: bold;
+}
+
+.details-sub-heading
+{
+	background-color: #d8dfe4;
+	font-weight: bold;
+}
+
+.details-description
+{
+   padding-bottom: 15px;
+}
+
+.details-separator
+{
+   padding-bottom: 5px;
+}
+
+.details-hints
+{
+   padding-top: 20px;
+}
+
+.buttons-panel
+{
+}
+
+.button-group-separator
+{
+   padding-bottom: 5px;
+}
+
+.button
+{
+   width: 60px;
+}
+
+.long-button
+{
+   width: 100px;
+}
+
+
+

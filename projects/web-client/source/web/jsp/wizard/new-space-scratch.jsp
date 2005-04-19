@@ -17,7 +17,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <h:form id="new-space-wizard-step1">
+   <h:form id="new-space-wizard-step2">
       
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="4" border="1">
@@ -96,10 +96,10 @@
                                     <td class="steps-heading">Steps</td>
                                  </tr>
                                  <tr>
-                                    <td class="selected-step">1. Starting Space</td>
+                                    <td class="unselected-step">1. Starting Space</td>
                                  </tr>
                                  <tr>
-                                    <td class="unselected-step">2. Space Options</td>
+                                    <td class="selected-step">2. Space Options</td>
                                  </tr>
                                  <tr>
                                     <td class="unselected-step">3. Space Details</td>
@@ -115,21 +115,42 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="1" cellspacing="2" border="0" class="details-panel">
                                  <tr>
-                                    <td class="details-heading">Step 1 - Starting Space</td>
+                                    <td class="details-heading">Step 2 - Space Options</td>
                                  </tr>
                                  <tr>
-                                    <td class="details-description">Choose how you want to create your space.</td>
+                                    <td class="details-description">Select space options.</td>
                                  </tr>
                                  <tr>
-                                    <td>How do you want to create your space?</td>
+                                    <td class="details-sub-heading">&nbsp;Space Type</td>
+                                 </tr>
+                                 <tr><td class="details-separator" /></tr>
+                                 <tr>
+                                    <td>Select the type of space you want to create.</td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:selectOneRadio value="#{NewSpaceWizard.createType}" layout="pageDirection">
-                                          <f:selectItem itemValue="scratch" itemLabel="From scratch" />
-                                          <f:selectItem itemValue="existing" itemLabel="Base on existing space" />
-                                          <f:selectItem itemValue="template" itemLabel="Use a template" />
+                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                                       <h:selectOneRadio value="#{NewSpaceWizard.spaceType}">
+                                          <f:selectItem itemValue="container" itemLabel="Container" />
+                                          <f:selectItem itemValue="wiki" itemLabel="Wiki" />
+                                          <f:selectItem itemValue="discussion" itemLabel="Discussion" />
                                        </h:selectOneRadio>
+                                       <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
+                                       <h:graphicImage id="info-icon" url="/images/icons/info_icon.gif" />&nbsp;
+                                       A place for keeping and organising documents and other spaces.
+                                       <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="details-separator" /></tr>
+                                 <tr>
+                                    <td>
+                                       Note:<br/>If you can only see one type of space then other space
+                                       types may not be enabled. See your System Administrator for further help.
                                     </td>
                                  </tr>
                                  <tr>
@@ -145,6 +166,11 @@
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="button" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="button" />
                                     </td>
                                  </tr>
                                  <tr>

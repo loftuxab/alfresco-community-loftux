@@ -141,6 +141,15 @@
    <!-- ==================== MANAGED BEANS ==================== -->
    <managed-bean>
       <description>
+         The bean that backs up the New Space Wizard
+      </description>
+      <managed-bean-name>NewSpaceWizard</managed-bean-name>
+      <managed-bean-class>com.activiti.web.wizard.NewSpace</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the jsf-test webapp Login screen
       </description>
       <managed-bean-name>LoginBean</managed-bean-name>
@@ -306,6 +315,75 @@
       <navigation-case>
          <from-outcome>showPropertyZoo</from-outcome>
          <to-view-id>/jsp/zoo/properties.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- new space wizard navigation -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/*</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/jump.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>minimise</from-outcome>
+         <to-view-id>/jsp/jump.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-space.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>next-scratch</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-scratch.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>next-existing</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-scratch.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>next-template</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-scratch.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-space-scratch.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>next</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>back</from-outcome>
+         <to-view-id>/jsp/wizard/new-space.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-space-details.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>next</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-summary.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>back</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-scratch.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/jump.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-space-summary.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>back</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/jump.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

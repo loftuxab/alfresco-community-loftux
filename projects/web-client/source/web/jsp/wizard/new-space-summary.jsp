@@ -96,7 +96,7 @@
                                     <td class="steps-heading">Steps</td>
                                  </tr>
                                  <tr>
-                                    <td class="selected-step">1. Starting Space</td>
+                                    <td class="unselected-step">1. Starting Space</td>
                                  </tr>
                                  <tr>
                                     <td class="unselected-step">2. Space Options</td>
@@ -105,7 +105,7 @@
                                     <td class="unselected-step">3. Space Details</td>
                                  </tr>
                                  <tr>
-                                    <td class="unselected-step">4. Summary</td>
+                                    <td class="selected-step">4. Summary</td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -115,25 +115,16 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="1" cellspacing="2" border="0" class="details-panel">
                                  <tr>
-                                    <td class="details-heading">Step 1 - Starting Space</td>
+                                    <td class="details-heading">Step 4 - Summary</td>
                                  </tr>
                                  <tr>
-                                    <td class="details-description">Choose how you want to create your space.</td>
+                                    <td class="details-description">The information you entered is shown below.</td>
                                  </tr>
                                  <tr>
-                                    <td>How do you want to create your space?</td>
+                                    <td><h:outputText value="#{NewSpaceWizard.summary}" escape="false"/></td>
                                  </tr>
                                  <tr>
-                                    <td>
-                                       <h:selectOneRadio value="#{NewSpaceWizard.createType}" layout="pageDirection">
-                                          <f:selectItem itemValue="scratch" itemLabel="From scratch" />
-                                          <f:selectItem itemValue="existing" itemLabel="Base on existing space" />
-                                          <f:selectItem itemValue="template" itemLabel="Use a template" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td class="details-hints">To continue click Next.</td>
+                                    <td class="details-hints">To close this wizard and create your space click Finish.</td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -144,13 +135,12 @@
                               <table cellpadding="1" cellspacing="1" border="0" class="buttons-panel">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="button" />
+                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="button" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" 
-                                                        disabled="true" styleClass="button" />
+                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="button" />
                                     </td>
                                  </tr>
                                  <tr><td class="button-group-separator"></td></tr>
