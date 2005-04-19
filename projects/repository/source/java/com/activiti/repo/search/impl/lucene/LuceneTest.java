@@ -1742,6 +1742,11 @@ public class LuceneTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
+        public List<AspectDefinition> getAspects()
+        {
+            throw new UnsupportedOperationException();
+        }
+
         public AssociationDefinition getAssociation(String name)
         {
             throw new UnsupportedOperationException();

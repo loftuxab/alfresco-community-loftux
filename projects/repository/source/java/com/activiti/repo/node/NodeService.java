@@ -204,6 +204,11 @@ public interface NodeService
     public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException;
     
     /**
+     * Set the values of all properties to be an <code>Serializable</code> instances.
+     * Use this method to remove unwanted properties.  The properties given must still
+     * fulfill the requirements of the class and aspects relevant to the node.
+     * <p>
+     * <b>NOTE:</b> Null values are not allowed.
      * 
      * @param nodeRef
      * @param properties all the properties of the node keyed by their qualified names
@@ -212,9 +217,15 @@ public interface NodeService
     public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException;
     
     /**
+     * Sets the value of a property to be any <code>Serializable</code> instance.
+     * To remove a property value, use {@link #getProperties(NodeRef)}, remove the
+     * value and call {@link #setProperties(NodeRef, Map<QName,Serializable>)}.
+     * <p>
+     * <b>NOTE:</b> Null values are not allowed.
+     * 
      * @param nodeRef
      * @param qname the fully qualified name of the property
-     * @param propertyValue the value of the property
+     * @param propertyValue the value of the property - never null
      * @throws InvalidNodeRefException if the node could not be found
      */
     public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException;

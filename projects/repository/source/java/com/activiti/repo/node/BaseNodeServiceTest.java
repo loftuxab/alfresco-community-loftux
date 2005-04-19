@@ -437,12 +437,15 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testProperties() throws Exception
     {
+        QName qnameProperty1 = QName.createQName("PROPERTY1");
+        QName qnameProperty2 = QName.createQName("PROPERTY2");
+        
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-        properties.put(QName.createQName("PROPERTY1"), "VALUE1");
+        properties.put(qnameProperty1, "VALUE1");
         // add some properties to the root node
         nodeService.setProperties(rootNodeRef, properties);
         // set a single property
-        nodeService.setProperty(rootNodeRef, QName.createQName("PROPERTY2"), "VALUE2");
+        nodeService.setProperty(rootNodeRef, qnameProperty2, "VALUE2");
         
         // force a flush
         getSession().flush();
@@ -451,13 +454,36 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // now get them back
         Map<QName, Serializable> checkMap = nodeService.getProperties(rootNodeRef);
         assertNotNull("Properties were not set/retrieved", checkMap);
-        assertNotNull("Property value not set", checkMap.get(QName.createQName("PROPERTY1")));
-        assertNotNull("Property value not set", checkMap.get(QName.createQName("PROPERTY2")));
+        assertNotNull("Property value not set", checkMap.get(qnameProperty1));
+        assertNotNull("Property value not set", checkMap.get(qnameProperty2));
         
         // get a single property direct from the node
-        Serializable valueCheck = nodeService.getProperty(rootNodeRef, QName.createQName("PROPERTY2"));
+        Serializable valueCheck = nodeService.getProperty(rootNodeRef, qnameProperty2);
         assertNotNull("Property value not set", valueCheck);
         assertEquals("Property value incorrect", "VALUE2", valueCheck);
+        
+        // set the property value to null
+        try
+        {
+            nodeService.setProperty(rootNodeRef, qnameProperty2, null);
+            fail("Null property value not detected");
+        }
+        catch (IllegalArgumentException e)
+        {
+            // expected
+        }
+        // try setting null value as part of complete set
+        try
+        {
+            properties = nodeService.getProperties(rootNodeRef);
+            properties.put(qnameProperty1, null);
+            nodeService.setProperties(rootNodeRef, properties);
+            fail("Failed to detect null value in property map");
+        }
+        catch (IllegalArgumentException e)
+        {
+            // expected
+        }
     }
     
     public void testGetParents() throws Exception

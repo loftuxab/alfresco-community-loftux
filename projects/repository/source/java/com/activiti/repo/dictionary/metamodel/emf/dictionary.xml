@@ -23,10 +23,7 @@
     <emfProperties emfName="encoding" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="mimetype" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFAspect>
-  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}base">
-    <emfProperties emfName="primaryType" emfType="/16" emfProtected="true" emfMandatory="true"/>
-    <emfProperties emfName="aspects" emfType="/16" emfProtected="true" emfMultiple="true"/>
-  </datadictionary:EMFType>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}base"/>
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}reference" emfSuperClass="/20">
     <emfProperties emfName="reference" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFType>

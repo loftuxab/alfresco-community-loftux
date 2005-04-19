@@ -132,7 +132,7 @@ public class M2AssociationDefinition implements AssociationDefinition
      */
     public List<ClassDefinition> getRequiredToClasses()
     {
-        return M2References.createClassRefList(m2Association.getRequiredToClasses());
+        return M2References.createClassDefList(m2Association.getRequiredToClasses());
     }
 
 }

@@ -2,9 +2,8 @@ package com.activiti.repo.dictionary.metamodel;
 
 import java.util.List;
 
-import com.activiti.repo.dictionary.ClassDefinition;
+import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.TypeDefinition;
-
 
 /**
  * Default Read-only Type Definition Implementation
@@ -20,16 +19,14 @@ public class M2TypeDefinition extends M2ClassDefinition
         super(m2Type);
     }
 
-    
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.TypeDefinition#getDefaultAspects()
+    /**
+     * @see M2References#createAspectDefList(Collection<? extends M2Aspect>)
      */
-    public List<ClassDefinition> getDefaultAspects()
+    public List<AspectDefinition> getDefaultAspects()
     {
         List<M2Aspect> defaultAspects = ((M2Type)getM2Class()).getDefaultAspects();
-        return M2References.createClassRefList(defaultAspects);
+        return M2References.createAspectDefList(defaultAspects);
     }
-
     
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.TypeDefinition#getOrderedChildren()
@@ -38,5 +35,4 @@ public class M2TypeDefinition extends M2ClassDefinition
     {
         return ((M2Type)getM2Class()).getOrderedChildren();
     }
-    
 }

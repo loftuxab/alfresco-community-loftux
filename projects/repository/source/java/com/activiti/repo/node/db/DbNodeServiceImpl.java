@@ -3,6 +3,7 @@ package com.activiti.repo.node.db;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,8 +13,11 @@ import java.util.Stack;
 
 import org.springframework.dao.DataIntegrityViolationException;
 
+import com.activiti.repo.dictionary.AspectDefinition;
+import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
+import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
@@ -216,28 +220,149 @@ public class DbNodeServiceImpl implements NodeService
         return  classRef;
     }
     
-    public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties)
+    /**
+     * Checks that the properties required by the given classes or aspects are all present
+     * in the map given.
+     * <p>
+     * No dependencies are fetched e.g. if a <code>TypeDefinition</code> is given, the
+     * aspects for that type will not be checked.
+     * 
+     * @param classDef the primary class definition to check against
+     * @param aspectDefs additional aspects definitions to check against - may be null
+     * @param properties the properties to check
+     * @throws PropertyException if the class or aspect requires a property not present
+     *      amongst those provided
+     */
+    private void checkProperties(
+            ClassDefinition classDef,
+            List<AspectDefinition> aspectDefs,
+            Map<QName, Serializable> properties)
+            throws PropertyException
+    {
+        // get properties applicable to the class/aspect itself
+        List<PropertyDefinition> propertyDefs = classDef.getProperties(); 
+        
+        // get properties of the additional aspects
+        if (aspectDefs != null)
+        {
+            for (AspectDefinition aspectDef : aspectDefs)
+            {
+                List<PropertyDefinition> aspectProperties = aspectDef.getProperties();
+                propertyDefs.addAll(aspectProperties);
+            }
+        }
+        
+        // check that each required property is present
+        for (PropertyDefinition propertyDef : propertyDefs)
+        {
+            // ignore optional properties
+            if (!propertyDef.isMandatory())
+            {
+                continue;
+            }
+            QName qname = propertyDef.getQName();
+            // is it present?
+            if (properties.get(qname) == null)
+            {
+                // not present
+                throw new PropertyException("Mandatory property value not supplied: " + qname,
+                        propertyDef.getReference());
+            }
+            // property has a value
+        }
+        // all required properties have values
+        // done
+    }
+    
+    /**
+     * @param node
+     * @return Returns a list of all aspects (default and optional) applied to the node
+     */
+    private List<AspectDefinition> getNodeAspects(Node node)
+    {
+        Set<QName> aspectQNames = node.getAspects();
+        List<AspectDefinition> aspectDefs = new ArrayList<AspectDefinition>(aspectQNames.size());
+        for (QName qname : aspectQNames)
+        {
+            ClassRef aspectRef = new ClassRef(qname);
+            AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
+            aspectDefs.add(aspectDef);
+        }
+        // done
+        return aspectDefs;
+    }
+    
+    /**
+     * @see #checkProperties(ClassDefinition, List<AspectDefinition>, Map<QName,Serializable>)
+     * @see Node#getAspects()
+     */
+    public void addAspect(
+            NodeRef nodeRef,
+            ClassRef aspectRef,
+            Map<QName, Serializable> aspectProperties)
             throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
-        Node node = getNodeNotNull(nodeRef);
-        // get the list of properties that are required for the aspect
+        // check that the properties supplied are adequate for the aspect
+        AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
+        if (aspectDef == null)
+        {
+            throw new InvalidAspectException(aspectRef);
+        }
+        checkProperties(aspectDef, null, aspectProperties);
         
-        throw new UnsupportedOperationException();
+        Node node = getNodeNotNull(nodeRef);
+        // physically attach the aspect to the node
+        node.getAspects().add(aspectRef.getQName());
+        
+        // attach the properties to the current node properties
+        Map<QName, Serializable> nodeProperties = getProperties(nodeRef);
+        nodeProperties.putAll(aspectProperties);
+        setProperties(nodeRef, nodeProperties);
+        // done
     }
 
-    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    /**
+     * @see Node#getAspects()
+     */
+    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef)
+            throws InvalidNodeRefException, InvalidAspectException
     {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Performs a check on the set of node aspects
+     * 
+     * @see Node#getAspects()
+     */
     public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
-        throw new UnsupportedOperationException();
+        Node node = getNodeNotNull(nodeRef);
+        Set<QName> aspectQNames = node.getAspects();
+        
+        QName aspectQName = aspectRef.getQName();
+        
+        boolean hasAspect = aspectQNames.contains(aspectQName);
+        // done
+        return hasAspect;
     }
 
+    /**
+     * Transforms the results from {@link Node#getAspects()} into an unmodifiable set
+     */
     public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException();
+        Node node = getNodeNotNull(nodeRef);
+        Set<QName> aspectQNames = node.getAspects();
+        Set<ClassRef> aspectRefs = new HashSet<ClassRef>(aspectQNames.size());
+        // transform to an a list of ClassRef instances
+        for (QName qname : aspectQNames)
+        {
+            ClassRef aspectRef = new ClassRef(qname);
+            aspectRefs.add(aspectRef);
+        }
+        // done
+        return Collections.unmodifiableSet(aspectRefs);
     }
 
     public void deleteNode(NodeRef nodeRef)
@@ -279,7 +404,7 @@ public class DbNodeServiceImpl implements NodeService
         NodeKey childNodeKey = childNode.getKey();
         
         // maintain a list of deleted entities
-        Collection<EntityRef> deletedRefs = new ArrayList<EntityRef>(5);
+        List<EntityRef> deletedRefs = new ArrayList<EntityRef>(5);
         
         // get all the child assocs
         boolean deleteChild = false;
@@ -315,7 +440,7 @@ public class DbNodeServiceImpl implements NodeService
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
 
         // maintain a list of deleted entities
-        Collection<EntityRef> deletedRefs = new ArrayList<EntityRef>(5);
+        List<EntityRef> deletedRefs = new ArrayList<EntityRef>(5);
         
         // get all the child assocs
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
@@ -365,39 +490,74 @@ public class DbNodeServiceImpl implements NodeService
         return properties.get(qname.toString());
     }
 
+    /**
+     * Ensures that all required properties are present on the node and copies the
+     * property values to the <code>Node</code>.
+     * <p>
+     * Null-valued properties are removed.
+     * 
+     * @see #checkProperties(ClassDefinition, List<AspectDefinition>, Map<QName,Serializable>)
+     * @see Node#getProperties()
+     */
     public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
         if (properties == null)
         {
             throw new IllegalArgumentException("Properties may not be null");
         }
-        
         Node node = getNodeNotNull(nodeRef);
+
+        // check that the properties fulfill all the requirements of the node type
+        // and any additional aspects
+        ClassRef nodeClassRef = getType(nodeRef);
+        ClassDefinition nodeClassDef = dictionaryService.getClass(nodeClassRef);
+        List<AspectDefinition> nodeAspectDefs = getNodeAspects(node);
+        checkProperties(nodeClassDef, nodeAspectDefs, properties);  // confirms that properties are valid
+        
+        // copy properties onto node
         Map<String, Serializable> nodeProperties = node.getProperties();
         nodeProperties.clear();
         // copy all the values across
         for (QName qname : properties.keySet())
         {
+            Serializable value = properties.get(qname);
+            if (value == null)
+            {
+                throw new IllegalArgumentException("Property values may not be null: " + qname);
+            }
             nodeProperties.put(qname.toString(), properties.get(qname));
         }
         // done
     }
 
+    /**
+     * Null values are not allowed for properties - hence no checking is done against
+     * the node type definition as this is only an addition or modification of a
+     * property.
+     */
     public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException
     {
+        if (value == null)
+        {
+            throw new IllegalArgumentException("Property values may not be null: " + qname);
+        }
         Node node = getNodeNotNull(nodeRef);
         Map<String, Serializable> properties = node.getProperties();
+        // Null value means remove property
         properties.put(qname.toString(), value);
         // done
     }
 
+    /**
+     * Transforms {@link Node#getParentAssocs()} into an unmodifiable collection
+     */
     public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
         // get the assocs pointing to it
         Set<ChildAssoc> parentAssocs = node.getParentAssocs();
         // list of results
-        List<NodeRef> results = new ArrayList<NodeRef>(parentAssocs.size());
+        Collection<NodeRef> results = new ArrayList<NodeRef>(parentAssocs.size());
         for (ChildAssoc assoc : parentAssocs)
         {
             // get the parent
@@ -405,23 +565,26 @@ public class DbNodeServiceImpl implements NodeService
             results.add(parentNode.getNodeRef());
         }
         // done
-        return results;
+        return Collections.unmodifiableCollection(results);
     }
 
+    /**
+     * Transforms {@link ContainerNode#getChildAssocs()} into an unmodifiable collection
+     */
     public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
         ContainerNode node = getContainerNodeNotNull(nodeRef);
         // get the assocs pointing from it
         Set<ChildAssoc> childAssocs = node.getChildAssocs();
         // list of results
-        List<ChildAssocRef> results = new ArrayList<ChildAssocRef>(childAssocs.size());
+        Collection<ChildAssocRef> results = new ArrayList<ChildAssocRef>(childAssocs.size());
         for (ChildAssoc assoc : childAssocs)
         {
             // get the child
             results.add(assoc.getChildAssocRef());
         }
         // done
-        return results;
+        return Collections.unmodifiableCollection(results);
     }
 
     public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
@@ -461,6 +624,12 @@ public class DbNodeServiceImpl implements NodeService
         nodeDaoService.deleteNodeAssoc(assoc);
     }
 
+    /**
+     * Transorms {@link NodeDaoService#getNodeAssocTargets(RealNode, String)} into
+     * an unmodifiable collection.
+     * 
+     * @see #convertToNodeRefs(Collection<? extends Node>)
+     */
     public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname)
             throws InvalidNodeRefException
     {
@@ -472,6 +641,12 @@ public class DbNodeServiceImpl implements NodeService
         return nodeRefs;
     }
 
+    /**
+     * Transorms {@link NodeDaoService#getNodeAssocSources(Node, String)} into
+     * an unmodifiable collection.
+     * 
+     * @see #convertToNodeRefs(Collection<? extends Node>)
+     */
     public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname)
             throws InvalidNodeRefException
     {
@@ -488,7 +663,8 @@ public class DbNodeServiceImpl implements NodeService
      * collection of <code>NodeRef</code> instances.
      * 
      * @param nodes the <code>Node</code> instances to convert to references
-     * @return Returns a <i>new</i> collection of equivalent <code>NodeRef</code> instances
+     * @return Returns a <i>new, unmodifiable</i> collection of equivalent
+     *      <code>NodeRef</code> instances
      */
     private Collection<NodeRef> convertToNodeRefs(Collection<? extends Node> nodes)
     {
@@ -499,7 +675,7 @@ public class DbNodeServiceImpl implements NodeService
             nodeRefs.add(node.getNodeRef());
         }
         // done
-        return nodeRefs;
+        return Collections.unmodifiableCollection(nodeRefs);
     }
 
     /**
@@ -618,6 +794,6 @@ public class DbNodeServiceImpl implements NodeService
         }
         
         // done
-        return paths;
+        return Collections.unmodifiableCollection(paths);
     }
 }

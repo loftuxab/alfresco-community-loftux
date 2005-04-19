@@ -1,6 +1,7 @@
 package com.activiti.repo.dictionary.metamodel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.activiti.repo.dictionary.AssociationDefinition;
@@ -95,9 +96,8 @@ public class M2ClassDefinition implements ClassDefinition
         return (m2Class instanceof M2Aspect);
     }
 
-    
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.ClassDefinition#getSuperClass()
+    /**
+     * @see M2Class#getSuperClass()
      */
     public ClassDefinition getSuperClass()
     {
@@ -163,7 +163,7 @@ public class M2ClassDefinition implements ClassDefinition
      */
     protected List<M2Property> getAggregateProperties()
     {
-        return m2Class.getInheritedProperties();
+        return Collections.unmodifiableList(m2Class.getInheritedProperties());
     }
     
     /**
@@ -177,7 +177,7 @@ public class M2ClassDefinition implements ClassDefinition
         {
             assocDefs.add(m2Assoc.getAssociationDefintion());
         }
-        return assocDefs;
+        return Collections.unmodifiableList(assocDefs);
     }
 
     /**
@@ -205,6 +205,6 @@ public class M2ClassDefinition implements ClassDefinition
      */
     protected List<M2Association> getAggregateAssociations()
     {
-        return m2Class.getInheritedAssociations();
+        return Collections.unmodifiableList(m2Class.getInheritedAssociations());
     }
 }

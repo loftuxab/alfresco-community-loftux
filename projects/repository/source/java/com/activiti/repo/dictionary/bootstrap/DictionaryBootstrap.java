@@ -140,7 +140,6 @@ public class DictionaryBootstrap
      */
     public void bootstrapTestModel()
     {
-        CodeMonkey.todo("Read model from a configuration file"); // TODO
         if (namespaceDAO == null)
         {
             throw new DictionaryException("Namespace DAO has not been provided");
@@ -152,6 +151,7 @@ public class DictionaryBootstrap
         createNamespaces();
         createPropertyTypes();
         createTestModel();
+        CodeMonkey.todo("Load up additional (user-defined) types here"); // TODO
     }
     
     /**
@@ -224,16 +224,17 @@ public class DictionaryBootstrap
 
         // Create Test Base Type
         M2Type baseType = metaModelDAO.createType(TYPE_QNAME_BASE);
-        M2Property primaryTypeProp = baseType.createProperty("primaryType");
-        primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
-        primaryTypeProp.setMandatory(true);
-        primaryTypeProp.setProtected(true);
-        primaryTypeProp.setMultiValued(false);
-        M2Property aspectsProp = baseType.createProperty("aspects");
-        aspectsProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
-        aspectsProp.setMandatory(false);
-        aspectsProp.setProtected(true);
-        aspectsProp.setMultiValued(true);
+//        M2Property primaryTypeProp = baseType.createProperty("primaryType");
+//        primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
+//        primaryTypeProp.setMandatory(true);
+//        primaryTypeProp.setProtected(true);
+//        primaryTypeProp.setMultiValued(false);
+//        M2Property aspectsProp = baseType.createProperty("aspects");
+//        aspectsProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
+//        aspectsProp.setMandatory(false);
+//        aspectsProp.setProtected(true);
+//        aspectsProp.setMultiValued(true);
+        CodeMonkey.issue("We persist type and aspects as native properties - are these properties required?");
 
         // Create Reference Type
         M2Type referenceType = metaModelDAO.createType(TYPE_QNAME_REFERENCE);

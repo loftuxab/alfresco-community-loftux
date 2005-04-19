@@ -12,7 +12,7 @@ public interface TypeDefinition extends ClassDefinition
     /**
      * @return  the default aspects associated with this type
      */
-    public List<ClassDefinition> getDefaultAspects();
+    public List<AspectDefinition> getDefaultAspects();
     
     /**
      * TODO: examine this property furher - will we support this? is it in the right place? 
