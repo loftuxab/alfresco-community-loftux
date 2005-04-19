@@ -185,7 +185,7 @@ public class DatePickerRenderer extends BaseRenderer
       List years = new ArrayList();
       for (int i=startYear; i<startYear + yearCount; i++)
       {
-         Integer year = new Integer(i);
+         Integer year = Integer.valueOf(i);
          years.add(new SelectItem(year, year.toString()));
       }
       return years;
@@ -199,7 +199,7 @@ public class DatePickerRenderer extends BaseRenderer
       List months = new ArrayList(12);
       for (int i=0; i<12; i++)
       {
-         Integer key = new Integer(i + 1);
+         Integer key = Integer.valueOf(i + 1);
          months.add(new SelectItem(key, names[i]));
       }
       return months;
@@ -210,7 +210,7 @@ public class DatePickerRenderer extends BaseRenderer
       List days = new ArrayList(31);
       for (int i=1; i<32; i++)
       {
-         Integer day = new Integer(i);
+         Integer day = Integer.valueOf(i);
          days.add(new SelectItem(day, day.toString()));
       }
       return days;

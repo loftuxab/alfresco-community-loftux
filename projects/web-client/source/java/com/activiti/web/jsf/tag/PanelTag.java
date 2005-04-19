@@ -43,6 +43,7 @@ public class PanelTag extends HtmlComponentTag
       setStringProperty(component, "border", this.border);
       setBooleanProperty(component, "progressive", this.progressive);
       setStringProperty(component, "bgcolor", this.bgcolor);
+      setBooleanProperty(component, "expanded", this.expanded);
    }
    
    /**
@@ -55,6 +56,7 @@ public class PanelTag extends HtmlComponentTag
       this.border = null;
       this.progressive = null;
       this.bgcolor = null;
+      this.expanded = null;
    }
    
    /**
@@ -124,7 +126,20 @@ public class PanelTag extends HtmlComponentTag
    {
       this.bgcolor = bgcolor;
    }
+   
+   /**
+    * Set whether the panel is expanded, default is true.
+    *
+    * @param expanded     the expanded flag
+    */
+   public void setExpanded(String expanded)
+   {
+      this.expanded = expanded;
+   }
 
+
+   /** the expanded flag */
+   private String expanded;
 
    /** the border */
    private String border;

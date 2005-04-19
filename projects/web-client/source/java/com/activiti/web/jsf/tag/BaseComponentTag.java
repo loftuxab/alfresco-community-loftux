@@ -140,7 +140,7 @@ public abstract class BaseComponentTag extends UIComponentTag
          {
             try
             {
-               component.getAttributes().put(name, new Integer(value));
+               component.getAttributes().put(name, Integer.valueOf(value));
             }
             catch (NumberFormatException ne)
             {
@@ -156,7 +156,7 @@ public abstract class BaseComponentTag extends UIComponentTag
       {
          try
          {
-            component.getAttributes().put(name, new Integer(value));
+            component.getAttributes().put(name, Integer.valueOf(value));
          }
          catch (NumberFormatException ne)
          {

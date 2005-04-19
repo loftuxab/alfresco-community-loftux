@@ -93,7 +93,47 @@ public class UIModeList extends UICommand
    {
       this.horizontal = horizontal;
    }
+   
+   /**
+    * Get the icon column width
+    *
+    * @return the icon column width
+    */
+   public int getIconColumnWidth()
+   {
+      if (this.iconColumnWidth == null)
+      {
+         ValueBinding vb = getValueBinding("iconColumnWidth");
+         if (vb != null)
+         {
+            this.iconColumnWidth = (Integer)vb.getValue(getFacesContext());
+         }
+      }
+      
+      if (this.iconColumnWidth != null)
+      {
+         return this.iconColumnWidth.intValue();
+      }
+      else
+      {
+         // return the default
+         return 20;
+      }
+   }
 
+   /**
+    * Set the icon column width
+    *
+    * @param iconColumnWidth     the icon column width
+    */
+   public void setIconColumnWidth(int iconColumnWidth)
+   {
+      this.iconColumnWidth = Integer.valueOf(iconColumnWidth);
+   }
+
+
+   /** the icon column width */
+   private Integer iconColumnWidth;
 
    /** true for horizontal rendering, false otherwise */
    private Boolean horizontal = null;

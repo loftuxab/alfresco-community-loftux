@@ -178,24 +178,6 @@ public class UIPanel extends SelfRenderingComponent
       return values;
    }
    
-   /**
-    * Returns whether the component show allow rendering of its child components.
-    */
-   public boolean isExpanded()
-   {
-      return this.expanded;
-   }
-   
-   /**
-    * Sets whether the component show allow rendering of its child components.
-    * For this component we change this value if the user indicates to change the
-    * hidden/visible state of the progressive panel.
-    */
-   public void setExpanded(boolean expanded)
-   {
-      this.expanded = expanded;
-   }
-   
    
    // ------------------------------------------------------------------------------
    // Strongly typed component property accessors 
@@ -303,6 +285,41 @@ public class UIPanel extends SelfRenderingComponent
       this.progressive = Boolean.valueOf(progressive);
    }
    
+   /**
+    * Returns whether the component show allow rendering of its child components.
+    */
+   public boolean isExpanded()
+   {
+      if (this.expanded == null)
+      {
+         ValueBinding vb = getValueBinding("expanded");
+         if (vb != null)
+         {
+            this.expanded = (Boolean)vb.getValue(getFacesContext());
+         }
+      }
+      
+      if (this.expanded != null)
+      {
+         return this.expanded.booleanValue();
+      }
+      else
+      {
+         // return the default
+         return true;
+      }
+   }
+   
+   /**
+    * Sets whether the component show allow rendering of its child components.
+    * For this component we change this value if the user indicates to change the
+    * hidden/visible state of the progressive panel.
+    */
+   public void setExpanded(boolean expanded)
+   {
+      this.expanded = Boolean.valueOf(expanded);
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Private helpers
@@ -338,5 +355,5 @@ public class UIPanel extends SelfRenderingComponent
    private String label = null;
    
    // component state
-   private boolean expanded = true;
+   private Boolean expanded = null;
 }

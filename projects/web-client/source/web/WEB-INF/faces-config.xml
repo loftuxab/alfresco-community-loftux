@@ -165,6 +165,24 @@
    
    <managed-bean>
       <description>
+         The bean that holds navigation state.
+      </description>
+      <managed-bean-name>NavigationBean</managed-bean-name>
+      <managed-bean-class>com.activiti.web.bean.NavigationBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that holds folder browse state.
+      </description>
+      <managed-bean-name>BrowseBean</managed-bean-name>
+      <managed-bean-class>com.activiti.web.bean.BrowseBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the jsf-test webapp User List screen
       </description>
       <managed-bean-name>UserListBean</managed-bean-name>

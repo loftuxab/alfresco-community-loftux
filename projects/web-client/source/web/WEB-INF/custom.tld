@@ -418,6 +418,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>expanded</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    </tag>
 
    <tag>
@@ -822,7 +828,13 @@
       </attribute>
       
       <attribute>
-         <name>itemStyleClass</name>
+         <name>labelStyle</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>labelStyleClass</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -834,13 +846,43 @@
       </attribute>
 
       <attribute>
-         <name>selectedStyleClass</name>
+         <name>itemStyleClass</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>itemLinkStyle</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>itemLinkStyleClass</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
 
       <attribute>
          <name>selectedStyle</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>selectedStyleClass</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>selectedLinkStyle</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>selectedLinkStyleClass</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>

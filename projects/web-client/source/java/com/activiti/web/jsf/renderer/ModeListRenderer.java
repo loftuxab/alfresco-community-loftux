@@ -90,14 +90,23 @@ public class ModeListRenderer extends BaseRenderer
          
          out.write("<td><table cellpadding=0 width=100%");
          outputAttribute(out, attrs.get("itemSpacing"), "cellspacing");
-         outputAttribute(out, attrs.get("itemStyleClass"), "class");
-         outputAttribute(out, attrs.get("itemStyle"), "style");
-         out.write("><tr><td");
-         outputAttribute(out, attrs.get("iconColumnWidth"), "width");
-         // TODO: allow styling of the label text cell
-         out.write("></td><td><b>");
+         out.write("><tr>");
+         
+         // output icon column
+         if (list.getIconColumnWidth() != 0)
+         {
+            out.write("<td");
+            outputAttribute(out, list.getIconColumnWidth(), "width");
+            out.write("></td>");
+         }
+         
+         // output title label
+         out.write("<td><span");
+         outputAttribute(out, attrs.get("labelStyle"), "style");
+         outputAttribute(out, attrs.get("labelStyleClass"), "class");
+         out.write('>');
          out.write((String)attrs.get("label"));
-         out.write("</b></td></tr></table></td>");
+         out.write("</span></td></tr></table></td>");
          
          if (list.isHorizontal() == false)
          {
@@ -151,25 +160,44 @@ public class ModeListRenderer extends BaseRenderer
                outputAttribute(out, attrs.get("itemStyleClass"), "class");
                outputAttribute(out, attrs.get("itemStyle"), "style");
             }
-            out.write("><tr><td");
-            outputAttribute(out, attrs.get("iconColumnWidth"), "width");
-            // TODO: allow styling of the label text cell
-            out.write(">");
+            out.write("><tr>");
             
-            // output icon
-            String image = (String)child.getAttributes().get("image"); 
-            if (image != null)
+            // output icon column
+            if (list.getIconColumnWidth() != 0)
             {
-               out.write( Utils.buildImageTag(context, image, (String)child.getAttributes().get("tooltip")) );
+               out.write("<td");
+               outputAttribute(out, list.getIconColumnWidth(), "width");
+               out.write(">");
+               
+               String image = (String)child.getAttributes().get("image"); 
+               if (image != null)
+               {
+                  out.write( Utils.buildImageTag(context, image, (String)child.getAttributes().get("tooltip")) );
+               }
+               
+               out.write("</td>");
             }
             
-            // output link label
-            out.write("</td><td>");
+            // output item link
+            out.write("<td>");
             out.write("<a href='#' onclick=\"");
             // generate javascript to submit the value of the child component
             String value = list.getClientId(context) + NamingContainer.SEPARATOR_CHAR + (String)child.getAttributes().get("value");
             out.write(Utils.generateFormSubmit(context, list, getHiddenFieldName(context, list), value));
             out.write('"');
+            
+            // render style for the item link
+            if (item.getValue().equals(list.getValue()))
+            {
+               outputAttribute(out, attrs.get("selectedLinkStyleClass"), "class");
+               outputAttribute(out, attrs.get("selectedLinkStyle"), "style");
+            }
+            else
+            {
+               outputAttribute(out, attrs.get("itemLinkStyleClass"), "class");
+               outputAttribute(out, attrs.get("itemLinkStyle"), "style");
+            }
+            
             outputAttribute(out, child.getAttributes().get("tooltip"), "title");
             out.write('>');
             out.write((String)child.getAttributes().get("label"));

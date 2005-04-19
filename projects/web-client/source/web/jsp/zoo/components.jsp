@@ -102,7 +102,7 @@
       
       <%-- Progressive panel tests --%>
       <b>Progressive Panels:</b><br>
-      <awc:panel id="panel0" border="ballongrey" bgcolor="#EEEEEE" progressive="true" label="Progressive Panel Test 1" styleClass="mainTitle">
+      <awc:panel id="panel0" border="ballongrey" bgcolor="#EEEEEE" progressive="true" label="Progressive Panel Test 1" styleClass="mainTitle" expanded="false">
          <p>
          HTML text inside the Progressive Panel
          <p>

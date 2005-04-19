@@ -35,10 +35,16 @@ public class ModeListTag extends HtmlComponentTag
       super.setProperties(component);
       setActionProperty((UICommand)component, this.action);
       setActionListenerProperty((UICommand)component, this.actionListener);
-      setStringProperty(component, "itemStyleClass", this.itemStyleClass);
+      setStringProperty(component, "labelStyle", this.labelStyle);
+      setStringProperty(component, "labelStyleClass", this.labelStyleClass);
       setStringProperty(component, "itemStyle", this.itemStyle);
-      setStringProperty(component, "selectedStyleClass", this.selectedStyleClass);
+      setStringProperty(component, "itemStyleClass", this.itemStyleClass);
+      setStringProperty(component, "itemLinkStyle", this.itemLinkStyle);
+      setStringProperty(component, "itemLinkStyleClass", this.itemLinkStyleClass);
       setStringProperty(component, "selectedStyle", this.selectedStyle);
+      setStringProperty(component, "selectedStyleClass", this.selectedStyleClass);
+      setStringProperty(component, "selectedLinkStyle", this.selectedLinkStyle);
+      setStringProperty(component, "selectedLinkStyleClass", this.selectedLinkStyleClass);
       setIntProperty(component, "itemSpacing", this.itemSpacing);
       setIntProperty(component, "iconColumnWidth", this.iconColumnWidth);
       setIntProperty(component, "width", this.width);
@@ -53,10 +59,16 @@ public class ModeListTag extends HtmlComponentTag
    public void release()
    {
       super.release();
-      this.itemStyleClass = null;
+      this.labelStyle = null;
+      this.labelStyleClass = null;
       this.itemStyle = null;
-      this.selectedStyleClass = null;
+      this.itemStyleClass = null;
+      this.itemLinkStyle = null;
+      this.itemLinkStyleClass = null;
       this.selectedStyle = null;
+      this.selectedStyleClass = null;
+      this.selectedLinkStyle = null;
+      this.selectedLinkStyleClass = null;
       this.itemSpacing = null;
       this.iconColumnWidth = null;
       this.horizontal = null;
@@ -65,46 +77,6 @@ public class ModeListTag extends HtmlComponentTag
       this.action = null;
       this.actionListener = null;
       this.value = null;
-   }
-   
-   /**
-    * Set the itemStyleClass
-    *
-    * @param itemStyleClass     the itemStyleClass
-    */
-   public void setItemStyleClass(String itemStyleClass)
-   {
-      this.itemStyleClass = itemStyleClass;
-   }
-
-   /**
-    * Set the itemStyle
-    *
-    * @param itemStyle     the itemStyle
-    */
-   public void setItemStyle(String itemStyle)
-   {
-      this.itemStyle = itemStyle;
-   }
-
-   /**
-    * Set the selectedStyleClass
-    *
-    * @param selectedStyleClass     the selectedStyleClass
-    */
-   public void setSelectedStyleClass(String selectedStyleClass)
-   {
-      this.selectedStyleClass = selectedStyleClass;
-   }
-
-   /**
-    * Set the selectedStyle
-    *
-    * @param selectedStyle     the selectedStyle
-    */
-   public void setSelectedStyle(String selectedStyle)
-   {
-      this.selectedStyle = selectedStyle;
    }
 
    /**
@@ -186,25 +158,143 @@ public class ModeListTag extends HtmlComponentTag
    {
       this.horizontal = horizontal;
    }
+   
+   /**
+    * Set the labelStyle
+    *
+    * @param labelStyle     the labelStyle
+    */
+   public void setLabelStyle(String labelStyle)
+   {
+      this.labelStyle = labelStyle;
+   }
 
+   /**
+    * Set the labelStyleClass
+    *
+    * @param labelStyleClass     the labelStyleClass
+    */
+   public void setLabelStyleClass(String labelStyleClass)
+   {
+      this.labelStyleClass = labelStyleClass;
+   }
+
+   /**
+    * Set the itemStyle
+    *
+    * @param itemStyle     the itemStyle
+    */
+   public void setItemStyle(String itemStyle)
+   {
+      this.itemStyle = itemStyle;
+   }
+
+   /**
+    * Set the itemStyleClass
+    *
+    * @param itemStyleClass     the itemStyleClass
+    */
+   public void setItemStyleClass(String itemStyleClass)
+   {
+      this.itemStyleClass = itemStyleClass;
+   }
+
+   /**
+    * Set the itemLinkStyle
+    *
+    * @param itemLinkStyle     the itemLinkStyle
+    */
+   public void setItemLinkStyle(String itemLinkStyle)
+   {
+      this.itemLinkStyle = itemLinkStyle;
+   }
+
+   /**
+    * Set the itemLinkStyleClass
+    *
+    * @param itemLinkStyleClass     the itemLinkStyleClass
+    */
+   public void setItemLinkStyleClass(String itemLinkStyleClass)
+   {
+      this.itemLinkStyleClass = itemLinkStyleClass;
+   }
+
+   /**
+    * Set the selectedStyle
+    *
+    * @param selectedStyle     the selectedStyle
+    */
+   public void setSelectedStyle(String selectedStyle)
+   {
+      this.selectedStyle = selectedStyle;
+   }
+
+   /**
+    * Set the selectedStyleClass
+    *
+    * @param selectedStyleClass     the selectedStyleClass
+    */
+   public void setSelectedStyleClass(String selectedStyleClass)
+   {
+      this.selectedStyleClass = selectedStyleClass;
+   }
+
+   /**
+    * Set the selectedLinkStyle
+    *
+    * @param selectedLinkStyle     the selectedLinkStyle
+    */
+   public void setSelectedLinkStyle(String selectedLinkStyle)
+   {
+      this.selectedLinkStyle = selectedLinkStyle;
+   }
+
+   /**
+    * Set the selectedLinkStyleClass
+    *
+    * @param selectedLinkStyleClass     the selectedLinkStyleClass
+    */
+   public void setSelectedLinkStyleClass(String selectedLinkStyleClass)
+   {
+      this.selectedLinkStyleClass = selectedLinkStyleClass;
+   }
+
+
+   /** the labelStyle */
+   private String labelStyle;
+
+   /** the labelStyleClass */
+   private String labelStyleClass;
+
+   /** the itemStyle */
+   private String itemStyle;
+
+   /** the itemStyleClass */
+   private String itemStyleClass;
+
+   /** the itemLinkStyle */
+   private String itemLinkStyle;
+
+   /** the itemLinkStyleClass */
+   private String itemLinkStyleClass;
+
+   /** the selectedStyle */
+   private String selectedStyle;
+
+   /** the selectedStyleClass */
+   private String selectedStyleClass;
+
+   /** the selectedLinkStyle */
+   private String selectedLinkStyle;
+
+   /** the selectedLinkStyleClass */
+   private String selectedLinkStyleClass;
 
    /** true if rendered horizontally, false to render vertically */
    private String horizontal;
 
    /** the width */
    private String width;
-   
-   /** the itemStyleClass */
-   private String itemStyleClass;
-
-   /** the itemStyle */
-   private String itemStyle;
-
-   /** the selectedStyleClass */
-   private String selectedStyleClass;
-
-   /** the selectedStyle */
-   private String selectedStyle;
 
    /** the itemSpacing */
    private String itemSpacing;

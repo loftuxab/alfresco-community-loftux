@@ -40,6 +40,8 @@ public class ActionLinkTag extends HtmlComponentTag
       setBooleanProperty(component, "showLink", this.showLink);
       setStringProperty(component, "verticalAlign", this.verticalAlign);
       setStringProperty(component, "value", this.value);
+      
+      // TODO: Add image width/height properties
    }
 
    /**

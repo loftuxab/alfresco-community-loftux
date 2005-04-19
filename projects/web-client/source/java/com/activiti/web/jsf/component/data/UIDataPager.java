@@ -138,7 +138,7 @@ public class UIDataPager extends UICommand
          // we were clicked - queue an event to represent the click
          // cannot handle the event here as other components etc. have not had
          // a chance to decode() - we queue an event to be processed later
-         PageEvent actionEvent = new PageEvent(this, new Integer(value).intValue());
+         PageEvent actionEvent = new PageEvent(this, Integer.valueOf(value).intValue());
          this.queueEvent(actionEvent);
       }
    }

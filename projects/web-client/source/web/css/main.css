@@ -16,7 +16,7 @@ td,tr,p,div
 p.status
 {
    margin:0px;
-   padding-left:8px;
+   padding-left:0px;
    padding-top:4px;
    padding-bottom:4px;
 }
@@ -283,4 +283,26 @@ a.small:hover
    background-color: #EEEEEE;
    border-top: thin solid #CCCCCC;
    border-bottom: thin solid #CCCCCC;
+}
+
+.topToolbar
+{
+   background-color:#5D747F;
+}
+
+a.topToolbarLink
+{
+   color:#ffffff;
+}
+
+.topToolbarHighlight
+{
+   background-color:#FFFFFF;
+   border:solid #5D6B71;
+   border-width:1px;
+}
+
+a.topToolbarLinkHighlight
+{
+   color:#5D747F;
 }

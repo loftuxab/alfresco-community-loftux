@@ -104,7 +104,7 @@ public class PropertyHelper
       
       if (property.isReadOnly())
       {
-         inputControl.getAttributes().put("disabled", new Boolean(true));
+         inputControl.getAttributes().put("disabled", Boolean.TRUE);
       }
       
       // add a validator if the field is required

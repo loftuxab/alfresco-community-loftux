@@ -28,11 +28,16 @@
                <tr>
                   <%-- Top level toolbar and company logo area --%>
                   <td width=100%>
-                     <table cellspacing=0 cellpadding=0 border=0 width=100%>
+                     <table cellspacing=0 cellpadding=0 width=100%>
                         <tr>
                            <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width=28 height=30></td>
                            <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/titlebar_bg.gif)">
-                              ...toolbar modes etc. go here...
+                              <%-- Toolbar --%>
+                              <awc:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true" value="1"
+                                    itemStyleClass="topToolbar" itemLinkStyleClass="topToolbarLink" selectedStyleClass="topToolbarHighlight" selectedLinkStyleClass="topToolbarLinkHighlight">
+                                 <awc:modeListItem value="0" label="Company Space" />
+                                 <awc:modeListItem value="1" label="My Home" />
+                              </awc:modeList>
                            </td>
                            <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width=4 height=30></td>
                         </tr>
@@ -41,9 +46,9 @@
                   
                   <%-- Help area --%>
                   <td>
-                     <table cellspacing=2 cellpadding=0 border=0 width=100%>
+                     <table cellspacing=2 cellpadding=0 width=100%>
                         <tr>
-                           <td><img src="<%=request.getContextPath()%>/images/icons/shelf.gif" width=16 height=16></td>
+                           <td><awc:actionLink value="#{msg.toggle_shelf}" image="/images/icons/shelf.gif" actionListener="#{NavigationBean.toggleShelf}" showLink="false" /></td>
                            <td width=8>&nbsp;</td>
                            <td><img src="<%=request.getContextPath()%>/images/icons/Help_icon.gif" width=15 height=15></td>
                            <td><h:outputText value="#{msg.help}"/></td>
@@ -53,15 +58,17 @@
                   
                   <%-- Search area --%>
                   <td>
-                     <table cellspacing=0 cellpadding=0 border=0 width=100%>
+                     <table cellspacing=0 cellpadding=0 width=100%>
                         <tr>
                            <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_begin.gif" width=4 height=30></td>
                            <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/searchbar_bg.gif)">
-                              <span style="white-space:nowrap">
-                                 <img src="<%=request.getContextPath()%>/images/icons/search_controls.gif" width=27 height=15 style="padding-top:4px">
-                                 &nbsp;
-                                 <h:inputText styleClass="userInputForm" id="search" maxlength="255" style="width:90px" />
-                              </span>
+                              <%--<span style="white-space:nowrap">--%>
+                              <table cellspacing=4 cellpadding=0>
+                                 <tr>
+                                    <td><img src="<%=request.getContextPath()%>/images/icons/search_controls.gif" width=27 height=13 style="padding-top:2px"></td>
+                                    <td><h:inputText styleClass="userInputForm" id="search" maxlength="255" style="width:90px;padding-top:3px" /></td>
+                                 </tr>
+                              </table>
                            </td>
                            <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_end.gif" width=4 height=30></td>
                         </tr>
@@ -76,30 +83,32 @@
       <tr>
          <%-- Shelf area --%>
          <td valign=top>
-            <table cellspacing=0 cellpadding=0 border=0 width=100% bgcolor='#ffffff'>
-               <tr>
-                  <td><img src="<%=request.getContextPath()%>/images/parts/headbar_begin.gif" width=4 height=33></td>
-                  <td align=center width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/headbar_bg.gif)">
-                     <div class="headbarTitle"><h:outputText value="#{msg.shelf}"/></div>
-                  </td>
-                  <td><img src="<%=request.getContextPath()%>/images/parts/headbar_end.gif" width=4 height=33></td>
-               </tr>
-               <tr>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
-                  <td height=425 valign=top>
-                     
-                     <%-- TODO: Shelf components --%>
-                     <img src="<%=request.getContextPath()%>/images/test/shelf.png">
-                     
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
-               </tr>
-               <tr>
-                  <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_7.gif" width=4 height=4></td>
-                  <td width=100% align=center style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_8.gif)"></td>
-                  <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_9.gif" width=4 height=4></td>
-               </tr>
-            </table>
+            <awc:panel id="shelfPanel">
+               <table cellspacing=0 cellpadding=0 width=100% bgcolor='#ffffff'>
+                  <tr>
+                     <td><img src="<%=request.getContextPath()%>/images/parts/headbar_begin.gif" width=4 height=33></td>
+                     <td align=center width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/headbar_bg.gif)">
+                        <div class="headbarTitle"><h:outputText id="shelfText" value="#{msg.shelf}"/></div>
+                     </td>
+                     <td><img src="<%=request.getContextPath()%>/images/parts/headbar_end.gif" width=4 height=33></td>
+                  </tr>
+                  <tr>
+                     <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
+                     <td height=425 valign=top>
+                        
+                        <%-- TODO: Shelf components --%>
+                        <img src="<%=request.getContextPath()%>/images/test/shelf.png">
+                        
+                     </td>
+                     <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
+                  </tr>
+                  <tr>
+                     <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_7.gif" width=4 height=4></td>
+                     <td width=100% align=center style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_8.gif)"></td>
+                     <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_9.gif" width=4 height=4></td>
+                  </tr>
+               </table>
+            </awc:panel>
          </td>
          
          <%-- Work area --%>
@@ -167,7 +176,7 @@
                <%-- Details --%>
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
-                  <td valign=top height=350>
+                  <td valign=top height=310>
                      ...Details...
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>

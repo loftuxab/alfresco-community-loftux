@@ -78,7 +78,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       Object values[] = new Object[4];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
-      values[1] = new Integer(this.currentPage);
+      values[1] = Integer.valueOf(this.currentPage);
       values[2] = this.sortColumn;
       values[3] = (this.sortDescending ? Boolean.TRUE : Boolean.FALSE);
       return (values);
