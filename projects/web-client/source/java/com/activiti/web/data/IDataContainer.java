@@ -3,9 +3,6 @@
  */
 package com.activiti.web.data;
 
-import javax.faces.component.NamingContainer;
-import javax.faces.context.FacesContext;
-
 /**
  * @author kevinr
  */

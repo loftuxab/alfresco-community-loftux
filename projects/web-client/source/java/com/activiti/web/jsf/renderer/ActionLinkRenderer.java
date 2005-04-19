@@ -5,15 +5,10 @@ package com.activiti.web.jsf.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
-import javax.faces.component.UIParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 

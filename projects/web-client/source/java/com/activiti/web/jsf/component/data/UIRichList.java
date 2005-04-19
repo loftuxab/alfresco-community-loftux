@@ -36,13 +36,13 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       IRichListRenderer renderer;
       
       renderer = new RichListRenderer.IconViewRenderer();
-      this.viewRenderers.put(renderer.getViewModeID(), renderer);
+      UIRichList.viewRenderers.put(renderer.getViewModeID(), renderer);
       
       renderer = new RichListRenderer.DetailsViewRenderer();
-      this.viewRenderers.put(renderer.getViewModeID(), renderer);
+      UIRichList.viewRenderers.put(renderer.getViewModeID(), renderer);
       
       renderer = new RichListRenderer.ListViewRenderer();
-      this.viewRenderers.put(renderer.getViewModeID(), renderer);
+      UIRichList.viewRenderers.put(renderer.getViewModeID(), renderer);
    }
 
 
@@ -317,7 +317,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       IRichListRenderer renderer = null;
       if (getViewMode() != null)
       {
-         renderer = (IRichListRenderer)this.viewRenderers.get(getViewMode());
+         renderer = (IRichListRenderer)UIRichList.viewRenderers.get(getViewMode());
       }
       return renderer;
    }

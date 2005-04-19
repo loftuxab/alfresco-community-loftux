@@ -1,14 +1,6 @@
 package com.activiti.web.jsf.tag.data;
 
-import java.io.IOException;
-
 import javax.faces.component.UIComponent;
-import javax.faces.el.ValueBinding;
-import javax.faces.webapp.UIComponentTag;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.JspWriter;
 
 import com.activiti.web.jsf.tag.BaseComponentTag;
 

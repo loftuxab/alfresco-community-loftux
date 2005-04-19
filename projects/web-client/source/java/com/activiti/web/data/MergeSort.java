@@ -3,9 +3,7 @@
  */
 package com.activiti.web.data;
 
-import java.text.Collator;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author kevinr

@@ -1,10 +1,6 @@
 package com.activiti.web.data;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.text.Collator;
-import java.text.CollationKey;
 
 /**
  * QuickSort

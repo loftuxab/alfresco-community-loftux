@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
 import javax.faces.model.SelectItem;
-import javax.faces.render.Renderer;
 
 /**
  * @author kevinr
