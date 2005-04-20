@@ -83,7 +83,7 @@
       <tr valign=top>
          <%-- Shelf area --%>
          <td>
-            <awc:panel id="shelfPanel">
+            <awc:panel id="shelfPanel" expanded="#{NavigationBean.shelfExpanded}">
                <table cellspacing=0 cellpadding=0 width=100% bgcolor='#ffffff'>
                   <tr>
                      <td><img src="<%=request.getContextPath()%>/images/parts/headbar_begin.gif" width=4 height=33></td>
@@ -150,6 +150,7 @@
                            <td width=100>
                               <%-- Global actions --%>
                               <span style="padding-left:26px" class="mainSubTitle">Actions</span><br>
+                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" verticalAlign="40%" />
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100>

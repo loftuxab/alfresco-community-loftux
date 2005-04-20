@@ -120,14 +120,12 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public String getViewMode()
    {
-      if (this.viewMode == null)
+      ValueBinding vb = getValueBinding("viewMode");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("viewMode");
-         if (vb != null)
-         {
-            this.viewMode = (String)vb.getValue(getFacesContext());
-         }
+         this.viewMode = (String)vb.getValue(getFacesContext());
       }
+      
       return this.viewMode;
    }
    

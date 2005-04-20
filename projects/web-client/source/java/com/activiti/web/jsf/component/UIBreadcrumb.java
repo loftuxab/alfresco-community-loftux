@@ -94,14 +94,12 @@ public class UIBreadcrumb extends UICommand
     */
    public String getSeparator()
    {
-      if (this.separator == null)
+      ValueBinding vb = getValueBinding("separator");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("separator");
-         if (vb != null)
-         {
-            this.separator = (String)vb.getValue(getFacesContext());
-         }
+         this.separator = (String)vb.getValue(getFacesContext());
       }
+      
       return this.separator;
    }
    
@@ -122,13 +120,10 @@ public class UIBreadcrumb extends UICommand
     */
    public boolean getShowRoot()
    {
-      if (this.showRoot == null)
+      ValueBinding vb = getValueBinding("showRoot");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("showRoot");
-         if (vb != null)
-         {
-            this.showRoot = (Boolean)vb.getValue(getFacesContext());
-         }
+         this.showRoot = (Boolean)vb.getValue(getFacesContext());
       }
       
       if (this.showRoot != null)
@@ -137,6 +132,7 @@ public class UIBreadcrumb extends UICommand
       }
       else
       {
+         // return default
          return true;
       }
    }

@@ -187,14 +187,12 @@ public class UIPanel extends SelfRenderingComponent
     */
    public String getBgcolor()
    {
-      if (this.bgcolor == null)
+      ValueBinding vb = getValueBinding("bgcolor");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("bgcolor");
-         if (vb != null)
-         {
-            this.bgcolor = (String)vb.getValue(getFacesContext());
-         }
+         this.bgcolor = (String)vb.getValue(getFacesContext());
       }
+      
       return this.bgcolor;
    }
    
@@ -211,14 +209,12 @@ public class UIPanel extends SelfRenderingComponent
     */
    public String getBorder()
    {
-      if (this.border == null)
+      ValueBinding vb = getValueBinding("border");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("border");
-         if (vb != null)
-         {
-            this.border = (String)vb.getValue(getFacesContext());
-         }
+         this.border = (String)vb.getValue(getFacesContext());
       }
+      
       return this.border;
    }
 
@@ -235,14 +231,12 @@ public class UIPanel extends SelfRenderingComponent
     */
    public String getLabel()
    {
-      if (this.label == null)
+      ValueBinding vb = getValueBinding("label");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("label");
-         if (vb != null)
-         {
-            this.label = (String)vb.getValue(getFacesContext());
-         }
+         this.label = (String)vb.getValue(getFacesContext());
       }
+      
       return this.label;
    }
 
@@ -259,21 +253,20 @@ public class UIPanel extends SelfRenderingComponent
     */
    public boolean isProgressive()
    {
-      if (this.progressive == null)
+      ValueBinding vb = getValueBinding("progressive");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("progressive");
-         if (vb != null)
-         {
-            this.progressive = (Boolean)vb.getValue(getFacesContext());
-         }
+         this.progressive = (Boolean)vb.getValue(getFacesContext());
       }
+      
       if (this.progressive != null)
       {
          return this.progressive.booleanValue();
       }
       else
       {
-         return Boolean.FALSE;
+         // return default
+         return false;
       }
    }
    
@@ -290,13 +283,10 @@ public class UIPanel extends SelfRenderingComponent
     */
    public boolean isExpanded()
    {
-      if (this.expanded == null)
+      ValueBinding vb = getValueBinding("expanded");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("expanded");
-         if (vb != null)
-         {
-            this.expanded = (Boolean)vb.getValue(getFacesContext());
-         }
+         this.expanded = (Boolean)vb.getValue(getFacesContext());
       }
       
       if (this.expanded != null)
@@ -305,7 +295,7 @@ public class UIPanel extends SelfRenderingComponent
       }
       else
       {
-         // return the default
+         // return default
          return true;
       }
    }
@@ -355,5 +345,5 @@ public class UIPanel extends SelfRenderingComponent
    private String label = null;
    
    // component state
-   private Boolean expanded = null;
+   private Boolean expanded = Boolean.TRUE;
 }

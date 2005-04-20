@@ -42,14 +42,12 @@ public class StringEqualsEvaluator extends BaseEvaluator
     */
    public String getCondition()
    {
-      if (this.condition == null)
+      ValueBinding vb = getValueBinding("condition");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("condition");
-         if (vb != null)
-         {
-            this.condition = (String)vb.getValue(getFacesContext());
-         }
+         this.condition = (String)vb.getValue(getFacesContext());
       }
+      
       return this.condition;
    }
    

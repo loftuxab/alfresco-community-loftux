@@ -64,13 +64,10 @@ public class UIModeList extends UICommand
     */
    public boolean isHorizontal()
    {
-      if (this.horizontal == null)
+      ValueBinding vb = getValueBinding("horizontal");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("horizontal");
-         if (vb != null)
-         {
-            this.horizontal = (Boolean)vb.getValue(getFacesContext());
-         }
+         this.horizontal = (Boolean)vb.getValue(getFacesContext());
       }
       
       if (this.horizontal != null)
@@ -101,13 +98,10 @@ public class UIModeList extends UICommand
     */
    public int getIconColumnWidth()
    {
-      if (this.iconColumnWidth == null)
+      ValueBinding vb = getValueBinding("iconColumnWidth");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("iconColumnWidth");
-         if (vb != null)
-         {
-            this.iconColumnWidth = (Integer)vb.getValue(getFacesContext());
-         }
+         this.iconColumnWidth = (Integer)vb.getValue(getFacesContext());
       }
       
       if (this.iconColumnWidth != null)

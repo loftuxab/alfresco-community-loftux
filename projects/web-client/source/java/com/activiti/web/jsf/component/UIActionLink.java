@@ -59,13 +59,10 @@ public class UIActionLink extends UICommand
     */
    public boolean getShowLink()
    {
-      if (this.showLink == null)
+      ValueBinding vb = getValueBinding("showLink");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("showLink");
-         if (vb != null)
-         {
-            this.showLink = (Boolean)vb.getValue(getFacesContext());
-         }
+         this.showLink = (Boolean)vb.getValue(getFacesContext());
       }
       
       if (this.showLink != null)
@@ -74,6 +71,7 @@ public class UIActionLink extends UICommand
       }
       else
       {
+         // return default
          return true;
       }
    }
@@ -97,13 +95,10 @@ public class UIActionLink extends UICommand
     */
    public String getImage()
    {
-      if (this.image == null)
+      ValueBinding vb = getValueBinding("image");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("image");
-         if (vb != null)
-         {
-            this.image = (String)vb.getValue(getFacesContext());
-         }
+         this.image = (String)vb.getValue(getFacesContext());
       }
       
       return this.image;

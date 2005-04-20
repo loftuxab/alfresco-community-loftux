@@ -65,14 +65,12 @@ public abstract class BaseEvaluator extends SelfRenderingComponent
     */
    public Object getValue()
    {
-      if (this.value == null)
+      ValueBinding vb = getValueBinding("value");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("value");
-         if (vb != null)
-         {
-            this.value = vb.getValue(getFacesContext());
-         }
+         this.value = vb.getValue(getFacesContext());
       }
+      
       return this.value;
    }
 

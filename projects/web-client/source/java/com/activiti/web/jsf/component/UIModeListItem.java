@@ -22,25 +22,25 @@ public class UIModeListItem extends SelfRenderingComponent
    }
    
    /**
-    * Get the value (for this component the value is an object used as the DataModel)
+    * Get the value - the value is used in a equals() match against the current value in the
+    * parent ModeList component to set the selected item.
     *
     * @return the value
     */
    public Object getValue()
    {
-      if (this.value == null)
+      ValueBinding vb = getValueBinding("value");
+      if (vb != null)
       {
-         ValueBinding vb = getValueBinding("value");
-         if (vb != null)
-         {
-            this.value = vb.getValue(getFacesContext());
-         }
+         this.value = vb.getValue(getFacesContext());
       }
+      
       return this.value;
    }
 
    /**
-    * Set the value (for this component the value is an object used as the DataModel)
+    * Set the value - the value is used in a equals() match against the current value in the
+    * parent ModeList component to set the selected item.
     *
     * @param value     the value
     */
