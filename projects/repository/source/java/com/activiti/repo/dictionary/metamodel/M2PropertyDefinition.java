@@ -42,6 +42,11 @@ public class M2PropertyDefinition implements PropertyDefinition
         this.m2Property.getType();
         this.m2Property.getContainerClass();
     }
+    
+    public String toString()
+    {
+        return getReference().toString();
+    }
 
     /**
      * @see M2PropertyDefinition#getQName(M2Property)

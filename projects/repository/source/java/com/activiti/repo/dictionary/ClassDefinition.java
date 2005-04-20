@@ -27,16 +27,6 @@ public interface ClassDefinition
     public ClassDefinition getSuperClass();
     
     /**
-     * @return the first basic bootstrap type found when moving up the hierarchy,
-     *      or null if the type doesn't derive (either directly or indirectly)
-     *      from any of the bootstrap types
-     * 
-     * @see #getSuperClass()
-     * @see com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap#TYPE_BASE
-     */
-    public ClassDefinition getBootstrapClass();
-
-    /**
      * @return Returns true => aspect, false => type
      */
     public boolean isAspect();
@@ -55,15 +45,26 @@ public interface ClassDefinition
     public PropertyDefinition getProperty(String name);
 
     /**
+     * Fetch all associations applicable to this type, including child associations.
+     * 
      * @return Returns the associations including inherited ones
+     * 
+     * @see ChildAssociationDefinition
      */
     public List<AssociationDefinition> getAssociations();
     
     /**
      * @param name the simple name of the association, i.e. not the qualified name
-     * @return Returns the association definition, or null if not found
+     * @return Returns the association definition, or null if not found.
      * 
      * @see AssociationRef#getAssociationName()
+     * @see ChildAssociationDefinition
      */
     public AssociationDefinition getAssociation(String name);
+    
+    /**
+     * @return Returns all child associations applicable to this type, including those
+     *      inherited from super types
+     */
+    public List<ChildAssociationDefinition> getChildAssociations();
 }

@@ -13,9 +13,9 @@ public class InvalidAspectException extends RuntimeException
 
     private ClassRef aspectRef;
     
-    public InvalidAspectException(ClassRef typeRef)
+    public InvalidAspectException(ClassRef aspectRef)
     {
-        this(null, typeRef);
+        this(null, aspectRef);
     }
 
     public InvalidAspectException(String msg, ClassRef aspectRef)

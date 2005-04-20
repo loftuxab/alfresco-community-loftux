@@ -426,14 +426,6 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     }
 
     /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.metamodel.M2Class#getProperties()
-     */
-    public List<M2Property> getProperties()
-    {
-        return getEmfProperties();
-    }
-
-    /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#createProperty(java.lang.String)
      */
     public M2Property createProperty(String propertyName)
@@ -445,6 +437,14 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
         return property;
     }
         
+    /* (non-Javadoc)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getProperties()
+     */
+    public List<M2Property> getProperties()
+    {
+        return getEmfProperties();
+    }
+
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#getInheritedProperties()
      */
@@ -466,13 +466,17 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     }
 
     /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.metamodel.M2Class#getAssociations()
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#createChildAssociation(java.lang.String)
      */
-    public List<M2Association> getAssociations()
+    public M2ChildAssociation createChildAssociation(String associationName)
     {
-        return getEmfAssociations();
+        EmfFactory factory = EmfFactory.eINSTANCE;
+        M2ChildAssociation association = (M2ChildAssociation)factory.createEMFChildAssociation();
+        association.setName(associationName);
+        getAssociations().add(association);
+        return association;
     }
-
+    
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#createAssociation(java.lang.String)
      */
@@ -486,17 +490,13 @@ public abstract class EMFClassImpl extends EObjectImpl implements EMFClass, M2Cl
     }
 
     /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.metamodel.M2Class#createChildAssociation(java.lang.String)
+     * @see com.activiti.repo.dictionary.metamodel.M2Class#getAssociations()
      */
-    public M2ChildAssociation createChildAssociation(String associationName)
+    public List<M2Association> getAssociations()
     {
-        EmfFactory factory = EmfFactory.eINSTANCE;
-        M2ChildAssociation association = (M2ChildAssociation)factory.createEMFChildAssociation();
-        association.setName(associationName);
-        getAssociations().add(association);
-        return association;
+        return getEmfAssociations();
     }
-    
+
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Class#getInheritedAssociations()
      */

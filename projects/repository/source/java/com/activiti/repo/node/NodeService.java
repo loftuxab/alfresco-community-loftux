@@ -57,7 +57,7 @@ public interface NodeService
     public ChildAssocRef createNode(NodeRef parentRef,
             QName qname,
             ClassRef typeRef)
-            throws InvalidNodeRefException, InvalidNodeTypeException;
+            throws InvalidNodeRefException, InvalidNodeTypeException, PropertyException;
     
     /**
      * Creates a new, non-abstract, real node as a primary child of the given parent node.

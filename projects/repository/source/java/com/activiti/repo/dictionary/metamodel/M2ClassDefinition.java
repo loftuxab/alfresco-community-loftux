@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 
 import com.activiti.repo.dictionary.AssociationDefinition;
+import com.activiti.repo.dictionary.ChildAssociationDefinition;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.PropertyDefinition;
-import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.QName;
 
 
@@ -104,26 +104,6 @@ public class M2ClassDefinition implements ClassDefinition
         return m2Class.getSuperClass().getClassDefinition();
     }
     
-    public ClassDefinition getBootstrapClass()
-    {
-        ClassDefinition baseClassDef = null;
-        ClassDefinition superClassDef = this;
-        while (superClassDef != null)
-        {
-            if (superClassDef.getReference().equals(DictionaryBootstrap.TYPE_CONTAINER) ||
-                    superClassDef.getReference().equals(DictionaryBootstrap.TYPE_CONTENT) ||
-                    superClassDef.getReference().equals(DictionaryBootstrap.TYPE_REFERENCE) ||
-                    superClassDef.getReference().equals(DictionaryBootstrap.TYPE_BASE))
-            {
-                baseClassDef = superClassDef;
-                break;
-            }
-            // move up the hierarchy
-            superClassDef = superClassDef.getSuperClass();
-        }
-        return baseClassDef;
-    }
-    
     /**
      * @see #getAggregateProperties()()
      */
@@ -197,6 +177,25 @@ public class M2ClassDefinition implements ClassDefinition
         // nothing found
         return null;
     }
+
+    /**
+     * Get all associations, but return only those that are {@link ChildAssociationDefinition} types.
+     */
+    public List<ChildAssociationDefinition> getChildAssociations()
+    {
+        List<AssociationDefinition> assocs = getAssociations();
+        List<ChildAssociationDefinition> childAssocs = new ArrayList<ChildAssociationDefinition>(assocs.size());
+        for (AssociationDefinition assoc : assocs)
+        {
+            if (assoc instanceof ChildAssociationDefinition)
+            {
+                childAssocs.add((ChildAssociationDefinition) assoc);
+            }
+        }
+        // done
+        return Collections.unmodifiableList(childAssocs);
+    }
+
 
     /**
      * Gets the full list of Associations to include in Class Definition

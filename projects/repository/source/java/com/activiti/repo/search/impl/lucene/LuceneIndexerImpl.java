@@ -25,10 +25,9 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 
-import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
-import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
+import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
@@ -763,10 +762,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             {
                 doc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
                 ClassRef nodeTypeRef = nodeService.getType(nodeRef);
-                ClassDefinition nodeClassDef = dictionaryService.getClass(nodeTypeRef);
-                ClassDefinition nodeBaseClassDef = nodeClassDef.getBootstrapClass();
-                ClassRef nodeBaseTypeRef = nodeBaseClassDef.getReference();
-                if (DictionaryBootstrap.TYPE_CONTAINER.equals(nodeBaseTypeRef))
+                TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeRef);
+                // check for child associations
+                if (nodeTypeDef.getChildAssociations().size() > 0)
                 {
                     Document directoryEntry = new Document();
                     directoryEntry.add(new Field("ID", nodeRef.getId(), true, true, false));

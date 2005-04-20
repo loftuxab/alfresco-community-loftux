@@ -11,13 +11,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.springframework.dao.DataIntegrityViolationException;
-
 import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.PropertyDefinition;
+import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
@@ -29,6 +28,7 @@ import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.CyclicChildRelationshipException;
 import com.activiti.repo.node.InvalidAspectException;
 import com.activiti.repo.node.InvalidNodeRefException;
+import com.activiti.repo.node.InvalidNodeTypeException;
 import com.activiti.repo.node.InvalidStoreRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.node.PropertyException;
@@ -39,6 +39,7 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.util.debug.CodeMonkey;
 
 /**
  * Node service using database persistence layer to fulfill functionality
@@ -189,12 +190,18 @@ public class DbNodeServiceImpl implements NodeService
             ClassRef typeRef,
             Map<QName, Serializable> properties)
     {
+        CodeMonkey.todo("Check that the child association is allowed"); // TODO
+        if (properties == null)
+        {
+            properties = Collections.emptyMap();
+        }
+        
         // get the store that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
         Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
         if (store == null)
         {
-            throw new DataIntegrityViolationException("No store found for parent node: " + parentRef);
+            throw new RuntimeException("No store found for parent node: " + parentRef);
         }
         // create the node instance
         RealNode node = nodeDaoService.newRealNode(store, typeRef);
@@ -203,8 +210,25 @@ public class DbNodeServiceImpl implements NodeService
         // create the association
         ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, qname);
         
-        // set the properties - it is a new node so only do it if there are properties present
-        if (properties != null)
+        // get the mandatory aspects for the node type
+        TypeDefinition nodeTypeDef = dictionaryService.getType(typeRef);
+        if (nodeTypeDef == null)
+        {
+            throw new InvalidNodeTypeException(typeRef);
+        }
+        List<AspectDefinition> defaultAspectDefs = nodeTypeDef.getDefaultAspects();
+        // check that property requirements are met
+        checkProperties(nodeTypeDef, defaultAspectDefs, properties);
+        
+        // add all the aspects to the node
+        Set<QName> nodeAspects = node.getAspects();
+        for (AspectDefinition defaultAspectDef : defaultAspectDefs)
+        {
+            nodeAspects.add(defaultAspectDef.getQName());
+        }
+        
+        // set the properties - it is a new node so only set properties if there are any
+        if (properties.size() > 0)
         {
             this.setProperties(node.getNodeRef(), properties);
         }
@@ -302,12 +326,13 @@ public class DbNodeServiceImpl implements NodeService
             Map<QName, Serializable> aspectProperties)
             throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
-        // check that the properties supplied are adequate for the aspect
+        // get the aspect
         AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
         if (aspectDef == null)
         {
             throw new InvalidAspectException(aspectRef);
         }
+        // check that the properties supplied are adequate for the aspect
         checkProperties(aspectDef, null, aspectProperties);
         
         Node node = getNodeNotNull(nodeRef);
@@ -327,7 +352,43 @@ public class DbNodeServiceImpl implements NodeService
     public void removeAspect(NodeRef nodeRef, ClassRef aspectRef)
             throws InvalidNodeRefException, InvalidAspectException
     {
-        throw new UnsupportedOperationException();
+        // get the aspect
+        AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
+        if (aspectDef == null)
+        {
+            throw new InvalidAspectException(aspectRef);
+        }
+        QName aspectQName = aspectDef.getQName();
+        // get the node
+        Node node = getNodeNotNull(nodeRef);
+        
+        // check that the aspect may be removed
+        ClassRef nodeTypeRef = new ClassRef(node.getTypeQName());
+        TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeRef);
+        if (nodeTypeDef == null)
+        {
+            throw new InvalidNodeRefException("The node type is no longer valid: " + nodeRef, nodeRef);
+        }
+        List<AspectDefinition> defaultAspects = nodeTypeDef.getDefaultAspects();
+        if (defaultAspects.contains(aspectDef))
+        {
+            throw new InvalidAspectException("The aspect is a default for the node's type and cannot be removed: " + aspectRef, aspectRef);
+        }
+        
+        // remove the aspect, if present
+        boolean removed = node.getAspects().remove(aspectQName);
+        // if the aspect was present, remove the associated properties
+        if (removed)
+        {
+            Map<String, Serializable> nodeProperties = node.getProperties();
+            List<PropertyDefinition> propertyDefs = aspectDef.getProperties();
+            for (PropertyDefinition propertyDef : propertyDefs)
+            {
+                nodeProperties.remove(propertyDef.getQName().toString());
+            }
+        }
+        // done
+        return;
     }
 
     /**
@@ -377,6 +438,7 @@ public class DbNodeServiceImpl implements NodeService
 
     public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
     {
+        CodeMonkey.todo("Check that the child association is allowed"); // TODO
         // check that both nodes belong to the same store
         if (!parentRef.getStoreRef().equals(childRef.getStoreRef()))
         {
@@ -600,6 +662,7 @@ public class DbNodeServiceImpl implements NodeService
     public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException, AssociationExistsException
     {
+        CodeMonkey.todo("Check that the association is allowed"); // TODO
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // see if it exists

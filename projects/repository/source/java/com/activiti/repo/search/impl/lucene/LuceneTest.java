@@ -14,6 +14,7 @@ import junit.framework.TestCase;
 
 import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.AssociationDefinition;
+import com.activiti.repo.dictionary.ChildAssociationDefinition;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
@@ -1732,11 +1733,6 @@ public class LuceneTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public ClassDefinition getBootstrapClass()
-        {
-            return this;
-        }
-
         public boolean isAspect()
         {
             throw new UnsupportedOperationException();
@@ -1753,6 +1749,11 @@ public class LuceneTest extends TestCase
         }
 
         public List<AssociationDefinition> getAssociations()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public List<ChildAssociationDefinition> getChildAssociations()
         {
             throw new UnsupportedOperationException();
         }

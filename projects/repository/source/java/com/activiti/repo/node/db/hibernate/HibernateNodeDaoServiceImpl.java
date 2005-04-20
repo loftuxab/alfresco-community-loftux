@@ -12,9 +12,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
+import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
@@ -34,7 +34,6 @@ import com.activiti.repo.node.InvalidNodeTypeException;
 import com.activiti.repo.node.db.NodeDaoService;
 import com.activiti.repo.ref.QName;
 import com.activiti.util.GUID;
-import com.activiti.util.debug.CodeMonkey;
 
 /**
  * Hibernate-specific implementation of the persistence-independent <b>node</b> DAO interface
@@ -104,21 +103,15 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
 
     public RealNode newRealNode(Store store, ClassRef classRef) throws InvalidNodeTypeException
     {
-        ClassDefinition classDef = dictionaryService.getClass(classRef);
-        if (classDef == null)
+        TypeDefinition typeDef = dictionaryService.getType(classRef);
+        if (typeDef == null)
         {
             throw new InvalidNodeTypeException(classRef);
         }
-        CodeMonkey.todo("Replace getBootstrapClass with check for presence of children"); // TODO
-        ClassDefinition baseClassDef = classDef.getBootstrapClass();
-        if (baseClassDef == null)
-        {
-            throw new InvalidNodeTypeException("Class does not derive from a base type",
-                    classRef);
-        }
+        boolean allowedChildren = typeDef.getChildAssociations().size() > 0;
         // build a concrete node based on a bootstrap type
         RealNode node = null;
-        if (baseClassDef.getReference().equals(DictionaryBootstrap.TYPE_CONTAINER))
+        if (allowedChildren)
         {
             node = new ContainerNodeImpl();
         }

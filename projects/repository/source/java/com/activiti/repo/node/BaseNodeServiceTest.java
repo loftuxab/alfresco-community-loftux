@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.hibernate.Session;
 
-import com.activiti.repo.dictionary.AspectDefinition;
+import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
@@ -249,6 +249,27 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     }
     
     /**
+     * Fills the given property map with some values according to the property definitions on the given class
+     */
+    protected void fillProperties(ClassRef classRef, Map<QName, Serializable> properties)
+    {
+        ClassDefinition classDef = dictionaryService.getClass(classRef);
+        if (classDef == null)
+        {
+            throw new RuntimeException("No such class: " + classRef);
+        }
+        List<PropertyDefinition> propertyDefs = classDef.getProperties();
+        // make up a property value for each property
+        for (PropertyDefinition propertyDef : propertyDefs)
+        {
+            QName qname = propertyDef.getQName();
+            Serializable value = new Long(System.currentTimeMillis());
+            // add it
+            properties.put(qname, value);
+        }
+    }
+    
+    /**
      * Checks that aspects can be added, removed and queried.  Failure to detect
      * inadequate properties is also checked.
      */
@@ -272,16 +293,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             // expected
         }
         // get the properties required for the aspect
-        AspectDefinition aspectDef = dictionaryService.getAspect(DictionaryBootstrap.ASPECT_CONTENT);
-        List<PropertyDefinition> propertyDefs = aspectDef.getProperties();
-        // make up a property value for each property
-        for (PropertyDefinition propertyDef : propertyDefs)
-        {
-            QName qname = propertyDef.getQName();
-            Serializable value = new Long(System.currentTimeMillis());
-            // add it
-            properties.put(qname, value);
-        }
+        fillProperties(DictionaryBootstrap.ASPECT_CONTENT, properties);
         // get the node properties before
         Map<QName, Serializable> propertiesBefore = nodeService.getProperties(nodeRef);
         // add the aspect
@@ -336,6 +348,49 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // count the nodes with the given id
         int count = countNodesById(nodeRef);
         assertEquals("Unexpected number of nodes present", 1, count);
+    }
+    
+    /**
+     * @see DictionaryBootstrap#ASPECT_CONTENT
+     * @see DictionaryBootstrap#TYPE_CONTENT
+     */
+    public void testCreateNodeWithAspects() throws Exception
+    {
+        try
+        {
+            ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+                    QName.createQName("MyContent"),
+                    DictionaryBootstrap.TYPE_CONTENT);
+            fail("Failed to detect missing properties for required aspect");
+        }
+        catch (PropertyException e)
+        {
+            // exptected
+        }
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+        // fill properties
+        fillProperties(DictionaryBootstrap.ASPECT_CONTENT, properties);
+        
+        // create node for real
+        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+                QName.createQName("MyContent"),
+                DictionaryBootstrap.TYPE_CONTENT,
+                properties);
+        NodeRef nodeRef = assocRef.getChildRef();
+        // check that the content aspect is present
+        assertTrue("Content aspect not present",
+                nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT));
+        
+        // attempt to remove the aspect
+        try
+        {
+            nodeService.removeAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT);
+            fail("Failed to prevent removal of type-required aspect");
+        }
+        catch (InvalidAspectException e)
+        {
+            // expected
+        }
     }
     
     public void testDelete() throws Exception
@@ -524,13 +579,17 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     private Object[] createAssociation() throws Exception
     {
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+        fillProperties(DictionaryBootstrap.TYPE_REFERENCE, properties);
+        
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName(null, "N1"),
                 DictionaryBootstrap.TYPE_BASE);
         NodeRef sourceRef = assocRef.getChildRef();
         assocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName(null, "N2"),
-                DictionaryBootstrap.TYPE_REFERENCE);
+                DictionaryBootstrap.TYPE_REFERENCE,
+                properties);
         NodeRef targetRef = assocRef.getChildRef();
         
         QName qname = QName.createQName("next");
