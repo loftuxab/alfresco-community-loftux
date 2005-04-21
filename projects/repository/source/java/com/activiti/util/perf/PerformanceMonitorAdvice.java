@@ -12,32 +12,32 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * An instance of this class keeps track of timings of method calls, logging either
- * after each invocation or only on VM shutdown or both.  Failed invocations are not
- * recorded.
+ * An instance of this class keeps track of timings of method calls on a bean,
+ * logging either after each invocation or only on VM shutdown or both.
+ * Failed invocations are not recorded.
  * <p>
- * Logging output is managed down to either the class or method level as follows:
+ * Logging output is managed down to either the bean or bean-method level as follows:
  * <p>
  * <pre>
  *      performance.summary.method
  *      performance.summary.vm
  *          AND
- *      perf.targetClassName
- *      perf.targetClassName.methodName
+ *      performance.targetBeanName
+ *      performance.targetBeanName.methodName
  * </pre>
- * In order to activate the performance logging, DEBUG must be active for both the method
+ * In order to activate the performance logging, DEBUG must be active for both the bean method
  * <b>AND</b> the PerformanceMonitorAdvice (<b>performance</b> logger).
  * <p>
  * The following examples illustrate how it can be used:
  * <p>
  * <pre>
  *      performance.summary.method=DEBUG
- *      performance.x.y.MyClass=DEBUG
- *          --> Output method statistic on each call to MyClass
+ *      performance.myBean=DEBUG
+ *          --> Output method statistic on each call to myBean
  *          
  *      performance.summary.vm=DEBUG
- *      performance.x.y.MyClass.doSomething=DEBUG
- *          --> Output summary for doSomething() method of MyClass when VM terminates
+ *      performance.myBean.doSomething=DEBUG
+ *          --> Output summary for doSomething() method of myBean when VM terminates
  * 
  *      performance=DEBUG
  *          --> Output all performance data - after each call and upon VM closure          
@@ -51,10 +51,14 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
     private static final Log methodSummaryLogger = LogFactory.getLog("performance.summary.method");
     private static final Log vmSummaryLogger = LogFactory.getLog("performance.summary.vm");
     
+    /** the name of the bean that this advice is being used against */
+    private final String beanName;
+    /** VM level summary */
     private SortedMap<Method, MethodStats> stats;
 
-    public PerformanceMonitorAdvice()
+    public PerformanceMonitorAdvice(String beanName)
     {
+        this.beanName = beanName;
         Comparator<Method> methodComparator = new MethodComparator();
         stats = new TreeMap<Method, MethodStats>(methodComparator);
     }
@@ -113,9 +117,8 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
     private void recordStats(Method method, long delayMs)
     {
         String methodName = method.getName();
-        String className = method.getDeclaringClass().getName();
         
-        Log methodLogger = LogFactory.getLog("performance." + className + "." + methodName);
+        Log methodLogger = LogFactory.getLog("performance." + beanName + "." + methodName);
         if (!methodLogger.isDebugEnabled())
         {
             // no recording for this method
@@ -124,7 +127,7 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
         // must we log on a per-method call?
         if (methodSummaryLogger.isDebugEnabled())
         {
-            methodLogger.debug("Executed " + className + "#" + methodName + " in " + delayMs + "ms");
+            methodLogger.debug("Executed " + beanName + "#" + methodName + " in " + delayMs + "ms");
         }
         if (vmSummaryLogger.isDebugEnabled())
         {
@@ -198,13 +201,20 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
     {
         public void run()
         {
-            Set<Method> methods = stats.keySet();
-            for (Method method : methods)
+            String beanName = PerformanceMonitorAdvice.this.beanName;
+            
+            // prevent multiple ShutdownThread instances interleaving their output
+            synchronized(ShutdownThread.class)
             {
-                vmSummaryLogger.debug("\nMethod performance summary: \n" +
-                        "   Class: " + method.getDeclaringClass().getName() + "\n" +
-                        "   Method: " + method.getName() + "\n" +
-                        "   Statistics: " + stats.get(method));
+                vmSummaryLogger.debug("\n==================== " + beanName.toUpperCase() + " ===================");
+                Set<Method> methods = stats.keySet();
+                for (Method method : methods)
+                {
+                    vmSummaryLogger.debug("\nMethod performance summary: \n" +
+                            "   Bean: " + PerformanceMonitorAdvice.this.beanName + "\n" +
+                            "   Method: " + method.getName() + "\n" +
+                            "   Statistics: " + stats.get(method));
+                }
             }
         }
     }

@@ -69,11 +69,6 @@
    <!-- use around method calls to debug - see class comments for details -->
    <bean id="methodCallLogAdvice" class="com.activiti.util.debug.MethodCallLogAdvice" />
    
-   <!-- use around method calls to debug - see class comments for details -->
-   <bean id="methodPerformanceAdvice"
-      class="com.activiti.util.perf.PerformanceMonitorAdvice" 
-      init-method="init"/>
-   
    <!--                    -->
    <!--  INTERNAL SERVICES -->
    <!--                    -->
@@ -103,7 +98,11 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <ref bean="methodPerformanceAdvice" />
+            <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
+               <constructor-arg>
+                  <value>nodeDaoService</value>
+               </constructor-arg>
+            </bean>
          </list>
       </property>
    </bean>   
@@ -138,7 +137,11 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <ref bean="methodPerformanceAdvice" />
+            <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
+               <constructor-arg>
+                  <value>dbNodeService</value>
+               </constructor-arg>
+            </bean>
          </list>
       </property>
    </bean>   
@@ -168,7 +171,11 @@
       </property>
       <property name="postInterceptors">
          <list>
-            <ref bean="methodPerformanceAdvice" />
+            <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
+               <constructor-arg>
+                  <value>indexingNodeService</value>
+               </constructor-arg>
+            </bean>
          </list>
       </property>
    </bean>
@@ -199,7 +206,11 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <ref bean="methodPerformanceAdvice" />
+            <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
+               <constructor-arg>
+                  <value>indexerComponent</value>
+               </constructor-arg>
+            </bean>
          </list>
       </property>
    </bean>
@@ -288,15 +299,15 @@
             <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
             </property>
-         <property name="dbNodeService">
+            <property name="dbNodeService">
                <ref bean="dbNodeService" />
             </property>
-         <property name="versionCounterDaoService">
-            <ref bean="versionCounterDaoService"/>
-         </property>
-         <property name="searcher">
-            <ref bean="searcherComponent"/>
-         </property>
+            <property name="versionCounterDaoService">
+               <ref bean="versionCounterDaoService"/>
+            </property>
+            <property name="searcher">
+               <ref bean="searcherComponent"/>
+            </property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -315,16 +326,16 @@
       </property>
       <property name="target">
          <bean class="com.activiti.repo.version.lightweight.VersionStoreNodeServiceImpl" init-method="initialise">
-         <property name="nodeService">
+            <property name="nodeService">
             <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
             </property>
             <property name="dbNodeService">
                <ref bean="dbNodeService" />
             </property>
-         <property name="searcher">
-            <ref bean="searcherComponent"/>
-         </property>
+            <property name="searcher">
+               <ref bean="searcherComponent"/>
+            </property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -385,12 +396,6 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <ref bean="methodPerformanceAdvice" />
-         </list>
-      </property>
    </bean>
    
    <bean id="namespaceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -407,12 +412,6 @@
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
-      </property>
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <ref bean="methodPerformanceAdvice" />
-         </list>
       </property>
    </bean>
    
