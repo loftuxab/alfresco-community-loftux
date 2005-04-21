@@ -49,4 +49,6 @@ public interface ResultSet extends Iterable<ResultSetRow> // Specfic iterator
      */
     // String toString();
     // ResultSetMetaData getMetaData();
+    
+    void close();
 }

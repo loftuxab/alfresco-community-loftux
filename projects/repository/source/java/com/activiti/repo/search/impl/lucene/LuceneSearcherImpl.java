@@ -9,6 +9,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Searcher;
 import org.saxpath.SAXPathException;
 
 import com.activiti.repo.dictionary.NamespaceService;
@@ -58,8 +59,11 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                 try
                 {
                     Query query = LuceneQueryParser.parse(queryString, DEFAULT_FIELD, new StandardAnalyzer(), nameSpaceService);
-                    Hits hits = getSearcher().search(query);
-                    return new LuceneResultSet(store, hits);
+                    Searcher searcher = getSearcher();
+
+                    Hits hits = searcher.search(query);
+                    return new LuceneResultSet(store, hits, searcher);
+
                 }
                 catch (ParseException e)
                 {
@@ -80,8 +84,10 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     reader.setXPathHandler(handler);
                     reader.parse(queryString);
                     Query query = handler.getQuery();
-                    Hits hits = getSearcher().search(query);
-                    return new LuceneResultSet(store, hits);
+                    Searcher searcher = getSearcher();
+                    Hits hits = searcher.search(query);
+                    return new LuceneResultSet(store, hits, searcher);
+
                 }
                 catch (SAXPathException e)
                 {

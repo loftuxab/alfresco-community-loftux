@@ -54,12 +54,24 @@ public class DictionaryBootstrap
     public static final QName ASPECT_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "aspect_content");
     public static final String PROP_ENCODING = "encoding";
     public static final String PROP_MIME_TYPE = "mimetype";
-    public static final ClassRef ASPECT_CONTENT = new ClassRef(ASPECT_QNAME_CONTENT);
     
+    // Categories and roots
+    
+    public static final QName ASPECT_QNAME_ROOT = QName.createQName(NamespaceService.ACTIVITI_URI, "aspect_root");
+    public static final QName TYPE_QNAME_CATEGORY = QName.createQName(NamespaceService.ACTIVITI_URI, "category");
+    public static final QName TYPE_QNAME_STOREROOT = QName.createQName(NamespaceService.ACTIVITI_URI, "store_root");
+    public static final QName TYPE_QNAME_CATEGORYROOT = QName.createQName(NamespaceService.ACTIVITI_URI, "category_root");
+    public static final ClassRef ASPECT_CONTENT = new ClassRef(ASPECT_QNAME_CONTENT);
+    public static final ClassRef ASPECT_ROOT = new ClassRef(ASPECT_QNAME_ROOT);
+    public static final ClassRef TYPE_CATEGORY = new ClassRef(TYPE_QNAME_CATEGORY);
+    public static final ClassRef TYPE_STOREROOT = new ClassRef(TYPE_QNAME_STOREROOT);
+    public static final ClassRef TYPE_CATEGORYROOT = new ClassRef(TYPE_QNAME_CATEGORYROOT);
+    
+
     // Content type constants
     public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "content");
     public static final ClassRef TYPE_CONTENT = new ClassRef(TYPE_QNAME_CONTENT);
-    
+ 
     // expected application types
     public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_URI, "folder");
     public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ACTIVITI_URI, "file");
@@ -240,6 +252,10 @@ public class DictionaryBootstrap
         mimetypeProp.setMandatory(true);
         mimetypeProp.setMultiValued(false);
 
+        // Root Aspect
+        
+        M2Aspect rootAspect = metaModelDAO.createAspect(ASPECT_QNAME_ROOT);
+        
         // Create Test Base Type
         M2Type baseType = metaModelDAO.createType(TYPE_QNAME_BASE);
 //        M2Property primaryTypeProp = baseType.createProperty("primaryType");
@@ -284,14 +300,38 @@ public class DictionaryBootstrap
         // Create Folder Type
         M2Type folderType = metaModelDAO.createType(TYPE_QNAME_FOLDER);
         folderType.setSuperClass(baseType);
-        M2ChildAssociation filesAssoc = containerType.createChildAssociation("*");
+        M2ChildAssociation filesAssoc = folderType.createChildAssociation("*");
         filesAssoc.getRequiredToClasses().add(fileType);
         filesAssoc.setMandatory(false);
-        filesAssoc.setMultiValued(false);
-        M2ChildAssociation foldersAssoc = containerType.createChildAssociation("*");
+        filesAssoc.setMultiValued(true);
+        M2ChildAssociation foldersAssoc = folderType.createChildAssociation("*");
         foldersAssoc.getRequiredToClasses().add(fileType);
         foldersAssoc.setMandatory(false);
-        foldersAssoc.setMultiValued(false);
+        foldersAssoc.setMultiValued(true);
+        
+        // Create Category Type
+        
+        M2Type categoryType = metaModelDAO.createType(TYPE_QNAME_CATEGORY);
+        categoryType.setSuperClass(baseType);
+        M2ChildAssociation subCategoriesAssoc = categoryType.createChildAssociation("*");
+        subCategoriesAssoc.getRequiredToClasses().add(baseType);
+        subCategoriesAssoc.setMandatory(false);
+        subCategoriesAssoc.setMultiValued(true);
+        
+        // Store Root
+        
+        M2Type storeRootType = metaModelDAO.createType(TYPE_QNAME_STOREROOT);
+        storeRootType.setSuperClass(containerType);
+        storeRootType.getDefaultAspects().add(rootAspect);
+        
+        // Create Category root Type
+        M2Type categoryRootType = metaModelDAO.createType(TYPE_QNAME_CATEGORYROOT);
+        categoryRootType.setSuperClass(baseType);
+        categoryRootType.getDefaultAspects().add(rootAspect);
+        M2ChildAssociation categoryAssoc = categoryRootType.createChildAssociation("*");
+        categoryAssoc.getRequiredToClasses().add(categoryType);
+        categoryAssoc.setMandatory(false);
+        categoryAssoc.setMultiValued(true);
     }
     
     /**

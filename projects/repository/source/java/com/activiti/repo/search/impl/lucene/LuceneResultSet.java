@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.Searcher;
 
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
@@ -35,17 +36,20 @@ public class LuceneResultSet implements ResultSet
      */
     StoreRef storeRef;
 
+    private Searcher searcher;
+
     /**
      * Wrap a lucene seach result with node support
      * 
      * @param storeRef
      * @param hits
      */
-    public LuceneResultSet(StoreRef storeRef, Hits hits)
+    public LuceneResultSet(StoreRef storeRef, Hits hits, Searcher searcher)
     {
         super();
         this.hits = hits;
         this.storeRef = storeRef;
+        this.searcher = searcher;
     }
 
     /*
@@ -107,4 +111,17 @@ public class LuceneResultSet implements ResultSet
             throw new SearcherException("IO Error reading reading document from the result set", e);
         }
     }
+
+    public void close()
+    {
+        try
+        {
+            searcher.close();
+        }
+        catch (IOException e)
+        {
+            throw new SearcherException(e);
+        }
+    }
+
 }

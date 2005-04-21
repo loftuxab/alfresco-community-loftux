@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="lib/aopalliance.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cglib-full-2.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils.jar"/>
@@ -12,8 +11,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-0.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar"/>
-	<classpathentry exported="true" sourcepath="W:/software/jsf-1_1_01/src/jsf-api/src" kind="lib" path="lib/jsf-api.jar"/>
-	<classpathentry exported="true" sourcepath="W:/software/jsf-1_1_01/src/jsf-ri/src" kind="lib" path="lib/jsf-impl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hrtlib.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsf-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsf-impl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsf-portlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jstl.jar"/>
@@ -24,17 +25,17 @@
 	<classpathentry exported="true" kind="lib" path="lib/lucene-1.4.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/quartz.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saxpath.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
-	<classpathentry exported="true" sourcepath="W:/spring-1.2-rc1/spring-framework-1.2-rc1/src" kind="lib" path="lib/spring.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-aop.jar"/>
-	<classpathentry exported="true" sourcepath="W:/spring-1.2-rc1/spring-framework-1.2-rc1/mock" kind="lib" path="lib/spring-mock.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-mock.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/standard.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/common.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/common.resources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.resources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.xmi.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path=""/>
 </classpath>

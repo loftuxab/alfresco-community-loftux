@@ -6,6 +6,7 @@ package com.activiti.repo.search.impl.lucene;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
@@ -35,6 +38,8 @@ import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.IndexerException;
+import com.vladium.utils.timing.ITimer;
+import com.vladium.utils.timing.TimerFactory;
 
 /**
  * The implementation of the lucene based indexer. Supports basic transactional
@@ -83,6 +88,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      */
 
     private boolean isModified = false;
+    
+    DecimalFormat format;
+    ITimer timer;
 
     /**
      * Setter for getting the node service via IOC Used in the Spring container
@@ -93,6 +101,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+        
+        timer = TimerFactory.newTimer();
+        
+        format = new DecimalFormat ();
+        format.setMinimumFractionDigits (3);
+        format.setMaximumFractionDigits (3);
+
+
     }
 
     public void setDictionaryService(DictionaryService dictionaryService)
@@ -383,6 +399,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 if (isModified())
                 {
                     saveDelta();
+                    flushPending();
                     prepareToMergeIntoMain();
                 }
                 status = Status.STATUS_PREPARED;
@@ -471,31 +488,64 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void reindex(NodeRef nodeRef) throws IOException
     {
-        Set<NodeRef> refs = delete(nodeRef, true);
-        index(refs, false);
+      
+        delete(nodeRef, true);
+        //index(nodeRef, false);
     }
 
-    private Set<NodeRef> delete(NodeRef nodeRef, boolean forReindex) throws IOException
+    private Map<NodeRef, Boolean> deltaDeletes = new HashMap<NodeRef, Boolean>();
+    
+    private void delete(NodeRef nodeRef, boolean forReindex) throws IOException
     {
-        Set<NodeRef> refs = new HashSet<NodeRef>();
+        deltaDeletes.put(nodeRef, Boolean.valueOf(forReindex));
+        
+        if(deltaDeletes.size() > 10000)
+        {
+            flushPending();
+        }
+    }
 
+    private void flushPending() throws IOException
+    {
+        Set<NodeRef> forIndex = new HashSet<NodeRef>();
+        for(NodeRef ref: deltaDeletes.keySet())
+        {
+            boolean index = deltaDeletes.get(ref);
+            if(index)
+            {
+                forIndex.addAll(deleteImpl(ref, index));
+            }
+            else
+            {
+                deleteImpl(ref, index);
+            }
+        }
+        deltaDeletes.clear();
+        index(forIndex, false);
+    }
+    
+    
+    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex) throws IOException
+    {
+        //startTimer();
+        getDeltaReader();
+        //outputTime("Delete "+nodeRef+" size = "+getDeltaWriter().docCount());
+        Set<NodeRef> refs = new HashSet<NodeRef>();
+       
         IndexReader mainReader = getReader();
         try
         {
-
-            refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaRamReader(), true));
             refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader(), true));
+            
             refs.addAll(deleteContainerAndBelow(nodeRef, mainReader, false));
 
             if (!forReindex)
             {
                 Set<NodeRef> leafrefs = new HashSet<NodeRef>();
 
-                leafrefs.addAll(deletePrimary(refs, getDeltaRamReader(), true));
                 leafrefs.addAll(deletePrimary(refs, getDeltaReader(), true));
                 leafrefs.addAll(deletePrimary(refs, mainReader, false));
 
-                leafrefs.addAll(deleteReference(refs, getDeltaRamReader(), true));
                 leafrefs.addAll(deleteReference(refs, getDeltaReader(), true));
                 leafrefs.addAll(deleteReference(refs, mainReader, false));
 
@@ -503,6 +553,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
 
             deletions.addAll(refs);
+            
+          
             return refs;
         }
         finally
@@ -513,6 +565,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private Set<NodeRef> deletePrimary(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws IOException
     {
+        
+     
         Set<NodeRef> refs = new HashSet<NodeRef>();
 
         for (NodeRef nodeRef : nodeRefs)
@@ -532,12 +586,15 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
             }
         }
+     
+        
         return refs;
 
     }
 
     private Set<NodeRef> deleteReference(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws IOException
     {
+        
         Set<NodeRef> refs = new HashSet<NodeRef>();
 
         for (NodeRef nodeRef : nodeRefs)
@@ -557,6 +614,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
             }
         }
+        
         return refs;
 
     }
@@ -589,26 +647,35 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void index(Set<NodeRef> nodeRefs, boolean isNew) throws IOException
     {
+        //Directory temp = new RAMDirectory();
+        //IndexWriter localWriter = new IndexWriter(temp, new LuceneAnalyser(), true);
+        //IndexWriter localWriter = getDeltaWriter();
         for (NodeRef ref : nodeRefs)
         {
             index(ref, isNew);
         }
+        //localWriter.close();
+        //IndexWriter writer = getDeltaRamWriter();
+        //writer.addIndexes(new Directory[] {temp});
+        //chechAndMergeToDisk(100);
     }
 
     private void index(NodeRef nodeRef, boolean isNew) throws IOException
     {
+        IndexWriter writer = getDeltaWriter();
+        
         // avoid attempting to index nodes that don't exist
         if (!nodeService.exists(nodeRef))
         {
             return;
         }
         List<Document> docs = createDocuments(nodeRef, isNew);
-        IndexWriter writer = getDeltaRamWriter();
         for (Document doc : docs)
         {
             writer.addDocument(doc);
         }
-        chechAndMergeToDisk(10000);
+       
+      
     }
 
     static class Counter
@@ -801,6 +868,18 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return docs;
     }
 
+    public void startTimer()
+    {
+        timer.reset();
+        timer.start();
+    }
+    
+    public void outputTime(String message)
+    {
+        timer.stop();
+        System.out.println(message +" in "+format.format(timer.getDuration()));
+    }
+    
     public void clearIndex()
     {
         try

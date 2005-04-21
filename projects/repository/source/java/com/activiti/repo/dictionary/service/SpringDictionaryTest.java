@@ -2,6 +2,7 @@ package com.activiti.repo.dictionary.service;
 
 import java.util.Collection;
 
+import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
@@ -47,6 +48,42 @@ public class SpringDictionaryTest extends BaseSpringTest
                 fileClass.getSuperClass().getQName());
     }
 
+    public void testCategoryTypes()
+    {
+        ClassRef rootRef = DictionaryBootstrap.ASPECT_ROOT;
+        AspectDefinition rootAspect = dictionaryService.getAspect(rootRef);
+        assertNotNull(rootAspect);
+        assertEquals(rootRef, rootAspect.getReference());
+        assertEquals(0, rootAspect.getAssociations().size());
+        assertEquals(0, rootAspect.getChildAssociations().size());
+        assertEquals(0, rootAspect.getProperties().size());
+        
+        ClassRef storeRootRef = DictionaryBootstrap.TYPE_STOREROOT;
+        TypeDefinition storeRootType = dictionaryService.getType(storeRootRef);
+        assertNotNull(storeRootType);
+        assertEquals(storeRootRef, storeRootType.getReference());
+        assertEquals(1, storeRootType.getAssociations().size());
+        assertEquals(1, storeRootType.getChildAssociations().size());
+        assertEquals(0, storeRootType.getProperties().size());
+        
+        ClassRef categoryRootRef = DictionaryBootstrap.TYPE_CATEGORYROOT;
+        TypeDefinition categoryRootType = dictionaryService.getType(categoryRootRef);
+        assertNotNull(categoryRootType);
+        assertEquals(categoryRootRef, categoryRootType.getReference());
+        assertEquals(1, categoryRootType.getAssociations().size());
+        assertEquals(1, categoryRootType.getChildAssociations().size());
+        assertEquals(0, categoryRootType.getProperties().size());
+        
+        ClassRef categoryRef = DictionaryBootstrap.TYPE_CATEGORY;
+        TypeDefinition categoryType = dictionaryService.getType(categoryRef);
+        assertNotNull(categoryType);
+        assertEquals(categoryRef, categoryType.getReference());
+        assertEquals(1, categoryType.getAssociations().size());
+        assertEquals(1, categoryType.getChildAssociations().size());
+        assertEquals(0, categoryType.getProperties().size());
+        
+    }
+    
     public void testNamespace()
     {
         Collection<String> prefixes = namespaceService.getPrefixes();

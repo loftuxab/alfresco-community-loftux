@@ -24,6 +24,8 @@ import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.util.BaseSpringTest;
 import com.activiti.util.debug.CodeMonkey;
+import com.vladium.utils.timing.ITimer;
+import com.vladium.utils.timing.TimerFactory;
 
 /**
  * Provides a base set of tests of the various {@link com.activiti.repo.node.NodeService}
@@ -737,4 +739,78 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             fail("Cyclic relationship caused stack overflow");
         }
     }
+    
+    
+    
+    public void testAddPerformance() throws Exception
+    {
+        ITimer timer = TimerFactory.newTimer();
+        timer.start();
+        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
+        directories.put(rootNodeRef, QName.createQName("{ } "));
+        createLevels(directories, 1);
+        timer.stop();
+        System.out.println("Created one layer in "+timer.getDuration());
+    }
+    
+    public void testAddPerformance2() throws Exception
+    {
+        ITimer timer = TimerFactory.newTimer();
+        timer.start();
+        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
+        directories.put(rootNodeRef, QName.createQName("{ } "));
+        createLevels(directories, 2);
+        timer.stop();
+        System.out.println("Created two layer in "+timer.getDuration());
+    }
+    
+    public void testAddPerformance3() throws Exception
+    {
+        ITimer timer = TimerFactory.newTimer();
+        timer.start();
+        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
+        directories.put(rootNodeRef, QName.createQName("{ } "));
+        createLevels(directories, 3);
+        timer.stop();
+        System.out.println("Created three layer in "+timer.getDuration());
+    }
+
+    private void createLevels( Map<NodeRef, QName> map, int levels)
+    {
+        for(NodeRef ref: map.keySet())
+        {
+            QName qname = map.get(ref);
+            Map<NodeRef, QName> directories = createLevel(ref, qname.getLocalName(), "file", "directory");
+            if(levels > 0)
+            {
+                createLevels(directories, levels-1);
+            }
+        }
+    }
+    
+    private Map<NodeRef, QName> createLevel(NodeRef container, String root, String filePrefix, String directoryPrefix)
+    {
+        String ns = NamespaceService.ACTIVITI_TEST_URI;
+        QName qname = null;
+        ChildAssocRef assoc = null;
+        Map<NodeRef, QName> ret = new HashMap<NodeRef, QName>(10);
+
+        for (int i = 0; i < 10; i++)
+        {
+            qname = QName.createQName(ns, root +"_ "+ directoryPrefix + "_" + i);
+            assoc = nodeService.createNode(container, qname, DictionaryBootstrap.TYPE_CONTAINER);
+            NodeRef ref = assoc.getChildRef();
+            ret.put(ref, qname);
+        }
+
+        for (int i = 10; i < 100; i++)
+        {
+            qname = QName.createQName(ns, root + filePrefix + "_" + i);
+            assoc = nodeService.createNode(container, qname, DictionaryBootstrap.TYPE_CONTAINER);
+            NodeRef ref = assoc.getChildRef();
+        }
+
+        return ret;
+    }
+
 }

@@ -52,23 +52,6 @@ import com.activiti.repo.search.transaction.LuceneIndexLock;
 
 public abstract class LuceneBase implements Lockable
 {
-    /*
-     * TODO: Should make the delta directories etc on the fly so we do not build
-     * them just to do a search
-     */
-
-    /**
-     * The in memory index store
-     */
-
-    private Directory deltaRamDir;
-
-    /**
-     * The in memory undo store
-     */
-
-    private Directory undoRamDir;
-
     /**
      * The base directory for the index (on file)
      */
@@ -95,25 +78,11 @@ public abstract class LuceneBase implements Lockable
     private IndexReader deltaReader;
 
     /**
-     * The index reader for the in memory index delta . (This should no coexist
-     * with the writer)
-     */
-
-    private IndexReader deltaRamReader;
-
-    /**
      * The writer for the delta to file. (This should no coexist with the
      * reader)
      */
 
     private IndexWriter deltaWriter;
-
-    /**
-     * The writer for the delta to disk. (This should no coexist with the
-     * reader)
-     */
-
-    private IndexWriter deltaRamWriter;
 
     /**
      * The writer for the main index. (This should no coexist with the reader)
@@ -158,15 +127,13 @@ public abstract class LuceneBase implements Lockable
         this.store = store;
         this.deltaId = deltaId;
 
-        String basePath = getBasePath();
-        baseDir = initialiseFSDirectory(basePath, createMain);
+        String basePath = getMainPath();
+        baseDir = initialiseFSDirectory(basePath, false, createMain);
         if (deltaId != null)
         {
             String deltaPath = getDeltaPath();
-            deltaDir = initialiseFSDirectory(deltaPath, true);
-            undoDir = initialiseFSDirectory(basePath + File.separator + "undo" + File.separator + deltaId + File.separator, true);
-            deltaRamDir = new RAMDirectory();
-            undoRamDir = new RAMDirectory();
+            deltaDir = initialiseFSDirectory(deltaPath, true, true);
+            //undoDir = initialiseFSDirectory(basePath + File.separator + "undo" + File.separator + deltaId + File.separator, true, true);
         }
     }
 
@@ -182,6 +149,13 @@ public abstract class LuceneBase implements Lockable
         return deltaPath;
     }
 
+    private String getMainPath()
+    {
+        String mainPath = getBasePath() + File.separator + "index" + File.separator;
+        return mainPath;
+    }
+
+    
     /**
      * Utility method to find the path to the base index
      * 
@@ -202,9 +176,13 @@ public abstract class LuceneBase implements Lockable
      * @return
      * @throws IOException
      */
-    private Directory initialiseFSDirectory(String path, boolean deleteOnExit) throws IOException
+    private Directory initialiseFSDirectory(String path, boolean deleteOnExit, boolean overwrite) throws IOException
     {
         File file = new File(path);
+        if (overwrite)
+        {
+            //deleteDirectory(file);
+        }
         if (!file.exists())
         {
             file.mkdirs();
@@ -217,7 +195,7 @@ public abstract class LuceneBase implements Lockable
         }
         else
         {
-            return FSDirectory.getDirectory(file, false);
+            return FSDirectory.getDirectory(file, overwrite);
         }
     }
 
@@ -232,7 +210,7 @@ public abstract class LuceneBase implements Lockable
 
     protected IndexSearcher getSearcher() throws IOException
     {
-        return new IndexSearcher(baseDir);
+        return new IndexSearcher(getMainPath());
     }
 
     /**
@@ -264,33 +242,6 @@ public abstract class LuceneBase implements Lockable
     }
 
     /**
-     * Get a reader for the in memory portion of the delta
-     * 
-     * @return
-     * @throws IOException
-     */
-    protected IndexReader getDeltaRamReader() throws IOException
-    {
-        if (deltaRamReader == null)
-        {
-            // Readers and writes can not exists at the same time so we swap
-            // between them.
-            closeDeltaRamWriter();
-
-            if (!IndexReader.indexExists(deltaRamDir))
-            {
-                // Make sure there is something we can read.
-                IndexWriter writer = new IndexWriter(deltaRamDir, new LuceneAnalyser(), true);
-                writer.setUseCompoundFile(true);
-                writer.close();
-            }
-            deltaRamReader = IndexReader.open(deltaRamDir);
-
-        }
-        return deltaRamReader;
-    }
-
-    /**
      * Close the on file reader for the delta if it is open
      * 
      * @throws IOException
@@ -310,26 +261,6 @@ public abstract class LuceneBase implements Lockable
             }
         }
 
-    }
-
-    /**
-     * Close the in memory reader for the delta if it is open
-     * 
-     * @throws IOException
-     */
-    protected void closeDeltaRamReader() throws IOException
-    {
-        if (deltaRamReader != null)
-        {
-            try
-            {
-                deltaRamReader.close();
-            }
-            finally
-            {
-                deltaRamReader = null;
-            }
-        }
     }
 
     /**
@@ -357,51 +288,10 @@ public abstract class LuceneBase implements Lockable
             }
         }
         deltaWriter.setUseCompoundFile(true);
+        deltaWriter.minMergeDocs = 1000;
+        deltaWriter.mergeFactor = 100;
+        deltaWriter.maxMergeDocs = 100000;
         return deltaWriter;
-    }
-
-    /**
-     * Get the in memory writer
-     * 
-     * @return
-     * @throws IOException
-     */
-
-    protected IndexWriter getDeltaRamWriter() throws IOException
-    {
-        return getDeltaRamWriter(!IndexReader.indexExists(deltaRamDir));
-    }
-
-    /**
-     * Get the in memory writer. Provides support to clear the in memory writer.
-     * 
-     * @param overwriteOrCreate
-     * @return
-     * @throws IOException
-     */
-    private IndexWriter getDeltaRamWriter(boolean overwriteOrCreate) throws IOException
-    {
-        if (deltaRamWriter == null)
-        {
-            // Readers and writes can not exists at the same time so we swap
-            // between them.
-            closeDeltaRamReader();
-
-            try
-            {
-                if (deltaRamDir == null)
-                {
-                    throw new IOException("No directory for the in memory delta: the delta has been deleted");
-                }
-                deltaRamWriter = new IndexWriter(deltaRamDir, new LuceneAnalyser(), overwriteOrCreate);
-            }
-            catch (IOException e)
-            {
-                throw new IndexerException(e);
-            }
-        }
-        deltaRamWriter.setUseCompoundFile(true);
-        return deltaRamWriter;
     }
 
     /**
@@ -416,7 +306,7 @@ public abstract class LuceneBase implements Lockable
         {
             try
             {
-                deltaWriter.optimize();
+                //deltaWriter.optimize();
                 deltaWriter.close();
             }
             finally
@@ -428,28 +318,6 @@ public abstract class LuceneBase implements Lockable
     }
 
     /**
-     * Close the in memory deltya writer
-     * 
-     * @throws IOException
-     */
-
-    protected void closeDeltaRamWriter() throws IOException
-    {
-        if (deltaRamWriter != null)
-        {
-            try
-            {
-                deltaRamWriter.optimize();
-                deltaRamWriter.close();
-            }
-            finally
-            {
-                deltaRamWriter = null;
-            }
-        }
-    }
-
-    /**
      * Save the in memory delta to the disk, make sure there is nothing held in
      * memory
      * 
@@ -457,41 +325,8 @@ public abstract class LuceneBase implements Lockable
      */
     protected void saveDelta() throws IOException
     {
-        // Make sure everything is flushed
         closeDeltaReader();
-        closeDeltaRamReader();
         closeDeltaWriter();
-        closeDeltaRamWriter();
-        // Append in memory to the disk
-        IndexWriter writer = getDeltaWriter();
-        Directory[] dirs = new Directory[] { deltaRamDir };
-        writer.addIndexes(dirs);
-        // Make sure everything is flushed
-        closeDeltaRamReader();
-        closeDeltaWriter();
-        // Clear the in memory index buffer
-        getDeltaRamWriter(true);
-        closeDeltaRamWriter();
-    }
-
-    /**
-     * Merge the in memory delat to file if it contains a given number of
-     * documents. TODO: This parameter should be tunable
-     * 
-     * @param size
-     * @throws IOException
-     */
-    protected void chechAndMergeToDisk(int size) throws IOException
-    {
-        IndexReader reader = getDeltaRamReader();
-        if (reader.numDocs() > size)
-        {
-            saveDelta();
-        }
-        else
-        {
-            // Leave open the redaer for potential reuse
-        }
     }
 
     /**
@@ -504,7 +339,6 @@ public abstract class LuceneBase implements Lockable
      */
     protected void prepareToMergeIntoMain() throws IOException
     {
-        chechAndMergeToDisk(0);
         if (mainWriter != null)
         {
             throw new IndexerException("Can not merge as main writer is active");
@@ -519,30 +353,6 @@ public abstract class LuceneBase implements Lockable
         {
             getDeltaReader(); // Flush any deletes
             closeDeltaReader();
-
-            if (IndexReader.indexExists(baseDir))
-            {
-
-                mainReader = IndexReader.open(baseDir);
-                // If exists lock for deletes
-
-            }
-            else
-            {
-                // Create the main index
-                mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), true);
-                mainWriter.setUseCompoundFile(true);
-                try
-                {
-                    mainWriter.close();
-                }
-                finally
-                {
-                    mainWriter = null;
-                }
-                // Lock the reader
-                mainReader = IndexReader.open(baseDir);
-            }
         }
         catch (IOException e)
         {
@@ -563,17 +373,20 @@ public abstract class LuceneBase implements Lockable
      */
     protected void mergeDeltaIntoMain(Set<Term> terms) throws IOException
     {
+
+        if (!IndexReader.indexExists(baseDir))
+        {
+            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), true);
+            mainWriter.setUseCompoundFile(true);
+            mainWriter.close();
+        }
+        mainReader = IndexReader.open(baseDir);
         try
         {
-            if (mainReader == null)
-            {
-                throw new IOException("No main index reader lock - not prepared");
-            }
-
             // Do the deletions
             try
             {
-                if (terms.size() > 0)
+                if ((mainReader.numDocs() > 0) && (terms.size() > 0))
                 {
                     for (Term term : terms)
                     {
@@ -595,13 +408,12 @@ public abstract class LuceneBase implements Lockable
 
             // Do the append
 
-            if (!IndexReader.indexExists(baseDir))
-            {
-                mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), true);
-                mainWriter.setUseCompoundFile(true);
-                mainWriter.close();
-            }
             mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), false);
+            mainWriter.setUseCompoundFile(true);
+
+            mainWriter.minMergeDocs = 1000;
+            mainWriter.mergeFactor = 1000;
+            mainWriter.maxMergeDocs = 1000000;
 
             try
             {
@@ -609,7 +421,9 @@ public abstract class LuceneBase implements Lockable
                 if (reader.numDocs() > 0)
                 {
                     IndexReader[] readers = new IndexReader[] { reader };
-                    mainWriter.addIndexes(readers);
+                    Directory[] dirs = new Directory[] {deltaDir};
+                    mainWriter.addIndexes(dirs);
+                    //mainWriter.optimize();
                     closeDeltaReader();
                 }
                 else
@@ -660,14 +474,6 @@ public abstract class LuceneBase implements Lockable
             }
             try
             {
-                closeDeltaRamReader();
-            }
-            catch (IOException e)
-            {
-
-            }
-            try
-            {
                 closeDeltaWriter();
             }
             catch (IOException e)
@@ -676,17 +482,13 @@ public abstract class LuceneBase implements Lockable
             }
             try
             {
-                closeDeltaRamWriter();
+                deltaDir.close();
             }
-            catch (IOException e)
+            catch (IOException e1)
             {
-
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
             }
-
-            // Set all to null so we can not get confused
-            // We could just reset here
-
-            deltaRamDir = null;
             deltaDir = null;
 
             // Close the main stuff
@@ -715,6 +517,14 @@ public abstract class LuceneBase implements Lockable
                 }
             }
             mainWriter = null;
+            try
+            {
+                baseDir.close();
+            }
+            catch (IOException e)
+            {
+
+            }
 
             // Delete the delta directories
             String deltaPath = getDeltaPath();
@@ -747,11 +557,17 @@ public abstract class LuceneBase implements Lockable
                 }
                 else
                 {
-                    child.delete();
+                    if (child.exists() && !child.delete() && child.exists())
+                    {
+                        throw new IllegalStateException("Failed to delete " + child);
+                    }
                 }
             }
         }
-        file.delete();
+        if (file.exists() && !file.delete() && file.exists())
+        {
+            throw new IllegalStateException("Failed to delete " + file);
+        }
     }
 
     public LuceneIndexLock getLuceneIndexLock()
@@ -808,9 +624,6 @@ public abstract class LuceneBase implements Lockable
         getWriteLock();
         try
         {
-
-            closeDeltaRamReader();
-            closeDeltaRamWriter();
             closeDeltaReader();
             closeDeltaWriter();
             if (mainWriter != null)
@@ -823,6 +636,8 @@ public abstract class LuceneBase implements Lockable
                 mainReader.close();
                 mainReader = null;
             }
+            deltaDir.close();
+            baseDir.close();
             initialise(store, deltaId, true);
         }
         finally

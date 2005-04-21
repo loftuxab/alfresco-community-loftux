@@ -169,6 +169,7 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
+      <!--
       <property name="postInterceptors">
          <list>
             <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
@@ -178,6 +179,7 @@
             </bean>
          </list>
       </property>
+      -->
    </bean>
       
    <!--                         -->
@@ -468,4 +470,48 @@
       </property>
    </bean>
    
+   
+   <!-- Bean to support full text search -->
+   
+   <bean id="LuceneFullTextSearchIndexer" class="com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexer">
+        
+   </bean>
+   
+   <!--                -->
+   <!-- Scheduled jobs -->
+   <!--                -->
+   
+    <bean id="ftsIndexerJob" 
+        class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass">
+            <value>com.activiti.repo.search.impl.lucene.fts.FTSIndexerJob</value>
+        </property>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="bean">
+                    <ref bean="LuceneFullTextSearchIndexer"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+   
+   <bean id="ftsIndexerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+        <property name="jobDetail">
+            <ref local="ftsIndexerJob"/>
+        </property>
+        <property name="startDelay">
+            <value>10000</value>
+        </property>
+        <property name="repeatInterval">
+            <value>10000</value>
+        </property>
+   </bean>
+   
+   <bean id="scedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="triggers">
+        <list>
+            <ref local="ftsIndexerTrigger"/>
+        </list>
+    </property>
+   </bean>
 </beans>

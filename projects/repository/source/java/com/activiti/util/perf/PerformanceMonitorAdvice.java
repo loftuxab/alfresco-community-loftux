@@ -1,6 +1,7 @@
 package com.activiti.util.perf;
 
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedMap;
@@ -10,6 +11,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.vladium.utils.timing.ITimer;
+import com.vladium.utils.timing.TimerFactory;
 
 /**
  * An instance of this class keeps track of timings of method calls on a bean,
@@ -93,13 +97,21 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
     private Object invokeWithLogging(MethodInvocation invocation) throws Throwable
     {
         // get the time prior to call
-        long start = System.currentTimeMillis();
+        final ITimer timer = TimerFactory.newTimer ();
+        
+        
+        timer.start ();
+       
+
+        //long start = System.currentTimeMillis();
         // execute - do not record exceptions
         Object ret = invocation.proceed();
         // get time after call
-        long end = System.currentTimeMillis();
+        //long end = System.currentTimeMillis();
         // record the stats
-        recordStats(invocation.getMethod(), (end - start));
+        timer.stop ();
+       
+        recordStats(invocation.getMethod(),  timer.getDuration ());
         // done
         return ret;
     }
@@ -114,8 +126,13 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
      * @param method the method against which to store the results
      * @param delayMs
      */
-    private void recordStats(Method method, long delayMs)
+    private void recordStats(Method method, double delayMs)
     {
+        DecimalFormat format = new DecimalFormat ();
+        format.setMinimumFractionDigits (3);
+        format.setMaximumFractionDigits (3);
+
+        
         String methodName = method.getName();
         
         Log methodLogger = LogFactory.getLog("performance." + beanName + "." + methodName);
@@ -127,7 +144,7 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
         // must we log on a per-method call?
         if (methodSummaryLogger.isDebugEnabled())
         {
-            methodLogger.debug("Executed " + beanName + "#" + methodName + " in " + delayMs + "ms");
+            methodLogger.debug("Executed " + beanName + "#" + methodName + " in " + format.format(delayMs) + "ms");
         }
         if (vmSummaryLogger.isDebugEnabled())
         {
@@ -174,14 +191,14 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
     private class MethodStats
     {
         private int count;
-        private long totalTimeMs;
+        private double totalTimeMs;
         
         /**
          * Records the time for a method to execute and bumps up the execution count
          * 
          * @param delayMs the time the method took to execute in milliseconds
          */
-        public void record(long delayMs)
+        public void record(double delayMs)
         {
            count++;
            totalTimeMs += delayMs;
@@ -189,8 +206,11 @@ public class PerformanceMonitorAdvice  implements MethodInterceptor
         
         public String toString()
         {
-            long averageMs = totalTimeMs / (long) count;
-            return ("Executed " + count + " times, averaging " + averageMs + "ms per call");
+            DecimalFormat format = new DecimalFormat ();
+            format.setMinimumFractionDigits (3);
+            format.setMaximumFractionDigits (3);
+            double averageMs = totalTimeMs / (long) count;
+            return ("Executed " + count + " times, averaging " + format.format(averageMs) + "ms per call");
         }
     }
     

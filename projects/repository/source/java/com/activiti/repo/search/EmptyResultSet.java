@@ -47,4 +47,8 @@ public class EmptyResultSet implements ResultSet
         return dummy.iterator();
     }
 
+    public void close()
+    {
+
+    }
 }
