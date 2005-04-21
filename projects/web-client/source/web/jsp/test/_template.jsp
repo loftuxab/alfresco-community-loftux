@@ -16,7 +16,8 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <h:form id="browse">
+   <%-- REPLACE ME: set the form name here --%>
+   <h:form id="myform">
    
    <%-- Main outer table --%>
    <table cellspacing=0 cellpadding=2>
@@ -51,37 +52,21 @@
                      <table cellspacing=4 cellpadding=0 width=100%>
                         <tr valign=top>
                            <td width=26>
-                              <img src="<%=request.getContextPath()%>/images/ball_big.gif" width=26 height=27>
+                              <%-- REPLACE ME: icon here --%>
                            </td>
                            <td>
                               <%-- Summary --%>
-                              <p class="status">
-                                 Status and actions.
-                              </p>
-                              <p class="status">
-                                 Several text lines will probably appear here, some will be quite long. And maybe really long, it's difficult to say really at the start of things.
-                              </p>
-                              <p class="status">
-                                 Let's have some more text. And more.
-                              </p>
+                              <%-- REPLACE ME: summary here --%>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100 style="padding-left:2px">
                               <%-- Current object actions --%>
-                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
-                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" />
-                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" />
-                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" />
+                              <%-- REPLACE ME: object actions --%>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100>
                               <%-- Details View settings --%>
-                              <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
-                              <awc:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" value="0">
-                                 <awc:modeListItem value="0" label="List All Items" image="/images/icons/Details.gif" />
-                                 <awc:modeListItem value="1" label="Dashboard" />
-                                 <awc:modeListItem value="2" label="Browse Items" />
-                              </awc:modeList>
+                              <%-- REPLACE ME: views --%>
                            </td>
                         </tr>
                      </table>
@@ -106,7 +91,7 @@
                            <td>
                               <%-- Toolbar actions --%>
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "bluetoolbar", "#E9F0F4"); %>
-                                 [Toolbar Buttons]
+                                 <%-- REPLACE ME: toolbar actions --%>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
                            </td>
                         </tr>
@@ -121,7 +106,7 @@
                   <td height=300>
                      
                      <%-- Details inner components --%>
-                     ...Details...
+                     <%-- REPLACE ME: details components --%>
                      
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
@@ -138,10 +123,6 @@
           </td>
        </tr>
     </table>
-    
-    <%-- TEMP! --%>
-    <p>
-    <h:commandButton id="show-jump-page" value="Back To Jump Page" action="jumppage" />
     
     </h:form>
     
