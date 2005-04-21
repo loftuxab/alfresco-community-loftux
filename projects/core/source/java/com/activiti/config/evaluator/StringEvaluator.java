@@ -1,0 +1,31 @@
+package com.activiti.config.evaluator;
+
+import javax.faces.component.UIComponentBase;
+
+import com.activiti.config.evaluator.Evaluator;
+
+/**
+ * Evaluator that tests whether an object is equal to a string
+ * 
+ * @author gavinc
+ */
+public class StringEvaluator implements Evaluator
+{
+   /**
+    * Tests whether the given object is equal to the string given in the condition
+    * 
+    * @see com.activiti.config.evaluator.Evaluator#applies(java.lang.Object, java.lang.String)
+    */
+   public boolean applies(Object obj, String condition)
+   {
+      boolean result = false;
+      
+      if (obj instanceof String)
+      {
+         result = obj.toString().equals(condition);
+      }
+      
+      return result;
+   }
+
+}
