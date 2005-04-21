@@ -70,7 +70,7 @@ public class M2PropertyDefinition implements PropertyDefinition
         QName classQName = m2Property.getContainerClass().getQName();
         String classNamespaceUri = classQName.getNamespaceURI();
         String classLocalName = classQName.getLocalName();
-        String localName = classLocalName + DictionaryRef.NAME_SEPARATOR + m2Property.getName();
+        String localName = m2Property.getName();
         QName qname = QName.createQName(classNamespaceUri, localName);
         return qname;
     }

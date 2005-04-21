@@ -35,5 +35,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.resources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.xmi.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

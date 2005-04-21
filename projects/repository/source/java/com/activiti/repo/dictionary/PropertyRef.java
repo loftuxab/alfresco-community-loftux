@@ -30,8 +30,8 @@ public class PropertyRef extends DictionaryRef
      */
     public PropertyRef(ClassRef classRef, String propertyName)
     {
-        super(QName.createQName(classRef.getQName().getNamespaceURI(),
-                classRef.getQName().getLocalName() + NAME_SEPARATOR + propertyName));
+        super(QName.createQName(
+                classRef.getQName().getNamespaceURI(), propertyName));
         this.classRef = classRef;
         this.propertyName = propertyName;
     }
@@ -52,6 +52,5 @@ public class PropertyRef extends DictionaryRef
     public String getPropertyName()
     {
         return propertyName; 
-    }
-    
+    }    
 }

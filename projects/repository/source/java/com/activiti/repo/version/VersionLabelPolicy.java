@@ -3,6 +3,7 @@
  */
 package com.activiti.repo.version;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -23,5 +24,5 @@ public interface VersionLabelPolicy
     public String getVersionLabelValue(
             Version preceedingVersion, 
             int versionNumber, 
-            Map<String, String> versionProperties);
+            Map<String, Serializable> versionProperties);
 }

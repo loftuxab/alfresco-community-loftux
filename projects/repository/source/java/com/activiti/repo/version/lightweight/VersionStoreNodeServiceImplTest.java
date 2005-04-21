@@ -4,11 +4,14 @@
 package com.activiti.repo.version.lightweight;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.version.Version;
@@ -42,15 +45,31 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
     {
 		super.onSetUpInTransaction();
 		
+        // Get the node service by name
+        this.lightWeightVersionStoreNodeService = (NodeService)this.applicationContext.getBean("lightWeightVersionStoreNodeService");
+        
+        // Create some dummy data used during the tests
         this.dummyNodeRef = new NodeRef(
 				this.lightWeightVersionStoreVersionService.getVersionStoreReference(),
 				"dummy");
 		this.dummyQName = QName.createQName("{dummy}dummy");
     }
 	
+    /**
+     * Test getType
+     */
 	public void testGetType()
     {
-		// should work
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+	
+        // Get the type from the versioned state
+        ClassRef versionedType = this.lightWeightVersionStoreNodeService.getType(version.getNodeRef());
+        assertNotNull(versionedType);
+        assertEquals(this.dbNodeService.getType(versionableNode), versionedType);
     }
     
     /**
@@ -94,14 +113,60 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
         assertEquals(VALUE_1, value1);
     }
     
+    /**
+     * Test getChildAssocs
+     */
     public void testGetChildAssocs()
     {
-        // should work
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        Collection<ChildAssocRef> origionalChildren = this.dbNodeService.getChildAssocs(versionableNode);
+        assertNotNull(origionalChildren);
+        
+        // Store the origional children in a map for easy navigation later
+        HashMap<String, ChildAssocRef> origionalChildAssocRefs = new HashMap<String, ChildAssocRef>();
+        for (ChildAssocRef ref : origionalChildren)
+        {
+            origionalChildAssocRefs.put(ref.getChildRef().getId(), ref);
+        }
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+        
+        // Get the children of the versioned node
+        Collection<ChildAssocRef> versionedChildren = this.lightWeightVersionStoreNodeService.getChildAssocs(version.getNodeRef());
+        assertNotNull(versionedChildren);
+        assertEquals(origionalChildren.size(), versionedChildren.size());
+        
+//        for (ChildAssocRef versionedChildRef : versionedChildren)
+//        {
+//            ChildAssocRef origChildAssocRef = origionalChildAssocRefs.get(versionedChildRef.getChildRef().getId());
+//            assertNotNull(origChildAssocRef);
+//                        
+//            assertEquals(
+//                    origChildAssocRef.getChildRef(),
+//                    versionedChildRef.getChildRef());
+//            assertEquals(
+//                    origChildAssocRef.isPrimary(),
+//                    versionedChildRef.isPrimary());
+//            assertEquals(
+//                    origChildAssocRef.getNthSibling(),
+//                    versionedChildRef.getNthSibling());
+//        }
     }
     
+    /**
+     * Test getAssociationTargets
+     */
     public void testGetAssociationTargets()
     {
-        // should work
+//        // Create a new versionable node
+//        NodeRef versionableNode = createNewVersionableNode();
+//        
+//        // Create a new version
+//        Version version = createVersion(versionableNode, this.versionProperties);
+//        
+//        throw new UnsupportedOperationException("Test incomplete");
     }
 	
 	/** ================================================

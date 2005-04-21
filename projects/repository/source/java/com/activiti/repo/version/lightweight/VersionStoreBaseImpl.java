@@ -5,10 +5,10 @@ package com.activiti.repo.version.lightweight;
 
 import java.util.Collection;
 
+import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
-import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.Searcher;
 import com.activiti.repo.version.VersionService;
@@ -19,51 +19,8 @@ import com.activiti.repo.version.VersionService;
  * 
  * @author Roy Wetherall
  */
-public abstract class VersionStoreBaseImpl
+public abstract class VersionStoreBaseImpl implements VersionStoreConst
 {
-    /**
-     * Namespace
-     */
-    public static final String LW_VERSION_STORE_NAMESPACE = "uri://com.activiti/lightWeightVersionStore";
-    
-    /**
-     * Type names
-     */
-    public static final String TYPE_VERSION_HISTORY = "versionHistory";
-    public static final String TYPE_VERSION = "version";
-    
-    /**
-     * Attribute names
-     */
-    // The versioned node id, set on a version history node
-    public static final QName ATTR_VERSIONED_NODE_ID = QName.createQName(LW_VERSION_STORE_NAMESPACE, "versionedNodeId");
-	// The version label, set on a version node
-    public static final QName ATTR_VERSION_LABEL = QName.createQName(LW_VERSION_STORE_NAMESPACE, "versionLabel");
-    // The version number, set on a verison node
-    public static final QName ATTR_VERSION_NUMBER = QName.createQName(LW_VERSION_STORE_NAMESPACE, "versionNumber");
-    // The created date, set on a version node
-    public static final QName ATTR_VERSION_CREATED_DATE = QName.createQName(LW_VERSION_STORE_NAMESPACE, "createdDate");
-    // The origional id of the versioned node
-	public static final QName ATTR_FROZEN_NODE_ID = QName.createQName(LW_VERSION_STORE_NAMESPACE, "frozenNodeId");
-	// The node type of the versioned node
-	public static final QName ATTR_FROZEN_NODE_TYPE = QName.createQName(LW_VERSION_STORE_NAMESPACE, "frozenNodeType");
-	// The protocol of the store that the versioned node origionated from
-	public static final QName ATTR_FROZEN_NODE_STORE_PROTOCOL = QName.createQName(LW_VERSION_STORE_NAMESPACE, "frozenNodeStoreProtocol");
-	// The identifier of the store that the versioned node origionated from
-	public static final QName ATTR_FROZEN_NODE_STORE_ID = QName.createQName(LW_VERSION_STORE_NAMESPACE, "frozenNodeStoreId");
-    
-    /**
-     * Association names
-     */
-    public static final QName ASSOC_ROOT_VERSION = QName.createQName(LW_VERSION_STORE_NAMESPACE, "rootVersion");
-    public static final QName ASSOC_SUCCESSOR = QName.createQName(LW_VERSION_STORE_NAMESPACE, "successor");
-    
-    /**
-     * Child relationship names
-     */
-    public static final QName CHILD_VERSION_HISTORIES = QName.createQName(LW_VERSION_STORE_NAMESPACE, "versionHistory");
-    public static final QName CHILD_VERSIONS = QName.createQName(LW_VERSION_STORE_NAMESPACE, "version");
-    
     /**
      * The store protocol
      */
@@ -93,6 +50,11 @@ public abstract class VersionStoreBaseImpl
      * The repository searcher
      */
     private Searcher searcher = null;
+    
+    /**
+     * The dictionary service
+     */
+    protected DictionaryService dicitionaryService = null;
     
     /**
      * The version store root node reference
@@ -145,6 +107,16 @@ public abstract class VersionStoreBaseImpl
     }
     
     /**
+     * Sets the dictionary service
+     * 
+     * @param dictionaryService  the dictionary service
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dicitionaryService = dictionaryService;
+    }
+    
+    /**
      * Gets the reference to the version store
      * 
      * @return  reference to the version store
@@ -164,40 +136,12 @@ public abstract class VersionStoreBaseImpl
     {
         NodeRef result = null;
         
-        // TODO for now get the version history node by hand, since objects added in this transaction
-        //      can not be found 
-        
-        //String strQueryString = 
-        //    "@\\{" +
-        //    LW_VERSION_STORE_NAMESPACE +
-        //    "\\}" +
-        //    ATTR_VERSIONED_NODE_ID.getLocalName() +
-        //    ":" +
-        //    nodeRef.getId();
-        
-        // Execute query to find the verison history object
-        //ResultSet results = searcher.query(
-        //        getVersionStoreReference(), 
-        //        "lucene", 
-        //        strQueryString, 
-        //        null, 
-        //        null);
-        
-        //if (results.length() == 1)
-        //{
-            // Get a reference to the version history node
-        //    result = results.getNodeRef(0);
-        //}
-        //else if (results.length() > 1)
-        //{
-            // Error since there should only be one version history node per node id
-        //    throw new VersionServiceException(ERR_MSG);
-        //}
+        // TODO use the sercher to retrieve the version history node
         
         Collection<ChildAssocRef> versionHistories = this.dbNodeService.getChildAssocs(this.versionStoreRootNodeRef);
         for (ChildAssocRef versionHistory : versionHistories)
         {
-            String nodeId = (String)this.dbNodeService.getProperty(versionHistory.getChildRef(), ATTR_VERSIONED_NODE_ID);
+            String nodeId = (String)this.dbNodeService.getProperty(versionHistory.getChildRef(), PROP_QNAME_VERSIONED_NODE_ID);
             if (nodeId != null && nodeId.equals(nodeRef.getId()) == true)
             {
                 result = versionHistory.getChildRef();
@@ -219,13 +163,15 @@ public abstract class VersionStoreBaseImpl
      */
     protected NodeRef getCurrentVersionNodeRef(NodeRef versionHistory, NodeRef nodeRef)
     {
+        // TODO use the searcher to retrieve the version node
+        
         NodeRef result = null;
         String versionLabel = (String)this.nodeService.getProperty(nodeRef, VersionService.ATTR_CURRENT_VERSION_LABEL);
         
         Collection<ChildAssocRef> versions = this.dbNodeService.getChildAssocs(versionHistory);
         for (ChildAssocRef version : versions)
         {
-            String tempLabel = (String)this.dbNodeService.getProperty(version.getChildRef(), ATTR_VERSION_LABEL);
+            String tempLabel = (String)this.dbNodeService.getProperty(version.getChildRef(), PROP_QNAME_VERSION_LABEL);
             if (tempLabel != null && tempLabel.equals(versionLabel) == true)
             {
                 result = version.getChildRef(); 

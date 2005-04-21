@@ -5,9 +5,10 @@
  */
 package com.activiti.repo.version;
 
+import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
@@ -27,7 +28,12 @@ public interface VersionService
     /**
      * Version namespace
      */
-    public static final String VERSION_NAMESPACE = "uri://com.activiti/version";
+    public static final String VERSION_NAMESPACE =  "http://www.activiti.com/version/1.0";
+    
+    /**
+     * Aspect name
+     */
+    public static final QName ASPECT_VERSION = QName.createQName(VERSION_NAMESPACE, "version");
     
     /**
      * The current version label attribute name
@@ -57,8 +63,12 @@ public interface VersionService
      * @param versionProperties  the version properties that are stored with the newly created
      *                           version
      * @return                   the created version object
+     * @throws                   ReservedVersionNameException 
      */
-    public Version createVersion(NodeRef nodeRef, Map<String, String> versionProperties);
+    public Version createVersion(
+            NodeRef nodeRef, 
+            Map<String, Serializable> versionProperties)
+            throws ReservedVersionNameException;
 
     /**
      * Creates a new version based on the referenced node.
@@ -78,9 +88,13 @@ public interface VersionService
      * @param versionChildren    if true then the children of the referenced node are also
      *                           versioned, false otherwise
      * @return                   the created version object(s)
+     * @throws                   ReservedVersionNameException 
      */
-    public Collection<Version> createVersion(NodeRef nodeRef, Map<String, String> versionProperties,
-            boolean versionChildren);
+    public Collection<Version> createVersion(
+            NodeRef nodeRef, 
+            Map<String, Serializable> versionProperties,
+            boolean versionChildren)
+            throws ReservedVersionNameException;
 
     /**
      * Creates new versions based on the list of node references provided.
@@ -88,8 +102,12 @@ public interface VersionService
      * @param nodeRefs           a list of node references
      * @param versionProperties  version property values
      * @return                   a collection of newly created versions
+     * @throws                   ReservedVersionNameException 
      */
-    public Collection<Version> createVersion(List<NodeRef> nodeRefs, Map<String, String> versionProperties);
+    public Collection<Version> createVersion(
+            Collection<NodeRef> nodeRefs, 
+            Map<String, Serializable> versionProperties)
+            throws ReservedVersionNameException;
 
     /**
      * Gets the version history information for a node.
@@ -104,6 +122,5 @@ public interface VersionService
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef);       
 
-    //TODO getState
-    //TODO restore ... 
+    // TODO figure out what is still missing, eg restore, getState ...
 }

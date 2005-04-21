@@ -1,5 +1,6 @@
 package com.activiti.repo.version.common;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,10 +37,23 @@ public class VersionHistoryImplTest extends TestCase
         // Create dummy node ref
         NodeRef nodeRef = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test"), "test");
         
-        // Create the versions
-        this.rootVersion = new VersionImpl("1", new Date(), new HashMap<String, String>(), nodeRef);
-        this.childVersion1 = new VersionImpl("2", new Date(), new HashMap<String, String>(), nodeRef);
-        this.childVersion2 = new VersionImpl("3", new Date(), new HashMap<String, String>(), nodeRef);                
+        HashMap<String, Serializable> versionProperties1 = new HashMap<String, Serializable>();
+        versionProperties1.put(Version.PROP_VERSION_LABEL, "1");
+        versionProperties1.put(Version.PROP_CREATED_DATE, new Date());
+        versionProperties1.put("testProperty", "testValue");
+        this.rootVersion = new VersionImpl(versionProperties1, nodeRef);
+        
+        HashMap<String, Serializable> versionProperties2 = new HashMap<String, Serializable>();
+        versionProperties2.put(Version.PROP_VERSION_LABEL, "2");
+        versionProperties2.put(Version.PROP_CREATED_DATE, new Date());
+        versionProperties2.put("testProperty", "testValue");
+        this.childVersion1 = new VersionImpl(versionProperties2, nodeRef);
+        
+        HashMap<String, Serializable> versionProperties3 = new HashMap<String, Serializable>();
+        versionProperties3.put(Version.PROP_VERSION_LABEL, "3");
+        versionProperties3.put(Version.PROP_CREATED_DATE, new Date());
+        versionProperties3.put("testProperty", "testValue");
+        this.childVersion2 = new VersionImpl(versionProperties3, nodeRef);                
     }
 
     /**
@@ -102,7 +116,7 @@ public class VersionHistoryImplTest extends TestCase
         
         Collection<Version> allVersions = vh.getAllVersions();
         assertNotNull(allVersions);
-        assertEquals(allVersions.size(), 3);
+        assertEquals(3, allVersions.size());
     }
     
     /**
@@ -132,8 +146,11 @@ public class VersionHistoryImplTest extends TestCase
     }
     
     /**
-     * Exception case - add version that has already been added 
-     * TODO
+     * TODO Exception case - add version that has already been added
+     */
+    
+    /**
+     * TODO Exception case - add a version with a duplicate version label
      */
     
     /**

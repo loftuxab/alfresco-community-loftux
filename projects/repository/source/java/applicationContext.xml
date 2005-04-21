@@ -280,11 +280,53 @@
 	</bean>
     
  
+   <!--                               -->
+   <!--  Simple Lock Service           -->
+   <!--                               -->
    
+   <bean id='simpleLockService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.lock.LockService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.lock.simple.SimpleLockService">
+            <property name="nodeService">
+               <!-- TODO This should point to the general node service -->	
+               <ref bean="dbNodeService" />
+            </property>         
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <!-- TODO does this need to be a transaction proxy factory bean? -->
+   <bean id="lockInterceptor" class="com.activiti.repo.lock.LockServiceInterceptor">
+		<property name="lockService">
+			<ref bean="simpleLockService"></ref>
+		</property>	
+   </bean>
    
    <!--                               -->
    <!--  Light Weight Version Store   -->
    <!--                               -->
+   
+   <bean id="versionServiceLockIntercepter" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice">
+        <ref local="lockInterceptor"/>
+		</property>
+		<property name="patterns">
+        	<list>
+				<value>.*createVersion</value>
+			</list>
+		</property>
+	</bean>
    
    <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
@@ -299,21 +341,29 @@
             <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
             </property>
-            <property name="dbNodeService">
-               <ref bean="dbNodeService" />
-            </property>
-            <property name="versionCounterDaoService">
-               <ref bean="versionCounterDaoService"/>
-            </property>
-            <property name="searcher">
-               <ref bean="searcherComponent"/>
-            </property>
+         	<property name="dbNodeService">
+				   <ref bean="dbNodeService" />
+				</property>
+			 <property name="versionCounterDaoService">
+				<ref bean="versionCounterDaoService"/>
+			 </property>
+			 <property name="searcher">
+				<ref bean="searcherComponent"/>
+			 </property>		 
+			 <property name="dictionaryService">
+			   <ref bean="dictionaryService" />
+			 </property>
          </bean>
       </property>
       <property name="transactionAttributes">
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
+      </property>
+	  <property name="postInterceptors">
+         <list>
+            <ref bean="versionServiceLockIntercepter" />
+         </list>
       </property>
    </bean>
    
@@ -326,16 +376,19 @@
       </property>
       <property name="target">
          <bean class="com.activiti.repo.version.lightweight.VersionStoreNodeServiceImpl" init-method="initialise">
-            <property name="nodeService">
-            <!-- TODO This should point to the general node service -->	
-               <ref bean="dbNodeService" />
-            </property>
-            <property name="dbNodeService">
-               <ref bean="dbNodeService" />
-            </property>
-            <property name="searcher">
-               <ref bean="searcherComponent"/>
-            </property>
+			 <property name="nodeService">
+				<!-- TODO This should point to the general node service -->	
+				<ref bean="dbNodeService" />
+			 </property>
+			 <property name="dbNodeService">
+				<ref bean="dbNodeService" />
+			 </property>
+			 <property name="searcher">
+				<ref bean="searcherComponent"/>
+			 </property>		 
+			 <property name="dictionaryService">
+			   <ref bean="dictionaryService" />
+			 </property>
          </bean>
       </property>
       <property name="transactionAttributes">

@@ -4,6 +4,7 @@
  */
 package com.activiti.repo.version.common;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
@@ -33,35 +34,21 @@ public class VersionImpl implements Version
     /**
      * The properties of the version
      */
-    private Map<String, String> versionProperties = null;
+    private Map<String, Serializable> versionProperties = null;
     
     /**
      * The node reference that represents the frozen state of the versioned object
      */
-    private NodeRef nodeRef = null;    
-    
-    /**
-     * The version label
-     */
-    private String versionLabel = null;
-    
-    /**
-     * The created date of the version
-     */
-    private Date createdDate = null;
+    private NodeRef nodeRef = null;        
     
     /**
      * Constructor that initialises the state of the version object.
      * 
-     * @param versionLabel
-     * @param createddate
-     * @param versionProperties
-     * @param nodeRef
+     * @param  versionProperties  the version properties
+     * @param  nodeRef            the forzen state node reference
      */
     public VersionImpl(
-            String versionLabel, 
-            Date createdDate, 
-            Map<String, String> versionProperties, 
+            Map<String, Serializable> versionProperties, 
             NodeRef nodeRef)
     {
         if (nodeRef == null)
@@ -70,10 +57,6 @@ public class VersionImpl implements Version
             throw new VersionServiceException(VersionImpl.ERR_NO_NODE_REF);
         }
         
-        // TODO A version label and createdDate must also be set
-        
-        this.versionLabel = versionLabel;
-        this.createdDate = createdDate;
         this.versionProperties = versionProperties;
         this.nodeRef = nodeRef;        
     }
@@ -86,7 +69,7 @@ public class VersionImpl implements Version
      */
     public Date getCreatedDate()
     {
-        return this.createdDate;
+        return (Date)this.versionProperties.get(PROP_CREATED_DATE);
     }
 
     /**
@@ -96,7 +79,7 @@ public class VersionImpl implements Version
      */
     public String getVersionLabel()
     {
-        return this.versionLabel;
+        return (String)this.versionProperties.get(PROP_VERSION_LABEL);
     }
     
     /**
@@ -104,7 +87,7 @@ public class VersionImpl implements Version
      * 
      * @return  the map containing the version properties
      */
-    public Map<String, String> getVersionProperties()
+    public Map<String, Serializable> getVersionProperties()
     {
         return this.versionProperties;
     }
@@ -116,9 +99,9 @@ public class VersionImpl implements Version
      * @return the value of the property, null if the property is undefined.
      * 
      */
-    public String getVersionProperty(String name)
+    public Serializable getVersionProperty(String name)
     {
-        String result = null;
+        Serializable result = null;
         if (this.versionProperties != null)
         {
             result = this.versionProperties.get(name);

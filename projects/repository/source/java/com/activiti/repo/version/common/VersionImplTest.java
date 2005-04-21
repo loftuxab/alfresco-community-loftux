@@ -4,12 +4,14 @@
  */
 package com.activiti.repo.version.common;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionServiceException;
 
 import junit.framework.TestCase;
@@ -41,7 +43,7 @@ public class VersionImplTest extends TestCase
      */
     private VersionImpl version = null;
     private NodeRef nodeRef = null;
-    private Map<String, String> versionProperties = null;
+    private Map<String, Serializable> versionProperties = null;
     private Date createdDate = new Date();
 
     /**
@@ -56,13 +58,15 @@ public class VersionImplTest extends TestCase
         assertNotNull(this.nodeRef);
         
         // Create the version property map
-        this.versionProperties = new HashMap<String, String>();
+        this.versionProperties = new HashMap<String, Serializable>();
+        this.versionProperties.put(Version.PROP_VERSION_LABEL, VersionImplTest.VERSION_1);
+        this.versionProperties.put(Version.PROP_CREATED_DATE, this.createdDate);
         this.versionProperties.put(VersionImplTest.PROP_1, VersionImplTest.VALUE_1);
         this.versionProperties.put(VersionImplTest.PROP_2, VersionImplTest.VALUE_2);
         this.versionProperties.put(VersionImplTest.PROP_3, VersionImplTest.VALUE_3);
         
         // Create the root version
-        this.version = new VersionImpl(VersionImplTest.VERSION_1, this.createdDate, this.versionProperties, this.nodeRef);
+        this.version = new VersionImpl(this.versionProperties, this.nodeRef);
         assertNotNull(this.version);
     }
     
@@ -91,7 +95,7 @@ public class VersionImplTest extends TestCase
      */
     public void testGetVersionProperties()
     {
-        Map<String, String> versionProperties = version.getVersionProperties();
+        Map<String, Serializable> versionProperties = version.getVersionProperties();
         assertNotNull(versionProperties);
         assertEquals(this.versionProperties.size(), versionProperties.size());
     }
@@ -101,13 +105,13 @@ public class VersionImplTest extends TestCase
      */
     public void testGetVersionProperty()
     {
-        String value1 = version.getVersionProperty(VersionImplTest.PROP_1);
+        String value1 = (String)version.getVersionProperty(VersionImplTest.PROP_1);
         assertEquals(value1, VersionImplTest.VALUE_1);
         
-        String value2 = version.getVersionProperty(VersionImplTest.PROP_2);
+        String value2 = (String)version.getVersionProperty(VersionImplTest.PROP_2);
         assertEquals(value2, VersionImplTest.VALUE_2);
         
-        String value3 = version.getVersionProperty(VersionImplTest.PROP_3);
+        String value3 = (String)version.getVersionProperty(VersionImplTest.PROP_3);
         assertEquals(value3, VersionImplTest.VALUE_3);
     }
 
@@ -128,12 +132,11 @@ public class VersionImplTest extends TestCase
     {
         try
         {
-            VersionImpl badVersion = new VersionImpl(VersionImplTest.VERSION_1, new Date(), this.versionProperties, null);
+            VersionImpl badVersion = new VersionImpl(this.versionProperties, null);
             fail("It is invalid to create a version object without a node ref specified.");
         }
         catch (VersionServiceException exception)
         {
         }
-    }
-
+    }    
 }

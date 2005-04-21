@@ -25,7 +25,7 @@ public class DictionaryRef extends NodeRef
     /**
      * Qualified name seperator
      */
-    public static final String NAME_SEPARATOR = "-";
+    //public static final String NAME_SEPARATOR = "-";
     
     /**
      * Qualified name of meta definition

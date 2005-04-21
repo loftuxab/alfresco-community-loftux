@@ -4,12 +4,14 @@
 package com.activiti.repo.version.lightweight;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidAspectException;
 import com.activiti.repo.node.InvalidNodeRefException;
@@ -23,7 +25,7 @@ import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 
 /**
- * THe light weight version store node service implementation.
+ * The light weight version store node service implementation.
  * 
  * @author Roy Wetherall
  */
@@ -135,8 +137,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
      */
     public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
-		// TODO
-        throw new UnsupportedOperationException();
+		return (ClassRef)this.dbNodeService.getProperty(nodeRef, VersionStoreBaseImpl.PROP_QNAME_FROZEN_NODE_TYPE);
     }
     
     public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
@@ -165,15 +166,24 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
     {
 		Map<QName, Serializable> result = new HashMap<QName, Serializable>();
-		Map<QName, Serializable> versionNodeProperties = this.dbNodeService.getProperties(nodeRef);
-		for (QName key : versionNodeProperties.keySet())
+		
+        // TODO should be doing this using a path query ..
+        
+        Collection<ChildAssocRef> children = this.dbNodeService.getChildAssocs(nodeRef);
+        for (ChildAssocRef child : children)
         {
-			// Do not return the version store properties
-            if (VersionStoreBaseImpl.LW_VERSION_STORE_NAMESPACE.equals(key.getNamespaceURI()) == false)
-			{
-				result.put(key, versionNodeProperties.get(key));
-			}
-        }
+            if (child.getName().equals(CHILD_QNAME_VERSIONED_ATTRIBUTES))
+            {
+                NodeRef versionedAttribute = child.getChildRef();
+                
+                // Get the QName and the value
+                QName qName = (QName)this.dbNodeService.getProperty(versionedAttribute, PROP_QNAME_QNAME);
+                Serializable value = this.dbNodeService.getProperty(versionedAttribute, PROP_QNAME_VALUE);
+                
+                result.put(qName, value);
+            }
+        }        
+        
 		return result;
     }
     
@@ -181,16 +191,11 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
      * Property translation for version store
      */
     public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException
-    {
-        Serializable result = null;
-		
-		// Ignore propreties that relate to the version store
-		if (VersionStoreBaseImpl.LW_VERSION_STORE_NAMESPACE.equals(qname.getNamespaceURI()) == false)
-		{
-			result = this.dbNodeService.getProperty(nodeRef, qname);
-		}
-		
-		return result;
+    {        
+        // TODO should be doing this with a search ...
+        
+        Map<QName, Serializable> properties = getProperties(nodeRef);
+        return properties.get(qname);			
     }
     
     /**
@@ -225,8 +230,40 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
      */
     public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        // TODO
-        throw new UnsupportedOperationException();
+        Collection<ChildAssocRef> result = new ArrayList<ChildAssocRef>();
+        
+        // Get the child assocs from the version store
+        Collection<ChildAssocRef> childAssocRefs = this.dbNodeService.getChildAssocs(nodeRef);
+        if (childAssocRefs.isEmpty() == false)
+        {
+            for (ChildAssocRef childAssocRef : childAssocRefs)
+            {
+                if (childAssocRef.getName().equals(CHILD_QNAME_VERSIONED_CHILD_ASSOCS))
+                {
+                    // Get the child reference
+                    NodeRef childRef = childAssocRef.getChildRef();
+                    NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
+                    
+                    // TODO if the referenced node is a version history then need to get the appropriate node ref                        
+                    
+                    // Retrieve the isPrimary and nthSibling values of the forzen child association
+                    QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_QNAME);
+                    boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
+                    int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
+                    
+                    // Build a child assoc ref to add to the returned list
+                    ChildAssocRef newChildAssocRef = new ChildAssocRef(
+                            nodeRef, 
+                            qName, 
+                            referencedNode, 
+                            isPrimary, 
+                            nthSibling);
+                    result.add(newChildAssocRef);
+                }
+            }
+        }
+        
+        return result;
     }
     
     /**
@@ -264,8 +301,11 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname)
             throws InvalidNodeRefException
     {
-        // TODO 
-        throw new UnsupportedOperationException();
+        // TODO in order to do this we need to be able to get a list of the
+        //      names of the target associations
+        
+        // TODO need to fill in the implementation here 
+        throw new UnsupportedOperationException();        
     }
     
     /**

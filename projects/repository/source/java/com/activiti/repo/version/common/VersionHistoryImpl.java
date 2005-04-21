@@ -159,9 +159,12 @@ public class VersionHistoryImpl implements VersionHistory
     }
     
     /**
+     * Add a version to the version history.
+     * <p>
+     * Used internally to build the version history tree.
      * 
-     * @param version
-     * @param predecessor
+     * @param version       the version object
+     * @param predecessor   the preceeding version
      */
     public void addVersion(Version version, Version predecessor)
     {

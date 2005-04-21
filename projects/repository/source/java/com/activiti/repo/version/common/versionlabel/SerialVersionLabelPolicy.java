@@ -3,6 +3,7 @@
  */
 package com.activiti.repo.version.common.versionlabel;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import com.activiti.repo.version.Version;
@@ -26,8 +27,9 @@ public class SerialVersionLabelPolicy implements VersionLabelPolicy
     public String getVersionLabelValue(
             Version preceedingVersion, 
             int versionNumber, 
-            Map<String, String> versionProperties)
+            Map<String, Serializable> versionProperties)
     {
+        // TODO fill in this example implementation
         throw new UnsupportedOperationException();
     }
 }

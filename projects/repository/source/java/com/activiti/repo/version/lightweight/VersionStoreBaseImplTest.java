@@ -27,8 +27,13 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
      * Data used by tests
      */
     protected NodeRef rootNodeRef = null;
-    protected Map<String,String> versionProperties = null;
+    protected Map<String, Serializable> versionProperties = null;
     protected HashMap<QName, Serializable> nodeProperties = null;
+    
+    /**
+     * The most recent set of versionable nodes created by createVersionableNode
+     */
+    protected HashMap<String, NodeRef> versionableNodes = null;
     
     /*
      * Proprety names and values
@@ -42,22 +47,19 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
 	protected final static String VALUE_1 = "value1";
 	protected final static String VALUE_2 = "value2";
 	protected final static String VALUE_3 = "value3";  
-	
-	/**
-	 * Constructor.  Auto-wire by name is required due to type conflicts
-	 */
-	public VersionStoreBaseImplTest()
-	{
-		setPopulateProtectedVariables(true);
-	}
     
     /**
      * Called during the transaction setup
      */
     protected void onSetUpInTransaction() throws Exception
     {
+        // Get the services by name from the application context
+        this.dbNodeService = (NodeService)applicationContext.getBean("dbNodeService");
+        this.lightWeightVersionStoreVersionService = (VersionService)applicationContext.getBean("lightWeightVersionStoreVersionService");
+        this.versionCounterDaoService = (VersionCounterDaoService)applicationContext.getBean("versionCounterDaoService");
+        
         // Create a bag of properties for later use
-        this.versionProperties = new HashMap<String, String>();
+        this.versionProperties = new HashMap<String, Serializable>();
         versionProperties.put(VERSION_PROP_1, VALUE_1);
         versionProperties.put(VERSION_PROP_2, VALUE_2);
         versionProperties.put(VERSION_PROP_3, VALUE_3);
@@ -74,18 +76,6 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         // Get a reference to the root node
         this.rootNodeRef = this.dbNodeService.getRootNode(storeRef);
     }
-	
-	public void testGetVersionStoreReference() 
-	{
-	}
-
-	public void testGetVersionHistoryNodeRef() 
-	{
-	}
-
-	public void testGetCurrentVersionNodeRef() 
-	{
-	}
     
     /**
      * Creates a new versionable node
@@ -94,12 +84,35 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
      */
     protected NodeRef createNewVersionableNode()
     {
+        // Use this map to retrive the versionable nodes in later tests
+        this.versionableNodes = new HashMap<String, NodeRef>();
+        
+        // Create node 
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
                 QName.createQName("{}MyVersionableNode"), 
                 DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
         assertNotNull(nodeRef);
+        this.versionableNodes.put(nodeRef.getId(), nodeRef);
+        
+        // Add some children to the node
+        NodeRef child1 = this.dbNodeService.createNode(
+                nodeRef,
+                QName.createQName("{}ChildNode1"),
+                DictionaryBootstrap.TYPE_CONTAINER,
+                this.nodeProperties).getChildRef();
+        assertNotNull(child1);
+        this.versionableNodes.put(child1.getId(), child1);
+        NodeRef child2 = this.dbNodeService.createNode(
+                nodeRef,
+                QName.createQName("{}ChildNode2"),
+                DictionaryBootstrap.TYPE_CONTAINER,
+                this.nodeProperties).getChildRef();
+        assertNotNull(child2);
+        this.versionableNodes.put(child2.getId(), child2);
+        
+        // TODO add some associations to the node
         
         return nodeRef;
     }
@@ -124,7 +137,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
      * @param versionProperties  the version properties
      * @return                   the created (and checked) new version
      */
-    protected Version createVersion(NodeRef versionableNode, Map<String, String> versionProperties)
+    protected Version createVersion(NodeRef versionableNode, Map<String, Serializable> versionProperties)
     {
         // Get the next version number
         // TODO this check of the version number presumes the default version label policy
@@ -135,10 +148,29 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         
         // Now lets create a new version for this node
         Version newVersion = lightWeightVersionStoreVersionService.createVersion(versionableNode, this.versionProperties);
+        checkNewVersion(beforeVersionTime, nextVersion, newVersion, versionableNode);
+        
+        // Return the new version
+        return newVersion;
+    }
+    
+    /**
+     * Checkd the validity of a new version
+     * 
+     * @param beforeVersionTime     the time snap shot before the version was created
+     * @param expectedVersionNumber the expected version number
+     * @param newVersion            the new version
+     * @param versionableNode       the versioned node
+     */
+    protected void checkNewVersion(long beforeVersionTime, int expectedVersionNumber, Version newVersion, NodeRef versionableNode)
+    {
         assertNotNull(newVersion);
         
         // Check the version label
-        assertEquals(Integer.toString(nextVersion), newVersion.getVersionLabel());
+        assertEquals(
+                "The expected version number was not used.",
+                Integer.toString(expectedVersionNumber), 
+                newVersion.getVersionLabel());
         
         // Check the created date
         long afterVersionTime = System.currentTimeMillis();
@@ -149,9 +181,9 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         }
         
         // Check the properties of the verison
-        Map<String, String> props = newVersion.getVersionProperties();
-        assertNotNull(props);
-        // TODO sort this out
+        Map<String, Serializable> props = newVersion.getVersionProperties();
+        assertNotNull("The version properties collection should not be null.", props);
+        // TODO sort this out - need to check for the reserved properties too
         //assertEquals(versionProperties.size(), props.size());
         for (String key : versionProperties.keySet())
         {
@@ -173,9 +205,6 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
                 versionableNode,
                 VersionService.ATTR_CURRENT_VERSION_LABEL);
         assertEquals(newVersion.getVersionLabel(), currentVersionLabel);
-        
-        // Return the new version
-        return newVersion;
     }
     
     /**

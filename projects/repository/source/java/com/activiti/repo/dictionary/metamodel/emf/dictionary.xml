@@ -25,7 +25,7 @@
   </datadictionary:EMFAspect>
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}base"/>
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}reference" emfSuperClass="/20">
-    <emfProperties emfName="reference" emfType="/7" emfMandatory="true"/>
+    <emfProperties emfName="reference" emfType="/6" emfMandatory="true"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}content" emfSuperClass="/20" emfDefaultAspects="/19"/>
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}container" emfSuperClass="/20">
@@ -35,15 +35,36 @@
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}file" emfSuperClass="/22"/>
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}folder" emfSuperClass="/20"/>
-  <datadictionary:EMFType emfName="{uri://com.activiti/lightWeightVersionStore}version">
+  <datadictionary:EMFAspect emfName="{http://www.activiti.com/lock/1.0}lock">
+    <emfProperties emfName="lockOwner" emfType="/6"/>
+  </datadictionary:EMFAspect>
+  <datadictionary:EMFAspect emfName="{http://www.activiti.com/version/1.0}version">
+    <emfProperties emfName="currentVersionLabel" emfType="/7"/>
+  </datadictionary:EMFAspect>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}versionedAttribute" emfSuperClass="/20">
+    <emfProperties emfName="qname" emfType="/6" emfMandatory="true"/>
+    <emfProperties emfName="value" emfType="/6" emfMandatory="true"/>
+  </datadictionary:EMFType>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}versionedChildAssoc" emfSuperClass="/21">
+    <emfProperties emfName="isPrimary" emfType="/15" emfMandatory="true"/>
+    <emfProperties emfName="assocQName" emfType="/6" emfMandatory="true"/>
+    <emfProperties emfName="nthSibling" emfType="/9" emfMandatory="true"/>
+  </datadictionary:EMFType>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}version" emfSuperClass="/23">
     <emfProperties emfName="versionNumber" emfType="/9" emfMandatory="true"/>
     <emfProperties emfName="versionLabel" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="createdDate" emfType="/13" emfMandatory="true"/>
-    <emfAssociations emfName="successor" emfRequiredToClasses="/26"/>
+    <emfProperties emfName="frozenNodeId" emfType="/17" emfMandatory="true"/>
+    <emfProperties emfName="frozenNodeStoreId" emfType="/17" emfMandatory="true"/>
+    <emfProperties emfName="frozenNodeStoreProtocol" emfType="/7" emfMandatory="true"/>
+    <emfProperties emfName="frozenNodeType" emfType="/7" emfMandatory="true"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedAttributes"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedChildAssocs"/>
+    <emfAssociations emfName="successor" emfRequiredToClasses="/30"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{uri://com.activiti/lightWeightVersionStore}versionHistory">
+  <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}versionHistory" emfSuperClass="/23">
     <emfProperties emfName="versionedNodeId" emfType="/17" emfMandatory="true"/>
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/26"/>
-    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/26"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/30"/>
+    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/30"/>
   </datadictionary:EMFType>
 </xmi:XMI>

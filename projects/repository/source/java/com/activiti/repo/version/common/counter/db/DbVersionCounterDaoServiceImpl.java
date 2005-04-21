@@ -18,6 +18,8 @@ import com.activiti.repo.version.common.counter.VersionCounterDaoService;
  */
 public class DbVersionCounterDaoServiceImpl implements VersionCounterDaoService
 {
+    // TODO these queries need to moved to a query register at some point
+    
     /**
      * SQL - create table
      */

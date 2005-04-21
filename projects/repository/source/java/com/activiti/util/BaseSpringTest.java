@@ -6,7 +6,12 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
- * Base test class providing Hibernate sessions
+ * Base test class providing Hibernate sessions.
+ * <p>
+ * By default this is auto-wired by type. If a this is going to 
+ * result in a conlict the use auto-wire by name.  This can be done by
+ * setting populateProtectedVariables to true in the constructor and 
+ * then adding protected members with the same name as the bean you require.
  * 
  * @author Derek Hulley
  */
@@ -15,12 +20,16 @@ public abstract class BaseSpringTest extends AbstractTransactionalDataSourceSpri
     /** protected so that it gets populated if autowiring is done by variable name **/
     protected SessionFactory sessionFactory;
     
+	/**
+	 * Constructor
+	 */
     public BaseSpringTest()
     {
     }
     
     /**
      * Setter present for in case autowiring is done by type
+     * 
      * @param sessionFactory
      */
     public void setSessionFactory(SessionFactory sessionFactory)
@@ -48,6 +57,11 @@ public abstract class BaseSpringTest extends AbstractTransactionalDataSourceSpri
         getSession().clear();
     }
 
+	/**
+	 * Get the config locations
+	 * 
+	 * @return  an array containing the config locations
+	 */
     protected String[] getConfigLocations()
     {
         if (logger.isDebugEnabled())

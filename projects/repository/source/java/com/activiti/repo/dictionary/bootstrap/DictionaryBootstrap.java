@@ -5,10 +5,12 @@ import java.io.File;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryException;
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.metamodel.M2Aspect;
 import com.activiti.repo.dictionary.metamodel.M2Association;
 import com.activiti.repo.dictionary.metamodel.M2ChildAssociation;
+import com.activiti.repo.dictionary.metamodel.M2Class;
 import com.activiti.repo.dictionary.metamodel.M2NamespacePrefix;
 import com.activiti.repo.dictionary.metamodel.M2NamespaceURI;
 import com.activiti.repo.dictionary.metamodel.M2Property;
@@ -19,8 +21,11 @@ import com.activiti.repo.dictionary.metamodel.NamespaceDAO;
 import com.activiti.repo.dictionary.metamodel.emf.EMFMetaModelDAO;
 import com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceDAO;
 import com.activiti.repo.dictionary.metamodel.emf.EMFResource;
+import com.activiti.repo.lock.LockService;
 import com.activiti.repo.ref.QName;
-import com.activiti.repo.version.lightweight.VersionStoreBaseImpl;
+import com.activiti.repo.version.Version;
+import com.activiti.repo.version.VersionService;
+import com.activiti.repo.version.lightweight.VersionStoreConst;
 import com.activiti.util.debug.CodeMonkey;
 
 /**
@@ -29,18 +34,31 @@ import com.activiti.util.debug.CodeMonkey;
  * @author David Caruana
  */
 public class DictionaryBootstrap
-{
-    // expected bootstrap types
+{   
+    // Base type constants
     public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ACTIVITI_URI, "base");
+    public static final ClassRef TYPE_BASE = new ClassRef(TYPE_QNAME_BASE);
+    
+    // Referenceable aspect constants
     public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ACTIVITI_URI, "reference");
+    public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE);
+    public static final String PROP_REFERENCE = "reference";
+    public static final QName PROP_QNAME_REFERENCE = QName.createQName(NamespaceService.ACTIVITI_URI, PROP_REFERENCE);
+        
+    // Container type constants
     public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ACTIVITI_URI, "container");
-    public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "content");
-    public static final QName ASPECT_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "aspect_content");
-    public static final ClassRef TYPE_BASE = new ClassRef(TYPE_QNAME_BASE); 
-    public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE); 
     public static final ClassRef TYPE_CONTAINER = new ClassRef(TYPE_QNAME_CONTAINER);
-    public static final ClassRef TYPE_CONTENT = new ClassRef(TYPE_QNAME_CONTENT);
+    public static final QName CHILD_ASSOC_CONTENTS = QName.createQName(NamespaceService.ACTIVITI_URI, "contents");
+
+    // Content aspect constants
+    public static final QName ASPECT_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "aspect_content");
+    public static final String PROP_ENCODING = "encoding";
+    public static final String PROP_MIME_TYPE = "mimetype";
     public static final ClassRef ASPECT_CONTENT = new ClassRef(ASPECT_QNAME_CONTENT);
+    
+    // Content type constants
+    public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "content");
+    public static final ClassRef TYPE_CONTENT = new ClassRef(TYPE_QNAME_CONTENT);
     
     // expected application types
     public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_URI, "folder");
@@ -213,11 +231,11 @@ public class DictionaryBootstrap
         
         // Create content aspect
         M2Aspect contentAspect = metaModelDAO.createAspect(ASPECT_QNAME_CONTENT);
-        M2Property encodingProp = contentAspect.createProperty("encoding");
+        M2Property encodingProp = contentAspect.createProperty(PROP_ENCODING);
         encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         encodingProp.setMandatory(true);
         encodingProp.setMultiValued(false);
-        M2Property mimetypeProp = contentAspect.createProperty("mimetype");
+        M2Property mimetypeProp = contentAspect.createProperty(PROP_MIME_TYPE);
         mimetypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         mimetypeProp.setMandatory(true);
         mimetypeProp.setMultiValued(false);
@@ -239,8 +257,8 @@ public class DictionaryBootstrap
         // Create Reference Type
         M2Type referenceType = metaModelDAO.createType(TYPE_QNAME_REFERENCE);
         referenceType.setSuperClass(baseType);
-        M2Property referenceProp = referenceType.createProperty("reference");
-        referenceProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        M2Property referenceProp = referenceType.createProperty(PROP_REFERENCE);
+        referenceProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
         referenceProp.setMandatory(true);
         referenceProp.setMultiValued(false);
 
@@ -253,6 +271,7 @@ public class DictionaryBootstrap
         // Create Container Type
         M2Type containerType = metaModelDAO.createType(TYPE_QNAME_CONTAINER);
         containerType.setSuperClass(baseType);
+
         M2ChildAssociation contentsAssoc = containerType.createChildAssociation("*");
         contentsAssoc.getRequiredToClasses().add(baseType);
         contentsAssoc.setMandatory(false);
@@ -329,68 +348,174 @@ public class DictionaryBootstrap
      */
     private void createVersionModel()
     {
-        // TODO these type should extend the base type
+        // Get a reference to the base type and conatiner type
+        M2Class baseType = metaModelDAO.getClass(TYPE_QNAME_BASE);
+        M2Class containerType = metaModelDAO.getClass(TYPE_QNAME_CONTAINER);
+        M2Class referenceType = metaModelDAO.getClass(TYPE_QNAME_REFERENCE);
         
-        // Create version type
-        M2Type versionType = metaModelDAO.createType(
-                QName.createQName(
-                        VersionStoreBaseImpl.LW_VERSION_STORE_NAMESPACE,
-                        VersionStoreBaseImpl.TYPE_VERSION));
+        // ===========================================================================
+        // Lock Aspect Model Defintions
+        
+        // Create the lock aspect
+        M2Aspect lockAspect = metaModelDAO.createAspect(LockService.ASPECT_QNAME_LOCK);
+        
+        // Create the lock owner property
+        M2Property lockOwnerProperty = lockAspect.createProperty(LockService.ATT_LOCK_OWNER.getLocalName());
+        lockOwnerProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        lockOwnerProperty.setMandatory(false);
+        lockOwnerProperty.setMultiValued(false);
+        
+        
+        // ===========================================================================
+        // Version Aspect Model Defintions
+        
+        // Create version aspect
+        M2Aspect versionAspect = metaModelDAO.createAspect(VersionService.ASPECT_VERSION);
+        
+        // Create current version label property
+        M2Property currentVersionLabelProperty = versionAspect.createProperty(VersionService.ATTR_CURRENT_VERSION_LABEL.getLocalName());
+        currentVersionLabelProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        currentVersionLabelProperty.setMandatory(false); 
+        currentVersionLabelProperty.setMultiValued(false);
+        
+        // TODO there is currently on way to link the aspect to the service implementation
+        
+        
+        // ===========================================================================
+        // Light Weight Version Store Model Defintions
+        
+        // -------------------- versionedAttribute type --------------------
+        M2Type versionedAttributeType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSIONED_ATTRIBUTE);
+        versionedAttributeType.setSuperClass(baseType);
+        
+        // Create assocQName property
+        M2Property assocQNameProperty = versionedAttributeType.createProperty(VersionStoreConst.PROP_QNAME);
+        assocQNameProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        assocQNameProperty.setMandatory(true);
+        assocQNameProperty.setMultiValued(false);
+        
+        // Create value property
+        M2Property valueProperty = versionedAttributeType.createProperty(VersionStoreConst.PROP_VALUE);
+        valueProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        valueProperty.setMandatory(true);
+        valueProperty.setMultiValued(false);        
+        
+        // -------------------- versionedChildAssoc type --------------------
+        M2Type versionedChildAssocType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSIONED_CHILD_ASSOC);
+        versionedChildAssocType.setSuperClass(referenceType);
+        
+        // Create frozen is primary property
+        M2Property frozenIsPrimary = versionedChildAssocType.createProperty(
+                VersionStoreConst.PROP_IS_PRIMARY);
+        frozenIsPrimary.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.BOOLEAN));
+        frozenIsPrimary.setMandatory(true);
+        frozenIsPrimary.setMultiValued(false);
+        
+        // Create qname property
+        M2Property qname2 = versionedChildAssocType.createProperty(VersionStoreConst.PROP_ASSOC_QNAME);
+        qname2.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        qname2.setMandatory(true);
+        qname2.setMultiValued(false);
+                
+        // Create frozen nth sibling property
+        M2Property frozenNthSibling = versionedChildAssocType.createProperty(
+                VersionStoreConst.PROP_NTH_SIBLING);
+        frozenNthSibling.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.INT));
+        frozenNthSibling.setMandatory(true);
+        frozenNthSibling.setMultiValued(false);
+        
+        
+        // -------------------- version type --------------------
+        M2Type versionType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSION);
+        versionType.setSuperClass(containerType);
         
         // Create verison number property
         M2Property versionNumber = versionType.createProperty(
-                VersionStoreBaseImpl.ATTR_VERSION_NUMBER.getLocalName());
+                Version.PROP_VERSION_NUMBER);
         versionNumber.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.INT));
         versionNumber.setMandatory(true);
         versionNumber.setMultiValued(false);
         
         // Create verison label property
         M2Property versionLabel = versionType.createProperty(
-                VersionStoreBaseImpl.ATTR_VERSION_LABEL.getLocalName());
+                Version.PROP_VERSION_LABEL);
         versionLabel.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));  
         versionLabel.setMandatory(true);
         versionLabel.setMultiValued(false);
         
         // Create created date property
         M2Property createdDate = versionType.createProperty(
-                VersionStoreBaseImpl.ATTR_VERSION_CREATED_DATE.getLocalName());
+                Version.PROP_CREATED_DATE);
         createdDate.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.DATE));  
         createdDate.setMandatory(true);
         createdDate.setMultiValued(false);
         
+        // Create frozen node id property
+        M2Property frozenNodeId = versionType.createProperty(
+                Version.PROP_FROZEN_NODE_ID);
+        frozenNodeId.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
+        frozenNodeId.setMandatory(true);
+        frozenNodeId.setMultiValued(false);
+                
+        // Create frozen node store id property
+        M2Property frozenNodeStoreId = versionType.createProperty(
+                Version.PROP_FROZEN_NODE_STORE_ID);
+        frozenNodeStoreId.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
+        frozenNodeStoreId.setMandatory(true);
+        frozenNodeStoreId.setMultiValued(false);
+                
+        // Create frozen node store protocol property
+        M2Property frozenNodeStoreProtocol = versionType.createProperty(
+                Version.PROP_FROZEN_NODE_STORE_PROTOCOL);
+        frozenNodeStoreProtocol.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        frozenNodeStoreProtocol.setMandatory(true);
+        frozenNodeStoreProtocol.setMultiValued(false);
+                
+        // Create frozen node type property        
+        M2Property frozenNodeType = versionType.createProperty(
+                Version.PROP_FROZEN_NODE_TYPE);
+        frozenNodeType.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        frozenNodeType.setMandatory(true);
+        frozenNodeType.setMultiValued(false);
+        
+        // Child assoc to versioned attribute details
+        M2ChildAssociation versionedAttributesChildAssoc = versionType.createChildAssociation(VersionStoreConst.CHILD_VERSIONED_ATTRIBUTES);
+        // TODO the details of this
+        
+        // Child assoc to versioned child assoc details
+        M2ChildAssociation versionedChildAssocsChildAssoc = versionType.createChildAssociation(VersionStoreConst.CHILD_VERSIONED_CHILD_ASSOCS);
+        // TODO the details of this
+        
         // Add the successor association
         M2Association successorAssoc = versionType.createAssociation(
-                VersionStoreBaseImpl.ASSOC_SUCCESSOR.getLocalName());
+                VersionStoreConst.ASSOC_SUCCESSOR.getLocalName());
         successorAssoc.getRequiredToClasses().add(versionType);
         successorAssoc.setMandatory(false);
         successorAssoc.setMultiValued(true);
-        
-        // Create version history type
-        M2Type versionHistoryType = metaModelDAO.createType(
-                QName.createQName(
-                        VersionStoreBaseImpl.LW_VERSION_STORE_NAMESPACE, 
-                        VersionStoreBaseImpl.TYPE_VERSION_HISTORY));
+              
+        // -------------------- versionHistoryType type --------------------
+        M2Type versionHistoryType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSION_HISTORY);
+        versionHistoryType.setSuperClass(containerType);
         
         // Create versioned node id property
         M2Property nodeIdProperty = versionHistoryType.createProperty(
-                VersionStoreBaseImpl.ATTR_VERSIONED_NODE_ID.getLocalName());
+                VersionStoreConst.PROP_VERSIONED_NODE_ID);
         nodeIdProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
         nodeIdProperty.setMandatory(true);
         nodeIdProperty.setMultiValued(false);
         
         // Add the child assoc
         M2ChildAssociation versionChildAssoc = versionHistoryType.createChildAssociation(
-                VersionStoreBaseImpl.CHILD_VERSIONS.getLocalName());
+                VersionStoreConst.CHILD_VERSIONS);
         versionChildAssoc.getRequiredToClasses().add(versionType);
         versionChildAssoc.setMandatory(true);
         versionChildAssoc.setMultiValued(true);
         
         // Add the root version association
         M2Association rootVersionAssoc = versionHistoryType.createAssociation(
-                VersionStoreBaseImpl.ASSOC_ROOT_VERSION.getLocalName());
+                VersionStoreConst.ASSOC_ROOT_VERSION.getLocalName());
         rootVersionAssoc.getRequiredToClasses().add(versionType);
         rootVersionAssoc.setMandatory(true);
-        rootVersionAssoc.setMultiValued(false);
-        
+        rootVersionAssoc.setMultiValued(false);               
     }
 }

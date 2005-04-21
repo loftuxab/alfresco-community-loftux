@@ -5,14 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
+import com.activiti.repo.version.ReservedVersionNameException;
 import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionHistory;
 import com.activiti.repo.version.VersionLabelPolicy;
@@ -20,6 +21,7 @@ import com.activiti.repo.version.VersionService;
 import com.activiti.repo.version.VersionServiceException;
 import com.activiti.repo.version.common.VersionHistoryImpl;
 import com.activiti.repo.version.common.VersionImpl;
+import com.activiti.repo.version.common.VersionUtil;
 import com.activiti.repo.version.common.counter.VersionCounterDaoService;
 
 /**
@@ -62,23 +64,12 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
     }
     
     /**
-     * Creates a new version based on the referenced node.
-     * <p>
-     * If the node has not previously been versioned then a version history and
-     * initial version will be created.
-     * <p>
-     * If the node referenced does not or can not have the version aspect
-     * applied to it then an exception will be raised.
-     * <p>
-     * The version properties are sotred as version meta-data against the newly
-     * created version.
-     * 
-     * @param nodeRef            a node reference
-     * @param versionProperties  the version properties that are stored with the newly created
-     *                           version
-     * @return                   the created version object
+     * @see com.activiti.repo.version.VersionService#createVersion(NodeRef, Map<String, Serializable>)
      */
-    public Version createVersion(NodeRef nodeRef, Map<String, String> versionProperties)
+    public Version createVersion(
+            NodeRef nodeRef, 
+            Map<String, Serializable> versionProperties)
+            throws ReservedVersionNameException 
     {
         // Get the next version number
         int versionNumber = this.versionCounterService.nextVersionNumber(getVersionStoreReference());
@@ -88,57 +79,80 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
     }        
 
     /**
-     * Creates a new version based on the referenced node.
-     * <p>
-     * If the node has not previously been versioned then a version history and
-     * initial version will be created.
-     * <p>
-     * If the node referenced does not or can not have the version aspect
-     * applied to it then an exception will be raised.
-     * <p>
-     * The version properties are sotred as version meta-data against the newly
-     * created version.
+     * The version's are created from the children upwards with the parent being created first.  This will
+     * ensure that the child version references in the version node will point to the version history nodes
+     * for the (possibly) newly created version histories.
      * 
-     * @param nodeRef            a node reference
-     * @param versionProperties  the version properties that are stored with the newly created
-     *                           version
-     * @param versionChildren    if true then the children of the referenced node are also
-     *                           versioned, false otherwise
-     * @return                   the created version object(s)
+     * @see com.activiti.repo.version.VersionService#createVersion(NodeRef, Map<String, Serializable>, boolean)
      */
-    public Collection<Version> createVersion(NodeRef nodeRef, Map<String, String> versionProperties,
+    public Collection<Version> createVersion(
+            NodeRef nodeRef, 
+            Map<String, Serializable> versionProperties,
             boolean versionChildren)
+            throws ReservedVersionNameException
     {
-        Collection<Version> result = new ArrayList<Version>();
-        
         // Get the next version number
         int versionNumber = this.versionCounterService.nextVersionNumber(getVersionStoreReference());
         
-        result.add(createVersion(nodeRef, versionProperties, versionNumber));
+        // Create the versions
+        return createVersion(nodeRef, versionProperties, versionChildren, versionNumber);
+    }
+    
+    /**
+     * Helper method used to create the version when the versionChildren flag is provided.  This method
+     * ensures that all the children (if the falg is set to true) are created with the same version 
+     * number, this ensuring that the version stripe is correct.
+     * 
+     * @param nodeRef                           the parent node reference
+     * @param versionProperties                 the version properties
+     * @param versionChildren                   indicates whether to version the children of the parent
+     *                                          node
+     * @param versionNumber                     the version number
+     
+     * @return                                  a collection of the created versions
+     * @throws ReservedVersionNameException     thrown if there is a reserved version property name clash
+     */
+    private Collection<Version> createVersion(
+            NodeRef nodeRef, 
+            Map<String, Serializable> versionProperties,
+            boolean versionChildren,
+            int versionNumber) 
+            throws ReservedVersionNameException
+    {
+        Collection<Version> result = new ArrayList<Version>();
         
-        if (versionChildren == true)
+       if (versionChildren == true)
         {
             // Get the children of the node
             Collection<ChildAssocRef> children = this.dbNodeService.getChildAssocs(nodeRef);
             for (ChildAssocRef childAssoc : children)
             {
-                // Recurse into this method to version all the children
-                Collection<Version> childVersions = createVersion(childAssoc.getChildRef(), versionProperties, versionChildren);
+                // Recurse into this method to version all the children with the same version number
+                Collection<Version> childVersions = createVersion(
+                        childAssoc.getChildRef(), 
+                        versionProperties, 
+                        versionChildren, 
+                        versionNumber);
                 result.addAll(childVersions);
             }
         }
+        
+        result.add(createVersion(nodeRef, versionProperties, versionNumber));
         
         return result;
     }
 
     /**
-     * Creates new versions based on the list of node references provided.
+     * Note:  we can't control the order of the list, so if we have children and parents in the list and the
+     * parents get versioned before the children and the children are not already versioned then the parents 
+     * child references will be pointing to the node ref, rather than the verison history.
      * 
-     * @param nodeRefs           a list of node references
-     * @param versionProperties  version property values
-     * @return                   a collection of newly created versions
+     * @see com.activiti.repo.version.VersionService#createVersion(List<NodeRef>, Map<String, Serializable>)
      */
-    public Collection<Version> createVersion(List<NodeRef> nodeRefs, Map<String, String> versionProperties)
+    public Collection<Version> createVersion(
+            Collection<NodeRef> nodeRefs, 
+            Map<String, Serializable> versionProperties)
+            throws ReservedVersionNameException
     {
         Collection<Version> result = new ArrayList<Version>(nodeRefs.size());
         
@@ -161,12 +175,20 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
      * @param nodeRef            a node reference
      * @param versionProperties  the version properties
      * @param versionNumber      the version number
-     * @return                   the newly created version     
+     * @return                   the newly created version
+     * @throws                   ReservedVersionNameException     
      */
-    private Version createVersion(NodeRef nodeRef, Map<String, String> versionProperties, int versionNumber)
+    private Version createVersion(
+            NodeRef nodeRef, 
+            Map<String, Serializable> versionProperties, 
+            int versionNumber)
+            throws ReservedVersionNameException
     {
         // TODO we need some way of 'locking' the current node to ensure no modifications (or other versions) 
         //      can take place untill the versioning process is complete
+        
+        // Check that the supplied additional version properties do not clash with the reserved ones
+        VersionUtil.checkVersionPropertyNames(versionProperties.keySet());
         
         // Check the repository for the version history for this node
         NodeRef versionHistoryRef = getVersionHistoryNodeRef(nodeRef); 
@@ -174,18 +196,16 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         
         if (versionHistoryRef == null)
         {
+            HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
+            props.put(PROP_QNAME_VERSIONED_NODE_ID, nodeRef.getId());
+            
             // Create a new version history node
             ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                     this.versionStoreRootNodeRef, 
-                    VersionStoreBaseImpl.CHILD_VERSION_HISTORIES, 
-                    DictionaryBootstrap.TYPE_CONTAINER);
-            versionHistoryRef = childAssocRef.getChildRef();
-            
-            // Store the id of the origional node on the version history node 
-            this.dbNodeService.setProperty(
-                    versionHistoryRef, 
-					VersionStoreBaseImpl.ATTR_VERSIONED_NODE_ID, 
-                    nodeRef.getId());
+                    CHILD_QNAME_VERSION_HISTORIES, 
+                    CLASS_REF_VERSION_HISTORY,
+                    props);
+            versionHistoryRef = childAssocRef.getChildRef();            
         }
         else
         {
@@ -195,7 +215,12 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         }
         
         // Create the new version node (child of the version history)
-        NodeRef newVersionRef = createNewVersion(nodeRef, versionHistoryRef, currentVersionRef, versionProperties, versionNumber);
+        NodeRef newVersionRef = createNewVersion(
+                nodeRef, 
+                versionHistoryRef,
+                currentVersionRef, 
+                versionProperties, 
+                versionNumber);
         
         // 'Freeze' the current nodes state in the new version node
         freezeNodeState(nodeRef, newVersionRef);
@@ -233,7 +258,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
     }
 
     /**
-     * TODO need to check performance
+     * @see com.activiti.repo.version.VersionService#getVersionHistory(NodeRef)
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef)
     {
@@ -247,40 +272,49 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         NodeRef versionHistoryRef = getVersionHistoryNodeRef(nodeRef);
         if (versionHistoryRef != null)
         {
-            NodeRef rootVersion = null;
-            Collection<NodeRef> rootNodes = this.dbNodeService.getAssociationTargets(versionHistoryRef, ASSOC_ROOT_VERSION);
-            if (rootNodes.size() == 1)
+            ArrayList<NodeRef> versionHistoryNodeRefs = new ArrayList<NodeRef>();
+            NodeRef currentVersion = getCurrentVersionNodeRef(versionHistoryRef, nodeRef);
+            
+            while (currentVersion != null)
             {
-                // Get the root version
-                rootVersion = (NodeRef)rootNodes.toArray()[0];
-            }
-            else
-            {
-                // Error since there should be one and only one root nodes
-                throw new VersionServiceException("There should only be one root node in a version history tree.");
+                NodeRef preceedingVersion = null;
+                
+                Collection<NodeRef> preceedingVersions = this.dbNodeService.getAssociationSources(currentVersion, ASSOC_SUCCESSOR);
+                if (preceedingVersions.size() == 1)
+                {
+                    preceedingVersion = (NodeRef)preceedingVersions.toArray()[0];
+                }
+                else if (preceedingVersions.size() > 1)
+                {
+                    // Error since we only currently support one preceeding version
+                    throw new VersionServiceException("The light weight version store only supports one preceeding version.");
+                }
+                
+                versionHistoryNodeRefs.add(0, currentVersion);
+                currentVersion = preceedingVersion;
             }
             
-            versionHistory = new VersionHistoryImpl(getVersion(rootVersion));
-            buildVersionHistory(versionHistory, rootVersion);
+            // Build the version history object
+            boolean isRoot = true;
+            Version preceeding = null;
+            for (NodeRef versionRef : versionHistoryNodeRefs)
+            {
+                Version version = getVersion(versionRef);
+                
+                if (isRoot == true)
+                {
+                    versionHistory = new VersionHistoryImpl(version);
+                    isRoot = false;
+                }
+                else
+                {
+                    ((VersionHistoryImpl)versionHistory).addVersion(version, preceeding);
+                }
+                preceeding = version;
+            }
         }
         
         return versionHistory;
-    }
-    
-    /**
-     * 
-     * 
-     * @param versionHistory
-     * @param nodeRef
-     */
-    private void buildVersionHistory(VersionHistory versionHistory, NodeRef nodeRef)
-    {
-        Collection<NodeRef> successors = this.dbNodeService.getAssociationTargets(nodeRef, ASSOC_SUCCESSOR);
-        for (NodeRef successor : successors)
-        {
-            ((VersionHistoryImpl)versionHistory).addVersion(getVersion(successor), getVersion(nodeRef));
-            buildVersionHistory(versionHistory, successor);
-        }
     }
     
     /**
@@ -292,45 +326,22 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
     private Version getVersion(NodeRef versionRef)
     {
         // TODO could definatly do with a cache since these are read only objects ...
-        // TODO this needs a little sorting out ....
-        // TODO store the date and label in the versionProperies map
         
-        String versionLabel = null;
-        Date createdDate = null;
-        Map<String, String> versionProperties = new HashMap<String, String>();
+        Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
         
         // Get the node properties
         Map<QName, Serializable> nodeProperties = this.dbNodeService.getProperties(versionRef);
         for (QName key : nodeProperties.keySet())
         {
-            if (key.getNamespaceURI().equals(VersionStoreVersionServiceImpl.LW_VERSION_STORE_NAMESPACE) == true)
-            {   
-                String strLocalName = key.getLocalName();
-                String value = (String)nodeProperties.get(key);
-                
-                if (strLocalName.equals(VersionStoreBaseImpl.ATTR_VERSION_LABEL.getLocalName()) == true)
-                {
-                    // Get the version label property
-                    versionLabel = value;
-                }
-                else if (strLocalName.equals(VersionStoreBaseImpl.ATTR_VERSION_CREATED_DATE.getLocalName()))
-                {
-                    // Get the created date property
-                    createdDate = new Date(Long.parseLong(value));
-                }
-				// TODO need to find a better way to sort this out ...
-                else if (strLocalName.equals(VersionStoreBaseImpl.ATTR_VERSION_NUMBER.getLocalName()) == false &&
-						 strLocalName.equals(VersionStoreBaseImpl.ATTR_FROZEN_NODE_ID.getLocalName()) == false &&
-						 strLocalName.equals(VersionStoreBaseImpl.ATTR_FROZEN_NODE_STORE_ID.getLocalName()) == false &&
-						 strLocalName.equals(VersionStoreBaseImpl.ATTR_FROZEN_NODE_STORE_PROTOCOL.getLocalName()) == false)
-                {
-                    versionProperties.put(strLocalName, value);
-                }
+            if (key.getNamespaceURI().equals(VersionStoreVersionServiceImpl.NAMESPACE_URI) == true)
+            {                   
+                Serializable value = nodeProperties.get(key);
+                versionProperties.put(key.getLocalName(), value);
             }
         }
         
         // Create and return the version object
-        return new VersionImpl(versionLabel, createdDate, versionProperties, versionRef);        
+        return new VersionImpl(versionProperties, versionRef);        
     }    
     
     /**
@@ -348,47 +359,30 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
 			NodeRef versionableNodeRef, 
 			NodeRef versionHistoryRef, 
 			NodeRef preceedingNodeRef, 
-			Map<String, String> 
+			Map<String, Serializable> 
 			versionProperties, 
 			int versionNumber)
     {
-        // Create the new version
-        ChildAssocRef childAssocRef = this.dbNodeService.createNode(
-                versionHistoryRef, 
-				VersionStoreBaseImpl.CHILD_VERSIONS, 
-                DictionaryBootstrap.TYPE_CONTAINER);
-        NodeRef newVersion = childAssocRef.getChildRef();
+        HashMap<QName, Serializable> props = new HashMap<QName, Serializable>(15, 1.0f);
         
         // Set the version number for the new version
-        this.dbNodeService.setProperty(
-                newVersion, 
-				VersionStoreBaseImpl.ATTR_VERSION_NUMBER, 
-                Integer.toString(versionNumber));
+        props.put(PROP_QNAME_VERSION_NUMBER, Integer.toString(versionNumber));
         
         // Set the created date
-        Date createdDate = new Date();
-        this.dbNodeService.setProperty(
-                newVersion, 
-				VersionStoreBaseImpl.ATTR_VERSION_CREATED_DATE, 
-                Long.toString(createdDate.getTime()));
+        props.put(PROP_QNAME_VERSION_CREATED_DATE, new Date());
 		
 		// Set the versionable node id
-		this.dbNodeService.setProperty(
-				newVersion,
-				VersionStoreBaseImpl.ATTR_FROZEN_NODE_ID,
-				versionableNodeRef.getId());
+		props.put(PROP_QNAME_FROZEN_NODE_ID, versionableNodeRef.getId());
 		
 		// Set the versionable node store protocol
-		this.dbNodeService.setProperty(
-				newVersion,
-				VersionStoreBaseImpl.ATTR_FROZEN_NODE_STORE_PROTOCOL,
-				versionableNodeRef.getStoreRef().getProtocol());
+		props.put(PROP_QNAME_FROZEN_NODE_STORE_PROTOCOL, versionableNodeRef.getStoreRef().getProtocol());
 		
 		// Set the versionable node store id
-		this.dbNodeService.setProperty(
-				newVersion,
-				VersionStoreBaseImpl.ATTR_FROZEN_NODE_STORE_ID,
-				versionableNodeRef.getStoreRef().getIdentifier());
+		props.put(PROP_QNAME_FROZEN_NODE_STORE_ID, versionableNodeRef.getStoreRef().getIdentifier());
+        
+        // Store the current node type
+        ClassRef nodeType = this.nodeService.getType(versionableNodeRef);
+        props.put(PROP_QNAME_FROZEN_NODE_TYPE, nodeType);
 		
         // Calculate the version label
         String versionLabel = null;
@@ -403,10 +397,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
             // The default version label policy is to set it equal to the verion number
             versionLabel = Integer.toString(versionNumber);
         }
-        this.dbNodeService.setProperty(
-                newVersion, 
-                VersionStoreVersionServiceImpl.ATTR_VERSION_LABEL, 
-                versionLabel);
+        props.put(PROP_QNAME_VERSION_LABEL, versionLabel);
         
         // TODO any other calculated properties ...
         
@@ -415,17 +406,20 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         {
             // Apply the namespace to the verison property
             QName propertyName = QName.createQName(
-                    VersionStoreVersionServiceImpl.LW_VERSION_STORE_NAMESPACE,
+                    VersionStoreVersionServiceImpl.NAMESPACE_URI,
                     key);
             
             // Set the property value on the node
-            this.dbNodeService.setProperty(
-                    newVersion,
-                    propertyName,
-                    versionProperties.get(key));
+            props.put(propertyName, versionProperties.get(key));
         }
         
-        return newVersion;
+        // Create the new version
+        ChildAssocRef childAssocRef = this.dbNodeService.createNode(
+                versionHistoryRef, 
+                VersionStoreBaseImpl.CHILD_QNAME_VERSIONS,
+                CLASS_REF_VERSION,
+                props);
+        return childAssocRef.getChildRef();
     }
     
     /**
@@ -438,56 +432,69 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
      */
     private void freezeNodeState(NodeRef nodeRef, NodeRef versionRef)
     {
-        // TODO this will chage when we integrate with the data dictionary
-        // Store the current node type
-        ClassRef nodeType = this.nodeService.getType(nodeRef);
-        this.dbNodeService.setProperty(versionRef, ATTR_FROZEN_NODE_TYPE, nodeType);
-        
         // Copy the current values of the node onto the version node, thus taking a snap shot of the values
         Map<QName, Serializable> nodeProperties = this.nodeService.getProperties(nodeRef);
         if (nodeProperties != null)
         {
             // Copy the property values from the node onto the version node
             for (QName propertyName : nodeProperties.keySet())
-            {
-                // TODO there will be certain properties that will be common (id, type ...) these
-                //      need to be stored specifically
+            {               
+                // TODO this lot should be kept as constants
                 
-                // Set the property value's
-                this.dbNodeService.setProperty(versionRef, propertyName, nodeProperties.get(propertyName));                
+                HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+                properties.put(PROP_QNAME_QNAME, propertyName);
+                properties.put(PROP_QNAME_VALUE, nodeProperties.get(propertyName));
+                
+                this.dbNodeService.createNode(
+                        versionRef, 
+                        CHILD_QNAME_VERSIONED_ATTRIBUTES,
+                        CLASS_REF_VERSIONED_ATTRIBUTE,
+                        properties);
             }
         }
         
         // TODO here we need to deal with any content that might be on the node
         
-        // TODO the following behaviour is default and should overrideable (ie: can choose when to ignore, version or reference children
+        // TODO the following behaviour is default and should overrideable (ie: can choose when to ignore, version or 
+        //      reference children) how do we do this?
+        
+        // TODO need to check that the node is of type container (at the moment you can't version a non-container
+        //      node !!
         
         // Get the children of the versioned node
         Collection<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
         for (ChildAssocRef childAssocRef : childAssocRefs)
         {
+            HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+            
+            // Set the qname, isPrimary and nthSibling properties
+            properties.put(PROP_QNAME_ASSOC_QNAME, childAssocRef.getName());
+            properties.put(PROP_QNAME_IS_PRIMARY, Boolean.valueOf(childAssocRef.isPrimary()));
+            properties.put(PROP_QNAME_NTH_SIBLING, Integer.valueOf(childAssocRef.getNthSibling()));
+            
             // Need to determine whether the child is versioned or not
             NodeRef versionHistoryRef = getVersionHistoryNodeRef(childAssocRef.getChildRef());
             if (versionHistoryRef == null)
             {
-                // The child node is not versioned so we associate to a node reference
-                NodeRef referenceRef = this.dbNodeService.createNode(versionRef,
-                        childAssocRef.getName(),
-                        DictionaryBootstrap.TYPE_REFERENCE).getChildRef();
-                
-                // Set the reference string
-                // TODO this needs to be inline with the reference type
-                this.dbNodeService.setProperty(referenceRef, QName.createQName("{referenceNode}referenceString"), nodeRef.toString());                
+                // Set the reference property to point to the child node
+                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, nodeRef);
             }
             else
             {
-                // Associate the version with the version history object of hte child
-                this.dbNodeService.addChild(versionRef, versionHistoryRef, childAssocRef.getName());
+                // Set the reference property to point to the version history
+                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, versionHistoryRef);
             }
+            
+            // Create child version reference
+            ChildAssocRef newRef = this.dbNodeService.createNode(
+                    versionRef,
+                    CHILD_QNAME_VERSIONED_CHILD_ASSOCS,
+                    CLASS_REF_VERSIONED_CHILD_ASSOC, 
+                    properties);
+            
+            NodeRef temp = newRef.getChildRef();
         }
         
         // TODO What do we do about the associations???
-        
-        // TODO how do we override the above default behaviour ??
     }    
 }

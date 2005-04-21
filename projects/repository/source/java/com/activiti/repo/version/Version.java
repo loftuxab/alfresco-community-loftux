@@ -24,6 +24,17 @@ import com.activiti.repo.ref.NodeRef;
 public interface Version extends Serializable
 {
     /**
+     * Names of the system version properties
+     */
+    public static final String PROP_VERSION_LABEL = "versionLabel";
+    public static final String PROP_CREATED_DATE = "createdDate";
+    public static final String PROP_VERSION_NUMBER = "versionNumber";
+    public static final String PROP_FROZEN_NODE_ID = "frozenNodeId";
+    public static final String PROP_FROZEN_NODE_TYPE = "frozenNodeType";
+    public static final String PROP_FROZEN_NODE_STORE_PROTOCOL = "frozenNodeStoreProtocol";
+    public static final String PROP_FROZEN_NODE_STORE_ID = "frozenNodeStoreId";
+    
+    /**
      * Helper method to get the created date from the version property data.
      * 
      * @return  the date the version was created
@@ -42,7 +53,7 @@ public interface Version extends Serializable
      * 
      * @return  the map containing the version properties
      */
-    public Map<String, String> getVersionProperties();
+    public Map<String, Serializable> getVersionProperties();
     
     /**
      * Gets the value of a named version property.
@@ -51,7 +62,7 @@ public interface Version extends Serializable
      * @return      the value of the property
      * 
      */
-    public String getVersionProperty(String name);
+    public Serializable getVersionProperty(String name);
 
     /**
      * Gets the reference to the node that contains the frozen state of the
