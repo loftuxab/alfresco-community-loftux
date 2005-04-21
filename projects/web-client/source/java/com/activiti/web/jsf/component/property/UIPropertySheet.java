@@ -18,11 +18,11 @@ import jsftest.repository.DataDictionary.Property;
 
 import org.apache.log4j.Logger;
 
-import com.activiti.web.config.Config;
-import com.activiti.web.config.ConfigService;
-import com.activiti.web.config.ConfigServiceFactory;
-import com.activiti.web.config.element.PropertiesConfigElement;
-import com.activiti.web.repository.Node;
+import com.activiti.config.Config;
+import com.activiti.config.ConfigService;
+import com.activiti.config.ConfigServiceFactory;
+import com.activiti.config.element.PropertiesConfigElement;
+import com.activiti.web.bean.repository.Node;
 
 /**
  * Component that represents the properties of an object

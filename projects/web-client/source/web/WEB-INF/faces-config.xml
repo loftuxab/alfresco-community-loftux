@@ -144,7 +144,7 @@
          The bean that backs up the New Space Wizard
       </description>
       <managed-bean-name>NewSpaceWizard</managed-bean-name>
-      <managed-bean-class>com.activiti.web.wizard.NewSpace</managed-bean-class>
+      <managed-bean-class>com.activiti.web.bean.wizard.NewSpaceWizard</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
    
@@ -357,11 +357,11 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>next-existing</from-outcome>
-         <to-view-id>/jsp/wizard/new-space-scratch.jsp</to-view-id>
+         <to-view-id>/jsp/wizard/new-space-existing.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>next-template</from-outcome>
-         <to-view-id>/jsp/wizard/new-space-scratch.jsp</to-view-id>
+         <to-view-id>/jsp/wizard/new-space-template.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -378,14 +378,46 @@
    </navigation-rule>
    
    <navigation-rule>
+      <from-view-id>/jsp/wizard/new-space-existing.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>next</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>back</from-outcome>
+         <to-view-id>/jsp/wizard/new-space.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-space-template.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>next</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>back</from-outcome>
+         <to-view-id>/jsp/wizard/new-space.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+      
+   <navigation-rule>
       <from-view-id>/jsp/wizard/new-space-details.jsp</from-view-id>
       <navigation-case>
          <from-outcome>next</from-outcome>
          <to-view-id>/jsp/wizard/new-space-summary.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
-         <from-outcome>back</from-outcome>
+         <from-outcome>back-scratch</from-outcome>
          <to-view-id>/jsp/wizard/new-space-scratch.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>back-existing</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-existing.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>back-template</from-outcome>
+         <to-view-id>/jsp/wizard/new-space-template.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>finish</from-outcome>

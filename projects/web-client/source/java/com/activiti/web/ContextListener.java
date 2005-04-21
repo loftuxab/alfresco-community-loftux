@@ -3,7 +3,7 @@ package com.activiti.web;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.activiti.web.config.ConfigServiceFactory;
+import com.activiti.config.ConfigServiceFactory;
 
 /**
  * ServletContextListener implementation that initialises the application 

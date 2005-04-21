@@ -35,7 +35,7 @@
    </target>
 
    <target name="deploy" depends="common-init" description="Deploys to JBoss">
-      <copy file="${basedir}/projects/web-client/build/dist/web-client.war" todir="${deploy.dir}" />
+      <copy file="${basedir}/projects/web-client/build/dist/web-client.ear" todir="${deploy.dir}" />
    </target>
    
    <target name="deploy-web-client" depends="common-init" description="Deploys the web client to a running JBoss server">

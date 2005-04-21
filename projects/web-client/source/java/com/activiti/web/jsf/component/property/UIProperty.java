@@ -15,7 +15,7 @@ import jsftest.repository.DataDictionary.Property;
 
 import org.apache.log4j.Logger;
 
-import com.activiti.web.repository.Node;
+import com.activiti.web.bean.repository.Node;
 
 /**
  * Component to represent an individual property

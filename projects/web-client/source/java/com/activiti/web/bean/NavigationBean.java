@@ -3,10 +3,7 @@
  */
 package com.activiti.web.bean;
 
-import javax.faces.component.UIComponent;
 import javax.faces.event.ActionEvent;
-
-import com.activiti.web.jsf.component.UIPanel;
 
 /**
  * @author kevinr

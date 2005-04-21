@@ -12,8 +12,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-0.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jsf-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jsf-impl.jar"/>
+	<classpathentry exported="true" sourcepath="W:/software/jsf-1_1_01/src/jsf-api/src" kind="lib" path="lib/jsf-api.jar"/>
+	<classpathentry exported="true" sourcepath="W:/software/jsf-1_1_01/src/jsf-ri/src" kind="lib" path="lib/jsf-impl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsf-portlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jstl.jar"/>

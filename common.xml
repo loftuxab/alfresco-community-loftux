@@ -19,6 +19,9 @@
          <fileset dir="${common.lib.dir}">
             <include name="**/*.jar" />
          </fileset>
+         <fileset dir="${common.dir}/projects">
+            <include name="**/build/dist/*.jar" />
+         </fileset>
       </path>
 
       <mkdir dir="${classes.dir}" />
@@ -71,7 +74,8 @@
       </copy>
    </target>
    
-   <target name="compile-javadocs" depends="init">
+   <target name="compile-javadocs" depends="init"
+           description="Creates the JavaDocs for the project">
       <mkdir dir="${javadoc.dir}" />
       <javadoc sourcepath="${src.java.dir}" destdir="${javadoc.dir}" 
                packagenames="${javadoc.packages}" author="true" version="true" 
@@ -104,7 +108,7 @@
    <!-- ** Packaging targets ** -->
    <!-- *********************** -->
 
-   <target name="package" depends="package-jar, package-war" description="Packages the JAR and WAR files" />
+   <target name="package" depends="package-war" description="Packages the archive files" />
       
    <target name="package-jar" depends="compile-java" description="Packages the JAR file">
       <mkdir dir="${dist.dir}"/>
@@ -113,7 +117,8 @@
 
    <target name="package-war" depends="package-jar" description="Packages the WAR file">
       <mkdir dir="${dist.dir}" />
-      <war warfile="${dist.dir}/${war.name}" webxml="${src.web.dir}\WEB-INF\web.xml">
+      <!-- manifest="${src.metainf.dir}\manifest.mf" -->
+      <war warfile="${dist.dir}\${war.name}" webxml="${src.web.dir}\WEB-INF\web.xml">
          <fileset dir="${src.web.dir}" excludes="WEB-INF\web.xml" />
          <zipfileset dir="${common.lib.dir}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}" 
                      prefix="WEB-INF\lib" />
@@ -121,6 +126,19 @@
       </war>
    </target>
 
+   <target name="assemble-ear" depends="package-war">
+      <copy todir="${assemble.dir}">
+         <fileset dir="${dist.dir}" includes="*.war" />
+      </copy>
+   </target>
+   
+   <target name="package-ear" depends="assemble-ear" description="Packages the EAR file">
+      <mkdir dir="${assemble.dir}"/>
+      <ear earfile="${dist.dir}\${ear.name}" appxml="${src.metainf.dir}\application.xml">
+         <fileset dir="${assemble.dir}"/>
+      </ear>
+   </target>
+   
    <target name="distribute" depends="package-binary, package-source"
            description="Creates the binary and source distributions" />
 
@@ -164,8 +182,8 @@
    <!-- ** Deployment targets ** -->
    <!-- ************************ -->
 
-   <target name="deploy" depends="init" description="Deploys the WAR file to an application server">
-      <copy file="${dist.dir}/${war.name}" todir="${deploy.dir}" />
+   <target name="deploy" depends="init" description="Deploys the EAR file to an application server">
+      <copy file="${dist.dir}/${ear.name}" todir="${deploy.dir}" />
    </target>
 
    <!-- ********************** -->
@@ -175,6 +193,7 @@
    <target name="clean" depends="init" description="Cleans the project">
       <delete includeEmptyDirs="true" quiet="yes" dir="${classes.dir}"/>
       <delete includeEmptyDirs="true" quiet="yes" dir="${dist.dir}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${assemble.dir}"/>
       <delete includeEmptyDirs="true" quiet="yes" dir="${test.results.dir}"/>
    </target>
 
