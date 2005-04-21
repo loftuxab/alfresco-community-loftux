@@ -315,3 +315,8 @@ a.topToolbarLinkHighlight
    border:solid #71828A;
    border-width:1px;
 }
+
+.inlineAction
+{
+   padding-right:4px;
+}

@@ -87,6 +87,40 @@ public class UIActionLink extends UICommand
    }
    
    /**
+    * Get the padding value for rendering this component in a table.
+    * 
+    * @return the padding in pixels, if set != 0 then a table will be rendering around the items
+    */
+   public int getPadding()
+   {
+      ValueBinding vb = getValueBinding("padding");
+      if (vb != null)
+      {
+         this.padding = (Integer)vb.getValue(getFacesContext());
+      }
+      
+      if (this.padding != null)
+      {
+         return this.padding.intValue();
+      }
+      else
+      {
+         // return default
+         return 0;
+      }
+   }
+   
+   /**
+    * Set the padding value for rendering this component in a table.
+    * 
+    * @param padding       value in pixels, if set != 0 then a table will be rendering around the items
+    */
+   public void setPadding(int padding)
+   {
+      this.padding = padding;
+   }
+   
+   /**
     * Return the Image path to use for this actionlink.
     * If an image is specified, it is shown in additon to the value text unless
     * the 'showLink' property is set to 'false'.
@@ -119,6 +153,9 @@ public class UIActionLink extends UICommand
    
    // ------------------------------------------------------------------------------
    // Private data
+   
+   /** the padding value in pixels, if set != 0 then a table will be rendered around the items */
+   private Integer padding = null;
    
    /** True to show the link as well as the image if specified */
    private Boolean showLink = null;

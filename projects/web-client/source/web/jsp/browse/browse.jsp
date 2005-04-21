@@ -77,10 +77,11 @@
                            <td width=100>
                               <%-- Details View settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
-                              <awc:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" value="0">
-                                 <awc:modeListItem value="0" label="List All Items" image="/images/icons/Details.gif" />
-                                 <awc:modeListItem value="1" label="Dashboard" />
-                                 <awc:modeListItem value="2" label="Browse Items" />
+                              <awc:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
+                                    value="details" actionListener="#{BrowseBean.viewModeChanged}">
+                                 <awc:modeListItem value="details" label="List All Items" image="/images/icons/Details.gif" />
+                                 <awc:modeListItem value="list" label="Dashboard" />
+                                 <awc:modeListItem value="icons" label="Browse Items" />
                               </awc:modeList>
                            </td>
                         </tr>
@@ -106,7 +107,12 @@
                            <td>
                               <%-- Toolbar actions --%>
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "bluetoolbar", "#E9F0F4"); %>
-                                 [Toolbar Buttons]
+                                 <table cellspacing=0 cellpadding=0><tr>
+                                    <td><awc:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
+                                    <td><awc:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
+                                    <td><awc:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
+                                    <td><awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false"/></td>
+                                 </tr></table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
                            </td>
                         </tr>
@@ -121,7 +127,55 @@
                   <td height=300>
                      
                      <%-- Details inner components --%>
-                     ...Details...
+                     <awc:richList viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
+                           width="100%" value="#{TestList.rows}" var="r" initialSortColumn="name" initialSortDescending="true">
+                        <awc:column primary="true" width="175" style="padding:2px;text-align:left;">
+                           <f:facet name="header">
+                              <awc:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
+                           </f:facet>
+                           <f:facet name="large-icon">
+                              <h:graphicImage alt="#{r.name}" title="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
+                           </f:facet>
+                           <f:facet name="small-icon">
+                              <awc:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{TestList.clickNameLink}" showLink="false">
+                                 <f:param name="name" value="#{r.name}" />
+                              </awc:actionLink>
+                           </f:facet>
+                           <awc:actionLink value="#{r.name}">
+                              <f:param name="name" value="#{r.name}" />
+                           </awc:actionLink>
+                        </awc:column>
+                        
+                        <awc:column style="text-align:left;">
+                           <f:facet name="header">
+                              <awc:sortLink label="Created Date" value="created" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.created}">
+                              <f:convertDateTime dateStyle="long" />
+                           </h:outputText>
+                        </awc:column>
+                        
+                        <awc:column style="text-align:left;">
+                           <f:facet name="header">
+                              <awc:sortLink label="Modified Date" value="created" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.created}">
+                              <f:convertDateTime dateStyle="long" />
+                           </h:outputText>
+                        </awc:column>
+                        
+                        <awc:column actions="true" style="text-align:left;">
+                           <f:facet name="header">
+                              <h:outputText value="#{msg.actions}"/>
+                           </f:facet>
+                           <awc:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
+                           <awc:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
+                           <awc:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
+                           <awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" />
+                        </awc:column>
+                        
+                        <awc:dataPager/>
+                     </awc:richList>
                      
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>

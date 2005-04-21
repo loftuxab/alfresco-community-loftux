@@ -39,6 +39,7 @@ public class ActionLinkTag extends HtmlComponentTag
       setStringProperty(component, "image", this.image);
       setBooleanProperty(component, "showLink", this.showLink);
       setStringProperty(component, "verticalAlign", this.verticalAlign);
+      setIntProperty(component, "padding", this.padding);
       setStringProperty(component, "value", this.value);
       
       // TODO: Add image width/height properties
@@ -56,6 +57,7 @@ public class ActionLinkTag extends HtmlComponentTag
       this.image = null;
       this.showLink = null;
       this.verticalAlign = null;
+      this.padding = null;
    }
    
    /**
@@ -117,7 +119,20 @@ public class ActionLinkTag extends HtmlComponentTag
    {
       this.verticalAlign = verticalAlign;
    }
+   
+   /**
+    * Set the padding in pixels
+    *
+    * @param padding     the padding in pixels
+    */
+   public void setPadding(String padding)
+   {
+      this.padding = padding;
+   }
 
+
+   /** the padding in pixels */
+   private String padding;
 
    /** the vertical alignment value */
    private String verticalAlign;

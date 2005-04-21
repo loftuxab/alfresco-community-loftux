@@ -110,22 +110,49 @@ public class ActionLinkRenderer extends BaseRenderer
       
       if (link.getImage() != null)
       {
+         int padding = link.getPadding();
+         if (padding != 0)
+         {
+            // need the crappy "cursor:hand" embedded style for IE support
+            buf.append("<table cellspacing=0 cellpadding=0 style=\"cursor:hand\"><tr><td>");
+         }
+         
          buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue()));
+         
          if (link.getShowLink() == true)
          {
-            // TODO: add horizontal spacing as component property
-            buf.append("<span style='padding-left:2px");
-            
-            // text next to an image may need alignment
-            if (attrs.get("verticalAlign") != null)
+            if (padding != 0)
             {
-               buf.append(";vertical-align:")
-                  .append(attrs.get("verticalAlign"));
+               buf.append("</td><td style=\"padding:")
+                  .append(padding)
+                  .append("px\">");
+            }
+            else
+            {
+               // TODO: add horizontal spacing as component property
+               buf.append("<span style='padding-left:2px");
+               
+               // text next to an image may need alignment
+               if (attrs.get("verticalAlign") != null)
+               {
+                  buf.append(";vertical-align:")
+                     .append(attrs.get("verticalAlign"));
+               }
+               
+               buf.append("'>");
             }
             
-            buf.append("'>")
-               .append(link.getValue())
-               .append("</span>");
+            buf.append(link.getValue());
+            
+            if (padding == 0)
+            {
+               buf.append("</span>");
+            }
+         }
+         
+         if (padding != 0)
+         {
+            buf.append("</td></tr></table>");
          }
       }
       else
@@ -156,10 +183,17 @@ public class ActionLinkRenderer extends BaseRenderer
          buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue()));
       }
       
-      buf.append("</td><td>");
+      buf.append("</td><td");
+      int padding = link.getPadding();
+      if (padding != 0)
+      {
+         buf.append(" style=\"padding:")
+            .append(padding)
+            .append("px\"");
+      }
       
       // render text link cell for the menu
-      buf.append("<a href='#' onclick=\"");
+      buf.append("><a href='#' onclick=\"");
       buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
       buf.append('"');
       Map attrs = link.getAttributes();

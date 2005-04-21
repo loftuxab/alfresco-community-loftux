@@ -119,7 +119,7 @@ public final class Utils
     */
    public static String buildImageTag(FacesContext context, String image, int width, int height, String alt)
    {
-      StringBuilder buf = new StringBuilder(100);
+      StringBuilder buf = new StringBuilder(128);
       
       buf.append("<img src='")
          .append(context.getExternalContext().getRequestContextPath())
@@ -156,7 +156,7 @@ public final class Utils
     */
    public static String buildImageTag(FacesContext context, String image, String alt)
    {
-      StringBuilder buf = new StringBuilder(100);
+      StringBuilder buf = new StringBuilder(128);
       
       buf.append("<img src='")
          .append(context.getExternalContext().getRequestContextPath())
