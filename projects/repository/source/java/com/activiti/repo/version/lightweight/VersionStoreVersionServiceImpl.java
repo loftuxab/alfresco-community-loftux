@@ -8,26 +8,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.activiti.repo.dictionary.ClassRef;
-import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
-import com.activiti.repo.version.ReservedVersionNameException;
 import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionHistory;
 import com.activiti.repo.version.VersionLabelPolicy;
 import com.activiti.repo.version.VersionService;
-import com.activiti.repo.version.VersionServiceException;
 import com.activiti.repo.version.common.VersionHistoryImpl;
 import com.activiti.repo.version.common.VersionImpl;
 import com.activiti.repo.version.common.VersionUtil;
 import com.activiti.repo.version.common.counter.VersionCounterDaoService;
+import com.activiti.repo.version.exception.ReservedVersionNameException;
+import com.activiti.repo.version.exception.VersionServiceException;
+import com.activiti.util.AspectMissingException;
 
 /**
  * The light weight version service implementation.
- * 
- * Uses a workspace store to contain the version histories and the related versions.
  * 
  * @author Roy Wetheral
  */
@@ -69,7 +67,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
     public Version createVersion(
             NodeRef nodeRef, 
             Map<String, Serializable> versionProperties)
-            throws ReservedVersionNameException 
+            throws ReservedVersionNameException, AspectMissingException
     {
         // Get the next version number
         int versionNumber = this.versionCounterService.nextVersionNumber(getVersionStoreReference());
@@ -89,7 +87,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
             NodeRef nodeRef, 
             Map<String, Serializable> versionProperties,
             boolean versionChildren)
-            throws ReservedVersionNameException
+            throws ReservedVersionNameException, AspectMissingException
     {
         // Get the next version number
         int versionNumber = this.versionCounterService.nextVersionNumber(getVersionStoreReference());
@@ -111,17 +109,19 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
      
      * @return                                  a collection of the created versions
      * @throws ReservedVersionNameException     thrown if there is a reserved version property name clash
+     * @throws AspectMissingException    thrown if the version aspect is missing from a node
      */
     private Collection<Version> createVersion(
             NodeRef nodeRef, 
             Map<String, Serializable> versionProperties,
             boolean versionChildren,
             int versionNumber) 
-            throws ReservedVersionNameException
+            throws ReservedVersionNameException, AspectMissingException
     {
+
         Collection<Version> result = new ArrayList<Version>();
         
-       if (versionChildren == true)
+        if (versionChildren == true)
         {
             // Get the children of the node
             Collection<ChildAssocRef> children = this.dbNodeService.getChildAssocs(nodeRef);
@@ -152,7 +152,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
     public Collection<Version> createVersion(
             Collection<NodeRef> nodeRefs, 
             Map<String, Serializable> versionProperties)
-            throws ReservedVersionNameException
+            throws ReservedVersionNameException, AspectMissingException
     {
         Collection<Version> result = new ArrayList<Version>(nodeRefs.size());
         
@@ -172,18 +172,25 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
      * Creates a new version of the passed node assigning the version properties 
      * accordingly.
      * 
-     * @param nodeRef            a node reference
-     * @param versionProperties  the version properties
-     * @param versionNumber      the version number
-     * @return                   the newly created version
-     * @throws                   ReservedVersionNameException     
+     * @param  nodeRef              a node reference
+     * @param  versionProperties    the version properties
+     * @param  versionNumber        the version number
+     * @return                      the newly created version
+     * @throws ReservedVersionNameException
+     *                              thrown if there is a name clash in the version properties  
+     * @throws AspectMissingException    
+     *                              thrown if the version aspect is missing from the node   
      */
     private Version createVersion(
             NodeRef nodeRef, 
             Map<String, Serializable> versionProperties, 
             int versionNumber)
-            throws ReservedVersionNameException
+            throws ReservedVersionNameException, AspectMissingException
     {
+
+        // Check for the version aspect
+        checkForVersionAspect(nodeRef);
+        
         // TODO we need some way of 'locking' the current node to ensure no modifications (or other versions) 
         //      can take place untill the versioning process is complete
         
@@ -250,7 +257,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         // Set the new version label on the versioned node
         this.dbNodeService.setProperty(
                 nodeRef, 
-                VersionService.ATTR_CURRENT_VERSION_LABEL, 
+                VersionService.PROP_QNAME_CURRENT_VERSION_LABEL, 
                 version.getVersionLabel());
         
         // Return the data object representing the newly created version
@@ -261,7 +268,11 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
      * @see com.activiti.repo.version.VersionService#getVersionHistory(NodeRef)
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef)
+        throws AspectMissingException
     {
+        // Check for the version aspect
+        checkForVersionAspect(nodeRef);
+
         // TODO could definatly do with a cache since these are read-only objects ... maybe not 
         //      since they are dependant on the workspace of the node passed
         

@@ -5,6 +5,7 @@ package com.activiti.repo.version.lightweight;
 
 import java.util.Collection;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -12,6 +13,7 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.Searcher;
 import com.activiti.repo.version.VersionService;
+import com.activiti.util.AspectMissingException;
 
 /**
  * Helper base class providing common implementation used by the 
@@ -166,7 +168,7 @@ public abstract class VersionStoreBaseImpl implements VersionStoreConst
         // TODO use the searcher to retrieve the version node
         
         NodeRef result = null;
-        String versionLabel = (String)this.nodeService.getProperty(nodeRef, VersionService.ATTR_CURRENT_VERSION_LABEL);
+        String versionLabel = (String)this.nodeService.getProperty(nodeRef, VersionService.PROP_QNAME_CURRENT_VERSION_LABEL);
         
         Collection<ChildAssocRef> versions = this.dbNodeService.getChildAssocs(versionHistory);
         for (ChildAssocRef version : versions)
@@ -180,5 +182,24 @@ public abstract class VersionStoreBaseImpl implements VersionStoreConst
         }
         
         return result;
+    }
+    
+    /**
+     * Checks the given node for the version aspect.  Throws an exception if it is not present.
+     * 
+     * @param nodeRef   the node reference
+     * @throws AspectMissingException
+     *                  the version aspect is not present on the node
+     */
+    protected void checkForVersionAspect(NodeRef nodeRef)
+       throws AspectMissingException
+    {
+        ClassRef aspectRef = new ClassRef(VersionService.ASPECT_QNAME_VERSION);
+        
+        if (this.dbNodeService.hasAspect(nodeRef, aspectRef) == false)
+        {
+            // Raise exception to indicate version aspect is not present
+            throw new AspectMissingException(aspectRef, nodeRef);
+        }
     }
 }

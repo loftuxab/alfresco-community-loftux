@@ -5,8 +5,8 @@ package com.activiti.repo.version.common;
 
 import java.util.Collection;
 
-import com.activiti.repo.version.ReservedVersionNameException;
 import com.activiti.repo.version.Version;
+import com.activiti.repo.version.exception.ReservedVersionNameException;
 
 /**
  * Helper class containing helper methods for the versioning services.

@@ -8,8 +8,11 @@ package com.activiti.repo.lock;
 import java.util.Collection;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.lock.exception.UnableToReleaseLockException;
+import com.activiti.repo.lock.exception.UnableToAquireLockException;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
+import com.activiti.util.AspectMissingException;
 
 
 /**
@@ -27,13 +30,15 @@ public interface LockService
     /**
      * Lock aspect QName and ClassRef
      */
-    public final static QName ASPECT_QNAME_LOCK = QName.createQName(NAMESPACE_LOCK, "lock");
+    public final static String ASPECT_LOCK = "lock";
+    public final static QName ASPECT_QNAME_LOCK = QName.createQName(NAMESPACE_LOCK, ASPECT_LOCK);
     public final static ClassRef ASPECT_CLASS_REF_LOCK = new ClassRef(ASPECT_QNAME_LOCK);
     
     /**
      * Lock aspect attribute names
      */
-    public final static QName ATT_LOCK_OWNER = QName.createQName(NAMESPACE_LOCK, "lockOwner");
+    public final static String PROP_LOCK_OWNER = "lockOwner";
+    public final static QName PROP_QNAME_LOCK_OWNER = QName.createQName(NAMESPACE_LOCK, PROP_LOCK_OWNER);
     
     /**
      * Type-safe enum used to indicate the lock status
@@ -51,11 +56,13 @@ public interface LockService
     * 
     * @param  nodeRef  a reference to a node 
     * @param  userRef  a reference to the user that will own the lock
-    * @throws NodeAlreadyLockedException
-    *                  the node is already locked by another user
+    * @throws UnableToAquireLockException
+    *                  thrown if the lock could not be obtained
+    * @throws LockAspectMissing
+    *                   thrown if the lock aspect is missing
     */
    public void lock(NodeRef nodeRef, String userRef)
-       throws NodeAlreadyLockedException;
+       throws UnableToAquireLockException, AspectMissingException;
    
    /**
     * Places a lock on a node and optionally on all its children.  
@@ -72,11 +79,13 @@ public interface LockService
     * @param  lockChildren   if true indicates that all the children (and 
     *                        grandchildren, etc) of the node will also be locked, 
     *                        false otherwise
-    * @throws NodeAlreadyLockedException
-    *                        the node is already locked by another user
+    * @throws UnableToAquireLockException
+    *                        thrown if the lock could not be obtained
+    * @throws LockAspectMissing
+    *                        thrown if the lock aspect is missing
     */
    public void lock(NodeRef nodeRef, String userRef, boolean lockChildren)
-       throws NodeAlreadyLockedException;
+       throws UnableToAquireLockException, AspectMissingException;
    
    /**
     * Places a lock on all the nodes referenced in the passed list.  
@@ -90,11 +99,13 @@ public interface LockService
     *  
     * @param  nodeRefs a list of node references
     * @param  userRef  a reference to the user that will own the lock(s)
-    * @throws NodeAlreadyLockedException
-    *                  the node is already locked by another user
+    * @throws UnableToAquireLockException
+    *                  thrown if the lock could not be obtained
+    * @throws LockAspectMissing
+    *                   thrown if the lock aspect is missing
     */
    public void lock(Collection<NodeRef> nodeRefs, String userRef)
-       throws NodeAlreadyLockedException;
+       throws UnableToAquireLockException, AspectMissingException;
    
    /**
     * Removes the lock on a node.  
@@ -104,12 +115,13 @@ public interface LockService
     * 
     * @param  nodeRef  a reference to a node
     * @param  userRef  the user reference
-    * @throws InsufficientPrivelegesToRealeseLockException
-    *                  if the lock can not be released because the user is not the
-    *                  lock owner
+    * @throws UnableToReleaseLockException
+    *                  thrown if the lock could not be released
+    * @thrown AspectMissingException
+    *                   thrown if the lock aspect is missing                 
     */
    public void unlock(NodeRef nodeRef, String userRef)
-       throws InsufficientPrivelegesToRealeseLockException;
+       throws UnableToReleaseLockException, AspectMissingException;
    
    /**
     * Removes the lock on a node and optional on its children.  
@@ -128,12 +140,13 @@ public interface LockService
     * @param  userRef        the user reference
     * @param  lockChildren   if true then all the children (and grandchildren, etc) 
     *                        of the node will also be unlocked, false otherwise
-    * @throws InsufficientPrivelegesToRealeseLockException
-    *                        if the lock can not be released because the user is not the
-    *                        lock owner
+    * @throws UnableToReleaseLockException
+    *                  thrown if the lock could not be released
+    * @thrown AspectMissingException
+    *                   thrown if the lock aspect is missing
     */
    public void unlock(NodeRef nodeRef, String userRef, boolean lockChildren)
-       throws InsufficientPrivelegesToRealeseLockException;
+       throws UnableToReleaseLockException, AspectMissingException;
    
    /**
     * Removes a lock on the nodes provided.
@@ -150,12 +163,13 @@ public interface LockService
     * 
     * @param  nodeRefs  the node references
     * @param  userRef   the user reference
-    * @throws InsufficientPrivelegesToRealeseLockException
-    *                   if the lock can not be released because the user is not the
-    *                   lock owner
+    * @throws UnableToReleaseLockException
+    *                  thrown if the lock could not be released
+    * @thrown AspectMissingException
+    *                   thrown if the lock aspect is missing
     */
    public void unlock(Collection<NodeRef> nodeRefs, String userRef)
-       throws InsufficientPrivelegesToRealeseLockException;
+       throws UnableToReleaseLockException, AspectMissingException;
    
    /**
     * Indicates the current lock status for the user against the passed node.
@@ -170,6 +184,9 @@ public interface LockService
     * @param nodeRef    the node reference
     * @param userRef    the user reference
     * @return           the status of the lock in relation to the user
+    * @thrown AspectMissingException
+    *                   thrown if the lock aspect is missing
     */
-   public LockStatus getLockStatus(NodeRef nodeRef, String userRef);
+   public LockStatus getLockStatus(NodeRef nodeRef, String userRef)
+       throws AspectMissingException;
 }

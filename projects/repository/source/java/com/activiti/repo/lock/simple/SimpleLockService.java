@@ -5,12 +5,14 @@ package com.activiti.repo.lock.simple;
 
 import java.util.Collection;
 
-import com.activiti.repo.lock.InsufficientPrivelegesToRealeseLockException;
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.lock.LockService;
-import com.activiti.repo.lock.NodeAlreadyLockedException;
+import com.activiti.repo.lock.exception.UnableToReleaseLockException;
+import com.activiti.repo.lock.exception.UnableToAquireLockException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.util.AspectMissingException;
 
 /**
  * Simple Lock service implementation
@@ -45,7 +47,7 @@ public class SimpleLockService implements LockService
      * @see com.activiti.repo.lock.LockService#lock(com.activiti.repo.ref.NodeRef, java.lang.String)
      */
     public void lock(NodeRef nodeRef, String userRef)
-        throws NodeAlreadyLockedException
+        throws UnableToAquireLockException, AspectMissingException
     {
         synchronized (SimpleLockService.syncObject)
         {
@@ -57,7 +59,7 @@ public class SimpleLockService implements LockService
      * @see com.activiti.repo.lock.LockService#lock(com.activiti.repo.ref.NodeRef, java.lang.String, boolean)
      */
     public void lock(NodeRef nodeRef, String userRef, boolean lockChildren)
-        throws NodeAlreadyLockedException
+        throws UnableToAquireLockException, AspectMissingException
     {
         synchronized (SimpleLockService.syncObject)
         {
@@ -69,7 +71,7 @@ public class SimpleLockService implements LockService
      * @see com.activiti.repo.lock.LockService#lock(java.util.Collection, java.lang.String)
      */
     public void lock(Collection<NodeRef> nodeRefs, String userRef)
-        throws NodeAlreadyLockedException
+        throws UnableToAquireLockException, AspectMissingException
     {
         synchronized (SimpleLockService.syncObject)
         {
@@ -86,34 +88,43 @@ public class SimpleLockService implements LockService
      * 
      * @param  nodeRef  the node reference
      * @param  userRef  the user reference
-     * @throws NodeAlreadyLockedException
-     *                  if the node is aleady locked by another user
+     * @throws UnableToAquireLockException
+     *                  thrown if the lock cannot be obtained
+     * @throws AspectMissingException
+     *                  thrown if the lock aspect is missing                  
      */
     private void lockImpl(NodeRef nodeRef, String userRef)
-        throws NodeAlreadyLockedException
+        throws UnableToAquireLockException, AspectMissingException
     {
+        // Check for lock aspect
+        checkForLockApsect(nodeRef);
+        
         LockStatus currentLockStatus = getLockStatus(nodeRef, userRef);
         if (LockStatus.LOCKED.equals(currentLockStatus) == true)
         {
             // Error since we are trying to lock a locked node
-            throw new NodeAlreadyLockedException(nodeRef);
+            throw new UnableToAquireLockException(nodeRef);
         }
         else if (LockStatus.UNLOCKED.equals(currentLockStatus) == true)
         {
             // Set the current user as the lock owner
-            this.nodeService.setProperty(nodeRef, ATT_LOCK_OWNER, userRef);
+            this.nodeService.setProperty(nodeRef, PROP_QNAME_LOCK_OWNER, userRef);
         }
     }
     
     /**
+     * Applies the lock to node and optionally the children of the node.
      * 
-     * @param nodeRef
-     * @param userRef
-     * @param lockChildren
-     * @throws NodeAlreadyLockedException
+     * @param  nodeRef       the node reference
+     * @param  userRef       the user reference
+     * @param  lockChildren  indicates whether to lock the children of the node
+     * @throws UnableToAquireLockException
+     *                       thrown if the lock cannot be obtained
+     * @throws LockAspectMissing
+     *                       thrown if the lock aspect is missing
      */
     private void lockImpl(NodeRef nodeRef, String userRef, boolean lockChildren)
-        throws NodeAlreadyLockedException
+        throws UnableToAquireLockException, AspectMissingException
     {
         lockImpl(nodeRef, userRef);
         
@@ -131,7 +142,7 @@ public class SimpleLockService implements LockService
      * @see com.activiti.repo.lock.LockService#unlock(NodeRef, String)
      */
     public void unlock(NodeRef nodeRef, String userRef)
-        throws InsufficientPrivelegesToRealeseLockException
+        throws UnableToReleaseLockException, AspectMissingException
     {
         synchronized (SimpleLockService.syncObject)
         {
@@ -143,7 +154,7 @@ public class SimpleLockService implements LockService
      * @see com.activiti.repo.lock.LockService#unlock(NodeRef, String, boolean)
      */
     public void unlock(NodeRef nodeRef, String userRef, boolean unlockChildren)
-        throws InsufficientPrivelegesToRealeseLockException
+        throws UnableToReleaseLockException, AspectMissingException
     {
         synchronized (SimpleLockService.syncObject)
         {
@@ -155,7 +166,7 @@ public class SimpleLockService implements LockService
      * @see com.activiti.repo.lock.LockService#unlock(Collection<NodeRef>, String)
      */
     public void unlock(Collection<NodeRef> nodeRefs, String userRef)
-        throws InsufficientPrivelegesToRealeseLockException
+        throws UnableToReleaseLockException, AspectMissingException
     {
         synchronized (SimpleLockService.syncObject)
         {
@@ -167,36 +178,46 @@ public class SimpleLockService implements LockService
     }
     
     /**
+     * Releases the lock held on the node.
      * 
-     * @param  nodeRef
-     * @param  userRef
-     * @throws InsufficientPrivelegesToRealeseLockException
+     * @param  nodeRef  the node reference
+     * @param  userRef  the user reference
+     * @throws UnableToReleaseLockException
+     *                  thrown if the lock cannot be released
+     * @throws AspectMissingException
+     *                  thrown is the lock aspect is missing
      */
     private void unlockImpl(NodeRef nodeRef, String userRef)
-        throws InsufficientPrivelegesToRealeseLockException
+        throws UnableToReleaseLockException, AspectMissingException
     {
+        // Check for lock aspect
+        checkForLockApsect(nodeRef);
+        
         LockStatus lockStatus = getLockStatus(nodeRef, userRef);
         if (LockStatus.LOCKED.equals(lockStatus) == true)
         {
             // Error since the lock can only be released by the lock owner
-            throw new InsufficientPrivelegesToRealeseLockException(nodeRef);
+            throw new UnableToReleaseLockException(nodeRef);
         }
         else if (LockStatus.LOCK_OWNER.equals(lockStatus) == true)
         {
             // Clear the lock owner
-            this.nodeService.setProperty(nodeRef, ATT_LOCK_OWNER, "");
+            this.nodeService.setProperty(nodeRef, PROP_QNAME_LOCK_OWNER, "");
         }
     }
 
     /**
      * 
-     * @param  nodeRef
-     * @param  userRef
-     * @param  unlockChildren
-     * @throws InsufficientPrivelegesToRealeseLockException
+     * @param  nodeRef          the node reference
+     * @param  userRef          the user reference
+     * @param  unlockChildren   indicates whether the children should also be unlocked
+     * @throws UnableToReleaseLockException
+     *                  thrown if the lock cannot be released
+     * @throws AspectMissingException
+     *                  thrown is the lock aspect is missing
      */
     private void unlockImpl(NodeRef nodeRef, String userRef, boolean unlockChildren)
-        throws InsufficientPrivelegesToRealeseLockException
+        throws UnableToReleaseLockException, AspectMissingException
     {
         // Unlock the parent
         unlockImpl(nodeRef, userRef);
@@ -216,13 +237,15 @@ public class SimpleLockService implements LockService
      * @see com.activiti.repo.lock.LockService#getLockStatus(NodeRef, String)
      */
     public LockStatus getLockStatus(NodeRef nodeRef, String userRef)
+        throws AspectMissingException
     {
-        // TODO first check that this node has the lock aspect applied
+        // Check for lock aspect
+        checkForLockApsect(nodeRef);
         
         LockStatus result = LockStatus.UNLOCKED;
         
         // Get the current lock owner
-        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, ATT_LOCK_OWNER);
+        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, PROP_QNAME_LOCK_OWNER);
         if (currentUserRef != null && currentUserRef.length() != 0)
         {
             if (currentUserRef.equals(userRef) == true)
@@ -237,6 +260,25 @@ public class SimpleLockService implements LockService
         
         return result;
         
+    }
+    
+    /**
+     * Checks for the lock aspect.  Throws an expception if it is missing.
+     * 
+     * @param nodeRef   the node reference
+     * @throws AspectMissingException
+     *                  thrown if the lock aspect is missing
+     */
+    private void checkForLockApsect(NodeRef nodeRef)
+        throws AspectMissingException
+    {
+        // Get the class ref for the lock aspect
+        ClassRef lockAspect = new ClassRef(ASPECT_QNAME_LOCK);
+        
+        if (this.nodeService.hasAspect(nodeRef, lockAspect) == false)
+        {
+            throw new AspectMissingException(lockAspect, nodeRef);
+        }
     }
 
 }

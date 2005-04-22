@@ -12,7 +12,7 @@ import java.util.Map;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.version.Version;
-import com.activiti.repo.version.VersionServiceException;
+import com.activiti.repo.version.exception.VersionServiceException;
 
 import junit.framework.TestCase;
 

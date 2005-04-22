@@ -6,15 +6,17 @@ package com.activiti.repo.lock.simple;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
-import com.activiti.repo.lock.InsufficientPrivelegesToRealeseLockException;
 import com.activiti.repo.lock.LockService;
-import com.activiti.repo.lock.NodeAlreadyLockedException;
 import com.activiti.repo.lock.LockService.LockStatus;
+import com.activiti.repo.lock.exception.UnableToReleaseLockException;
+import com.activiti.repo.lock.exception.UnableToAquireLockException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.util.AspectMissingException;
 import com.activiti.util.BaseSpringTest;
 
 /**
@@ -39,6 +41,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
     private NodeRef parentNode = null;
     private NodeRef childNode1 = null;
     private NodeRef childNode2 = null;    
+    private NodeRef noAspectNode = null;
 
     /**
      * Called during the transaction setup
@@ -47,6 +50,9 @@ public class SimpleLockServiceTest extends BaseSpringTest
     {
         this.nodeService = (NodeService)applicationContext.getBean("dbNodeService");
         this.lockService = (LockService)applicationContext.getBean("simpleLockService");
+        
+        // Get the lock aspect class ref
+        ClassRef lockAspect = new ClassRef(LockService.ASPECT_QNAME_LOCK);
         
         // Create the node properties
         HashMap<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
@@ -64,6 +70,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
                 QName.createQName("{}ParentNode"), 
                 DictionaryBootstrap.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
+        this.nodeService.addAspect(this.parentNode, lockAspect, new HashMap<QName, Serializable>());
         assertNotNull(this.parentNode);
         
         // Add some children to the node
@@ -72,13 +79,23 @@ public class SimpleLockServiceTest extends BaseSpringTest
                 QName.createQName("{}ChildNode1"),
                 DictionaryBootstrap.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
+        this.nodeService.addAspect(this.childNode1, lockAspect, new HashMap<QName, Serializable>());
         assertNotNull(this.childNode1);
         this.childNode2 = this.nodeService.createNode(
                 this.parentNode,
                 QName.createQName("{}ChildNode2"),
                 DictionaryBootstrap.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
+        this.nodeService.addAspect(this.childNode2, lockAspect, new HashMap<QName, Serializable>());
         assertNotNull(this.childNode2);
+        
+        // Create a node with no lockAspect
+        this.noAspectNode = this.nodeService.createNode(
+                rootNodeRef, 
+                QName.createQName("{}noAspectNode"), 
+                DictionaryBootstrap.TYPE_CONTAINER,
+                nodeProperties).getChildRef();
+        assertNotNull(this.noAspectNode);
     }
     
     /**
@@ -106,7 +123,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
             this.lockService.lock(this.parentNode, USER_REF2);
             fail("The user should not be able to lock the node since it is already locked by another user.");
         }
-        catch (NodeAlreadyLockedException exception)
+        catch (UnableToAquireLockException exception)
         {
         }
         
@@ -119,11 +136,22 @@ public class SimpleLockServiceTest extends BaseSpringTest
         {
             fail("No error should be thrown when a node is re-locked by the current lock owner.");
         }
+        
+        // Test with no apect node
+        try
+        {
+            this.lockService.lock(this.noAspectNode, USER_REF1);
+            fail("This node has no lock aspect.");
+        }
+        catch (AspectMissingException exception)
+        {
+        }
     }
 
     /**
      * Test lock with lockChildren == true
      */
+    // TODO
     public void testLockChildren()
     {
     }
@@ -131,6 +159,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
     /**
      * Test lock with collection
      */
+    // TODO
     public void testLockMany()
     {
     }
@@ -149,7 +178,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
             this.lockService.unlock(this.parentNode, USER_REF2);
             fail("A user cannot unlock a node that is currently lock by another user.");
         }
-        catch (InsufficientPrivelegesToRealeseLockException exception)
+        catch (UnableToReleaseLockException exception)
         {
         }
         
@@ -171,12 +200,24 @@ public class SimpleLockServiceTest extends BaseSpringTest
         {
             fail("Unlocking an unlocked node should not result in an exception being raised.");
         }
+        
+        // Test with no apect node
+        try
+        {
+            this.lockService.unlock(this.noAspectNode, USER_REF1);
+            fail("This node has no lock aspect.");
+        }
+        catch (AspectMissingException exception)
+        {
+        }
     }
     
+    // TODO
     public void testUnlockChildren()
     {
     }
     
+    // TODO
     public void testUnlockMany()
     {
     }
@@ -186,14 +227,12 @@ public class SimpleLockServiceTest extends BaseSpringTest
      */
     public void testGetLockStatus()
     {
-        // TODO check that fails when called with a node without the lock aspect
-        
         // Check an unlocked node
         LockStatus lockStatus1 = this.lockService.getLockStatus(this.parentNode, USER_REF1);
         assertEquals(LockStatus.UNLOCKED, lockStatus1);
         
         // Simulate the node being locked by user1
-        this.nodeService.setProperty(this.parentNode, LockService.ATT_LOCK_OWNER, USER_REF1);
+        this.nodeService.setProperty(this.parentNode, LockService.PROP_QNAME_LOCK_OWNER, USER_REF1);
         
         // Check for locked status
         LockStatus lockStatus2 = this.lockService.getLockStatus(this.parentNode, USER_REF2);
@@ -202,5 +241,15 @@ public class SimpleLockServiceTest extends BaseSpringTest
         // Check for lock owner status
         LockStatus lockStatus3 = this.lockService.getLockStatus(this.parentNode, USER_REF1);
         assertEquals(LockStatus.LOCK_OWNER, lockStatus3);
+                
+        // Test with no apect node
+        try
+        {
+            this.lockService.getLockStatus(this.noAspectNode, USER_REF1);
+            fail("This node has no lock aspect.");
+        }
+        catch (AspectMissingException exception)
+        {
+        }
     }
 }

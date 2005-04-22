@@ -5,7 +5,6 @@ import java.io.File;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryException;
 import com.activiti.repo.dictionary.NamespaceService;
-import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.metamodel.M2Aspect;
 import com.activiti.repo.dictionary.metamodel.M2Association;
@@ -393,6 +392,7 @@ public class DictionaryBootstrap
         M2Class containerType = metaModelDAO.getClass(TYPE_QNAME_CONTAINER);
         M2Class referenceType = metaModelDAO.getClass(TYPE_QNAME_REFERENCE);
         
+        
         // ===========================================================================
         // Lock Aspect Model Defintions
         
@@ -400,7 +400,7 @@ public class DictionaryBootstrap
         M2Aspect lockAspect = metaModelDAO.createAspect(LockService.ASPECT_QNAME_LOCK);
         
         // Create the lock owner property
-        M2Property lockOwnerProperty = lockAspect.createProperty(LockService.ATT_LOCK_OWNER.getLocalName());
+        M2Property lockOwnerProperty = lockAspect.createProperty(LockService.PROP_LOCK_OWNER);
         lockOwnerProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
         lockOwnerProperty.setMandatory(false);
         lockOwnerProperty.setMultiValued(false);
@@ -410,10 +410,10 @@ public class DictionaryBootstrap
         // Version Aspect Model Defintions
         
         // Create version aspect
-        M2Aspect versionAspect = metaModelDAO.createAspect(VersionService.ASPECT_VERSION);
+        M2Aspect versionAspect = metaModelDAO.createAspect(VersionService.ASPECT_QNAME_VERSION);
         
         // Create current version label property
-        M2Property currentVersionLabelProperty = versionAspect.createProperty(VersionService.ATTR_CURRENT_VERSION_LABEL.getLocalName());
+        M2Property currentVersionLabelProperty = versionAspect.createProperty(VersionService.PROP_CURRENT_VERSION_LABEL);
         currentVersionLabelProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         currentVersionLabelProperty.setMandatory(false); 
         currentVersionLabelProperty.setMultiValued(false);

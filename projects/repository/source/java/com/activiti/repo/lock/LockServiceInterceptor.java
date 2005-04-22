@@ -8,6 +8,7 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import com.activiti.repo.lock.LockService.LockStatus;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.util.AspectMissingException;
 
 /**
  * Lock service interceptor used to call the lock service and determine
@@ -40,36 +41,30 @@ class LockServiceInterceptor implements MethodInterceptor
     {
         // Get the method name
         String methodName = arg0.getMethod().getName();
-        
-        // TODO the name match should be dirven from the config file
-        //if ("createVersion".equals(methodName) == true)
-        //{
-            System.out.println("Lock service interceptor for " + methodName);
-            
-            // TODO need to get the user from somewhere ...
-            String userRef = "userRef";
-            
-            // TODO this will not work if there are more that one node ref's in the
-            //      method unless the first is the significant one!!
-            
-            // Get the node reference
-            NodeRef nodeRef = null;
-            for (Object argumentValue : arg0.getArguments())
-            {
-                if (argumentValue instanceof NodeRef)
-                {
-                    nodeRef = (NodeRef)argumentValue;
-                    break;
-                }
-            }
-            
-            // Ensure we have found a node reference
-            // TODO should throw an exception here?
-            if (nodeRef != null && userRef != null)
-            {
-                // TODO check that the node ref has the lock aspect applied
-                //      ignore if it hasn't
                 
+        // TODO need to get the user from somewhere ...
+        String userRef = "userRef";
+        
+        // TODO this will not work if there are more that one node ref's in the
+        //      method unless the first is the significant one!!
+        
+        // Get the node reference
+        NodeRef nodeRef = null;
+        for (Object argumentValue : arg0.getArguments())
+        {
+            if (argumentValue instanceof NodeRef)
+            {
+                nodeRef = (NodeRef)argumentValue;
+                break;
+            }
+        }
+        
+        // Ensure we have found a node reference
+        // TODO should throw an exception here?
+        if (nodeRef != null && userRef != null)
+        {
+            try
+            {
                 // Get the current lock status on the node ref
                 LockStatus currentLockStatus = this.lockService.getLockStatus(nodeRef, userRef);
                 
@@ -82,7 +77,12 @@ class LockServiceInterceptor implements MethodInterceptor
                     throw new NodeLockedException(nodeRef);
                 }
             }
-       // }
+            catch (AspectMissingException exception)
+            {
+                // Ignore since this indicates that the node does not have the lock  
+                // aspect applied
+            }
+        }
         
         return arg0.proceed(); 
     }

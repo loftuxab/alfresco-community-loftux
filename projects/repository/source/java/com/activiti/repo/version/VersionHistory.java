@@ -8,6 +8,8 @@ package com.activiti.repo.version;
 import java.io.Serializable;
 import java.util.Collection;
 
+import com.activiti.repo.version.exception.VersionDoesNotExistException;
+
 /**
  * Version history interface.
  * 

@@ -4,7 +4,6 @@
 package com.activiti.repo.version.lightweight;
 
 import com.activiti.repo.dictionary.ClassRef;
-import com.activiti.repo.dictionary.PropertyRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.version.Version;
 

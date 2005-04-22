@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
@@ -87,12 +88,16 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         // Use this map to retrive the versionable nodes in later tests
         this.versionableNodes = new HashMap<String, NodeRef>();
         
+        // Get the version aspect class reference
+        ClassRef aspectRef = new ClassRef(VersionService.ASPECT_QNAME_VERSION);
+        
         // Create node 
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
                 QName.createQName("{}MyVersionableNode"), 
                 DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
+        this.dbNodeService.addAspect(nodeRef, aspectRef, new HashMap<QName, Serializable>());
         assertNotNull(nodeRef);
         this.versionableNodes.put(nodeRef.getId(), nodeRef);
         
@@ -102,6 +107,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
                 QName.createQName("{}ChildNode1"),
                 DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
+        this.dbNodeService.addAspect(child1, aspectRef, new HashMap<QName, Serializable>());
         assertNotNull(child1);
         this.versionableNodes.put(child1.getId(), child1);
         NodeRef child2 = this.dbNodeService.createNode(
@@ -109,6 +115,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
                 QName.createQName("{}ChildNode2"),
                 DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
+        this.dbNodeService.addAspect(child2, aspectRef, new HashMap<QName, Serializable>());
         assertNotNull(child2);
         this.versionableNodes.put(child2.getId(), child2);
         
@@ -203,7 +210,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         // Check the node ref for the current version
         String currentVersionLabel = (String)this.dbNodeService.getProperty(
                 versionableNode,
-                VersionService.ATTR_CURRENT_VERSION_LABEL);
+                VersionService.PROP_QNAME_CURRENT_VERSION_LABEL);
         assertEquals(newVersion.getVersionLabel(), currentVersionLabel);
     }
     

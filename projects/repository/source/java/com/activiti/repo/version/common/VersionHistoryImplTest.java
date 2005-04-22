@@ -8,8 +8,8 @@ import java.util.HashMap;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.version.Version;
-import com.activiti.repo.version.VersionDoesNotExistException;
-import com.activiti.repo.version.VersionServiceException;
+import com.activiti.repo.version.exception.VersionDoesNotExistException;
+import com.activiti.repo.version.exception.VersionServiceException;
 
 import junit.framework.TestCase;
 

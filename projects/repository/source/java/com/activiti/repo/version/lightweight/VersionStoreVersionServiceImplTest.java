@@ -35,7 +35,7 @@ public class VersionStoreVersionServiceImplTest extends VersionStoreBaseImplTest
         createVersion(versionableNode);
     }
     
-    // TODO test versioning a non versionable node
+    // TODO test versioning a non versionable node ie: no veriosn apsect
     
     // TODO test versioning numberious times with branchs implies by different workspaces
     
