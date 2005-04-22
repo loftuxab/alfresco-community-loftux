@@ -107,7 +107,8 @@ public class BreadcrumbTag extends HtmlComponentTag
    }
    
    /**
-    * Set the value
+    * Set the value. The value for a breadcrumb is either a '/' separated String path
+    * or a List of IBreadcrumb handler instances.
     *
     * @param value     the value
     */

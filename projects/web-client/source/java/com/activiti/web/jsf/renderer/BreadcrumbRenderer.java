@@ -5,6 +5,7 @@ package com.activiti.web.jsf.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -14,6 +15,7 @@ import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 
 import com.activiti.web.jsf.Utils;
+import com.activiti.web.jsf.component.IBreadcrumbHandler;
 import com.activiti.web.jsf.component.UIBreadcrumb;
 
 /**
@@ -54,22 +56,19 @@ public class BreadcrumbRenderer extends BaseRenderer
          Writer out = context.getResponseWriter();
          
          UIBreadcrumb breadcrumb = (UIBreadcrumb)component;
-         String path = (String)breadcrumb.getValue();
-         if (path != null)
+         // get the List of IBreadcrumbHandler elements from the component
+         List<IBreadcrumbHandler> elements = (List)breadcrumb.getValue();
+         
+         boolean first = true;
+         for (int index=0; index<elements.size(); index++)
          {
-            int index = 0;
-            boolean first = true;
-            StringTokenizer t = new StringTokenizer(path, UIBreadcrumb.SEPARATOR);
-            while (t.hasMoreTokens() == true)
+            IBreadcrumbHandler element = elements.get(index);
+            
+            // handle not optionally hiding the root part
+            if (index != 0 || breadcrumb.getShowRoot() == true)
             {
-               String element = t.nextToken();
-               // handle not optionally hiding the root part
-               if (index != 0 || breadcrumb.getShowRoot() == true)
-               {
-                  out.write( renderBreadcrumb(context, breadcrumb, element, index, first) );
-                  first = false;
-               }
-               index++;
+               out.write( renderBreadcrumb(context, breadcrumb, element.toString(), index, first) );
+               first = false;
             }
          }
       }
@@ -93,7 +92,7 @@ public class BreadcrumbRenderer extends BaseRenderer
    private String renderBreadcrumb(FacesContext context, UIBreadcrumb bc, String element, int index, boolean first)
    {
       // render breadcrumb link element
-      StringBuilder buf = new StringBuilder(256);
+      StringBuilder buf = new StringBuilder(200);
       
       // output separator
       if (first == false)

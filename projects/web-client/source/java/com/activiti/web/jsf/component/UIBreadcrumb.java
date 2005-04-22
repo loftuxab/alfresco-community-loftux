@@ -3,6 +3,9 @@
  */
 package com.activiti.web.jsf.component;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.faces.component.UICommand;
@@ -63,24 +66,81 @@ public class UIBreadcrumb extends UICommand
     */
    public void setSelectedPathIndex(int index)
    {
-      if (index >= 0)
+      // getValue() will return a List of IBreadcrumbHandler (see impl below)
+      List<IBreadcrumbHandler> elements = (List)getValue();
+      
+      if (elements.size() >= index)
       {
-         String path = (String)getValue();
-         if (path != null)
+         // copy path elements up to the selected index to a new List
+         List<IBreadcrumbHandler> path = new ArrayList<IBreadcrumbHandler>(index + 1);
+         path.addAll(elements.subList(0, index + 1));
+         
+         // set the new List as our new path value
+         setValue(path);
+         
+         // call the app logic for the element handler and perform any required navigation
+         String outcome = path.get(index).navigationOutcome();
+         if (outcome != null)
          {
-            // rebuild the path upto the specified token index
-            StringBuilder newPath = new StringBuilder(path.length());
-            StringTokenizer t = new StringTokenizer(path, SEPARATOR);
-            for (int i=0; i<=index && t.hasMoreTokens(); i++)
-            {
-               newPath.append(SEPARATOR)
-                      .append(t.nextToken());
-            }
-            
-            // save the new path up to and including the selected element
-            setValue(newPath.toString());
+            String viewId = getFacesContext().getViewRoot().getViewId();
+            getFacesContext().getApplication().getNavigationHandler().handleNavigation(
+                  getFacesContext(), viewId, outcome);
          }
       }
+   }
+   
+   /**
+    * Override getValue() to deal with converting a String path into a valid List of IBreadcrumbHandler
+    */
+   public Object getValue()
+   {
+      List<IBreadcrumbHandler> elements = null;
+      
+      Object value = super.getValue();
+      if (value instanceof String)
+      {
+         elements = new ArrayList(8);
+         // found a String based path - convert to List of IBreadcrumbHandler instances
+         StringTokenizer t = new StringTokenizer((String)value, SEPARATOR);
+         while (t.hasMoreTokens() == true)
+         {
+            IBreadcrumbHandler handler = new DefaultPathHandler(t.nextToken());
+            elements.add(handler);
+         }
+         
+         // save result so we don't need to repeat the conversion
+         setValue(elements);
+      }
+      else if (value instanceof List)
+      {
+         elements = (List)value;
+      }
+      else if (value != null)
+      {
+         throw new IllegalArgumentException("UIBreadcrumb value must be a String path or List of IBreadcrumbHandler!");
+      }
+      else
+      {
+         elements = new ArrayList(8);
+      }
+      
+      return elements;
+   }
+   
+   /**
+    * Append a handler object to the current breadcrumb structure
+    * 
+    * @param handler    The IBreadcrumbHandler to append
+    */
+   public void appendHandler(IBreadcrumbHandler handler)
+   {
+      if (handler == null)
+      {
+         throw new NullPointerException("IBreadcrumbHandler instance cannot be null!");
+      }
+      
+      List elements = (List)getValue();
+      elements.add(handler);
    }
    
    
@@ -163,6 +223,41 @@ public class UIBreadcrumb extends UICommand
       }
       
       public int SelectedIndex = 0;
+   }
+   
+   /**
+    * Class representing a handler for the default String path based breadcrumb
+    */
+   private class DefaultPathHandler implements IBreadcrumbHandler, Serializable
+   {
+      /**
+       * Constructor
+       * 
+       * @param label      The element display label
+       */
+      public DefaultPathHandler(String label)
+      {
+         this.label = label;
+      }
+      
+      /**
+       * Return the element display label
+       */
+      public String toString()
+      {
+         return this.label;
+      }
+      
+      /**
+       * @see com.activiti.web.jsf.component.IBreadcrumbHandler#navigationOutcome()
+       */
+      public String navigationOutcome()
+      {
+         // no outcome for the default handler - return to current page
+         return null;
+      }
+      
+      private String label;
    }
    
    
