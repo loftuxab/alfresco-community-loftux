@@ -123,4 +123,12 @@ public class LuceneResultSetRow implements ResultSetRow
         return value;
     }
 
+   public QName getQName()
+   {
+      String qname = getDocument().getField("QNAME").stringValue();
+      return QName.createQName(qname);
+   }
+    
+    
+
 }

@@ -62,5 +62,12 @@ public interface ResultSetRow
      * @return
      */
     public ResultSet getResultSet();
+    
+    /**
+     * Return the QName of the node in the context in which it was found.
+     * @return
+     */
+    
+    public QName getQName();
 
 }

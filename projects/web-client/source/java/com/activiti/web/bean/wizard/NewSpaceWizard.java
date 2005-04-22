@@ -3,14 +3,23 @@ package com.activiti.web.bean.wizard;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.faces.application.ViewHandler;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
+import com.activiti.repo.node.NodeService;
+import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.Path;
+import com.activiti.repo.ref.QName;
+import com.activiti.repo.ref.StoreRef;
+import com.activiti.repo.search.ResultSet;
+import com.activiti.repo.search.ResultSetRow;
+import com.activiti.repo.search.Searcher;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -19,7 +28,9 @@ import org.apache.log4j.Logger;
  */
 public class NewSpaceWizard
 {
+   private static final String REPOSITORY_STORE = "SpacesStore";
    private static Logger logger = Logger.getLogger(NewSpaceWizard.class);
+   private static ApplicationContext appCtx;
    
    private String createType = "scratch";
    private String spaceType = "container";
@@ -32,6 +43,56 @@ public class NewSpaceWizard
    private boolean saveAsTemplate = false;
    private String templateName;
    private int currentStep = 1;
+   
+   private List spaces;
+   private List templates;
+   
+   private NodeService nodeService;
+   
+   // ************************************************************************
+   // TODO: Remove these methods when Spring integration is done properly
+   private ApplicationContext getAppContext()
+   {
+      if (appCtx == null)
+      {
+         appCtx = new ClassPathXmlApplicationContext("applicationContext.xml");
+      }
+      
+      return appCtx;
+   }
+   
+   private StoreRef getStoreRef()
+   {
+      return new StoreRef(StoreRef.PROTOCOL_WORKSPACE, REPOSITORY_STORE);
+   }
+   // ************************************************************************
+   
+   /**
+    * @return Returns the nodeService.
+    */
+   public NodeService getNodeService()
+   {
+      // TODO: Do this in the context listener i.e. when the app starts
+      
+      NodeService nodeService = (NodeService)getAppContext().getBean("indexingNodeService");
+         
+      if (nodeService.exists(getStoreRef()) == false)
+      {
+         // create the store
+         nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, REPOSITORY_STORE);
+      }
+      
+      return nodeService;
+   }
+   
+
+   /**
+    * @param nodeService The nodeService to set.
+    */
+   public void setNodeService(NodeService nodeService)
+   {
+      this.nodeService = nodeService;
+   }
    
    /**
     * Deals with the next button being pressed
@@ -118,13 +179,26 @@ public class NewSpaceWizard
     */
    public String finish()
    {
-      // TODO: gather up all the data entered by the user and create the space using the NodeService
-      
       if (logger.isDebugEnabled())
-      {
-         logger.debug("Finish called");
          logger.debug(getSummary());
+      
+      // get the node service and create the space (just create a folder for now)
+      NodeService svc = getNodeService();
+      NodeRef rootNodeRef = svc.getRootNode(getStoreRef());
+      ChildAssocRef assocRef = svc.createNode(rootNodeRef,
+                QName.createQName(NamespaceService.ACTIVITI_URI, this.name),
+                DictionaryBootstrap.TYPE_FOLDER);
+      NodeRef nodeRef = assocRef.getChildRef();
+      
+      // set the properties
+      if (this.description != null)
+      {
+         QName propDesc = QName.createQName("description");
+         svc.setProperty(nodeRef, propDesc, this.description);
       }
+      
+      QName propIcon = QName.createQName("icon");
+      svc.setProperty(nodeRef, propIcon, this.icon);
       
       this.currentStep = 1;
       
@@ -183,17 +257,12 @@ public class NewSpaceWizard
     */
    public List getTemplateSpaces()
    {
-      // TODO: use the service APIs to query for the data then create the items 
-      //       from the results
+      if (this.templates == null)
+      {
+         this.templates = querySpaces();
+      }
       
-      ArrayList items = new ArrayList();
-      
-//      SelectItem item1 = new SelectItem("template1", "Template 1");
-//      SelectItem item2 = new SelectItem("template2", "Template 2");
-//      items.add(item1);
-//      items.add(item2);
-      
-      return items;
+      return this.templates;
    }
    
    /**
@@ -201,19 +270,12 @@ public class NewSpaceWizard
     */
    public List getSpaces()
    {
-      // TODO: use the service APIs to query for the data then create the items 
-      //       from the results
+      if (this.spaces == null)
+      {
+         this.spaces = querySpaces();
+      }
       
-      ArrayList items = new ArrayList();
-      
-      SelectItem item1 = new SelectItem("space1", "Space 1");
-      SelectItem item11 = new SelectItem("space11", "Space 1.1");
-      SelectItem item2 = new SelectItem("space2", "Space 2");
-      items.add(item1);
-      items.add(item11);
-      items.add(item2);
-      
-      return items;
+      return this.spaces;
    }
    
    /**
@@ -390,5 +452,31 @@ public class NewSpaceWizard
    public void setCurrentStep(int currentStep)
    {
       this.currentStep = currentStep;
+   }
+   
+   private List querySpaces()
+   {
+      // get the node service and root node
+      NodeService svc = getNodeService();
+      NodeRef rootNodeRef = svc.getRootNode(getStoreRef());
+      
+      // get the searcher object and perform the search of the root node
+      Searcher searcher = (Searcher)getAppContext().getBean("searcherComponent");
+      String s = "PATH:\"/" + NamespaceService.ACTIVITI_PREFIX + ":*\"";
+      ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
+      
+      // create a list of items from the results
+      ArrayList items = new ArrayList();
+      if (results.length() > 0)
+      {
+         for (ResultSetRow row: results)
+         {
+            String name = row.getQName().getLocalName();
+            SelectItem item = new SelectItem(name, name);
+            items.add(item);
+         }
+      }
+      
+      return items;
    }
 }
