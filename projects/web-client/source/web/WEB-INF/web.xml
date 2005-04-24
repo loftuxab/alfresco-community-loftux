@@ -5,75 +5,56 @@
   "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-    <display-name>JavaServer Faces Test Portlet Sample Application</display-name>
+   <display-name>Company Name Web Client</display-name>
     
-    <description>
-        JavaServer Faces Test Portlet Sample Application
-    </description>
+   <description>Company Name Web Client</description>
 
-    <context-param>
-        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
-        <param-value>server</param-value>
-    </context-param>
+   <context-param>
+      <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+      <param-value>server</param-value>
+   </context-param>
 
-    <context-param>
-        <param-name>javax.faces.application.CONFIG_FILES</param-name>
-        <param-value>/WEB-INF/faces-config.xml</param-value>
-    </context-param>
+   <context-param>
+      <param-name>javax.faces.application.CONFIG_FILES</param-name>
+      <param-value>/WEB-INF/faces-config.xml</param-value>
+   </context-param>
 
-    <context-param>
-        <param-name>com.sun.faces.validateXml</param-name>
-        <param-value>false</param-value>
-    </context-param>
-    
-    <context-param>
-        <param-name>config.files</param-name>
-        <param-value>/WEB-INF/web-client-config.xml</param-value>
-    </context-param>
-        
-    <listener>
+   <context-param>
+      <param-name>com.sun.faces.validateXml</param-name>
+      <param-value>false</param-value>
+   </context-param>
+
+   <context-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:applicationContext.xml /WEB-INF/web-client-application-context.xml</param-value>
+   </context-param>
+   
+   <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
+   
+   <listener>
       <listener-class>com.activiti.web.ContextListener</listener-class>
-    </listener>
+   </listener>
     
-    <!-- Faces Servlet -->
-    <servlet>
-        <servlet-name>Faces Servlet</servlet-name>
-        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+   <!-- Faces Servlet -->
+   <servlet>
+      <servlet-name>Faces Servlet</servlet-name>
+      <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
 
-    <!-- Faces Servlet Mapping -->
-    <!-- NOTE: not required for portlet URLs? -->
-    <!--
-    <servlet-mapping>
-        <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>/jsf-test/*</url-pattern>
-    </servlet-mapping>
-    -->
+   <!-- Faces Servlet Mapping -->
+   <!-- NOTE: not required for portlet URLs? -->
+   <!--
+   <servlet-mapping>
+      <servlet-name>Faces Servlet</servlet-name>
+      <url-pattern>/jsf-test/*</url-pattern>
+   </servlet-mapping>
+   -->
     
-    <session-config>
-       <session-timeout>120</session-timeout>
-    </session-config>
-
-    <security-constraint>
-   	 <!-- This security constraint illustrates how JSP pages 
-                with JavaServer Faces components can be protected from
-                being accessed without going through the Faces Servlet.
-                The security constraint ensures that the Faces Servlet will
-                be used or the pages will not be processed. -->
-   	 <display-name>Restrict access to JSP pages</display-name>
-   	 <web-resource-collection>
-          <web-resource-name>
-             Restrict access to JSP pages
-          </web-resource-name>
-   	    <url-pattern>/main.jsp</url-pattern>
-   	    <url-pattern>/response.jsp</url-pattern>
-   	 </web-resource-collection>
-   	 <auth-constraint>
-   	    <description>
-   		   With no roles defined, no access granted
-   	    </description>
-   	 </auth-constraint>
-    </security-constraint>
+   <session-config>
+      <session-timeout>120</session-timeout>
+   </session-config>
 
 </web-app>

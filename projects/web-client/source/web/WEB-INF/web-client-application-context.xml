@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+
+<beans>
+   
+   <bean id="configSource" class="com.activiti.config.source.WebAppConfigSource">
+      <!--<property name="source">param:config.files</property>-->
+      <property name="source"><value>/WEB-INF/web-client-config.xml</value></property>
+   </bean>
+   
+   <bean id="configService" class="com.activiti.config.xml.XMLConfigService" init-method="init">
+      <property name="configSource"><ref bean="configSource"/></property>
+   </bean>
+   
+</beans>

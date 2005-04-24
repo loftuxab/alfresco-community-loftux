@@ -11,7 +11,7 @@
    <!-- load common properties -->
    <bean id="db-properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
       <property name="location">
-         <value>db.properties</value>
+         <value>classpath:db.properties</value>
       </property>
    </bean>
    

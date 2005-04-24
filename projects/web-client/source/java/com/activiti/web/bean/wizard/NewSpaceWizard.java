@@ -20,6 +20,7 @@ import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
+import com.activiti.web.bean.repository.Repository;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -28,9 +29,7 @@ import com.activiti.repo.search.Searcher;
  */
 public class NewSpaceWizard
 {
-   private static final String REPOSITORY_STORE = "SpacesStore";
    private static Logger logger = Logger.getLogger(NewSpaceWizard.class);
-   private static ApplicationContext appCtx;
    
    private String createType = "scratch";
    private String spaceType = "container";
@@ -48,43 +47,15 @@ public class NewSpaceWizard
    private List templates;
    
    private NodeService nodeService;
-   
-   // ************************************************************************
-   // TODO: Remove these methods when Spring integration is done properly
-   private ApplicationContext getAppContext()
-   {
-      if (appCtx == null)
-      {
-         appCtx = new ClassPathXmlApplicationContext("applicationContext.xml");
-      }
-      
-      return appCtx;
-   }
-   
-   private StoreRef getStoreRef()
-   {
-      return new StoreRef(StoreRef.PROTOCOL_WORKSPACE, REPOSITORY_STORE);
-   }
-   // ************************************************************************
+   private Searcher searchService;
    
    /**
     * @return Returns the nodeService.
     */
    public NodeService getNodeService()
    {
-      // TODO: Do this in the context listener i.e. when the app starts
-      
-      NodeService nodeService = (NodeService)getAppContext().getBean("indexingNodeService");
-         
-      if (nodeService.exists(getStoreRef()) == false)
-      {
-         // create the store
-         nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, REPOSITORY_STORE);
-      }
-      
-      return nodeService;
+      return this.nodeService;
    }
-   
 
    /**
     * @param nodeService The nodeService to set.
@@ -94,6 +65,22 @@ public class NewSpaceWizard
       this.nodeService = nodeService;
    }
    
+   /**
+    * @return Returns the searchService.
+    */
+   public Searcher getSearchService()
+   {
+      return searchService;
+   }
+
+   /**
+    * @param searchService The searchService to set.
+    */
+   public void setSearchService(Searcher searchService)
+   {
+      this.searchService = searchService;
+   }
+
    /**
     * Deals with the next button being pressed
     * 
@@ -183,9 +170,8 @@ public class NewSpaceWizard
          logger.debug(getSummary());
       
       // get the node service and create the space (just create a folder for now)
-      NodeService svc = getNodeService();
-      NodeRef rootNodeRef = svc.getRootNode(getStoreRef());
-      ChildAssocRef assocRef = svc.createNode(rootNodeRef,
+      NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+      ChildAssocRef assocRef = this.nodeService.createNode(rootNodeRef,
                 QName.createQName(NamespaceService.ACTIVITI_URI, this.name),
                 DictionaryBootstrap.TYPE_FOLDER);
       NodeRef nodeRef = assocRef.getChildRef();
@@ -194,11 +180,11 @@ public class NewSpaceWizard
       if (this.description != null)
       {
          QName propDesc = QName.createQName("description");
-         svc.setProperty(nodeRef, propDesc, this.description);
+         this.nodeService.setProperty(nodeRef, propDesc, this.description);
       }
       
       QName propIcon = QName.createQName("icon");
-      svc.setProperty(nodeRef, propIcon, this.icon);
+      this.nodeService.setProperty(nodeRef, propIcon, this.icon);
       
       this.currentStep = 1;
       
@@ -259,7 +245,7 @@ public class NewSpaceWizard
    {
       if (this.templates == null)
       {
-         this.templates = querySpaces();
+         this.templates = querySpaces(true);
       }
       
       return this.templates;
@@ -272,7 +258,7 @@ public class NewSpaceWizard
    {
       if (this.spaces == null)
       {
-         this.spaces = querySpaces();
+         this.spaces = querySpaces(false);
       }
       
       return this.spaces;
@@ -454,16 +440,14 @@ public class NewSpaceWizard
       this.currentStep = currentStep;
    }
    
-   private List querySpaces()
+   private List querySpaces(boolean templates)
    {
       // get the node service and root node
-      NodeService svc = getNodeService();
-      NodeRef rootNodeRef = svc.getRootNode(getStoreRef());
+      NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
       
       // get the searcher object and perform the search of the root node
-      Searcher searcher = (Searcher)getAppContext().getBean("searcherComponent");
       String s = "PATH:\"/" + NamespaceService.ACTIVITI_PREFIX + ":*\"";
-      ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
+      ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
       
       // create a list of items from the results
       ArrayList items = new ArrayList();

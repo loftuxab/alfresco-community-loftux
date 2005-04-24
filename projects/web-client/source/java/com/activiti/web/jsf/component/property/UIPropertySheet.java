@@ -17,10 +17,11 @@ import jsftest.repository.DataDictionary.MetaData;
 import jsftest.repository.DataDictionary.Property;
 
 import org.apache.log4j.Logger;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.jsf.FacesContextUtils;
 
 import com.activiti.config.Config;
 import com.activiti.config.ConfigService;
-import com.activiti.config.ConfigServiceFactory;
 import com.activiti.config.element.PropertiesConfigElement;
 import com.activiti.web.bean.repository.Node;
 
@@ -84,7 +85,8 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
             if (logger.isDebugEnabled())
                logger.debug("Configuring property sheet using ConfigService");
             
-            ConfigService configSvc = ConfigServiceFactory.getConfigService();
+            //ConfigService configSvc = ConfigServiceFactory.getConfigService();
+            ConfigService configSvc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("configService");
             Config configProps = configSvc.getConfig(this.node);
             PropertiesConfigElement propsToDisplay = (PropertiesConfigElement)configProps.getConfigElement("properties");
             List propNames = propsToDisplay.getProperties();

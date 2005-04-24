@@ -5,6 +5,7 @@
 
    <!-- ==================== APPLICATION ==================== -->
    <application>
+      <variable-resolver>org.springframework.web.jsf.DelegatingVariableResolver</variable-resolver>
       <locale-config>
          <default-locale>en</default-locale>
       </locale-config>
@@ -146,6 +147,14 @@
       <managed-bean-name>NewSpaceWizard</managed-bean-name>
       <managed-bean-class>com.activiti.web.bean.wizard.NewSpaceWizard</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>
