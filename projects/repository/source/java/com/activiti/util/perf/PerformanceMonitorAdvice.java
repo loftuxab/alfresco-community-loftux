@@ -29,6 +29,8 @@ import com.vladium.utils.timing.TimerFactory;
  *      performance.targetBeanName
  *      performance.targetBeanName.methodName
  * </pre>
+ * The {@link #PerformanceMonitorAdvice(String) constructor} requires a bean name that
+ * will be used to construct a <code>Log</code>.
  * In order to activate the performance logging, DEBUG must be active for both the bean method
  * <b>AND</b> the PerformanceMonitorAdvice (<b>performance</b> logger).
  * <p>
