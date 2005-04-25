@@ -21,6 +21,7 @@ import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
 import com.activiti.repo.search.Value;
+import com.activiti.util.Conversion;
 import com.activiti.web.bean.repository.Node;
 import com.activiti.web.bean.repository.Repository;
 import com.activiti.web.jsf.component.IBreadcrumbHandler;
@@ -127,17 +128,29 @@ public class BrowseBean
             String name = row.getQName().getLocalName();
             props.put("name", name);
             
-            Value descValue = row.getValue(QName.createQName(NamespaceService.ACTIVITI_URI, "description"));
-            String description = null;
-            if (descValue != null)
+            props.put("description", getValueProperty(row, "description", true));
+            
+            String createdDate = getValueProperty(row, "createddate", false);
+            if (createdDate != null)
             {
-               description = descValue.getString();
+               props.put("createddate", Conversion.dateFromXmlDate(createdDate));
             }
-            if (description == null)
+            else
             {
-               description = "";
+               // TODO: a null created/modified date shouldn't happen!?
+               props.put("createddate", null);
             }
-            props.put("description", description);
+            
+            String modifiedDate = getValueProperty(row, "modifieddate", false);
+            if (modifiedDate != null)
+            {
+               props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
+            }
+            else
+            {
+               // TODO: a null created/modified date shouldn't happen!?
+               props.put("modifieddate", null);
+            }
             
             node.setProperties(props);
             
@@ -146,6 +159,23 @@ public class BrowseBean
       }
       
       return items;
+   }
+   
+   private String getValueProperty(ResultSetRow row, String name, boolean convertNull)
+   {
+      Value value = row.getValue(QName.createQName(NamespaceService.ACTIVITI_URI, name));
+      String property = null;
+      if (value != null)
+      {
+         property = value.getString();
+      }
+      
+      if (convertNull == true && property == null)
+      {
+         property = "";
+      }
+      
+      return property;
    }
 
 

@@ -124,7 +124,7 @@
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
-                  <td height=300>
+                  <td>
                      
                      <%-- Details inner components --%>
                      <awc:richList viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"

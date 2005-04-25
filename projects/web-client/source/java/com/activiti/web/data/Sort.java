@@ -104,7 +104,19 @@ public abstract class Sort
             if (bean instanceof Map)
             {
                Object obj = ((Map)bean).get(this.column);
-               returnType = obj.getClass();
+               if (obj != null)
+               {
+                  returnType = obj.getClass();
+               }
+               else
+               {
+                  if (s_logger.isInfoEnabled())
+                  {
+                     s_logger.info("Unable to get return type class for RichList column: " + column +
+                           ". Suggest set java type directly in sort component tag.");
+                  }
+                  returnType = Object.class;
+               }
             }
             else
             {
@@ -196,7 +208,14 @@ public abstract class Sort
             }
             else
             {
-               keys.add(obj.toString());
+               if (obj != null)
+               {
+                  keys.add(obj.toString());
+               }
+               else
+               {
+                  keys.add(null);
+               }
             }
          }
       }
@@ -253,6 +272,8 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null) return -1;
+         if (obj2 == null) return 1;
          return (obj1.toString()).compareTo(obj2.toString());
       }
    }
@@ -275,6 +296,8 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null) return -1;
+         if (obj2 == null) return 1;
          return ((Integer)obj1).compareTo((Integer)obj2);
       }
    }
@@ -286,6 +309,8 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null) return -1;
+         if (obj2 == null) return 1;
          return ((Float)obj1).compareTo((Float)obj2);
       }
    }
@@ -297,6 +322,8 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null) return -1;
+         if (obj2 == null) return 1;
          return ((Long)obj1).compareTo((Long)obj2);
       }
    }
@@ -308,6 +335,8 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null) return -1;
+         if (obj2 == null) return 1;
          return ((Boolean)obj1).equals((Boolean)obj2) ? -1 : 1;
       }
    }
@@ -319,6 +348,8 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null) return -1;
+         if (obj2 == null) return 1;
          return ((Date)obj1).compareTo((Date)obj2);
       }
    }
