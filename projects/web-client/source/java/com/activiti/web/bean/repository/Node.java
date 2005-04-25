@@ -1,7 +1,10 @@
 package com.activiti.web.bean.repository;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -10,14 +13,14 @@ import org.apache.log4j.Logger;
  * 
  * @author gavinc
  */
-public class Node implements Serializable
-{ 
+public class Node implements Serializable, Map<String, Object>
+{
    private static final long serialVersionUID = 3544390322739034169L;
 
    private static Logger logger = Logger.getLogger(Node.class);
    
    private String type;
-   private Map properties;
+   private Map<String, Object> properties = new HashMap(7, 1.0f);
    
    public Node(String type)
    {
@@ -31,19 +34,19 @@ public class Node implements Serializable
    {
       return type;
    }
-
+   
    /**
-    * @return Returns the properties.
+    * @return The display name for the node
     */
-   public Map getProperties()
+   public String getName()
    {
-      return properties;
+      return this.properties.get("name").toString();
    }
 
    /**
     * @param properties The properties to set.
     */
-   public void setProperties(Map properties)
+   public void setProperties(Map<String, Object> properties)
    {
       this.properties = properties;
    }
@@ -62,6 +65,106 @@ public class Node implements Serializable
       return "success";
    }
 
+   
+   // ------------------------------------------------------------------------------
+   // Map implementation - allows the Node bean to be accessed using JSF expression syntax 
+   
+   /**
+    * @see java.util.Map#clear()
+    */
+   public void clear()
+   {
+      this.properties.clear();
+   }
+
+   /**
+    * @see java.util.Map#containsKey(java.lang.Object)
+    */
+   public boolean containsKey(Object key)
+   {
+      return this.properties.containsKey(key);
+   }
+
+   /**
+    * @see java.util.Map#containsValue(java.lang.Object)
+    */
+   public boolean containsValue(Object value)
+   {
+      return this.properties.containsKey(value);
+   }
+
+   /**
+    * @see java.util.Map#entrySet()
+    */
+   public Set entrySet()
+   {
+      return this.properties.entrySet();
+   }
+
+   /**
+    * @see java.util.Map#get(java.lang.Object)
+    */
+   public Object get(Object key)
+   {
+      return this.properties.get(key);
+   }
+
+   /**
+    * @see java.util.Map#isEmpty()
+    */
+   public boolean isEmpty()
+   {
+      return this.properties.isEmpty();
+   }
+
+   /**
+    * @see java.util.Map#keySet()
+    */
+   public Set keySet()
+   {
+      return this.properties.keySet();
+   }
+
+   /**
+    * @see java.util.Map#put(K, V)
+    */
+   public Object put(String key, Object value)
+   {
+      return this.properties.put(key, value);
+   }
+
+   /**
+    * @see java.util.Map#putAll(java.util.Map)
+    */
+   public void putAll(Map t)
+   {
+      this.properties.putAll(t);
+   }
+
+   /**
+    * @see java.util.Map#remove(java.lang.Object)
+    */
+   public Object remove(Object key)
+   {
+      return this.properties.remove(key);
+   }
+
+   /**
+    * @see java.util.Map#size()
+    */
+   public int size()
+   {
+      return this.properties.size();
+   }
+
+   /**
+    * @see java.util.Map#values()
+    */
+   public Collection values()
+   {
+      return this.properties.values();
+   }
+
    /**
     * @see java.lang.Object#toString()
     */
@@ -73,4 +176,6 @@ public class Node implements Serializable
 //      buffer.append(" properties=").append(this.properties).append(")");
 //      return buffer.toString();
 //   }
+   
+   
 }

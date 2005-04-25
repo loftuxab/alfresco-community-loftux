@@ -132,7 +132,7 @@ a.small:hover
    font-size: 12px;
 }
 
-.headbar
+a.headbarLink
 {
    color: #495F69;
    font-family: Tahoma, Arial, Helvetica, sans-serif;

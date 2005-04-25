@@ -179,6 +179,14 @@
       <managed-bean-name>NavigationBean</managed-bean-name>
       <managed-bean-class>com.activiti.web.bean.NavigationBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>
@@ -188,6 +196,14 @@
       <managed-bean-name>BrowseBean</managed-bean-name>
       <managed-bean-class>com.activiti.web.bean.BrowseBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

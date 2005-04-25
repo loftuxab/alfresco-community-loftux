@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.Collator;
@@ -88,13 +89,33 @@ public abstract class Sort
       {
          // create the Bean getter method invoker to retrieve the value for a colunm
          String methodName = getGetterMethodName(this.column);
-         Method getter = this.data.get(0).getClass().getMethod(methodName, (Class [])null);
+         Class returnType = null;;
+         Method getter = null;
+         // there will always be at least one item to sort if we get to this method
+         Object bean = this.data.get(0);
+         try
+         {
+            getter = bean.getClass().getMethod(methodName, (Class [])null);
+            returnType = getter.getReturnType();
+         }
+         catch (NoSuchMethodException nsmerr)
+         {
+            // no bean getter method found - try Map implementation
+            if (bean instanceof Map)
+            {
+               Object obj = ((Map)bean).get(this.column);
+               returnType = obj.getClass();
+            }
+            else
+            {
+               throw new IllegalStateException("Unable to find bean getter or Map impl for column name: " + this.column);
+            }
+         }
          
          // create appropriate comparator instance based on data type
          // using the strategy pattern so  sub-classes of Sort simply invoke the
          // compare() method on the comparator interface - no type info required
          boolean bknownType = true;
-         Class returnType = getter.getReturnType();
          if (returnType.equals(String.class))
          {
             this.comparator = new StringComparator();
@@ -129,7 +150,17 @@ public abstract class Sort
          // create a collation key for each required column item in the dataset
          for (int iIndex=0; iIndex<iSize; iIndex++)
          {
-            Object obj = getter.invoke(data.get(iIndex), (Object [])null);
+            Object obj;
+            if (getter != null)
+            {
+               // if we have a bean getter method impl use that
+               obj = getter.invoke(data.get(iIndex), (Object [])null);
+            }
+            else
+            {
+               // else we must have a bean Map impl
+               obj = ((Map)data.get(iIndex)).get(column);
+            }
             
             if (obj instanceof String)
             {

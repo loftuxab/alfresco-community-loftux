@@ -3,10 +3,12 @@
  */
 package com.activiti.web.jsf.component;
 
+import java.io.Serializable;
+
 /**
  * @author Kevin Roast
  */
-public interface IBreadcrumbHandler
+public interface IBreadcrumbHandler extends Serializable
 {
    /**
     * Override Object.toString()

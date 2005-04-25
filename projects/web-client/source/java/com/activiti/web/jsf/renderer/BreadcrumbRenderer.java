@@ -21,7 +21,7 @@ import com.activiti.web.jsf.component.UIBreadcrumb;
 /**
  * Renderer class for the UIBreadcrumb component
  * 
- * @author kevinr
+ * @author Kevin Roast
  */
 public class BreadcrumbRenderer extends BaseRenderer
 {

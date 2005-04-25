@@ -228,7 +228,7 @@ public class UIBreadcrumb extends UICommand
    /**
     * Class representing a handler for the default String path based breadcrumb
     */
-   private class DefaultPathHandler implements IBreadcrumbHandler, Serializable
+   private static class DefaultPathHandler implements IBreadcrumbHandler
    {
       /**
        * Constructor

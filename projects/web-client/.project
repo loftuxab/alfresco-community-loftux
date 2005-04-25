@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Web Client</name>
+	<name>Web-Client</name>
 	<comment></comment>
 	<projects>
 		<project>3rd Party</project>
+		<project>repository</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

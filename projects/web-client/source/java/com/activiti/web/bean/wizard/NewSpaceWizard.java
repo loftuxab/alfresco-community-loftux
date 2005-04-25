@@ -1,6 +1,8 @@
 package com.activiti.web.bean.wizard;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.faces.component.UIViewRoot;
@@ -19,6 +21,7 @@ import com.activiti.repo.ref.QName;
 import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
+import com.activiti.util.Conversion;
 import com.activiti.web.bean.repository.Repository;
 import com.activiti.web.jsf.component.UIModeList;
 
@@ -157,6 +160,13 @@ public class NewSpaceWizard
       
       QName propIcon = QName.createQName(NamespaceService.ACTIVITI_URI, "icon");
       this.nodeService.setProperty(nodeRef, propIcon, this.icon);
+      
+      QName propCreatedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "createddate");
+      Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+      this.nodeService.setProperty(nodeRef, propCreatedDate, Conversion.dateToXmlDate(now));
+      
+      QName propModifiedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "modifieddate");
+      this.nodeService.setProperty(nodeRef, propModifiedDate, Conversion.dateToXmlDate(now));
       
       // reset the state
       reset();

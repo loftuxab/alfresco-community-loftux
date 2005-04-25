@@ -128,7 +128,7 @@
                      
                      <%-- Details inner components --%>
                      <awc:richList viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
-                           width="100%" value="#{TestList.rows}" var="r" initialSortColumn="name" initialSortDescending="true">
+                           width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         <awc:column primary="true" width="175" style="padding:2px;text-align:left;">
                            <f:facet name="header">
                               <awc:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
@@ -148,18 +148,25 @@
                         
                         <awc:column style="text-align:left;">
                            <f:facet name="header">
-                              <awc:sortLink label="Created Date" value="created" styleClass="header"/>
+                              <awc:sortLink label="Description" value="description" styleClass="header"/>
                            </f:facet>
-                           <h:outputText value="#{r.created}">
+                           <h:outputText value="#{r.description}" />
+                        </awc:column>
+                        
+                        <awc:column style="text-align:left;">
+                           <f:facet name="header">
+                              <awc:sortLink label="Created Date" value="createddate" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.createddate}">
                               <f:convertDateTime dateStyle="long" />
                            </h:outputText>
                         </awc:column>
                         
                         <awc:column style="text-align:left;">
                            <f:facet name="header">
-                              <awc:sortLink label="Modified Date" value="created" styleClass="header"/>
+                              <awc:sortLink label="Modified Date" value="modifieddate" styleClass="header"/>
                            </f:facet>
-                           <h:outputText value="#{r.created}">
+                           <h:outputText value="#{r.modifieddate}">
                               <f:convertDateTime dateStyle="long" />
                            </h:outputText>
                         </awc:column>

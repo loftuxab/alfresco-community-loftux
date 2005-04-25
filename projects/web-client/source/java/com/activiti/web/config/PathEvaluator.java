@@ -21,7 +21,7 @@ public class PathEvaluator implements Evaluator
       
       if (obj instanceof Node)
       {
-         String path = (String)((Node)obj).getProperties().get("path");
+         String path = (String)((Node)obj).get("path");
          if (path != null)
          {
             result = path.equalsIgnoreCase(condition);
