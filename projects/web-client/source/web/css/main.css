@@ -320,3 +320,27 @@ a.topToolbarLinkHighlight
 {
    padding-right:4px;
 }
+
+.paddingRow
+{
+   padding-top: 3px;
+}
+
+.wizardSectionHeading
+{
+   padding: 2px;
+   background-color: #cddbe8;
+   font-weight: bold;
+}
+
+.wizardButton
+{
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+}
+
+.wizardButtonSpacing
+{
+	height: 5px;
+}
+

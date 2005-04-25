@@ -4,126 +4,108 @@
 <%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
 <%@ taglib uri="/WEB-INF/custom.tld" prefix="awc" %>
 
-<%@ page import="com.activiti.web.PanelGenerator"%>
-
 <%@ page isELIgnored="false" %>
+
+<%@ page import="com.activiti.web.PanelGenerator" %>
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/wizard.css" TYPE="text/css">
-   
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <h:form id="new-space-wizard-step2">
-      
+   <%-- REPLACE ME: set the form name here --%>
+   <h:form id="new-space-from-scratch">
+   
    <%-- Main outer table --%>
-   <table cellspacing="0" cellpadding="4" border="1">
+   <table cellspacing="0" cellpadding="2">
       
-      <%-- Title bar area --%>
+      <%-- Title bar --%>
       <tr>
-         <td>
-            <table cellspacing=0 cellpadding=4 border=1 width=100%>
-               <tr>
-                  <%-- Top level toolbar and company logo area --%>
-                  <td width=100%>
-                     Company Space Home
-                  </td>
-                  <%-- Help area --%>
-                  <td width=80>
-                     Help
-                  </td>
-                  <%-- Search area --%>
-                  <td width=180>
-                     Search
-                  </td>
-               </tr>
-            </table>
+         <td colspan="2">
+            <%@ include file="../../parts/titlebar.jsp" %>
          </td>
       </tr>
       
       <%-- Main area --%>
-      <tr>
-         <%-- Shelf area --%>
-         <td width=210>
-            Shelf
+      <tr valign="top">
+         <%-- Shelf --%>
+         <td>
+            <%@ include file="../../parts/shelf.jsp" %>
          </td>
-         <%-- Work area --%>
-         <td width=100%>
-            <table cellspacing=0 cellpadding=4 border=1 width=100%>
+         
+         <%-- Work Area --%>
+         <td width="100%">
+            <table cellspacing="0" cellpadding="0" width="100%">
                <%-- Breadcrumb --%>
-               <tr>
-                  <td>
-                     Breadcrumb here
-                  </td>
-               </tr>
+               <%@ include file="../../parts/breadcrumb.jsp" %>
+               
                <%-- Status and Actions --%>
                <tr>
-                  <td>
-                     Status and actions
-                  </td>
-               </tr>
-               <%-- Toolbar --%>
-               <tr>
-                  <td>
-                     <table cellpadding="3" cellspacing="1" border="0">
-                        <tr>
-                           <td rowspan="3" valign="top">
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
+                  <td bgcolor="#ECE9E1">
+                  
+                     <%-- Status and Actions inner contents table --%>
+                     <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
+                     <table cellspacing="4" cellpadding="0" width="100%">
+                        <tr valign="top">
+                           <td width="26">
                               <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
                            </td>
-                           <td class="mainSubTitle">Interface Design</td>
-                        </tr>
-                        <tr>
-                           <td class="mainTitle">New Space</td>
-                        </tr>
-                        <tr>
-                           <td class="mainSubText">Use this wizard to create a new space.</td>
+                           <td>
+                              <div class="mainSubTitle">Space Name</div>
+                              <div class="mainTitle">New Space</div>
+                              <div class="mainSubText">Use this wizard to create a new space.</div>
+                           </td>
                         </tr>
                      </table>
+                     
                   </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_6.gif)" width="4"></td>
                </tr>
-               <%-- Content --%>
+               
+               <%-- separator row with gradient shadow --%>
                <tr>
+                  <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_7.gif" width="4" height="9"></td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_8.gif)"></td>
+                  <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width="4" height="9"></td>
+               </tr>
+               
+               <%-- Details --%>
+               <tr valign=top>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="20%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="1" cellspacing="1" border="0" class="steps-panel">
-                                 <tr>
-                                    <td class="steps-heading">Steps</td>
-                                 </tr>
-                                 <tr>
-                                    <td class="unselected-step">1. Starting Space</td>
-                                 </tr>
-                                 <tr>
-                                    <td class="selected-step">2. Space Options</td>
-                                 </tr>
-                                 <tr>
-                                    <td class="unselected-step">3. Space Details</td>
-                                 </tr>
-                                 <tr>
-                                    <td class="unselected-step">4. Summary</td>
-                                 </tr>
-                              </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <awc:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
+                                    value="2" actionListener="#{NewSpaceWizard.stepChanged}">
+                                 <awc:modeListItem value="1" label="1. Starting Space" />
+                                 <awc:modeListItem value="2" label="2. Space Options" />
+                                 <awc:modeListItem value="3" label="3. Space Details" />
+                                 <awc:modeListItem value="4" label="4. Summary" />
+                              </awc:modeList>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                            
-                           <td width="*" valign="top">
+                           <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="1" cellspacing="2" border="0" class="details-panel">
+                              <table cellpadding="2" cellspacing="2" border="0">
                                  <tr>
-                                    <td class="details-heading">Step 2 - Space Options</td>
+                                    <td class="mainSubTitle">Step 2 - Space Options</td>
                                  </tr>
                                  <tr>
-                                    <td class="details-description">Select space options.</td>
+                                    <td class="mainSubText">Select space options.</td>
                                  </tr>
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="details-sub-heading">&nbsp;Space Type</td>
+                                    <td class="wizardSectionHeading">Space Type</td>
                                  </tr>
-                                 <tr><td class="details-separator" /></tr>
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>Select the type of space you want to create.</td>
                                  </tr>
@@ -146,50 +128,51 @@
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                                     </td>
                                  </tr>
-                                 <tr><td class="details-separator" /></tr>
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
                                        Note:<br/>If you can only see one type of space then other space
                                        types may not be enabled. See your System Administrator for further help.
                                     </td>
                                  </tr>
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="details-hints">To continue click Next.</td>
+                                    <td>To continue click Next.</td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
                            
-                           <td width="20%" valign="top">
+                           <td valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                              <table cellpadding="1" cellspacing="1" border="0" class="buttons-panel">
+                              <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="button" />
+                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="button" />
+                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" 
-                                                        disabled="true" styleClass="button" />
+                                                        disabled="#{NewSpaceWizard.finishDisabled}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="button-group-separator"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="button" />
+                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="button-group-separator"></td></tr>
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Minimise To Shelf" action="#{NewSpaceWizard.minimise}" 
-                                                        styleClass="long-button" />
+                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
@@ -198,7 +181,16 @@
                         </tr>
                      </table>
                   </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>
+               
+               <%-- separator row with bottom panel graphics --%>
+               <tr>
+                  <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_7.gif" width="4" height="4"></td>
+                  <td width="100%" align="center" style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_8.gif)"></td>
+                  <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_9.gif" width="4" height="4"></td>
+               </tr>
+               
             </table>
           </td>
        </tr>

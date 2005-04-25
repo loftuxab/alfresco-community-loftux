@@ -3,24 +3,24 @@ package com.activiti.web.bean.wizard;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.faces.component.UIViewRoot;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
-import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
-import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
 import com.activiti.web.bean.repository.Repository;
+import com.activiti.web.jsf.component.UIModeList;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -31,7 +31,7 @@ public class NewSpaceWizard
 {
    private static Logger logger = Logger.getLogger(NewSpaceWizard.class);
    
-   private String createType = "scratch";
+   private String createFrom = "scratch";
    private String spaceType = "container";
    private String existingSpaceId;
    private String templateSpaceId;
@@ -39,15 +39,15 @@ public class NewSpaceWizard
    private String name;
    private String description;
    private String icon = "icon1";
-   private boolean saveAsTemplate = false;
    private String templateName;
+   private boolean saveAsTemplate = false;
+   private boolean finishDisabled = true;
    private int currentStep = 1;
+   private NodeService nodeService;
+   private Searcher searchService;
    
    private List spaces;
    private List templates;
-   
-   private NodeService nodeService;
-   private Searcher searchService;
    
    /**
     * @return Returns the nodeService.
@@ -88,39 +88,22 @@ public class NewSpaceWizard
     */
    public String next()
    {
-      String nextOutcome = "next";      
-      
-//      String page = "/jsp/wizard/new-space-scratch.jsp";
-//      UIViewRoot newRoot = FacesContext.getCurrentInstance().getApplication().getViewHandler().createView(FacesContext.getCurrentInstance(), page);
-//      FacesContext.getCurrentInstance().setViewRoot(newRoot);
-//      FacesContext.getCurrentInstance().renderResponse();
-//      logger.debug("set view root to: " + page);
-      
-      if (this.currentStep == 1)
-      {
-         if (createType.equalsIgnoreCase("scratch"))
-         {
-            nextOutcome = "next-scratch";
-         }
-         else if (createType.equalsIgnoreCase("existing"))
-         {
-            nextOutcome = "next-existing";
-         }
-         else if (createType.equalsIgnoreCase("template"))
-         {
-            nextOutcome = "next-template";
-         }
-      }
-       
       this.currentStep++;
+      
+      // determine which page to go to next
+      String nextPage = determinePageForStep(this.currentStep);
+      
+      // navigate
+      navigate(nextPage);
       
       if (logger.isDebugEnabled())
       {
-         logger.debug("Navigating to next outcome: " + nextOutcome);
+         logger.debug("Navigating to next page: " + nextPage);
          logger.debug("currentStep: " + this.currentStep);
       }
       
-      return nextOutcome;
+      // return null to prevent the naviagtion handler looking up the next page
+      return null;
    }
    
    /**
@@ -129,34 +112,23 @@ public class NewSpaceWizard
     * @return
     */
    public String back()
-   {
-      String backOutcome = "back";
-      
-      if (this.currentStep == 3)
-      {
-         if (createType.equalsIgnoreCase("scratch"))
-         {
-            backOutcome = "back-scratch";
-         }
-         else if (createType.equalsIgnoreCase("existing"))
-         {
-            backOutcome = "back-existing";
-         }
-         else if (createType.equalsIgnoreCase("template"))
-         {
-            backOutcome = "back-template";
-         }
-      }
-      
+   {       
       this.currentStep--;
+      
+      // determine which page to go to next
+      String previousPage = determinePageForStep(this.currentStep);
+      
+      // navigate
+      navigate(previousPage);
       
       if (logger.isDebugEnabled())
       {
-         logger.debug("Navigating to back outcome: " + backOutcome);
+         logger.debug("Navigating to previous page: " + previousPage);
          logger.debug("currentStep: " + this.currentStep);
-      } 
+      }
       
-      return backOutcome;
+      // return null to prevent the naviagtion handler looking up the next page
+      return null;
    }
    
    /**
@@ -179,16 +151,20 @@ public class NewSpaceWizard
       // set the properties
       if (this.description != null)
       {
-         QName propDesc = QName.createQName("description");
+         QName propDesc = QName.createQName(NamespaceService.ACTIVITI_URI, "description");
          this.nodeService.setProperty(nodeRef, propDesc, this.description);
       }
       
-      QName propIcon = QName.createQName("icon");
+      QName propIcon = QName.createQName(NamespaceService.ACTIVITI_URI, "icon");
       this.nodeService.setProperty(nodeRef, propIcon, this.icon);
       
-      this.currentStep = 1;
+      // reset the state
+      reset();
       
-      return "finish";
+      // navigate
+      navigate("/jsp/jump.jsp");
+      
+      return null;
    }
    
    /**
@@ -198,12 +174,13 @@ public class NewSpaceWizard
     */
    public String cancel()
    {
-      if (logger.isDebugEnabled())
-         logger.debug("Cancel called");
+      // reset the state
+      reset();
       
-      this.currentStep = 1;
+      // navigate
+      navigate("/jsp/jump.jsp");
       
-      return "cancel";
+      return null;
    }
    
    /**
@@ -213,12 +190,10 @@ public class NewSpaceWizard
     */
    public String minimise()
    {
-      if (logger.isDebugEnabled())
-         logger.debug("Minimise called");
+      // navigate
+      navigate("/jsp/jump.jsp");
       
-      this.currentStep = 1;
-      
-      return "minimise";
+      return null;
    }
    
    /**
@@ -229,7 +204,7 @@ public class NewSpaceWizard
       StringBuilder builder = new StringBuilder();
       builder.append("Name: ").append(this.name).append("<br/>");
       builder.append("Description: ").append(this.description).append("<br/>");
-      builder.append("Create Type: ").append(this.createType).append("<br/>");
+      builder.append("Create Type: ").append(this.createFrom).append("<br/>");
       builder.append("Space Type: ").append(this.spaceType).append("<br/>");
       builder.append("icon: ").append(this.icon).append("<br/>");
       builder.append("Save As Template: ").append(this.saveAsTemplate).append("<br/>");
@@ -263,7 +238,7 @@ public class NewSpaceWizard
       
       return this.spaces;
    }
-   
+
    /**
     * @return Returns the copyPolicy.
     */
@@ -279,23 +254,23 @@ public class NewSpaceWizard
    {
       this.copyPolicy = copyPolicy;
    }
+   
+   /**
+    * @return Returns the createFrom.
+    */
+   public String getCreateFrom()
+   {
+      return createFrom;
+   }
 
    /**
-    * @return Returns the createType.
+    * @param createFrom The createFrom to set.
     */
-   public String getCreateType()
+   public void setCreateFrom(String createFrom)
    {
-      return createType;
+      this.createFrom = createFrom;
    }
-   
-   /**
-    * @param createType The createType to set.
-    */
-   public void setCreateType(String createType)
-   {
-      this.createType = createType;
-   }
-   
+
    /**
     * @return Returns the description.
     */
@@ -310,8 +285,8 @@ public class NewSpaceWizard
    public void setDescription(String description)
    {
       this.description = description;
-   }
-   
+   } 
+
    /**
     * @return Returns the existingSpaceId.
     */
@@ -377,6 +352,22 @@ public class NewSpaceWizard
    }
    
    /**
+    * @return Returns the finishDisabled.
+    */
+   public boolean isFinishDisabled()
+   {
+      return finishDisabled;
+   }
+
+   /**
+    * @param finishDisabled The finishDisabled to set.
+    */
+   public void setFinishDisabled(boolean finishDisabled)
+   {
+      this.finishDisabled = finishDisabled;
+   }
+
+   /**
     * @return Returns the spaceType.
     */
    public String getSpaceType()
@@ -439,7 +430,101 @@ public class NewSpaceWizard
    {
       this.currentStep = currentStep;
    }
+
+   /**
+    * Called when the step is changed by the left panel
+    * 
+    * @param event The event representing the step change
+    */
+   public void stepChanged(ActionEvent event)
+   {
+      UIModeList viewList = (UIModeList)event.getComponent();
+      int step = Integer.parseInt(viewList.getValue().toString());
+      
+      String page = determinePageForStep(step);
+      navigate(page);
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Navigating directly to: " + page);
+   }
    
+   /**
+    * Sets the page to navigate to
+    * 
+    * @param page Page to navigate to
+    */
+   private void navigate(String page)
+   {
+      FacesContext ctx = FacesContext.getCurrentInstance();
+      UIViewRoot newRoot = ctx.getApplication().getViewHandler().createView(ctx, page);
+      ctx.setViewRoot(newRoot);
+      ctx.renderResponse();
+   }
+   
+   /**
+    * Returns the page to be navigated to for the given step
+    * 
+    * @param step
+    * @return
+    */
+   private String determinePageForStep(int step)
+   {
+      // TODO: in the wizard framework make this abstract and represent step
+      //       0 as the page the wizard was launched from and step -1 as the
+      //       cancel page
+      
+      String page = null;
+      String dir = "/jsp/wizard/new-space/";
+      
+      switch (step)
+      {
+         case 1:
+         {
+            page = dir + "create-from.jsp";
+            break;
+         }
+         case 2:
+         {
+            if (createFrom.equalsIgnoreCase("scratch"))
+            {
+               page = dir + "from-scratch.jsp";
+            }
+            else if (createFrom.equalsIgnoreCase("existing"))
+            {
+               page = dir + "from-existing.jsp";
+            }
+            else if (createFrom.equalsIgnoreCase("template"))
+            {
+               page = dir + "from-template.jsp";
+            }
+            
+            break;
+         }
+         case 3:
+         {
+            page = dir + "details.jsp";
+            break;
+         }
+         case 4:
+         {
+            page = dir + "summary.jsp";
+            break;
+         }
+         default:
+         {
+            page = "/jsp/jump.jsp";
+         }
+      }
+      
+      return page;
+   }
+   
+   /**
+    * Returns a list of spaces in the system 
+    * 
+    * @param templates Determines whether to return template spaces or not 
+    * @return List of spaces
+    */
    private List querySpaces(boolean templates)
    {
       // get the node service and root node
@@ -450,7 +535,7 @@ public class NewSpaceWizard
       ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
       
       // create a list of items from the results
-      ArrayList items = new ArrayList();
+      ArrayList<SelectItem> items = new ArrayList<SelectItem>();
       if (results.length() > 0)
       {
          for (ResultSetRow row: results)
@@ -462,5 +547,37 @@ public class NewSpaceWizard
       }
       
       return items;
+   }
+   
+   /**
+    * Resets the state of the wizard
+    */
+   private void reset()
+   {
+      // clear the cached query results
+      if (this.spaces != null)
+      {
+         this.spaces.clear();
+         this.spaces = null;
+      }
+      if (this.templates != null)
+      {
+         this.templates.clear();
+         this.templates = null;
+      }
+      
+      // reset all variables
+      this.currentStep = 1;
+      this.createFrom = "scratch";
+      this.spaceType = "container";
+      this.existingSpaceId = null;
+      this.templateSpaceId = null;
+      this.copyPolicy = "structure";
+      this.name = null;
+      this.description = null;
+      this.icon = "icon1";
+      this.templateName = null;
+      this.saveAsTemplate = false;
+      this.finishDisabled = true;
    }
 }
