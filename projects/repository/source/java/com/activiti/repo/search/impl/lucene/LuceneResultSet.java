@@ -99,7 +99,7 @@ public class LuceneResultSet implements ResultSet
         }
     }
 
-    Document getDocument(int n)
+    public Document getDocument(int n)
     {
         try
         {

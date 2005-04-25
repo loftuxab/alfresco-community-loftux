@@ -63,7 +63,7 @@ public class LuceneResultSetRow implements ResultSetRow
      * 
      * @return
      */
-    private Document getDocument()
+    public Document getDocument()
     {
         if (document == null)
         {
@@ -121,6 +121,11 @@ public class LuceneResultSetRow implements ResultSetRow
         Document doc = getDocument();
         Value value = new StringValue(doc.get("@" + qname));
         return value;
+    }
+    
+    public int getIndex()
+    {
+        return position;
     }
 
    public QName getQName()

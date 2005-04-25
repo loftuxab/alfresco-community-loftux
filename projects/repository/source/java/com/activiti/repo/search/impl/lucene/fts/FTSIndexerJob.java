@@ -10,7 +10,6 @@ package com.activiti.repo.search.impl.lucene.fts;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.context.ApplicationContext;
 
 public class FTSIndexerJob implements Job
 {

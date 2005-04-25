@@ -24,7 +24,7 @@ public interface PropertyDefinition
      * 
      * @return  the qualified name of the property type
      */
-    public QName getPropertyType();
+    public PropertyTypeDefinition getPropertyType();
 
     /**
      * @return Returns the owning class's defintion
@@ -57,8 +57,16 @@ public interface PropertyDefinition
     public boolean isStoredInIndex();
 
     /**
-     * @return  Returns the class name of the index tokeniser to use on this property
+     * @return true => tokenised when it is indexed (the stored value will not be tokenised)
      */
-    public String getIndexTokeniserClassName();
+    
+    public boolean isTokenisedInIndex();
+    
+    /**
+     * @return true => The attribute must be indexed in the commit of the transaction. 
+     * false => the indexing will be done in the background and may be out of date.
+     * All non atomic properties will be indexed at the same time.
+     */
+    public boolean isIndexedAtomically();
     
 }

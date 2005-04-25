@@ -2,9 +2,9 @@ package com.activiti.repo.dictionary.metamodel;
 
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
-import com.activiti.repo.dictionary.DictionaryRef;
 import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.PropertyRef;
+import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.ref.QName;
 
 
@@ -92,9 +92,9 @@ public class M2PropertyDefinition implements PropertyDefinition
     /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.PropertyDefinition#getPropertyType()
      */
-    public QName getPropertyType()
+    public PropertyTypeDefinition getPropertyType()
     {
-        return m2Property.getType().getQName();
+        return m2Property.getType().getPropertyTypeDefinition();
     }
 
 
@@ -151,13 +151,17 @@ public class M2PropertyDefinition implements PropertyDefinition
         return m2Property.isStoredInIndex();
     }
 
-
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.PropertyDefinition#getIndexTokeniserClassName()
-     */
-    public String getIndexTokeniserClassName()
+    public boolean isIndexedAtomically()
     {
-        return m2Property.getIndexTokeniserClassName();
+      
+        return m2Property.isIndexedAtomically();
     }
+
+    public boolean isTokenisedInIndex()
+    {
+        return m2Property.isTokenisedInIndex();
+    }
+
+
     
 }

@@ -10,8 +10,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +25,11 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TermQuery;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
@@ -38,6 +41,8 @@ import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.IndexerException;
+import com.activiti.repo.search.ResultSetRow;
+import com.activiti.repo.search.impl.lucene.fts.FTSIndexerAware;
 import com.vladium.utils.timing.ITimer;
 import com.vladium.utils.timing.TimerFactory;
 
@@ -50,6 +55,8 @@ import com.vladium.utils.timing.TimerFactory;
  */
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
+    private enum Action {INDEX, REINDEX, DELETE};
+    
     private DictionaryService dictionaryService;
 
     /**
@@ -64,7 +71,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * TODO: Consider if this informantion needs to be persisted for recovery
      */
 
-    private Set<NodeRef> deletions = new HashSet<NodeRef>();
+    private Set<NodeRef> deletions = new LinkedHashSet<NodeRef>();
 
     /**
      * A list of all nodes we have altered This list is used to drive the
@@ -75,7 +82,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * TODO: Condsider persistence and recovery
      */
 
-    private Set<NodeRef> fts = new HashSet<NodeRef>();
+    private Set<NodeRef> fts = new LinkedHashSet<NodeRef>();
 
     /**
      * The status of this index - follows javax.transaction.Status
@@ -88,8 +95,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      */
 
     private boolean isModified = false;
-    
+
+    private Boolean isFTSUpdate = null;
+
     DecimalFormat format;
+
     ITimer timer;
 
     /**
@@ -101,13 +111,12 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
-        
-        timer = TimerFactory.newTimer();
-        
-        format = new DecimalFormat ();
-        format.setMinimumFractionDigits (3);
-        format.setMaximumFractionDigits (3);
 
+        timer = TimerFactory.newTimer();
+
+        format = new DecimalFormat();
+        format.setMinimumFractionDigits(3);
+        format.setMaximumFractionDigits(3);
 
     }
 
@@ -126,8 +135,20 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * 
      */
 
-    private void checkAbleToDoWork()
+    private void checkAbleToDoWork(boolean isFTS)
     {
+        if (isFTSUpdate == null)
+        {
+            isFTSUpdate = Boolean.valueOf(isFTS);
+        }
+        else
+        {
+            if (isFTS != isFTSUpdate.booleanValue())
+            {
+                throw new IndexerException("Can not mix FTS and transactional updates");
+            }
+        }
+
         switch (status)
         {
         case Status.STATUS_UNKNOWN:
@@ -190,7 +211,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void createNode(ChildAssocRef relationshipRef) throws IndexerException
     {
-        checkAbleToDoWork();
+        checkAbleToDoWork(false);
         try
         {
             if (relationshipRef.getParentRef() != null)
@@ -207,7 +228,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void updateNode(NodeRef nodeRef) throws IndexerException
     {
-        checkAbleToDoWork();
+        checkAbleToDoWork(false);
         try
         {
             reindex(nodeRef);
@@ -220,7 +241,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void deleteNode(ChildAssocRef relationshipRef) throws IndexerException
     {
-        checkAbleToDoWork();
+        checkAbleToDoWork(false);
         try
         {
             delete(relationshipRef.getChildRef(), false);
@@ -233,7 +254,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void createChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
     {
-        checkAbleToDoWork();
+        checkAbleToDoWork(false);
         try
         {
             // TODO: Optimise
@@ -248,7 +269,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef) throws IndexerException
     {
-        checkAbleToDoWork();
+        checkAbleToDoWork(false);
         try
         {
             // TODO: Optimise
@@ -266,7 +287,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void deleteChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
     {
-        checkAbleToDoWork();
+        checkAbleToDoWork(false);
         try
         {
             // TODO: Optimise
@@ -337,14 +358,21 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             {
                 if (isModified())
                 {
-                    // Build the deletion terms
-                    Set<Term> terms = new HashSet<Term>();
-                    for (NodeRef nodeRef : deletions)
+                    if (isFTSUpdate.booleanValue())
                     {
-                        terms.add(new Term("ID", nodeRef.getId()));
+                        doFTSIndexCommit();
                     }
-                    // Merge
-                    mergeDeltaIntoMain(terms);
+                    else
+                    {
+                        // Build the deletion terms
+                        Set<Term> terms = new LinkedHashSet<Term>();
+                        for (NodeRef nodeRef : deletions)
+                        {
+                            terms.add(new Term("ID", nodeRef.getId()));
+                        }
+                        // Merge
+                        mergeDeltaIntoMain(terms);
+                    }
                 }
                 status = Status.STATUS_COMMITTED;
             }
@@ -361,6 +389,48 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
             break;
         }
+    }
+
+    private void doFTSIndexCommit() throws IOException
+    {
+        IndexReader mainReader = getReader();
+        IndexReader deltaReader = getDeltaReader();
+
+        IndexSearcher mainSearcher = new IndexSearcher(mainReader);
+        IndexSearcher deltaSearcher = new IndexSearcher(deltaReader);
+
+        for (Helper helper : toFTSIndex)
+        {
+            BooleanQuery query = new BooleanQuery();
+            query.add(new TermQuery(new Term("ID", helper.document.getField("ID").stringValue())), true, false);
+            query.add(new TermQuery(new Term("TX", helper.document.getField("TX").stringValue())), true, false);
+
+            Hits hits = mainSearcher.search(query);
+            if (hits.length() > 0)
+            {
+                // No change
+                for (int i = 0; i < hits.length(); i++)
+                {
+                    mainReader.delete(hits.id(i));
+                }
+            }
+            else
+            {
+                hits = deltaSearcher.search(query);
+                for (int i = 0; i < hits.length(); i++)
+                {
+                    deltaReader.delete(hits.id(i));
+                }
+            }
+        }
+
+        deltaSearcher.close();
+        mainSearcher.close();
+        deltaReader.close();
+        mainReader.close();
+
+        mergeDeltaIntoMain(new LinkedHashSet<Term>());
+
     }
 
     /**
@@ -488,18 +558,23 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void reindex(NodeRef nodeRef) throws IOException
     {
-      
+
         delete(nodeRef, true);
-        //index(nodeRef, false);
+        // index(nodeRef, false);
     }
 
-    private Map<NodeRef, Boolean> deltaDeletes = new HashMap<NodeRef, Boolean>();
-    
+    private List<Command> deltaDeletes = new ArrayList<Command>(10000);
+
+    private FTSIndexerAware callBack;
+
+    private ArrayList<Helper> toFTSIndex = new ArrayList<Helper>();
+
     private void delete(NodeRef nodeRef, boolean forReindex) throws IOException
     {
-        deltaDeletes.put(nodeRef, Boolean.valueOf(forReindex));
         
-        if(deltaDeletes.size() > 10000)
+        deltaDeletes.add(new Command(nodeRef, forReindex ? Action.REINDEX : Action.DELETE));
+
+        if (deltaDeletes.size() > 10000)
         {
             flushPending();
         }
@@ -507,41 +582,41 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void flushPending() throws IOException
     {
-        Set<NodeRef> forIndex = new HashSet<NodeRef>();
-        for(NodeRef ref: deltaDeletes.keySet())
+        Set<NodeRef> forIndex = new LinkedHashSet<NodeRef>();
+        for (Command command : deltaDeletes)
         {
-            boolean index = deltaDeletes.get(ref);
-            if(index)
+            if (command.action == Action.REINDEX)
             {
-                forIndex.addAll(deleteImpl(ref, index));
+                Set set = deleteImpl(command.nodeRef, true);
+                forIndex.removeAll(set);
+                forIndex.addAll(set);
             }
-            else
+            else if (command.action == Action.DELETE)
             {
-                deleteImpl(ref, index);
+                deleteImpl(command.nodeRef, false);
             }
         }
         deltaDeletes.clear();
         index(forIndex, false);
     }
-    
-    
+
     private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex) throws IOException
     {
-        //startTimer();
+        // startTimer();
         getDeltaReader();
-        //outputTime("Delete "+nodeRef+" size = "+getDeltaWriter().docCount());
-        Set<NodeRef> refs = new HashSet<NodeRef>();
-       
+        // outputTime("Delete "+nodeRef+" size = "+getDeltaWriter().docCount());
+        Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
+
         IndexReader mainReader = getReader();
         try
         {
             refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader(), true));
-            
+
             refs.addAll(deleteContainerAndBelow(nodeRef, mainReader, false));
 
             if (!forReindex)
             {
-                Set<NodeRef> leafrefs = new HashSet<NodeRef>();
+                Set<NodeRef> leafrefs = new LinkedHashSet<NodeRef>();
 
                 leafrefs.addAll(deletePrimary(refs, getDeltaReader(), true));
                 leafrefs.addAll(deletePrimary(refs, mainReader, false));
@@ -553,8 +628,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
 
             deletions.addAll(refs);
-            
-          
+
             return refs;
         }
         finally
@@ -565,9 +639,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private Set<NodeRef> deletePrimary(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws IOException
     {
-        
-     
-        Set<NodeRef> refs = new HashSet<NodeRef>();
+
+        Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
 
         for (NodeRef nodeRef : nodeRefs)
         {
@@ -586,16 +659,15 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
             }
         }
-     
-        
+
         return refs;
 
     }
 
     private Set<NodeRef> deleteReference(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws IOException
     {
-        
-        Set<NodeRef> refs = new HashSet<NodeRef>();
+
+        Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
 
         for (NodeRef nodeRef : nodeRefs)
         {
@@ -614,14 +686,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
             }
         }
-        
+
         return refs;
 
     }
 
     private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader, boolean delete) throws IOException
     {
-        Set<NodeRef> refs = new HashSet<NodeRef>();
+        Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
 
         if (delete)
         {
@@ -647,23 +719,24 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void index(Set<NodeRef> nodeRefs, boolean isNew) throws IOException
     {
-        //Directory temp = new RAMDirectory();
-        //IndexWriter localWriter = new IndexWriter(temp, new LuceneAnalyser(), true);
-        //IndexWriter localWriter = getDeltaWriter();
+        // Directory temp = new RAMDirectory();
+        // IndexWriter localWriter = new IndexWriter(temp, new LuceneAnalyser(),
+        // true);
+        // IndexWriter localWriter = getDeltaWriter();
         for (NodeRef ref : nodeRefs)
         {
             index(ref, isNew);
         }
-        //localWriter.close();
-        //IndexWriter writer = getDeltaRamWriter();
-        //writer.addIndexes(new Directory[] {temp});
-        //chechAndMergeToDisk(100);
+        // localWriter.close();
+        // IndexWriter writer = getDeltaRamWriter();
+        // writer.addIndexes(new Directory[] {temp});
+        // chechAndMergeToDisk(100);
     }
 
     private void index(NodeRef nodeRef, boolean isNew) throws IOException
     {
         IndexWriter writer = getDeltaWriter();
-        
+
         // avoid attempting to index nodes that don't exist
         if (!nodeService.exists(nodeRef))
         {
@@ -672,10 +745,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         List<Document> docs = createDocuments(nodeRef, isNew);
         for (Document doc : docs)
         {
-            writer.addDocument(doc);
+            writer.addDocument(doc /* TODO: Select the language based analyser */);
         }
-       
-      
+
     }
 
     static class Counter
@@ -712,6 +784,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         // For each node and directory create a copy for each parent in which it
         // occurs
 
+        ClassRef nodeTypeRef = nodeService.getType(nodeRef);
+
         Map<ChildAssocRef, Counter> nodeCounts = new HashMap<ChildAssocRef, Counter>(5);
 
         List<Document> docs = new ArrayList<Document>();
@@ -722,7 +796,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
         Collection<Path> paths = nodeService.getPaths(nodeRef, false);
 
-        for (NodeRef parent : nodeService.getParents(nodeRef))
+        Set<NodeRef> parentSet = new LinkedHashSet<NodeRef>();
+        parentSet.addAll(nodeService.getParents(nodeRef));
+        for (NodeRef parent : parentSet)
         {
             for (ChildAssocRef cae : nodeService.getChildAssocs(parent))
             {
@@ -754,11 +830,28 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             for (QName propertyQName : properties.keySet())
             {
+                // TODO: - should be able to get the property by its QName?
+                // ClassDefinition cd = dictionaryService.getClass(nodeTypeRef);
+                // PropertyRef pref = new PropertyRef(propertyQName);
+                // PropertyDefinition propDef =
+                // dictionaryService.getProperty(pref);
+                // PropertyTypeDefinition propTypeDef =
+                // propDef.getPropertyType();
 
+                // PropertyTypeDefinition propDef = null;
                 Serializable value = properties.get(propertyQName);
                 // convert value to String
-                String strValue = value.toString(); // TODO: Need converter here
-                doc.add(new Field("@" + propertyQName, strValue, true, true, false));
+                String strValue = value.toString();
+
+                // TODO: Need converter here
+                // Conversion should be done in the anlyser as we may take
+                // advantage of tokenisation
+
+                // Need to add with the correct language based analyser
+                if (true)
+                {
+                    doc.add(new Field("@" + propertyQName, strValue, true, true, true));
+                }
 
             }
 
@@ -828,7 +921,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             else
             {
                 doc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
-                ClassRef nodeTypeRef = nodeService.getType(nodeRef);
+
                 TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeRef);
                 // check for child associations
                 if (nodeTypeDef.getChildAssociations().size() > 0)
@@ -851,11 +944,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 if (isNew)
                 {
                     doc.add(new Field("FTSSTATUS", "New", true, true, true));
+
                 }
                 else
                 {
                     doc.add(new Field("FTSSTATUS", "Dirty", true, true, true));
                 }
+                doc.add(new Field("TX", deltaId, true, true, true));
 
                 if (counter.getRepeat() == 1)
                 {
@@ -873,13 +968,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         timer.reset();
         timer.start();
     }
-    
+
     public void outputTime(String message)
     {
         timer.stop();
-        System.out.println(message +" in "+format.format(timer.getDuration()));
+        System.out.println(message + " in " + format.format(timer.getDuration()));
     }
-    
+
     public void clearIndex()
     {
         try
@@ -889,6 +984,140 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         catch (IOException e)
         {
             throw new IndexerException(e);
+        }
+    }
+
+    public void updateFullTextSearch(int size)
+    {
+        System.out.println("Doing FTS index");
+        checkAbleToDoWork(true);
+        try
+        {
+            String lastId = null;
+
+            toFTSIndex = new ArrayList<Helper>(size);
+            BooleanQuery booleanQuery = new BooleanQuery();
+            booleanQuery.add(new TermQuery(new Term("FTSSTATUS", "Dirty")), false, false);
+            booleanQuery.add(new TermQuery(new Term("FTSSTATUS", "New")), false, false);
+
+            Searcher searcher = getSearcher();
+            Hits hits = searcher.search(booleanQuery);
+            LuceneResultSet results = new LuceneResultSet(store, hits, searcher);
+            int count = 0;
+            for (ResultSetRow row : results)
+            {
+                LuceneResultSetRow lrow = (LuceneResultSetRow) row;
+                Helper helper = new Helper(lrow.getNodeRef(), lrow.getDocument(), lrow.getIndex());
+                if (++count >= size)
+                {
+                    break;
+                }
+            }
+            count = results.length();
+            results.close();
+
+            IndexWriter writer = getDeltaWriter();
+            for (Helper helper : toFTSIndex)
+            {
+                Document document = helper.document;
+                NodeRef ref = helper.nodeRef;
+                ClassRef nodeTypeRef = nodeService.getType(ref);
+
+                Map<QName, Serializable> properties = nodeService.getProperties(ref);
+
+                for (QName propertyQName : properties.keySet())
+                {
+                    // TODO: - should be able to get the property by its QName?
+                    // ClassDefinition cd =
+                    // dictionaryService.getClass(nodeTypeRef);
+                    // PropertyDefinition propDef =
+                    // cd.getProperty(propertyQName.getLocalName());
+                    // PropertyTypeDefinition propTypeDef =
+                    // propDef.getPropertyType();
+
+                    Serializable value = properties.get(propertyQName);
+                    // convert value to String
+                    String strValue = value.toString();
+
+                    // TODO: Need converter here
+                    // Conversion should be done in the anlyser as we may take
+                    // advantage of tokenisation
+
+                    // Need to add with the correct language based analyser
+                    if (true)
+                    {
+                        String fieldName = "@" + propertyQName;
+                        document.removeFields(fieldName);
+                        document.add(new Field(fieldName, strValue, true, true, true));
+                    }
+
+                }
+
+                document.removeField("FTSSTATUS");
+                document.add(new Field("FTSSTATUS", "Clean", true, true, true));
+
+                writer.addDocument(document /*
+                                             * TODO: Select the language based
+                                             * analyser
+                                             */);
+
+                // Need to do all the current id in the TX - should all be
+                // together so skip until id changes
+                if (writer.docCount() > size)
+                {
+                    String id = document.getField("ID").stringValue();
+                    if (lastId == null)
+                    {
+                        lastId = id;
+                    }
+                    if (!lastId.equals(id))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            callBack.indexCompleted(store, count - writer.docCount(), null);
+        }
+        catch (IOException e)
+        {
+            callBack.indexCompleted(store, 0, e);
+        }
+    }
+
+    public void registerCallBack(FTSIndexerAware callBack)
+    {
+        this.callBack = callBack;
+    }
+
+    private static class Helper
+    {
+        NodeRef nodeRef;
+
+        Document document;
+
+        int index;
+
+        boolean update = false;
+
+        Helper(NodeRef nodeRef, Document document, int index)
+        {
+            this.nodeRef = nodeRef;
+            this.document = document;
+            this.index = index;
+        }
+    }
+
+    private static class Command
+    {
+        NodeRef nodeRef;
+        Action action;
+        
+        Command(NodeRef nodeRef,
+        Action action)
+        {
+            this.nodeRef = nodeRef;
+            this.action = action;
         }
     }
 }

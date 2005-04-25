@@ -838,4 +838,30 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
         return propertyDefinition;
     }
 
+    public boolean isIndexedAtomically()
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isTokenisedInIndex()
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean setIndexedAtomically(boolean isIndexedAtomically)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean setTokenisedInIndex(boolean isTokenisedInIndex)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    
+    
 } //EMFPropertyImpl

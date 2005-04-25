@@ -39,18 +39,24 @@ public interface M2Property
     
     public void setStoredInIndex(boolean isStoredInIndex);
     
-    public String getIndexTokeniserClassName();
-    
-    public void setIndexTokeniserClassName(String indexTokeniserName);
+  
 
     // TODO: public List getDefaultValues();
     
     // TODO:  public List/*M2ValueConstraint*/ getValueConstraints();
     
-    // TODO: IndexTokenizer Class setter/getters??
-    
     /**
      * @return Returns a read-only property definition
      */
     public PropertyDefinition getPropertyDefinition();
+
+    public boolean isIndexedAtomically();
+    
+    public boolean setIndexedAtomically(boolean isIndexedAtomically);
+
+    public boolean isTokenisedInIndex();
+    
+    public boolean setTokenisedInIndex(boolean isTokenisedInIndex);
+    
+    
 }

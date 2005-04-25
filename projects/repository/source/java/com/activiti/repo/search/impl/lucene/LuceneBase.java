@@ -14,7 +14,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.IndexerException;
