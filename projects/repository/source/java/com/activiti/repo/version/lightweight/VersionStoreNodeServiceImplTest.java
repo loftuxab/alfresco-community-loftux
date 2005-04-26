@@ -323,13 +323,13 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
     }
     
     /**
-     * Test getParents
+     * Test getParentAssocs
      */
-    public void testGetParents()
+    public void testGetParentAssocs()
     {
         try
         {
-            this.lightWeightVersionStoreNodeService.getParents(this.dummyNodeRef);
+            this.lightWeightVersionStoreNodeService.getParentAssocs(this.dummyNodeRef);
             fail("This operation is not supported.");
         }
         catch (UnsupportedOperationException exception)

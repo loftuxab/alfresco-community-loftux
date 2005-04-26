@@ -1,13 +1,9 @@
 package com.activiti.repo.node.index;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
-import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.BaseNodeServiceTest;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -66,6 +62,4 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
         assertEquals(1, results.length());
 
     }
-
- 
 }

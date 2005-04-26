@@ -15,10 +15,10 @@ import com.activiti.repo.ref.NodeRef;
  */
 public class AspectMissingException extends RuntimeException
 {
-    /**
-     * Serial version UID 
-     */
     private static final long serialVersionUID = 3257852099244210228L;
+    
+    private ClassRef missingAspect;
+    private NodeRef nodeRef;
 
     /**
      * Error message
@@ -32,5 +32,17 @@ public class AspectMissingException extends RuntimeException
     public AspectMissingException(ClassRef missingAspect, NodeRef nodeRef)
     {
         super(MessageFormat.format(ERROR_MESSAGE, new Object[]{missingAspect.getQName().getLocalName(), nodeRef.getId()}));
+        this.missingAspect = missingAspect;
+        this.nodeRef = nodeRef;
+    }
+
+    public ClassRef getMissingAspect()
+    {
+        return missingAspect;
+    }
+    
+    public NodeRef getNodeRef()
+    {
+        return nodeRef;
     }
 }

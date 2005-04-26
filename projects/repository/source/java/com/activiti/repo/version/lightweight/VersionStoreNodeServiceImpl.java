@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +24,8 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.repo.ref.qname.QNamePattern;
+import com.activiti.repo.ref.qname.RegexQNamePattern;
 
 /**
  * The light weight version store node service implementation.
@@ -219,48 +222,58 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     /**
      * @throws UnsupportedOperationException always
      */
-    public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }
-    
+
     /**
-     * @throws UnsupportedOperationException always
+     * @see RegexQNamePattern#MATCH_ALL
+     * @see #getChildAssocs(NodeRef, QNamePattern)
      */
-    public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        Collection<ChildAssocRef> result = new ArrayList<ChildAssocRef>();
+        return getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+    }
+
+    /**
+     * Performs conversion from version store properties to <i>real</i> associations
+     */
+    public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern) throws InvalidNodeRefException
+    {
+        List<ChildAssocRef> result = new ArrayList<ChildAssocRef>();
         
         // Get the child assocs from the version store
-        Collection<ChildAssocRef> childAssocRefs = this.dbNodeService.getChildAssocs(nodeRef);
-        if (childAssocRefs.isEmpty() == false)
+        List<ChildAssocRef> childAssocRefs = this.dbNodeService.getChildAssocs(
+                nodeRef,
+                CHILD_QNAME_PATTERN_VERSIONED_CHILD_ASSOCS);
+        for (ChildAssocRef childAssocRef : childAssocRefs)
         {
-            for (ChildAssocRef childAssocRef : childAssocRefs)
+            // Get the child reference
+            NodeRef childRef = childAssocRef.getChildRef();
+            NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
+            
+            // TODO if the referenced node is a version history then need to get the appropriate node ref                        
+            
+            // get the qualified name of the frozen child association and filter out unwanted names
+            QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_QNAME);
+            if (!qnamePattern.isMatch(qName))
             {
-                if (childAssocRef.getName().equals(CHILD_QNAME_VERSIONED_CHILD_ASSOCS))
-                {
-                    // Get the child reference
-                    NodeRef childRef = childAssocRef.getChildRef();
-                    NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
-                    
-                    // TODO if the referenced node is a version history then need to get the appropriate node ref                        
-                    
-                    // Retrieve the isPrimary and nthSibling values of the forzen child association
-                    QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_QNAME);
-                    boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
-                    int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
-                    
-                    // Build a child assoc ref to add to the returned list
-                    ChildAssocRef newChildAssocRef = new ChildAssocRef(
-                            nodeRef, 
-                            qName, 
-                            referencedNode, 
-                            isPrimary, 
-                            nthSibling);
-                    result.add(newChildAssocRef);
-                }
+                continue;   // this was not a match
             }
+            // Retrieve the isPrimary and nthSibling values of the frozen child association
+            boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
+            int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
+            
+            // Build a child assoc ref to add to the returned list
+            ChildAssocRef newChildAssocRef = new ChildAssocRef(
+                    nodeRef, 
+                    qName, 
+                    referencedNode, 
+                    isPrimary, 
+                    nthSibling);
+            result.add(newChildAssocRef);
         }
         
         return result;
@@ -269,7 +282,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     /**
      * @throws UnsupportedOperationException always
      */
-    public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
+    public ChildAssocRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);

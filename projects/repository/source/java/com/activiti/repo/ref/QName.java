@@ -3,6 +3,7 @@ package com.activiti.repo.ref;
 import java.io.Serializable;
 
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.util.EqualsHelper;
 
 /**
  * <code>QName</code> represents the qualified name of a Repository item. Each
@@ -185,7 +186,7 @@ public final class QName implements Serializable
     /**
      * Gets the namespace
      * 
-     * @return the namespace (empty string when not specified)
+     * @return the namespace (empty string when not specified, but never null)
      */
     public String getNamespaceURI()
     {
@@ -200,15 +201,24 @@ public final class QName implements Serializable
      */
     public boolean equals(Object object)
     {
+        if (this == object)
+        {
+            return true;
+        }
+        else if (object == null)
+        {
+            return false;
+        }
         if (object instanceof QName)
         {
             QName other = (QName) object;
-            if (this.namespaceURI.equals(other.namespaceURI) && this.localName.equals(other.localName))
-            {
-                return true;
-            }
+            return (EqualsHelper.nullSafeEquals(this.namespaceURI, other.namespaceURI) &&
+                    EqualsHelper.nullSafeEquals(this.localName, other.localName));
         }
-        return false;
+        else
+        {
+            return false;
+        }
     }
 
 

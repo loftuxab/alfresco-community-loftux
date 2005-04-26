@@ -2,6 +2,7 @@ package com.activiti.repo.node;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.repo.ref.qname.QNamePattern;
 
 /**
  * Interface for public and internal <b>node</b> and <b>store</b> operations.
@@ -232,25 +234,45 @@ public interface NodeService
     
     /**
      * @param nodeRef the child node
-     * @return Returns a collection of <code>NodeRef</code> instances
+     * @return Returns a list of all parent-child associations that exist where the given
+     *      node is the child
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException;
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
-     * @param nodeRef the parent node - must be a <b>container</b>
-     * @return Returns a collection of <code>ChildAssocRef</code> instances
+     * @param nodeRef the parent node - usually a <b>container</b>
+     * @return Returns a collection of <code>ChildAssocRef</code> instances.  If the
+     *      node is not a <b>container</b> then the result will be empty.
+     * @throws InvalidNodeRefException if the node could not be found
+     * 
+     * @see #getChildAssocs(NodeRef, QNamePattern)
+     */
+    public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException;
+    
+    /**
+     * Gets all child associations where the pattern of the association qualified
+     * name is matched.
+     * 
+     * @param nodeRef the parent node - usually a <b>container</b>
+     * @param qnamePattern the pattern that the qnames of the assocs must match
+     * @return Returns a list of <code>ChildAssocRef</code> instances.  If the
+     *      node is not a <b>container</b> then the result will be empty.
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException;
+    public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
+            throws InvalidNodeRefException;
     
     /**
+     * Fetches the primary parent-child relationship.
+     * <p>
+     * For a root node, the parent node reference will be null.
+     * 
      * @param nodeRef
-     * @return Returns Fetches the primary parent of the node unless it is a root node,
-     *      in which case null is returned.
+     * @return Returns the primary parent-child association of the node
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException;
+    public ChildAssocRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * 

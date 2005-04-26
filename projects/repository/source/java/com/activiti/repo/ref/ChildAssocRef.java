@@ -10,6 +10,7 @@ package com.activiti.repo.ref;
 import java.io.Serializable;
 
 import com.activiti.util.EqualsHelper;
+import com.activiti.util.debug.CodeMonkey;
 
 /**
  * This class represents a child relationship between two nodes. This
@@ -42,8 +43,8 @@ public class ChildAssocRef implements EntityRef, Serializable
    /**
     * Construct a representation of a parent --- name ----> child relationship.
     * 
-    * @param parentRef the parent reference
-    * @param childQName the qualified name of the association
+    * @param parentRef the parent reference - may be null
+    * @param childQName the qualified name of the association - may be null
     * @param childRef the child node reference. This must not be null.
     * @param isPrimary true if this represents the primary parent-child relationship
     * @param nthSibling the nth association with the same properties.  Usually -1 to be ignored.
@@ -85,6 +86,7 @@ public class ChildAssocRef implements EntityRef, Serializable
     */
    public QName getName()
    {
+       CodeMonkey.todo("Rename getName() to getQName()"); // TODO
       return childQName;
    }
 
@@ -121,6 +123,14 @@ public class ChildAssocRef implements EntityRef, Serializable
        return nthSibling;
    }
 
+   /**
+    * Compares:
+    * <ul>
+    *   <li>{@link #parentRef}</li>
+    *   <li>{@link #childRef}</li>
+    *   <li>{@link #childQName}</li>
+    * </ul>
+    */
    public boolean equals(Object o)
    {
       if (this == o)
@@ -135,8 +145,7 @@ public class ChildAssocRef implements EntityRef, Serializable
 
       return (EqualsHelper.nullSafeEquals(this.parentRef, other.parentRef)
               && EqualsHelper.nullSafeEquals(this.childQName, other.childQName)
-              && EqualsHelper.nullSafeEquals(this.childRef, other.childRef)
-              && this.nthSibling == other.nthSibling);
+              && EqualsHelper.nullSafeEquals(this.childRef, other.childRef));
    }
 
    public int hashCode()

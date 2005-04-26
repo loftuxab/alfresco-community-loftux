@@ -797,22 +797,18 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         Collection<Path> paths = nodeService.getPaths(nodeRef, false);
 
         Set<NodeRef> parentSet = new LinkedHashSet<NodeRef>();
-        parentSet.addAll(nodeService.getParents(nodeRef));
-        for (NodeRef parent : parentSet)
+        List<ChildAssocRef> parentAssocs = nodeService.getParentAssocs(nodeRef);
+        // count the number of times the association is duplicated
+        for (ChildAssocRef assoc : parentAssocs)
         {
-            for (ChildAssocRef cae : nodeService.getChildAssocs(parent))
+            Counter counter = nodeCounts.get(assoc);
+            if (counter == null)
             {
-                if (cae.getChildRef().equals(nodeRef))
-                {
-                    Counter counter = nodeCounts.get(cae);
-                    if (counter == null)
-                    {
-                        counter = new Counter();
-                        nodeCounts.put(cae, counter);
-                    }
-                    counter.incrementParentCount();
-                }
+                counter = new Counter();
+                nodeCounts.put(assoc, counter);
             }
+            counter.incrementParentCount();
+            
         }
 
         int containerCount = 0;
@@ -918,7 +914,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 doc.add(new Field("ISNODE", "T", true, true, false));
                 docs.add(doc);
             }
-            else
+            else // not a root node
             {
                 doc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
 
@@ -934,7 +930,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     docs.add(directoryEntry);
                 }
 
-                doc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getId(), true, true, false));
+                doc.add(new Field("PRIMARYPARENT",
+                        nodeService.getPrimaryParent(nodeRef).getParentRef().getId(),
+                        true,
+                        true,
+                        false));
 
                 Counter counter = nodeCounts.get(qNameRef);
                 counter.increment();

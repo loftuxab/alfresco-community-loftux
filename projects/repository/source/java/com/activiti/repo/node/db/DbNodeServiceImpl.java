@@ -24,13 +24,13 @@ import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.NodeKey;
 import com.activiti.repo.domain.RealNode;
 import com.activiti.repo.domain.Store;
+import com.activiti.repo.node.AbstractNodeServiceImpl;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.CyclicChildRelationshipException;
 import com.activiti.repo.node.InvalidAspectException;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.InvalidNodeTypeException;
 import com.activiti.repo.node.InvalidStoreRefException;
-import com.activiti.repo.node.NodeService;
 import com.activiti.repo.node.PropertyException;
 import com.activiti.repo.node.StoreExistsException;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -39,6 +39,7 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.repo.ref.qname.QNamePattern;
 import com.activiti.util.debug.CodeMonkey;
 
 /**
@@ -46,7 +47,7 @@ import com.activiti.util.debug.CodeMonkey;
  * 
  * @author Derek Hulley
  */
-public class DbNodeServiceImpl implements NodeService
+public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 {
     private final DictionaryService dictionaryService;
     private final NodeDaoService nodeDaoService;
@@ -631,32 +632,73 @@ public class DbNodeServiceImpl implements NodeService
     }
 
     /**
-     * Transforms {@link ContainerNode#getChildAssocs()} into an unmodifiable collection
+     * Transforms {@link Node#getParentAssocs()} into an unmodifiable list
      */
-    public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        ContainerNode node = getContainerNodeNotNull(nodeRef);
+        Node node = getNodeNotNull(nodeRef);
+        // get the assocs pointing to it
+        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
+        // list of results
+        List<ChildAssocRef> results = new ArrayList<ChildAssocRef>(parentAssocs.size());
+        for (ChildAssoc assoc : parentAssocs)
+        {
+            results.add(assoc.getChildAssocRef());
+        }
+        // done
+        return Collections.unmodifiableList(results);
+    }
+
+    /**
+     * Filters out any child associations if their qname is matched by the given pattern.
+     * <p>
+     * Transforms {@link ContainerNode#getChildAssocs()} into an unmodifiable list.
+     */
+    public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern) throws InvalidNodeRefException
+    {
+        Node nodeUnchecked = getNodeNotNull(nodeRef);
+        if (!(nodeUnchecked instanceof ContainerNode))
+        {
+            // not being a container, we just return an empty collection
+            return Collections.emptyList();
+        }
+        ContainerNode node = (ContainerNode) nodeUnchecked;
         // get the assocs pointing from it
         Set<ChildAssoc> childAssocs = node.getChildAssocs();
         // list of results
-        Collection<ChildAssocRef> results = new ArrayList<ChildAssocRef>(childAssocs.size());
+        List<ChildAssocRef> results = new ArrayList<ChildAssocRef>(childAssocs.size());
         for (ChildAssoc assoc : childAssocs)
         {
+            // does the qname match the pattern?
+            if (!qnamePattern.isMatch(assoc.getQName()))
+            {
+                // no match - ignore
+                continue;
+            }
             // get the child
             results.add(assoc.getChildAssocRef());
         }
         // done
-        return Collections.unmodifiableCollection(results);
+        return Collections.unmodifiableList(results);
     }
 
-    public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
+    public ChildAssocRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
         // get the primary parent assoc
         ChildAssoc assoc = nodeDaoService.getPrimaryParentAssoc(node);
 
-        // done - the assoc may be null
-        return (assoc == null ? null : assoc.getParent().getNodeRef());
+        // done - the assoc may be null for a root node
+        ChildAssocRef assocRef = null;
+        if (assoc == null)
+        {
+            assocRef = new ChildAssocRef(null, null, nodeRef);
+        }
+        else
+        {
+            assocRef = assoc.getChildAssocRef();
+        }
+        return assocRef;
     }
 
     public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)

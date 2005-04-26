@@ -5,6 +5,8 @@ package com.activiti.repo.version.lightweight;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.QName;
+import com.activiti.repo.ref.qname.QNamePattern;
+import com.activiti.repo.ref.qname.SimpleQNamePattern;
 import com.activiti.repo.version.Version;
 
 /**
@@ -97,5 +99,6 @@ public interface VersionStoreConst
     public static final QName CHILD_QNAME_VERSION_HISTORIES = QName.createQName(NAMESPACE_URI, CHILD_VERSION_HISTORIES);
     public static final QName CHILD_QNAME_VERSIONS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONS);
     public static final QName CHILD_QNAME_VERSIONED_ATTRIBUTES = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_ATTRIBUTES);
-    public static final QName CHILD_QNAME_VERSIONED_CHILD_ASSOCS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_CHILD_ASSOCS);      
+    public static final QName CHILD_QNAME_VERSIONED_CHILD_ASSOCS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_CHILD_ASSOCS);
+    public static final QNamePattern CHILD_QNAME_PATTERN_VERSIONED_CHILD_ASSOCS = new SimpleQNamePattern(CHILD_QNAME_VERSIONED_CHILD_ASSOCS);
 }

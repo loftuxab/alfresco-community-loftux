@@ -2,10 +2,12 @@ package com.activiti.repo.node.index;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.node.AbstractNodeServiceImpl;
 import com.activiti.repo.node.AssociationExistsException;
 import com.activiti.repo.node.InvalidAspectException;
 import com.activiti.repo.node.InvalidNodeRefException;
@@ -19,6 +21,7 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
+import com.activiti.repo.ref.qname.QNamePattern;
 import com.activiti.repo.search.Indexer;
 import com.activiti.repo.search.IndexerComponent;
 
@@ -32,7 +35,7 @@ import com.activiti.repo.search.IndexerComponent;
  * 
  * @author Derek Hulley
  */
-public class IndexingNodeServiceImpl implements NodeService
+public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
 {
     private final NodeService nodeServiceDelegate;
     private final Indexer indexer;
@@ -335,9 +338,9 @@ public class IndexingNodeServiceImpl implements NodeService
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public Collection<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern) throws InvalidNodeRefException
     {
-        return nodeServiceDelegate.getChildAssocs(nodeRef);
+        return nodeServiceDelegate.getChildAssocs(nodeRef, qnamePattern);
     }
 
     /**
@@ -359,7 +362,7 @@ public class IndexingNodeServiceImpl implements NodeService
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public NodeRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
+    public ChildAssocRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
     {
         return nodeServiceDelegate.getPrimaryParent(nodeRef);
     }
@@ -367,9 +370,9 @@ public class IndexingNodeServiceImpl implements NodeService
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        return nodeServiceDelegate.getParents(nodeRef);
+        return nodeServiceDelegate.getParentAssocs(nodeRef);
     }
 
     /**

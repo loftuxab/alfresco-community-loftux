@@ -543,25 +543,27 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
     }
     
-    public void testGetParents() throws Exception
+    public void testGetParentAssocs() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n6Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n3_p_n6")).getChildRef();
-        NodeRef n7Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n5_p_n7")).getChildRef();
+        ChildAssocRef n3pn6Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "n3_p_n6"));
+        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "n5_p_n7"));
+        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "n6_p_n8"));
+        ChildAssocRef n7n8Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "n7_n8"));
         // get a child node's parents
-        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI,"n6_p_n8")).getChildRef();
-        Collection<NodeRef> parents = nodeService.getParents(n8Ref);
-        assertEquals("Incorrect number of parents", 2, parents.size());
-        assertTrue("Expected parent not found", parents.contains(n6Ref));
-        assertTrue("Expected parent not found", parents.contains(n7Ref));
+        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "n6_p_n8")).getChildRef();
+        List<ChildAssocRef> parentAssocs = nodeService.getParentAssocs(n8Ref);
+        assertEquals("Incorrect number of parents", 2, parentAssocs.size());
+        assertTrue("Expected assoc not found", parentAssocs.contains(n6pn8Ref));
+        assertTrue("Expected assoc not found", parentAssocs.contains(n7n8Ref));
         
         // check that we can retrieve the primary parent
-        NodeRef primaryParentCheck = nodeService.getPrimaryParent(n8Ref);
-        assertEquals("Primary parent not retrieved", n6Ref, primaryParentCheck);
+        ChildAssocRef primaryParentAssocCheck = nodeService.getPrimaryParent(n8Ref);
+        assertEquals("Primary parent assoc not retrieved", n6pn8Ref, primaryParentAssocCheck);
         
         // check that the root node returns a null primary parent
-        NodeRef nullParent = nodeService.getPrimaryParent(rootNodeRef);
-        assertNull("Expected null primary parent for root node", nullParent);
+        ChildAssocRef rootNodePrimaryAssoc = nodeService.getPrimaryParent(rootNodeRef);
+        assertNull("Expected null primary parent for root node", rootNodePrimaryAssoc.getParentRef());
     }
     
     public void testGetChildAssocs() throws Exception
@@ -750,7 +752,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         directories.put(rootNodeRef, QName.createQName("{ } "));
         createLevels(directories, 1);
         timer.stop();
-        System.out.println("Created one layer in "+timer.getDuration());
     }
     
     public void testAddPerformance2() throws Exception
@@ -761,7 +762,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         directories.put(rootNodeRef, QName.createQName("{ } "));
         createLevels(directories, 2);
         timer.stop();
-        System.out.println("Created two layer in "+timer.getDuration());
     }
     
     public void testAddPerformance3() throws Exception
@@ -772,7 +772,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         directories.put(rootNodeRef, QName.createQName("{ } "));
         createLevels(directories, 3);
         timer.stop();
-        System.out.println("Created three layer in "+timer.getDuration());
     }
 
     private void createLevels( Map<NodeRef, QName> map, int levels)
