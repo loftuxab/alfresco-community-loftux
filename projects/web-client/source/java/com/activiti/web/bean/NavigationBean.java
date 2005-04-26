@@ -7,11 +7,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+
+import org.apache.log4j.Logger;
 
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.search.Searcher;
 import com.activiti.web.jsf.component.IBreadcrumbHandler;
+import com.activiti.web.jsf.component.UIBreadcrumb;
+import com.activiti.web.jsf.component.data.UIRichList;
 
 /**
  * @author Kevin Roast
@@ -61,7 +66,7 @@ public class NavigationBean
    {
       this.searchService = searchService;
    }
-   
+
    /**
     * Return the expanded state of the Shelf panel wrapper component
     * 
@@ -83,6 +88,23 @@ public class NavigationBean
    }
    
    /**
+    * @return Returns the currently browsing node Id.
+    */
+   public String getCurrentNodeId()
+   {
+      return currentNodeId;
+   }
+   
+   /**
+    * @param currentNodeId    The currently browsing node Id.
+    */
+   public void setCurrentNodeId(String currentNodeId)
+   {
+      this.currentNodeId = currentNodeId;
+      // TODO: need a decoupled way to refresh components - a view-local context event service?
+   }
+   
+   /**
     * @return Returns the breadcrumb handler elements representing the location path of the UI.
     */
    public List<IBreadcrumbHandler> getLocation()
@@ -100,7 +122,7 @@ public class NavigationBean
    
    
    // ------------------------------------------------------------------------------
-   // Navigation action event handlers 
+   // Navigation action event handlers
    
    /**
     * Action to toggle the expanded state of the shelf.
@@ -120,7 +142,7 @@ public class NavigationBean
    /**
     * Class to handle breadcrumb interaction for top-level navigation pages
     */
-   private static class NavigationBreadcrumbHandler implements IBreadcrumbHandler
+   private class NavigationBreadcrumbHandler implements IBreadcrumbHandler
    {
       /**
        * Constructor
@@ -129,7 +151,6 @@ public class NavigationBean
        */
       public NavigationBreadcrumbHandler(String label)
       {
-         // TODO: this class will probably store an ID/QName of the Node it represents?
          this.label = label;
       }
       
@@ -142,11 +163,17 @@ public class NavigationBean
       }
 
       /**
-       * @see com.activiti.web.jsf.component.IBreadcrumbHandler#navigationOutcome()
+       * @see com.activiti.web.jsf.component.IBreadcrumbHandler#navigationOutcome(com.activiti.web.jsf.component.UIBreadcrumb)
        */
-      public String navigationOutcome()
+      public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
-         return null;
+         // TODO: replace this one we have home folders etc.!
+         
+         // TEMP!
+         setCurrentNodeId(null);
+         setLocation( (List)breadcrumb.getValue() );
+         
+         return "browse";
       }
       
       private String label;
@@ -156,11 +183,16 @@ public class NavigationBean
    // ------------------------------------------------------------------------------
    // Private data
    
+   private static Logger s_logger = Logger.getLogger(NavigationBean.class);
+   
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
    
    /** The SearchService to be used by the bean */
    private Searcher searchService;
+   
+   /** Node we are currently in the context of */
+   private String currentNodeId;
    
    /** expanded state of the Shelf panel wrapper component */
    private boolean shelfExpanded = true;

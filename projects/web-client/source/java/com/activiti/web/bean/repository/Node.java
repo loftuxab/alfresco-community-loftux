@@ -42,6 +42,14 @@ public class Node implements Serializable, Map<String, Object>
    {
       return this.properties.get("name").toString();
    }
+   
+   /**
+    * @return The GUID for the node
+    */
+   public String getId()
+   {
+      return this.properties.get("id").toString();
+   }
 
    /**
     * @param properties The properties to set.

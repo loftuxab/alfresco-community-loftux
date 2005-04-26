@@ -79,7 +79,7 @@ public class UIBreadcrumb extends UICommand
          setValue(path);
          
          // call the app logic for the element handler and perform any required navigation
-         String outcome = path.get(index).navigationOutcome();
+         String outcome = path.get(index).navigationOutcome(this);
          if (outcome != null)
          {
             String viewId = getFacesContext().getViewRoot().getViewId();
@@ -249,9 +249,9 @@ public class UIBreadcrumb extends UICommand
       }
       
       /**
-       * @see com.activiti.web.jsf.component.IBreadcrumbHandler#navigationOutcome()
+       * @see com.activiti.web.jsf.component.IBreadcrumbHandler#navigationOutcome(com.activiti.web.jsf.component.UIBreadcrumb)
        */
-      public String navigationOutcome()
+      public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
          // no outcome for the default handler - return to current page
          return null;

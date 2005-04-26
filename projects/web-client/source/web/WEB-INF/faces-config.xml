@@ -155,6 +155,10 @@
          <property-name>searchService</property-name>
          <value>#{searcherComponent}</value>
       </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>
@@ -203,6 +207,10 @@
       <managed-property>
          <property-name>searchService</property-name>
          <value>#{searcherComponent}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
       </managed-property>
    </managed-bean>
    
@@ -299,6 +307,7 @@
       </navigation-case>
    </navigation-rule>
    
+   <!-- rule to get back to the jump page from anywhere -->
    <navigation-rule>
       <from-view-id>/jsp/*</from-view-id>
       <navigation-case>
@@ -313,6 +322,15 @@
       <navigation-case>
          <from-outcome>createSpace</from-outcome>
          <to-view-id>/jsp/wizard/new-space/create-from.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click) -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>browse</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
 

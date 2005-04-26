@@ -22,6 +22,7 @@ import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
 import com.activiti.util.Conversion;
+import com.activiti.web.bean.NavigationBean;
 import com.activiti.web.bean.repository.Repository;
 import com.activiti.web.jsf.component.UIModeList;
 
@@ -48,6 +49,9 @@ public class NewSpaceWizard
    private int currentStep = 1;
    private NodeService nodeService;
    private Searcher searchService;
+   
+   /** The NavigationBean reference */
+   private NavigationBean navigator;
    
    private List spaces;
    private List templates;
@@ -82,6 +86,22 @@ public class NewSpaceWizard
    public void setSearchService(Searcher searchService)
    {
       this.searchService = searchService;
+   }
+   
+   /**
+    * @return Returns the navigation bean instance.
+    */
+   public NavigationBean getNavigator()
+   {
+      return navigator;
+   }
+   
+   /**
+    * @param navigator The NavigationBean to set.
+    */
+   public void setNavigator(NavigationBean navigator)
+   {
+      this.navigator = navigator;
    }
 
    /**
@@ -137,7 +157,7 @@ public class NewSpaceWizard
    /**
     * Deals with the finish button being pressed
     * 
-    * @return
+    * @return outcome
     */
    public String finish()
    {
@@ -145,8 +165,18 @@ public class NewSpaceWizard
          logger.debug(getSummary());
       
       // get the node service and create the space (just create a folder for now)
-      NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
-      ChildAssocRef assocRef = this.nodeService.createNode(rootNodeRef,
+      NodeRef parentNodeRef;
+      String nodeId = getNavigator().getCurrentNodeId();
+      if (nodeId == null)
+      {
+         parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+      }
+      else
+      {
+         parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
+      }
+      
+      ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
                 QName.createQName(NamespaceService.ACTIVITI_URI, this.name),
                 DictionaryBootstrap.TYPE_FOLDER);
       NodeRef nodeRef = assocRef.getChildRef();

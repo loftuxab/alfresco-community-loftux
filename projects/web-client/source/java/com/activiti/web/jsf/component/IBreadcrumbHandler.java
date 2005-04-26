@@ -21,7 +21,9 @@ public interface IBreadcrumbHandler extends Serializable
     * Perform appropriate processing logic and then return a JSF navigation outcome.
     * This method will be called by the framework when the handler instance is selected by the user.
     * 
+    * @param breadcrumb    The UIBreadcrumb component that caused the navigation
+    * 
     * @return JSF navigation outcome
     */
-   public String navigationOutcome();
+   public String navigationOutcome(UIBreadcrumb breadcrumb);
 }

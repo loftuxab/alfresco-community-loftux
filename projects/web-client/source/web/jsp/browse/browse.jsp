@@ -127,22 +127,25 @@
                   <td>
                      
                      <%-- Details inner components --%>
-                     <awc:richList viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
+                     <awc:richList id="browseList" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
                            width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
+                        
                         <awc:column primary="true" width="175" style="padding:2px;text-align:left;">
                            <f:facet name="header">
                               <awc:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>
                            <f:facet name="large-icon">
-                              <h:graphicImage alt="#{r.name}" title="#{r.name}" width="38" height="38" url="/images/icons/folder_large.png" />
-                           </f:facet>
-                           <f:facet name="small-icon">
-                              <awc:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{TestList.clickNameLink}" showLink="false">
-                                 <f:param name="name" value="#{r.name}" />
+                              <awc:actionLink value="#{r.name}" image="/images/icons/folder_large.png" actionListener="#{BrowseBean.clickSpace}" showLink="false">
+                                 <f:param name="id" value="#{r.id}" />
                               </awc:actionLink>
                            </f:facet>
-                           <awc:actionLink value="#{r.name}">
-                              <f:param name="name" value="#{r.name}" />
+                           <f:facet name="small-icon">
+                              <awc:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{BrowseBean.clickSpace}" showLink="false">
+                                 <f:param name="id" value="#{r.id}" />
+                              </awc:actionLink>
+                           </f:facet>
+                           <awc:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickSpace}">
+                              <f:param name="id" value="#{r.id}" />
                            </awc:actionLink>
                         </awc:column>
                         

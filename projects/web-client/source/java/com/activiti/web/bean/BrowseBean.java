@@ -4,23 +4,22 @@
 package com.activiti.web.bean;
 
 import java.io.Serializable;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import javax.faces.model.SelectItem;
+
+import org.apache.log4j.Logger;
 
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
-import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
-import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
 import com.activiti.repo.search.Value;
@@ -28,7 +27,10 @@ import com.activiti.util.Conversion;
 import com.activiti.web.bean.repository.Node;
 import com.activiti.web.bean.repository.Repository;
 import com.activiti.web.jsf.component.IBreadcrumbHandler;
+import com.activiti.web.jsf.component.UIActionLink;
+import com.activiti.web.jsf.component.UIBreadcrumb;
 import com.activiti.web.jsf.component.UIModeList;
+import com.activiti.web.jsf.component.data.UIRichList;
 
 /**
  * @author Kevin Roast
@@ -39,7 +41,7 @@ public class BrowseBean
    // Bean property getters and setters 
    
    /**
-    * @return Returns the nodeService.
+    * @return Returns the NodeService.
     */
    public NodeService getNodeService()
    {
@@ -47,7 +49,7 @@ public class BrowseBean
    }
 
    /**
-    * @param nodeService The nodeService to set.
+    * @param nodeService The NodeService to set.
     */
    public void setNodeService(NodeService nodeService)
    {
@@ -55,7 +57,7 @@ public class BrowseBean
    }
    
    /**
-    * @return Returns the searchService.
+    * @return Returns the Searcher service.
     */
    public Searcher getSearchService()
    {
@@ -63,11 +65,27 @@ public class BrowseBean
    }
 
    /**
-    * @param searchService The searchService to set.
+    * @param searchService The Searcher to set.
     */
    public void setSearchService(Searcher searchService)
    {
       this.searchService = searchService;
+   }
+   
+   /**
+    * @return Returns the navigation bean instance.
+    */
+   public NavigationBean getNavigator()
+   {
+      return navigator;
+   }
+   
+   /**
+    * @param navigator The NavigationBean to set.
+    */
+   public void setNavigator(NavigationBean navigator)
+   {
+      this.navigator = navigator;
    }
    
    /**
@@ -86,9 +104,14 @@ public class BrowseBean
       this.browseViewMode = browseViewMode;
    }
    
+   /**
+    * Page accessed bean method to get the nodes currently being browsed
+    * 
+    * @return List of Node objects for the current browse location
+    */
    public List<Node> getNodes()
    {
-      return querySpaces("*");
+      return queryBrowseNodes(getNavigator().getCurrentNodeId());
    }
    
    
@@ -110,12 +133,28 @@ public class BrowseBean
    // ------------------------------------------------------------------------------
    // Helper methods 
    
-   private List<Node> querySpaces(String path)
+   /**
+    * Query a list of nodes for the specified parent node Id
+    * 
+    * @param parentNodeId     Id of the parent node or null for the root node
+    * 
+    * @return a List of Node object found directly below the specified parent node
+    */
+   private List<Node> queryBrowseNodes(String parentNodeId)
    {
-      // get the node service and root node
-      NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+      NodeRef parentRef;
+      if (parentNodeId == null)
+      {
+         // no specific parent node specified - use the root node
+         parentRef = this.nodeService.getRootNode(Repository.getStoreRef());
+      }
+      else
+      {
+         // build a NodeRef for the specified Id and our store
+         parentRef = new NodeRef(Repository.getStoreRef(), parentNodeId);
+      }
       
-      Collection<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(rootNodeRef);
+      Collection<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(parentRef);
       List<Node> items = new ArrayList<Node>(childRefs.size());
       for (ChildAssocRef ref: childRefs)
       {
@@ -129,9 +168,11 @@ public class BrowseBean
          // convert the rest of the well known properties
          Map<QName, Serializable> childProps = this.nodeService.getProperties(ref.getChildRef());
          
-         String name = qname.getLocalName();
-         props.put("name", name);
+         // name and ID always exist
+         props.put("id", ref.getChildRef().getId());
+         props.put("name", qname.getLocalName());
          
+         // other properties which may exist
          String description = getQNameProperty(childProps, "description", true);
          props.put("description", description);
          
@@ -157,12 +198,15 @@ public class BrowseBean
             props.put("modifieddate", null);
          }
          
+         // push the propeties into the Node
          node.setProperties(props);
          
          items.add(node);
       }
       
       /* -- Example of Search code -- leave here for now
+       * -- Note: The passed in path was "*" for a root node search
+      
       // get the searcher object and perform the search of the root node
       String s = MessageFormat.format(SEARCH_PATH, new Object[] {path});
       ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
@@ -247,7 +291,48 @@ public class BrowseBean
       
       return property;
    }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Navigation action event handlers
 
+   /**
+    * Action called when a folder space is clicked.
+    * Navigate into the space.
+    */
+   public void clickSpace(ActionEvent event)
+   {
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         s_logger.debug("Clicked Space Id: " + id);
+         // TODO: wrap up common property set in the Node bean - and hide the NodeService usage
+         //       this will hide the nasty code required to get simple props like "name"!
+         NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+         String name = this.nodeService.getPrimaryParent(ref).getName().getLocalName();
+         
+         // get the current breadcrumb location and append a new handler to it
+         // our handler know the ID of the selected node and the display label for it
+         List<IBreadcrumbHandler> location = this.navigator.getLocation();
+         location.add(new BrowseBreadcrumbHandler(id, name));
+         
+         // set the current node Id ready for page refresh
+         getNavigator().setCurrentNodeId(id);
+         
+         // clear the value for the list component - will cause it to re-bind to it's data and refresh
+         // TODO: need a decoupled way to refresh components - a view-local context event service?
+         // TODO: remove this weakness!
+         UIRichList richList = (UIRichList)link.findComponent("browseList");
+         if (richList != null)
+         {
+            s_logger.debug("Clearing RichList data source.");
+            richList.setValue(null);
+         }
+      }
+   }
+   
 
    // ------------------------------------------------------------------------------
    // Inner classes
@@ -255,17 +340,18 @@ public class BrowseBean
    /**
     * Class to handle breadcrumb interaction for Browse pages
     */
-   private static class BrowseBreadcrumbHandler implements IBreadcrumbHandler
+   private class BrowseBreadcrumbHandler implements IBreadcrumbHandler
    {
       /**
        * Constructor
        * 
+       * @param nodeId     The nodeID for this browse navigation element
        * @param label      Element label
        */
-      public BrowseBreadcrumbHandler(String label)
+      public BrowseBreadcrumbHandler(String nodeId, String label)
       {
-         // TODO: this class will probably store an ID/QName of the Node it represents!
          this.label = label;
+         this.nodeId = nodeId;
       }
       
       /**
@@ -277,19 +363,29 @@ public class BrowseBean
       }
 
       /**
-       * @see com.activiti.web.jsf.component.IBreadcrumbHandler#navigationOutcome()
+       * @see com.activiti.web.jsf.component.IBreadcrumbHandler#navigationOutcome(com.activiti.web.jsf.component.UIBreadcrumb)
        */
-      public String navigationOutcome()
+      public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
-         return null;
+         // All browse breadcrumb element relate to a Node Id - when selected we
+         // set the current node id
+         getNavigator().setCurrentNodeId( nodeId );
+         
+         getNavigator().setLocation( (List)breadcrumb.getValue() );
+         
+         // return to browse page
+         return "browse";
       }
       
+      private String nodeId;
       private String label;
    }
 
    
    // ------------------------------------------------------------------------------
    // Private data
+   
+   private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    
    private static final String SEARCH_PATH = "PATH:\"/" + NamespaceService.ACTIVITI_PREFIX + ":{0}\"";
    
@@ -298,6 +394,9 @@ public class BrowseBean
    
    /** The SearchService to be used by the bean */
    private Searcher searchService;
+   
+   /** The NavigationBean reference */
+   private NavigationBean navigator;
    
    /** The current browse view mode - set to a well known IRichListRenderer name */
    private String browseViewMode = "details";
