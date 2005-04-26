@@ -306,6 +306,15 @@
          <to-view-id>/jsp/jump.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
+   
+   <!-- Browse screen action outcomes -->
+   <navigation-rule>
+      <from-view-id>/jsp/browse/browse.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>createSpace</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/create-from.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
 
    <!-- Note that the from-view-id can contain * wildcard to specify an entire dir match -->
    <!-- e.g. <from-view-id>/myfiles/*</from-view-id> -->

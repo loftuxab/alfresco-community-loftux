@@ -69,9 +69,9 @@
                            <td width=100 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
-                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" />
-                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" />
-                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" />
+                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" />
+                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" />
+                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" />
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100>

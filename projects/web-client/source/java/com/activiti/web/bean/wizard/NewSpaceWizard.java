@@ -172,7 +172,7 @@ public class NewSpaceWizard
       reset();
       
       // navigate
-      navigate("/jsp/jump.jsp");
+      navigate("/jsp/browse/browse.jsp");
       
       return null;
    }
@@ -188,7 +188,7 @@ public class NewSpaceWizard
       reset();
       
       // navigate
-      navigate("/jsp/jump.jsp");
+      navigate("/jsp/browse/browse.jsp");
       
       return null;
    }
@@ -201,7 +201,7 @@ public class NewSpaceWizard
    public String minimise()
    {
       // navigate
-      navigate("/jsp/jump.jsp");
+      navigate("/jsp/browse/browse.jsp");
       
       return null;
    }

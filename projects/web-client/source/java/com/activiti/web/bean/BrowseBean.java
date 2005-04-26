@@ -3,8 +3,10 @@
  */
 package com.activiti.web.bean;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ import javax.faces.model.SelectItem;
 
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -112,6 +115,54 @@ public class BrowseBean
       // get the node service and root node
       NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
       
+      Collection<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(rootNodeRef);
+      List<Node> items = new ArrayList<Node>(childRefs.size());
+      for (ChildAssocRef ref: childRefs)
+      {
+         // display name is the QName localname part
+         QName qname = ref.getName();
+         
+         // create our Node representation
+         Node node = new Node(qname.getNamespaceURI());  // TODO: where does Type come from?
+         Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
+         
+         // convert the rest of the well known properties
+         Map<QName, Serializable> childProps = this.nodeService.getProperties(ref.getChildRef());
+         
+         String name = qname.getLocalName();
+         props.put("name", name);
+         
+         String description = getQNameProperty(childProps, "description", true);
+         props.put("description", description);
+         
+         String createdDate = getQNameProperty(childProps, "createddate", false);
+         if (createdDate != null)
+         {
+            props.put("createddate", Conversion.dateFromXmlDate(createdDate));
+         }
+         else
+         {
+            // TODO: a null created/modified date shouldn't happen!? - remove this later
+            props.put("createddate", null);
+         }
+         
+         String modifiedDate = getQNameProperty(childProps, "modifieddate", false);
+         if (modifiedDate != null)
+         {
+            props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
+         }
+         else
+         {
+            // TODO: a null created/modified date shouldn't happen!?
+            props.put("modifieddate", null);
+         }
+         
+         node.setProperties(props);
+         
+         items.add(node);
+      }
+      
+      /* -- Example of Search code -- leave here for now
       // get the searcher object and perform the search of the root node
       String s = MessageFormat.format(SEARCH_PATH, new Object[] {path});
       ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
@@ -156,9 +207,28 @@ public class BrowseBean
             
             items.add(node);
          }
-      }
+      }*/
       
       return items;
+   }
+   
+   private String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
+   {
+      String value = null;
+      
+      QName propQName = QName.createQName(NamespaceService.ACTIVITI_URI, property);
+      Object obj = props.get(propQName);
+      
+      if (obj != null)
+      {
+         value = obj.toString();
+      }
+      else if (convertNull == true && obj == null)
+      {
+         value = "";
+      }
+      
+      return value;
    }
    
    private String getValueProperty(ResultSetRow row, String name, boolean convertNull)
