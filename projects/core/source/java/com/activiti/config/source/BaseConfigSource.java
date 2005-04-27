@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
+
 import com.activiti.config.ConfigSource;
 
 /**
@@ -16,6 +18,8 @@ import com.activiti.config.ConfigSource;
  */
 public abstract class BaseConfigSource implements ConfigSource
 {
+   private static final Logger logger = Logger.getLogger(BaseConfigSource.class);
+   
    private List sourceList = new ArrayList();
    private Iterator sources;
    
@@ -60,6 +64,10 @@ public abstract class BaseConfigSource implements ConfigSource
    public InputStream nextStream()
    {
       String source = (String)this.sources.next();
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Retrieving stream for: " + source);
+      
       return getInputStream(source);
    }
 

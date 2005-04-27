@@ -18,10 +18,12 @@ public class PathEvaluator implements Evaluator
    public boolean applies(Object obj, String condition)
    {
       boolean result = false;
+
+      // TODO: Also deal with NodeRef object's being passed in
       
       if (obj instanceof Node)
       {
-         String path = (String)((Node)obj).get("path");
+         String path = (String)((Node)obj).getPath();
          if (path != null)
          {
             result = path.equalsIgnoreCase(condition);

@@ -4,9 +4,16 @@
 
 <beans>
    
+   <!--
    <bean id="configSource" class="com.activiti.config.source.WebAppConfigSource">
-      <!--<property name="source">param:config.files</property>-->
       <property name="source"><value>/WEB-INF/web-client-config.xml</value></property>
+   </bean>
+   -->
+   
+   <bean id="configSource" class="com.activiti.config.source.FileConfigSource">
+      <property name="source">
+         <value>W:\sandbox\projects\web-client\source\test-resources\test-config.xml</value>
+      </property>
    </bean>
    
    <bean id="configService" class="com.activiti.config.xml.XMLConfigService" init-method="init">

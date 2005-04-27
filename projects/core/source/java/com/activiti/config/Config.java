@@ -1,5 +1,7 @@
 package com.activiti.config;
 
+import java.util.Map;
+
 /**
  * Definition of a object that represents the results of a lookup. 
  * 
@@ -14,6 +16,13 @@ public interface Config
     * @return The ConfigElement object or null if it doesn't exist
     */
    public ConfigElement getConfigElement(String name);
+   
+   /**
+    * Returns all the config elements
+    * 
+    * @return All the config elements 
+    */
+   public Map getConfigElements();
    
    // TODO: Add more methods to this interface to allow for easier client
    //       access to the results i.e. by using an XPath expression for

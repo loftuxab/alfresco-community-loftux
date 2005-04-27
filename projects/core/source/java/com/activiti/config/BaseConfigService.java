@@ -20,11 +20,11 @@ import com.activiti.config.evaluator.Evaluator;
  * The algorithm used is as follows:
  * <p>
  * Lookup methods go through the list of sections (maybe restricted to an area) 
- * and looks at the evaluator for each one. If the Evaluator is in the list (or 
- * lookup() has been called) the implementation is extracted and applies() is 
- * called on it. If applies() returns true all the ConfigElements from it are 
- * added to the Config object. If the ConfigElement already exists in the Config
- * object being built up the new one is combined() with the existing one.
+ * and looks at the evaluator for each one. The Evaluator implementation is 
+ * extracted and applies() is called on it. If applies() returns true all the 
+ * ConfigElements from it are added to the Config object. If the ConfigElement 
+ * already exists in the Config object being built up the new one is combined() 
+ * with the existing one.
  * </p>
  * 
  * @author gavinc
@@ -34,11 +34,10 @@ public abstract class BaseConfigService implements ConfigService
    private static final Logger logger = Logger.getLogger(BaseConfigService.class);
    
    protected ConfigSource configSource;
-   protected ConfigSection globalSection;
+   protected ConfigImpl globalConfig;
    protected Map evaluators;
-   protected List sections;
    protected Map sectionsByArea;
-   //protected Map sectionsByEvaluator;
+   protected List sections;
    
    /**
     * @see com.activiti.config.ConfigService#init()
@@ -48,6 +47,7 @@ public abstract class BaseConfigService implements ConfigService
       this.sections = new ArrayList();
       this.sectionsByArea = new HashMap();
       this.evaluators = new HashMap();
+      this.globalConfig = new ConfigImpl();
    }
 
    /**
@@ -59,10 +59,11 @@ public abstract class BaseConfigService implements ConfigService
       this.sectionsByArea.clear();
       this.evaluators.clear();
       
+      
       this.sections = null;
       this.sectionsByArea = null;
       this.evaluators = null;
-      this.globalSection = null;
+      
    }
 
    /**
@@ -78,7 +79,7 @@ public abstract class BaseConfigService implements ConfigService
     */
    public Config getConfig(Object object)
    {
-      return getConfig(object, null, null, true);
+      return getConfig(object, new String[] {}, true);
    }
 
    /**
@@ -86,82 +87,108 @@ public abstract class BaseConfigService implements ConfigService
     */
    public Config getConfig(Object object, boolean includeGlobalConfig)
    {
-      return getConfig(object, null, null, includeGlobalConfig);
-   }
-
-   public Config getConfig(Object object, String[] areas, String[] evaluators)
-   {
-      return getConfig(object, areas, evaluators, true);
+      return getConfig(object, new String[] {}, includeGlobalConfig);
    }
    
    /**
-    * @see com.activiti.config.ConfigService#getConfig(java.lang.Object, java.lang.String[], java.lang.String[], boolean)
+    * @see com.activiti.config.ConfigService#getConfig(java.lang.Object, java.lang.String)
     */
-   public Config getConfig(Object object, String[] areas, String[] evaluators, boolean includeGlobalConfig)
+   public Config getConfig(Object object, String area)
    {
-      // ********************************************************
-      // ** TODO: Implement the area and evaluator restrictions
-      // ********************************************************
-      
+      return getConfig(object, area, true);
+   }
+   
+   /**
+    * @see com.activiti.config.ConfigService#getConfig(java.lang.Object, java.lang.String, boolean)
+    */
+   public Config getConfig(Object object, String area, boolean includeGlobalConfig)
+   {
+      return getConfig(object, new String[] {area}, includeGlobalConfig);
+   }
+
+   /**
+    * @see com.activiti.config.ConfigService#getConfig(java.lang.Object, java.lang.String[], boolean)
+    */
+   public Config getConfig(Object object, String[] areas, boolean includeGlobalConfig)
+   {
       if (logger.isDebugEnabled())
-         logger.debug("Retrieving configuration for " + object + "...");
+         logger.debug("Retrieving configuration for " + object);
       
-      ConfigImpl results = new ConfigImpl();
+      ConfigImpl results = null;
       
-      if (this.globalSection != null)
+      if (includeGlobalConfig)
       {
-         if (includeGlobalConfig)
-         {
-            if (logger.isDebugEnabled())
-               logger.debug("Adding global section...");
-            
-            // add all the config elements from the global section to the results
-            List globalConfigElements = this.globalSection.getConfigElements();
-            for (int x = 0; x < globalConfigElements.size(); x++)
-            {
-               results.addConfigElement((ConfigElement)globalConfigElements.get(x));
-            }
-         }
-         else
-         {
-            if (logger.isDebugEnabled())
-               logger.debug("Ignoring global section");
-         }
+         results = new ConfigImpl(this.globalConfig);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Created initial config results using global section");
+      }
+      else
+      {
+         results = new ConfigImpl();
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Created initial config results ignoring the global section");
       }
       
-      // add all the config elements from all sections to the results
-      Iterator sections = this.sections.iterator();
-      while (sections.hasNext())
+      if (areas != null && areas.length > 0)
       {
-         // for each section get hold of the evaluator
-         ConfigSection section = (ConfigSection)sections.next();
-         String evaluatorName = section.getEvaluator();
-         Evaluator evaluator = getEvaluator(evaluatorName);
-         
-         if (evaluator == null)
+         if (logger.isDebugEnabled())
          {
-            throw new ConfigException("Unable to locate evaluator implementation for '" + 
-                                      evaluatorName + "' for " + section);
+            StringBuilder searchAreas = new StringBuilder();
+            for (int x = 0; x < areas.length; x++)
+            {
+               if (x > 0)
+               {
+                  searchAreas.append(", ");
+               }
+               
+               searchAreas.append(areas[x]);
+            }
+            
+            logger.debug("Restricting search within following areas: " + searchAreas.toString());
          }
          
-         // if the config section applies to the given object exract all the config
-         // elements inside and add them to the Config object
-         if (evaluator.applies(object, section.getCondition()))
+         // add all the config elements from all sections (that match) in each named area to the results
+         for (int x = 0; x < areas.length; x++)
          {
-            if (logger.isDebugEnabled())
-               logger.debug(section + " matched");
-            
-            List sectionConfigElements = section.getConfigElements();
-            for (int x = 0; x < sectionConfigElements.size(); x++)
+            String area = areas[x];
+            List areaSections = (List)this.sectionsByArea.get(area);
+            if (areaSections == null)
             {
-               results.addConfigElement((ConfigElement)sectionConfigElements.get(x));
+               throw new ConfigException("Requested area '" + area + "' has not been defined");
             }
+            
+            Iterator iterAreaSections = areaSections.iterator();
+            while (iterAreaSections.hasNext())
+            {
+               ConfigSection section = (ConfigSection)iterAreaSections.next();
+               processSection(section, object, results);
+            }
+         }
+      }
+      else
+      {
+         // add all the config elements from all sections (that match) to the results
+         Iterator sections = this.sections.iterator();
+         while (sections.hasNext())
+         {
+            ConfigSection section = (ConfigSection)sections.next();
+            processSection(section, object, results);
          }
       }
       
       return results;
    }
 
+   /**
+    * @see com.activiti.config.ConfigService#getGlobalConfig()
+    */
+   public Config getGlobalConfig()
+   {
+      return this.globalConfig;
+   }
+   
    /**
     * Parses all the files passed to this config service
     */
@@ -197,12 +224,17 @@ public abstract class BaseConfigService implements ConfigService
    {
       if (section.isGlobal())
       {
-         // TODO: Deal with adding multiple global sections, need
-         //       to combine the contained config elements
-         this.globalSection = section;
+         // get all the config elements from this section and add them to 
+         // the global section, if any already exist we must combine them
          
+         List globalConfigElements = section.getConfigElements();
+         for (int x = 0; x < globalConfigElements.size(); x++)
+         {
+            this.globalConfig.addConfigElement((ConfigElement)globalConfigElements.get(x));
+         }
+            
          if (logger.isDebugEnabled())
-            logger.debug("Set " + section + " to be global");
+            logger.debug("Added config elements from " + section + " to the global section");
       }
       else
       {
@@ -210,17 +242,24 @@ public abstract class BaseConfigService implements ConfigService
          this.sections.add(section);
          
          if (logger.isDebugEnabled())
-            logger.debug("Added " + section);
+            logger.debug("Added " + section + " to the sections list");
          
          if (area != null && area.length() > 0)
          {
-            this.sectionsByArea.put(area, section);
+            // get the list of sections for the given area name (create the list if required)
+            List areaSections = (List)this.sectionsByArea.get(area);
+            if (areaSections == null)
+            {
+               areaSections = new ArrayList();
+               this.sectionsByArea.put(area, areaSections);
+            }
+            
+            // add the section to the list
+            areaSections.add(section);
             
             if (logger.isDebugEnabled())
                logger.debug("Added " + section + " to the '" + area + "' area");
          }
-         
-         // TODO: store the sections by evaluator type too?
       }
    }
    
@@ -260,5 +299,39 @@ public abstract class BaseConfigService implements ConfigService
       
       if (logger.isDebugEnabled())
          logger.debug("Added evaluator '" + name + "': " + className);
+   }
+   
+   /**
+    * Determines whether the given section applies for the given object, if it does, the
+    * section is added to given results object.
+    * 
+    * @param section The section to process
+    * @param object The object to retrieve config for
+    * @param results The resulting config object for the search
+    */
+   protected void processSection(ConfigSection section, Object object, ConfigImpl results)
+   {
+      String evaluatorName = section.getEvaluator();
+      Evaluator evaluator = getEvaluator(evaluatorName);
+      
+      if (evaluator == null)
+      {
+         throw new ConfigException("Unable to locate evaluator implementation for '" + 
+                                   evaluatorName + "' for " + section);
+      }
+      
+      // if the config section applies to the given object exract all the config
+      // elements inside and add them to the Config object
+      if (evaluator.applies(object, section.getCondition()))
+      {
+         if (logger.isDebugEnabled())
+            logger.debug(section + " matches");
+         
+         List sectionConfigElements = section.getConfigElements();
+         for (int x = 0; x < sectionConfigElements.size(); x++)
+         {
+            results.addConfigElement((ConfigElement)sectionConfigElements.get(x));
+         }
+      }
    }
 }

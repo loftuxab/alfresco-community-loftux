@@ -128,21 +128,27 @@ public class GenericConfigElement implements ConfigElement
       combined.setValue(configElement.getValue());
       
       // add the existing attributes to the new instance
-      Iterator attrs = this.getAttributes().keySet().iterator();
-      while (attrs.hasNext())
+      if (this.attributes != null)
       {
-         String attrName = (String)attrs.next();
-         String attrValue = configElement.getAttribute(attrName);
-         combined.addAttribute(attrName, attrValue);
+         Iterator attrs = this.getAttributes().keySet().iterator();
+         while (attrs.hasNext())
+         {
+            String attrName = (String)attrs.next();
+            String attrValue = configElement.getAttribute(attrName);
+            combined.addAttribute(attrName, attrValue);
+         }
       }
       
       // add/combine the attributes from the given instance
-      attrs = configElement.getAttributes().keySet().iterator();
-      while (attrs.hasNext())
+      if (configElement.getAttributes() != null)
       {
-         String attrName = (String)attrs.next();
-         String attrValue = configElement.getAttribute(attrName);
-         combined.addAttribute(attrName, attrValue);
+         Iterator attrs = configElement.getAttributes().keySet().iterator();
+         while (attrs.hasNext())
+         {
+            String attrName = (String)attrs.next();
+            String attrValue = configElement.getAttribute(attrName);
+            combined.addAttribute(attrName, attrValue);
+         }
       }
       
       // add the existing children to the new instance

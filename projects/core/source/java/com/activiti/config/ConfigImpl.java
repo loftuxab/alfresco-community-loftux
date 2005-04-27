@@ -25,6 +25,18 @@ public class ConfigImpl implements Config
    }
    
    /**
+    * Construct a ConfigImpl using the contents of an existing ConfigImpl
+    * 
+    * @param config The instance to create this one from
+    */
+   public ConfigImpl(ConfigImpl config)
+   {
+      this();
+      
+      this.configElements.putAll(config.getConfigElements());
+   }
+   
+   /**
     * @see com.activiti.config.Config#getConfigElement(java.lang.String)
     */
    public ConfigElement getConfigElement(String name)
@@ -32,6 +44,14 @@ public class ConfigImpl implements Config
       return (ConfigElement)this.configElements.get(name);
    }
 
+   /**
+    * @see com.activiti.config.Config#getConfigElements()
+    */
+   public Map getConfigElements()
+   {
+      return this.configElements;
+   }
+   
    /**
     * Adds a config element to the results for the lookup
     * 
@@ -53,9 +73,6 @@ public class ConfigImpl implements Config
       else
       {
          this.configElements.put(name, newConfigElement);
-         
-         if (logger.isDebugEnabled())
-            logger.debug("Added " + newConfigElement);
       }
    }
 }

@@ -52,7 +52,7 @@ public class PropertyHelper
    {
       UIInput inputControl = null;
       ValueBinding vb = context.getApplication().
-                        createValueBinding("#{" + varName + ".properties." + 
+                        createValueBinding("#{" + varName + "." + 
                         property.getName() + "}");
       
       // generate the appropriate input field 

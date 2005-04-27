@@ -2,10 +2,10 @@
    
    <global>
       <evaluators>
-         <evaluator id="type-name" class="com.activiti.web.config.TypeNameEvaluator" />
+         <evaluator id="string" class="com.activiti.config.evaluator.StringEvaluator" />
+         <evaluator id="type-name" class="jsftest.repository.TypeNameEvaluator" />
          <evaluator id="aspect" class="com.activiti.web.config.AspectEvaluator" />
-         <evaluator id="path" class="com.activiti.web.config.PathEvaluator" />
-         <evaluator id="component-type" class="com.activiti.web.config.ComponentTypeEvaluator" />
+         <evaluator id="object-type" class="com.activiti.config.ObjectTypeEvaluator" />
       </evaluators>
       <element-readers>
          <!-- NOTE: This will be a built-in element reader, it's here for testing -->
@@ -14,40 +14,17 @@
      </element-readers>
    </global>
    
-   <!-- define a global config section -->
-   <config>
-      <properties>
-         <property name="name" />
-      </properties>
+   <!--
+   <config evaluator-ref="string" condition="wizard:new-space">
+      <wizard>
+         <steps>
+            <step id="1">
+               <page>/jsp/wizard/new-space/create-from.jsp</page>
+               <title>Choose how you want to create your space.</title>
+            </step>
+         </steps>
+      </wizard>
    </config>
-   
-   <config evaluator-ref="type-name" condition="base">
-      <properties>
-         <property name="description" />
-         <property name="created" />
-         <property name="modified" />
-      </properties>
-   </config>
-   
-   <config evaluator-ref="type-name" condition="SOP">
-      <properties>
-         <property name="description" />
-         <property name="modified" />
-         <property name="effective" />
-         <property name="approved" />
-      </properties>
-   </config>
-   
-   <config evaluator-ref="aspect" condition="versionable">
-      <properties>
-         <property name="latestversion" />
-      </properties>
-   </config>
-   
-   <config evaluator-ref="component-type" condition="com.activiti.web.jsf.component.data.UIRichList">
-      <renderers>
-         <renderer mode="details">com.activiti.web.jsf.renderer.data.RichListRenderer.DetailsViewRenderer</renderer>
-      </renderers>
-   </config>
+   -->
    
 </activiti-config>

@@ -1,7 +1,6 @@
 package com.activiti.web.config;
 
-import jsftest.repository.DataDictionary;
-import jsftest.repository.DataDictionary.MetaData;
+import java.util.List;
 
 import com.activiti.config.evaluator.Evaluator;
 import com.activiti.web.bean.repository.Node;
@@ -22,12 +21,15 @@ public class AspectEvaluator implements Evaluator
    {
       boolean result = false;
       
+      // TODO: Also deal with NodeRef object's being passed in
+      
       if (obj instanceof Node)
       {
-         String typeName = ((Node)obj).getType();
-         DataDictionary dd = new DataDictionary();
-         MetaData metaData = dd.getMetaData(typeName);
-         result = metaData.getAspects().contains(condition);
+         List aspects = ((Node)obj).getAspects();
+         if (aspects != null)
+         {
+            result = aspects.contains(condition);
+         }
       }
       
       return result;

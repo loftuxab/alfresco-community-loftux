@@ -10,6 +10,9 @@ import com.activiti.repo.ref.StoreRef;
 public class Repository
 {
    public static final String REPOSITORY_STORE = "SpacesStore";
+   public static final String NODE_SERVICE = "indexingNodeService";
+   public static final String SEARCH_SERVICE = "searcherComponent";
+   public static final String DICTIONARY_SERVICE = "dictionaryService";
    
    /**
     * Returns a store reference object

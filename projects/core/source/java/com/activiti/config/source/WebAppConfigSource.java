@@ -15,6 +15,8 @@ import com.activiti.config.ConfigSource;
 /**
  * ConfigSource implementation that gets its data via files in a web application.
  * 
+ * TODO: Also deal with the source being specified as an init param i.e. param:config.files
+ * 
  * @author gavinc
  */
 public class WebAppConfigSource extends BaseConfigSource implements ServletContextAware

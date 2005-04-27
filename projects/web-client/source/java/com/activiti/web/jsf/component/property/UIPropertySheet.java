@@ -17,7 +17,6 @@ import jsftest.repository.DataDictionary.MetaData;
 import jsftest.repository.DataDictionary.Property;
 
 import org.apache.log4j.Logger;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.jsf.FacesContextUtils;
 
 import com.activiti.config.Config;
@@ -166,7 +165,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
          }
          
          this.nodeRef = NodeService.getNodeRef(path);
-         this.node = new Node(NodeService.getType(this.nodeRef));
+         this.node = new Node(null, NodeService.getType(this.nodeRef));
          this.node.setProperties(NodeService.getProperties(this.nodeRef));
       }
       

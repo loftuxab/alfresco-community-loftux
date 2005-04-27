@@ -3,13 +3,21 @@ package com.activiti.web.bean.repository;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.activiti.repo.ref.NodeRef;
+
 /**
  * Lighweight client side representation of a node held in the repository. 
+ * 
+ * TODO: This object should be retrieved via Spring (singleton = false)
+ *       and then the nodeService etc. can be injected in here and be
+ *       used to find metadata etc.
+ * 
  * 
  * @author gavinc
  */
@@ -19,19 +27,37 @@ public class Node implements Serializable, Map<String, Object>
 
    private static Logger logger = Logger.getLogger(Node.class);
    
+   private NodeRef nodeRef;
    private String type;
    private Map<String, Object> properties = new HashMap(7, 1.0f);
    
-   public Node(String type)
+   public Node(NodeRef nodeRef, String type)
    {
       this.type = type;
+      this.nodeRef = nodeRef;
+      
+      // also add the type to the properties so it can be retrieved
+      // that way too (for value binding expressions), this needs to
+      // reviewed though as we don't want this appearing as a property!
+      this.properties.put("type", this.type);
    }
 
+   /**
+    * @return Returns the NodeRef this Node object represents
+    */
+   public NodeRef getNodeRef()
+   {
+      return this.nodeRef;
+   }
+   
    /**
     * @return Returns the type.
     */
    public String getType()
    {
+      // TODO: Use the node service to retrieve the type and
+      //       remove the type from the constructor
+      
       return type;
    }
    
@@ -42,7 +68,17 @@ public class Node implements Serializable, Map<String, Object>
    {
       return this.properties.get("name").toString();
    }
-   
+
+   /**
+    * @return The list of aspects applied to this node
+    */
+   public List getAspects()
+   {
+      // TODO: Use the node service to retrieve the aspects
+      
+      return null;
+   }
+
    /**
     * @return The GUID for the node
     */
@@ -51,12 +87,28 @@ public class Node implements Serializable, Map<String, Object>
       return this.properties.get("id").toString();
    }
 
+   public String getPath()
+   {
+      // TODO: Use the node service to retrieve the path
+      
+      return null;
+   }
+   
    /**
     * @param properties The properties to set.
     */
    public void setProperties(Map<String, Object> properties)
    {
+      // TODO: Use the node service to retrieve the properties,
+      //       this will probably be done in the constructor so
+      //       this method can be removed.
+      
       this.properties = properties;
+      
+      // also add the type to the properties so it can be retrieved
+      // that way too (for value binding expressions), this needs to
+      // reviewed though as we don't want this appearing as a property!
+      this.properties.put("type", this.type);
    }
    
    /**

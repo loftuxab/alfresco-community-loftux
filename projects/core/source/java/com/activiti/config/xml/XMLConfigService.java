@@ -28,6 +28,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
    private static final Logger logger = Logger.getLogger(XMLConfigService.class);
 
    private Map elementReaders;
+   private String currentArea;
    
    /**
     * Default constructor
@@ -54,13 +55,19 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     */
    public void init()
    {
+      if (logger.isDebugEnabled())
+         logger.debug("Commencing initialisation");
+      
       super.init();
       
+      // initialise the element readers map with built-in readers
       this.elementReaders = new HashMap();
-      
-      // TODO: add all the built in element readers
+      addConfigElementReader("properties", "com.activiti.config.xml.elementreader.PropertiesElementReader");
       
       parse();
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Completed initialisation");
    }
    
    /**
@@ -74,6 +81,9 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
          SAXReader reader = new SAXReader();
          Document document = reader.read(stream);
          Element rootElement = document.getRootElement();
+         
+         // see if there is an area defined
+         this.currentArea = rootElement.attributeValue("area");
          
          // parse the global section first
          Element globalConfig  = rootElement.element(ELEMENT_GLOBAL);
@@ -159,7 +169,6 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             String readerElementName = readerElement.attributeValue(ATTR_ELEMENT_NAME);
             String readerElementClass = readerElement.attributeValue(ATTR_CLASS);
             
-            // TODO: Can these checks be removed if we use a DTD and/or schema??
             if (readerElementName == null || readerElementName.length() == 0 )
             {
                throw new ConfigException("All element-reader elements must define an element-name attribute");
@@ -172,8 +181,6 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             
             // add the evaluator
             addConfigElementReader(readerElementName, readerElementClass);
-            
-            
          }
       }
    }
@@ -224,7 +231,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
          }
          
          // now all the config elements are added, add the section to the config service
-         addConfigSection(section, null);
+         addConfigSection(section, this.currentArea);
       }
    }
    

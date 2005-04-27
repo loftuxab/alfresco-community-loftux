@@ -12,15 +12,15 @@
    
       <awc:propertySheetGrid value="/gav.doc">
          <h:outputText value='#{DDService.types[node.type].propertiesMap["name"].displayName}: ' />
-         <h:inputText value="#{node.properties.name}" />
+         <h:inputText value="#{node.name}" />
          <h:outputText value='#{DDService.types[node.type].propertiesMap["description"].displayName}: ' />
-         <h:inputText value="#{node.properties.description}" />         
+         <h:inputText value="#{node.description}" />         
          <h:outputText value='#{DDService.types[node.type].propertiesMap["created"].displayName}: ' />
-         <h:inputText value="#{node.properties.created}" disabled='#{DDService.types[node.type].propertiesMap["created"].readOnly}'>
+         <h:inputText value="#{node.created}" disabled='#{DDService.types[node.type].propertiesMap["created"].readOnly}'>
             <f:convertDateTime dateStyle="short" pattern="d/MM/yyyy" />
          </h:inputText>
          <h:outputText value='#{DDService.types[node.type].propertiesMap["modified"].displayName}: ' />
-         <h:inputText value="#{node.properties.modified}">
+         <h:inputText value="#{node.modified}">
             <f:convertDateTime dateStyle="short" pattern="d/MM/yyyy" />
          </h:inputText>
          <!-- TODO: Put the keywords in here to test the custom converter tag -->
