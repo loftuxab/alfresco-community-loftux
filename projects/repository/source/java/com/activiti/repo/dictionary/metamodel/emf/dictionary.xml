@@ -6,19 +6,19 @@
   <datadictionary:EMFNamespacePrefix emfPrefix="act" emfURI="/2"/>
   <datadictionary:EMFNamespaceURI emfURI="http://www.activiti.com/test/1.0" emfPrefixes="/5"/>
   <datadictionary:EMFNamespacePrefix emfPrefix="test" emfURI="/4"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}any"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}text"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}content"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}int"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}long"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}float"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}double"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}date"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}datetime"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}boolean"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}name"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}guid"/>
-  <datadictionary:EMFPropertyType name="{http://www.activiti.com/1.0}category"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}any" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}text" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}content" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}int" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}long" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}float" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}double" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}date" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}datetime" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}boolean" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}name" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}guid" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}category" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
   <datadictionary:EMFAspect emfName="{http://www.activiti.com/1.0}aspect_content">
     <emfProperties emfName="encoding" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="mimetype" emfType="/7" emfMandatory="true"/>

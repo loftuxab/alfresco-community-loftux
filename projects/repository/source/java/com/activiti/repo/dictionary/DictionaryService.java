@@ -2,6 +2,8 @@ package com.activiti.repo.dictionary;
 
 import java.util.Collection;
 
+import com.activiti.repo.ref.QName;
+
 
 /**
  * Data Dictionary Service.
@@ -59,11 +61,15 @@ public interface DictionaryService
      * @return  the property definition (or null, if it does not exist)
      */
     PropertyDefinition getProperty(PropertyRef propertyRef);
+    
+    PropertyDefinition getProperty(QName property);
+    
+    
 
 //    AssociationDef getAssociation(AssociationRef association);
     
 //    BehaviourDef[] getBehaviours();
     
-//    PropertyTypeDefinition getPropertyType(DictionaryRef propertyTypeRef);
+      PropertyTypeDefinition getPropertyType(DictionaryRef propertyTypeRef);
     
 }

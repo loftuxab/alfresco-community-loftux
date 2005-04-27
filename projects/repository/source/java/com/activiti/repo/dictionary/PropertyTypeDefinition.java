@@ -36,4 +36,6 @@ public interface PropertyTypeDefinition
      */
     public QName getName();
     
+    public String getAnalyserClassName();
+    
 }

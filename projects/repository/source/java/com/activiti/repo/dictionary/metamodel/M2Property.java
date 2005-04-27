@@ -52,11 +52,11 @@ public interface M2Property
 
     public boolean isIndexedAtomically();
     
-    public boolean setIndexedAtomically(boolean isIndexedAtomically);
+    public void setIndexedAtomically(boolean isIndexedAtomically);
 
     public boolean isTokenisedInIndex();
     
-    public boolean setTokenisedInIndex(boolean isTokenisedInIndex);
+    public void setTokenisedInIndex(boolean isTokenisedInIndex);
     
     
 }

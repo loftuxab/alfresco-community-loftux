@@ -197,13 +197,22 @@ public interface EmfPackage extends EPackage{
     int EMF_PROPERTY__EMF_STORED_IN_INDEX = 7;
 
     /**
-     * The feature id for the '<em><b>Emf Index Tokeniser Class Name</b></em>' attribute.
+     * The feature id for the '<em><b>Emf Tokenised In Index</b></em>' attribute.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      * @ordered
      */
-    int EMF_PROPERTY__EMF_INDEX_TOKENISER_CLASS_NAME = 8;
+    int EMF_PROPERTY__EMF_TOKENISED_IN_INDEX = 8;
+
+    /**
+     * The feature id for the '<em><b>Emf Index Atomically</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_PROPERTY__EMF_INDEX_ATOMICALLY = 9;
 
     /**
      * The number of structural features of the the '<em>EMF Property</em>' class.
@@ -212,7 +221,7 @@ public interface EmfPackage extends EPackage{
      * @generated
      * @ordered
      */
-    int EMF_PROPERTY_FEATURE_COUNT = 9;
+    int EMF_PROPERTY_FEATURE_COUNT = 10;
 
     /**
      * The meta object id for the '{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFAspectImpl <em>EMF Aspect</em>}' class.
@@ -435,13 +444,22 @@ public interface EmfPackage extends EPackage{
     int EMF_PROPERTY_TYPE = 5;
 
     /**
-     * The feature id for the '<em><b>Name</b></em>' attribute.
+     * The feature id for the '<em><b>QName</b></em>' attribute.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      * @ordered
      */
-    int EMF_PROPERTY_TYPE__NAME = 0;
+    int EMF_PROPERTY_TYPE__QNAME = 0;
+
+    /**
+     * The feature id for the '<em><b>Emf Analyser Class Name</b></em>' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     * @ordered
+     */
+    int EMF_PROPERTY_TYPE__EMF_ANALYSER_CLASS_NAME = 1;
 
     /**
      * The number of structural features of the the '<em>EMF Property Type</em>' class.
@@ -450,7 +468,7 @@ public interface EmfPackage extends EPackage{
      * @generated
      * @ordered
      */
-    int EMF_PROPERTY_TYPE_FEATURE_COUNT = 1;
+    int EMF_PROPERTY_TYPE_FEATURE_COUNT = 2;
 
     /**
      * The meta object id for the '{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFTypeImpl <em>EMF Type</em>}' class.
@@ -571,6 +589,7 @@ public interface EmfPackage extends EPackage{
      */
     int EMF_NAMESPACE_PREFIX_FEATURE_COUNT = 2;
 
+ 
     /**
      * The meta object id for the '{@link com.activiti.repo.dictionary.metamodel.emf.impl.EMFNamespaceURIImpl <em>EMF Namespace URI</em>}' class.
      * <!-- begin-user-doc -->
@@ -772,15 +791,26 @@ public interface EmfPackage extends EPackage{
     EAttribute getEMFProperty_EmfStoredInIndex();
 
     /**
-     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfIndexTokeniserClassName <em>Emf Index Tokeniser Class Name</em>}'.
+     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfTokenisedInIndex <em>Emf Tokenised In Index</em>}'.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @return the meta object for the attribute '<em>Emf Index Tokeniser Class Name</em>'.
-     * @see com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfIndexTokeniserClassName()
+     * @return the meta object for the attribute '<em>Emf Tokenised In Index</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfTokenisedInIndex()
      * @see #getEMFProperty()
      * @generated
      */
-    EAttribute getEMFProperty_EmfIndexTokeniserClassName();
+    EAttribute getEMFProperty_EmfTokenisedInIndex();
+
+    /**
+     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfIndexAtomically <em>Emf Index Atomically</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the attribute '<em>Emf Index Atomically</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfIndexAtomically()
+     * @see #getEMFProperty()
+     * @generated
+     */
+    EAttribute getEMFProperty_EmfIndexAtomically();
 
     /**
      * Returns the meta object for class '{@link com.activiti.repo.dictionary.metamodel.emf.EMFAspect <em>EMF Aspect</em>}'.
@@ -900,15 +930,26 @@ public interface EmfPackage extends EPackage{
     EClass getEMFPropertyType();
 
     /**
-     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType#getName <em>Name</em>}'.
+     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType#getQName <em>QName</em>}'.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @return the meta object for the attribute '<em>Name</em>'.
+     * @return the meta object for the attribute '<em>QName</em>'.
      * @see com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType#getQName()
      * @see #getEMFPropertyType()
      * @generated
      */
-    EAttribute getEMFPropertyType_Name();
+    EAttribute getEMFPropertyType_QName();
+
+    /**
+     * Returns the meta object for the attribute '{@link com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType#getEmfAnalyserClassName <em>Emf Analyser Class Name</em>}'.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @return the meta object for the attribute '<em>Emf Analyser Class Name</em>'.
+     * @see com.activiti.repo.dictionary.metamodel.emf.EMFPropertyType#getEmfAnalyserClassName()
+     * @see #getEMFPropertyType()
+     * @generated
+     */
+    EAttribute getEMFPropertyType_EmfAnalyserClassName();
 
     /**
      * Returns the meta object for class '{@link com.activiti.repo.dictionary.metamodel.emf.EMFType <em>EMF Type</em>}'.

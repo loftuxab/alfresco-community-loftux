@@ -184,24 +184,44 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
     protected Boolean emfStoredInIndex = EMF_STORED_IN_INDEX_EDEFAULT;
 
     /**
-     * The default value of the '{@link #getEmfIndexTokeniserClassName() <em>Emf Index Tokeniser Class Name</em>}' attribute.
+     * The default value of the '{@link #getEmfTokenisedInIndex() <em>Emf Tokenised In Index</em>}' attribute.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getEmfIndexTokeniserClassName()
+     * @see #getEmfTokenisedInIndex()
      * @generated
      * @ordered
      */
-    protected static final String EMF_INDEX_TOKENISER_CLASS_NAME_EDEFAULT = null;
+    protected static final Boolean EMF_TOKENISED_IN_INDEX_EDEFAULT = new Boolean(false);
 
     /**
-     * The cached value of the '{@link #getEmfIndexTokeniserClassName() <em>Emf Index Tokeniser Class Name</em>}' attribute.
+     * The cached value of the '{@link #getEmfTokenisedInIndex() <em>Emf Tokenised In Index</em>}' attribute.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getEmfIndexTokeniserClassName()
+     * @see #getEmfTokenisedInIndex()
      * @generated
      * @ordered
      */
-    protected String emfIndexTokeniserClassName = EMF_INDEX_TOKENISER_CLASS_NAME_EDEFAULT;
+    protected Boolean emfTokenisedInIndex = EMF_TOKENISED_IN_INDEX_EDEFAULT;
+
+    /**
+     * The default value of the '{@link #getEmfIndexAtomically() <em>Emf Index Atomically</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see #getEmfIndexAtomically()
+     * @generated
+     * @ordered
+     */
+    protected static final Boolean EMF_INDEX_ATOMICALLY_EDEFAULT = new Boolean(true);
+
+    /**
+     * The cached value of the '{@link #getEmfIndexAtomically() <em>Emf Index Atomically</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see #getEmfIndexAtomically()
+     * @generated
+     * @ordered
+     */
+    protected Boolean emfIndexAtomically = EMF_INDEX_ATOMICALLY_EDEFAULT;
 
     /**
      * Property Reference
@@ -430,9 +450,9 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
      * <!-- end-user-doc -->
      * @generated
      */
-    public String getEmfIndexTokeniserClassName()
+    public Boolean getEmfTokenisedInIndex()
     {
-        return emfIndexTokeniserClassName;
+        return emfTokenisedInIndex;
     }
 
     /**
@@ -440,12 +460,35 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
      * <!-- end-user-doc -->
      * @generated
      */
-    public void setEmfIndexTokeniserClassName(String newEmfIndexTokeniserClassName)
+    public void setEmfTokenisedInIndex(Boolean newEmfTokenisedInIndex)
     {
-        String oldEmfIndexTokeniserClassName = emfIndexTokeniserClassName;
-        emfIndexTokeniserClassName = newEmfIndexTokeniserClassName;
+        Boolean oldEmfTokenisedInIndex = emfTokenisedInIndex;
+        emfTokenisedInIndex = newEmfTokenisedInIndex;
         if (eNotificationRequired())
-            eNotify(new ENotificationImpl(this, Notification.SET, EmfPackage.EMF_PROPERTY__EMF_INDEX_TOKENISER_CLASS_NAME, oldEmfIndexTokeniserClassName, emfIndexTokeniserClassName));
+            eNotify(new ENotificationImpl(this, Notification.SET, EmfPackage.EMF_PROPERTY__EMF_TOKENISED_IN_INDEX, oldEmfTokenisedInIndex, emfTokenisedInIndex));
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public Boolean getEmfIndexAtomically()
+    {
+        return emfIndexAtomically;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public void setEmfIndexAtomically(Boolean newEmfIndexAtomically)
+    {
+        Boolean oldEmfIndexAtomically = emfIndexAtomically;
+        emfIndexAtomically = newEmfIndexAtomically;
+        if (eNotificationRequired())
+            eNotify(new ENotificationImpl(this, Notification.SET, EmfPackage.EMF_PROPERTY__EMF_INDEX_ATOMICALLY, oldEmfIndexAtomically, emfIndexAtomically));
     }
 
     /**
@@ -504,12 +547,12 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
             switch (eContainerFeatureID)
             {
                 case EmfPackage.EMF_PROPERTY__EMF_CONTAINER_CLASS:
-                    return ((InternalEObject)eContainer).eInverseRemove(this, EmfPackage.EMF_CLASS__EMF_PROPERTIES, EMFClass.class, msgs);
+                    return eContainer.eInverseRemove(this, EmfPackage.EMF_CLASS__EMF_PROPERTIES, EMFClass.class, msgs);
                 default:
                     return eDynamicBasicRemoveFromContainer(msgs);
             }
         }
-        return ((InternalEObject)eContainer).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - eContainerFeatureID, null, msgs);
+        return eContainer.eInverseRemove(this, EOPPOSITE_FEATURE_BASE - eContainerFeatureID, null, msgs);
     }
 
     /**
@@ -538,8 +581,10 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
                 return getEmfIndexed();
             case EmfPackage.EMF_PROPERTY__EMF_STORED_IN_INDEX:
                 return getEmfStoredInIndex();
-            case EmfPackage.EMF_PROPERTY__EMF_INDEX_TOKENISER_CLASS_NAME:
-                return getEmfIndexTokeniserClassName();
+            case EmfPackage.EMF_PROPERTY__EMF_TOKENISED_IN_INDEX:
+                return getEmfTokenisedInIndex();
+            case EmfPackage.EMF_PROPERTY__EMF_INDEX_ATOMICALLY:
+                return getEmfIndexAtomically();
         }
         return eDynamicGet(eFeature, resolve);
     }
@@ -574,8 +619,11 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
             case EmfPackage.EMF_PROPERTY__EMF_STORED_IN_INDEX:
                 setEmfStoredInIndex((Boolean)newValue);
                 return;
-            case EmfPackage.EMF_PROPERTY__EMF_INDEX_TOKENISER_CLASS_NAME:
-                setEmfIndexTokeniserClassName((String)newValue);
+            case EmfPackage.EMF_PROPERTY__EMF_TOKENISED_IN_INDEX:
+                setEmfTokenisedInIndex((Boolean)newValue);
+                return;
+            case EmfPackage.EMF_PROPERTY__EMF_INDEX_ATOMICALLY:
+                setEmfIndexAtomically((Boolean)newValue);
                 return;
         }
         eDynamicSet(eFeature, newValue);
@@ -611,8 +659,11 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
             case EmfPackage.EMF_PROPERTY__EMF_STORED_IN_INDEX:
                 setEmfStoredInIndex(EMF_STORED_IN_INDEX_EDEFAULT);
                 return;
-            case EmfPackage.EMF_PROPERTY__EMF_INDEX_TOKENISER_CLASS_NAME:
-                setEmfIndexTokeniserClassName(EMF_INDEX_TOKENISER_CLASS_NAME_EDEFAULT);
+            case EmfPackage.EMF_PROPERTY__EMF_TOKENISED_IN_INDEX:
+                setEmfTokenisedInIndex(EMF_TOKENISED_IN_INDEX_EDEFAULT);
+                return;
+            case EmfPackage.EMF_PROPERTY__EMF_INDEX_ATOMICALLY:
+                setEmfIndexAtomically(EMF_INDEX_ATOMICALLY_EDEFAULT);
                 return;
         }
         eDynamicUnset(eFeature);
@@ -643,8 +694,10 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
                 return EMF_INDEXED_EDEFAULT == null ? emfIndexed != null : !EMF_INDEXED_EDEFAULT.equals(emfIndexed);
             case EmfPackage.EMF_PROPERTY__EMF_STORED_IN_INDEX:
                 return EMF_STORED_IN_INDEX_EDEFAULT == null ? emfStoredInIndex != null : !EMF_STORED_IN_INDEX_EDEFAULT.equals(emfStoredInIndex);
-            case EmfPackage.EMF_PROPERTY__EMF_INDEX_TOKENISER_CLASS_NAME:
-                return EMF_INDEX_TOKENISER_CLASS_NAME_EDEFAULT == null ? emfIndexTokeniserClassName != null : !EMF_INDEX_TOKENISER_CLASS_NAME_EDEFAULT.equals(emfIndexTokeniserClassName);
+            case EmfPackage.EMF_PROPERTY__EMF_TOKENISED_IN_INDEX:
+                return EMF_TOKENISED_IN_INDEX_EDEFAULT == null ? emfTokenisedInIndex != null : !EMF_TOKENISED_IN_INDEX_EDEFAULT.equals(emfTokenisedInIndex);
+            case EmfPackage.EMF_PROPERTY__EMF_INDEX_ATOMICALLY:
+                return EMF_INDEX_ATOMICALLY_EDEFAULT == null ? emfIndexAtomically != null : !EMF_INDEX_ATOMICALLY_EDEFAULT.equals(emfIndexAtomically);
         }
         return eDynamicIsSet(eFeature);
     }
@@ -671,8 +724,10 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
         result.append(emfIndexed);
         result.append(", emfStoredInIndex: ");
         result.append(emfStoredInIndex);
-        result.append(", emfIndexTokeniserClassName: ");
-        result.append(emfIndexTokeniserClassName);
+        result.append(", emfTokenisedInIndex: ");
+        result.append(emfTokenisedInIndex);
+        result.append(", emfIndexAtomically: ");
+        result.append(emfIndexAtomically);
         result.append(')');
         return result.toString();
     }
@@ -811,22 +866,6 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
     }
 
     /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.metamodel.M2Property#getIndexTokeniserClassName()
-     */
-    public String getIndexTokeniserClassName()
-    {
-        return getEmfIndexTokeniserClassName();
-    }
-
-    /* (non-Javadoc)
-     * @see com.activiti.repo.dictionary.metamodel.M2Property#setIndexTokeniserClassName(java.lang.String)
-     */
-    public void setIndexTokeniserClassName(String indexTokeniserName)
-    {
-        setEmfIndexTokeniserClassName(indexTokeniserName);
-    }
-
-    /* (non-Javadoc)
      * @see com.activiti.repo.dictionary.metamodel.M2Property#getPropertyDefinition()
      */
     public PropertyDefinition getPropertyDefinition()
@@ -840,26 +879,22 @@ public class EMFPropertyImpl extends EObjectImpl implements EMFProperty, M2Prope
 
     public boolean isIndexedAtomically()
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        return getEmfIndexAtomically();
     }
 
     public boolean isTokenisedInIndex()
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        return getEmfTokenisedInIndex();
     }
 
-    public boolean setIndexedAtomically(boolean isIndexedAtomically)
+    public void setIndexedAtomically(boolean isIndexedAtomically)
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        setEmfIndexAtomically(isIndexedAtomically);
     }
 
-    public boolean setTokenisedInIndex(boolean isTokenisedInIndex)
+    public void setTokenisedInIndex(boolean isTokenisedInIndex)
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        setEmfTokenisedInIndex(isTokenisedInIndex);
     }
 
     

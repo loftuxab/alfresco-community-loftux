@@ -42,6 +42,9 @@ import com.vladium.utils.timing.TimerFactory;
  */
 public abstract class BaseNodeServiceTest extends BaseSpringTest
 {
+    
+    private static ITimer timer = TimerFactory.newTimer();
+    
     protected DictionaryService dictionaryService;
     protected NodeService nodeService;
     /** populated during setup */
@@ -746,33 +749,48 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testAddPerformance() throws Exception
     {
-        ITimer timer = TimerFactory.newTimer();
         timer.start();
         Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
         directories.put(rootNodeRef, QName.createQName("{ } "));
-        createLevels(directories, 1);
-        timer.stop();
+        createLevels(directories, 1);    
+        setComplete();
+        
     }
     
     public void testAddPerformance2() throws Exception
     {
-        ITimer timer = TimerFactory.newTimer();
+        timer.stop();
+        System.out.println("Created in "+timer.getDuration());
+        timer.reset();
         timer.start();
         Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
         directories.put(rootNodeRef, QName.createQName("{ } "));
         createLevels(directories, 2);
-        timer.stop();
+        setComplete();
     }
     
     public void testAddPerformance3() throws Exception
     {
-        ITimer timer = TimerFactory.newTimer();
+        timer.stop();
+        System.out.println("Created in "+timer.getDuration());
+        timer.reset();
         timer.start();
         Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
         directories.put(rootNodeRef, QName.createQName("{ } "));
         createLevels(directories, 3);
         timer.stop();
+        setComplete();
+        System.out.println("Created in "+timer.getDuration());
     }
+    
+    public void testAddPerformance4() throws Exception
+    {
+        timer.stop();
+        System.out.println("Created in "+timer.getDuration());
+        timer.reset();
+    }
+    
+    
 
     private void createLevels( Map<NodeRef, QName> map, int levels)
     {

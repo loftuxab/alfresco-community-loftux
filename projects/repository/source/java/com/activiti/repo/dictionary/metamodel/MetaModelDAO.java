@@ -54,6 +54,8 @@ public interface MetaModelDAO
      * @return  the property
      */
     public M2Property getProperty(QName className, String propertyName);
+    
+    public M2Property getProperty(QName propertyName);
 
     /**
      * Gets a Property Type

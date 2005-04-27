@@ -6,8 +6,7 @@ import org.eclipse.emf.ecore.EObject;
 /**
  * @model
  */
-public interface EMFProperty extends EObject
-{
+public interface EMFProperty extends EObject{
 
     /**
      * @model
@@ -100,19 +99,58 @@ public interface EMFProperty extends EObject
     void setEmfStoredInIndex(Boolean value);
 
     /**
-     * @model
-     */
-    String getEmfIndexTokeniserClassName();
-
-    /**
-     * Sets the value of the '{@link com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfIndexTokeniserClassName <em>Emf Index Tokeniser Class Name</em>}' attribute.
+     * Returns the value of the '<em><b>Emf Tokenised In Index</b></em>' attribute.
+     * The default value is <code>"false"</code>.
      * <!-- begin-user-doc -->
+     * <p>
+     * If the meaning of the '<em>Emf Tokenised In Index</em>' attribute isn't clear,
+     * there really should be more of a description here...
+     * </p>
      * <!-- end-user-doc -->
-     * @param value the new value of the '<em>Emf Index Tokeniser Class Name</em>' attribute.
-     * @see #getEmfIndexTokeniserClassName()
+     * @return the value of the '<em>Emf Tokenised In Index</em>' attribute.
+     * @see #setEmfTokenisedInIndex(Boolean)
+     * @see com.activiti.repo.dictionary.metamodel.emf.EmfPackage#getEMFProperty_EmfTokenisedInIndex()
+     * @model default="false"
      * @generated
      */
-    void setEmfIndexTokeniserClassName(String value);
+    Boolean getEmfTokenisedInIndex();
+
+    /**
+     * Sets the value of the '{@link com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfTokenisedInIndex <em>Emf Tokenised In Index</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @param value the new value of the '<em>Emf Tokenised In Index</em>' attribute.
+     * @see #getEmfTokenisedInIndex()
+     * @generated
+     */
+    void setEmfTokenisedInIndex(Boolean value);
+
+    /**
+     * Returns the value of the '<em><b>Emf Index Atomically</b></em>' attribute.
+     * The default value is <code>"true"</code>.
+     * <!-- begin-user-doc -->
+     * <p>
+     * If the meaning of the '<em>Emf Index Atomically</em>' attribute isn't clear,
+     * there really should be more of a description here...
+     * </p>
+     * <!-- end-user-doc -->
+     * @return the value of the '<em>Emf Index Atomically</em>' attribute.
+     * @see #setEmfIndexAtomically(Boolean)
+     * @see com.activiti.repo.dictionary.metamodel.emf.EmfPackage#getEMFProperty_EmfIndexAtomically()
+     * @model default="true"
+     * @generated
+     */
+    Boolean getEmfIndexAtomically();
+
+    /**
+     * Sets the value of the '{@link com.activiti.repo.dictionary.metamodel.emf.EMFProperty#getEmfIndexAtomically <em>Emf Index Atomically</em>}' attribute.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @param value the new value of the '<em>Emf Index Atomically</em>' attribute.
+     * @see #getEmfIndexAtomically()
+     * @generated
+     */
+    void setEmfIndexAtomically(Boolean value);
 
     /**
      * @model type="EMFPropertyType"

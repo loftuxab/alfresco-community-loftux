@@ -82,7 +82,7 @@
                windowtitle="${javadoc.title}" />
    </target>
    
-   <target name="run-tests" depends="compile-java"
+   <target name="run-tests" depends="package-jar"
            description="Runs the projects unit tests">
       <mkdir dir="${test.results.dir}" />
       <junit printsummary="yes" fork="yes" haltonfailure="yes">
@@ -92,7 +92,9 @@
             <fileset dir="${common.lib.dir}">
                <include name="**/*.jar" />
             </fileset>
-            <pathelement location="${classes.dir}"/>
+            <fileset dir="${common.dir}/projects">
+               <include name="**/build/dist/*.jar" />
+            </fileset>
          </classpath>
          <formatter type="plain"/>
          <batchtest fork="yes" todir="${test.results.dir}">

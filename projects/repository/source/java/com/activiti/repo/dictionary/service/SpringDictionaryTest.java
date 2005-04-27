@@ -2,11 +2,17 @@ package com.activiti.repo.dictionary.service;
 
 import java.util.Collection;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+
 import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.dictionary.PropertyDefinition;
+import com.activiti.repo.dictionary.PropertyRef;
+import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.util.BaseSpringTest;
@@ -81,6 +87,34 @@ public class SpringDictionaryTest extends BaseSpringTest
         assertEquals(1, categoryType.getAssociations().size());
         assertEquals(1, categoryType.getChildAssociations().size());
         assertEquals(0, categoryType.getProperties().size());
+        
+    }
+    
+    public void testIndexingProperties()
+    {
+        // Check types know about thier tokeniser - we should change to analyser ...
+        DictionaryRef ref = new DictionaryRef(PropertyTypeDefinition.TEXT);
+        PropertyTypeDefinition textType = dictionaryService.getPropertyType(ref);
+        assertNotNull(textType);
+        assertEquals(StandardAnalyzer.class.getName(), textType.getAnalyserClassName());
+        
+        // Find a property definition by Qname
+        PropertyRef propRef = new PropertyRef(new ClassRef(DictionaryBootstrap.ASPECT_QNAME_CONTENT), DictionaryBootstrap.PROP_ENCODING);
+        PropertyDefinition propDef = dictionaryService.getProperty(propRef.getQName());
+        assertNotNull(propDef);
+        assertEquals(true, propDef.isIndexed());
+        assertEquals(true, propDef.isIndexedAtomically());
+        assertEquals(false, propDef.isStoredInIndex());
+        assertEquals(false, propDef.isTokenisedInIndex());
+        
+        propDef = dictionaryService.getProperty(propRef);
+        assertNotNull(propDef);
+        assertEquals(true, propDef.isIndexed());
+        assertEquals(true, propDef.isIndexedAtomically());
+        assertEquals(false, propDef.isStoredInIndex());
+        assertEquals(false, propDef.isTokenisedInIndex());
+        
+        
         
     }
     

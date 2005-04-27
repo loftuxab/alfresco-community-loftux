@@ -5,13 +5,16 @@ import java.util.Collection;
 import com.activiti.repo.dictionary.AspectDefinition;
 import com.activiti.repo.dictionary.ClassDefinition;
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.PropertyRef;
+import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.dictionary.metamodel.M2Aspect;
 import com.activiti.repo.dictionary.metamodel.M2Class;
 import com.activiti.repo.dictionary.metamodel.M2Property;
+import com.activiti.repo.dictionary.metamodel.M2PropertyType;
 import com.activiti.repo.dictionary.metamodel.M2References;
 import com.activiti.repo.dictionary.metamodel.M2Type;
 import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
@@ -87,5 +90,17 @@ public class DictionaryComponent implements DictionaryService
         M2Property m2Property = metaModelDAO.getProperty(propertyRef.getClassRef().getQName(),
                 propertyRef.getPropertyName());
         return m2Property == null ? null : m2Property.getPropertyDefinition();
+    }
+
+    public PropertyDefinition getProperty(QName property)
+    {
+        M2Property m2Property = metaModelDAO.getProperty(property);
+        return m2Property == null ? null : m2Property.getPropertyDefinition();
+    }
+
+    public PropertyTypeDefinition getPropertyType(DictionaryRef propertyTypeRef)
+    {
+       M2PropertyType m2PropertyType = metaModelDAO.getPropertyType(propertyTypeRef.getQName());
+       return m2PropertyType == null ? null : m2PropertyType.getPropertyTypeDefinition();
     }
 }

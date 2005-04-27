@@ -66,7 +66,7 @@ public class EMFMetaModelDAOTest extends BaseDictionaryTest
         QName fileQName = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file");
         M2Property m2Property = metaModelDao.getProperty(fileQName, "encoding");
         assertNotNull(m2Property);
-        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "file-encoding"),
+        assertEquals(QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "encoding"),
                 m2Property.getPropertyDefinition().getQName());
     }
 }

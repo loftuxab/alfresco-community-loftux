@@ -5,8 +5,7 @@ import org.eclipse.emf.ecore.EObject;
 /**
  * @model
  */
-public interface EMFNamespacePrefix extends EObject
-{
+public interface EMFNamespacePrefix extends EObject{
 
     /**
      * @model

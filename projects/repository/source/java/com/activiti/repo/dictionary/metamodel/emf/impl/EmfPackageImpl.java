@@ -321,9 +321,19 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
      * <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getEMFProperty_EmfIndexTokeniserClassName()
+    public EAttribute getEMFProperty_EmfTokenisedInIndex()
     {
         return (EAttribute)emfPropertyEClass.getEStructuralFeatures().get(8);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getEMFProperty_EmfIndexAtomically()
+    {
+        return (EAttribute)emfPropertyEClass.getEStructuralFeatures().get(9);
     }
 
     /**
@@ -441,9 +451,19 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
      * <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getEMFPropertyType_Name()
+    public EAttribute getEMFPropertyType_QName()
     {
         return (EAttribute)emfPropertyTypeEClass.getEStructuralFeatures().get(0);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getEMFPropertyType_EmfAnalyserClassName()
+    {
+        return (EAttribute)emfPropertyTypeEClass.getEStructuralFeatures().get(1);
     }
 
     /**
@@ -601,7 +621,8 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
         createEAttribute(emfPropertyEClass, EMF_PROPERTY__EMF_MULTIPLE);
         createEAttribute(emfPropertyEClass, EMF_PROPERTY__EMF_INDEXED);
         createEAttribute(emfPropertyEClass, EMF_PROPERTY__EMF_STORED_IN_INDEX);
-        createEAttribute(emfPropertyEClass, EMF_PROPERTY__EMF_INDEX_TOKENISER_CLASS_NAME);
+        createEAttribute(emfPropertyEClass, EMF_PROPERTY__EMF_TOKENISED_IN_INDEX);
+        createEAttribute(emfPropertyEClass, EMF_PROPERTY__EMF_INDEX_ATOMICALLY);
 
         emfAspectEClass = createEClass(EMF_ASPECT);
 
@@ -617,7 +638,8 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
         createEReference(emfChildAssociationEClass, EMF_CHILD_ASSOCIATION__EMF_DEFAULT_TYPE);
 
         emfPropertyTypeEClass = createEClass(EMF_PROPERTY_TYPE);
-        createEAttribute(emfPropertyTypeEClass, EMF_PROPERTY_TYPE__NAME);
+        createEAttribute(emfPropertyTypeEClass, EMF_PROPERTY_TYPE__QNAME);
+        createEAttribute(emfPropertyTypeEClass, EMF_PROPERTY_TYPE__EMF_ANALYSER_CLASS_NAME);
 
         emfTypeEClass = createEClass(EMF_TYPE);
         createEAttribute(emfTypeEClass, EMF_TYPE__EMF_ORDERED_CHILDREN);
@@ -681,7 +703,8 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
         initEAttribute(getEMFProperty_EmfMultiple(), ecorePackage.getEBooleanObject(), "emfMultiple", "false", 0, 1, EMFProperty.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEAttribute(getEMFProperty_EmfIndexed(), ecorePackage.getEBooleanObject(), "emfIndexed", "true", 0, 1, EMFProperty.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
         initEAttribute(getEMFProperty_EmfStoredInIndex(), ecorePackage.getEBooleanObject(), "emfStoredInIndex", "false", 0, 1, EMFProperty.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-        initEAttribute(getEMFProperty_EmfIndexTokeniserClassName(), ecorePackage.getEString(), "emfIndexTokeniserClassName", null, 0, 1, EMFProperty.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEAttribute(getEMFProperty_EmfTokenisedInIndex(), ecorePackage.getEBooleanObject(), "emfTokenisedInIndex", "false", 0, 1, EMFProperty.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEAttribute(getEMFProperty_EmfIndexAtomically(), ecorePackage.getEBooleanObject(), "emfIndexAtomically", "true", 0, 1, EMFProperty.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         initEClass(emfAspectEClass, EMFAspect.class, "EMFAspect", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -697,7 +720,8 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
         initEReference(getEMFChildAssociation_EmfDefaultType(), this.getEMFType(), null, "emfDefaultType", null, 0, 1, EMFChildAssociation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         initEClass(emfPropertyTypeEClass, EMFPropertyType.class, "EMFPropertyType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-        initEAttribute(getEMFPropertyType_Name(), this.getQName(), "name", null, 0, 1, EMFPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEAttribute(getEMFPropertyType_QName(), this.getQName(), "qName", null, 0, 1, EMFPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEAttribute(getEMFPropertyType_EmfAnalyserClassName(), ecorePackage.getEString(), "emfAnalyserClassName", null, 0, 1, EMFPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         initEClass(emfTypeEClass, EMFType.class, "EMFType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getEMFType_EmfOrderedChildren(), ecorePackage.getEBooleanObject(), "emfOrderedChildren", "false", 0, 1, EMFType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -706,7 +730,7 @@ public class EmfPackageImpl extends EPackageImpl implements EmfPackage
 
         initEClass(emfNamespacePrefixEClass, EMFNamespacePrefix.class, "EMFNamespacePrefix", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getEMFNamespacePrefix_EmfPrefix(), ecorePackage.getEString(), "emfPrefix", null, 0, 1, EMFNamespacePrefix.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-        initEReference(getEMFNamespacePrefix_EmfURI(), this.getEMFNamespaceURI(), this.getEMFNamespaceURI_EmfPrefixes(), "emfURI", null, 0, 1, EMFNamespacePrefix.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        initEReference(getEMFNamespacePrefix_EmfURI(), this.getEMFNamespaceURI(), this.getEMFNamespaceURI_EmfPrefixes(), "emfURI", null, 1, 1, EMFNamespacePrefix.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         initEClass(emfNamespaceURIEClass, EMFNamespaceURI.class, "EMFNamespaceURI", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
         initEAttribute(getEMFNamespaceURI_EmfURI(), ecorePackage.getEString(), "emfURI", null, 0, 1, EMFNamespaceURI.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

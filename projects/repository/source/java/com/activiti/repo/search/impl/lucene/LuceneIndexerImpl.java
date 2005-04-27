@@ -32,7 +32,10 @@ import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.dictionary.DictionaryRef;
 import com.activiti.repo.dictionary.DictionaryService;
+import com.activiti.repo.dictionary.PropertyDefinition;
+import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.TypeDefinition;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -826,13 +829,21 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             for (QName propertyQName : properties.keySet())
             {
+                boolean store = true;
+                boolean index = true;
+                boolean tokenise = true;
+                boolean atomic = true;
                 // TODO: - should be able to get the property by its QName?
-                // ClassDefinition cd = dictionaryService.getClass(nodeTypeRef);
-                // PropertyRef pref = new PropertyRef(propertyQName);
-                // PropertyDefinition propDef =
-                // dictionaryService.getProperty(pref);
-                // PropertyTypeDefinition propTypeDef =
-                // propDef.getPropertyType();
+                
+                PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
+                PropertyTypeDefinition propertyType = dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
+                if(propertyDefinition != null)
+                {
+                    index = propertyDefinition.isIndexed();
+                    store = propertyDefinition.isStoredInIndex();
+                    tokenise = propertyDefinition.isTokenisedInIndex();
+                    atomic = propertyDefinition.isIndexedAtomically();
+                }
 
                 // PropertyTypeDefinition propDef = null;
                 Serializable value = properties.get(propertyQName);
@@ -844,9 +855,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 // advantage of tokenisation
 
                 // Need to add with the correct language based analyser
-                if (true)
+                if (index && atomic)
                 {
-                    doc.add(new Field("@" + propertyQName, strValue, true, true, true));
+                    doc.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
                 }
 
             }
@@ -1027,13 +1038,22 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
                 for (QName propertyQName : properties.keySet())
                 {
+                    boolean store = true;
+                    boolean index = true;
+                    boolean tokenise = true;
+                    boolean atomic = true;
                     // TODO: - should be able to get the property by its QName?
-                    // ClassDefinition cd =
-                    // dictionaryService.getClass(nodeTypeRef);
-                    // PropertyDefinition propDef =
-                    // cd.getProperty(propertyQName.getLocalName());
-                    // PropertyTypeDefinition propTypeDef =
-                    // propDef.getPropertyType();
+                    
+                    PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
+                    PropertyTypeDefinition propertyType = dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
+                    if(propertyDefinition != null)
+                    {
+                        index = propertyDefinition.isIndexed();
+                        store = propertyDefinition.isStoredInIndex();
+                        tokenise = propertyDefinition.isTokenisedInIndex();
+                        atomic = propertyDefinition.isIndexedAtomically();
+                    }
+
 
                     Serializable value = properties.get(propertyQName);
                     // convert value to String
@@ -1044,11 +1064,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     // advantage of tokenisation
 
                     // Need to add with the correct language based analyser
-                    if (true)
+                    if (index && !atomic)
                     {
                         String fieldName = "@" + propertyQName;
                         document.removeFields(fieldName);
-                        document.add(new Field(fieldName, strValue, true, true, true));
+                        document.add(new Field(fieldName, strValue, store, index, tokenise));
                     }
 
                 }

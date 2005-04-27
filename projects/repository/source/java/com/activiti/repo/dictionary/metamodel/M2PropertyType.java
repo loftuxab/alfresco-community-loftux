@@ -25,4 +25,8 @@ public interface M2PropertyType
      */
     public PropertyTypeDefinition getPropertyTypeDefinition();
     
+    public String getAnalyserClassName();
+    
+    public void setAnalyserClassName(String analyserClassName);
+    
 }

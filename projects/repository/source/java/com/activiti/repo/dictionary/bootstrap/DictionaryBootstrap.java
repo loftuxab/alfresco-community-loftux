@@ -2,6 +2,8 @@ package com.activiti.repo.dictionary.bootstrap;
 
 import java.io.File;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryException;
 import com.activiti.repo.dictionary.NamespaceService;
@@ -211,18 +213,31 @@ public class DictionaryBootstrap
     private void createPropertyTypes()
     {
         M2PropertyType ANY = metaModelDAO.createPropertyType(PropertyTypeDefinition.ANY);
+        ANY.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType TEXT = metaModelDAO.createPropertyType(PropertyTypeDefinition.TEXT);
+        TEXT.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType CONTENT = metaModelDAO.createPropertyType(PropertyTypeDefinition.CONTENT);
+        CONTENT.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType INT = metaModelDAO.createPropertyType(PropertyTypeDefinition.INT);
+        INT.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType LONG = metaModelDAO.createPropertyType(PropertyTypeDefinition.LONG);
+        LONG.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType FLOAT = metaModelDAO.createPropertyType(PropertyTypeDefinition.FLOAT);
+        FLOAT.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType DOUBLE = metaModelDAO.createPropertyType(PropertyTypeDefinition.DOUBLE);
+        DOUBLE.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType DATE = metaModelDAO.createPropertyType(PropertyTypeDefinition.DATE);
+        DATE.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType DATETIME = metaModelDAO.createPropertyType(PropertyTypeDefinition.DATETIME);
+        DATETIME.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType BOOLEAN = metaModelDAO.createPropertyType(PropertyTypeDefinition.BOOLEAN);
+        BOOLEAN.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType NAME = metaModelDAO.createPropertyType(PropertyTypeDefinition.NAME);
+        NAME.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType GUID = metaModelDAO.createPropertyType(PropertyTypeDefinition.GUID);
+        GUID.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType CATEGORY = metaModelDAO.createPropertyType(PropertyTypeDefinition.CATEGORY);
+        CATEGORY.setAnalyserClassName(StandardAnalyzer.class.getName());
     }
     
 

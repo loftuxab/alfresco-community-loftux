@@ -95,6 +95,13 @@ public class EmfSwitch {
     {
         switch (classifierID)
         {
+            case EmfPackage.EMF_CLASS:
+            {
+                EMFClass emfClass = (EMFClass)theEObject;
+                Object result = caseEMFClass(emfClass);
+                if (result == null) result = defaultCase(theEObject);
+                return result;
+            }
             case EmfPackage.EMF_PROPERTY:
             {
                 EMFProperty emfProperty = (EMFProperty)theEObject;

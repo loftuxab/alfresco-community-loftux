@@ -166,12 +166,12 @@ public class EMFChildAssociationImpl extends EMFAssociationImpl implements EMFCh
             switch (eContainerFeatureID)
             {
                 case EmfPackage.EMF_CHILD_ASSOCIATION__EMF_CONTAINER_CLASS:
-                    return ((InternalEObject)eContainer).eInverseRemove(this, EmfPackage.EMF_CLASS__EMF_ASSOCIATIONS, EMFClass.class, msgs);
+                    return eContainer.eInverseRemove(this, EmfPackage.EMF_CLASS__EMF_ASSOCIATIONS, EMFClass.class, msgs);
                 default:
                     return eDynamicBasicRemoveFromContainer(msgs);
             }
         }
-        return ((InternalEObject)eContainer).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - eContainerFeatureID, null, msgs);
+        return eContainer.eInverseRemove(this, EOPPOSITE_FEATURE_BASE - eContainerFeatureID, null, msgs);
     }
 
     /**
