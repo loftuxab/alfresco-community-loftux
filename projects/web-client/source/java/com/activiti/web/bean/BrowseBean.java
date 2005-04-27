@@ -162,7 +162,7 @@ public class BrowseBean
          QName qname = ref.getName();
          
          // create our Node representation
-         Node node = new Node(qname.getNamespaceURI());  // TODO: where does Type come from?
+         Node node = new Node(null, qname.getNamespaceURI());  // TODO: where does Type come from?
          Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
          
          // convert the rest of the well known properties
