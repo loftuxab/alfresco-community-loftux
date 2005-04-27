@@ -78,6 +78,13 @@ public class DictionaryBootstrap
     public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ACTIVITI_URI, "file");
     public static final ClassRef TYPE_FOLDER = new ClassRef(TYPE_QNAME_FOLDER);
     public static final ClassRef TYPE_FILE = new ClassRef(TYPE_QNAME_FILE);
+    public static final QName ASPECT_QNAME_SPACE = QName.createQName(NamespaceService.ACTIVITI_URI, "space");
+    public static final ClassRef ASPECT_SPACE = new ClassRef(ASPECT_QNAME_SPACE);
+    public static final String PROP_CREATED_DATE = "createddate";
+    public static final String PROP_MODIFIED_DATE = "modifieddate";
+    public static final String PROP_DESCRIPTION = "description";
+    public static final String PROP_ICON = "icon";
+    public static final String PROP_SPACE_TYPE = "spacetype";
 
     // test types
     public static final QName TEST_TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "folder");
@@ -346,6 +353,34 @@ public class DictionaryBootstrap
         categoryAssoc.getRequiredToClasses().add(categoryType);
         categoryAssoc.setMandatory(false);
         categoryAssoc.setMultiValued(true);
+        
+        // Create Space Aspect
+        M2Aspect spaceAspect = metaModelDAO.createAspect(ASPECT_QNAME_SPACE);
+        // created date property
+        M2Property createdDateProp = spaceAspect.createProperty(PROP_CREATED_DATE);
+        createdDateProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.DATETIME));
+        createdDateProp.setMandatory(true);
+        createdDateProp.setMultiValued(false);
+        // modified date property
+        M2Property modifiedDateProp = spaceAspect.createProperty(PROP_MODIFIED_DATE);
+        modifiedDateProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.DATETIME));
+        modifiedDateProp.setMandatory(true);
+        modifiedDateProp.setMultiValued(false);
+        // space type property
+        M2Property spaceTypeProp = spaceAspect.createProperty(PROP_SPACE_TYPE);
+        spaceTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        spaceTypeProp.setMandatory(true);
+        spaceTypeProp.setMultiValued(false);
+        // icon property
+        M2Property iconProp = spaceAspect.createProperty(PROP_ICON);
+        iconProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        iconProp.setMandatory(true);
+        iconProp.setMultiValued(false);
+        // description property
+        M2Property descriptionProp = spaceAspect.createProperty(PROP_DESCRIPTION);
+        descriptionProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        descriptionProp.setMandatory(false);
+        descriptionProp.setMultiValued(false);
     }
     
     /**

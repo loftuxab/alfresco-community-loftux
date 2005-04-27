@@ -1,9 +1,13 @@
 package com.activiti.web.bean.wizard;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
@@ -11,6 +15,8 @@ import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
 import org.apache.log4j.Logger;
+
+import sun.security.krb5.internal.crypto.c;
 
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
@@ -23,6 +29,7 @@ import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
 import com.activiti.util.Conversion;
 import com.activiti.web.bean.NavigationBean;
+import com.activiti.web.bean.repository.Node;
 import com.activiti.web.bean.repository.Repository;
 import com.activiti.web.jsf.component.UIModeList;
 
@@ -164,6 +171,14 @@ public class NewSpaceWizard
       if (logger.isDebugEnabled())
          logger.debug(getSummary());
       
+      // *******************************************************************************
+      // TODO: The user may have selected to create the space from an existing space
+      //       or a template space, if so we need to copy rather than create, but there
+      //       are no repository services available yet to do this!
+      //       We also need to be aware of copying structure and/or content.
+      //       For now we always create the space from scratch.
+      // *******************************************************************************
+      
       // get the node service and create the space (just create a folder for now)
       NodeRef parentNodeRef;
       String nodeId = getNavigator().getCurrentNodeId();
@@ -182,21 +197,28 @@ public class NewSpaceWizard
       NodeRef nodeRef = assocRef.getChildRef();
       
       // set the properties
-      if (this.description != null)
-      {
-         QName propDesc = QName.createQName(NamespaceService.ACTIVITI_URI, "description");
-         this.nodeService.setProperty(nodeRef, propDesc, this.description);
-      }
-      
-      QName propIcon = QName.createQName(NamespaceService.ACTIVITI_URI, "icon");
-      this.nodeService.setProperty(nodeRef, propIcon, this.icon);
-      
+      Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
       QName propCreatedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "createddate");
       Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-      this.nodeService.setProperty(nodeRef, propCreatedDate, Conversion.dateToXmlDate(now));
-      
+      properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
+     
       QName propModifiedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "modifieddate");
-      this.nodeService.setProperty(nodeRef, propModifiedDate, Conversion.dateToXmlDate(now));
+      properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
+     
+      QName propIcon = QName.createQName(NamespaceService.ACTIVITI_URI, "icon");
+      properties.put(propIcon, this.icon);
+     
+      QName propSpaceType = QName.createQName(NamespaceService.ACTIVITI_URI, "spacetype");
+      properties.put(propSpaceType, this.spaceType);
+     
+      if (this.description != null)
+      {
+         QName propDescription = QName.createQName(NamespaceService.ACTIVITI_URI, "description");
+         properties.put(propDescription, this.description);
+      }
+      
+      // add the space aspect to the folder
+      this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
       
       // reset the state
       reset();
@@ -552,7 +574,7 @@ public class NewSpaceWizard
          }
          default:
          {
-            page = "/jsp/jump.jsp";
+            page = "/jsp/browse/browse.jsp";
          }
       }
       
@@ -570,19 +592,41 @@ public class NewSpaceWizard
       // get the node service and root node
       NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
       
-      // get the searcher object and perform the search of the root node
-      String s = "PATH:\"/" + NamespaceService.ACTIVITI_PREFIX + ":*\"";
-      ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
+      List<SelectItem> items = new ArrayList<SelectItem>();
       
-      // create a list of items from the results
-      ArrayList<SelectItem> items = new ArrayList<SelectItem>();
-      if (results.length() > 0)
+      if (templates)
       {
-         for (ResultSetRow row: results)
+         String actNs = NamespaceService.ACTIVITI_PREFIX;
+         String s = "PATH:\"/" + actNs + ":Glossary/" + actNs + ":Templates/" + actNs + ":*\"";
+         ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
+         if (results.length() > 0)
          {
-            String name = row.getQName().getLocalName();
-            SelectItem item = new SelectItem(name, name);
-            items.add(item);
+            for (ResultSetRow row : results)
+            {
+               NodeRef node = row.getNodeRef();
+               if (this.nodeService.hasAspect(node, DictionaryBootstrap.ASPECT_SPACE))
+               {
+                  String name = row.getQName().getLocalName();
+                  String id = node.getId();
+                  items.add(new SelectItem(id, name));
+               }
+            }
+         }
+      }
+      else
+      {
+         // get all the child nodes from the root
+         Collection<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(rootNodeRef);
+         for (ChildAssocRef ref: childRefs)
+         {
+            NodeRef child = ref.getChildRef();
+            // if the node has the space aspect applied add it to the list
+            if (this.nodeService.hasAspect(child, DictionaryBootstrap.ASPECT_SPACE))
+            {
+               String id = child.getId();
+               String name = ref.getName().getLocalName();
+               items.add(new SelectItem(id, name));
+            }
          }
       }
       

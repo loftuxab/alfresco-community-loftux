@@ -1,7 +1,9 @@
 package com.activiti.repo.node;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.util.BaseSpringTest;
+import com.activiti.util.Conversion;
 import com.activiti.util.debug.CodeMonkey;
 import com.vladium.utils.timing.ITimer;
 import com.vladium.utils.timing.TimerFactory;
@@ -342,6 +345,41 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals("Aspect properties not removed",
                 propertiesBefore.size(),
                 propertiesAfter.size());
+    }
+    
+    public void testSpaceAspect() throws Exception
+    {
+       // create a folder node
+        ChildAssocRef assocRef = nodeService.createNode(
+                rootNodeRef,
+                QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "test-space"),
+                DictionaryBootstrap.TYPE_FOLDER);
+        NodeRef nodeRef = assocRef.getChildRef();
+        
+        // define properties required for the space aspect
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+        
+        QName propCreatedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "createddate");
+        Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+        properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
+        
+        QName propModifiedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "modifieddate");
+        properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
+        
+        QName propIcon = QName.createQName(NamespaceService.ACTIVITI_URI, "icon");
+        properties.put(propIcon, "space.gif");
+        
+        QName propDescription = QName.createQName(NamespaceService.ACTIVITI_URI, "description");
+        properties.put(propDescription, "Short description");
+        
+        QName propSpaceType = QName.createQName(NamespaceService.ACTIVITI_URI, "spacetype");
+        properties.put(propSpaceType, "container");
+        
+        // try and add the aspect to the folder node
+        nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
+        
+        Set<ClassRef> aspects = nodeService.getAspects(nodeRef);
+        assertEquals("There should only be 1 aspect applied", 1, aspects.size());
     }
 
     public void testCreateNodeNoProperties() throws Exception

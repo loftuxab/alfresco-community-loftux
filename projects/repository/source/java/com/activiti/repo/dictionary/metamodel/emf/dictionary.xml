@@ -44,6 +44,13 @@
   <datadictionary:EMFType emfName="{http://www.activiti.com/1.0}category_root" emfSuperClass="/21" emfDefaultAspects="/20">
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/27"/>
   </datadictionary:EMFType>
+  <datadictionary:EMFAspect emfName="{http://www.activiti.com/1.0}space">
+    <emfProperties emfName="createddate" emfType="/14" emfMandatory="true"/>
+    <emfProperties emfName="modifieddate" emfType="/14" emfMandatory="true"/>
+    <emfProperties emfName="spacetype" emfType="/7" emfMandatory="true"/>
+    <emfProperties emfName="icon" emfType="/7" emfMandatory="true"/>
+    <emfProperties emfName="description" emfType="/7"/>
+  </datadictionary:EMFAspect>
   <datadictionary:EMFAspect emfName="{http://www.activiti.com/lock/1.0}lock">
     <emfProperties emfName="lockOwner" emfType="/6"/>
   </datadictionary:EMFAspect>
@@ -69,11 +76,11 @@
     <emfProperties emfName="frozenNodeType" emfType="/7" emfMandatory="true"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedAttributes"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedChildAssocs"/>
-    <emfAssociations emfName="successor" emfRequiredToClasses="/34"/>
+    <emfAssociations emfName="successor" emfRequiredToClasses="/35"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}versionHistory" emfSuperClass="/24">
     <emfProperties emfName="versionedNodeId" emfType="/17" emfMandatory="true"/>
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/34"/>
-    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/34"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/35"/>
+    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/35"/>
   </datadictionary:EMFType>
 </xmi:XMI>
