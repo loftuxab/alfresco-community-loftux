@@ -1,0 +1,33 @@
+<activiti-config>
+   
+   <global>
+      <evaluators>
+         <evaluator id="type-name" class="com.activiti.config.evaluator.StringEvaluator" />
+      </evaluators>
+   </global>
+      
+   <!-- global config section -->
+   <config>
+      <properties>
+         <property name="name" />
+      </properties>
+   </config>
+   
+   <config evaluator-ref="type-name" condition="base">
+      <properties>
+         <property name="description" />
+         <property name="created" />
+         <property name="modified" />
+      </properties>
+   </config>
+   
+   <config evaluator-ref="type-name" condition="SOP">
+      <properties>
+         <property name="description" />
+         <property name="modified" />
+         <property name="effective" />
+         <property name="approved" />
+      </properties>
+   </config>
+   
+</activiti-config>
