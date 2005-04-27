@@ -36,13 +36,13 @@ public final class CodeMonkey
 {
     private static final Log logger = LogFactory.getLog(CodeMonkey.class);
     
-    private static Map<StackTraceElement, String> todos;
-    private static Map<StackTraceElement, String> issues;
+    private static Map<String, StackTraceElement> todos;
+    private static Map<String, StackTraceElement> issues;
     
     static
     {
-        todos = new HashMap<StackTraceElement, String>(17); 
-        issues = new HashMap<StackTraceElement, String>(17); 
+        todos = new HashMap<String, StackTraceElement>(17); 
+        issues = new HashMap<String, StackTraceElement>(17); 
         // only do any work if debug is enabled in the first place
         if (logger.isDebugEnabled())
         {
@@ -77,7 +77,7 @@ public final class CodeMonkey
         addElement(msg, issues);
     }
     
-    private static void addElement(String msg, Map<StackTraceElement, String> elements)
+    private static void addElement(String msg, Map<String, StackTraceElement> elements)
     {
         // obtain lock around access to static map
         Lock lock = new ReentrantLock();
@@ -92,7 +92,7 @@ public final class CodeMonkey
             // get the location string
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
             // save second stack trace element
-            elements.put(stack[4], msg);
+            elements.put(msg, stack[4]);
         }
         finally
         {
@@ -114,17 +114,17 @@ public final class CodeMonkey
             }
             StringBuilder sb = new StringBuilder(256);
             // get todos
-            for (StackTraceElement st : todos.keySet())
+            for (String msg : todos.keySet())
             {
-                String msg = todos.get(st);
+                StackTraceElement st = todos.get(msg);
                 sb.append("\n")
                   .append("TODO: ").append(msg)
                   .append("  <").append(st).append(">");
             }
             // get issues
-            for (StackTraceElement st : issues.keySet())
+            for (String msg : issues.keySet())
             {
-                String msg = issues.get(st);
+                StackTraceElement st = issues.get(msg);
                 sb.append("\n")
                   .append("ISSUE: ").append(msg)
                   .append("  <").append(st).append(">");
