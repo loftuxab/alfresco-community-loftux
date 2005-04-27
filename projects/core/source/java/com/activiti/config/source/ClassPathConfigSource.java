@@ -3,26 +3,26 @@ package com.activiti.config.source;
 import java.io.InputStream;
 
 /**
- * ConfigSource implementation that gets its data via XML files on the classpath
+ * ConfigSource implementation that gets its data via the class path.
  * 
  * @author gavinc
  */
-public class ClasspathConfigSource extends BaseConfigSource
+public class ClassPathConfigSource extends BaseConfigSource
 {
    /**
     * Default Constructor
     */
-   public ClasspathConfigSource()
+   public ClassPathConfigSource()
    {
       super();
    }
    
    /**
-    * Constructs an ClasspathConfigSource using the list of classpath references
+    * Constructs an ClassPathConfigSource using the list of files
     * 
-    * @param source List of classpath references to get config from
+    * @param source List of files to get config from
     */
-   public ClasspathConfigSource(String source)
+   public ClassPathConfigSource(String source)
    {
       super();
       
