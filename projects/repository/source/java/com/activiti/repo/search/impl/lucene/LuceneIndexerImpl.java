@@ -882,9 +882,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getChildRef());
                 if (!elit.hasNext())
                 {
-                    if (cae.getRef().getName() != null)
+                    if (cae.getRef().getQName() != null)
                     {
-                        qNameBuffer.append(cae.getRef().getName().toString());
+                        qNameBuffer.append(cae.getRef().getQName().toString());
                     }
                     if (cae.getRef().getParentRef() != null)
                     {
@@ -897,9 +897,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 {
                     pathBuffer.append("/");
                 }
-                if (cae.getRef().getName() != null)
+                if (cae.getRef().getQName() != null)
                 {
-                    pathBuffer.append(cae.getRef().getName().toString());
+                    pathBuffer.append(cae.getRef().getQName().toString());
                 }
                 pathLength++;
             }

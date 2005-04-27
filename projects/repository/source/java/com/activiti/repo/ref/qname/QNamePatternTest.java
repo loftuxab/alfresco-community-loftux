@@ -31,7 +31,7 @@ public class QNamePatternTest extends TestCase
     
     public void testSimpleQNamePattern() throws Exception
     {
-        QNamePattern pattern = new SimpleQNamePattern(NamespaceService.ACTIVITI_TEST_URI, "ABC");
+        QNamePattern pattern = QName.createQName(NamespaceService.ACTIVITI_TEST_URI, "ABC");
         
         // check
         assertFalse("Simple match failed: " + check1, pattern.isMatch(check1));

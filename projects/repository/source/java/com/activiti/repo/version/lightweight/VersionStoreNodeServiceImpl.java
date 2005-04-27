@@ -20,6 +20,7 @@ import com.activiti.repo.node.NodeService;
 import com.activiti.repo.node.PropertyException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
+import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -175,7 +176,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
         Collection<ChildAssocRef> children = this.dbNodeService.getChildAssocs(nodeRef);
         for (ChildAssocRef child : children)
         {
-            if (child.getName().equals(CHILD_QNAME_VERSIONED_ATTRIBUTES))
+            if (child.getQName().equals(CHILD_QNAME_VERSIONED_ATTRIBUTES))
             {
                 NodeRef versionedAttribute = child.getChildRef();
                 
@@ -222,7 +223,16 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     /**
      * @throws UnsupportedOperationException always
      */
-    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef)
+    {
+        // This operation is not supported for a verion store
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
+    /**
+     * @throws UnsupportedOperationException always
+     */
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
@@ -247,7 +257,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
         // Get the child assocs from the version store
         List<ChildAssocRef> childAssocRefs = this.dbNodeService.getChildAssocs(
                 nodeRef,
-                CHILD_QNAME_PATTERN_VERSIONED_CHILD_ASSOCS);
+                CHILD_QNAME_VERSIONED_CHILD_ASSOCS);
         for (ChildAssocRef childAssocRef : childAssocRefs)
         {
             // Get the child reference
@@ -291,7 +301,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     /**
      * @throws UnsupportedOperationException always
      */
-    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException, AssociationExistsException
     {
         // This operation is not supported for a verion store
@@ -302,7 +312,6 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
      * @throws UnsupportedOperationException always
      */
     public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
-            throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
@@ -311,8 +320,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     /**
      * @throws UnsupportedOperationException always
      */
-    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname)
-            throws InvalidNodeRefException
+    public List<NodeAssocRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
     {
         // TODO in order to do this we need to be able to get a list of the
         //      names of the target associations
@@ -324,8 +332,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     /**
      * @throws UnsupportedOperationException always
      */
-    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname)
-            throws InvalidNodeRefException
+    public List<NodeAssocRef> getSourceAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);

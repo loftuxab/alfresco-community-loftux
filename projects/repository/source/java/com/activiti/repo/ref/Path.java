@@ -173,7 +173,7 @@ public final class Path implements Iterable<Path.Element>
             else
             {
                 // a parent is present
-                sb.append("/").append(ref.getName());
+                sb.append("/").append(ref.getQName());
             }
             if (ref.getNthSibling() > -1)
             {

@@ -18,6 +18,7 @@ import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.domain.hibernate.NodeImpl;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
+import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -584,34 +585,33 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      * 
      * @return Returns an array of [source real NodeRef][target reference NodeRef][assoc name String]
      */
-    private Object[] createAssociation() throws Exception
+    private NodeAssocRef createAssociation() throws Exception
     {
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         fillProperties(DictionaryBootstrap.TYPE_REFERENCE, properties);
         
-        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+        ChildAssocRef childAssocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName(null, "N1"),
                 DictionaryBootstrap.TYPE_BASE);
-        NodeRef sourceRef = assocRef.getChildRef();
-        assocRef = nodeService.createNode(rootNodeRef,
+        NodeRef sourceRef = childAssocRef.getChildRef();
+        childAssocRef = nodeService.createNode(rootNodeRef,
                 QName.createQName(null, "N2"),
                 DictionaryBootstrap.TYPE_REFERENCE,
                 properties);
-        NodeRef targetRef = assocRef.getChildRef();
+        NodeRef targetRef = childAssocRef.getChildRef();
         
         QName qname = QName.createQName("next");
-        nodeService.createAssociation(sourceRef, targetRef, qname);
+        NodeAssocRef assocRef = nodeService.createAssociation(sourceRef, targetRef, qname);
         // done
-        Object[] ret = new Object[] {sourceRef, targetRef, qname};
-        return ret;
+        return assocRef;
     }
     
     public void testCreateAssociation() throws Exception
     {
-        Object[] ret = createAssociation();
-        NodeRef sourceRef = (NodeRef) ret[0];
-        NodeRef targetRef = (NodeRef) ret[1];
-        QName qname = (QName) ret[2];
+        NodeAssocRef assocRef = createAssociation();
+        NodeRef sourceRef = assocRef.getSourceRef();
+        NodeRef targetRef = assocRef.getTargetRef();
+        QName qname = assocRef.getQName();
         try
         {
             // attempt the association in reverse
@@ -636,38 +636,38 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testRemoveAssociation() throws Exception
     {
-        Object[] ret = createAssociation();
-        NodeRef sourceRef = (NodeRef) ret[0];
-        NodeRef targetRef = (NodeRef) ret[1];
-        QName qname = (QName) ret[2];
+        NodeAssocRef assocRef = createAssociation();
+        NodeRef sourceRef = assocRef.getSourceRef();
+        NodeRef targetRef = assocRef.getTargetRef();
+        QName qname = assocRef.getQName();
         // remove the association
         nodeService.removeAssociation(sourceRef, targetRef, qname);
         // remake association
         nodeService.createAssociation(sourceRef, targetRef, qname);
     }
     
-    public void testGetAssociationTargets() throws Exception
+    public void testGetTargetAssocs() throws Exception
     {
-        Object[] ret = createAssociation();
-        NodeRef sourceRef = (NodeRef) ret[0];
-        NodeRef targetRef = (NodeRef) ret[1];
-        QName qname = (QName) ret[2];
-        // get the association targets
-        Collection<NodeRef> targets = nodeService.getAssociationTargets(sourceRef, qname);
-        assertEquals("Incorrect number of targets", 1, targets.size());
-        assertTrue("Target not found", targets.contains(targetRef));
+        NodeAssocRef assocRef = createAssociation();
+        NodeRef sourceRef = assocRef.getSourceRef();
+        NodeRef targetRef = assocRef.getTargetRef();
+        QName qname = assocRef.getQName();
+        // get the target assocs
+        List<NodeAssocRef> targetAssocs = nodeService.getTargetAssocs(sourceRef, qname);
+        assertEquals("Incorrect number of targets", 1, targetAssocs.size());
+        assertTrue("Target not found", targetAssocs.contains(assocRef));
     }
     
-    public void testGetAssociationSources() throws Exception
+    public void testGetSourceAssocs() throws Exception
     {
-        Object[] ret = createAssociation();
-        NodeRef sourceRef = (NodeRef) ret[0];
-        NodeRef targetRef = (NodeRef) ret[1];
-        QName qname = (QName) ret[2];
-        // get the association targets
-        Collection<NodeRef> sources = nodeService.getAssociationSources(targetRef, qname);
-        assertEquals("Incorrect number of sources", 1, sources.size());
-        assertTrue("Source not found", sources.contains(sourceRef));
+        NodeAssocRef assocRef = createAssociation();
+        NodeRef sourceRef = assocRef.getSourceRef();
+        NodeRef targetRef = assocRef.getTargetRef();
+        QName qname = assocRef.getQName();
+        // get the source assocs
+        List<NodeAssocRef> sourceAssocs = nodeService.getSourceAssocs(targetRef, qname);
+        assertEquals("Incorrect number of source assocs", 1, sourceAssocs.size());
+        assertTrue("Source not found", sourceAssocs.contains(assocRef));
     }
     
     /**
@@ -717,7 +717,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 {
                     // for all but the first element, the parent and assoc qname must be set
                     assertNotNull("Parent node ref not set", ref.getParentRef());
-                    assertNotNull("QName not set", ref.getName());
+                    assertNotNull("QName not set", ref.getQName());
                 }
                 // all associations must have a child ref
                 assertNotNull("Child node ref not set", ref.getChildRef());

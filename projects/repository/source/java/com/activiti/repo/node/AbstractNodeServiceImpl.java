@@ -29,6 +29,17 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * Defers to the pattern matching overload
      * 
      * @see RegexQNamePattern#MATCH_ALL
+     * @see NodeService#getParentAssocs(NodeRef, QNamePattern)
+     */
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    {
+        return getParentAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+    }
+
+    /**
+     * Defers to the pattern matching overload
+     * 
+     * @see RegexQNamePattern#MATCH_ALL
      * @see NodeService#getChildAssocs(NodeRef, QNamePattern)
      */
     public final List<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException

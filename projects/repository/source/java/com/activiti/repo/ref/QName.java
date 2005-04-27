@@ -3,16 +3,21 @@ package com.activiti.repo.ref;
 import java.io.Serializable;
 
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.ref.qname.QNamePattern;
 import com.activiti.util.EqualsHelper;
 
 /**
  * <code>QName</code> represents the qualified name of a Repository item. Each
  * QName consists of a local name qualified by a namespace.
+ * <p>
+ * The {@link com.activiti.repo.ref.qname.QNamePattern QNamePattern} is implemented
+ * to allow instances of this class to be used for direct pattern matching where
+ * required on interfaces.
  * 
  * @author David Caruana
  * 
  */
-public final class QName implements Serializable
+public final class QName implements QNamePattern, Serializable
 {
     private static final long serialVersionUID = 3977016258204348976L;
 
@@ -221,6 +226,15 @@ public final class QName implements Serializable
         }
     }
 
+    /**
+     * Performs a direct comparison between qnames.
+     * 
+     * @see #equals(Object)
+     */
+    public boolean isMatch(QName qname)
+    {
+        return this.equals(qname);
+    }
 
     /**
      * Calculate hashCode. Follows pattern used by String where hashCode is

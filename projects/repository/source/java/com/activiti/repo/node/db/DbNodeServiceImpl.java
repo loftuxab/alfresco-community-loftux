@@ -35,6 +35,7 @@ import com.activiti.repo.node.PropertyException;
 import com.activiti.repo.node.StoreExistsException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
+import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -632,9 +633,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     }
 
     /**
+     * Filters out any associations if their qname is not a match to the given pattern.
+     * <p>
      * Transforms {@link Node#getParentAssocs()} into an unmodifiable list
      */
-    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
     {
         Node node = getNodeNotNull(nodeRef);
         // get the assocs pointing to it
@@ -643,6 +646,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         List<ChildAssocRef> results = new ArrayList<ChildAssocRef>(parentAssocs.size());
         for (ChildAssoc assoc : parentAssocs)
         {
+            // does the qname match the pattern?
+            if (!qnamePattern.isMatch(assoc.getQName()))
+            {
+                // no match - ignore
+                continue;
+            }
             results.add(assoc.getChildAssocRef());
         }
         // done
@@ -650,11 +659,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     }
 
     /**
-     * Filters out any child associations if their qname is matched by the given pattern.
+     * Filters out any associations if their qname is not a match to the given pattern.
      * <p>
      * Transforms {@link ContainerNode#getChildAssocs()} into an unmodifiable list.
      */
-    public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern) throws InvalidNodeRefException
+    public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
     {
         Node nodeUnchecked = getNodeNotNull(nodeRef);
         if (!(nodeUnchecked instanceof ContainerNode))
@@ -701,21 +710,23 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         return assocRef;
     }
 
-    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException, AssociationExistsException
     {
         CodeMonkey.todo("Check that the association is allowed"); // TODO
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // see if it exists
-        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, qname.toString());
+        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, qname);
         if (assoc != null)
         {
             throw new AssociationExistsException(sourceRef, targetRef, qname);
         }
         // we are sure that the association doesn't exist - make it
-        nodeDaoService.newNodeAssoc(sourceNode, targetNode, qname.toString());
+        assoc = nodeDaoService.newNodeAssoc(sourceNode, targetNode, qname);
+        NodeAssocRef assocRef = assoc.getNodeAssocRef();
         // done
+        return assocRef;
     }
 
     public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
@@ -724,65 +735,59 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // get the association
-        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, qname.toString());
+        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, qname);
         // delete it
         nodeDaoService.deleteNodeAssoc(assoc);
     }
 
     /**
-     * Transorms {@link NodeDaoService#getNodeAssocTargets(RealNode, String)} into
+     * Transforms {@link NodeDaoService#getNodeAssocTargets(RealNode, String)} into
      * an unmodifiable collection.
-     * 
-     * @see #convertToNodeRefs(Collection<? extends Node>)
      */
-    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname)
+    public List<NodeAssocRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException
     {
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
-        Collection<Node> targets = nodeDaoService.getNodeAssocTargets(sourceNode, qname.toString());
-        // build the reference results
-        Collection<NodeRef> nodeRefs = convertToNodeRefs(targets);
-        // done
-        return nodeRefs;
-    }
-
-    /**
-     * Transorms {@link NodeDaoService#getNodeAssocSources(Node, String)} into
-     * an unmodifiable collection.
-     * 
-     * @see #convertToNodeRefs(Collection<? extends Node>)
-     */
-    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname)
-            throws InvalidNodeRefException
-    {
-        Node targetNode = getNodeNotNull(targetRef);
-        Collection<RealNode> sources = nodeDaoService.getNodeAssocSources(targetNode, qname.toString());
-        // build the reference results
-        Collection<NodeRef> nodeRefs = convertToNodeRefs(sources);
-        // done
-        return nodeRefs;
-    }
-    
-    /**
-     * Converts a collection of <code>Node</code> instances into an equivalent
-     * collection of <code>NodeRef</code> instances.
-     * 
-     * @param nodes the <code>Node</code> instances to convert to references
-     * @return Returns a <i>new, unmodifiable</i> collection of equivalent
-     *      <code>NodeRef</code> instances
-     */
-    private Collection<NodeRef> convertToNodeRefs(Collection<? extends Node> nodes)
-    {
-        // build the reference results
-        Collection<NodeRef> nodeRefs = new ArrayList<NodeRef>(nodes.size());
-        for (Node node : nodes)
+        // get all assocs to target
+        Set<NodeAssoc> assocs = sourceNode.getTargetNodeAssocs();
+        List<NodeAssocRef> nodeAssocRefs = new ArrayList<NodeAssocRef>(assocs.size());
+        for (NodeAssoc assoc : assocs)
         {
-            nodeRefs.add(node.getNodeRef());
+            // check qname pattern
+            if (!qnamePattern.isMatch(assoc.getQName()))
+            {
+                continue;   // the assoc name doesn't match the pattern given 
+            }
+            nodeAssocRefs.add(assoc.getNodeAssocRef());
         }
         // done
-        return Collections.unmodifiableCollection(nodeRefs);
+        return Collections.unmodifiableList(nodeAssocRefs);
     }
 
+    /**
+     * Transforms {@link NodeDaoService#getNodeAssocSources(Node, String)} into
+     * an unmodifiable collection.
+     */
+    public List<NodeAssocRef> getSourceAssocs(NodeRef targetRef, QNamePattern qnamePattern)
+            throws InvalidNodeRefException
+    {
+        RealNode sourceNode = getRealNodeNotNull(targetRef);
+        // get all assocs to source
+        Set<NodeAssoc> assocs = sourceNode.getSourceNodeAssocs();
+        List<NodeAssocRef> nodeAssocRefs = new ArrayList<NodeAssocRef>(assocs.size());
+        for (NodeAssoc assoc : assocs)
+        {
+            // check qname pattern
+            if (!qnamePattern.isMatch(assoc.getQName()))
+            {
+                continue;   // the assoc name doesn't match the pattern given 
+            }
+            nodeAssocRefs.add(assoc.getNodeAssocRef());
+        }
+        // done
+        return Collections.unmodifiableList(nodeAssocRefs);
+    }
+    
     /**
      * Recursive method used to build up paths from a given node to the root.
      * 

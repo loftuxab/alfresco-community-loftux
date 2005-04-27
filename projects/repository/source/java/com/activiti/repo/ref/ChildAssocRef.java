@@ -1,16 +1,8 @@
-/*
- * Created on Mar 24, 2005
- * 
- * TODO Comment this class
- * 
- * 
- */
 package com.activiti.repo.ref;
 
 import java.io.Serializable;
 
 import com.activiti.util.EqualsHelper;
-import com.activiti.util.debug.CodeMonkey;
 
 /**
  * This class represents a child relationship between two nodes. This
@@ -28,140 +20,138 @@ import com.activiti.util.debug.CodeMonkey;
  */
 public class ChildAssocRef implements EntityRef, Serializable
 {
-   private static final long serialVersionUID = 4051322336257127729L;
+    private static final long serialVersionUID = 4051322336257127729L;
 
-   private NodeRef parentRef;
+    private NodeRef parentRef;
+    private QName childQName;
+    private NodeRef childRef;
+    private boolean isPrimary;
+    private int nthSibling;
 
-   private QName childQName;
+    /**
+     * Construct a representation of a parent --- name ----> child relationship.
+     * 
+     * @param parentRef
+     *            the parent reference - may be null
+     * @param childQName
+     *            the qualified name of the association - may be null
+     * @param childRef
+     *            the child node reference. This must not be null.
+     * @param isPrimary
+     *            true if this represents the primary parent-child relationship
+     * @param nthSibling
+     *            the nth association with the same properties. Usually -1 to be
+     *            ignored.
+     */
+    public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef, boolean isPrimary, int nthSibling)
+    {
+        this.parentRef = parentRef;
+        this.childQName = childQName;
+        this.childRef = childRef;
+        this.isPrimary = isPrimary;
+        this.nthSibling = nthSibling;
 
-   private NodeRef childRef;
-   
-   private boolean isPrimary;
-   
-   private int nthSibling;
+        // check
+        if (childRef == null)
+        {
+            throw new IllegalArgumentException("Child reference may not be null");
+        }
+    }
 
-   /**
-    * Construct a representation of a parent --- name ----> child relationship.
-    * 
-    * @param parentRef the parent reference - may be null
-    * @param childQName the qualified name of the association - may be null
-    * @param childRef the child node reference. This must not be null.
-    * @param isPrimary true if this represents the primary parent-child relationship
-    * @param nthSibling the nth association with the same properties.  Usually -1 to be ignored.
-    */
-   public ChildAssocRef(NodeRef parentRef,
-           QName childQName,
-           NodeRef childRef,
-           boolean isPrimary,
-           int nthSibling)
-   {
-      this.parentRef = parentRef;
-      this.childQName = childQName;
-      this.childRef = childRef;
-      this.isPrimary = isPrimary;
-      this.nthSibling = nthSibling;
-      
-      // check
-      if (childRef == null)
-      {
-          throw new IllegalArgumentException("Child reference may not be null");
-      }
-   }
-   
-   /**
-    * Constructs a <b>non-primary</b>, -1th sibling parent-child association reference.
-    * 
-    * @see ChildAssocRef#ChildRelationshipRef(NodeRef, QName, NodeRef, int) 
-    */
-   public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef)
-   {
-       this(parentRef, childQName, childRef, false, -1);
-   }
+    /**
+     * Constructs a <b>non-primary</b>, -1th sibling parent-child association
+     * reference.
+     * 
+     * @see ChildAssocRef#ChildRelationshipRef(NodeRef, QName, NodeRef, int)
+     */
+    public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef)
+    {
+        this(parentRef, childQName, childRef, false, -1);
+    }
 
-   /**
-    * Get the qualified name of the parent-child association
-    * 
-    * @return Returns the qualified name of the parent-child association.
-    *       It may be null if this is the imaginary association to a root node.
-    */
-   public QName getName()
-   {
-       CodeMonkey.todo("Rename getName() to getQName()"); // TODO
-      return childQName;
-   }
+    /**
+     * Get the qualified name of the parent-child association
+     * 
+     * @return Returns the qualified name of the parent-child association. It
+     *         may be null if this is the imaginary association to a root node.
+     */
+    public QName getQName()
+    {
+        return childQName;
+    }
 
-   /**
-    * @return Returns the child node reference - never null
-    */
-   public NodeRef getChildRef()
-   {
-      return childRef;
-   }
+    /**
+     * @return Returns the child node reference - never null
+     */
+    public NodeRef getChildRef()
+    {
+        return childRef;
+    }
 
-   /**
-    * @return Returns the parent node reference, which may be null if this
-    *       represents the imaginary reference to the root node
-    */
-   public NodeRef getParentRef()
-   {
-      return parentRef;
-   }
-   
-   /**
-    * @return Returns true if this represents a primary association
-    */
-   public boolean isPrimary()
-   {
-       return isPrimary;
-   }
+    /**
+     * @return Returns the parent node reference, which may be null if this
+     *         represents the imaginary reference to the root node
+     */
+    public NodeRef getParentRef()
+    {
+        return parentRef;
+    }
 
-   /**
-    * @return Returns the nth sibling required
-    */
-   public int getNthSibling()
-   {
-       return nthSibling;
-   }
+    /**
+     * @return Returns true if this represents a primary association
+     */
+    public boolean isPrimary()
+    {
+        return isPrimary;
+    }
 
-   /**
-    * Compares:
-    * <ul>
-    *   <li>{@link #parentRef}</li>
-    *   <li>{@link #childRef}</li>
-    *   <li>{@link #childQName}</li>
-    * </ul>
-    */
-   public boolean equals(Object o)
-   {
-      if (this == o)
-      {
-         return true;
-      }
-      if (!(o instanceof ChildAssocRef))
-      {
-         return false;
-      }
-      ChildAssocRef other = (ChildAssocRef) o;
+    /**
+     * @return Returns the nth sibling required
+     */
+    public int getNthSibling()
+    {
+        return nthSibling;
+    }
 
-      return (EqualsHelper.nullSafeEquals(this.parentRef, other.parentRef)
-              && EqualsHelper.nullSafeEquals(this.childQName, other.childQName)
-              && EqualsHelper.nullSafeEquals(this.childRef, other.childRef));
-   }
+    /**
+     * Compares:
+     * <ul>
+     * <li>{@link #parentRef}</li>
+     * <li>{@link #childRef}</li>
+     * <li>{@link #childQName}</li>
+     * </ul>
+     */
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof ChildAssocRef))
+        {
+            return false;
+        }
+        ChildAssocRef other = (ChildAssocRef) o;
 
-   public int hashCode()
-   {
-      int hashCode = (getParentRef() == null) ? 0 :  getParentRef().hashCode();
-      hashCode = 37 * hashCode + ((getName() == null) ? 0 : getName().hashCode());
-      hashCode = 37 * hashCode + getChildRef().hashCode();
-      return hashCode;
-   }
+        return (EqualsHelper.nullSafeEquals(this.parentRef, other.parentRef)
+                && EqualsHelper.nullSafeEquals(this.childQName, other.childQName)
+                && EqualsHelper.nullSafeEquals(this.childRef, other.childRef));
+    }
 
-   public String toString()
-   {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append(getParentRef());
-      buffer.append(" --- ").append(getName()).append(" ---> ");
-      buffer.append(getChildRef());
-      return buffer.toString();
-   }
+    public int hashCode()
+    {
+        int hashCode = (getParentRef() == null) ? 0 : getParentRef().hashCode();
+        hashCode = 37 * hashCode + ((getQName() == null) ? 0 : getQName().hashCode());
+        hashCode = 37 * hashCode + getChildRef().hashCode();
+        return hashCode;
+    }
+
+    public String toString()
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(getParentRef());
+        buffer.append(" --- ").append(getQName()).append(" ---> ");
+        buffer.append(getChildRef());
+        return buffer.toString();
+    }
 }

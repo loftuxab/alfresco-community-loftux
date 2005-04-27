@@ -1,5 +1,8 @@
 package com.activiti.repo.domain;
 
+import com.activiti.repo.ref.NodeAssocRef;
+import com.activiti.repo.ref.QName;
+
 /**
  * Represents a generic association between two nodes.  The association is named
  * and bidirectional by default.
@@ -9,8 +12,6 @@ package com.activiti.repo.domain;
 public interface NodeAssoc
 {
     public long getId();
-
-    public void setId(long id);
 
     /**
      * Wires up the necessary bits on the source and target nodes so that the association
@@ -25,15 +26,25 @@ public interface NodeAssoc
      */
     public void buildAssociation(RealNode sourceNode, Node targetNode);
 
-    public RealNode getSource();
+    /**
+     * Performs the necessary work on the {@link #getSource()() source} and
+     * {@link #getTarget()() target} nodes to maintain the inverse association sets
+     */
+    public void removeAssociation();
 
-    public void setSource(RealNode node);
+    public NodeAssocRef getNodeAssocRef();
+    
+    public RealNode getSource();
 
     public Node getTarget();
 
-    public void setTarget(Node node);
+    /**
+     * @return Returns the qualified name of this association 
+     */
+    public QName getQName();
 
-    public String getName();
-
-    public void setName(String name);
+    /**
+     * @param qname the qualified name of the association
+     */
+    public void setQName(QName qname);
 }

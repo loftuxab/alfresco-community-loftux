@@ -17,6 +17,7 @@ import com.activiti.repo.node.PropertyException;
 import com.activiti.repo.node.StoreExistsException;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
+import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -306,9 +307,9 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname) throws InvalidNodeRefException, AssociationExistsException
+    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname) throws InvalidNodeRefException, AssociationExistsException
     {
-        nodeServiceDelegate.createAssociation(sourceRef, targetRef, qname);
+        return nodeServiceDelegate.createAssociation(sourceRef, targetRef, qname);
     }
 
     /**
@@ -322,17 +323,17 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname) throws InvalidNodeRefException
+    public List<NodeAssocRef> getSourceAssocs(NodeRef targetRef, QNamePattern qnamePattern) throws InvalidNodeRefException
     {
-        return nodeServiceDelegate.getAssociationSources(targetRef, qname);
+        return nodeServiceDelegate.getSourceAssocs(targetRef, qnamePattern);
     }
 
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname) throws InvalidNodeRefException
+    public List<NodeAssocRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern) throws InvalidNodeRefException
     {
-        return nodeServiceDelegate.getAssociationTargets(sourceRef, qname);
+        return nodeServiceDelegate.getTargetAssocs(sourceRef, qnamePattern);
     }
 
     /**
@@ -370,9 +371,9 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern) throws InvalidNodeRefException
     {
-        return nodeServiceDelegate.getParentAssocs(nodeRef);
+        return nodeServiceDelegate.getParentAssocs(nodeRef, qnamePattern);
     }
 
     /**

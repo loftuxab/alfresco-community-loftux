@@ -54,7 +54,7 @@ public class ChildAssocImpl implements ChildAssoc
         sb.append("ChildAssoc")
           .append("[ parent=").append(parent)
           .append(", child=").append(child)
-          .append(", name=").append(localName)
+          .append(", name=").append(getQName())
           .append(", isPrimary=").append(isPrimary)
           .append("]");
         return sb.toString();
@@ -65,7 +65,10 @@ public class ChildAssocImpl implements ChildAssoc
         return id;
     }
 
-    public void setId(Long id)
+    /**
+     * For Hibernate use
+     */
+    private void setId(Long id)
     {
         this.id = id;
     }
@@ -75,7 +78,10 @@ public class ChildAssocImpl implements ChildAssoc
         return parent;
     }
 
-    public void setParent(ContainerNode parentNode)
+    /**
+     * For Hibernate use
+     */
+    private void setParent(ContainerNode parentNode)
     {
         this.parent = parentNode;
     }
@@ -85,7 +91,10 @@ public class ChildAssocImpl implements ChildAssoc
         return child;
     }
 
-    public void setChild(Node node)
+    /**
+     * For Hibernate use
+     */
+    private void setChild(Node node)
     {
         child = node;
     }

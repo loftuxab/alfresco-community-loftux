@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.version.Version;
@@ -290,12 +292,13 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
             {
                 NodeRef preceedingVersion = null;
                 
-                Collection<NodeRef> preceedingVersions = this.dbNodeService.getAssociationSources(currentVersion, ASSOC_SUCCESSOR);
-                if (preceedingVersions.size() == 1)
+                List<NodeAssocRef> preceedingAssocs = this.dbNodeService.getSourceAssocs(currentVersion, ASSOC_SUCCESSOR);
+                if (preceedingAssocs.size() == 1)
                 {
-                    preceedingVersion = (NodeRef)preceedingVersions.toArray()[0];
+                    NodeAssocRef preceedingAssoc = preceedingAssocs.get(0);
+                    preceedingVersion = preceedingAssoc.getSourceRef();
                 }
-                else if (preceedingVersions.size() > 1)
+                else if (preceedingAssocs.size() > 1)
                 {
                     // Error since we only currently support one preceeding version
                     throw new VersionServiceException("The light weight version store only supports one preceeding version.");
@@ -479,7 +482,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
             HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
             
             // Set the qname, isPrimary and nthSibling properties
-            properties.put(PROP_QNAME_ASSOC_QNAME, childAssocRef.getName());
+            properties.put(PROP_QNAME_ASSOC_QNAME, childAssocRef.getQName());
             properties.put(PROP_QNAME_IS_PRIMARY, Boolean.valueOf(childAssocRef.isPrimary()));
             properties.put(PROP_QNAME_NTH_SIBLING, Integer.valueOf(childAssocRef.getNthSibling()));
             

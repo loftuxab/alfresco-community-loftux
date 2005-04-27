@@ -172,7 +172,8 @@
             type="long" >
          <generator class="increment" />
       </id>
-      <property name="name" />
+      <property name="namespaceUri" column="namespace_uri" length="100" not-null="false" />
+      <property name="localName" length="100" not-null="true" />
       <!-- forward assoc to source node -->
       <many-to-one
             name="source"
@@ -204,7 +205,8 @@
          source.key.protocol = :sourceKeyProtocol and
          source.key.identifier = :sourceKeyIdentifier and
          source.key.guid = :sourceKeyGuid and
-         assoc.name = :assocName and
+         assoc.namespaceUri = :assocNamespaceUri and
+         assoc.localName = :assocLocalName and
          target.key.protocol = :targetKeyProtocol and
          target.key.identifier = :targetKeyIdentifier and
          target.key.guid = :targetKeyGuid
@@ -221,7 +223,8 @@
          source.key.protocol = :sourceKeyProtocol and
          source.key.identifier = :sourceKeyIdentifier and
          source.key.guid = :sourceKeyGuid and
-         assoc.name = :assocName
+         assoc.namespaceUri = :assocNamespaceUri and
+         assoc.localName = :assocLocalName
    </query>
 
    <query name="node.GetNodeAssocSources">
@@ -235,7 +238,8 @@
          target.key.protocol = :targetKeyProtocol and
          target.key.identifier = :targetKeyIdentifier and
          target.key.guid = :targetKeyGuid and
-         assoc.name = :assocName
+         assoc.namespaceUri = :assocNamespaceUri and
+         assoc.localName = :assocLocalName
    </query>
 
 </hibernate-mapping>

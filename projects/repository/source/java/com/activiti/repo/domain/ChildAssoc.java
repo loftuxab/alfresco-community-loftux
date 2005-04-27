@@ -26,8 +26,8 @@ public interface ChildAssoc
     public void buildAssociation(ContainerNode parentNode, Node childNode);
     
     /**
-     * Performs the necessary work on the {@link #getParent() parent} and {@link #getChild() child} nodes
-     * to maintain the inverse association sets
+     * Performs the necessary work on the {@link #getParent() parent} and
+     * {@link #getChild() child} nodes to maintain the inverse association sets
      */
     public void removeAssociation();
     
@@ -35,16 +35,10 @@ public interface ChildAssoc
 
     public Long getId();
 
-    public void setId(Long id);
-
     public ContainerNode getParent();
-
-    public void setParent(ContainerNode node);
 
     public Node getChild();
 
-    public void setChild(Node node);
-    
     /**
      * @return Returns the qualified name of this association 
      */

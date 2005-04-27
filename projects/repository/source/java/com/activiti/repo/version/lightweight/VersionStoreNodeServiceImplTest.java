@@ -411,7 +411,7 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
     {
         try
         {
-            this.lightWeightVersionStoreNodeService.getAssociationSources(
+            this.lightWeightVersionStoreNodeService.getSourceAssocs(
                     this.dummyNodeRef,
                     this.dummyQName);
             fail("This operation is not supported.");

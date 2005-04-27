@@ -110,24 +110,24 @@ public interface NodeDaoService
      */
     public NodeAssoc newNodeAssoc(RealNode sourceNode,
             Node targetNode,
-            String assocName);
+            QName assocQName);
     
     /**
      * @return Returns the node association or null if not found
      */
     public NodeAssoc getNodeAssoc(RealNode sourceNode,
             Node targetNode,
-            String assocName);
+            QName assocQName);
     
     /**
      * @return Returns the target nodes for the association
      */
-    public Collection<Node> getNodeAssocTargets(RealNode sourceNode, String assocName);
+    public Collection<Node> getNodeAssocTargets(RealNode sourceNode, QName assocQName);
     
     /**
      * @return Returns the source nodes for the association
      */
-    public Collection<RealNode> getNodeAssocSources(Node targetNode, String assocName);
+    public Collection<RealNode> getNodeAssocSources(Node targetNode, QName assocQName);
     
     /**
      * @param assoc the node association to remove

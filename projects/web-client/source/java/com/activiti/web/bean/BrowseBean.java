@@ -178,7 +178,7 @@ public class BrowseBean
       for (ChildAssocRef ref: childRefs)
       {
          // display name is the QName localname part
-         QName qname = ref.getName();
+         QName qname = ref.getQName();
          
          // create our Node representation
          Node node = new Node(ref.getChildRef(), qname.getNamespaceURI());  // TODO: where does Type come from?
@@ -331,7 +331,7 @@ public class BrowseBean
             // TODO: wrap up common property set in the Node bean - and hide the NodeService usage
             //       this will hide the nasty code required to get simple props like "name"!
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            String name = this.nodeService.getPrimaryParent(ref).getName().getLocalName();
+            String name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
             
             // get the current breadcrumb location and append a new handler to it
             // our handler know the ID of the selected node and the display label for it
@@ -369,7 +369,7 @@ public class BrowseBean
          try
          {
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            QName qname = this.nodeService.getPrimaryParent(ref).getName();
+            QName qname = this.nodeService.getPrimaryParent(ref).getQName();
             
             // create our Node representation
             Node node = new Node(ref, qname.getNamespaceURI());  // TODO: where does Type come from?

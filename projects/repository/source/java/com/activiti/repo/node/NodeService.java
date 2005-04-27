@@ -9,6 +9,7 @@ import java.util.Set;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.EntityRef;
+import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.Path;
 import com.activiti.repo.ref.QName;
@@ -237,8 +238,26 @@ public interface NodeService
      * @return Returns a list of all parent-child associations that exist where the given
      *      node is the child
      * @throws InvalidNodeRefException if the node could not be found
+     * 
+     * @see #getParentAssocs(NodeRef, QNamePattern)
      */
     public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException;
+    
+    /**
+     * Gets all parent associations where the pattern of the association qualified
+     * name is a match
+     * 
+     * @param nodeRef the child node
+     * @param qnamePattern the pattern that the qnames of the assocs must match
+     * @return Returns a list of all parent-child associations that exist where the given
+     *      node is the child
+     * @throws InvalidNodeRefException if the node could not be found
+     * 
+     * @see QName
+     * @see com.activiti.repo.ref.qname.RegexQNamePattern#MATCH_ALL
+     */
+    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
+            throws InvalidNodeRefException;
     
     /**
      * @param nodeRef the parent node - usually a <b>container</b>
@@ -252,13 +271,16 @@ public interface NodeService
     
     /**
      * Gets all child associations where the pattern of the association qualified
-     * name is matched.
+     * name is a match.
      * 
      * @param nodeRef the parent node - usually a <b>container</b>
      * @param qnamePattern the pattern that the qnames of the assocs must match
      * @return Returns a list of <code>ChildAssocRef</code> instances.  If the
      *      node is not a <b>container</b> then the result will be empty.
      * @throws InvalidNodeRefException if the node could not be found
+     * 
+     * @see QName
+     * @see com.activiti.repo.ref.qname.RegexQNamePattern#MATCH_ALL
      */
     public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException;
@@ -279,10 +301,11 @@ public interface NodeService
      * @param sourceRef a reference to a <b>real</b> node
      * @param targetRef a reference to a node
      * @param qname the qualified name of the association
+     * @return Returns a reference to the new association
      * @throws InvalidNodeRefException if either of the nodes could not be found
      * @throws AssociationExistsException
      */
-    public void createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
             throws InvalidNodeRefException, AssociationExistsException;
     
     /**
@@ -296,23 +319,35 @@ public interface NodeService
             throws InvalidNodeRefException;
     
     /**
+     * Fetches all associations <i>from</i> the given source where the associations'
+     * qualified names match the pattern provided.
+     * 
      * @param sourceRef the association source
-     * @param qname the qualified name of the association
-     * @return Returns a collection of <code>NodeRef</code> instances at the target end of the
-     *      named association for which the given node is a source
+     * @param qnamePattern the association qname pattern to match against
+     * @return Returns a list of <code>NodeAssocRef</code> instances for which the
+     *      given node is a source
      * @throws InvalidNodeRefException if the source node could not be found
+     * 
+     * @see QName
+     * @see com.activiti.repo.ref.qname.RegexQNamePattern#MATCH_ALL
      */
-    public Collection<NodeRef> getAssociationTargets(NodeRef sourceRef, QName qname)
+    public List<NodeAssocRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException;
     
     /**
+     * Fetches all associations <i>to</i> the given target where the associations'
+     * qualified names match the pattern provided.
+     * 
      * @param targetRef the association target
-     * @param qname the qualified name of the association
-     * @return Returns a collection of <code>NodeRef</code> instances at the source of the
-     *      named association for which the given node is a target
+     * @param qnamePattern the association qname pattern to match against
+     * @return Returns a list of <code>NodeAssocRef</code> instances for which the
+     *      given node is a target
      * @throws InvalidNodeRefException
+     * 
+     * @see QName
+     * @see com.activiti.repo.ref.qname.RegexQNamePattern#MATCH_ALL
      */
-    public Collection<NodeRef> getAssociationSources(NodeRef targetRef, QName qname)
+    public List<NodeAssocRef> getSourceAssocs(NodeRef targetRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException;
     
     /**

@@ -3,6 +3,8 @@ package com.activiti.repo.domain.hibernate;
 import com.activiti.repo.domain.Node;
 import com.activiti.repo.domain.NodeAssoc;
 import com.activiti.repo.domain.RealNode;
+import com.activiti.repo.ref.NodeAssocRef;
+import com.activiti.repo.ref.QName;
 
 /**
  * Hibernate-specific implementation of the generic node association
@@ -14,7 +16,9 @@ public class NodeAssocImpl implements NodeAssoc
     private long id;
     private RealNode source;
     private Node target;
-    private String name;
+    private String namespaceUri;
+    private String localName;
+    private NodeAssocRef nodeAssocRef;
 
     public NodeAssocImpl()
     {
@@ -30,13 +34,32 @@ public class NodeAssocImpl implements NodeAssoc
         targetNode.getSourceNodeAssocs().add(this);
     }
     
+    public void removeAssociation()
+    {
+        // maintain inverse assoc from source node to this instance
+        this.getSource().getTargetNodeAssocs().remove(this);
+        // maintain inverse assoc from target node to this instance
+        this.getTarget().getSourceNodeAssocs().remove(this);
+    }
+    
+    public synchronized NodeAssocRef getNodeAssocRef()
+    {
+        if (nodeAssocRef == null)
+        {
+            nodeAssocRef = new NodeAssocRef(getSource().getNodeRef(),
+                    QName.createQName(getNamespaceUri(), getLocalName()),
+                    getTarget().getNodeRef());
+        }
+        return nodeAssocRef;
+    }
+
     public String toString()
     {
         StringBuffer sb = new StringBuffer(32);
         sb.append("NodeAssoc")
           .append("[ source=").append(source)
           .append(", target=").append(target)
-          .append(", name=").append(name)
+          .append(", name=").append(getQName())
           .append("]");
         return sb.toString();
     }
@@ -46,7 +69,10 @@ public class NodeAssocImpl implements NodeAssoc
         return id;
     }
 
-    public void setId(long id)
+    /**
+     * For Hibernate use
+     */
+    private void setId(long id)
     {
         this.id = id;
     }
@@ -56,7 +82,10 @@ public class NodeAssocImpl implements NodeAssoc
         return source;
     }
 
-    public void setSource(RealNode source)
+    /**
+     * For internal use
+     */
+    private void setSource(RealNode source)
     {
         this.source = source;
     }
@@ -66,18 +95,62 @@ public class NodeAssocImpl implements NodeAssoc
         return target;
     }
 
-    public void setTarget(Node target)
+    /**
+     * For internal use
+     */
+    private void setTarget(Node target)
     {
         this.target = target;
     }
 
-    public String getName()
+    /**
+     * @see #getNamespaceUri()
+     * @see #getLocalName()
+     */
+    public QName getQName()
     {
-        return name;
+        return QName.createQName(getNamespaceUri(), getLocalName());
     }
-    
-    public void setName(String name)
+
+    /**
+     * @see #setNamespaceUri(String)
+     * @see #setLocalName(String)
+     */
+    public void setQName(QName qname)
     {
-        this.name = name;
+        setNamespaceUri(qname.getNamespaceURI());
+        setLocalName(qname.getLocalName());
+    }
+
+    /**
+     * For Hibernate use only
+     */
+    private String getNamespaceUri()
+    {
+        return namespaceUri;
+    }
+
+    /**
+     * For Hibernate use only
+     */
+    private void setNamespaceUri(String namespaceUri)
+    {
+        this.namespaceUri = namespaceUri;
+    }
+
+    /**
+     * For Hibernate use only
+     */
+    private String getLocalName()
+    {
+        return localName;
+    }
+
+    /**
+     * For Hibernate use only
+     */
+    private void setLocalName(String name)
+    {
+        this.localName = name;
     }
 }

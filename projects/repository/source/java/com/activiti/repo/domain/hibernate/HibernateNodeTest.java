@@ -204,13 +204,13 @@ public class HibernateNodeTest extends BaseHibernateTest
         
         // create an association between them
         NodeAssoc assoc = new NodeAssocImpl();
-        assoc.setName("next");
+        assoc.setQName(QName.createQName("next"));
         assoc.buildAssociation(sourceNode, targetNode);
         getSession().save(assoc);
         
         // make another association between the same two nodes
         assoc = new NodeAssocImpl();
-        assoc.setName("helper");
+        assoc.setQName(QName.createQName("helper"));
         assoc.buildAssociation(sourceNode, targetNode);
         getSession().save(assoc);
         
