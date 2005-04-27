@@ -174,7 +174,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      */
     private String buildErrorString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder(128);
         buffer.append("The indexer is unable to accept more work: ");
         switch (status)
         {
@@ -864,9 +864,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             // Paths
 
-            StringBuffer qNameBuffer = new StringBuffer();
-            StringBuffer pathBuffer = new StringBuffer();
-            StringBuffer parentBuffer = new StringBuffer();
+            StringBuilder qNameBuffer = new StringBuilder();
+            StringBuilder pathBuffer = new StringBuilder();
+            StringBuilder parentBuffer = new StringBuilder();
 
             ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>();
 
@@ -955,7 +955,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 if (isNew)
                 {
                     doc.add(new Field("FTSSTATUS", "New", true, true, true));
-
                 }
                 else
                 {
@@ -967,7 +966,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 {
                     docs.add(doc);
                 }
-
             }
         }
 

@@ -149,14 +149,6 @@ a.headbarLink
    margin-bottom: 5px;
 }
 
-.dialogTitleText
-{
-   color: #495F69;
-   font-family: Tahoma, Arial, Helvetica, sans-serif;
-   font-size: 12px;
-   font-weight: bold;
-}
-
 .mainSubTextSmall
 {
    color: #495F69;
@@ -243,8 +235,9 @@ a.headbarLink
 .errorMessage
 {
    font-family: Tahoma, Arial, Helvetica, sans-serif;
-   font-size: 11px;
+   font-size: 12px;
    color: #e00028;
+   padding: 4px;
 }
 
 .userInputForm
@@ -259,30 +252,9 @@ a.headbarLink
    font-size: 11px;
 }
 
-.dialogSectionHeader
+.dialogButtonSpacing
 {
-   font-family: Tahoma, Arial, Helvetica, sans-serif;
-   font-size: 11px;
-   font-weight: bold;
-   background-color: #C6D8EB;
-}
-
-.dialogButtons
-{
-   background-color: #cccccc;
-   text-align: center;
-}
-
-.dialogButtonsSpacing
-{
-   margin: 3px;
-}
-
-.dialogTitle
-{
-   background-color: #EEEEEE;
-   border-top: thin solid #CCCCCC;
-   border-bottom: thin solid #CCCCCC;
+	height: 5px;
 }
 
 .topToolbar

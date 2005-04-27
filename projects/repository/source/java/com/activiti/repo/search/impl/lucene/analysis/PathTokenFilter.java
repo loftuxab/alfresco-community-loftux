@@ -209,7 +209,7 @@ public class PathTokenFilter extends Tokenizer
         {
             return null;
         }
-        StringBuffer buffer = new StringBuffer(64);
+        StringBuilder buffer = new StringBuilder(64);
         boolean inNameSpace = false;
         int start = readerPosition;
         int current;

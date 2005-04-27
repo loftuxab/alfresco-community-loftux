@@ -10,7 +10,6 @@ import com.activiti.repo.ref.QName;
  */
 public class ClassRef extends DictionaryRef
 {
-
     private static final long serialVersionUID = 3763098565714457649L;
 
     
@@ -23,5 +22,4 @@ public class ClassRef extends DictionaryRef
     {
         super(classQName);
     }
-
 }

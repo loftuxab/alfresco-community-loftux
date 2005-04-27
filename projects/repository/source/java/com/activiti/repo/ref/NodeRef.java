@@ -43,6 +43,11 @@ public class NodeRef implements EntityRef, Serializable
         return storeRef.toString() + URI_FILLER + id;
     }
 
+    /**
+     * Override equals for this ref type
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -69,12 +74,18 @@ public class NodeRef implements EntityRef, Serializable
         return id.hashCode();
     }
 
-    public StoreRef getStoreRef()
+    /**
+     * @return The StoreRef part of this reference
+     */
+    public final StoreRef getStoreRef()
     {
         return storeRef;
     }
 
-    public String getId()
+    /**
+     * @return The Node Id part of this reference
+     */
+    public final String getId()
     {
         return id;
     }

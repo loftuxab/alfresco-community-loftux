@@ -323,9 +323,13 @@
          <from-outcome>createSpace</from-outcome>
          <to-view-id>/jsp/wizard/new-space/create-from.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteSpace</from-outcome>
+         <to-view-id>/jsp/browse/delete-space.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
-   <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click) -->
+   <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click, finish on dialog) -->
    <navigation-rule>
       <from-view-id>/jsp/*</from-view-id>
       <navigation-case>

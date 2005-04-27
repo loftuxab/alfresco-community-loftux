@@ -4,18 +4,21 @@
 package com.activiti.web.bean;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.apache.log4j.Logger;
 
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
@@ -105,6 +108,22 @@ public class BrowseBean
    }
    
    /**
+    * @return Returns the current Space if any for browse screen actions.
+    */
+   public Node getCurrentSpace()
+   {
+      return currentSpace;
+   }
+   
+   /**
+    * @param currentSpace     The currentSpace to set, used for browse screen actions.
+    */
+   public void setCurrentSpace(Node currentSpace)
+   {
+      this.currentSpace = currentSpace;
+   }
+   
+   /**
     * Page accessed bean method to get the nodes currently being browsed
     * 
     * @return List of Node objects for the current browse location
@@ -162,7 +181,7 @@ public class BrowseBean
          QName qname = ref.getName();
          
          // create our Node representation
-         Node node = new Node(null, qname.getNamespaceURI());  // TODO: where does Type come from?
+         Node node = new Node(ref.getChildRef(), qname.getNamespaceURI());  // TODO: where does Type come from?
          Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
          
          // convert the rest of the well known properties
@@ -307,32 +326,108 @@ public class BrowseBean
       String id = params.get("id");
       if (id != null && id.length() != 0)
       {
-         s_logger.debug("Clicked Space Id: " + id);
-         // TODO: wrap up common property set in the Node bean - and hide the NodeService usage
-         //       this will hide the nasty code required to get simple props like "name"!
-         NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-         String name = this.nodeService.getPrimaryParent(ref).getName().getLocalName();
-         
-         // get the current breadcrumb location and append a new handler to it
-         // our handler know the ID of the selected node and the display label for it
-         List<IBreadcrumbHandler> location = this.navigator.getLocation();
-         location.add(new BrowseBreadcrumbHandler(id, name));
-         
-         // set the current node Id ready for page refresh
-         getNavigator().setCurrentNodeId(id);
-         
-         // clear the value for the list component - will cause it to re-bind to it's data and refresh
-         // TODO: need a decoupled way to refresh components - a view-local context event service?
-         // TODO: remove this weakness!
-         UIRichList richList = (UIRichList)link.findComponent("browseList");
-         if (richList != null)
+         try
          {
-            s_logger.debug("Clearing RichList data source.");
-            richList.setValue(null);
+            // TODO: wrap up common property set in the Node bean - and hide the NodeService usage
+            //       this will hide the nasty code required to get simple props like "name"!
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+            String name = this.nodeService.getPrimaryParent(ref).getName().getLocalName();
+            
+            // get the current breadcrumb location and append a new handler to it
+            // our handler know the ID of the selected node and the display label for it
+            List<IBreadcrumbHandler> location = this.navigator.getLocation();
+            location.add(new BrowseBreadcrumbHandler(id, name));
+            
+            // set the current node Id ready for page refresh
+            getNavigator().setCurrentNodeId(id);
+            
+            // clear the value for the list component - will cause it to re-bind to it's data and refresh
+            // TODO: need a decoupled way to refresh components - a view-local context event service?
+            // TODO: remove this weakness!
+            UIRichList richList = (UIRichList)link.findComponent("browseList");
+            if (richList != null)
+            {
+               s_logger.debug("Clearing RichList data source.");
+               richList.setValue(null);
+            }
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
          }
       }
    }
    
+   public void spaceActionSetup(ActionEvent event)
+   {
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         s_logger.debug("Setup for action, setting current space to: " + id);
+         try
+         {
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+            QName qname = this.nodeService.getPrimaryParent(ref).getName();
+            
+            // create our Node representation
+            Node node = new Node(ref, qname.getNamespaceURI());  // TODO: where does Type come from?
+            // TEMP: until we have a proper Node wrapper with lazy getting of props etc.
+            // name and ID always exist
+            Map<String, Object> props = new HashMap<String, Object>(3, 1.0f);
+            props.put("id", id);
+            props.put("name", qname.getLocalName());
+            node.setProperties(props);
+            
+            setCurrentSpace(node);
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+         }
+      }
+   }
+   
+   public String deleteSpaceOK()
+   {
+      String outcome = null;
+      
+      Node node = getCurrentSpace();
+      if (node != null)
+      {
+         try
+         {
+            s_logger.debug("Trying to delete space Id: " + node.getId());
+            this.nodeService.deleteNode(new NodeRef(Repository.getStoreRef(), node.getId()));
+            outcome = "browse";
+         }
+         catch (Throwable err)
+         {
+            addErrorMessage("Unable to delete Space due to system error: " + err.getMessage());
+         }
+      }
+      
+      return outcome;
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Private helpers 
+   
+   /**
+    * Add an ERROR level message that can be displayed by the 'messages' tag
+    * 
+    * @param msg
+    */
+   private void addErrorMessage(String msg)
+   {
+      FacesContext context = FacesContext.getCurrentInstance( );
+      
+      FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg);
+      context.addMessage(null, facesMsg);
+   }
+
 
    // ------------------------------------------------------------------------------
    // Inner classes
@@ -385,6 +480,8 @@ public class BrowseBean
    // ------------------------------------------------------------------------------
    // Private data
    
+   private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
+   
    private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    
    private static final String SEARCH_PATH = "PATH:\"/" + NamespaceService.ACTIVITI_PREFIX + ":{0}\"";
@@ -397,6 +494,9 @@ public class BrowseBean
    
    /** The NavigationBean reference */
    private NavigationBean navigator;
+   
+   /** The current space and it's properties - if any */
+   private Node currentSpace;
    
    /** The current browse view mode - set to a well known IRichListRenderer name */
    private String browseViewMode = "details";

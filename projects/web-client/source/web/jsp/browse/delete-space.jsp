@@ -16,8 +16,8 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
-   <h:form id="myform">
+   <%-- set the form name here --%>
+   <h:form id="delete-space">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -46,27 +46,18 @@
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
                   <td bgcolor="#ECE9E1">
-                  
+                     
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
-                           <td width="26">
-                              <%-- REPLACE ME: icon here --%>
+                           <td width="20">
+                              <h:graphicImage url="/images/icons/delete.gif" width="14" height="14"/>
                            </td>
                            <td>
-                              <%-- Summary --%>
-                              <%-- REPLACE ME: summary here --%>
-                           </td>
-                           <td bgcolor="#495F69" width="1"></td>
-                           <td width="100" style="padding-left:2px">
-                              <%-- Current object actions --%>
-                              <%-- REPLACE ME: object actions --%>
-                           </td>
-                           <td bgcolor="#495F69" width="1"></td>
-                           <td width="100">
-                              <%-- Details View settings --%>
-                              <%-- REPLACE ME: views --%>
+                              <div class="mainSubTitle"><h:outputText value="#{BrowseBean.currentSpace.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.delete_space}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.delete_info}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -82,44 +73,55 @@
                   <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width="4" height="9"></td>
                </tr>
                
-               <%-- Toolbar --%>
-               <tr style="padding-top:4px">
+               <%-- Details --%>
+               <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
-                     <table cellspacing="0" cellpadding="4">
+                     <table cellspacing="0" cellpadding="4" border="0" width="100%">
                         <tr>
-                           <td>
-                              <%-- Toolbar actions --%>
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "bluetoolbar", "#E9F0F4"); %>
-                                 <%-- REPLACE ME: toolbar actions --%>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
+                           
+                           <td width="100%" valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
+                              <table cellpadding="2" cellspacing="2" border="0">
+                                 <tr>
+                                    <td class="mainSubTitle">
+                                       <h:outputFormat value="#{msg.delete_space_confirm}">
+                                          <f:param value="#{BrowseBean.currentSpace.name}"/>
+                                       </h:outputFormat>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <%-- Error Messages --%>
+                                       <%-- messages tag to show messages not handled by other specific message tags --%>
+                                       <h:messages globalOnly="true" styleClass="errorMessage" />
+                                    <td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                           </td>
+                           
+                           <td valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <table cellpadding="1" cellspacing="1" border="0">
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Finish" action="#{BrowseBean.deleteSpaceOK}" styleClass="dialogControls" />
+                                    </td>
+                                 </tr>
+                                 <tr><td class="dialogButtonSpacing"></td></tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
+                                    </td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                         </tr>
                      </table>
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Details --%>
-               <tr valign=top>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td height="300">
-                     
-                     <%-- Details inner components --%>
-                     <%-- REPLACE ME: details components --%>
-                     
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign=top>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>
                
                <%-- separator row with bottom panel graphics --%>

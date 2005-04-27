@@ -46,17 +46,21 @@ public class DictionaryRef extends NodeRef
         this.metaQName = metaQName;
     }
 
-
     /**
      * Gets the qualified name of the meta definition
      * 
      * @return  the qualified name (e.g. class name, property name)
      */
-    public QName getQName()
+    public final QName getQName()
     {
         return this.metaQName;
     }
     
+    /**
+     * Override equals for this ref type 
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     public boolean equals(Object obj)
     {
         if (obj == this)

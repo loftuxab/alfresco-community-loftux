@@ -28,7 +28,7 @@ import java.util.LinkedList;
  * 
  * @author Derek Hulley
  */
-public class Path implements Iterable<Path.Element>
+public final class Path implements Iterable<Path.Element>
 {
     private LinkedList<Element> elements;
     
@@ -119,7 +119,7 @@ public class Path implements Iterable<Path.Element>
      */
     public String toString()
     {
-        StringBuffer sb = new StringBuffer(50);
+        StringBuilder sb = new StringBuilder(128);
         for (Element element : elements)
         {
             sb.append(element.getElementString());

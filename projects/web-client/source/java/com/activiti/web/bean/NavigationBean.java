@@ -100,6 +100,7 @@ public class NavigationBean
     */
    public void setCurrentNodeId(String currentNodeId)
    {
+      s_logger.debug("Setting current node id to: " + currentNodeId);
       this.currentNodeId = currentNodeId;
       // TODO: need a decoupled way to refresh components - a view-local context event service?
    }

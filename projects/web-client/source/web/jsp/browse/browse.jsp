@@ -78,7 +78,7 @@
                               <%-- Details View settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
                               <awc:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
-                                    value="details" actionListener="#{BrowseBean.viewModeChanged}">
+                                    value="#{BrowseBean.browseViewMode}" actionListener="#{BrowseBean.viewModeChanged}">
                                  <awc:modeListItem value="details" label="List All Items" image="/images/icons/Details.gif" />
                                  <awc:modeListItem value="list" label="Dashboard" />
                                  <awc:modeListItem value="icons" label="Browse Items" />
@@ -111,7 +111,7 @@
                                     <td><awc:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
                                     <td><awc:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
                                     <td><awc:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
-                                    <td><awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false"/></td>
+                                    <td><awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}"><f:param name="id" value="#{BrowseBean.currentSpace.id}" /></awc:actionLink></td>
                                  </tr></table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
                            </td>
@@ -181,12 +181,24 @@
                            <awc:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
                            <awc:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
                            <awc:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
-                           <awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" />
+                           <awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
+                              <f:param name="id" value="#{r.id}" />
+                           </awc:actionLink>
                         </awc:column>
                         
                         <awc:dataPager/>
                      </awc:richList>
                      
+                  </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
+               </tr>
+               
+               <%-- Error Messages --%>
+               <tr valign=top>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
+                  <td>
+                     <%-- messages tag to show messages not handled by other specific message tags --%>
+                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>
