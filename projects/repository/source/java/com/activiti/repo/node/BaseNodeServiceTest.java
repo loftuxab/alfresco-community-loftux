@@ -3,6 +3,7 @@ package com.activiti.repo.node;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +104,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      * Level 3:     n3_p_n6     n4_n6       n5_p_n7
      * Level 4:     n6_p_n8     n7_n8
      * </pre>
-     * The namespace URI for all associations is <b>http://x</b>.
+     * <p>
+     * Apart from the root node having the root aspect, node 6 (<b>n6</b>) also has the
+     * root aspect.
+     * <p>
+     * The namespace URI for all associations is <b>{@link NamespaceService.ACTIVITI_TEST_URI}</b>.
      * <p>
      * The naming convention is:
      * <pre>
@@ -165,6 +170,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assoc = nodeService.createNode(n3, qname, DictionaryBootstrap.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n6 = assoc.getChildRef();
+        nodeService.addAspect(n6,
+                DictionaryBootstrap.ASPECT_ROOT,
+                Collections.<QName, Serializable>emptyMap());
 
         qname = QName.createQName(ns, "n4_n6");
         assoc = nodeService.addChild(n4, n6, qname);
@@ -221,7 +229,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testCreateStore() throws Exception
     {
-        createStore();
+        StoreRef storeRef = createStore();
+        // get the root node
+        NodeRef storeRootNode = nodeService.getRootNode(storeRef);
+        // make sure that it has the root aspect
+        boolean isRoot = nodeService.hasAspect(storeRootNode, DictionaryBootstrap.ASPECT_ROOT);
+        assertTrue("Root node of store does not have root aspect", isRoot);
     }
     
     public void testExists() throws Exception
@@ -741,7 +754,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
 
         // get all paths for n8
         paths = nodeService.getPaths(n8Ref, false);
-        assertEquals("Incorrect path count", 4, paths.size());
+        assertEquals("Incorrect path count", 5, paths.size());  // n6 is a root as well
         // check that each path element has parent node ref, qname and child node ref
         for (Path path : paths)
         {

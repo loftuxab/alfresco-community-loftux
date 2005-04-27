@@ -17,6 +17,7 @@ import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.TypeDefinition;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.domain.ChildAssoc;
 import com.activiti.repo.domain.ContainerNode;
 import com.activiti.repo.domain.Node;
@@ -165,6 +166,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
         // create a new one
         store = nodeDaoService.createStore(protocol, identifier);
+        // get the root node
+        Node rootNode = store.getRootNode();
+        // assign the root aspect - this is expected of all roots, even store roots
+        addAspect(rootNode.getNodeRef(),
+                DictionaryBootstrap.ASPECT_ROOT,
+                Collections.EMPTY_MAP);
         // done
         StoreRef storeRef = store.getStoreRef();
         return storeRef;
@@ -790,13 +797,18 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     
     /**
      * Recursive method used to build up paths from a given node to the root.
+     * <p>
+     * Whilst walking up the hierarchy to the root, some nodes may have a <b>root</b> aspect.
+     * Everytime one of these is encountered, a new path is farmed off, but the method
+     * continues to walk up the hierarchy.
      * 
      * @param currentNode the node to start from, i.e. the child node to work upwards from
      * @param currentPath the path from the current node to the descendent that we started from
      * @param completedPaths paths that have reached the root are added to this collection
      * @param assocStack the parent-child relationships traversed whilst building the path.
      *      Used to detected cyclic relationships.
-     * @param primaryOnly true if only the primary parent association must be traversed
+     * @param primaryOnly true if only the primary parent association must be traversed.
+     *      If this is true, then the only root is the top level node having no parents.
      * @throws CyclicChildRelationshipException
      */
     private void prependPaths(final Node currentNode,
@@ -806,58 +818,73 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             boolean primaryOnly)
         throws CyclicChildRelationshipException
     {
+        NodeRef currentNodeRef = currentNode.getNodeRef();
         // get the parent associations of the given node
         Set<ChildAssoc> parentAssocs = currentNode.getParentAssocs();
-        if (parentAssocs.size() == 0)
+        // does the node have parents
+        boolean hasParents = parentAssocs.size() > 0;
+        // does the current node have a root aspect?
+        boolean isRoot = hasAspect(currentNodeRef, DictionaryBootstrap.ASPECT_ROOT);
+        
+        // look for a root.  If we only want the primary root, then ignore all but the
+        // top-level root.
+        if (isRoot && !(primaryOnly && hasParents))  // exclude primary search with parents present
         {
-            // there are no parents so we must be at the root
             // create a one-sided assoc ref for the root node and prepend to the stack
             ChildAssocRef assocRef = new ChildAssocRef(null, null, currentNode.getNodeRef());
+            // create a path to save and add the 'root' assoc
+            Path pathToSave = new Path();
             Path.Element element = new Path.ChildAssocElement(assocRef);
-            currentPath.prepend(element);
-            // save the current path
-            completedPaths.add(currentPath);
+            pathToSave.prepend(element);
+            // append the current path elements onto the 'root' assoc
+            pathToSave.append(currentPath);
+            completedPaths.add(pathToSave);
         }
-        else // we have some parents
+
+        if (parentAssocs.size() == 0 && !isRoot)
         {
-            for (ChildAssoc assoc : parentAssocs)
+            throw new RuntimeException("Node without parents does not have root aspect: " +
+                    currentNodeRef);
+        }
+        // walk up each parent association
+        for (ChildAssoc assoc : parentAssocs)
+        {
+            // does the association already exist in the stack
+            if (assocStack.contains(assoc))
             {
-                // does the association already exist in the stack
-                if (assocStack.contains(assoc))
-                {
-                    // the association was present already
-                    throw new CyclicChildRelationshipException(
-                            "Cyclic parent-child relationship detected: \n" +
-                            "   current node: " + currentNode + "\n" +
-                            "   current path: " + currentPath + "\n" +
-                            "   next assoc: " + assoc,
-                            assoc);
-                }
-                // do we consider only primary assocs?
-                if (primaryOnly && !assoc.getIsPrimary())
-                {
-                    continue;
-                }
-                // build a path element
-                NodeRef parentRef = assoc.getParent().getNodeRef();
-                QName qname = assoc.getQName();
-                NodeRef childRef = assoc.getChild().getNodeRef();
-                boolean isPrimary = assoc.getIsPrimary();
-                ChildAssocRef assocRef = new ChildAssocRef(parentRef, qname, childRef, isPrimary, -1);
-                Path.Element element = new Path.ChildAssocElement(assocRef);  // TODO: consider ordering
-                // create a new path that builds on the current path
-                Path path = new Path();
-                path.append(currentPath);
-                // prepend element
-                path.prepend(element);
-                // get parent node
-                Node parentNode = assoc.getParent();
-                
-                // push the assoc stack, recurse and pop
-                assocStack.push(assoc);
-                prependPaths(parentNode, path, completedPaths, assocStack, primaryOnly);
-                assocStack.pop();
+                // the association was present already
+                throw new CyclicChildRelationshipException(
+                        "Cyclic parent-child relationship detected: \n" +
+                        "   current node: " + currentNode + "\n" +
+                        "   current path: " + currentPath + "\n" +
+                        "   next assoc: " + assoc,
+                        assoc);
             }
+            // do we consider only primary assocs?
+            if (primaryOnly && !assoc.getIsPrimary())
+            {
+                continue;
+            }
+            // build a path element
+            NodeRef parentRef = assoc.getParent().getNodeRef();
+            QName qname = assoc.getQName();
+            NodeRef childRef = assoc.getChild().getNodeRef();
+            boolean isPrimary = assoc.getIsPrimary();
+            ChildAssocRef assocRef = new ChildAssocRef(parentRef, qname, childRef, isPrimary, -1);
+            CodeMonkey.issue("Is ordering relevant here?");  // TODO: consider ordering
+            Path.Element element = new Path.ChildAssocElement(assocRef);
+            // create a new path that builds on the current path
+            Path path = new Path();
+            path.append(currentPath);
+            // prepend element
+            path.prepend(element);
+            // get parent node
+            Node parentNode = assoc.getParent();
+            
+            // push the assoc stack, recurse and pop
+            assocStack.push(assoc);
+            prependPaths(parentNode, path, completedPaths, assocStack, primaryOnly);
+            assocStack.pop();
         }
         // done
     }
@@ -876,7 +903,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
                 return path;   // we know there is only one
             }
         }
-        throw new RuntimeException("Primary path count not checked");
+        throw new RuntimeException("Primary path count not checked");  // checked by getPaths()
     }
 
     /**
