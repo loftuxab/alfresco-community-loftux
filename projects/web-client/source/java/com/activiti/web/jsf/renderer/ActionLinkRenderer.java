@@ -38,12 +38,15 @@ public class ActionLinkRenderer extends BaseRenderer
          ActionEvent event = new ActionEvent(component);
          component.queueEvent(event);
          
+         // get all the params for this actionlink, see if any values have been set
+         // on the request which match our params and set them into the component
          UIActionLink link = (UIActionLink)component;
          Map<String, String> destParams = link.getParameterMap();
          destParams.clear();
-         if (getParameterMap(link) != null)
+         Map<String, String> actionParams = getParameterMap(link);
+         if (actionParams != null)
          {
-            for (String name : getParameterMap(link).keySet())
+            for (String name : actionParams.keySet())
             {
                String paramValue = (String)requestMap.get(name);
                destParams.put(name, paramValue);
@@ -51,11 +54,11 @@ public class ActionLinkRenderer extends BaseRenderer
          }
       }
    }
-
+   
    /**
-    * @see javax.faces.render.Renderer#encodeBegin(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
+    * @see javax.faces.render.Renderer#encodeEnd(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
     */
-   public void encodeBegin(FacesContext context, UIComponent component) throws IOException
+   public void encodeEnd(FacesContext context, UIComponent component) throws IOException
    {
       // always check for this flag - as per the spec
       if (component.isRendered() == true)
@@ -74,9 +77,14 @@ public class ActionLinkRenderer extends BaseRenderer
             // render as action link
             out.write( renderActionLink(context, link) );
          }
+         
+         if (isInMenu((UIActionLink)component) == false)
+         {
+            out.write("</a>");
+         }
       }
    }
-
+   
    /**
     * Render ActionLink as plain link and image
     * 
@@ -215,22 +223,6 @@ public class ActionLinkRenderer extends BaseRenderer
       buf.append("</td></tr>");
       
       return buf.toString();
-   }
-   
-   /**
-    * @see javax.faces.render.Renderer#encodeEnd(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
-    */
-   public void encodeEnd(FacesContext context, UIComponent component) throws IOException
-   {
-      if (component.isRendered() == true)
-      {
-         Writer out = context.getResponseWriter();
-         
-         if (isInMenu((UIActionLink)component) == false)
-         {
-            out.write("</a>");
-         }
-      }
    }
    
    

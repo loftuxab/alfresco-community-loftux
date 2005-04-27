@@ -31,8 +31,23 @@ public class Node implements Serializable, Map<String, Object>
    private String type;
    private Map<String, Object> properties = new HashMap(7, 1.0f);
    
+   /**
+    * Constructor
+    * 
+    * @param nodeRef    The NodeRef this Node wrapper represents
+    * @param type       Type of the Node this represents
+    */
    public Node(NodeRef nodeRef, String type)
    {
+      if (nodeRef == null)
+      {
+         throw new IllegalArgumentException("NodeRef must be specified during creation of a Node.");
+      }
+      if (type == null || type.length() == 0)
+      {
+         throw new IllegalArgumentException("Node Type must be specified during the creation of a Node.");
+      }
+      
       this.type = type;
       this.nodeRef = nodeRef;
       

@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,19 +109,19 @@ public class BrowseBean
    }
    
    /**
-    * @return Returns the current Space if any for browse screen actions.
+    * @return Returns the Space Node being used for the current browse screen action.
     */
-   public Node getCurrentSpace()
+   public Node getActionSpace()
    {
-      return currentSpace;
+      return actionSpace;
    }
    
    /**
-    * @param currentSpace     The currentSpace to set, used for browse screen actions.
+    * @param actionSpace     Set the Space Node to be used for the current browse screen action.
     */
-   public void setCurrentSpace(Node currentSpace)
+   public void setActionSpace(Node actionSpace)
    {
-      this.currentSpace = currentSpace;
+      this.actionSpace = actionSpace;
    }
    
    /**
@@ -161,66 +162,75 @@ public class BrowseBean
     */
    private List<Node> queryBrowseNodes(String parentNodeId)
    {
-      NodeRef parentRef;
-      if (parentNodeId == null)
+      List<Node> items = null;
+      try
       {
-         // no specific parent node specified - use the root node
-         parentRef = this.nodeService.getRootNode(Repository.getStoreRef());
-      }
-      else
-      {
-         // build a NodeRef for the specified Id and our store
-         parentRef = new NodeRef(Repository.getStoreRef(), parentNodeId);
-      }
-      
-      Collection<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(parentRef);
-      List<Node> items = new ArrayList<Node>(childRefs.size());
-      for (ChildAssocRef ref: childRefs)
-      {
-         // display name is the QName localname part
-         QName qname = ref.getQName();
-         
-         // create our Node representation
-         Node node = new Node(ref.getChildRef(), qname.getNamespaceURI());  // TODO: where does Type come from?
-         Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
-         
-         // convert the rest of the well known properties
-         Map<QName, Serializable> childProps = this.nodeService.getProperties(ref.getChildRef());
-         
-         // name and ID always exist
-         props.put("id", ref.getChildRef().getId());
-         props.put("name", qname.getLocalName());
-         
-         // other properties which may exist
-         String description = getQNameProperty(childProps, "description", true);
-         props.put("description", description);
-         
-         String createdDate = getQNameProperty(childProps, "createddate", false);
-         if (createdDate != null)
+         NodeRef parentRef;
+         if (parentNodeId == null)
          {
-            props.put("createddate", Conversion.dateFromXmlDate(createdDate));
+            // no specific parent node specified - use the root node
+            parentRef = this.nodeService.getRootNode(Repository.getStoreRef());
          }
          else
          {
-            // TODO: a null created/modified date shouldn't happen!? - remove this later
-            props.put("createddate", null);
+            // build a NodeRef for the specified Id and our store
+            parentRef = new NodeRef(Repository.getStoreRef(), parentNodeId);
          }
          
-         String modifiedDate = getQNameProperty(childProps, "modifieddate", false);
-         if (modifiedDate != null)
+         Collection<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(parentRef);
+         items = new ArrayList<Node>(childRefs.size());
+         for (ChildAssocRef ref: childRefs)
          {
-            props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
+            // display name is the QName localname part
+            QName qname = ref.getQName();
+            
+            // create our Node representation
+            Node node = new Node(ref.getChildRef(), qname.getNamespaceURI());  // TODO: where does Type come from?
+            Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
+            
+            // convert the rest of the well known properties
+            Map<QName, Serializable> childProps = this.nodeService.getProperties(ref.getChildRef());
+            
+            // name and ID always exist
+            props.put("id", ref.getChildRef().getId());
+            props.put("name", qname.getLocalName());
+            
+            // other properties which may exist
+            String description = getQNameProperty(childProps, "description", true);
+            props.put("description", description);
+            
+            String createdDate = getQNameProperty(childProps, "createddate", false);
+            if (createdDate != null)
+            {
+               props.put("createddate", Conversion.dateFromXmlDate(createdDate));
+            }
+            else
+            {
+               // TODO: a null created/modified date shouldn't happen!? - remove this later
+               props.put("createddate", null);
+            }
+            
+            String modifiedDate = getQNameProperty(childProps, "modifieddate", false);
+            if (modifiedDate != null)
+            {
+               props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
+            }
+            else
+            {
+               // TODO: a null created/modified date shouldn't happen!?
+               props.put("modifieddate", null);
+            }
+            
+            // push the propeties into the Node
+            node.setProperties(props);
+            
+            items.add(node);
          }
-         else
-         {
-            // TODO: a null created/modified date shouldn't happen!?
-            props.put("modifieddate", null);
-         }
-         
-         // push the propeties into the Node
-         node.setProperties(props);
-         
-         items.add(node);
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {parentNodeId}) );
+         items = Collections.EMPTY_LIST;
       }
       
       /* -- Example of Search code -- leave here for now
@@ -358,6 +368,13 @@ public class BrowseBean
       }
    }
    
+   /**
+    * Action event called by all Browse actions that need to setup a Space context
+    * before the action page is called. The context will be a Node in setActionSpace() which
+    * can be retrieved on the action page from BrowseBean.getActionSpace().
+    * 
+    * @param event   ActionEvent
+    */
    public void spaceActionSetup(ActionEvent event)
    {
       UIActionLink link = (UIActionLink)event.getComponent();
@@ -380,12 +397,17 @@ public class BrowseBean
             props.put("name", qname.getLocalName());
             node.setProperties(props);
             
-            setCurrentSpace(node);
+            setActionSpace(node);
          }
          catch (InvalidNodeRefException refErr)
          {
             addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
          }
+      }
+      else
+      {
+         s_logger.warn("WARNING: setActionSpace called without a Space Id!");
+         setActionSpace(null);
       }
    }
    
@@ -393,19 +415,54 @@ public class BrowseBean
    {
       String outcome = null;
       
-      Node node = getCurrentSpace();
+      Node node = getActionSpace();
       if (node != null)
       {
          try
          {
             s_logger.debug("Trying to delete space Id: " + node.getId());
-            this.nodeService.deleteNode(new NodeRef(Repository.getStoreRef(), node.getId()));
+            this.nodeService.deleteNode(node.getNodeRef());
+            
+            // remove this node from the breadcrumb if required
+            List<IBreadcrumbHandler> location = navigator.getLocation();
+            IBreadcrumbHandler handler = location.get(location.size() - 1);
+            if (handler instanceof BrowseBreadcrumbHandler)
+            {
+               // see if the current breadcrumb location is our node 
+               if ( ((BrowseBreadcrumbHandler)handler).getNodeId().equals(node.getId()) == true )
+               {
+                  location.remove(location.size() - 1);
+                  
+                  // now work out which node to set the list to refresh against
+                  if (location.size() != 0)
+                  {
+                     handler = location.get(location.size() - 1);
+                     if (handler instanceof BrowseBreadcrumbHandler)
+                     {
+                        // change the current node Id
+                        navigator.setCurrentNodeId(((BrowseBreadcrumbHandler)handler).getNodeId());
+                     }
+                     else
+                     {
+                        // TODO: shouldn't do this - but for now the user home dir is the root!
+                        navigator.setCurrentNodeId(null);
+                     }
+                  }
+               }
+            }
+            
+            // clear action context
+            setActionSpace(null);
             outcome = "browse";
          }
          catch (Throwable err)
          {
             addErrorMessage("Unable to delete Space due to system error: " + err.getMessage());
          }
+      }
+      else
+      {
+         s_logger.warn("WARNING: deleteSpaceOK called without a current Space!");
       }
       
       return outcome;
@@ -472,6 +529,11 @@ public class BrowseBean
          return "browse";
       }
       
+      public String getNodeId()
+      {
+         return this.nodeId;
+      }
+      
       private String nodeId;
       private String label;
    }
@@ -496,7 +558,7 @@ public class BrowseBean
    private NavigationBean navigator;
    
    /** The current space and it's properties - if any */
-   private Node currentSpace;
+   private Node actionSpace;
    
    /** The current browse view mode - set to a well known IRichListRenderer name */
    private String browseViewMode = "details";

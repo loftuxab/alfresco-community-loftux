@@ -111,7 +111,11 @@
                                     <td><awc:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
                                     <td><awc:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
                                     <td><awc:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
-                                    <td><awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}"><f:param name="id" value="#{BrowseBean.currentSpace.id}" /></awc:actionLink></td>
+                                    <td>
+                                       <awc:actionLink id="deleteCurrent" value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
+                                          <f:param name="id" value="#{NavigationBean.currentNodeId}" />
+                                       </awc:actionLink>
+                                     </td>
                                  </tr></table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
                            </td>

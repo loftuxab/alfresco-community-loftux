@@ -624,7 +624,7 @@ public class NewSpaceWizard
             if (this.nodeService.hasAspect(child, DictionaryBootstrap.ASPECT_SPACE))
             {
                String id = child.getId();
-               String name = ref.getName().getLocalName();
+               String name = ref.getQName().getLocalName();
                items.add(new SelectItem(id, name));
             }
          }

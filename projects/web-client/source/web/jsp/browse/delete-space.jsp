@@ -55,7 +55,7 @@
                               <h:graphicImage url="/images/icons/delete.gif" width="14" height="14"/>
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value="#{BrowseBean.currentSpace.name}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
                               <div class="mainTitle"><h:outputText value="#{msg.delete_space}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.delete_info}" /></div>
                            </td>
@@ -86,7 +86,7 @@
                                  <tr>
                                     <td class="mainSubTitle">
                                        <h:outputFormat value="#{msg.delete_space_confirm}">
-                                          <f:param value="#{BrowseBean.currentSpace.name}"/>
+                                          <f:param value="#{BrowseBean.actionSpace.name}"/>
                                        </h:outputFormat>
                                     </td>
                                  </tr>

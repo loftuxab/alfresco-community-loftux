@@ -23,6 +23,7 @@ import com.activiti.config.Config;
 import com.activiti.config.ConfigService;
 import com.activiti.config.element.PropertiesConfigElement;
 import com.activiti.web.bean.repository.Node;
+import com.activiti.web.bean.repository.Repository;
 
 /**
  * Component that represents the properties of an object
@@ -165,7 +166,9 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
          }
          
          this.nodeRef = NodeService.getNodeRef(path);
-         this.node = new Node(null, NodeService.getType(this.nodeRef));
+         // TODO: This needs refactoring - it is still using old NodeRef - should be using new one,
+         //       should pass a real NodeRef into the new Node() constructor.
+         this.node = new Node(new com.activiti.repo.ref.NodeRef(Repository.getStoreRef(), ""), NodeService.getType(this.nodeRef));
          this.node.setProperties(NodeService.getProperties(this.nodeRef));
       }
       
