@@ -122,7 +122,8 @@ public class ActionLinkRenderer extends BaseRenderer
          if (padding != 0)
          {
             // need the crappy "cursor:hand" embedded style for IE support
-            buf.append("<table cellspacing=0 cellpadding=0 style=\"cursor:hand\"><tr><td>");
+            // TODO: make this width value a property!
+            buf.append("<table cellspacing=0 cellpadding=0 style=\"cursor:hand\"><tr><td width=16>");
          }
          
          buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue()));

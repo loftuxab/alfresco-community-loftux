@@ -70,8 +70,9 @@
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
                               <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" />
-                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" />
-                              <awc:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" />
+                              <awc:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
+                                 <f:param name="id" value="#{NavigationBean.currentNodeId}" />
+                              </awc:actionLink>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100>
@@ -108,14 +109,10 @@
                               <%-- Toolbar actions --%>
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "bluetoolbar", "#E9F0F4"); %>
                                  <table cellspacing=0 cellpadding=0><tr>
-                                    <td><awc:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
-                                    <td><awc:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
-                                    <td><awc:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" showLink="false"/></td><td>&nbsp;|&nbsp;</td>
-                                    <td>
-                                       <awc:actionLink id="deleteCurrent" value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
-                                          <f:param name="id" value="#{NavigationBean.currentNodeId}" />
-                                       </awc:actionLink>
-                                     </td>
+                                    <td><awc:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
+                                    <td><awc:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
+                                    <td><awc:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
+                                    <td><awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" /></td>
                                  </tr></table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
                            </td>
@@ -134,7 +131,7 @@
                      <awc:richList id="browseList" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
                            width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
-                        <awc:column primary="true" width="175" style="padding:2px;text-align:left;">
+                        <awc:column primary="true" width="200" style="padding:2px;text-align:left;">
                            <f:facet name="header">
                               <awc:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>

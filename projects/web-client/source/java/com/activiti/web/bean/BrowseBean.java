@@ -19,6 +19,7 @@ import javax.faces.event.ActionEvent;
 import org.apache.log4j.Logger;
 
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -220,6 +221,10 @@ public class BrowseBean
                // TODO: a null created/modified date shouldn't happen!?
                props.put("modifieddate", null);
             }
+            
+            // TODO: resolve icon etc. some how using this e.g. on either make an ActionLink image
+            //       property smart or better set in the Node wrapper as property
+            //nodeService.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_SPACE);
             
             // push the propeties into the Node
             node.setProperties(props);
