@@ -150,7 +150,8 @@ public class ActionLinkRenderer extends BaseRenderer
                buf.append("'>");
             }
             
-            buf.append(link.getValue());
+            // TODO: encode label value
+            buf.append(Utils.encode(link.getValue().toString()));
             
             if (padding == 0)
             {
@@ -165,7 +166,7 @@ public class ActionLinkRenderer extends BaseRenderer
       }
       else
       {
-         buf.append(link.getValue());
+         buf.append(Utils.encode(link.getValue().toString()));
       }
       
       return buf.toString();
@@ -217,7 +218,7 @@ public class ActionLinkRenderer extends BaseRenderer
             .append(attrs.get("styleClass"));
       }
       buf.append('>');
-      buf.append(link.getValue());
+      buf.append(Utils.encode(link.getValue().toString()));
       buf.append("</a>");
       
       buf.append("</td></tr>");

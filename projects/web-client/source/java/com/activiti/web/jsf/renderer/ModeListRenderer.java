@@ -105,7 +105,7 @@ public class ModeListRenderer extends BaseRenderer
          outputAttribute(out, attrs.get("labelStyle"), "style");
          outputAttribute(out, attrs.get("labelStyleClass"), "class");
          out.write('>');
-         out.write((String)attrs.get("label"));
+         out.write(Utils.encode((String)attrs.get("label")));
          out.write("</span></td></tr></table></td>");
          
          if (list.isHorizontal() == false)
@@ -200,7 +200,7 @@ public class ModeListRenderer extends BaseRenderer
             
             outputAttribute(out, child.getAttributes().get("tooltip"), "title");
             out.write('>');
-            out.write((String)child.getAttributes().get("label"));
+            out.write(Utils.encode((String)child.getAttributes().get("label")));
             out.write("</td></tr></table></td>");
             
             if (list.isHorizontal() == false)

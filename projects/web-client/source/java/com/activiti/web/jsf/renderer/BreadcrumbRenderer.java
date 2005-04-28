@@ -129,7 +129,7 @@ public class BreadcrumbRenderer extends BaseRenderer
       
       // output path element text
       // TODO: optionally crop text length with ellipses - use title attribute for all
-      buf.append(element);
+      buf.append(Utils.encode(element));
       
       // close tag
       buf.append("</a>");

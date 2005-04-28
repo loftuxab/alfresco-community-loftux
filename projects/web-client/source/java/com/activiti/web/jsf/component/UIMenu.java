@@ -54,7 +54,7 @@ public class UIMenu extends SelfRenderingComponent
       if (getAttributes().get("label") != null)
       {
          out.write("<span>");
-         out.write((String)getAttributes().get("label"));
+         out.write(Utils.encode((String)getAttributes().get("label")));
          out.write("</span>");
       }
       

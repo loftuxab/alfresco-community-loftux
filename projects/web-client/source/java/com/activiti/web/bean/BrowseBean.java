@@ -370,7 +370,7 @@ public class BrowseBean
    
    /**
     * Action event called by all Browse actions that need to setup a Space context
-    * before the action page is called. The context will be a Node in setActionSpace() which
+    * before an action page/wizard is called. The context will be a Node in setActionSpace() which
     * can be retrieved on the action page from BrowseBean.getActionSpace().
     * 
     * @param event   ActionEvent
@@ -411,6 +411,11 @@ public class BrowseBean
       }
    }
    
+   /**
+    * Handler called upon the completion of the Delete Space page
+    * 
+    * @return outcome
+    */
    public String deleteSpaceOK()
    {
       String outcome = null;

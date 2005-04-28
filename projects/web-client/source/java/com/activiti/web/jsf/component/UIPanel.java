@@ -69,7 +69,7 @@ public class UIPanel extends SelfRenderingComponent
          outputAttribute(out, getAttributes().get("styleClass"), "class");
          out.write('>');
          
-         out.write(label);
+         out.write(Utils.encode(label));
          
          out.write("</span>&nbsp;");
       }

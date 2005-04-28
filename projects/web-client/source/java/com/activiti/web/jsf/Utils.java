@@ -20,6 +20,86 @@ import com.sun.faces.renderkit.html_basic.FormRenderer;
 public final class Utils
 {
    /**
+    * Encodes the given string, so that it can be used within an HTML page.
+    * 
+    * @param string     the String to convert
+    */
+   public static String encode(String string)
+   {
+      if (string == null)
+      {
+         return "";
+      }
+
+      StringBuilder sb = null;      //create on demand
+      String enc;
+      char c;
+      for (int i = 0; i < string.length(); i++)
+      {
+         enc = null;
+         c = string.charAt(i);
+         switch (c)
+         {
+            case '"': enc = "&quot;"; break;    //"
+            case '&': enc = "&amp;"; break;     //&
+            case '<': enc = "&lt;"; break;      //<
+            case '>': enc = "&gt;"; break;      //>
+             
+            //german umlauts
+            case '\u00E4' : enc = "&auml;";  break;
+            case '\u00C4' : enc = "&Auml;";  break;
+            case '\u00F6' : enc = "&ouml;";  break;
+            case '\u00D6' : enc = "&Ouml;";  break;
+            case '\u00FC' : enc = "&uuml;";  break;
+            case '\u00DC' : enc = "&Uuml;";  break;
+            case '\u00DF' : enc = "&szlig;"; break;
+            
+            //misc
+            //case 0x80: enc = "&euro;"; break;  sometimes euro symbol is ascii 128, should we suport it?
+            case '\u20AC': enc = "&euro;";  break;
+            case '\u00AB': enc = "&laquo;"; break;
+            case '\u00BB': enc = "&raquo;"; break;
+            case '\u00A0': enc = "&nbsp;"; break;
+            
+            default:
+               if (((int)c) >= 0x80)
+               {
+                  //encode all non basic latin characters
+                  enc = "&#" + ((int)c) + ";";
+               }
+               break;
+         }
+         
+         if (enc != null)
+         {
+            if (sb == null)
+            {
+               String soFar = string.substring(0, i);
+               sb = new StringBuilder(i + 8);
+               sb.append(soFar);
+            }
+            sb.append(enc);
+         }
+         else
+         {
+            if (sb != null)
+            {
+               sb.append(c);
+            }
+         }
+      }
+      
+      if (sb == null)
+      {
+         return string;
+      }
+      else
+      {
+         return sb.toString();
+      }
+   }
+   
+   /**
     * Generate the JavaScript to submit set the specified hidden Form field to the
     * supplied value and submit the parent Form.
     * 
@@ -132,6 +212,7 @@ public final class Utils
       
       if (alt != null)
       {
+         alt = Utils.encode(alt);
          buf.append(" alt=\"")
             .append(alt)
             .append("\" title=\"")
@@ -165,6 +246,7 @@ public final class Utils
       
       if (alt != null)
       {
+         alt = Utils.encode(alt);
          buf.append(" alt=\"")
             .append(alt)
             .append("\" title=\"")
