@@ -80,6 +80,26 @@ public class VersionImpl implements Version
     public String getVersionLabel()
     {
         return (String)this.versionProperties.get(PROP_VERSION_LABEL);
+    }    
+    
+    /**
+     * Helper method to get the version type.
+     * 
+     * @return  the value of the version type as an enum value
+     */
+    public VersionTypeEnum getVersionType()
+    {
+        return (VersionTypeEnum)this.versionProperties.get(PROP_VERSION_TYPE);
+    }
+    
+    /**
+     * Helper method to get the version description.
+     * 
+     * @return the version description
+     */
+    public String getDescription()
+    {
+        return (String)this.versionProperties.get(PROP_DESCRIPTION);
     }
     
     /**

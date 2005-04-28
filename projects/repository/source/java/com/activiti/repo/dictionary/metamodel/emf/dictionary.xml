@@ -74,6 +74,7 @@
     <emfProperties emfName="frozenNodeStoreId" emfType="/17" emfMandatory="true"/>
     <emfProperties emfName="frozenNodeStoreProtocol" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="frozenNodeType" emfType="/7" emfMandatory="true"/>
+    <emfProperties emfName="frozenAspects" emfType="/6" emfMultiple="true"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedAttributes"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedChildAssocs"/>
     <emfAssociations emfName="successor" emfRequiredToClasses="/35"/>

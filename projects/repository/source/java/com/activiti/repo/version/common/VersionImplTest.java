@@ -12,6 +12,7 @@ import java.util.Map;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.version.Version;
+import com.activiti.repo.version.Version.VersionTypeEnum;
 import com.activiti.repo.version.exception.VersionServiceException;
 
 import junit.framework.TestCase;
@@ -32,6 +33,8 @@ public class VersionImplTest extends TestCase
     private final static String VALUE_1 = "value1";
     private final static String VALUE_2 = "value2";
     private final static String VALUE_3 = "value3";  
+    private final static String VALUE_DESCRIPTION = "This string describes the version details.";
+    private final static VersionTypeEnum VERSION_TYPE = VersionTypeEnum.MINOR;
     
     /**
      * Version labels
@@ -59,11 +62,13 @@ public class VersionImplTest extends TestCase
         
         // Create the version property map
         this.versionProperties = new HashMap<String, Serializable>();
-        this.versionProperties.put(Version.PROP_VERSION_LABEL, VersionImplTest.VERSION_1);
+        this.versionProperties.put(Version.PROP_VERSION_LABEL, VERSION_1);
         this.versionProperties.put(Version.PROP_CREATED_DATE, this.createdDate);
-        this.versionProperties.put(VersionImplTest.PROP_1, VersionImplTest.VALUE_1);
-        this.versionProperties.put(VersionImplTest.PROP_2, VersionImplTest.VALUE_2);
-        this.versionProperties.put(VersionImplTest.PROP_3, VersionImplTest.VALUE_3);
+        this.versionProperties.put(Version.PROP_DESCRIPTION, VALUE_DESCRIPTION);
+        this.versionProperties.put(Version.PROP_VERSION_TYPE, VERSION_TYPE);
+        this.versionProperties.put(PROP_1, VALUE_1);
+        this.versionProperties.put(PROP_2, VALUE_2);
+        this.versionProperties.put(PROP_3, VALUE_3);
         
         // Create the root version
         this.version = new VersionImpl(this.versionProperties, this.nodeRef);
@@ -87,6 +92,24 @@ public class VersionImplTest extends TestCase
     {
         String versionLabel1 = this.version.getVersionLabel();
         assertEquals(VersionImplTest.VERSION_1, versionLabel1);
+    }
+    
+    /**
+     * Test getDescription
+     */
+    public void testGetDescription()
+    {
+        String description = this.version.getDescription();
+        assertEquals(VALUE_DESCRIPTION, description);
+    }
+    
+    /**
+     * Test getVersionType
+     */
+    public void testGetVersionType()
+    {
+        VersionTypeEnum versionType = this.version.getVersionType();
+        assertEquals(VERSION_TYPE, versionType);
     }
     
     /**

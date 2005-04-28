@@ -131,7 +131,7 @@ public class VersionStoreVersionServiceImplTest extends VersionStoreBaseImplTest
         Version version2 = addToVersionHistory(versionableNode, version1);
         Version version3 = addToVersionHistory(versionableNode, version2);
         Version version4 = addToVersionHistory(versionableNode, version3);
-        addToVersionHistory(versionableNode, version4);        
+        addToVersionHistory(versionableNode, version4);    
     }
     
     /**

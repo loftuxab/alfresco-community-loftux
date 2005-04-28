@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.activiti.repo.version.Version;
+import com.activiti.repo.version.Version.VersionTypeEnum;
 import com.activiti.repo.version.VersionLabelPolicy;
 
 /**
@@ -16,6 +17,8 @@ import com.activiti.repo.version.VersionLabelPolicy;
  */
 public class SerialVersionLabelPolicy implements VersionLabelPolicy
 {
+    // TODO need to add support for branches into this labeling policy
+    
     /**
      * Get the version label value base on the data provided.
      * 
@@ -29,7 +32,94 @@ public class SerialVersionLabelPolicy implements VersionLabelPolicy
             int versionNumber, 
             Map<String, Serializable> versionProperties)
     {
-        // TODO fill in this example implementation
-        throw new UnsupportedOperationException();
+        SerialVersionLabel serialVersionNumber = null;
+        
+        if (preceedingVersion != null)
+        {
+            serialVersionNumber = new SerialVersionLabel(preceedingVersion.getVersionLabel());
+            
+            VersionTypeEnum versionType = (VersionTypeEnum)versionProperties.get(Version.PROP_VERSION_TYPE);
+            if (VersionTypeEnum.MAJOR.equals(versionType) == true)
+            {
+                serialVersionNumber.majorIncrement();
+            }
+            else
+            {
+                serialVersionNumber.minorIncrement();
+            }
+        }
+        else
+        {
+            serialVersionNumber = new SerialVersionLabel(null);
+        }
+        
+        return serialVersionNumber.toString();
+    }
+    
+    /**
+     * Inner class encapsulating the notion of the serial version number.
+     * 
+     * @author Roy Wetherall
+     */
+    private class SerialVersionLabel
+    {
+        /**
+         * The version number delimiter
+         */
+        private static final String DELIMITER = ".";
+        
+        /**
+         * The major revision number
+         */
+        private int majorRevisionNumber = 1;
+        
+        /**
+         * The minor revision number
+         */
+        private int minorRevisionNumber = 0;        
+        
+        /**
+         * Constructor
+         * 
+         * @param version  the vesion to take the version from
+         */
+        public SerialVersionLabel(String versionLabel)
+        {
+            if (versionLabel != null && versionLabel.length() != 0)
+            {
+                int iIndex = versionLabel.indexOf(DELIMITER);
+                String majorString = versionLabel.substring(0, iIndex);
+                String minorString = versionLabel.substring(iIndex+1);
+                
+                this.majorRevisionNumber = Integer.parseInt(majorString);
+                this.minorRevisionNumber = Integer.parseInt(minorString);
+            }
+        }
+        
+        /**
+         * Increments the major revision numebr and sets the minor to 
+         * zero.
+         */
+        public void majorIncrement()
+        {
+            this.majorRevisionNumber += 1;
+            this.minorRevisionNumber = 0;
+        }
+        
+        /**
+         * Increments only the minor revision number
+         */
+        public void minorIncrement()
+        {
+            this.minorRevisionNumber += 1;
+        }
+        
+        /**
+         * Converts the serial version number into a string
+         */
+        public String toString()
+        {
+            return this.majorRevisionNumber + DELIMITER + this.minorRevisionNumber;
+        }
     }
 }

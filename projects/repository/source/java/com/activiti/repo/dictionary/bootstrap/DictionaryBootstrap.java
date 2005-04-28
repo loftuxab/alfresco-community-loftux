@@ -568,6 +568,13 @@ public class DictionaryBootstrap
         frozenNodeType.setMandatory(true);
         frozenNodeType.setMultiValued(false);
         
+        // Create frozen aspect property
+        M2Property frozenAspects = versionType.createProperty(
+                Version.PROP_FROZEN_ASPECTS);
+        frozenAspects.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        frozenAspects.setMandatory(false);
+        frozenAspects.setMultiValued(true);
+        
         // Child assoc to versioned attribute details
         M2ChildAssociation versionedAttributesChildAssoc = versionType.createChildAssociation(VersionStoreConst.CHILD_VERSIONED_ATTRIBUTES);
         // TODO the details of this

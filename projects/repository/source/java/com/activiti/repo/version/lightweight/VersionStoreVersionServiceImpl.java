@@ -7,9 +7,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
+import com.activiti.repo.policy.PolicyDefinitionService;
+import com.activiti.repo.policy.PolicyRuntimeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
@@ -18,12 +21,11 @@ import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionHistory;
 import com.activiti.repo.version.VersionLabelPolicy;
 import com.activiti.repo.version.VersionService;
-import com.activiti.repo.version.common.VersionHistoryImpl;
-import com.activiti.repo.version.common.VersionImpl;
 import com.activiti.repo.version.common.VersionUtil;
 import com.activiti.repo.version.common.counter.VersionCounterDaoService;
 import com.activiti.repo.version.exception.ReservedVersionNameException;
 import com.activiti.repo.version.exception.VersionServiceException;
+import com.activiti.repo.version.policy.OnBeforeCreateVersionPolicy;
 import com.activiti.util.AspectMissingException;
 
 /**
@@ -34,6 +36,13 @@ import com.activiti.util.AspectMissingException;
 public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl implements VersionService
 {
     /**
+     * Error messages
+     */
+    private static final String ERR_NOT_FOUND = "The current version could not be found in the light weight store.";
+    private static final String ERR_NO_BRANCHES = "The current implmentation of the light weight version store does " +
+                                                    "not support the creation of branches.";
+    
+    /**
      * The version counter service
      */
     private VersionCounterDaoService versionCounterService = null;
@@ -42,6 +51,16 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
      * The version label policy
      */
     private VersionLabelPolicy versionLabelPolicy = null;
+    
+    /**
+     * Policy definition service
+     */
+    protected PolicyDefinitionService policyDefinitionService = null;
+    
+    /**
+     * Policy runtime service
+     */
+    protected PolicyRuntimeService policyRuntimeService = null;
     
     /**
      * Sets the version counter service
@@ -61,6 +80,37 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
     public void setVersionLabelPolicy(VersionLabelPolicy versionLabelPolicy)
     {
         this.versionLabelPolicy = versionLabelPolicy;
+    }
+        
+    /**
+     * Sets the policy defintion service
+     * 
+     * @param policyDefintionService  the policy definition service
+     */
+    public void setPolicyDefinitionService(
+            PolicyDefinitionService policyDefinitionService)
+    {
+        this.policyDefinitionService = policyDefinitionService;
+    }
+    
+    /**
+     * Sets the policy runtime service
+     * 
+     * @param policyRuntimeService  the policy runtime service
+     */
+    public void setPolicyRuntimeService(
+            PolicyRuntimeService policyRuntimeService)
+    {
+        this.policyRuntimeService = policyRuntimeService;
+    }
+    
+    @Override
+    public void initialise()
+    {
+        super.initialise();
+        
+        // Register the policies
+        this.policyDefinitionService.registerPolicy(this, OnBeforeCreateVersionPolicy.class);
     }
     
     /**
@@ -193,6 +243,15 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         // Check for the version aspect
         checkForVersionAspect(nodeRef);
         
+        // Call the onBeforeCreateVersionPolicy 
+        OnBeforeCreateVersionPolicy policy = this.policyRuntimeService.getClassBehaviour(
+                OnBeforeCreateVersionPolicy.class, 
+                nodeRef);
+        if (policy != null)
+        {
+            policy.OnBeforeCreateVersion(nodeRef);
+        }
+        
         // TODO we need some way of 'locking' the current node to ensure no modifications (or other versions) 
         //      can take place untill the versioning process is complete
         
@@ -220,7 +279,20 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         {
             // Since we have an exisiting version history we should be able to lookup
             // the current version
-            currentVersionRef = getCurrentVersionNodeRef(versionHistoryRef, nodeRef);
+            currentVersionRef = getCurrentVersionNodeRef(versionHistoryRef, nodeRef);     
+            
+            if (currentVersionRef == null)
+            {
+                throw new VersionServiceException(ERR_NOT_FOUND);
+            }
+            
+            // Need to check that we are not about to create branch since this is not currently supported
+            VersionHistory versionHistory = buildVersionHistory(versionHistoryRef, nodeRef);
+            Version currentVersion = getVersion(currentVersionRef);
+            if (versionHistory.getSuccessors(currentVersion).size() != 0)
+            {
+                throw new VersionServiceException(ERR_NO_BRANCHES);
+            }
         }
         
         // Create the new version node (child of the version history)
@@ -249,8 +321,6 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
                     currentVersionRef, 
                     newVersionRef, 
                     VersionStoreVersionServiceImpl.ASSOC_SUCCESSOR);
-            
-            // TODO what do we do about branches (if anything) are we going to support them to begin with ??
         }
         
         // Create the version data object
@@ -278,85 +348,16 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         // TODO could definatly do with a cache since these are read-only objects ... maybe not 
         //      since they are dependant on the workspace of the node passed
         
-        // TODO need to scope version history by work space ....
-        
         VersionHistory versionHistory = null;
         
         NodeRef versionHistoryRef = getVersionHistoryNodeRef(nodeRef);
         if (versionHistoryRef != null)
         {
-            ArrayList<NodeRef> versionHistoryNodeRefs = new ArrayList<NodeRef>();
-            NodeRef currentVersion = getCurrentVersionNodeRef(versionHistoryRef, nodeRef);
-            
-            while (currentVersion != null)
-            {
-                NodeRef preceedingVersion = null;
-                
-                List<NodeAssocRef> preceedingAssocs = this.dbNodeService.getSourceAssocs(currentVersion, ASSOC_SUCCESSOR);
-                if (preceedingAssocs.size() == 1)
-                {
-                    NodeAssocRef preceedingAssoc = preceedingAssocs.get(0);
-                    preceedingVersion = preceedingAssoc.getSourceRef();
-                }
-                else if (preceedingAssocs.size() > 1)
-                {
-                    // Error since we only currently support one preceeding version
-                    throw new VersionServiceException("The light weight version store only supports one preceeding version.");
-                }
-                
-                versionHistoryNodeRefs.add(0, currentVersion);
-                currentVersion = preceedingVersion;
-            }
-            
-            // Build the version history object
-            boolean isRoot = true;
-            Version preceeding = null;
-            for (NodeRef versionRef : versionHistoryNodeRefs)
-            {
-                Version version = getVersion(versionRef);
-                
-                if (isRoot == true)
-                {
-                    versionHistory = new VersionHistoryImpl(version);
-                    isRoot = false;
-                }
-                else
-                {
-                    ((VersionHistoryImpl)versionHistory).addVersion(version, preceeding);
-                }
-                preceeding = version;
-            }
+            versionHistory = buildVersionHistory(versionHistoryRef, nodeRef);
         }
         
         return versionHistory;
-    }
-    
-    /**
-     * Constructs the a version object to contain the version information from the version node ref.
-     * 
-     * @param versionRef  the version reference
-     * @return            object containing verison data
-     */
-    private Version getVersion(NodeRef versionRef)
-    {
-        // TODO could definatly do with a cache since these are read only objects ...
-        
-        Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
-        
-        // Get the node properties
-        Map<QName, Serializable> nodeProperties = this.dbNodeService.getProperties(versionRef);
-        for (QName key : nodeProperties.keySet())
-        {
-            if (key.getNamespaceURI().equals(VersionStoreVersionServiceImpl.NAMESPACE_URI) == true)
-            {                   
-                Serializable value = nodeProperties.get(key);
-                versionProperties.put(key.getLocalName(), value);
-            }
-        }
-        
-        // Create and return the version object
-        return new VersionImpl(versionProperties, versionRef);        
-    }    
+    }           
     
     /**
      * Creates a new version node, setting the properties both calculated and specified.
@@ -397,7 +398,11 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         // Store the current node type
         ClassRef nodeType = this.nodeService.getType(versionableNodeRef);
         props.put(PROP_QNAME_FROZEN_NODE_TYPE, nodeType);
-		
+        
+        // Store the current aspects
+        Set<ClassRef> aspects = this.nodeService.getAspects(versionableNodeRef);
+		props.put(PROP_QNAME_FROZEN_ASPECTS, (Serializable)aspects);
+        
         // Calculate the version label
         String versionLabel = null;
         if (this.versionLabelPolicy != null)
@@ -452,18 +457,18 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         {
             // Copy the property values from the node onto the version node
             for (QName propertyName : nodeProperties.keySet())
-            {               
-                // TODO this lot should be kept as constants
-                
+            {                               
+                // Get the property values
                 HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
                 properties.put(PROP_QNAME_QNAME, propertyName);
                 properties.put(PROP_QNAME_VALUE, nodeProperties.get(propertyName));
                 
+                // Create the node storing the frozen attribute details
                 this.dbNodeService.createNode(
                         versionRef, 
                         CHILD_QNAME_VERSIONED_ATTRIBUTES,
                         CLASS_REF_VERSIONED_ATTRIBUTE,
-                        properties);
+                        properties);                
             }
         }
         
@@ -491,7 +496,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
             if (versionHistoryRef == null)
             {
                 // Set the reference property to point to the child node
-                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, nodeRef);
+                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, childAssocRef.getChildRef());
             }
             else
             {

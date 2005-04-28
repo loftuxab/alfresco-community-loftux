@@ -51,6 +51,7 @@ public interface VersionStoreConst
     public static final QName PROP_QNAME_FROZEN_NODE_TYPE = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_NODE_TYPE);
     public static final QName PROP_QNAME_FROZEN_NODE_STORE_PROTOCOL = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_NODE_STORE_PROTOCOL);
     public static final QName PROP_QNAME_FROZEN_NODE_STORE_ID = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_NODE_STORE_ID);
+    public static final QName PROP_QNAME_FROZEN_ASPECTS = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_ASPECTS);
     public static final QName ASSOC_SUCCESSOR = QName.createQName(NAMESPACE_URI, "successor");    
     
     /**

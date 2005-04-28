@@ -64,7 +64,7 @@ public class VersionHistoryImpl implements VersionHistory
         
         this.rootVersionLabel = rootVersion.getVersionLabel();
         addVersion(rootVersion, null);        
-    }
+    }    
     
     /**
      * Gets the root (or initial) version of the version history.

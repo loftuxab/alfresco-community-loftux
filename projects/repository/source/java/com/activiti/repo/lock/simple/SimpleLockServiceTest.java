@@ -32,16 +32,16 @@ public class SimpleLockServiceTest extends BaseSpringTest
     /**
      * Services used in tests
      */
-    private NodeService nodeService = null;
-    private LockService lockService = null;
+    private NodeService nodeService;
+    private LockService lockService;
     
     /**
      * Data used in tests
      */
-    private NodeRef parentNode = null;
-    private NodeRef childNode1 = null;
-    private NodeRef childNode2 = null;    
-    private NodeRef noAspectNode = null;
+    private NodeRef parentNode;
+    private NodeRef childNode1;
+    private NodeRef childNode2;    
+    private NodeRef noAspectNode;
 
     /**
      * Called during the transaction setup

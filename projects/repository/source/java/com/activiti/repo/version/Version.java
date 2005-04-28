@@ -28,11 +28,21 @@ public interface Version extends Serializable
      */
     public static final String PROP_VERSION_LABEL = "versionLabel";
     public static final String PROP_CREATED_DATE = "createdDate";
+    public static final String PROP_VERSION_TYPE = "versionType";
+    public static final String PROP_DESCRIPTION = "description";
     public static final String PROP_VERSION_NUMBER = "versionNumber";
     public static final String PROP_FROZEN_NODE_ID = "frozenNodeId";
     public static final String PROP_FROZEN_NODE_TYPE = "frozenNodeType";
     public static final String PROP_FROZEN_NODE_STORE_PROTOCOL = "frozenNodeStoreProtocol";
     public static final String PROP_FROZEN_NODE_STORE_ID = "frozenNodeStoreId";
+    public static final String PROP_FROZEN_ASPECTS = "frozenAspects";
+    
+    /**
+     * Version type enum 
+     * 
+     * @author Roy Wetherall
+     */
+    public enum VersionTypeEnum {MAJOR, MINOR};
     
     /**
      * Helper method to get the created date from the version property data.
@@ -47,6 +57,20 @@ public interface Version extends Serializable
      * @return  the version label
      */
     public String getVersionLabel();
+    
+    /**
+     * Helper method to get the version type.
+     * 
+     * @return  the value of the version type as an enum value
+     */
+    public VersionTypeEnum getVersionType();
+    
+    /**
+     * Helper method to get the version description.
+     * 
+     * @return the version description
+     */
+    public String getDescription();
 
     /**
      * Get the map containing the version property values

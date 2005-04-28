@@ -137,31 +137,46 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
     
     /**
-     * @throws UnsupportedOperationException always
+     * Type translation for version store
      */
     public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
 		return (ClassRef)this.dbNodeService.getProperty(nodeRef, VersionStoreBaseImpl.PROP_QNAME_FROZEN_NODE_TYPE);
     }
     
+    /**
+     * @throws UnsupportedOperationException always
+     */
     public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
+        // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }
 
+    /**
+     * Translation for version store
+     */
     public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+        Set<ClassRef> aspects = (Set<ClassRef>)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_ASPECTS);
+        return aspects.contains(aspectRef);
     }
 
+    /**
+     * @throws UnsupportedOperationException always
+     */
     public void removeAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
+        // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }
 
+    /**
+     * Translation for version store
+     */
     public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+        return (Set<ClassRef>)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_ASPECTS);
     }
 
     /**
@@ -230,7 +245,7 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
     }
 
     /**
-     * @throws UnsupportedOperationException always
+     * @see NodeService#getChildAssocs(NodeRef)
      */
     public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
     {
@@ -264,26 +279,52 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
             NodeRef childRef = childAssocRef.getChildRef();
             NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
             
-            // TODO if the referenced node is a version history then need to get the appropriate node ref                        
-            
             // get the qualified name of the frozen child association and filter out unwanted names
-            QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_QNAME);
-            if (!qnamePattern.isMatch(qName))
+            QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_QNAME);
+            
+            if (qnamePattern.isMatch(qName) == true)
             {
-                continue;   // this was not a match
-            }
+                //if (childAssocRef.getQName().equals(CHILD_QNAME_VERSIONED_CHILD_ASSOCS))
+                //{
+                    // Get the child reference
+                    //NodeRef childRef = childAssocRef.getChildRef();
+                   //NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
+                    
+                    // Check to see if the versioned node is a version history
+                    ClassRef classRef = this.dbNodeService.getType(referencedNode);
+                    if (CLASS_REF_VERSION_HISTORY.equals(classRef) == true)
+                    {
+                        // TODO if the referenced node is a version history then need to get the appropriate node ref                                                
+                    }
+                    
+                    // Retrieve the isPrimary and nthSibling values of the forzen child association
+                    //QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_QNAME);
+                    boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
+                    int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
+                    
+                    // Build a child assoc ref to add to the returned list
+                    ChildAssocRef newChildAssocRef = new ChildAssocRef(
+                            nodeRef, 
+                            qName, 
+                            referencedNode, 
+                            isPrimary, 
+                            nthSibling);
+                    result.add(newChildAssocRef);
+                }
+                //continue;   // this was not a match
+           // }
             // Retrieve the isPrimary and nthSibling values of the frozen child association
-            boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
-            int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
+           // boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
+           // int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
             
             // Build a child assoc ref to add to the returned list
-            ChildAssocRef newChildAssocRef = new ChildAssocRef(
-                    nodeRef, 
-                    qName, 
-                    referencedNode, 
-                    isPrimary, 
-                    nthSibling);
-            result.add(newChildAssocRef);
+           // ChildAssocRef newChildAssocRef = new ChildAssocRef(
+           //         nodeRef, 
+           //         qName, 
+            //        referencedNode, 
+            //        isPrimary, 
+            //        nthSibling);
+            //result.add(newChildAssocRef);
         }
         
         return result;

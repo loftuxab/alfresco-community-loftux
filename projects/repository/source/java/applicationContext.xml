@@ -294,11 +294,14 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.lock.simple.SimpleLockService">
+         <bean class="com.activiti.repo.lock.simple.SimpleLockService" init-method="initialise">
             <property name="nodeService">
                <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
             </property>         
+			<property name="policyRuntimeService">
+				<ref bean="policyRuntimeService"></ref>
+			</property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -309,17 +312,17 @@
    </bean>
    
    <!-- TODO does this need to be a transaction proxy factory bean? -->
-   <bean id="lockInterceptor" class="com.activiti.repo.lock.LockServiceInterceptor">
+   <!-- <bean id="lockInterceptor" class="com.activiti.repo.lock.LockServiceInterceptor">
 		<property name="lockService">
 			<ref bean="simpleLockService"></ref>
 		</property>	
-   </bean>
+   </bean> -->
    
    <!--                               -->
    <!--  Light Weight Version Store   -->
    <!--                               -->
    
-   <bean id="versionServiceLockIntercepter" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+   <!--<bean id="versionServiceLockIntercepter" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
 		<property name="advice">
         <ref local="lockInterceptor"/>
 		</property>
@@ -328,7 +331,7 @@
 				<value>.*createVersion</value>
 			</list>
 		</property>
-	</bean>
+	</bean>-->
    
    <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
@@ -355,17 +358,18 @@
 			 <property name="dictionaryService">
 			   <ref bean="dictionaryService" />
 			 </property>
+			 <property name="policyDefinitionService">
+				<ref bean="policyDefinitionService"/>
+			 </property>
+			 <property name="policyRuntimeService">
+				<ref bean="policyRuntimeService"/>
+			 </property>
          </bean>
       </property>
       <property name="transactionAttributes">
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
-      </property>
-	  <property name="postInterceptors">
-         <list>
-            <ref bean="versionServiceLockIntercepter" />
-         </list>
       </property>
    </bean>
    
@@ -470,6 +474,44 @@
       </property>
    </bean>
    
+   <!--                 -->
+   <!-- Policy Franeworks Services -->
+   <!--                 -->
+   
+   <bean id="policyDefinitionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.policy.PolicyDefinitionService</value>
+      </property>
+      <property name="transactionManager"><ref bean="transactionManager"/></property>
+      <property name="target">
+         <bean class="com.activiti.repo.policy.impl.PolicyDefinitionServiceImpl">
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <bean id="policyRuntimeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.policy.PolicyRuntimeService</value>
+      </property>
+      <property name="transactionManager"><ref bean="transactionManager"/></property>
+      <property name="target">
+         <bean class="com.activiti.repo.policy.impl.PolicyRuntimeServiceImpl">
+			<property name="nodeService">
+				<ref bean="dbNodeService"></ref>
+			</property>			
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
    
    <!-- Bean to support full text search -->
    
@@ -514,4 +556,5 @@
         </list>
     </property>
    </bean>
+
 </beans>

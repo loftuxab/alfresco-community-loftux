@@ -3,16 +3,28 @@
  */
 package com.activiti.repo.version.lightweight;
 
+import java.util.List;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.Searcher;
+import com.activiti.repo.version.Version;
+import com.activiti.repo.version.VersionHistory;
 import com.activiti.repo.version.VersionService;
+import com.activiti.repo.version.common.VersionHistoryImpl;
+import com.activiti.repo.version.common.VersionImpl;
+import com.activiti.repo.version.exception.VersionServiceException;
 import com.activiti.util.AspectMissingException;
 
 /**
@@ -69,13 +81,13 @@ public abstract class VersionStoreBaseImpl implements VersionStoreConst
     public void initialise()
     {
         // Ensure that the version store has been created
-        if (this.nodeService.exists(getVersionStoreReference()) == false)
+        if (this.dbNodeService.exists(getVersionStoreReference()) == false)
         {
-            this.nodeService.createStore(STORE_PROTOCOL, STORE_ID);
+            this.dbNodeService.createStore(STORE_PROTOCOL, STORE_ID);
         }        
         
         // Get the version store root node reference
-        this.versionStoreRootNodeRef = this.nodeService.getRootNode(getVersionStoreReference());
+        this.versionStoreRootNodeRef = this.dbNodeService.getRootNode(getVersionStoreReference());
     }
     
     /**
@@ -126,6 +138,95 @@ public abstract class VersionStoreBaseImpl implements VersionStoreConst
     public StoreRef getVersionStoreReference()
     {
         return new StoreRef(STORE_PROTOCOL, STORE_ID);
+    }    
+    
+    /**
+     * Builds a version history object from the version history reference.
+     * <p>
+     * The node ref is passed to enable the version history to be scoped to the
+     * appropriate branch in the version history.
+     * 
+     * @param versionHistoryRef  the node ref for the version history
+     * @param nodeRef            the node reference
+     * @return                   a constructed version history object
+     */
+    protected VersionHistory buildVersionHistory(NodeRef versionHistoryRef, NodeRef nodeRef)
+    {
+        VersionHistory versionHistory = null;
+        
+        ArrayList<NodeRef> versionHistoryNodeRefs = new ArrayList<NodeRef>();
+        NodeRef currentVersion = getCurrentVersionNodeRef(versionHistoryRef, nodeRef);
+        
+        while (currentVersion != null)
+        {
+            NodeAssocRef preceedingVersion = null;
+            
+            versionHistoryNodeRefs.add(0, currentVersion);
+            
+            List<NodeAssocRef> preceedingVersions = this.dbNodeService.getSourceAssocs(currentVersion, ASSOC_SUCCESSOR);
+            if (preceedingVersions.size() == 1)
+            {
+                preceedingVersion = (NodeAssocRef)preceedingVersions.toArray()[0];
+                currentVersion = preceedingVersion.getSourceRef();                
+            }
+            else if (preceedingVersions.size() > 1)
+            {
+                // Error since we only currently support one preceeding version
+                throw new VersionServiceException("The light weight version store only supports one preceeding version.");
+            }     
+            else
+            {
+                currentVersion = null;
+            }
+        }
+        
+        // Build the version history object
+        boolean isRoot = true;
+        Version preceeding = null;
+        for (NodeRef versionRef : versionHistoryNodeRefs)
+        {
+            Version version = getVersion(versionRef);
+            
+            if (isRoot == true)
+            {
+                versionHistory = new VersionHistoryImpl(version);
+                isRoot = false;
+            }
+            else
+            {
+                ((VersionHistoryImpl)versionHistory).addVersion(version, preceeding);
+            }
+            preceeding = version;
+        }
+        
+        return versionHistory;
+    }
+    
+    /**
+     * Constructs the a version object to contain the version information from the version node ref.
+     * 
+     * @param versionRef  the version reference
+     * @return            object containing verison data
+     */
+    protected Version getVersion(NodeRef versionRef)
+    {
+        // TODO could definatly do with a cache since these are read only objects ...
+        
+        Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
+        
+        // Get the node properties
+        Map<QName, Serializable> nodeProperties = this.dbNodeService.getProperties(versionRef);
+        for (QName key : nodeProperties.keySet())
+        {
+            if (key.getNamespaceURI().equals(VersionStoreVersionServiceImpl.NAMESPACE_URI) == true)
+            {                   
+                Serializable value = nodeProperties.get(key);
+                versionProperties.put(key.getLocalName(), value);
+            }
+        }
+        
+        // Create and return the version object
+        return new VersionImpl(versionProperties, versionRef);        
     }
     
     /**

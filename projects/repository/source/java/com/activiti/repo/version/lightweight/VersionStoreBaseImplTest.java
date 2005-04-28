@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
+import com.activiti.repo.lock.LockService;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
@@ -27,6 +28,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
     /*
      * Data used by tests
      */
+    protected StoreRef testStoreRef = null;
     protected NodeRef rootNodeRef = null;
     protected Map<String, Serializable> versionProperties = null;
     protected HashMap<QName, Serializable> nodeProperties = null;
@@ -72,10 +74,10 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         this.nodeProperties.put(VersionStoreVersionServiceImplTest.PROP_3, VersionStoreVersionServiceImplTest.VALUE_3);
         
         // Create a workspace that contains the 'live' nodes
-        StoreRef storeRef = this.dbNodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        this.testStoreRef = this.dbNodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         
         // Get a reference to the root node
-        this.rootNodeRef = this.dbNodeService.getRootNode(storeRef);
+        this.rootNodeRef = this.dbNodeService.getRootNode(this.testStoreRef);
     }
     
     /**
@@ -94,17 +96,21 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         // Create node 
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
-                QName.createQName("{}MyVersionableNode"), 
+                QName.createQName("{test}MyVersionableNode"), 
                 DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(nodeRef, aspectRef, new HashMap<QName, Serializable>());
+        
+        //TODO for now make this lockabel so I can test things out .. need a system test for this stuff
+        this.dbNodeService.addAspect(nodeRef, LockService.ASPECT_CLASS_REF_LOCK, new HashMap<QName, Serializable>());
+        
         assertNotNull(nodeRef);
         this.versionableNodes.put(nodeRef.getId(), nodeRef);
         
         // Add some children to the node
         NodeRef child1 = this.dbNodeService.createNode(
                 nodeRef,
-                QName.createQName("{}ChildNode1"),
+                QName.createQName("{test}ChildNode1"),
                 DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(child1, aspectRef, new HashMap<QName, Serializable>());
@@ -112,7 +118,7 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         this.versionableNodes.put(child1.getId(), child1);
         NodeRef child2 = this.dbNodeService.createNode(
                 nodeRef,
-                QName.createQName("{}ChildNode2"),
+                QName.createQName("{test}ChildNode2"),
                 DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(child2, aspectRef, new HashMap<QName, Serializable>());

@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
@@ -15,6 +16,8 @@ import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.version.Version;
+import com.activiti.repo.version.VersionService;
+import com.activiti.util.debug.NodeStoreInspector;
 
 /**
  * @author Roy Wetherall
@@ -133,26 +136,29 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
         
+        // Lets have a look at the version store ..
+        //System.out.println(NodeStoreInspector.dumpNodeStore(this.dbNodeService, this.lightWeightVersionStoreVersionService.getVersionStoreReference()));
+        
         // Get the children of the versioned node
         Collection<ChildAssocRef> versionedChildren = this.lightWeightVersionStoreNodeService.getChildAssocs(version.getNodeRef());
         assertNotNull(versionedChildren);
         assertEquals(origionalChildren.size(), versionedChildren.size());
         
-//        for (ChildAssocRef versionedChildRef : versionedChildren)
-//        {
-//            ChildAssocRef origChildAssocRef = origionalChildAssocRefs.get(versionedChildRef.getChildRef().getId());
-//            assertNotNull(origChildAssocRef);
-//                        
-//            assertEquals(
-//                    origChildAssocRef.getChildRef(),
-//                    versionedChildRef.getChildRef());
-//            assertEquals(
-//                    origChildAssocRef.isPrimary(),
-//                    versionedChildRef.isPrimary());
-//            assertEquals(
-//                    origChildAssocRef.getNthSibling(),
-//                    versionedChildRef.getNthSibling());
-//        }
+        for (ChildAssocRef versionedChildRef : versionedChildren)
+        {
+            ChildAssocRef origChildAssocRef = origionalChildAssocRefs.get(versionedChildRef.getChildRef().getId());
+            assertNotNull(origChildAssocRef);
+                        
+            assertEquals(
+                    origChildAssocRef.getChildRef(),
+                    versionedChildRef.getChildRef());
+            assertEquals(
+                    origChildAssocRef.isPrimary(),
+                    versionedChildRef.isPrimary());
+            assertEquals(
+                    origChildAssocRef.getNthSibling(),
+                    versionedChildRef.getNthSibling());
+        }
     }
     
     /**
@@ -167,6 +173,46 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
 //        Version version = createVersion(versionableNode, this.versionProperties);
 //        
 //        throw new UnsupportedOperationException("Test incomplete");
+    }
+    
+    /**
+     * Test hasAspect
+     */
+    public void testHasAspect()
+    {
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+        
+        boolean test1 = this.lightWeightVersionStoreNodeService.hasAspect(
+                version.getNodeRef(), 
+                DictionaryBootstrap.ASPECT_CONTENT);
+        assertFalse(test1);
+        
+        boolean test2 = this.lightWeightVersionStoreNodeService.hasAspect(
+                version.getNodeRef(),
+                new ClassRef(VersionService.ASPECT_QNAME_VERSION));
+        assertTrue(test2);
+    }
+
+    /**
+     * Test getAspects
+     */
+    public void testGetAspects() 
+    {
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        Set<ClassRef> origAspects = this.dbNodeService.getAspects(versionableNode);
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+        
+        Set<ClassRef> aspects = this.lightWeightVersionStoreNodeService.getAspects(version.getNodeRef());
+        assertEquals(origAspects.size(), aspects.size());
+        
+        // TODO check that the set's contain the same items
     }
 	
 	/** ================================================
@@ -194,6 +240,49 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
 				fail("Unexpected exception raised during method excution: " + exception.getMessage());
 			}
 		}
+    }
+    
+    /**
+     * Test addAspect
+     */
+    public void testAddAspect()
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.addAspect(
+                    dummyNodeRef,
+                    DictionaryBootstrap.ASPECT_CONTENT,
+                    null);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Test removeAspect
+     */
+    public void testRemoveAspect() 
+    {
+        try
+        {
+            this.lightWeightVersionStoreNodeService.removeAspect(
+                    dummyNodeRef,
+                    DictionaryBootstrap.ASPECT_CONTENT);
+            fail("This operation is not supported.");
+        }
+        catch (UnsupportedOperationException exception)
+        {
+            if (exception.getMessage() != MSG_ERR)
+            {
+                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+            }
+        }
     }
     
 	/**

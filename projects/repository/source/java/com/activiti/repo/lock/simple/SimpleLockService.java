@@ -10,8 +10,10 @@ import com.activiti.repo.lock.LockService;
 import com.activiti.repo.lock.exception.UnableToReleaseLockException;
 import com.activiti.repo.lock.exception.UnableToAquireLockException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.policy.PolicyRuntimeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.version.policy.OnBeforeCreateVersionPolicy;
 import com.activiti.util.AspectMissingException;
 
 /**
@@ -32,6 +34,11 @@ public class SimpleLockService implements LockService
     private NodeService nodeService = null;
     
     /**
+     * The policy runtime service
+     */
+    private PolicyRuntimeService policyRuntimeService = null;
+    
+    /**
      * Set the node service
      * 
      * @param nodeService  the node service
@@ -39,6 +46,29 @@ public class SimpleLockService implements LockService
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+    
+    /**
+     * Set the policy runtime service
+     * 
+     * @param policyRuntimeService  the policy runtime service
+     */
+    public void setPolicyRuntimeService(
+            PolicyRuntimeService policyRuntimeService)
+    {
+        this.policyRuntimeService = policyRuntimeService;
+    }
+    
+    /**
+     * Initialise methods called by Spring framework
+     */
+    public void initialise()
+    {
+        // Register the behaviours
+        this.policyRuntimeService.registerBehaviour(
+                OnBeforeCreateVersionPolicy.class, 
+                new OnBeforeCreateVersionPolicyImpl(),
+                LockService.ASPECT_QNAME_LOCK);
     }
     
     /**
@@ -278,6 +308,21 @@ public class SimpleLockService implements LockService
         if (this.nodeService.hasAspect(nodeRef, lockAspect) == false)
         {
             throw new AspectMissingException(lockAspect, nodeRef);
+        }
+    }
+    
+    /**
+     * 
+     * @author Roy Wetherall
+     */
+    public class OnBeforeCreateVersionPolicyImpl implements OnBeforeCreateVersionPolicy
+    {
+        /**
+         * 
+         */
+        public void OnBeforeCreateVersion(NodeRef versionableNode)
+        {
+            System.out.println("Checking the lock here ...");
         }
     }
 
