@@ -87,7 +87,7 @@
       
       <p>
       
-      <h:commandButton id="show-jump-page" value="Back To Jump Page" action="jumppage" />
+      <h:commandButton id="show-zoo-page" value="Show Zoo" action="showZoo" />
       
    </h:form>
 </f:view>

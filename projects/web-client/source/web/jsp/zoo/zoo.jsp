@@ -9,19 +9,23 @@
 
 <f:view>
    
-   <h2>Jump Page</h2>
+   <h2>The Zoo</h2>
    
-   <h:form id="jumpForm">
+   <h:form id="zooForm">
       
-      <h:commandButton id="show-components-zoo" value="Components Zoo" action="showComponentsZoo" />
+      <h:commandButton id="show-components-zoo" value="Rich List Zoo" action="showRichListZoo" />
       <br/><br/>
       <h:commandButton id="show-property-zoo" value="Property Zoo" action="showPropertyZoo" />
       <br/><br/>
+      <h:commandButton id="show-auto-property-zoo" value="Auto Property Zoo" action="showAutoPropertyZoo" />
+      <br/><br/>
+      <h:commandButton id="show-image-picker" value="Image Picker Zoo" action="showImagePickerZoo" />
+      <br/><br/>
       <h:commandButton id="show-user-list" value="UserList Test Pages" action="showUserlist" />
-      <br/><br/>
-      <h:commandButton id="show-browse" value="Browse Test Page" action="showBrowse" />
-      <br/><br/>
-      <h:commandButton id="show-new-space-wizard" value="New Space Wizard" action="showNewSpaceWizard" />
+      
+      <p/><p/>
+      <hr/><p/>
+      <h:commandButton id="show-web-client" value="Back to the Web Client" action="showWebClient" />
       
    </h:form>
    

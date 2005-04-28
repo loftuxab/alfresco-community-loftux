@@ -11,15 +11,15 @@
    <h:form id="propertySheetForm">
    
       <awc:propertySheetGrid value="/gav.doc">
-         <h:outputText value='#{DDService.types[node.type].propertiesMap["name"].displayName}: ' />
+         <h:outputText value='#{MockDDService.types[node.type].propertiesMap["name"].displayName}: ' />
          <h:inputText value="#{node.name}" />
-         <h:outputText value='#{DDService.types[node.type].propertiesMap["description"].displayName}: ' />
+         <h:outputText value='#{MockDDService.types[node.type].propertiesMap["description"].displayName}: ' />
          <h:inputText value="#{node.description}" />         
-         <h:outputText value='#{DDService.types[node.type].propertiesMap["created"].displayName}: ' />
-         <h:inputText value="#{node.created}" disabled='#{DDService.types[node.type].propertiesMap["created"].readOnly}'>
+         <h:outputText value='#{MockDDService.types[node.type].propertiesMap["created"].displayName}: ' />
+         <h:inputText value="#{node.created}" disabled='#{MockDDService.types[node.type].propertiesMap["created"].readOnly}'>
             <f:convertDateTime dateStyle="short" pattern="d/MM/yyyy" />
          </h:inputText>
-         <h:outputText value='#{DDService.types[node.type].propertiesMap["modified"].displayName}: ' />
+         <h:outputText value='#{MockDDService.types[node.type].propertiesMap["modified"].displayName}: ' />
          <h:inputText value="#{node.modified}">
             <f:convertDateTime dateStyle="short" pattern="d/MM/yyyy" />
          </h:inputText>
@@ -49,13 +49,10 @@
       <div style="color:red;"><h:messages/></div>
       <br/>
       <h:commandButton value="Update Properties" action="#{node2.persist}"/>
-      
-      <br/><br/><hr/><br/>
-      <h:commandButton value="Auto Configured Property Zoo" action="#{ZooService.showPropertyZoo2}" />
 
       <p>
       
-      <h:commandButton id="show-jump-page" value="Back To Jump Page" action="jumppage" />
+      <h:commandButton id="show-zoo-page" value="Show Zoo" action="showZoo" />
 
    </h:form>
       

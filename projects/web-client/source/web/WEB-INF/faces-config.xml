@@ -163,21 +163,6 @@
    
    <managed-bean>
       <description>
-         The bean that backs up the jsf-test webapp Login screen
-      </description>
-      <managed-bean-name>LoginBean</managed-bean-name>
-      <managed-bean-class>jsftest.LoginBean</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-      <!-- default value forced for a managed property -->
-      <managed-property>
-         <property-name>name</property-name>
-         <property-class>java.lang.String</property-class>
-         <value>admin</value>
-      </managed-property>
-   </managed-bean>
-   
-   <managed-bean>
-      <description>
          The bean that holds navigation state.
       </description>
       <managed-bean-name>NavigationBean</managed-bean-name>
@@ -213,53 +198,7 @@
          <value>#{NavigationBean}</value>
       </managed-property>
    </managed-bean>
-   
-   <managed-bean>
-      <description>
-         The bean that backs up the jsf-test webapp User List screen
-      </description>
-      <managed-bean-name>UserListBean</managed-bean-name>
-      <managed-bean-class>jsftest.UserListBean</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-   </managed-bean>
-   
-   <managed-bean>
-      <description>
-         Bean for component testing
-      </description>
-      <managed-bean-name>TestList</managed-bean-name>
-      <managed-bean-class>jsftest.TestList</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-   </managed-bean>
-
-   <managed-bean>
-      <description>
-         The bean that acts as the Node Service
-      </description>
-      <managed-bean-name>NodeService</managed-bean-name>
-      <managed-bean-class>jsftest.repository.NodeService</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-   </managed-bean>
-   
-   <managed-bean>
-      <description>
-         The bean that acts as the Data Dictionary Service
-      </description>
-      <managed-bean-name>DDService</managed-bean-name>
-      <managed-bean-class>jsftest.repository.DataDictionary</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-   </managed-bean>
-   
-   <managed-bean>
-      <description>
-         The bean that acts as the navigation aid for the component zoo
-      </description>
-      <managed-bean-name>ZooService</managed-bean-name>
-      <managed-bean-class>jsftest.ZooService</managed-bean-class>
-      <managed-bean-scope>application</managed-bean-scope>
-   </managed-bean>
-   
-   
+      
    <!-- ==================== NAVIGATION ==================== -->
    <!-- navigation rules describe the navigation cases between views using the -->
    <!-- outcomes from action methods or the outcome from a default action impl -->
@@ -272,47 +211,13 @@
       <from-view-id>/jsp/login.jsp</from-view-id>
       <navigation-case>
          <description>
-             Indicates to the NavigationHandler that the jump.jsp
+             Indicates to the NavigationHandler that the browse.jsp
              view must be displayed if the Action referenced by a 
              UICommand component on the login.jsp view returns 
              the outcome "success".
          </description>
          <from-outcome>success</from-outcome>
-         <to-view-id>/jsp/jump.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <!-- Jump page links -->
-   <navigation-rule>
-      <from-view-id>/jsp/jump.jsp</from-view-id>
-      <navigation-case>
-         <from-outcome>showUserlist</from-outcome>
-         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>showComponentsZoo</from-outcome>
-         <to-view-id>/jsp/zoo/components.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>showPropertyZoo</from-outcome>
-         <to-view-id>/jsp/zoo/properties.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>showBrowse</from-outcome>
          <to-view-id>/jsp/browse/browse.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>showNewSpaceWizard</from-outcome>
-         <to-view-id>/jsp/wizard/new-space/create-from.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <!-- rule to get back to the jump page from anywhere -->
-   <navigation-rule>
-      <from-view-id>/jsp/*</from-view-id>
-      <navigation-case>
-         <from-outcome>jumppage</from-outcome>
-         <to-view-id>/jsp/jump.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -337,59 +242,5 @@
          <to-view-id>/jsp/browse/browse.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
-
-   <!-- Note that the from-view-id can contain * wildcard to specify an entire dir match -->
-   <!-- e.g. <from-view-id>/myfiles/*</from-view-id> -->
-   <navigation-rule>
-      <from-view-id>/jsp/test/userlist.jsp</from-view-id>
-      <navigation-case>
-         <from-outcome>edituser</from-outcome>
-         <to-view-id>/jsp/test/edituser.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>adduser</from-outcome>
-         <to-view-id>/jsp/test/adduser.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <navigation-rule>
-      <from-view-id>/jsp/test/adduser.jsp</from-view-id>
-      <navigation-case>
-         <from-outcome>success</from-outcome>
-         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>cancel</from-outcome>
-         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <navigation-rule>
-      <from-view-id>/jsp/test/edituser.jsp</from-view-id>
-      <navigation-case>
-         <from-outcome>success</from-outcome>
-         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>cancel</from-outcome>
-         <to-view-id>/jsp/test/userlist.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-
-   <navigation-rule>
-      <from-view-id>/jsp/zoo/properties.jsp</from-view-id>
-      <navigation-case>
-         <from-outcome>showPropertyZoo2</from-outcome>
-         <to-view-id>/jsp/zoo/properties-auto.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <navigation-rule>
-      <from-view-id>/jsp/zoo/properties-auto.jsp</from-view-id>
-      <navigation-case>
-         <from-outcome>showPropertyZoo</from-outcome>
-         <to-view-id>/jsp/zoo/properties.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
+      
 </faces-config>
