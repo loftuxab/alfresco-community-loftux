@@ -9,14 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
 import org.apache.log4j.Logger;
-
-import sun.security.krb5.internal.crypto.c;
 
 import com.activiti.repo.dictionary.NamespaceService;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
@@ -29,7 +28,6 @@ import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
 import com.activiti.util.Conversion;
 import com.activiti.web.bean.NavigationBean;
-import com.activiti.web.bean.repository.Node;
 import com.activiti.web.bean.repository.Repository;
 import com.activiti.web.jsf.component.UIModeList;
 
@@ -120,6 +118,9 @@ public class NewSpaceWizard
    {
       this.currentStep++;
       
+      // determine whether the finish button should be enabled
+      evaluateFinishButtonState();
+      
       // determine which page to go to next
       String nextPage = determinePageForStep(this.currentStep);
       
@@ -144,6 +145,9 @@ public class NewSpaceWizard
    public String back()
    {       
       this.currentStep--;
+      
+      // determine whether the finish button should be enabled
+      evaluateFinishButtonState();
       
       // determine which page to go to next
       String previousPage = determinePageForStep(this.currentStep);
@@ -179,52 +183,63 @@ public class NewSpaceWizard
       //       For now we always create the space from scratch.
       // *******************************************************************************
       
-      // get the node service and create the space (just create a folder for now)
-      NodeRef parentNodeRef;
-      String nodeId = getNavigator().getCurrentNodeId();
-      if (nodeId == null)
+      if (this.name == null || this.name.length() == 0)
       {
-         parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+         // create error and send wizard back to details page
+         String msg = "You must supply a name for the space";
+         FacesContext.getCurrentInstance().addMessage(null, 
+               new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg));
+         navigate(determinePageForStep(3));
       }
       else
       {
-         parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
+         // get the node service and create the space (just create a folder for now)
+         NodeRef parentNodeRef;
+         String nodeId = getNavigator().getCurrentNodeId();
+         if (nodeId == null)
+         {
+            parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+         }
+         else
+         {
+            parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
+         }
+         
+         ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
+                   QName.createQName(NamespaceService.ACTIVITI_URI, this.name),
+                   DictionaryBootstrap.TYPE_FOLDER);
+         NodeRef nodeRef = assocRef.getChildRef();
+         
+         // set the properties
+         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+         QName propCreatedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "createddate");
+         Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+         properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
+        
+         QName propModifiedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "modifieddate");
+         properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
+        
+         QName propIcon = QName.createQName(NamespaceService.ACTIVITI_URI, "icon");
+         properties.put(propIcon, this.icon);
+        
+         QName propSpaceType = QName.createQName(NamespaceService.ACTIVITI_URI, "spacetype");
+         properties.put(propSpaceType, this.spaceType);
+        
+         if (this.description != null)
+         {
+            QName propDescription = QName.createQName(NamespaceService.ACTIVITI_URI, "description");
+            properties.put(propDescription, this.description);
+         }
+         
+         // add the space aspect to the folder
+         this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
+         
+         // reset the state
+         reset();
+         
+         // navigate
+         navigate("/jsp/browse/browse.jsp");
       }
-      
-      ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
-                QName.createQName(NamespaceService.ACTIVITI_URI, this.name),
-                DictionaryBootstrap.TYPE_FOLDER);
-      NodeRef nodeRef = assocRef.getChildRef();
-      
-      // set the properties
-      Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-      QName propCreatedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "createddate");
-      Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-      properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
-     
-      QName propModifiedDate = QName.createQName(NamespaceService.ACTIVITI_URI, "modifieddate");
-      properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
-     
-      QName propIcon = QName.createQName(NamespaceService.ACTIVITI_URI, "icon");
-      properties.put(propIcon, this.icon);
-     
-      QName propSpaceType = QName.createQName(NamespaceService.ACTIVITI_URI, "spacetype");
-      properties.put(propSpaceType, this.spaceType);
-     
-      if (this.description != null)
-      {
-         QName propDescription = QName.createQName(NamespaceService.ACTIVITI_URI, "description");
-         properties.put(propDescription, this.description);
-      }
-      
-      // add the space aspect to the folder
-      this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
-      
-      // reset the state
-      reset();
-      
-      // navigate
-      navigate("/jsp/browse/browse.jsp");
       
       return null;
    }
@@ -582,6 +597,22 @@ public class NewSpaceWizard
    }
    
    /**
+    * Determines whether the finish button should be enabled and sets
+    * the finishDisabled flag appropriately
+    */
+   private void evaluateFinishButtonState()
+   {
+      if (this.createFrom.equals("scratch") && this.currentStep > 2)
+      {
+         this.finishDisabled = false;
+      }
+      else
+      {
+         this.finishDisabled = true;
+      }
+   }
+   
+   /**
     * Returns a list of spaces in the system 
     * 
     * @param templates Determines whether to return template spaces or not 
@@ -625,7 +656,11 @@ public class NewSpaceWizard
             {
                String id = child.getId();
                String name = ref.getQName().getLocalName();
-               items.add(new SelectItem(id, name));
+               // also filter out the Glossary space  TODO: make this a system type or space
+               if (name.equals("Glossary") == false)
+               {
+                  items.add(new SelectItem(id, name));
+               }
             }
          }
       }

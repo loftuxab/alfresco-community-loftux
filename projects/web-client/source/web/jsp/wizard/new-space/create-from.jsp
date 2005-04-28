@@ -109,8 +109,8 @@
                                     <td>
                                        <h:selectOneRadio value="#{NewSpaceWizard.createFrom}" layout="pageDirection">
                                           <f:selectItem itemValue="scratch" itemLabel="From scratch" />
-                                          <f:selectItem itemValue="existing" itemLabel="Base on existing space" />
-                                          <f:selectItem itemValue="template" itemLabel="Use a template" />
+                                          <f:selectItem itemValue="existing" itemLabel="Based on an existing space" />
+                                          <f:selectItem itemValue="template" itemLabel="Using a template" />
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>

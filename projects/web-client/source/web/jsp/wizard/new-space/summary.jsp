@@ -118,7 +118,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
+                                                        disabled="#{NewSpaceWizard.finishDisabled}" />
                                     </td>
                                  </tr>
                                  <tr>

@@ -109,6 +109,7 @@
                                     <td>Name:</td>
                                     <td>
                                        <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" />&nbsp;*
+                                       <span class="errorMessage"><h:messages /></span>
                                     </td>
                                  </tr>
                                  <tr>
@@ -146,7 +147,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>To continue click Next.</td>
+                                    <td colspan="2">To continue click Next.</td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -167,7 +168,8 @@
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton" 
+                                                        disabled="#{NewSpaceWizard.finishDisabled}"/>
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
