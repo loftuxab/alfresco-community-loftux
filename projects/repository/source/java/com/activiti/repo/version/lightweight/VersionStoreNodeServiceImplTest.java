@@ -6,6 +6,7 @@ package com.activiti.repo.version.lightweight;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,8 +14,10 @@ import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
+import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
+import com.activiti.repo.ref.qname.RegexQNamePattern;
 import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionService;
 import com.activiti.util.debug.NodeStoreInspector;
@@ -166,13 +169,22 @@ public class VersionStoreNodeServiceImplTest extends VersionStoreBaseImplTest
      */
     public void testGetAssociationTargets()
     {
-//        // Create a new versionable node
-//        NodeRef versionableNode = createNewVersionableNode();
-//        
-//        // Create a new version
-//        Version version = createVersion(versionableNode, this.versionProperties);
-//        
-//        throw new UnsupportedOperationException("Test incomplete");
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        
+        // Store the current details of the target associations
+        List<NodeAssocRef> origAssocs = this.dbNodeService.getTargetAssocs(
+                versionableNode,
+                RegexQNamePattern.MATCH_ALL);
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+
+        List<NodeAssocRef> assocs = this.lightWeightVersionStoreNodeService.getTargetAssocs(
+                version.getNodeRef(), 
+                RegexQNamePattern.MATCH_ALL);
+        assertNotNull(assocs);
+        assertEquals(origAssocs.size(), assocs.size());
     }
     
     /**

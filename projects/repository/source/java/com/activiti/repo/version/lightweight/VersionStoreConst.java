@@ -56,11 +56,10 @@ public interface VersionStoreConst
     
     /**
      * Versioned attribute type
-     * TODO should be named versionedProperty
      */
-    public static final String TYPE_VERSIONED_ATTRIBUTE = "versionedAttribute";
-    public static final QName TYPE_QNAME_VERSIONED_ATTRIBUTE = QName.createQName(NAMESPACE_URI, TYPE_VERSIONED_ATTRIBUTE);
-    public static final ClassRef CLASS_REF_VERSIONED_ATTRIBUTE = new ClassRef(TYPE_QNAME_VERSIONED_ATTRIBUTE);
+    public static final String TYPE_VERSIONED_PROPERTY = "versionedProperty";
+    public static final QName TYPE_QNAME_VERSIONED_PROPERTY = QName.createQName(NAMESPACE_URI, TYPE_VERSIONED_PROPERTY);
+    public static final ClassRef CLASS_REF_VERSIONED_PROPERTY = new ClassRef(TYPE_QNAME_VERSIONED_PROPERTY);
     
     /**
      * Versioned attribute properties
@@ -88,15 +87,24 @@ public interface VersionStoreConst
     public static final QName PROP_QNAME_NTH_SIBLING = QName.createQName(NAMESPACE_URI, PROP_NTH_SIBLING);
     
     /**
+     * Versioned assoc type
+     */
+    public static final String TYPE_VERSIONED_ASSOC = "versionedAssoc";
+    public static final QName TYPE_QNAME_VERSIONED_ASSOC = QName.createQName(NAMESPACE_URI, TYPE_VERSIONED_ASSOC);
+    public static final ClassRef CLASS_REF_VERSIONED_ASSOC = new ClassRef(TYPE_QNAME_VERSIONED_ASSOC);
+    
+    /**
      * Child relationship names
      */
     public static final String CHILD_VERSION_HISTORIES = "versionHistory";
     public static final String CHILD_VERSIONS = "version";
     public static final String CHILD_VERSIONED_ATTRIBUTES = "versionedAttributes";
     public static final String CHILD_VERSIONED_CHILD_ASSOCS = "versionedChildAssocs";
+    public static final String CHILD_VERSIONED_ASSOCS = "versionedAssocs";
     
     public static final QName CHILD_QNAME_VERSION_HISTORIES = QName.createQName(NAMESPACE_URI, CHILD_VERSION_HISTORIES);
     public static final QName CHILD_QNAME_VERSIONS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONS);
     public static final QName CHILD_QNAME_VERSIONED_ATTRIBUTES = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_ATTRIBUTES);
     public static final QName CHILD_QNAME_VERSIONED_CHILD_ASSOCS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_CHILD_ASSOCS);
+    public static final QName CHILD_QNAME_VERSIONED_ASSOCS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_ASSOCS);
 }

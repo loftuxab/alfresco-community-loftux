@@ -17,6 +17,8 @@ import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeAssocRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
+import com.activiti.repo.ref.qname.QNamePattern;
+import com.activiti.repo.ref.qname.RegexQNamePattern;
 import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionHistory;
 import com.activiti.repo.version.VersionLabelPolicy;
@@ -467,7 +469,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
                 this.dbNodeService.createNode(
                         versionRef, 
                         CHILD_QNAME_VERSIONED_ATTRIBUTES,
-                        CLASS_REF_VERSIONED_ATTRIBUTE,
+                        CLASS_REF_VERSIONED_PROPERTY,
                         properties);                
             }
         }
@@ -510,10 +512,36 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
                     CHILD_QNAME_VERSIONED_CHILD_ASSOCS,
                     CLASS_REF_VERSIONED_CHILD_ASSOC, 
                     properties);
-            
-            NodeRef temp = newRef.getChildRef();
         }
         
-        // TODO What do we do about the associations???
+        // Version the target assocs
+        List<NodeAssocRef> targetAssocs = this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+        for (NodeAssocRef targetAssoc : targetAssocs)
+        {
+            HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+            
+            // Set the qname of the association
+            properties.put(PROP_QNAME_ASSOC_QNAME, targetAssoc.getQName());
+            
+            // Need to determine whether the target is versioned or not
+            NodeRef versionHistoryRef = getVersionHistoryNodeRef(targetAssoc.getTargetRef());
+            if (versionHistoryRef == null)
+            {
+                // Set the reference property to point to the child node
+                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, targetAssoc.getTargetRef());
+            }
+            else
+            {
+                // Set the reference property to point to the version history
+                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, versionHistoryRef);
+            }
+            
+            // Create child version reference
+            ChildAssocRef newRef = this.dbNodeService.createNode(
+                    versionRef,
+                    CHILD_QNAME_VERSIONED_ASSOCS, 
+                    CLASS_REF_VERSIONED_ASSOC, 
+                    properties);
+        }
     }    
 }

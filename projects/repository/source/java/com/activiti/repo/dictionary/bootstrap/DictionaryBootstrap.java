@@ -475,7 +475,7 @@ public class DictionaryBootstrap
         // Light Weight Version Store Model Defintions
         
         // -------------------- versionedAttribute type --------------------
-        M2Type versionedAttributeType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSIONED_ATTRIBUTE);
+        M2Type versionedAttributeType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSIONED_PROPERTY);
         versionedAttributeType.setSuperClass(baseType);
         
         // Create assocQName property
@@ -514,6 +514,15 @@ public class DictionaryBootstrap
         frozenNthSibling.setMandatory(true);
         frozenNthSibling.setMultiValued(false);
         
+        // -------------------- versionedChildAssoc type --------------------
+        M2Type versionedAssocType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSIONED_ASSOC);
+        versionedAssocType.setSuperClass(referenceType);
+        
+        // Create qname property
+        M2Property qname3 = versionedAssocType.createProperty(VersionStoreConst.PROP_ASSOC_QNAME);
+        qname3.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        qname3.setMandatory(true);
+        qname3.setMultiValued(false);
         
         // -------------------- version type --------------------
         M2Type versionType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSION);

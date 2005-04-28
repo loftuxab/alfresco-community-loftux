@@ -100,10 +100,6 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
                 DictionaryBootstrap.TYPE_CONTAINER,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(nodeRef, aspectRef, new HashMap<QName, Serializable>());
-        
-        //TODO for now make this lockabel so I can test things out .. need a system test for this stuff
-        this.dbNodeService.addAspect(nodeRef, LockService.ASPECT_CLASS_REF_LOCK, new HashMap<QName, Serializable>());
-        
         assertNotNull(nodeRef);
         this.versionableNodes.put(nodeRef.getId(), nodeRef);
         
@@ -125,7 +121,14 @@ public class VersionStoreBaseImplTest extends BaseSpringTest
         assertNotNull(child2);
         this.versionableNodes.put(child2.getId(), child2);
         
-        // TODO add some associations to the node
+        // Create a node that can be associated with the root node
+        NodeRef assocNode = this.dbNodeService.createNode(
+                rootNodeRef,
+                QName.createQName("{test}MyAssocNode"),
+                DictionaryBootstrap.TYPE_CONTAINER,
+                this.nodeProperties).getChildRef();
+        assertNotNull(assocNode);
+        this.dbNodeService.createAssociation(nodeRef, assocNode, QName.createQName("{test}MyAssociation"));
         
         return nodeRef;
     }

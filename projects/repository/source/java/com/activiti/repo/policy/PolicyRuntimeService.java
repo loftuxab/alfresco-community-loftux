@@ -3,8 +3,6 @@
  */
 package com.activiti.repo.policy;
 
-import java.util.Set;
-
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;

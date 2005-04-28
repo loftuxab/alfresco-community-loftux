@@ -57,7 +57,7 @@
   <datadictionary:EMFAspect emfName="{http://www.activiti.com/version/1.0}version">
     <emfProperties emfName="currentVersionLabel" emfType="/7"/>
   </datadictionary:EMFAspect>
-  <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}versionedAttribute" emfSuperClass="/21">
+  <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}versionedProperty" emfSuperClass="/21">
     <emfProperties emfName="qname" emfType="/6" emfMandatory="true"/>
     <emfProperties emfName="value" emfType="/6" emfMandatory="true"/>
   </datadictionary:EMFType>
@@ -65,6 +65,9 @@
     <emfProperties emfName="isPrimary" emfType="/15" emfMandatory="true"/>
     <emfProperties emfName="assocQName" emfType="/6" emfMandatory="true"/>
     <emfProperties emfName="nthSibling" emfType="/9" emfMandatory="true"/>
+  </datadictionary:EMFType>
+  <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}versionedAssoc" emfSuperClass="/22">
+    <emfProperties emfName="assocQName" emfType="/6" emfMandatory="true"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}version" emfSuperClass="/24">
     <emfProperties emfName="versionNumber" emfType="/9" emfMandatory="true"/>
@@ -77,11 +80,11 @@
     <emfProperties emfName="frozenAspects" emfType="/6" emfMultiple="true"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedAttributes"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedChildAssocs"/>
-    <emfAssociations emfName="successor" emfRequiredToClasses="/35"/>
+    <emfAssociations emfName="successor" emfRequiredToClasses="/36"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.activiti.com/lightWeightVersionStore/1.0}versionHistory" emfSuperClass="/24">
     <emfProperties emfName="versionedNodeId" emfType="/17" emfMandatory="true"/>
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/35"/>
-    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/35"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/36"/>
+    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/36"/>
   </datadictionary:EMFType>
 </xmi:XMI>

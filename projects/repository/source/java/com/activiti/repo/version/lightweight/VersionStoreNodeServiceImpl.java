@@ -284,47 +284,26 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
             
             if (qnamePattern.isMatch(qName) == true)
             {
-                //if (childAssocRef.getQName().equals(CHILD_QNAME_VERSIONED_CHILD_ASSOCS))
-                //{
-                    // Get the child reference
-                    //NodeRef childRef = childAssocRef.getChildRef();
-                   //NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
-                    
-                    // Check to see if the versioned node is a version history
-                    ClassRef classRef = this.dbNodeService.getType(referencedNode);
-                    if (CLASS_REF_VERSION_HISTORY.equals(classRef) == true)
-                    {
-                        // TODO if the referenced node is a version history then need to get the appropriate node ref                                                
-                    }
-                    
-                    // Retrieve the isPrimary and nthSibling values of the forzen child association
-                    //QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_QNAME);
-                    boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
-                    int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
-                    
-                    // Build a child assoc ref to add to the returned list
-                    ChildAssocRef newChildAssocRef = new ChildAssocRef(
-                            nodeRef, 
-                            qName, 
-                            referencedNode, 
-                            isPrimary, 
-                            nthSibling);
-                    result.add(newChildAssocRef);
+                // Check to see if the versioned node is a version history
+                ClassRef classRef = this.dbNodeService.getType(referencedNode);
+                if (CLASS_REF_VERSION_HISTORY.equals(classRef) == true)
+                {
+                    // TODO if the referenced node is a version history then need to get the appropriate node ref                                                
                 }
-                //continue;   // this was not a match
-           // }
-            // Retrieve the isPrimary and nthSibling values of the frozen child association
-           // boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
-           // int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
-            
-            // Build a child assoc ref to add to the returned list
-           // ChildAssocRef newChildAssocRef = new ChildAssocRef(
-           //         nodeRef, 
-           //         qName, 
-            //        referencedNode, 
-            //        isPrimary, 
-            //        nthSibling);
-            //result.add(newChildAssocRef);
+                
+                // Retrieve the isPrimary and nthSibling values of the forzen child association
+                boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
+                int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
+                
+                // Build a child assoc ref to add to the returned list
+                ChildAssocRef newChildAssocRef = new ChildAssocRef(
+                        nodeRef, 
+                        qName, 
+                        referencedNode, 
+                        isPrimary, 
+                        nthSibling);
+                result.add(newChildAssocRef);
+            }
         }
         
         return result;
@@ -363,11 +342,36 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
      */
     public List<NodeAssocRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
     {
-        // TODO in order to do this we need to be able to get a list of the
-        //      names of the target associations
+        List<NodeAssocRef> result = new ArrayList<NodeAssocRef>();
         
-        // TODO need to fill in the implementation here 
-        throw new UnsupportedOperationException();        
+        // Get the child assocs from the version store
+        List<ChildAssocRef> childAssocRefs = this.dbNodeService.getChildAssocs(
+                sourceRef,
+                CHILD_QNAME_VERSIONED_ASSOCS);
+        for (ChildAssocRef childAssocRef : childAssocRefs)
+        {
+            // Get the assoc reference
+            NodeRef childRef = childAssocRef.getChildRef();
+            NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
+            
+            // get the qualified name of the frozen child association and filter out unwanted names
+            QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_QNAME);
+            
+            if (qnamePattern.isMatch(qName) == true)
+            {
+                // Check to see if the versioned node is a version history
+                ClassRef classRef = this.dbNodeService.getType(referencedNode);
+                if (CLASS_REF_VERSION_HISTORY.equals(classRef) == true)
+                {
+                    // TODO if the referenced node is a version history then need to get the appropriate node ref                                                
+                }
+                
+                NodeAssocRef newAssocRef = new NodeAssocRef(sourceRef, qName, childRef);
+                result.add(newAssocRef);
+            }
+        }
+        
+        return result;
     }
     
     /**
