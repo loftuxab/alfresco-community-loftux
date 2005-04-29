@@ -10,6 +10,7 @@
    
    <h:form id="imagePicker">
    
+      
       <h:commandButton id="show-zoo-page" value="Show Zoo" action="showZoo" />
 
    </h:form>

@@ -1,17 +1,17 @@
 <activiti-config>
 
-   <global>
+   <plug-ins>
       <evaluators>
          <evaluator id="object-type" class="com.activiti.config.evaluator.ObjectTypeEvaluator" />
       </evaluators>
-   </global>
+   </plug-ins>
    
    <config>
       <another-global-item>Another global value</another-global-item>
       <override>true</override>
    </config>
    
-   <config evaluator-ref="object-type" condition="java.lang.String">
+   <config evaluator="object-type" condition="java.lang.String">
       <another-item>Another value</another-item>
    </config>
    

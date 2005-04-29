@@ -85,9 +85,9 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
          // see if there is an area defined
          this.currentArea = rootElement.attributeValue("area");
          
-         // parse the global section first
-         Element globalConfig  = rootElement.element(ELEMENT_GLOBAL);
-         parseGlobalElement(globalConfig);
+         // parse the plug-ins section first
+         Element pluginsConfig  = rootElement.element(ELEMENT_PLUG_INS);
+         parsePluginsElement(pluginsConfig);
          
          // parse each config section in turn
          Iterator configElements = rootElement.elementIterator(ELEMENT_CONFIG);
@@ -104,19 +104,19 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
    }
    
    /**
-    * Parses the global section of a config file
+    * Parses the plug-ins section of a config file
     * 
-    * @param globalElement The global element
+    * @param pluginsElement The plug-ins element
     */
-   private void parseGlobalElement(Element globalElement)
+   private void parsePluginsElement(Element pluginsElement)
    {
-      if (globalElement != null)
+      if (pluginsElement != null)
       {
          // parese the evaluators section
-         parseEvaluatorsElement(globalElement.element(ELEMENT_EVALUATORS));
+         parseEvaluatorsElement(pluginsElement.element(ELEMENT_EVALUATORS));
          
          // parse the element readers section
-         parseElementReadersElement(globalElement.element(ELEMENT_ELEMENT_READERS));
+         parseElementReadersElement(pluginsElement.element(ELEMENT_ELEMENT_READERS));
       }
    }
    
@@ -194,7 +194,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
    {
       if (configElement != null)
       {
-         String evaluatorName = configElement.attributeValue(ATTR_EVALUATOR_REF);
+         String evaluatorName = configElement.attributeValue(ATTR_EVALUATOR);
          String condition = configElement.attributeValue(ATTR_CONDITION);
          
          // create the section object

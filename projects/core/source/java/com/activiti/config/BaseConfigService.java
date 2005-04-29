@@ -48,6 +48,10 @@ public abstract class BaseConfigService implements ConfigService
       this.sectionsByArea = new HashMap();
       this.evaluators = new HashMap();
       this.globalConfig = new ConfigImpl();
+      
+      // Add the built-in evaluators
+      addEvaluator("string-compare", "com.activiti.config.evaluator.StringEvaluator");
+      addEvaluator("object-type", "com.activiti.config.evaluator.ObjectTypeEvaluator");
    }
 
    /**

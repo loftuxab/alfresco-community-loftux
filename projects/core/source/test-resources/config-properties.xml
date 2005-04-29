@@ -1,10 +1,10 @@
 <activiti-config>
    
-   <global>
+   <plug-ins>
       <evaluators>
          <evaluator id="type-name" class="com.activiti.config.evaluator.StringEvaluator" />
       </evaluators>
-   </global>
+   </plug-ins>
       
    <!-- global config section -->
    <config>
@@ -13,7 +13,7 @@
       </properties>
    </config>
    
-   <config evaluator-ref="type-name" condition="base">
+   <config evaluator="type-name" condition="base">
       <properties>
          <property name="description" />
          <property name="created" />
@@ -21,7 +21,7 @@
       </properties>
    </config>
    
-   <config evaluator-ref="type-name" condition="SOP">
+   <config evaluator="type-name" condition="SOP">
       <properties>
          <property name="description" />
          <property name="modified" />

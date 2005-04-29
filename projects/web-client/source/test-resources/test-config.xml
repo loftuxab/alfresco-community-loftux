@@ -1,53 +1,43 @@
 <activiti-config>
    
-   <global>
+   <plug-ins>
       <evaluators>
-         <evaluator id="type-name" class="jsftest.repository.TypeNameEvaluator" />
-         <evaluator id="object-type" class="com.activiti.config.evaluator.ObjectTypeEvaluator" />         
-         <evaluator id="aspect" class="com.activiti.web.config.AspectEvaluator" />
+         <evaluator id="type-name" class="jsftest.repository.TypeNameEvaluator"/>
+         <evaluator id="aspect" class="com.activiti.web.config.AspectEvaluator"/>
       </evaluators>
-      <element-readers>
-         <!-- NOTE: This will be a built-in element reader, it's here for testing -->
-         <element-reader element-name="properties" 
-                         class="com.activiti.config.xml.elementreader.PropertiesElementReader" />
-     </element-readers>
-   </global>
-   
-   <!-- ******************************************************** -->
-   <!-- TODO: move all this stuff to a separate test config file -->
-   <!-- ******************************************************** -->
+   </plug-ins>
       
    <!-- define a global config section -->
    <config>
       <properties>
-         <property name="name" />
+         <property name="name"/>
       </properties>
    </config>
    
-   <config evaluator-ref="type-name" condition="base">
+   <config evaluator="type-name" condition="base">
       <properties>
-         <property name="description" />
-         <property name="created" />
-         <property name="modified" />
+         <property name="description"/>
+         <property name="created"/>
+         <property name="modified"/>
       </properties>
    </config>
    
-   <config evaluator-ref="type-name" condition="SOP">
+   <config evaluator="type-name" condition="SOP">
       <properties>
-         <property name="description" />
-         <property name="modified" />
-         <property name="effective" />
-         <property name="approved" />
+         <property name="description"/>
+         <property name="modified"/>
+         <property name="effective"/>
+         <property name="approved"/>
       </properties>
    </config>
    
-   <config evaluator-ref="aspect" condition="versionable">
+   <config evaluator="aspect" condition="versionable">
       <properties>
-         <property name="latestversion" />
+         <property name="latestversion"/>
       </properties>
    </config>
    
-   <config evaluator-ref="object-type" condition="com.activiti.web.jsf.component.data.UIRichList">
+   <config evaluator="object-type" condition="com.activiti.web.jsf.component.data.UIRichList">
       <renderers>
          <renderer mode="details">com.activiti.web.jsf.renderer.data.RichListRenderer.DetailsViewRenderer</renderer>
       </renderers>

@@ -1,17 +1,11 @@
 <activiti-config>
    
-   <global>
-      <evaluators>
-         <evaluator id="string" class="com.activiti.config.evaluator.StringEvaluator" />
-      </evaluators>
-   </global>
-   
    <config>
       <global-item>The global value</global-item>
       <override>false</override>
    </config>
    
-   <config evaluator-ref="string" condition="Unit Test">
+   <config evaluator="string-compare" condition="Unit Test">
       <item>The value</item>
       <override>true</override>
    </config>

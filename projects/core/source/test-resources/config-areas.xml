@@ -1,6 +1,6 @@
 <activiti-config area="test-area">
    
-   <config evaluator-ref="string" condition="Area Specific Config">
+   <config evaluator="string-compare" condition="Area Specific Config">
       <parent-item>
          <child-item>value</child-item>
       </parent-item>

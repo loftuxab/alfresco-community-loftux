@@ -13,11 +13,11 @@ public interface XMLConfigConstants
    public static final String ATTR_VALUE = "value";
    public static final String ATTR_CLASS = "class";
    public static final String ATTR_ELEMENT_NAME = "element-name";
-   public static final String ATTR_EVALUATOR_REF = "evaluator-ref";
+   public static final String ATTR_EVALUATOR = "evaluator";
    public static final String ATTR_CONDITION = "condition";
    
    // XML element names
-   public static final String ELEMENT_GLOBAL = "global";
+   public static final String ELEMENT_PLUG_INS = "plug-ins";
    public static final String ELEMENT_CONFIG = "config";
    public static final String ELEMENT_EVALUATORS = "evaluators";
    public static final String ELEMENT_EVALUATOR = "evaluator";

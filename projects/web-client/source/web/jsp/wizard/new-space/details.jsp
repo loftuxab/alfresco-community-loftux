@@ -109,7 +109,6 @@
                                     <td>Name:</td>
                                     <td>
                                        <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" />&nbsp;*
-                                       <span class="errorMessage"><h:messages /></span>
                                     </td>
                                  </tr>
                                  <tr>
@@ -190,6 +189,16 @@
                            </td>
                         </tr>
                      </table>
+                  </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
+               </tr>
+               
+               <%-- Error Messages --%>
+               <tr valign="top">
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
+                  <td>
+                     <%-- messages tag to show messages not handled by other specific message tags --%>
+                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>
