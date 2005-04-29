@@ -66,7 +66,7 @@ public class BrowseBean
     */
    public Searcher getSearchService()
    {
-      return searchService;
+      return this.searchService;
    }
 
    /**
@@ -82,7 +82,7 @@ public class BrowseBean
     */
    public NavigationBean getNavigator()
    {
-      return navigator;
+      return this.navigator;
    }
    
    /**
@@ -98,7 +98,7 @@ public class BrowseBean
     */
    public String getBrowseViewMode()
    {
-      return browseViewMode;
+      return this.browseViewMode;
    }
    
    /**
@@ -114,7 +114,7 @@ public class BrowseBean
     */
    public Node getActionSpace()
    {
-      return actionSpace;
+      return this.actionSpace;
    }
    
    /**
@@ -132,6 +132,8 @@ public class BrowseBean
     */
    public List<Node> getNodes()
    {
+      s_logger.info("getNodes() called in BrowseBean, querying...");
+      
       return queryBrowseNodes(getNavigator().getCurrentNodeId());
    }
    
@@ -152,7 +154,7 @@ public class BrowseBean
    
    
    // ------------------------------------------------------------------------------
-   // Helper methods 
+   // Helper methods
    
    /**
     * Query a list of nodes for the specified parent node Id
@@ -358,13 +360,14 @@ public class BrowseBean
             
             // clear the value for the list component - will cause it to re-bind to it's data and refresh
             // TODO: need a decoupled way to refresh components - a view-local context event service?
-            // TODO: remove this weakness!
+            // TODO: remove this weakness - use direct component binding here? e.g. a ref in this class
             UIRichList richList = (UIRichList)link.findComponent("browseList");
             if (richList != null)
             {
-               s_logger.debug("Clearing RichList data source.");
+               s_logger.info("Clearing RichList data source.");
                richList.setValue(null);
             }
+            this.lastQueriedNodes = null;
          }
          catch (InvalidNodeRefException refErr)
          {
@@ -463,6 +466,8 @@ public class BrowseBean
             
             // clear action context
             setActionSpace(null);
+            
+            // setting the outcome will refresh the browse screen
             outcome = "browse";
          }
          catch (Throwable err)

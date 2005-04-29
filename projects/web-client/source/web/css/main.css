@@ -123,6 +123,7 @@ a.small:hover
    color: #495F69;
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 11px;
+   padding: 2px;
 }
 
 .mainSubTextLarge

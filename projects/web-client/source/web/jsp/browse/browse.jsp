@@ -50,20 +50,16 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing=4 cellpadding=0 width=100%>
                         <tr valign=top>
-                           <td width=26>
+                           <td width=30>
                               <img src="<%=request.getContextPath()%>/images/ball_big.gif" width=26 height=27>
                            </td>
                            <td>
                               <%-- Summary --%>
-                              <p class="status">
-                                 Status and actions.
-                              </p>
-                              <p class="status">
-                                 Several text lines will probably appear here, some will be quite long. And maybe really long, it's difficult to say really at the start of things.
-                              </p>
-                              <p class="status">
-                                 Let's have some more text. And more.
-                              </p>
+                              <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" /></div>
+                              <div class="mainTitle">Linton's Home</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.view_description}" /></div>
+                              <div class="mainSubText">Text description of Linton's Home from Space property</div>
+                              <div class="mainSubText">There are currently 2 members of this space</div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100 style="padding-left:2px">
@@ -122,10 +118,13 @@
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>
                
-               <%-- Details --%>
+               <%-- Details - Spaces --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
                   <td>
+                     <div style="padding:4px">
+                     
+                     <awc:panel id="spaces-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
                      <%-- Details inner components --%>
                      <awc:richList id="browseList" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
@@ -190,6 +189,25 @@
                         <awc:dataPager/>
                      </awc:richList>
                      
+                     </awc:panel>
+                     
+                     <div>
+                     
+                  </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
+               </tr>
+               
+               <%-- Details - Content --%>
+               <tr valign=top>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
+                  <td>
+                     <div style="padding:4px">
+                     
+                     <awc:panel id="content-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_content}">
+                        <p>
+                     </awc:panel>
+                     
+                     </div>
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>
