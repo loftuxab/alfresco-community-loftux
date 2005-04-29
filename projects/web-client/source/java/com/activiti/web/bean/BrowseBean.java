@@ -367,7 +367,6 @@ public class BrowseBean
                s_logger.info("Clearing RichList data source.");
                richList.setValue(null);
             }
-            this.lastQueriedNodes = null;
          }
          catch (InvalidNodeRefException refErr)
          {
