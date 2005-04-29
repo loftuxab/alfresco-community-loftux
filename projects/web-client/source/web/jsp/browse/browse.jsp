@@ -77,8 +77,8 @@
                               <awc:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
                                     value="#{BrowseBean.browseViewMode}" actionListener="#{BrowseBean.viewModeChanged}">
                                  <awc:modeListItem value="details" label="List All Items" image="/images/icons/Details.gif" />
-                                 <awc:modeListItem value="list" label="Dashboard" />
-                                 <awc:modeListItem value="icons" label="Browse Items" />
+                                 <awc:modeListItem value="icons" label="Dashboard" />
+                                 <awc:modeListItem value="list" label="Browse Items" />
                               </awc:modeList>
                            </td>
                         </tr>
@@ -126,8 +126,8 @@
                      
                      <awc:panel id="spaces-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
-                     <%-- Details inner components --%>
-                     <awc:richList id="browseList" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
+                     <%-- Browse - details mode --%>
+                     <awc:richList id="detailsList" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
                            width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
                         <awc:column primary="true" width="200" style="padding:2px;text-align:left;">
@@ -182,6 +182,44 @@
                            <awc:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
                            <awc:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
                            <awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
+                              <f:param name="id" value="#{r.id}" />
+                           </awc:actionLink>
+                        </awc:column>
+                        
+                        <awc:dataPager/>
+                     </awc:richList>
+                     
+                     <%-- Browse - list mode --%>
+                     <awc:richList id="browseList" viewMode="list" rendered="#{BrowseBean.browseViewMode == 'list'}" pageSize="5" style="padding:2px" rowStyleClass="recordSetRowAlt"
+                           width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
+                        
+                        <awc:column primary="true" style="padding:2px;text-align:left">
+                           <f:facet name="small-icon">
+                              <awc:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{BrowseBean.clickSpace}" showLink="false">
+                                 <f:param name="id" value="#{r.id}" />
+                              </awc:actionLink>
+                           </f:facet>
+                           <awc:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickSpace}" style="font-weight:bold">
+                              <f:param name="id" value="#{r.id}" />
+                           </awc:actionLink>
+                        </awc:column>
+                        
+                        <awc:column style="text-align:left;">
+                           <h:outputText value="#{r.description}" />
+                        </awc:column>
+                        
+                        <awc:column style="text-align:left;">
+                           <h:outputText value="Modified Date:" />
+                           <h:outputText value="#{r.modifieddate}">
+                              <f:convertDateTime dateStyle="long" />
+                           </h:outputText>
+                        </awc:column>
+                        
+                        <awc:column actions="true" style="text-align:right">
+                           <awc:actionLink value="#{msg.edit}" styleClass="inlineAction" />
+                           <awc:actionLink value="#{msg.cut}" styleClass="inlineAction" />
+                           <awc:actionLink value="#{msg.copy}" styleClass="inlineAction" />
+                           <awc:actionLink value="#{msg.delete}" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
                               <f:param name="id" value="#{r.id}" />
                            </awc:actionLink>
                         </awc:column>

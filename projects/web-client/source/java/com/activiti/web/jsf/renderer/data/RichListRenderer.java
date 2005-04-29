@@ -50,47 +50,50 @@ public class RichListRenderer extends BaseRenderer
    public void encodeChildren(FacesContext context, UIComponent component)
          throws IOException
    {
-      // the RichList component we are working with
-      UIRichList richList = (UIRichList)component;
-      
-      // prepare the component current row against the current page settings
-      richList.bind();
-      
-      // collect child column components so they can be passed to the renderer
-      List<UIColumn> columnList = new ArrayList<UIColumn>(8);
-      for (Iterator i=richList.getChildren().iterator(); i.hasNext(); /**/)
+      if (component.isRendered() == true)
       {
-         UIComponent child = (UIComponent)i.next();
-         if (child instanceof UIColumn)
+         // the RichList component we are working with
+         UIRichList richList = (UIRichList)component;
+         
+         // prepare the component current row against the current page settings
+         richList.bind();
+         
+         // collect child column components so they can be passed to the renderer
+         List<UIColumn> columnList = new ArrayList<UIColumn>(8);
+         for (Iterator i=richList.getChildren().iterator(); i.hasNext(); /**/)
          {
-            columnList.add((UIColumn)child);
+            UIComponent child = (UIComponent)i.next();
+            if (child instanceof UIColumn)
+            {
+               columnList.add((UIColumn)child);
+            }
          }
+         
+         UIColumn[] columns = new UIColumn[columnList.size()];
+         columnList.toArray(columns);
+         
+         // get the renderer instance
+         IRichListRenderer renderer = (IRichListRenderer)richList.getViewRenderer();
+         if (renderer == null)
+         {
+            throw new IllegalStateException("IRichListRenderer must be available in UIRichList!");
+         }
+         
+         // call render-before to output headers if required
+         ResponseWriter out = context.getResponseWriter();
+         out.write("<thead>");
+         renderer.renderListBefore(context, richList, columns);
+         out.write("</thead>");
+         out.write("<tbody>");
+         while (richList.isDataAvailable() == true)
+         {
+            // render each row in turn
+            renderer.renderListRow(context, richList, columns, richList.nextRow());
+         }
+         // call render-after to output footers if required
+         renderer.renderListAfter(context, richList, columns);
+         out.write("</tbody>");
       }
-      
-      UIColumn[] columns = new UIColumn[columnList.size()];
-      columnList.toArray(columns);
-      
-      // get the renderer instance
-      IRichListRenderer renderer = (IRichListRenderer)richList.getViewRenderer();
-      if (renderer == null)
-      {
-         throw new IllegalStateException("IRichListRenderer must be available in UIRichList!");
-      }
-      
-      // call render-before to output headers if required
-      ResponseWriter out = context.getResponseWriter();
-      out.write("<thead>");
-      renderer.renderListBefore(context, richList, columns);
-      out.write("</thead>");
-      out.write("<tbody>");
-      while (richList.isDataAvailable() == true)
-      {
-         // render each row in turn
-         renderer.renderListRow(context, richList, columns, richList.nextRow());
-      }
-      // call render-after to output footers if required
-      renderer.renderListAfter(context, richList, columns);
-      out.write("</tbody>");
    }
    
    /**
@@ -316,7 +319,7 @@ public class RichListRenderer extends BaseRenderer
       {
          ResponseWriter out = context.getResponseWriter();
          
-         // output a new table per row item
+         // output a new TABLE per row item
          out.write("<tr><td colspan=99><table cellspacing=0 cellpadding=2 border=0");
          outputAttribute(out, richList.getAttributes().get("width"), "width");
          out.write('>');
@@ -328,15 +331,26 @@ public class RichListRenderer extends BaseRenderer
             rowStyle = altStyle;
          }
          
-         // first cell contains the small icon
+         // find the actions column if it exists
+         UIColumn actionsColumn = null;
+         for (int i=0; i<columns.length; i++)
+         {
+            if (columns[i].isActionsColumn() == true)
+            {
+               actionsColumn = columns[i];
+               break;
+            }
+         }
+         
+         // first column cell contains the small icon
          if (columns.length != 0)
          {
             UIColumn column = columns[0];
             
             // output row or alt style row if set
-            out.write("<tr");
+            out.write("<tr valign=top");
             outputAttribute(out, rowStyle, "class");
-            out.write("><td valign=top rowspan=10 width=20");
+            out.write("><td rowspan=10 width=20");
             outputAttribute(out, column.getAttributes().get("style"), "style");
             outputAttribute(out, column.getAttributes().get("styleClass"), "class");
             out.write('>');
@@ -352,15 +366,33 @@ public class RichListRenderer extends BaseRenderer
             out.write("</td>");
             
             // start the next cell which contains the first column component
-            out.write("<td align=left valign=top");
+            out.write("<td align=left");
             outputAttribute(out, column.getAttributes().get("style"), "style");
             outputAttribute(out, column.getAttributes().get("styleClass"), "class");
             out.write('>');
+            
             if (column.getChildCount() != 0)
             {
                // allow child controls inside the columns to render themselves
                encodeRecursive(context, column);
             }
+            out.write("</td>");
+            
+            // output actions column if any
+            if (actionsColumn != null)
+            {
+               out.write("<td");
+               outputAttribute(out, actionsColumn.getAttributes().get("style"), "style");
+               outputAttribute(out, actionsColumn.getAttributes().get("styleClass"), "class");
+               out.write('>');
+               
+               if (actionsColumn.getChildCount() != 0)
+               {
+                  // allow child controls inside the columns to render themselves
+                  encodeRecursive(context, actionsColumn);
+               }
+            }
+            
             out.write("</td></tr>");
          }
          
@@ -369,12 +401,12 @@ public class RichListRenderer extends BaseRenderer
          {
             UIColumn column = columns[i];
             
-            if (i < MAX_DISPLAYABLE_LINES || column.isActionsColumn() == true)
+            if (i < MAX_DISPLAYABLE_LINES && column.isActionsColumn() == false)
             {
                // output row or alt style row if set
-               out.write("<tr");
+               out.write("<tr valign=top");
                outputAttribute(out, rowStyle, "class");
-               out.write("><td valign=top");
+               out.write("><td");
                outputAttribute(out, column.getAttributes().get("style"), "style");
                outputAttribute(out, column.getAttributes().get("styleClass"), "class");
                out.write('>');
@@ -383,7 +415,7 @@ public class RichListRenderer extends BaseRenderer
                   // allow child controls inside the columns to render themselves
                   encodeRecursive(context, column);
                }
-               out.write("</td></tr>");
+               out.write("</td><td></td></tr>");
             }
          }
          
@@ -496,7 +528,7 @@ public class RichListRenderer extends BaseRenderer
             out.write("</td>");
             
             // start the next cell which contains the first column component
-            out.write("<td valign=top");
+            out.write("<td");
             outputAttribute(out, column.getAttributes().get("style"), "style");
             outputAttribute(out, column.getAttributes().get("styleClass"), "class");
             out.write('>');
@@ -515,7 +547,7 @@ public class RichListRenderer extends BaseRenderer
             
             if (i < MAX_DISPLAYABLE_LINES || column.isActionsColumn() == true)
             {
-               out.write("<tr><td valign=top");
+               out.write("<tr><td");
                outputAttribute(out, column.getAttributes().get("style"), "style");
                outputAttribute(out, column.getAttributes().get("styleClass"), "class");
                out.write('>');
