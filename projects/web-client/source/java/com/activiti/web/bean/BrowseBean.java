@@ -364,7 +364,13 @@ public class BrowseBean
             UIRichList richList = (UIRichList)link.findComponent("browseList");
             if (richList != null)
             {
-               s_logger.info("Clearing RichList data source.");
+               s_logger.info("Clearing 'browseList' data source.");
+               richList.setValue(null);
+            }
+            richList = (UIRichList)link.findComponent("detailsList");
+            if (richList != null)
+            {
+               s_logger.info("Clearing 'detailsList' data source.");
                richList.setValue(null);
             }
          }
