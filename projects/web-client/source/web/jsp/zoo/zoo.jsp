@@ -13,7 +13,7 @@
    
    <h:form id="zooForm">
       
-      <h:commandButton id="show-components-zoo" value="Rich List Zoo" action="showRichListZoo" />
+      <h:commandButton id="show-components-zoo" value="Component Zoo" action="showRichListZoo" />
       <br/><br/>
       <h:commandButton id="show-property-zoo" value="Property Zoo" action="showPropertyZoo" />
       <br/><br/>
