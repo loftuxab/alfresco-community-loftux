@@ -1054,25 +1054,7 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
-      
-      <attribute>
-         <name>tooltip</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>labelStyle</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-
-      <attribute>
-         <name>labelStyleClass</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
+            
       <attribute>
          <name>onclick</name>
          <required>false</required>
