@@ -242,7 +242,7 @@ public final class Utils
       buf.append("<img src='")
          .append(context.getExternalContext().getRequestContextPath())
          .append(image)
-         .append("' border=0");
+         .append("' border='0'");
       
       if (alt != null)
       {
@@ -325,5 +325,34 @@ public final class Utils
          parent = parent.getParent();
       }
       return (IDataContainer)parent;
+   }
+   
+   /**
+    * Determines whether the given component is disabled or readonly
+    * 
+    * @param component The component to test
+    * @return true if the component is either disabled or set to readonly
+    */
+   public static boolean isComponentDisabledOrReadOnly(UIComponent component)
+   {
+      boolean disabled = false;
+      boolean readOnly = false;
+      
+      Object disabledAttr = component.getAttributes().get("disabled");
+      if (disabledAttr != null)
+      {
+         disabled = disabledAttr.equals(Boolean.TRUE);
+      }
+      
+      if (disabled == false)
+      {
+         Object readOnlyAttr = component.getAttributes().get("disabled");
+         if (readOnlyAttr != null)
+         {
+            readOnly = readOnlyAttr.equals(Boolean.TRUE);
+         }
+      }
+
+      return disabled || readOnly;
    }
 }

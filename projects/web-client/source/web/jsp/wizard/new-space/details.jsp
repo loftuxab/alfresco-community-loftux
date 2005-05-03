@@ -124,13 +124,22 @@
                                     <td>Choose space icon:</td>
                                     <td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                                       <h:selectOneRadio value="#{NewSpaceWizard.icon}">
-                                          <f:selectItem itemValue="icon1" itemLabel="Icon1" />
-                                          <f:selectItem itemValue="icon2" itemLabel="Icon2" />
-                                          <f:selectItem itemValue="icon3" itemLabel="Icon3" />
-                                          <f:selectItem itemValue="icon4" itemLabel="Icon4" />
-                                          <f:selectItem itemValue="icon5" itemLabel="Icon5" />
-                                       </h:selectOneRadio>
+                                       <awc:imagePickerRadio columns="7" spacing="4" value="#{NewSpaceWizard.icon}">
+                                          <awc:modeListItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
+                                          <awc:modeListItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
+                                          <awc:modeListItem value="space-icon-www" image="/images/icons/space-icon-www.gif" />
+                                          <awc:modeListItem value="space-icon-world" image="/images/icons/space-icon-world.gif" />
+                                          <awc:modeListItem value="space-icon-spanner" image="/images/icons/space-icon-spanner.gif" />
+                                          <awc:modeListItem value="space-icon-public" image="/images/icons/space-icon-public.gif" />
+                                          <awc:modeListItem value="space-icon-orange-ball" image="/images/icons/space-icon-orange-ball.gif" />
+                                          <awc:modeListItem value="space-icon-lock" image="/images/icons/space-icon-lock.gif" />
+                                          <awc:modeListItem value="space-icon-library" image="/images/icons/space-icon-library.gif" />
+                                          <awc:modeListItem value="space-icon-images" image="/images/icons/space-icon-images.gif" />
+                                          <awc:modeListItem value="space-icon-id" image="/images/icons/space-icon-id.gif" />
+                                          <awc:modeListItem value="space-icon-glasses" image="/images/icons/space-icon-glasses.gif" />
+                                          <awc:modeListItem value="space-icon-download" image="/images/icons/space-icon-download.gif" />
+                                          <awc:modeListItem value="space-icon-documents" image="/images/icons/space-icon-documents.gif" />
+                                       </awc:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                     </td>
                                  </tr>

@@ -10,6 +10,17 @@
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
+   
+<script language='JavaScript'>
+   var m_currentDescription = 'desc-container';
+         
+   function itemSelected(radioButton)
+   {
+      document.getElementById(m_currentDescription).style.display = 'none';  
+      m_currentDescription = 'desc-' + radioButton.value;
+      document.getElementById(m_currentDescription).style.display = 'inline';
+   }
+</script>
 
 <f:view>
    
@@ -112,19 +123,40 @@
                                  <tr>
                                     <td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                                       <h:selectOneRadio value="#{NewSpaceWizard.spaceType}">
-                                          <f:selectItem itemValue="container" itemLabel="Container" />
-                                          <f:selectItem itemValue="wiki" itemLabel="Wiki" />
-                                          <f:selectItem itemValue="discussion" itemLabel="Discussion" />
-                                       </h:selectOneRadio>
+                                       <awc:imagePickerRadio columns="4" spacing="4" value="#{NewSpaceWizard.spaceType}"
+                                                             onclick="javascript:itemSelected(this);">
+                                          <awc:modeListItem value="container" label="Container" tooltip="Container"
+                                                            image="/images/icons/space.gif" />
+                                          <awc:modeListItem value="wiki" label="Wiki" tooltip="Wiki"
+                                                            image="/images/icons/wiki.gif" />
+                                          <awc:modeListItem value="discussion" label="Discussion" tooltip="Discussion"
+                                                            image="/images/icons/discussion.gif" />
+                                       </awc:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                                       <h:graphicImage id="info-icon" url="/images/icons/info_icon.gif" />&nbsp;
-                                       A place for keeping and organising documents and other spaces.
+                                       <table border='0'>
+                                          <tr>
+                                             <td valign='top'>
+                                                <h:graphicImage id="info-icon" url="/images/icons/info_icon.gif" />
+                                             </td>
+                                             <td valign='top' align='left'>
+                                                <span id='desc-container' style='display: inline'>
+                                                A place for keeping and organising documents and other spaces.
+                                                </span>
+                                                <span id='desc-discussion' style='display: none'>
+                                                A place for discussing the subject of this Space.
+                                                </span>
+                                                <span id='desc-wiki' style='display: none'>
+                                                A place to store Wiki pages.
+                                                </span>
+                                             </td>
+                                          </tr>
+                                       </table>
+                                       
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                                     </td>
                                  </tr>

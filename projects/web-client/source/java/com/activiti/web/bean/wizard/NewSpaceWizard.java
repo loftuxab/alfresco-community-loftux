@@ -47,7 +47,7 @@ public class NewSpaceWizard
    private String copyPolicy = "structure";
    private String name;
    private String description;
-   private String icon = "icon1";
+   private String icon = "space-icon-default";
    private String templateName;
    private boolean saveAsTemplate = false;
    private boolean finishDisabled = true;
