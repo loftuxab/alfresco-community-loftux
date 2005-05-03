@@ -107,7 +107,7 @@ public class UIMenu extends SelfRenderingComponent
     * 
     * @return hidden field name shared by all menus within the Form.
     */
-   private String getHiddenFieldName(FacesContext context, UIComponent component)
+   private static String getHiddenFieldName(FacesContext context, UIComponent component)
    {
       return Utils.getParentForm(context, component).getClientId(context) + NamingContainer.SEPARATOR_CHAR + "menu";
    }

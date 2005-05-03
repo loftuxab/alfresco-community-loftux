@@ -6,7 +6,6 @@ package com.activiti.web.bean;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +18,6 @@ import javax.faces.event.ActionEvent;
 import org.apache.log4j.Logger;
 
 import com.activiti.repo.dictionary.NamespaceService;
-import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
@@ -180,7 +178,7 @@ public class BrowseBean
             parentRef = new NodeRef(Repository.getStoreRef(), parentNodeId);
          }
          
-         Collection<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(parentRef);
+         List<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(parentRef);
          items = new ArrayList<Node>(childRefs.size());
          for (ChildAssocRef ref: childRefs)
          {
@@ -197,6 +195,7 @@ public class BrowseBean
             // name and ID always exist
             props.put("id", ref.getChildRef().getId());
             props.put("name", qname.getLocalName());
+            props.put("nodeRef", ref.getChildRef());
             
             // other properties which may exist
             String description = getQNameProperty(childProps, "description", true);

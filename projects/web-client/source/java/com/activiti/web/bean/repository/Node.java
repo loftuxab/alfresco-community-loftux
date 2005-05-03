@@ -52,9 +52,12 @@ public class Node implements Serializable, Map<String, Object>
       this.nodeRef = nodeRef;
       
       // also add the type to the properties so it can be retrieved
-      // that way too (for value binding expressions), this needs to
-      // reviewed though as we don't want this appearing as a property!
+      // that way too (for value binding expressions)
+      // TODO: this needs to reviewed though as we don't want this appearing as a property!
+      //       we should have several types of Node (e.g. Node as as interface) Map type used for datagrids
+      // IMPORTANT: these props will be lost if you call setProperties() later!
       this.properties.put("type", this.type);
+      this.properties.put("nodeRef", this.nodeRef);
    }
 
    /**

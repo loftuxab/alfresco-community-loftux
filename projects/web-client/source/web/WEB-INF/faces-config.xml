@@ -77,12 +77,17 @@
       <component-type>awc.faces.ModeListItem</component-type>
       <component-class>com.activiti.web.jsf.component.UIModeListItem</component-class>
    </component>
-
+   
+   <component>
+      <component-type>awc.repo.NodeDescendants</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.UINodeDescendants</component-class>
+   </component>
+   
    <component>
       <component-type>awc.faces.ImagePicker</component-type>
       <component-class>com.activiti.web.jsf.component.UIImagePicker</component-class>
    </component>
-      
+   
    <component>
       <component-type>awc.faces.BooleanEvaluator</component-type>
       <component-class>com.activiti.web.jsf.component.evaluator.BooleanEvaluator</component-class>
@@ -141,12 +146,21 @@
          <renderer-type>awc.faces.ModeListRenderer</renderer-type>
          <renderer-class>com.activiti.web.jsf.renderer.ModeListRenderer</renderer-class>
       </renderer>
+<<<<<<< .mine
+      
+      <renderer>
+         <component-family>awc.repo.NodeDescendants</component-family>
+         <renderer-type>awc.repo.NodeDescendantsLinkRenderer</renderer-type>
+         <renderer-class>org.alfresco.web.ui.repo.renderer.NodeDescendantsLinkRenderer</renderer-class>
+      </renderer>
+=======
       
       <renderer>
          <component-family>awc.faces.ImagePicker</component-family>
          <renderer-type>awc.faces.Radio</renderer-type>
          <renderer-class>com.activiti.web.jsf.renderer.ImagePickerRadioRenderer</renderer-class>
       </renderer>
+>>>>>>> .r224
    </render-kit>
 
 

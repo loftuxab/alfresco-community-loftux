@@ -144,7 +144,7 @@ public class BreadcrumbRenderer extends BaseRenderer
     * 
     * @return hidden field name
     */
-   private String getHiddenFieldName(FacesContext context, UIComponent component)
+   private static String getHiddenFieldName(FacesContext context, UIComponent component)
    {
       return component.getClientId(context);
    }

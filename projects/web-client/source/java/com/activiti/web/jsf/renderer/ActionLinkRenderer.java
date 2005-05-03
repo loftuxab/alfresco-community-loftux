@@ -77,11 +77,6 @@ public class ActionLinkRenderer extends BaseRenderer
             // render as action link
             out.write( renderActionLink(context, link) );
          }
-         
-         if (isInMenu((UIActionLink)component) == false)
-         {
-            out.write("</a>");
-         }
       }
    }
    
@@ -170,6 +165,8 @@ public class ActionLinkRenderer extends BaseRenderer
          buf.append(Utils.encode(link.getValue().toString()));
       }
       
+      buf.append("</a>");
+      
       return buf.toString();
    }
    
@@ -237,7 +234,7 @@ public class ActionLinkRenderer extends BaseRenderer
     * 
     * @return hidden field name shared by all action links within the Form.
     */
-   private String getHiddenFieldName(FacesContext context, UIComponent component)
+   private static String getHiddenFieldName(FacesContext context, UIComponent component)
    {
       return Utils.getParentForm(context, component).getClientId(context) + NamingContainer.SEPARATOR_CHAR + "act";
    }
@@ -249,7 +246,7 @@ public class ActionLinkRenderer extends BaseRenderer
     * 
     * @return true if the action link is present within a UIMenu component
     */
-   private boolean isInMenu(UIActionLink link)
+   private static boolean isInMenu(UIActionLink link)
    {
       UIComponent parent = link.getParent();
       while (parent != null)

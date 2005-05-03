@@ -7,7 +7,7 @@ import com.activiti.repo.ref.StoreRef;
  * 
  * @author gavinc
  */
-public class Repository
+public final class Repository
 {
    public static final String REPOSITORY_STORE = "SpacesStore";
    public static final String NODE_SERVICE = "indexingNodeService";

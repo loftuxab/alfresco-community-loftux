@@ -208,11 +208,15 @@
                            <h:outputText value="#{r.description}" />
                         </awc:column>
                         
-                        <awc:column style="text-align:left;">
+                        <%--<awc:column style="text-align:left;">
                            <h:outputText value="Modified Date:" />
                            <h:outputText value="#{r.modifieddate}">
                               <f:convertDateTime dateStyle="long" />
                            </h:outputText>
+                        </awc:column>--%>
+                        
+                        <awc:column style="text-align:left;">
+                           <awc:nodeDescendants value="#{r.nodeRef}" />
                         </awc:column>
                         
                         <awc:column actions="true" style="text-align:right">

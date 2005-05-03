@@ -246,7 +246,7 @@ public class ModeListRenderer extends BaseRenderer
     * 
     * @return hidden field name
     */
-   private String getHiddenFieldName(FacesContext context, UIComponent component)
+   private static String getHiddenFieldName(FacesContext context, UIComponent component)
    {
       UIForm form = Utils.getParentForm(context, component);
       return form.getClientId(context) + NamingContainer.SEPARATOR_CHAR + "modelist";
