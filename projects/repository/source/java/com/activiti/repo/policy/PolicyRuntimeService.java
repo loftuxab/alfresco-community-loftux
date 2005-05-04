@@ -4,6 +4,7 @@
 package com.activiti.repo.policy;
 
 import com.activiti.repo.dictionary.ClassRef;
+import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 
@@ -62,11 +63,12 @@ public interface PolicyRuntimeService
      * will include behaviours registered against the type and sub-types of the 
      * node and against all the nodes aspects.
      * 
-     * @param <T>       the policy interface type
-     * @param policy    the policy interface type
-     * @param nodeRef   the node reference
-     * @return          the behaviour object
+     * @param <T>           the policy interface type
+     * @param policy        the policy interface type
+     * @param nodeService   the node service
+     * @param nodeRef       the node reference
+     * @return              the behaviour object
      */
-    public <T> T getClassBehaviour(Class<T> policy, NodeRef nodeRef);
+    public <T> T getClassBehaviour(Class<T> policy, NodeService nodeService, NodeRef nodeRef);
       
 }

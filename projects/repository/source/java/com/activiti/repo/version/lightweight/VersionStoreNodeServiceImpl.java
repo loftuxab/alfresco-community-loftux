@@ -288,7 +288,9 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
                 ClassRef classRef = this.dbNodeService.getType(referencedNode);
                 if (CLASS_REF_VERSION_HISTORY.equals(classRef) == true)
                 {
-                    // TODO if the referenced node is a version history then need to get the appropriate node ref                                                
+                    // Return a reference to the node in the correct workspace
+                    String childRefId = (String)this.dbNodeService.getProperty(referencedNode, PROP_QNAME_VERSIONED_NODE_ID);
+                    childRef = new NodeRef(nodeRef.getStoreRef(), childRefId);                                                
                 }
                 
                 // Retrieve the isPrimary and nthSibling values of the forzen child association
@@ -363,7 +365,9 @@ public class VersionStoreNodeServiceImpl extends VersionStoreBaseImpl implements
                 ClassRef classRef = this.dbNodeService.getType(referencedNode);
                 if (CLASS_REF_VERSION_HISTORY.equals(classRef) == true)
                 {
-                    // TODO if the referenced node is a version history then need to get the appropriate node ref                                                
+                    // Return a reference to the node in the correct workspace
+                    String childRefId = (String)this.dbNodeService.getProperty(referencedNode, PROP_QNAME_VERSIONED_NODE_ID);
+                    childRef = new NodeRef(sourceRef.getStoreRef(), childRefId);                    
                 }
                 
                 NodeAssocRef newAssocRef = new NodeAssocRef(sourceRef, qName, childRef);

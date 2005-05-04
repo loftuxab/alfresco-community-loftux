@@ -130,7 +130,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.node.db.DbNodeServiceImpl" >
+         <bean class="com.activiti.repo.node.db.DbNodeServiceImpl">
             <constructor-arg>
                <ref bean="dictionaryService" />
             </constructor-arg>
@@ -166,7 +166,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.node.index.IndexingNodeServiceImpl" >
+         <bean class="com.activiti.repo.node.index.IndexingNodeServiceImpl">
             <constructor-arg>
                <ref bean="dbNodeService" />
             </constructor-arg>
@@ -335,27 +335,10 @@
       </property>
    </bean>
    
-   <!-- TODO does this need to be a transaction proxy factory bean? -->
-   <!-- <bean id="lockInterceptor" class="com.activiti.repo.lock.LockServiceInterceptor">
-		<property name="lockService">
-			<ref bean="simpleLockService"></ref>
-		</property>	
-   </bean> -->
-   
    <!--                               -->
    <!--  Light Weight Version Store   -->
    <!--                               -->
    
-   <!--<bean id="versionServiceLockIntercepter" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-		<property name="advice">
-        <ref local="lockInterceptor"/>
-		</property>
-		<property name="patterns">
-        	<list>
-				<value>.*createVersion</value>
-			</list>
-		</property>
-	</bean>-->
    
    <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
@@ -524,10 +507,7 @@
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="com.activiti.repo.policy.impl.PolicyRuntimeServiceImpl">
-			<property name="nodeService">
-				<ref bean="dbNodeService"></ref>
-			</property>			
+         <bean class="com.activiti.repo.policy.impl.PolicyRuntimeServiceImpl">		
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -535,7 +515,7 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
-   </bean>
+   </bean> 
    
    <!-- Bean to support full text search -->
    

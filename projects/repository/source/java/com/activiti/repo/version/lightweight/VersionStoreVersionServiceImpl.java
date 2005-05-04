@@ -19,14 +19,14 @@ import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.qname.QNamePattern;
 import com.activiti.repo.ref.qname.RegexQNamePattern;
+import com.activiti.repo.version.ReservedVersionNameException;
 import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionHistory;
 import com.activiti.repo.version.VersionLabelPolicy;
 import com.activiti.repo.version.VersionService;
+import com.activiti.repo.version.VersionServiceException;
 import com.activiti.repo.version.common.VersionUtil;
 import com.activiti.repo.version.common.counter.VersionCounterDaoService;
-import com.activiti.repo.version.exception.ReservedVersionNameException;
-import com.activiti.repo.version.exception.VersionServiceException;
 import com.activiti.repo.version.policy.OnBeforeCreateVersionPolicy;
 import com.activiti.util.AspectMissingException;
 
@@ -248,6 +248,7 @@ public class VersionStoreVersionServiceImpl extends VersionStoreBaseImpl impleme
         // Call the onBeforeCreateVersionPolicy 
         OnBeforeCreateVersionPolicy policy = this.policyRuntimeService.getClassBehaviour(
                 OnBeforeCreateVersionPolicy.class, 
+                this.nodeService,
                 nodeRef);
         if (policy != null)
         {

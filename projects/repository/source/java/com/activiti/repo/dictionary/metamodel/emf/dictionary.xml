@@ -54,6 +54,7 @@
   </datadictionary:EMFAspect>
   <datadictionary:EMFAspect emfName="{http://www.activiti.com/lock/1.0}lock">
     <emfProperties emfName="lockOwner" emfType="/6"/>
+    <emfProperties emfName="lockType" emfType="/6"/>
   </datadictionary:EMFAspect>
   <datadictionary:EMFAspect emfName="{http://www.activiti.com/version/1.0}version">
     <emfProperties emfName="currentVersionLabel" emfType="/7"/>

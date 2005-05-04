@@ -1,7 +1,7 @@
 /**
  * Created on Apr 14, 2005
  */
-package com.activiti.repo.version.exception;
+package com.activiti.repo.version;
 
 import java.text.MessageFormat;
 

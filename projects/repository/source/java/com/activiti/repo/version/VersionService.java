@@ -12,7 +12,6 @@ import java.util.Map;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.repo.ref.StoreRef;
-import com.activiti.repo.version.exception.ReservedVersionNameException;
 import com.activiti.util.AspectMissingException;
 
 /**

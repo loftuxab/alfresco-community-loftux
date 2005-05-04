@@ -31,9 +31,9 @@ public class PolicyRuntimeServiceImplTest extends TestCase
     {
         PolicyRuntimeServiceImpl service = new PolicyRuntimeServiceImpl();
         
-        // Check that there are no behaviours registered
+        // Even when no behaviours are registered then a policy is returned
         TestPolicy policy = service.getBehaviour(TestPolicy.class, TEST_QNAME);
-        assertNull(policy);
+        assertNotNull(policy);
         
         // Register the an implementaion of the interface
         service.registerBehaviour(

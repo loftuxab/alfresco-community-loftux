@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.activiti.repo.version.exception;
+package com.activiti.repo.version;
 
 /**
  * Version service exception class.

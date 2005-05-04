@@ -30,21 +30,6 @@ public class PolicyRuntimeServiceImpl implements PolicyRuntimeService
     private HashMap<BehaviourKey, Set<? extends Object>> behaviourMap = new HashMap<BehaviourKey, Set<? extends Object>>();
     
     /**
-     * The node service
-     */
-    private NodeService nodeService = null;
-    
-    /**
-     * Set the node service
-     * 
-     * @param nodeService  the node service
-     */
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-    
-    /**
      * @see PolicyRuntimeService#registerClassBehaviour(java.lang.Object, com.activiti.repo.ref.QName)
      */
     public <T> void registerBehaviour(Class<T> policy, T policyImpl, QName qname)
@@ -72,7 +57,7 @@ public class PolicyRuntimeServiceImpl implements PolicyRuntimeService
     }
     
     /**
-     * @see 
+     * @see PolicyRuntimeService#getClassBehaviour(Class<T>, QName)
      */
     public <T> T getBehaviour(Class<T> policy, QName qname)
     {
@@ -116,11 +101,11 @@ public class PolicyRuntimeServiceImpl implements PolicyRuntimeService
     }
     
     /**
-     * @see
+     * @see PolicyRuntimeService#getClassBehaviour(Class<T>, NodeService, NodeRef)
      */
-    public <T> T getClassBehaviour(Class<T> policy, NodeRef nodeRef)
+    public <T> T getClassBehaviour(Class<T> policy, NodeService nodeService, NodeRef nodeRef)
     {
-        return getBehaviourProxy(policy, getClassBehaviourImpl(policy, nodeRef));
+        return getBehaviourProxy(policy, getClassBehaviourImpl(policy, nodeService, nodeRef));
     }    
 
     /**
@@ -130,12 +115,12 @@ public class PolicyRuntimeServiceImpl implements PolicyRuntimeService
      * @param nodeRef
      * @return
      */
-    public <T> Set<T> getClassBehaviourImpl(Class<T> policy, NodeRef nodeRef)
+    public <T> Set<T> getClassBehaviourImpl(Class<T> policy, NodeService nodeService, NodeRef nodeRef)
     {
         Set<T> result = new HashSet<T>();
          
         // First get the type of the node ref
-        ClassRef classRef = this.nodeService.getType(nodeRef);
+        ClassRef classRef = nodeService.getType(nodeRef);
         Set<T> classBehaviours = getClassBehaviourImpl(policy, classRef); 
         if (classBehaviours != null)
         {
@@ -143,7 +128,7 @@ public class PolicyRuntimeServiceImpl implements PolicyRuntimeService
         }
          
         // Next get all the aspects of the nodeRef
-        Set<ClassRef> apects = this.nodeService.getAspects(nodeRef);
+        Set<ClassRef> apects = nodeService.getAspects(nodeRef);
         for (ClassRef aspect : apects)
         {
             Set<T> aspectBehaviours = getClassBehaviourImpl(policy, aspect);
@@ -184,6 +169,15 @@ public class PolicyRuntimeServiceImpl implements PolicyRuntimeService
                         new Class[]{policy},
                         handler);
             }
+        }
+        else
+        {
+            // Create a proxy that is a shell and does nothing
+            NoBehaviourInvocationHandler handler = new NoBehaviourInvocationHandler();
+            result = (T)Proxy.newProxyInstance(
+                    PolicyRuntimeServiceImpl.class.getClassLoader(),
+                    new Class[]{policy},
+                    handler);
         }
         
         return result;
@@ -268,6 +262,24 @@ public class PolicyRuntimeServiceImpl implements PolicyRuntimeService
                 method.invoke(behaviour, args);
             }  
             
+            return null;
+        }
+    }
+    
+    /**
+     * Proxy invocation handler that can be returned when no behaviour is present.  Can be called 
+     * with no effect.
+     * 
+     * @author Roy Wetherall
+     */
+    private class NoBehaviourInvocationHandler implements InvocationHandler
+    {
+        /**
+         * Invocation handler incoke method
+         */
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+        {
+            // Do nothing
             return null;
         }
     }

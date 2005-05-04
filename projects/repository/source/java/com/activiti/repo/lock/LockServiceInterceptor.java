@@ -41,7 +41,7 @@ class LockServiceInterceptor implements MethodInterceptor
     {
         // Get the method name
         String methodName = arg0.getMethod().getName();
-                
+        
         // TODO need to get the user from somewhere ...
         String userRef = "userRef";
         

@@ -9,9 +9,10 @@ import java.util.HashMap;
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
 import com.activiti.repo.lock.LockService;
+import com.activiti.repo.lock.LockService.LockType;
+import com.activiti.repo.lock.UnableToAquireLockException;
+import com.activiti.repo.lock.UnableToReleaseLockException;
 import com.activiti.repo.lock.LockService.LockStatus;
-import com.activiti.repo.lock.exception.UnableToReleaseLockException;
-import com.activiti.repo.lock.exception.UnableToAquireLockException;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
@@ -105,11 +106,11 @@ public class SimpleLockServiceTest extends BaseSpringTest
     {
         // Check that the node is not currently locked
         assertEquals(
-                LockStatus.UNLOCKED, 
+                LockStatus.NO_LOCK, 
                 this.lockService.getLockStatus(this.parentNode, USER_REF1));
         
         // Test valid lock
-        this.lockService.lock(this.parentNode, USER_REF1);
+        this.lockService.lock(this.parentNode, USER_REF1, LockType.WRITE_LOCK);
         assertEquals(
                 LockStatus.LOCK_OWNER, 
                 this.lockService.getLockStatus(this.parentNode, USER_REF1));
@@ -120,7 +121,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
         // Test lock when already locked
         try
         {
-            this.lockService.lock(this.parentNode, USER_REF2);
+            this.lockService.lock(this.parentNode, USER_REF2, LockType.WRITE_LOCK);
             fail("The user should not be able to lock the node since it is already locked by another user.");
         }
         catch (UnableToAquireLockException exception)
@@ -130,7 +131,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
         // Test already locked by this user
         try
         {
-            this.lockService.lock(this.parentNode, USER_REF1);
+            this.lockService.lock(this.parentNode, USER_REF1, LockType.WRITE_LOCK);
         }
         catch (Exception exception)
         {
@@ -140,7 +141,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
         // Test with no apect node
         try
         {
-            this.lockService.lock(this.noAspectNode, USER_REF1);
+            this.lockService.lock(this.noAspectNode, USER_REF1, LockType.WRITE_LOCK);
             fail("This node has no lock aspect.");
         }
         catch (AspectMissingException exception)
@@ -185,10 +186,10 @@ public class SimpleLockServiceTest extends BaseSpringTest
         // Unlock the node
         this.lockService.unlock(this.parentNode, USER_REF1);
         assertEquals(
-                LockStatus.UNLOCKED,
+                LockStatus.NO_LOCK,
                 this.lockService.getLockStatus(this.parentNode, USER_REF1));
         assertEquals(
-                LockStatus.UNLOCKED,
+                LockStatus.NO_LOCK,
                 this.lockService.getLockStatus(this.parentNode, USER_REF2));
         
         // Try and unlock node with no lock
@@ -229,7 +230,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
     {
         // Check an unlocked node
         LockStatus lockStatus1 = this.lockService.getLockStatus(this.parentNode, USER_REF1);
-        assertEquals(LockStatus.UNLOCKED, lockStatus1);
+        assertEquals(LockStatus.NO_LOCK, lockStatus1);
         
         // Simulate the node being locked by user1
         this.nodeService.setProperty(this.parentNode, LockService.PROP_QNAME_LOCK_OWNER, USER_REF1);
@@ -246,6 +247,43 @@ public class SimpleLockServiceTest extends BaseSpringTest
         try
         {
             this.lockService.getLockStatus(this.noAspectNode, USER_REF1);
+            fail("This node has no lock aspect.");
+        }
+        catch (AspectMissingException exception)
+        {
+        }
+    }
+    
+    /**
+     * Test getLockType
+     */
+    public void testGetLockType()
+    {
+        // Get the lock type (should be null since the object is not locked)
+        LockType lockType1 = this.lockService.getLockType(this.parentNode);
+        assertNull(lockType1);
+        
+        // Lock the object for writing
+        this.lockService.lock(this.parentNode, USER_REF1, LockType.WRITE_LOCK);
+        LockType lockType2 = this.lockService.getLockType(this.parentNode);
+        assertNotNull(lockType2);               
+        assertEquals(LockType.WRITE_LOCK, lockType2);
+        
+        // Unlock the node
+        this.lockService.unlock(this.parentNode, USER_REF1);
+        LockType lockType3 = this.lockService.getLockType(this.parentNode);
+        assertNull(lockType3);
+        
+        // Lock the object for read only
+        this.lockService.lock(this.parentNode, USER_REF1, LockType.READ_ONLY_LOCK);
+        LockType lockType4 = this.lockService.getLockType(this.parentNode);
+        assertNotNull(lockType4);
+        assertEquals(LockType.READ_ONLY_LOCK, lockType4);
+        
+        // Test with no apect node
+        try
+        {
+            this.lockService.getLockType(this.noAspectNode);
             fail("This node has no lock aspect.");
         }
         catch (AspectMissingException exception)

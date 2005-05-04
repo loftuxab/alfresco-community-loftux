@@ -8,8 +8,6 @@ package com.activiti.repo.lock;
 import java.util.Collection;
 
 import com.activiti.repo.dictionary.ClassRef;
-import com.activiti.repo.lock.exception.UnableToReleaseLockException;
-import com.activiti.repo.lock.exception.UnableToAquireLockException;
 import com.activiti.repo.ref.NodeRef;
 import com.activiti.repo.ref.QName;
 import com.activiti.util.AspectMissingException;
@@ -39,12 +37,18 @@ public interface LockService
      */
     public final static String PROP_LOCK_OWNER = "lockOwner";
     public final static QName PROP_QNAME_LOCK_OWNER = QName.createQName(NAMESPACE_LOCK, PROP_LOCK_OWNER);
+    public final static String PROP_LOCK_TYPE = "lockType";
+    public final static QName PROP_QNAME_LOCK_TYPE = QName.createQName(NAMESPACE_LOCK, PROP_LOCK_TYPE);
     
     /**
-     * Type-safe enum used to indicate the lock status
-     * TODO details of the various lock status and what they mean
+     * Enum used to indicate lock status
      */
-    public enum LockStatus {UNLOCKED, LOCKED, LOCK_OWNER};
+    public enum LockStatus {NO_LOCK, LOCKED, LOCK_OWNER};
+    
+    /**
+     * Enum used to indicate lock type
+     */
+    public enum LockType {READ_ONLY_LOCK, WRITE_LOCK};
     
    /**
     * Places a lock on a node.  
@@ -53,15 +57,15 @@ public interface LockService
     * to the node untill the lock is released.  
     * <p>
     * The user reference passed indicates who the owner of the lock is.
-    * 
     * @param  nodeRef  a reference to a node 
     * @param  userRef  a reference to the user that will own the lock
+    * @param  lockType the lock type
     * @throws UnableToAquireLockException
     *                  thrown if the lock could not be obtained
     * @throws LockAspectMissing
     *                   thrown if the lock aspect is missing
     */
-   public void lock(NodeRef nodeRef, String userRef)
+   public void lock(NodeRef nodeRef, String userRef, LockType lockType)
        throws UnableToAquireLockException, AspectMissingException;
    
    /**
@@ -73,18 +77,19 @@ public interface LockService
     * The user reference passed indicates who the owner of the lock(s) is.  
     * If any one of the child locks can not be taken then an exception will 
     * be raised and all locks canceled.
+    * @param nodeRef        a reference to a node
+    * @param userRef        a reference to the user that will own the lock(s)
+    * @param lockType       the lock type 
+    * @param lockChildren   if true indicates that all the children (and 
+    *                       grandchildren, etc) of the node will also be locked, 
+    *                       false otherwise
     * 
-    * @param  nodeRef        a reference to a node
-    * @param  userRef        a reference to the user that will own the lock(s)
-    * @param  lockChildren   if true indicates that all the children (and 
-    *                        grandchildren, etc) of the node will also be locked, 
-    *                        false otherwise
     * @throws UnableToAquireLockException
     *                        thrown if the lock could not be obtained
     * @throws LockAspectMissing
     *                        thrown if the lock aspect is missing
     */
-   public void lock(NodeRef nodeRef, String userRef, boolean lockChildren)
+   public void lock(NodeRef nodeRef, String userRef, LockType lockType, boolean lockChildren)
        throws UnableToAquireLockException, AspectMissingException;
    
    /**
@@ -96,15 +101,16 @@ public interface LockService
     * The user reference passed indicates who the owner of the lock(s) is.  
     * If any one of the child locks can not be taken then an exception will 
     * be raised and all locks canceled.
+ * @param  nodeRefs a list of node references
+ * @param  userRef  a reference to the user that will own the lock(s)
+ * @param lockType TODO
     *  
-    * @param  nodeRefs a list of node references
-    * @param  userRef  a reference to the user that will own the lock(s)
     * @throws UnableToAquireLockException
     *                  thrown if the lock could not be obtained
     * @throws LockAspectMissing
     *                   thrown if the lock aspect is missing
     */
-   public void lock(Collection<NodeRef> nodeRefs, String userRef)
+   public void lock(Collection<NodeRef> nodeRefs, String userRef, LockType lockType)
        throws UnableToAquireLockException, AspectMissingException;
    
    /**
@@ -174,7 +180,7 @@ public interface LockService
    /**
     * Indicates the current lock status for the user against the passed node.
     * <p>
-    * Possible results are LOCKED (the node is locked by antoher user), UNLOCKED 
+    * Possible results are LOCKED (the node is locked by antoher user), NO_LOCK 
     * (the node is not locked) , LOCK_OWNER (the node is locked by the referenced
     * user).
     * 
@@ -188,5 +194,21 @@ public interface LockService
     *                   thrown if the lock aspect is missing
     */
    public LockStatus getLockStatus(NodeRef nodeRef, String userRef)
+       throws AspectMissingException;
+   
+   /**
+    * Gets the lock type for the node indicated.  
+    * <p>
+    * Returns null if the node is not locked.
+    * <p>
+    * Throws an exception if the node does not have the lock aspect.
+    * 
+    * @param  nodeRef  the node reference
+    * @return          the lock type, null is returned if the object in question has no
+    *                  lock
+    * @throws AspectMissingException
+    *                  thrown if the lock aspect is missing
+    */
+   public LockType getLockType(NodeRef nodeRef)
        throws AspectMissingException;
 }

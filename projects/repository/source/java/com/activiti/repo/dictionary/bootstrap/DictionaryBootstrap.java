@@ -463,6 +463,12 @@ public class DictionaryBootstrap
         lockOwnerProperty.setMandatory(false);
         lockOwnerProperty.setMultiValued(false);
         
+        // Create the lock type property
+        M2Property lockTypeProperty = lockAspect.createProperty(LockService.PROP_LOCK_TYPE);
+        lockTypeProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        lockTypeProperty.setMandatory(false);
+        lockTypeProperty.setMultiValued(false);
+        
         
         // ===========================================================================
         // Version Aspect Model Defintions

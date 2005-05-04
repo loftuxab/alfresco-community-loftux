@@ -22,9 +22,9 @@ import com.activiti.repo.search.Searcher;
 import com.activiti.repo.version.Version;
 import com.activiti.repo.version.VersionHistory;
 import com.activiti.repo.version.VersionService;
+import com.activiti.repo.version.VersionServiceException;
 import com.activiti.repo.version.common.VersionHistoryImpl;
 import com.activiti.repo.version.common.VersionImpl;
-import com.activiti.repo.version.exception.VersionServiceException;
 import com.activiti.util.AspectMissingException;
 
 /**

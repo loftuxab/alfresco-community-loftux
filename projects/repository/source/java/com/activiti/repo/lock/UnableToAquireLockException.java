@@ -1,7 +1,7 @@
 /**
  * Created on Apr 19, 2005
  */
-package com.activiti.repo.lock.exception;
+package com.activiti.repo.lock;
 
 import java.text.MessageFormat;
 

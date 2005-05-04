@@ -5,8 +5,8 @@ package com.activiti.repo.version.common;
 
 import java.util.Collection;
 
+import com.activiti.repo.version.ReservedVersionNameException;
 import com.activiti.repo.version.Version;
-import com.activiti.repo.version.exception.ReservedVersionNameException;
 
 /**
  * Helper class containing helper methods for the versioning services.
@@ -24,6 +24,7 @@ public class VersionUtil
         Version.PROP_FROZEN_NODE_STORE_ID, 
         Version.PROP_FROZEN_NODE_STORE_PROTOCOL,
         Version.PROP_FROZEN_NODE_TYPE,
+        Version.PROP_FROZEN_ASPECTS,
         Version.PROP_VERSION_LABEL,
         Version.PROP_VERSION_NUMBER};
     

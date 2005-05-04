@@ -9,9 +9,9 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import com.activiti.repo.version.Version;
+import com.activiti.repo.version.VersionDoesNotExistException;
 import com.activiti.repo.version.VersionHistory;
-import com.activiti.repo.version.exception.VersionDoesNotExistException;
-import com.activiti.repo.version.exception.VersionServiceException;
+import com.activiti.repo.version.VersionServiceException;
 
 /**
  * Version History implementation. 
