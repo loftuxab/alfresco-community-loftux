@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -29,6 +28,7 @@ import com.activiti.repo.search.Searcher;
 import com.activiti.util.Conversion;
 import com.activiti.web.bean.NavigationBean;
 import com.activiti.web.bean.repository.Repository;
+import com.activiti.web.jsf.Utils;
 import com.activiti.web.jsf.component.UIModeList;
 
 /**
@@ -40,6 +40,7 @@ public class NewSpaceWizard
 {
    private static Logger logger = Logger.getLogger(NewSpaceWizard.class);
    
+   // new space wizard specific properties
    private String createFrom = "scratch";
    private String spaceType = "container";
    private String existingSpaceId;
@@ -50,17 +51,17 @@ public class NewSpaceWizard
    private String icon = "space-icon-default";
    private String templateName;
    private boolean saveAsTemplate = false;
-   private boolean finishDisabled = true;
-   private int currentStep = 1;
-   private NodeService nodeService;
-   private Searcher searchService;
-   
-   /** The NavigationBean reference */
-   private NavigationBean navigator;
-   
    private List spaces;
    private List templates;
    
+   // common wizard properties
+   private int currentStep = 1;
+   private boolean finishDisabled = true;
+   private String currentSpaceName;
+   private NodeService nodeService;
+   private Searcher searchService;
+   private NavigationBean navigator;
+
    /**
     * @return Returns the nodeService.
     */
@@ -107,6 +108,54 @@ public class NewSpaceWizard
    public void setNavigator(NavigationBean navigator)
    {
       this.navigator = navigator;
+   }
+   
+   /**
+    * @return Returns the currentStep.
+    */
+   public int getCurrentStep()
+   {
+      return currentStep;
+   }
+
+   /**
+    * @param currentStep The currentStep to set.
+    */
+   public void setCurrentStep(int currentStep)
+   {
+      this.currentStep = currentStep;
+   }
+   
+   /**
+    * @return Returns the currentSpaceName.
+    */
+   public String getCurrentSpaceName()
+   {
+      return currentSpaceName;
+   }
+
+   /**
+    * @param currentSpaceName The currentSpaceName to set.
+    */
+   public void setCurrentSpaceName(String currentSpaceName)
+   {
+      this.currentSpaceName = currentSpaceName;
+   }
+   
+   /**
+    * @return Returns the finishDisabled.
+    */
+   public boolean isFinishDisabled()
+   {
+      return finishDisabled;
+   }
+
+   /**
+    * @param finishDisabled The finishDisabled to set.
+    */
+   public void setFinishDisabled(boolean finishDisabled)
+   {
+      this.finishDisabled = finishDisabled;
    }
 
    /**
@@ -186,9 +235,7 @@ public class NewSpaceWizard
       if (this.name == null || this.name.length() == 0)
       {
          // create error and send wizard back to details page
-         String msg = "You must supply a name for the space";
-         FacesContext.getCurrentInstance().addMessage(null, 
-               new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg));
+         Utils.addErrorMessage("You must supply a name for the space");
          navigate(determinePageForStep(3));
       }
       else
@@ -427,22 +474,6 @@ public class NewSpaceWizard
    {
       this.saveAsTemplate = saveAsTemplate;
    }
-   
-   /**
-    * @return Returns the finishDisabled.
-    */
-   public boolean isFinishDisabled()
-   {
-      return finishDisabled;
-   }
-
-   /**
-    * @param finishDisabled The finishDisabled to set.
-    */
-   public void setFinishDisabled(boolean finishDisabled)
-   {
-      this.finishDisabled = finishDisabled;
-   }
 
    /**
     * @return Returns the spaceType.
@@ -490,22 +521,6 @@ public class NewSpaceWizard
    public void setTemplateSpaceId(String templateSpaceId)
    {
       this.templateSpaceId = templateSpaceId;
-   }
-
-   /**
-    * @return Returns the currentStep.
-    */
-   public int getCurrentStep()
-   {
-      return currentStep;
-   }
-
-   /**
-    * @param currentStep The currentStep to set.
-    */
-   public void setCurrentStep(int currentStep)
-   {
-      this.currentStep = currentStep;
    }
 
    /**

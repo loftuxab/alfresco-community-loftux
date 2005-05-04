@@ -185,6 +185,23 @@
    
    <managed-bean>
       <description>
+         The bean that backs up the Add Content Wizard
+      </description>
+      <managed-bean-name>AddContentWizard</managed-bean-name>
+      <managed-bean-class>com.activiti.web.bean.wizard.AddContentWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that holds navigation state.
       </description>
       <managed-bean-name>NavigationBean</managed-bean-name>
@@ -253,6 +270,10 @@
       <navigation-case>
          <from-outcome>deleteSpace</from-outcome>
          <to-view-id>/jsp/browse/delete-space.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>addContent</from-outcome>
+         <to-view-id>/jsp/wizard/add-content/details.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

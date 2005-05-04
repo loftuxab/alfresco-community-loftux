@@ -2,7 +2,10 @@ package com.activiti.web;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 
+import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -17,8 +20,10 @@ import com.activiti.web.bean.repository.Repository;
  * 
  * @author gavinc
  */
-public class ContextListener implements ServletContextListener
+public class ContextListener implements ServletContextListener, HttpSessionListener
 {
+   private static Logger logger = Logger.getLogger(ContextListener.class);
+   
    /**
     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
     */
@@ -41,5 +46,15 @@ public class ContextListener implements ServletContextListener
    public void contextDestroyed(ServletContextEvent event)
    {
       // nothing to do
+   }
+
+   public void sessionCreated(HttpSessionEvent event)
+   {
+      logger.info("HTTP session created: " + event.getSession().getId());
+   }
+
+   public void sessionDestroyed(HttpSessionEvent event)
+   {
+      logger.info("HTTP session destroyed: " + event.getSession().getId());
    }
 }

@@ -31,6 +31,7 @@ import com.activiti.repo.search.Value;
 import com.activiti.util.Conversion;
 import com.activiti.web.bean.repository.Node;
 import com.activiti.web.bean.repository.Repository;
+import com.activiti.web.jsf.Utils;
 import com.activiti.web.jsf.component.IBreadcrumbHandler;
 import com.activiti.web.jsf.component.UIActionLink;
 import com.activiti.web.jsf.component.UIBreadcrumb;
@@ -237,7 +238,7 @@ public class BrowseBean
       }
       catch (InvalidNodeRefException refErr)
       {
-         addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {parentNodeId}) );
+         Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {parentNodeId}) );
          items = Collections.EMPTY_LIST;
       }
       
@@ -355,7 +356,7 @@ public class BrowseBean
          }
          catch (InvalidNodeRefException refErr)
          {
-            addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
          }
       }
    }
@@ -399,7 +400,7 @@ public class BrowseBean
       }
       catch (InvalidNodeRefException refErr)
       {
-         addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
+         Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
       }
    }
    
@@ -436,7 +437,7 @@ public class BrowseBean
          }
          catch (InvalidNodeRefException refErr)
          {
-            addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
          }
       }
       else
@@ -499,7 +500,7 @@ public class BrowseBean
          }
          catch (Throwable err)
          {
-            addErrorMessage("Unable to delete Space due to system error: " + err.getMessage());
+            Utils.addErrorMessage("Unable to delete Space due to system error: " + err.getMessage());
          }
       }
       else
@@ -508,8 +509,7 @@ public class BrowseBean
       }
       
       return outcome;
-   }
-   
+   }   
    
    // ------------------------------------------------------------------------------
    // Private helpers 
@@ -548,20 +548,6 @@ public class BrowseBean
          richList.setValue(null);
       }
    }
-   
-   /**
-    * Add an ERROR level message that can be displayed by the 'messages' tag
-    * 
-    * @param msg
-    */
-   private void addErrorMessage(String msg)
-   {
-      FacesContext context = FacesContext.getCurrentInstance( );
-      
-      FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg);
-      context.addMessage(null, facesMsg);
-   }
-
 
    // ------------------------------------------------------------------------------
    // Inner classes

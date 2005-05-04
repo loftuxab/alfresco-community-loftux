@@ -94,7 +94,7 @@
                            
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0">
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
                                     <td class="mainSubTitle">Step 4 - Summary</td>
                                  </tr>

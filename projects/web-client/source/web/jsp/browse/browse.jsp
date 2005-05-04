@@ -69,6 +69,7 @@
                               <awc:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
                                  <f:param name="id" value="#{NavigationBean.currentNodeId}" />
                               </awc:actionLink>
+                              <awc:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" />
                               <awc:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" />
                               <%-- TODO: add real actions --%>
                               <awc:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">

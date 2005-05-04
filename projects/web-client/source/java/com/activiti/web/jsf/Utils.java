@@ -5,6 +5,7 @@ package com.activiti.web.jsf;
 
 import java.util.Map;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
@@ -354,5 +355,17 @@ public final class Utils
       }
 
       return disabled || readOnly;
+   }
+   
+   /**
+    * Adds a global error message
+    * 
+    * @param msg The error message
+    */
+   public static void addErrorMessage(String msg)
+   {
+      FacesContext context = FacesContext.getCurrentInstance( );
+      FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg);
+      context.addMessage(null, facesMsg);
    }
 }

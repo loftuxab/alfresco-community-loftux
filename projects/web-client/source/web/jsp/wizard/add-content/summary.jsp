@@ -17,7 +17,7 @@
    <f:loadBundle basename="messages" var="msg"/>
    
    <%-- REPLACE ME: set the form name here --%>
-   <h:form id="new-space-details">
+   <h:form id="add-content-summary">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -52,12 +52,12 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
+                              <h:graphicImage id="wizard-logo" url="/images/icons/other_file.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle">Space Name</div>
-                              <div class="mainTitle">New Space</div>
-                              <div class="mainSubText">Use this wizard to create a new space.</div>
+                              <h:outputText value="#{AddContentWizard.currentSpaceName}" styleClass="mainSubTitle"/><br/>
+                              <div class="mainTitle">Add Content</div>
+                              <div class="mainSubText">You have entered the information required to add the content to this space.</div>
                            </td>
                         </tr>
                      </table>
@@ -83,11 +83,9 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <awc:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                    value="3" actionListener="#{NewSpaceWizard.stepChanged}">
+                                    value="2" actionListener="#{NewSpaceWizard.stepChanged}">
                                  <awc:modeListItem value="1" label="1. Starting Space" />
-                                 <awc:modeListItem value="2" label="2. Space Options" />
-                                 <awc:modeListItem value="3" label="3. Space Details" />
-                                 <awc:modeListItem value="4" label="4. Summary" />
+                                 <awc:modeListItem value="2" label="2. Summary" />
                               </awc:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -96,66 +94,21 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="mainSubTitle">Step 3 - Space Details</td>
+                                    <td class="mainSubTitle">Step 2 - Summary</td>
                                  </tr>
                                  <tr>
-                                    <td colspan="2" class="mainSubText">Enter information about the space.</td>
-                                 </tr>
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Space Details</td>
-                                 </tr>
-                                 <tr>
-                                    <td>Name:</td>
-                                    <td>
-                                       <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" />&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Description:</td>
-                                    <td>
-                                       <h:inputText value="#{NewSpaceWizard.description}" size="35" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading">&nbsp;Other Options</td>
-                                 </tr>
-                                 <tr>
-                                    <td>Choose space icon:</td>
-                                    <td>
-                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                                       <awc:imagePickerRadio columns="7" spacing="4" value="#{NewSpaceWizard.icon}">
-                                          <awc:modeListItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
-                                          <awc:modeListItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
-                                          <awc:modeListItem value="space-icon-www" image="/images/icons/space-icon-www.gif" />
-                                          <awc:modeListItem value="space-icon-world" image="/images/icons/space-icon-world.gif" />
-                                          <awc:modeListItem value="space-icon-spanner" image="/images/icons/space-icon-spanner.gif" />
-                                          <awc:modeListItem value="space-icon-public" image="/images/icons/space-icon-public.gif" />
-                                          <awc:modeListItem value="space-icon-orange-ball" image="/images/icons/space-icon-orange-ball.gif" />
-                                          <awc:modeListItem value="space-icon-lock" image="/images/icons/space-icon-lock.gif" />
-                                          <awc:modeListItem value="space-icon-library" image="/images/icons/space-icon-library.gif" />
-                                          <awc:modeListItem value="space-icon-images" image="/images/icons/space-icon-images.gif" />
-                                          <awc:modeListItem value="space-icon-id" image="/images/icons/space-icon-id.gif" />
-                                          <awc:modeListItem value="space-icon-glasses" image="/images/icons/space-icon-glasses.gif" />
-                                          <awc:modeListItem value="space-icon-download" image="/images/icons/space-icon-download.gif" />
-                                          <awc:modeListItem value="space-icon-documents" image="/images/icons/space-icon-documents.gif" />
-                                       </awc:imagePickerRadio>
-                                       <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td colspan="2">
-                                       <h:selectBooleanCheckbox value="#{NewSpaceWizard.saveAsTemplate}"/>&nbsp;
-                                       Save as template
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="middle">Name:</td>
-                                    <td><h:inputText value="#{NewSpaceWizard.templateName}" size="35" />&nbsp;*</td>
+                                    <td class="mainSubText">You are about to add the following content:</td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2">To continue click Next.</td>
+                                    <td><h:outputText value="#{AddContentWizard.summary}" escape="false"/></td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td class="details-hints">
+                                       To add the content to this space click Finish.<br/>
+                                       To review or change your selections click Back.
+                                    </td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -166,30 +119,25 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton"
+                                                        disabled="#{AddContentWizard.finishDisabled}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton" 
-                                                        disabled="#{NewSpaceWizard.finishDisabled}"/>
+                                       <h:commandButton value="Back" action="#{AddContentWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="Cancel" action="#{AddContentWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Minimise To Shelf" action="#{NewSpaceWizard.minimise}" 
+                                       <h:commandButton value="Minimise To Shelf" action="#{AddContentWizard.minimise}" 
                                                         styleClass="wizardButton" />
                                     </td>
                                  </tr>
@@ -198,16 +146,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>
