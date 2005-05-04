@@ -56,13 +56,23 @@
    </bean>
    
    <!-- create a transaction manager to handle the Hibernate sessions -->
-   <bean id='transactionManager' 
-      class='com.activiti.repo.search.transaction.LuceneTransactionManager'>
-      <property name='sessionFactory'>
-         <ref local='sessionFactory'/>
+   <bean id="transactionManager" 
+      class="com.activiti.repo.search.transaction.LuceneTransactionManager">
+      <property name="sessionFactory">
+         <ref local="sessionFactory"/>
       </property>
-      <property name='luceneIndexerAndSearchFactory'>
-         <ref bean='luceneIndexerAndSearcherFactory'/>
+      <property name="luceneIndexerAndSearchFactory">
+         <ref bean="luceneIndexerAndSearcherFactory"/>
+      </property>
+   </bean>
+   
+   <!-- factory for UserTransaction instances -->
+   <bean id="userTransaction" class="com.activiti.util.transaction.UserTransactionFactory">
+      <constructor-arg>
+         <ref bean="transactionManager" />
+      </constructor-arg>
+      <property name="singleton">
+         <value>false</value>
       </property>
    </bean>
    
@@ -147,6 +157,7 @@
    </bean>   
    
    <!-- NodeService implemented to call a delegate and ensure that nodes get indexed -->
+   <!-- TODO: To be replaced by use of callbacks using policy framework -->
    <bean id="indexingNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>com.activiti.repo.node.NodeService</value>
@@ -169,17 +180,30 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
-      <!--
-      <property name="postInterceptors">
-         <list>
-            <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
-               <constructor-arg>
-                  <value>indexingNodeService</value>
-               </constructor-arg>
-            </bean>
-         </list>
+   </bean>
+      
+   <bean id="contentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.content.ContentService</value>
       </property>
-      -->
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.content.RoutingContentServiceImpl" >
+            <constructor-arg>
+               <ref bean="indexingNodeService" />
+            </constructor-arg>
+            <constructor-arg>
+               <value>c:/contentstore</value>
+            </constructor-arg>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+         </props>
+      </property>
    </bean>
       
    <!--                         -->

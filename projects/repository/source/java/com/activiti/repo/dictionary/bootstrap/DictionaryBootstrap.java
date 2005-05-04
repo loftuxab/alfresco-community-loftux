@@ -53,8 +53,12 @@ public class DictionaryBootstrap
 
     // Content aspect constants
     public static final QName ASPECT_QNAME_CONTENT = QName.createQName(NamespaceService.ACTIVITI_URI, "aspect_content");
+    public static final String PROP_CONTENT_URL = "contentUrl";
+    public static final QName PROP_QNAME_CONTENT_URL = QName.createQName(NamespaceService.ACTIVITI_URI, PROP_CONTENT_URL);
     public static final String PROP_ENCODING = "encoding";
+    public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.ACTIVITI_URI, PROP_ENCODING);
     public static final String PROP_MIME_TYPE = "mimetype";
+    public static final QName PROP_QNAME_MIME_TYPE = QName.createQName(NamespaceService.ACTIVITI_URI, PROP_MIME_TYPE);
     
     // Categories and roots
     
@@ -264,6 +268,10 @@ public class DictionaryBootstrap
         
         // Create content aspect
         M2Aspect contentAspect = metaModelDAO.createAspect(ASPECT_QNAME_CONTENT);
+        M2Property contentUrlProp = contentAspect.createProperty(PROP_CONTENT_URL);
+        contentUrlProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        contentUrlProp.setMandatory(false);   // not required until content is actually written
+        contentUrlProp.setMultiValued(false);
         M2Property encodingProp = contentAspect.createProperty(PROP_ENCODING);
         encodingProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         encodingProp.setMandatory(true);
@@ -467,9 +475,6 @@ public class DictionaryBootstrap
         currentVersionLabelProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         currentVersionLabelProperty.setMandatory(false); 
         currentVersionLabelProperty.setMultiValued(false);
-        
-        // TODO there is currently on way to link the aspect to the service implementation
-        
         
         // ===========================================================================
         // Light Weight Version Store Model Defintions

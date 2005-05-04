@@ -20,6 +20,7 @@
   <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}guid" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
   <datadictionary:EMFPropertyType qName="{http://www.activiti.com/1.0}category" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
   <datadictionary:EMFAspect emfName="{http://www.activiti.com/1.0}aspect_content">
+    <emfProperties emfName="contentUrl" emfType="/7"/>
     <emfProperties emfName="encoding" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="mimetype" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFAspect>

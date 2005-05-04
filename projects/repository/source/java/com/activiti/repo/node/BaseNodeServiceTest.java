@@ -323,7 +323,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // get the properties after and check
         Map<QName, Serializable> propertiesAfter = nodeService.getProperties(nodeRef);
         assertEquals("Aspect properties not added",
-                propertiesBefore.size() + 2,
+                propertiesBefore.size() + 3,
                 propertiesAfter.size());
         
         // attempt to override node properties with insufficient properties
