@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.apache.log4j.Logger;
 
 import com.activiti.repo.dictionary.NamespaceService;
@@ -347,35 +349,45 @@ public class BrowseBean
             // TODO: wrap up common property set in the Node bean - and hide the NodeService usage
             //       this will hide the nasty code required to get simple props like "name"!
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            String name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
             
-            // get the current breadcrumb location and append a new handler to it
-            // our handler know the ID of the selected node and the display label for it
-            List<IBreadcrumbHandler> location = this.navigator.getLocation();
-            location.add(new BrowseBreadcrumbHandler(id, name));
-            
-            // set the current node Id ready for page refresh
-            getNavigator().setCurrentNodeId(id);
-            
-            // clear the value for the list component - will cause it to re-bind to it's data and refresh
-            // TODO: need a decoupled way to refresh components - a view-local context event service?
-            // TODO: remove this weakness - use direct component binding here? e.g. a ref in this class
-            UIRichList richList = (UIRichList)link.findComponent("browseList");
-            if (richList != null)
-            {
-               s_logger.info("Clearing 'browseList' data source.");
-               richList.setValue(null);
-            }
-            richList = (UIRichList)link.findComponent("detailsList");
-            if (richList != null)
-            {
-               s_logger.info("Clearing 'detailsList' data source.");
-               richList.setValue(null);
-            }
+            // refresh UI basedon node selection
+            refreshUI(ref, link);
          }
          catch (InvalidNodeRefException refErr)
          {
             addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+         }
+      }
+   }
+   
+   public void clickDescendantSpace(ActionEvent event)
+   {
+      UINodeDescendants.NodeSelectedEvent nodeEvent = (UINodeDescendants.NodeSelectedEvent)event;
+      NodeRef nodeRef = nodeEvent.NodeReference;
+      if (nodeRef == null)
+      {
+         throw new IllegalStateException("NodeRef returned from UINodeDescendants.NodeSelectedEvent cannot be null!");
+      }
+      
+      // user can either select a descendant of a node display on the page which means we
+      // must add the it's parent and itself to the breadcrumb
+      List<IBreadcrumbHandler> location = this.navigator.getLocation();
+      ChildAssocRef parentAssocRef = nodeService.getPrimaryParent(nodeRef);
+      if (parentAssocRef != null && parentAssocRef.getParentRef() != null)
+      {
+         if (parentAssocRef.getParentRef().getId().equals(getNavigator().getCurrentNodeId()) == false)
+         {
+            // a descendant of the displayed node was selected
+            // first refresh based on the parent and add to the breadcrumb
+            refreshUI(parentAssocRef.getParentRef(), event.getComponent());
+            
+            // now add our selected node
+            refreshUI(nodeRef, event.getComponent());
+         }
+         else
+         {
+            // // else the ellipses i.e. the displayed node was selected
+            refreshUI(nodeRef, event.getComponent());
          }
       }
    }
@@ -490,6 +502,41 @@ public class BrowseBean
    
    // ------------------------------------------------------------------------------
    // Private helpers 
+   
+   /**
+    * Refresh the UI after a Space selection change. Adds the selected space to the breadcrumb
+    * location path and also updates the list components in the UI.
+    * 
+    * @param ref     NodeRef of the selected space
+    * @param link    UIComponent responsible for the UI update
+    */
+   private void refreshUI(NodeRef ref, UIComponent link)
+   {
+      // get the current breadcrumb location and append a new handler to it
+      // our handler know the ID of the selected node and the display label for it
+      List<IBreadcrumbHandler> location = this.navigator.getLocation();
+      String name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
+      location.add(new BrowseBreadcrumbHandler(ref.getId(), name));
+      
+      // set the current node Id ready for page refresh
+      getNavigator().setCurrentNodeId(ref.getId());
+      
+      // clear the value for the list component - will cause it to re-bind to it's data and refresh
+      // TODO: need a decoupled way to refresh components - a view-local context event service?
+      // TODO: remove this weakness - use direct component binding here? e.g. a ref in this class
+      UIRichList richList = (UIRichList)link.findComponent("browseList");
+      if (richList != null)
+      {
+         s_logger.info("Clearing 'browseList' data source.");
+         richList.setValue(null);
+      }
+      richList = (UIRichList)link.findComponent("detailsList");
+      if (richList != null)
+      {
+         s_logger.info("Clearing 'detailsList' data source.");
+         richList.setValue(null);
+      }
+   }
    
    /**
     * Add an ERROR level message that can be displayed by the 'messages' tag

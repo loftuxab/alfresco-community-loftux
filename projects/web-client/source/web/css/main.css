@@ -63,6 +63,18 @@ a.header:hover
 	font-weight: bold;
 }
 
+a.title:link, a.title:visited
+{
+   font-size: 12px;
+	font-weight: bold;
+}
+
+a.title:hover
+{
+   font-size: 12px;
+	font-weight: bold;
+}
+
 a.moreactions:link, a.moreactions:visited
 {
    vertical-align: 30%;

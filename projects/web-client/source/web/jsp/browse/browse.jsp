@@ -199,7 +199,7 @@
                                  <f:param name="id" value="#{r.id}" />
                               </awc:actionLink>
                            </f:facet>
-                           <awc:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickSpace}" style="font-weight:bold">
+                           <awc:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickSpace}" styleClass="title">
                               <f:param name="id" value="#{r.id}" />
                            </awc:actionLink>
                         </awc:column>
@@ -216,7 +216,7 @@
                         </awc:column>--%>
                         
                         <awc:column style="text-align:left;">
-                           <awc:nodeDescendants value="#{r.nodeRef}" />
+                           <awc:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
                         </awc:column>
                         
                         <awc:column actions="true" style="text-align:right">

@@ -154,6 +154,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
       }
       else
       {
+         // TODO: allow the ellipses string to be set as component property?
          buf.append("...");
       }
       
