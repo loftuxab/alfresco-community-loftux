@@ -114,13 +114,15 @@ public class UINodeDescendants extends UICommand
     */
    public static class NodeSelectedEvent extends ActionEvent
    {
-      public NodeSelectedEvent(UIComponent component, NodeRef nodeRef)
+      public NodeSelectedEvent(UIComponent component, NodeRef nodeRef, boolean isParent)
       {
          super(component);
-         NodeReference = nodeRef;
+         this.NodeReference = nodeRef;
+         this.IsParent = isParent;
       }
       
-      public NodeRef NodeReference = null;
+      public NodeRef NodeReference;
+      public boolean IsParent;
    }
    
    

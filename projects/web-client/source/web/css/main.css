@@ -169,6 +169,15 @@ a.headbarLink
    font-size: 10px;
 }
 
+.moreActionsMenu
+{
+   background-color: #eeeeee;
+   border-top: thin solid #FFFFFF;
+   border-left: thin solid #FFFFFF;
+   border-right: thin solid #444444;
+   border-bottom: thin solid #444444;
+}
+
 .welcomeHeader
 {
    background-color: #eeeeee;

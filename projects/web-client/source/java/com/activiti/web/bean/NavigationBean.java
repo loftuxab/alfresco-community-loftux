@@ -3,17 +3,25 @@
  */
 package com.activiti.web.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.apache.log4j.Logger;
 
+import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.node.InvalidNodeRefException;
 import com.activiti.repo.node.NodeService;
+import com.activiti.repo.ref.NodeRef;
+import com.activiti.repo.ref.QName;
 import com.activiti.repo.search.Searcher;
+import com.activiti.web.bean.repository.Repository;
 import com.activiti.web.jsf.component.IBreadcrumbHandler;
 import com.activiti.web.jsf.component.UIBreadcrumb;
 import com.activiti.web.jsf.component.data.UIRichList;
@@ -25,10 +33,11 @@ public class NavigationBean
 {
    public NavigationBean()
    {
-      // TEMP: test code to kick off the breadcrumb path
+      // TODO: remove this test code - to kick off the breadcrumb path and root node Id
       List<IBreadcrumbHandler> elements = new ArrayList(1);
       elements.add(new NavigationBreadcrumbHandler("My Home"));
       setLocation(elements);
+      setCurrentNodeId(null);
    }
    
    
@@ -101,8 +110,50 @@ public class NavigationBean
    public void setCurrentNodeId(String currentNodeId)
    {
       s_logger.debug("Setting current node id to: " + currentNodeId);
-      this.currentNodeId = currentNodeId;
-      // TODO: need a decoupled way to refresh components - a view-local context event service?
+      
+      if (currentNodeId != null)
+      {
+         try
+         {
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), currentNodeId);
+            
+            Map<QName, Serializable> props = this.nodeService.getProperties(new NodeRef(Repository.getStoreRef(), currentNodeId));
+            
+            // setup some properties
+            this.nodeProperties.clear();
+            this.nodeProperties.put("id", currentNodeId);
+            String name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
+            this.nodeProperties.put("name", name);
+            String desc = getQNameProperty(props, "description", true);
+            this.nodeProperties.put("description", desc);
+            
+            this.currentNodeId = currentNodeId;
+         }
+         catch (InvalidNodeRefException err)
+         {
+            // TODO: how to handle this?
+            s_logger.error("Unable to locate node Id: " + currentNodeId);
+         }
+      }
+      else
+      {
+         // TODO: replace this with correct root node handling!
+         // setup some properties
+         this.nodeProperties.clear();
+         this.nodeProperties.put("id", currentNodeId);
+         this.nodeProperties.put("name", "Linton's Home");
+         this.nodeProperties.put("description", "Text description of Linton's Home from Space property");
+         
+         this.currentNodeId = currentNodeId;
+      }
+   }
+   
+   /**
+    * @return Returns the Map of properties for the current Node. 
+    */
+   public Map<String, String> getNodeProperties()
+   {
+      return this.nodeProperties;
    }
    
    /**
@@ -134,6 +185,29 @@ public class NavigationBean
    public void toggleShelf(ActionEvent event)
    {
       this.shelfExpanded = !this.shelfExpanded;
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Private helpers
+   
+   private static String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
+   {
+      String value = null;
+      
+      QName propQName = QName.createQName(NamespaceService.ACTIVITI_URI, property);
+      Object obj = props.get(propQName);
+      
+      if (obj != null)
+      {
+         value = obj.toString();
+      }
+      else if (convertNull == true && obj == null)
+      {
+         value = "";
+      }
+      
+      return value;
    }
    
    
@@ -194,6 +268,9 @@ public class NavigationBean
    
    /** Node we are currently in the context of */
    private String currentNodeId;
+   
+   /** bag of displayable properties for the current node */
+   private Map<String, String> nodeProperties = new HashMap<String, String>(7, 1.0f);
    
    /** expanded state of the Shelf panel wrapper component */
    private boolean shelfExpanded = true;

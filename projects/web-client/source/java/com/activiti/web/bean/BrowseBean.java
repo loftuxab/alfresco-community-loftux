@@ -293,7 +293,7 @@ public class BrowseBean
       return items;
    }
    
-   private String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
+   private static String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
    {
       String value = null;
       
@@ -312,7 +312,7 @@ public class BrowseBean
       return value;
    }
    
-   private String getValueProperty(ResultSetRow row, String name, boolean convertNull)
+   private static String getValueProperty(ResultSetRow row, String name, boolean convertNull)
    {
       Value value = row.getValue(QName.createQName(NamespaceService.ACTIVITI_URI, name));
       String property = null;
@@ -369,13 +369,20 @@ public class BrowseBean
          throw new IllegalStateException("NodeRef returned from UINodeDescendants.NodeSelectedEvent cannot be null!");
       }
       
-      // user can either select a descendant of a node display on the page which means we
-      // must add the it's parent and itself to the breadcrumb
-      List<IBreadcrumbHandler> location = this.navigator.getLocation();
-      ChildAssocRef parentAssocRef = nodeService.getPrimaryParent(nodeRef);
-      if (parentAssocRef != null && parentAssocRef.getParentRef() != null)
+      s_logger.info("*****Selected noderef Id: " + nodeRef.getId());
+      
+      try
       {
-         if (parentAssocRef.getParentRef().getId().equals(getNavigator().getCurrentNodeId()) == false)
+         // user can either select a descendant of a node display on the page which means we
+         // must add the it's parent and itself to the breadcrumb
+         List<IBreadcrumbHandler> location = this.navigator.getLocation();
+         ChildAssocRef parentAssocRef = nodeService.getPrimaryParent(nodeRef);
+         
+         s_logger.info("*****Selected item getPrimaryParent().getChildRef() noderef Id:  " + parentAssocRef.getChildRef().getId());
+         s_logger.info("*****Selected item getPrimaryParent().getParentRef() noderef Id: " + parentAssocRef.getParentRef().getId());
+         s_logger.info("*****Current value getNavigator().getCurrentNodeId() noderef Id: " + getNavigator().getCurrentNodeId());
+         
+         if (nodeEvent.IsParent == false)
          {
             // a descendant of the displayed node was selected
             // first refresh based on the parent and add to the breadcrumb
@@ -386,9 +393,13 @@ public class BrowseBean
          }
          else
          {
-            // // else the ellipses i.e. the displayed node was selected
+            // else the parent ellipses i.e. the displayed node was selected
             refreshUI(nodeRef, event.getComponent());
          }
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
       }
    }
    
@@ -587,7 +598,7 @@ public class BrowseBean
       {
          // All browse breadcrumb element relate to a Node Id - when selected we
          // set the current node id
-         getNavigator().setCurrentNodeId( nodeId );
+         getNavigator().setCurrentNodeId(this.nodeId);
          
          getNavigator().setLocation( (List)breadcrumb.getValue() );
          

@@ -56,9 +56,9 @@
                            <td>
                               <%-- Summary --%>
                               <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" /></div>
-                              <div class="mainTitle">Linton's Home</div>
+                              <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.view_description}" /></div>
-                              <div class="mainSubText">Text description of Linton's Home from Space property</div>
+                              <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" /></div>
                               <div class="mainSubText">There are currently 2 members of this space</div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
@@ -69,6 +69,14 @@
                               <awc:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
                                  <f:param name="id" value="#{NavigationBean.currentNodeId}" />
                               </awc:actionLink>
+                              <awc:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" />
+                              <%-- TODO: add real actions --%>
+                              <awc:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
+                                 <awc:actionLink value="Change Details" image="/images/icons/Change_details.gif" />
+                                 <awc:actionLink value="Cut" image="/images/icons/cut.gif" />
+                                 <awc:actionLink value="Copy" image="/images/icons/copy.gif" />
+                                 <awc:actionLink value="Paste" image="/images/icons/paste.gif" />
+                              </awc:menu>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100>
@@ -184,6 +192,12 @@
                            <awc:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
                               <f:param name="id" value="#{r.id}" />
                            </awc:actionLink>
+                           <%-- TODO: add real actions --%>
+                           <awc:menu id="actionsMenu1" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                              <awc:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <awc:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <awc:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                           </awc:menu>
                         </awc:column>
                         
                         <awc:dataPager/>
@@ -226,6 +240,12 @@
                            <awc:actionLink value="#{msg.delete}" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
                               <f:param name="id" value="#{r.id}" />
                            </awc:actionLink>
+                           <%-- TODO: add real actions --%>
+                           <awc:menu id="actionsMenu2" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                              <awc:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <awc:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <awc:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                           </awc:menu>
                         </awc:column>
                         
                         <awc:dataPager/>

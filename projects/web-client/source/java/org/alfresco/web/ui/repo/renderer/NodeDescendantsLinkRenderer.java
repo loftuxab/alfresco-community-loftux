@@ -18,7 +18,6 @@ import org.springframework.web.jsf.FacesContextUtils;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NodeRef;
-import com.activiti.web.bean.repository.Node;
 import com.activiti.web.bean.repository.Repository;
 import com.activiti.web.jsf.Utils;
 import com.activiti.web.jsf.renderer.BaseRenderer;
@@ -43,13 +42,17 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
       // we encoded the value to start with our Id
       if (value != null && value.startsWith(component.getClientId(context) + NamingContainer.SEPARATOR_CHAR))
       {
+         value = value.substring(component.getClientId(context).length() + 1);
+         
          // found a new selected value for this component
          // queue an event to represent the change
-         String selectedNodeId = value.substring(component.getClientId(context).length() + 1);
+         int separatorIndex = value.indexOf(NamingContainer.SEPARATOR_CHAR);
+         String selectedNodeId = value.substring(0, separatorIndex);
+         boolean isParent = Boolean.parseBoolean(value.substring(separatorIndex + 1));
          NodeService service = getNodeService(context);
          NodeRef ref = new NodeRef(Repository.getStoreRef(), selectedNodeId);
          
-         UINodeDescendants.NodeSelectedEvent event = new UINodeDescendants.NodeSelectedEvent(component, ref); 
+         UINodeDescendants.NodeSelectedEvent event = new UINodeDescendants.NodeSelectedEvent(component, ref, isParent); 
          component.queueEvent(event);
       }
    }
@@ -130,7 +133,10 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
       
       buf.append("<a href='#' onclick=\"");
       // build an HTML param that contains the client Id of this control, followed by the node Id
-      String param = control.getClientId(context) + NamingContainer.SEPARATOR_CHAR + childRef.getChildRef().getId();
+      // followed by whether this is the parent node not a decendant (ellipses clicked)
+      String param = control.getClientId(context) + NamingContainer.SEPARATOR_CHAR +
+                     childRef.getChildRef().getId() + NamingContainer.SEPARATOR_CHAR +
+                     Boolean.toString(ellipses);
       buf.append(Utils.generateFormSubmit(context, control, getHiddenFieldName(context, control), param));
       buf.append('"');
       Map attrs = control.getAttributes();
