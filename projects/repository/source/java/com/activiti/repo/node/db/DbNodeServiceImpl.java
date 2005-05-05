@@ -831,13 +831,32 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         if (isRoot && !(primaryOnly && hasParents))  // exclude primary search with parents present
         {
             // create a one-sided assoc ref for the root node and prepend to the stack
-            ChildAssocRef assocRef = new ChildAssocRef(null, null, currentNode.getNodeRef());
+            ChildAssocRef assocRef = new ChildAssocRef(null, null, getRootNode(currentNode.getNodeRef().getStoreRef()));
             // create a path to save and add the 'root' assoc
             Path pathToSave = new Path();
+            Path.ChildAssocElement first = null;
+            for(Path.Element element: currentPath)
+            {
+                if(first == null)
+                {
+                    first = (Path.ChildAssocElement)element;
+                }
+                else
+                {
+                    pathToSave.append(element);
+                }
+            }
+            if(first != null)
+            {
+               ChildAssocRef updateAssocRef = new ChildAssocRef(getRootNode(currentNode.getNodeRef().getStoreRef()), first.getRef().getQName(), first.getRef().getChildRef());
+               Path.Element newFirst =  new Path.ChildAssocElement(updateAssocRef);
+               pathToSave.prepend(newFirst);
+            }
+            
             Path.Element element = new Path.ChildAssocElement(assocRef);
             pathToSave.prepend(element);
             // append the current path elements onto the 'root' assoc
-            pathToSave.append(currentPath);
+            //pathToSave.append(currentPath);
             completedPaths.add(pathToSave);
         }
 
