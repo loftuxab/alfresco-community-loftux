@@ -16,8 +16,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
-   <h:form id="add-content-details" enctype="multipart/form-data">
+   <h:form id="add-content-details">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
