@@ -51,7 +51,6 @@
       <%-- Menu tests --%>
       <b>Menus:</b><br>
       Simple menu:<br>
-      <br>
       <awc:menu id="menu1" menuStyle="background-color:#FFFFFF; border:thin solid #AAAAAA;"
             itemSpacing="4" label="Menu" tooltip="I am a menu tooltip">
          <awc:actionLink value="Item 001" />
@@ -61,7 +60,6 @@
       </awc:menu>
       <p>
       Menu with image, styles and actions with icons:<br>
-      <br>
       <awc:menu id="menu2" styleClass="header" itemSpacing="2" label="More..." image="/images/arrow_expanded.gif" tooltip="Click Me"
             menuStyle="background-color:#eeeeee;border-top:thin solid #FFFFFF; border-left:thin solid #FFFFFF; border-right:thin solid #444444; border-bottom:thin solid #444444;">
          <awc:actionLink value="Menu Action Link" image="/images/icons/BlueArrow.gif" />

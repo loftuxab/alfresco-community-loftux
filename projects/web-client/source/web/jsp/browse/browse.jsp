@@ -135,11 +135,11 @@
                      
                      <awc:panel id="spaces-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
-                     <%-- Browse - details mode --%>
+                     <%-- Browse - details/icons mode --%>
                      <awc:richList id="detailsList" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
                            width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
-                        <awc:column primary="true" width="200" style="padding:2px;text-align:left;">
+                        <awc:column primary="true" width="200" style="padding:2px;text-align:left">
                            <f:facet name="header">
                               <awc:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>
@@ -158,14 +158,14 @@
                            </awc:actionLink>
                         </awc:column>
                         
-                        <awc:column style="text-align:left;">
+                        <awc:column style="text-align:left">
                            <f:facet name="header">
                               <awc:sortLink label="Description" value="description" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.description}" />
                         </awc:column>
                         
-                        <awc:column style="text-align:left;">
+                        <awc:column style="text-align:left">
                            <f:facet name="header">
                               <awc:sortLink label="Created Date" value="createddate" styleClass="header"/>
                            </f:facet>
@@ -174,7 +174,7 @@
                            </h:outputText>
                         </awc:column>
                         
-                        <awc:column style="text-align:left;">
+                        <awc:column style="text-align:left">
                            <f:facet name="header">
                               <awc:sortLink label="Modified Date" value="modifieddate" styleClass="header"/>
                            </f:facet>
@@ -183,7 +183,7 @@
                            </h:outputText>
                         </awc:column>
                         
-                        <awc:column actions="true" style="text-align:left;">
+                        <awc:column actions="true" style="text-align:left">
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
@@ -219,7 +219,7 @@
                            </awc:actionLink>
                         </awc:column>
                         
-                        <awc:column style="text-align:left;">
+                        <awc:column style="text-align:left">
                            <h:outputText value="#{r.description}" />
                         </awc:column>
                         
@@ -230,7 +230,7 @@
                            </h:outputText>
                         </awc:column>--%>
                         
-                        <awc:column style="text-align:left;">
+                        <awc:column style="text-align:left">
                            <awc:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
                         </awc:column>
                         

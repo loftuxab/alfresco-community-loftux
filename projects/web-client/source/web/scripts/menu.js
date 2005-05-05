@@ -5,6 +5,9 @@
 
 // Menu component functions
 var _lastMenu = null;
+var _timeoutId = null;
+
+// toggle a dynamic menu dropping down
 function _toggleMenu(menuId)
 {
    // hide any open menu
@@ -24,4 +27,33 @@ function _toggleMenu(menuId)
    {
       document.getElementById(menuId).style.display = 'none';
    }
+}
+
+// Hide the specified menu DIV
+function _hideMenu(id)
+{
+   document.getElementById(id).style.display = 'none';
+}
+
+// menu DIV onmouseover handler
+function _menuIn(id)
+{
+   if (_timeoutId != null)
+   {
+      clearTimeout(_timeoutId);
+      _timeoutId = null;
+   }
+}
+
+// menu DIV onmouseout handler
+function _menuOut(id)
+{
+   if (_timeoutId != null)
+   {
+      clearTimeout(_timeoutId);
+      _timeoutId = null;
+   }
+   
+   // hide the menu after 2 seconds delay
+   _timeoutId = window.setTimeout("_hideMenu('" + id + "')", 2000);
 }
