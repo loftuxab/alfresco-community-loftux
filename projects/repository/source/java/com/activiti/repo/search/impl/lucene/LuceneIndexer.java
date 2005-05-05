@@ -12,6 +12,7 @@ import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.search.Indexer;
 import com.activiti.repo.search.impl.lucene.fts.FTSIndexerAware;
+import com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 
 public interface LuceneIndexer extends Indexer, Lockable
 {
@@ -22,6 +23,7 @@ public interface LuceneIndexer extends Indexer, Lockable
     public boolean isModified();
     public void setNodeService(NodeService nodeService);
     public void setDictionaryService(DictionaryService dictionaryService);
+    public void setLuceneFullTextSearchIndexer(FullTextSearchIndexer luceneFullTextSearchIndexer);
     
     public void updateFullTextSearch(int size);
     public void registerCallBack(FTSIndexerAware indexer);

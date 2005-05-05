@@ -33,7 +33,6 @@ import org.apache.lucene.search.TermQuery;
 
 import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryRef;
-import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.PropertyDefinition;
 import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.TypeDefinition;
@@ -46,6 +45,7 @@ import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.IndexerException;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.impl.lucene.fts.FTSIndexerAware;
+import com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import com.vladium.utils.timing.ITimer;
 import com.vladium.utils.timing.TimerFactory;
 
@@ -58,9 +58,9 @@ import com.vladium.utils.timing.TimerFactory;
  */
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
-    private enum Action {INDEX, REINDEX, DELETE};
-    
-    private DictionaryService dictionaryService;
+    private enum Action {
+        INDEX, REINDEX, DELETE
+    };
 
     /**
      * The node service we use to get information about nodes
@@ -122,12 +122,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         format.setMaximumFractionDigits(3);
 
     }
-
-    public void setDictionaryService(DictionaryService dictionaryService)
-    {
-        this.dictionaryService = dictionaryService;
-    }
-
+    
     /*
      * Indexer Implementation
      */
@@ -225,6 +220,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         catch (IOException e)
         {
+            setRollbackOnly();
             throw new IndexerException(e);
         }
     }
@@ -238,6 +234,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         catch (IOException e)
         {
+            setRollbackOnly();
             throw new IndexerException(e);
         }
     }
@@ -251,6 +248,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         catch (IOException e)
         {
+            setRollbackOnly();
             throw new IndexerException(e);
         }
     }
@@ -266,6 +264,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         catch (IOException e)
         {
+            setRollbackOnly();
             throw new IndexerException(e);
         }
     }
@@ -284,6 +283,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         catch (IOException e)
         {
+            setRollbackOnly();
             throw new IndexerException(e);
         }
     }
@@ -302,6 +302,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         catch (IOException e)
         {
+            setRollbackOnly();
             throw new IndexerException(e);
         }
     }
@@ -364,6 +365,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     if (isFTSUpdate.booleanValue())
                     {
                         doFTSIndexCommit();
+                        // FTS does not trigger indexing request
                     }
                     else
                     {
@@ -375,12 +377,18 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         }
                         // Merge
                         mergeDeltaIntoMain(terms);
+                        luceneFullTextSearchIndexer.requiresIndex(store);
                     }
                 }
                 status = Status.STATUS_COMMITTED;
+                if (callBack != null)
+                {
+                    callBack.indexCompleted(store, remainingCount, null);
+                }
             }
             catch (IOException e)
             {
+                e.printStackTrace();
                 // If anything goes wrong we try and do a roll back
                 rollback();
                 throw new IndexerException(e);
@@ -429,7 +437,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
         deltaSearcher.close();
         mainSearcher.close();
-        deltaReader.close();
+        closeDeltaReader();
         mainReader.close();
 
         mergeDeltaIntoMain(new LinkedHashSet<Term>());
@@ -480,7 +488,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
             catch (IOException e)
             {
-                status = Status.STATUS_MARKED_ROLLBACK;
+                setRollbackOnly();
                 throw new IndexerException(e);
             }
         }
@@ -531,6 +539,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 deleteDelta();
             }
             status = Status.STATUS_ROLLEDBACK;
+            if (callBack != null)
+            {
+                callBack.indexCompleted(store, 0, null);
+            }
             break;
         }
     }
@@ -569,12 +581,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     private List<Command> deltaDeletes = new ArrayList<Command>(10000);
 
     private FTSIndexerAware callBack;
+    
+    private int remainingCount = 0;
 
     private ArrayList<Helper> toFTSIndex = new ArrayList<Helper>();
 
     private void delete(NodeRef nodeRef, boolean forReindex) throws IOException
     {
-        
+
         deltaDeletes.add(new Command(nodeRef, forReindex ? Action.REINDEX : Action.DELETE));
 
         if (deltaDeletes.size() > 10000)
@@ -590,7 +604,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             if (command.action == Action.REINDEX)
             {
-                Set set = deleteImpl(command.nodeRef, true);
+                Set<NodeRef> set = deleteImpl(command.nodeRef, true);
                 forIndex.removeAll(set);
                 forIndex.addAll(set);
             }
@@ -811,7 +825,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 nodeCounts.put(assoc, counter);
             }
             counter.incrementParentCount();
-            
+
         }
 
         int containerCount = 0;
@@ -827,6 +841,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             // Properties
 
+            boolean isAtomic = true;
             for (QName propertyQName : properties.keySet())
             {
                 boolean store = true;
@@ -834,16 +849,18 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 boolean tokenise = true;
                 boolean atomic = true;
                 // TODO: - should be able to get the property by its QName?
-                
-                PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
-                PropertyTypeDefinition propertyType = dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
-                if(propertyDefinition != null)
+
+                PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
+                PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
+                if (propertyDefinition != null)
                 {
                     index = propertyDefinition.isIndexed();
                     store = propertyDefinition.isStoredInIndex();
                     tokenise = propertyDefinition.isTokenisedInIndex();
                     atomic = propertyDefinition.isIndexedAtomically();
                 }
+
+                isAtomic &= atomic;
 
                 // PropertyTypeDefinition propDef = null;
                 Serializable value = properties.get(propertyQName);
@@ -916,7 +933,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             parentsInDepthOrderStartingWithSelf.clear();
 
             // Root Node
-            if (pathLength == 1)
+            if (nodeRef.equals(nodeService.getRootNode(nodeRef.getStoreRef())))
             {
                 // TODO: Does the root element have a QName?
                 doc.add(new Field("ISCONTAINER", "T", true, true, false));
@@ -925,11 +942,16 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 doc.add(new Field("ISNODE", "T", true, true, false));
                 docs.add(doc);
             }
-            else // not a root node
+            else if (pathLength == 1)
+            {
+                // Pseudo root node ignore
+            }
+            else
+            // not a root node
             {
                 doc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
 
-                TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeRef);
+                TypeDefinition nodeTypeDef = getDictionaryService().getType(nodeTypeRef);
                 // check for child associations
                 if (nodeTypeDef.getChildAssociations().size() > 0)
                 {
@@ -941,28 +963,36 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     docs.add(directoryEntry);
                 }
 
-                doc.add(new Field("PRIMARYPARENT",
-                        nodeService.getPrimaryParent(nodeRef).getParentRef().getId(),
-                        true,
-                        true,
-                        false));
+                doc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getParentRef().getId(), true, true, false));
 
                 Counter counter = nodeCounts.get(qNameRef);
-                counter.increment();
+                // If we have something in a container with root aspect we will
+                // not find it
+                if (counter != null)
+                {
+                    counter.increment();
+                }
 
                 doc.add(new Field("ISROOT", "F", true, true, false));
                 doc.add(new Field("ISNODE", "T", true, true, false));
-                if (isNew)
+                if (isAtomic)
                 {
-                    doc.add(new Field("FTSSTATUS", "New", true, true, true));
-                }
+                    doc.add(new Field("FTSSTATUS", "Clean", true, true, false)); 
+                }   
                 else
                 {
-                    doc.add(new Field("FTSSTATUS", "Dirty", true, true, true));
+                    if (isNew)
+                    {
+                        doc.add(new Field("FTSSTATUS", "New", true, true, false));
+                    }
+                    else
+                    {
+                        doc.add(new Field("FTSSTATUS", "Dirty", true, true, false));
+                    }
                 }
-                doc.add(new Field("TX", deltaId, true, true, true));
+                doc.add(new Field("TX", deltaId, true, true, false));
 
-                if (counter.getRepeat() == 1)
+                if ((counter == null) || counter.getRepeat() == 1)
                 {
                     docs.add(doc);
                 }
@@ -992,13 +1022,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         catch (IOException e)
         {
+            setRollbackOnly();
             throw new IndexerException(e);
         }
     }
 
     public void updateFullTextSearch(int size)
     {
-        System.out.println("Doing FTS index");
         checkAbleToDoWork(true);
         try
         {
@@ -1017,6 +1047,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             {
                 LuceneResultSetRow lrow = (LuceneResultSetRow) row;
                 Helper helper = new Helper(lrow.getNodeRef(), lrow.getDocument(), lrow.getIndex());
+                toFTSIndex.add(helper);
                 if (++count >= size)
                 {
                     break;
@@ -1041,17 +1072,16 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     boolean tokenise = true;
                     boolean atomic = true;
                     // TODO: - should be able to get the property by its QName?
-                    
-                    PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
-                    PropertyTypeDefinition propertyType = dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
-                    if(propertyDefinition != null)
+
+                    PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
+                    PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
+                    if (propertyDefinition != null)
                     {
                         index = propertyDefinition.isIndexed();
                         store = propertyDefinition.isStoredInIndex();
                         tokenise = propertyDefinition.isTokenisedInIndex();
                         atomic = propertyDefinition.isIndexedAtomically();
                     }
-
 
                     Serializable value = properties.get(propertyQName);
                     // convert value to String
@@ -1072,7 +1102,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
 
                 document.removeField("FTSSTATUS");
-                document.add(new Field("FTSSTATUS", "Clean", true, true, true));
+                document.add(new Field("FTSSTATUS", "Clean", true, true, false));
 
                 writer.addDocument(document /*
                                              * TODO: Select the language based
@@ -1095,11 +1125,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
             }
 
-            callBack.indexCompleted(store, count - writer.docCount(), null);
+            remainingCount = count - writer.docCount();
+            
         }
         catch (IOException e)
         {
-            callBack.indexCompleted(store, 0, e);
+            setRollbackOnly();
+            throw new IndexerException(e);
         }
     }
 
@@ -1129,13 +1161,20 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     private static class Command
     {
         NodeRef nodeRef;
+
         Action action;
-        
-        Command(NodeRef nodeRef,
-        Action action)
+
+        Command(NodeRef nodeRef, Action action)
         {
             this.nodeRef = nodeRef;
             this.action = action;
         }
+    }
+    
+    private FullTextSearchIndexer luceneFullTextSearchIndexer;
+    
+    public void setLuceneFullTextSearchIndexer(FullTextSearchIndexer luceneFullTextSearchIndexer)
+    {
+        this.luceneFullTextSearchIndexer = luceneFullTextSearchIndexer;
     }
 }

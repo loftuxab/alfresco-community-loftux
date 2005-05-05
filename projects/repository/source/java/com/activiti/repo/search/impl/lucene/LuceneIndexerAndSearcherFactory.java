@@ -19,6 +19,7 @@ import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.IndexerException;
 import com.activiti.repo.search.SearcherException;
+import com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import com.activiti.repo.search.transaction.LuceneIndexLock;
 import com.activiti.repo.search.transaction.SimpleTransaction;
 import com.activiti.repo.search.transaction.SimpleTransactionManager;
@@ -84,6 +85,8 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private NodeService nodeService;
 
     private LuceneIndexLock luceneIndexLock;
+    
+    private FullTextSearchIndexer luceneFullTextSearchIndexer;
 
     /**
      * Private constructor for the singleton TODO: FIt in with IOC
@@ -131,6 +134,12 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         this.luceneIndexLock = luceneIndexLock;
     }
     
+    public void setLuceneFullTextSearchIndexer(FullTextSearchIndexer luceneFullTextSearchIndexer)
+    {
+        this.luceneFullTextSearchIndexer = luceneFullTextSearchIndexer;
+    }
+    
+
     /**
      * Check if we are in a global transactoin according to the transaction
      * manager
@@ -214,8 +223,6 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                 indexer = createIndexer(storeRef, getTransactionId(tx));
                 indexers.put(storeRef, indexer);
             }
-            indexer.setNodeService(nodeService);
-            indexer.setLuceneIndexLock(luceneIndexLock);
             return indexer;
         }
         else
@@ -233,8 +240,6 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                 indexer = createIndexer(storeRef, GUID.generate());
                 indexers.put(storeRef, indexer);
             }
-            indexer.setNodeService(nodeService);
-            indexer.setLuceneIndexLock(luceneIndexLock);
             return indexer;
         }
 
@@ -271,6 +276,8 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(storeRef, deltaId);
         indexer.setNodeService(nodeService);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneIndexLock(luceneIndexLock);
+        indexer.setLuceneFullTextSearchIndexer(luceneFullTextSearchIndexer);
         return indexer;
     }
 

@@ -298,6 +298,9 @@
         <property name="luceneIndexLock">
             <ref bean="luceneIndexLock"/>
         </property>
+        <property name="luceneFullTextSearchIndexer">
+            <ref bean="LuceneFullTextSearchIndexer"/>
+        </property>
     </bean>
     
     <!-- Support for locking lucene indexes for deletion and update -->
@@ -519,8 +522,23 @@
    
    <!-- Bean to support full text search -->
    
-   <bean id="LuceneFullTextSearchIndexer" class="com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexer">
-        
+   <bean id="LuceneFullTextSearchIndexer" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexer</value>
+      </property>
+      <property name="transactionManager"><ref bean="transactionManager"/></property>
+      <property name="target">
+         <bean class="com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexerImpl">
+            <property name="luceneIndexerAndSearcherFactory">
+               <ref bean="luceneIndexerAndSearcherFactory"/>
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
    </bean>
    
    <!--                -->

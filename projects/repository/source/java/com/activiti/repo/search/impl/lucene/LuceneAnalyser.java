@@ -12,6 +12,11 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
+import com.activiti.repo.dictionary.DictionaryRef;
+import com.activiti.repo.dictionary.DictionaryService;
+import com.activiti.repo.dictionary.PropertyDefinition;
+import com.activiti.repo.dictionary.PropertyTypeDefinition;
+import com.activiti.repo.ref.QName;
 import com.activiti.repo.search.impl.lucene.analysis.PathAnalyser;
 
 /**
@@ -28,6 +33,8 @@ import com.activiti.repo.search.impl.lucene.analysis.PathAnalyser;
 public class LuceneAnalyser extends Analyzer
 {
 
+    private DictionaryService dictionaryService;
+
     private Analyzer defaultAnalyser;
 
     private Map<String, Analyzer> analysers = new HashMap<String, Analyzer>();
@@ -39,9 +46,10 @@ public class LuceneAnalyser extends Analyzer
      *            Any fields not specifically defined to use a different
      *            analyzer will use the one provided here.
      */
-    public LuceneAnalyser()
+    public LuceneAnalyser(DictionaryService dictionaryService)
     {
         this(new StandardAnalyzer());
+        this.dictionaryService = dictionaryService;
     }
 
     /**
@@ -73,13 +81,41 @@ public class LuceneAnalyser extends Analyzer
         {
             analyser = new PathAnalyser();
         }
-        else  if (fieldName.equals("QNAME"))
+        else if (fieldName.equals("QNAME"))
         {
             analyser = new PathAnalyser();
         }
         else if (fieldName.equals("ANCESTOR"))
         {
             analyser = new WhitespaceAnalyzer();
+        }
+        else if (fieldName.startsWith("@"))
+        {
+            QName propertyQName = QName.createQName(fieldName.substring(1));
+            PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
+            PropertyTypeDefinition propertyType = dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
+            if(propertyDefinition != null)
+            {
+               propertyType = propertyDefinition.getPropertyType();
+            }
+            String analyserClassName = propertyType.getAnalyserClassName();
+            try
+            {
+                Class<?> clazz = Class.forName(analyserClassName);
+                analyser = (Analyzer)clazz.newInstance();
+            }
+            catch (ClassNotFoundException e)
+            {
+                throw new RuntimeException("Unable to load analyser for type "+propertyDefinition.getQName() + " of type "+propertyType.getName()+ " using "+analyserClassName);
+            }
+            catch (InstantiationException e)
+            {
+                throw new RuntimeException("Unable to load analyser for type "+propertyDefinition.getQName() + " of type "+propertyType.getName()+ " using "+analyserClassName);   
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new RuntimeException("Unable to load analyser for type "+propertyDefinition.getQName() + " of type "+propertyType.getName()+ " using "+analyserClassName);
+            }
         }
         else
         {
@@ -88,5 +124,4 @@ public class LuceneAnalyser extends Analyzer
         analysers.put(fieldName, analyser);
         return analyser;
     }
-
 }

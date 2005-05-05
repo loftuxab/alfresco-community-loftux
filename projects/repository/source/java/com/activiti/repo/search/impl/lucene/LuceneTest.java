@@ -1,8 +1,10 @@
 package com.activiti.repo.search.impl.lucene;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 
 import junit.framework.TestCase;
@@ -10,9 +12,14 @@ import junit.framework.TestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.activiti.repo.dictionary.ClassRef;
 import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.dictionary.NamespaceService;
+import com.activiti.repo.dictionary.PropertyTypeDefinition;
 import com.activiti.repo.dictionary.bootstrap.DictionaryBootstrap;
+import com.activiti.repo.dictionary.metamodel.M2Property;
+import com.activiti.repo.dictionary.metamodel.M2Type;
+import com.activiti.repo.dictionary.metamodel.MetaModelDAO;
 import com.activiti.repo.node.NodeService;
 import com.activiti.repo.ref.ChildAssocRef;
 import com.activiti.repo.ref.NamespaceException;
@@ -23,6 +30,7 @@ import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.ResultSet;
 import com.activiti.repo.search.ResultSetRow;
 import com.activiti.repo.search.Searcher;
+import com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import com.activiti.repo.search.transaction.LuceneIndexLock;
 
 /**
@@ -31,53 +39,89 @@ import com.activiti.repo.search.transaction.LuceneIndexLock;
  */
 public class LuceneTest extends TestCase
 {
-    
-    ApplicationContext ctx;
+
+    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+
     NodeService nodeService;
+
     DictionaryService dictionaryService;
-    LuceneIndexLock luceneIndexLock;
+
+    LuceneIndexLock luceneIndexLock; //= (LuceneIndexLock) ctx.getBean("luceneIndexLock");
+
     private NodeRef rootNodeRef;
+
     private NodeRef n1;
+
     private NodeRef n2;
+
     private NodeRef n3;
+
     private NodeRef n4;
+
     private NodeRef n6;
+
     private NodeRef n5;
+
     private NodeRef n7;
+
     private NodeRef n8;
+
     private NodeRef n9;
+
     private NodeRef n10;
+
     private NodeRef n11;
+
     private NodeRef n12;
+
     private NodeRef n13;
+
     private NodeRef n14;
-    
+
+    private MetaModelDAO metaModelDAO;
+
+    private QName testType;
+
+    private ClassRef testTypeRef;
+
+    private FullTextSearchIndexer luceneFTS; // = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
 
     public LuceneTest()
     {
         super();
     }
-    
-    
+
     public void setUp()
     {
-        ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-        nodeService = (NodeService)ctx.getBean("dbNodeService");
-        luceneIndexLock = (LuceneIndexLock)ctx.getBean("luceneIndexLock");
-        dictionaryService = (DictionaryService)ctx.getBean("dictionaryService");
         
-        StoreRef storeRef = nodeService.createStore(
-                StoreRef.PROTOCOL_WORKSPACE,
-                "Test_" + System.currentTimeMillis());
+        nodeService = (NodeService) ctx.getBean("dbNodeService");
+        luceneIndexLock = (LuceneIndexLock) ctx.getBean("luceneIndexLock");
+        dictionaryService = (DictionaryService) ctx.getBean("dictionaryService");
+        metaModelDAO = (MetaModelDAO) ctx.getBean("metaModelDAO");
+        luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
+        
+        assertEquals(true, ctx.isSingleton("luceneIndexLock"));
+        assertEquals(true, ctx.isSingleton("LuceneFullTextSearchIndexer"));
+        
+
+        createTestTypes();
+
+        StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
-        
+
+        Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
+        testProperties
+                .put(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-atomic"), "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
+        testProperties.put(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-nonatomic"),
+                "TEXT THAT IS INDEXED STORED AND TOKENISED BUT NOT ATOMICALLY KEYTWO");
+
         n1 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}one"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
         nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "value-1");
         n2 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}two"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "value-1");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "value-2");
         n3 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}three"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n4 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}four"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
+        n4 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}four"), testTypeRef, testProperties).getChildRef();
         n5 = nodeService.createNode(n1, QName.createQName("{namespace}five"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
         n6 = nodeService.createNode(n1, QName.createQName("{namespace}six"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
         n7 = nodeService.createNode(n2, QName.createQName("{namespace}seven"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
@@ -88,96 +132,132 @@ public class LuceneTest extends TestCase
         n12 = nodeService.createNode(n5, QName.createQName("{namespace}twelve"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
         n13 = nodeService.createNode(n12, QName.createQName("{namespace}thirteen"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
         n14 = nodeService.createNode(n13, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        
+
         nodeService.addChild(rootNodeRef, n8, QName.createQName("{namespace}eight-0"));
         nodeService.addChild(n1, n8, QName.createQName("{namespace}eight-1"));
         nodeService.addChild(n2, n13, QName.createQName("{namespace}link"));
-        
+
         nodeService.addChild(n1, n14, QName.createQName("{namespace}common"));
         nodeService.addChild(n2, n14, QName.createQName("{namespace}common"));
         nodeService.addChild(n5, n14, QName.createQName("{namespace}common"));
         nodeService.addChild(n6, n14, QName.createQName("{namespace}common"));
         nodeService.addChild(n12, n14, QName.createQName("{namespace}common"));
         nodeService.addChild(n13, n14, QName.createQName("{namespace}common"));
-        
-        
-        
     }
-    
-    
+
+    private void createTestTypes()
+    {
+        testType = QName.createQName(NamespaceService.ACTIVITI_URI, "testType");
+        testTypeRef = new ClassRef(testType);
+
+        M2Type testTypeType = metaModelDAO.createType(testType);
+        M2Property text_indexed_stored_tokenised_atomic = testTypeType.createProperty("text-indexed-stored-tokenised-atomic");
+        text_indexed_stored_tokenised_atomic.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        text_indexed_stored_tokenised_atomic.setMandatory(true);
+        text_indexed_stored_tokenised_atomic.setMultiValued(false);
+        text_indexed_stored_tokenised_atomic.setIndexed(true);
+        text_indexed_stored_tokenised_atomic.setIndexedAtomically(true);
+        text_indexed_stored_tokenised_atomic.setStoredInIndex(true);
+        text_indexed_stored_tokenised_atomic.setTokenisedInIndex(true);
+
+        M2Property text_indexed_stored_tokenised_nonatomic = testTypeType.createProperty("text-indexed-stored-tokenised-nonatomic");
+        text_indexed_stored_tokenised_nonatomic.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        text_indexed_stored_tokenised_nonatomic.setMandatory(true);
+        text_indexed_stored_tokenised_nonatomic.setMultiValued(false);
+        text_indexed_stored_tokenised_nonatomic.setIndexed(true);
+        text_indexed_stored_tokenised_nonatomic.setIndexedAtomically(false);
+        text_indexed_stored_tokenised_nonatomic.setStoredInIndex(true);
+        text_indexed_stored_tokenised_nonatomic.setTokenisedInIndex(true);
+    }
 
     public LuceneTest(String arg0)
     {
         super(arg0);
     }
 
-    public void test1()
+    public void test1() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
+        luceneFTS.resume();
     }
 
-    public void test2()
+    public void test2() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
+        luceneFTS.resume();
     }
 
-    public void test3()
+    public void test3() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
+        luceneFTS.resume();
     }
 
-    public void test4()
+    public void test4() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
 
         Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
 
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"value-2\"", null, null);
         results.close();
-
+        luceneFTS.resume();
     }
 
-    public void test5()
+    public void test5() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
+        luceneFTS.resume();
     }
 
-    public void test6()
+    public void test6() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
+        luceneFTS.resume();
     }
 
-    public void testNoOp()
+    public void testNoOp() throws InterruptedException
     {
-
+        luceneFTS.pause();
         LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_1");
 
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
 
         indexer.prepare();
         indexer.commit();
+        luceneFTS.resume();
     }
 
     /**
      * Test basic index and search
+     * @throws InterruptedException 
      * 
      */
 
-    public void testStandAloneIndexerCommit()
+    public void testStandAloneIndexerCommit() throws InterruptedException
     {
 
+        luceneFTS.pause();
         LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_1");
 
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
 
         indexer.clearIndex();
 
@@ -231,11 +311,13 @@ public class LuceneTest extends TestCase
         assertEquals(2, results.length());
 
         results.close();
+        luceneFTS.resume();
 
     }
 
-    public void testStandAlonePathIndexer()
+    public void testStandAlonePathIndexer() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
 
         Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
@@ -274,7 +356,7 @@ public class LuceneTest extends TestCase
             results.close();
         }
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+ID:\""+n1.getId()+"\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+ID:\"" + n1.getId() + "\"", null, null);
         try
         {
             assertEquals(2, results.length());
@@ -284,7 +366,7 @@ public class LuceneTest extends TestCase
             results.close();
         }
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ID:\""+rootNodeRef.getId()+"\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ID:\"" + rootNodeRef.getId() + "\"", null, null);
         try
         {
             assertEquals(1, results.length());
@@ -293,6 +375,7 @@ public class LuceneTest extends TestCase
         {
             results.close();
         }
+        luceneFTS.resume();
 
     }
 
@@ -302,6 +385,7 @@ public class LuceneTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.clearIndex();
         indexer.createNode(new ChildAssocRef(null, null, rootNodeRef));
         indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}one"), n1));
@@ -322,11 +406,13 @@ public class LuceneTest extends TestCase
         indexer.commit();
     }
 
-    public void testAllPathSearch()
+    public void testAllPathSearch() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
 
         runBaseTests();
+        luceneFTS.resume();
 
     }
 
@@ -489,8 +575,9 @@ public class LuceneTest extends TestCase
         results.close();
     }
 
-    public void testPathSearch()
+    public void testPathSearch() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
 
         Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
@@ -523,6 +610,7 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen\"", null, null);
         assertEquals(1, results.length());
         results.close();
+        luceneFTS.resume();
     }
 
     void printPaths(ResultSet results)
@@ -539,8 +627,9 @@ public class LuceneTest extends TestCase
         }
     }
 
-    public void testXPathSearch()
+    public void testXPathSearch() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
 
         Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
@@ -553,10 +642,12 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "xpath", "//./*", null, null);
         assertEquals(25, results.length());
         results.close();
+        luceneFTS.resume();
     }
 
-    public void testMissingIndex()
+    public void testMissingIndex() throws InterruptedException
     {
+        luceneFTS.pause();
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "_missing_");
         Searcher searcher = LuceneSearcherImpl.getSearcher(storeRef);
         searcher.setNameSpaceService(new MockNameService());
@@ -567,10 +658,12 @@ public class LuceneTest extends TestCase
 
         results = searcher.query(storeRef, "xpath", "//./*", null, null);
         assertEquals(0, results.length());
+        luceneFTS.resume();
     }
 
-    public void testUpdateIndex()
+    public void testUpdateIndex() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
 
         runBaseTests();
@@ -579,6 +672,7 @@ public class LuceneTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
 
         indexer.updateNode(rootNodeRef);
         indexer.updateNode(n1);
@@ -599,11 +693,12 @@ public class LuceneTest extends TestCase
         indexer.commit();
 
         runBaseTests();
-
+        luceneFTS.resume();
     }
 
-    public void testDeleteLeaf()
+    public void testDeleteLeaf() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
 
@@ -611,8 +706,8 @@ public class LuceneTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
 
-        
         indexer.deleteNode(new ChildAssocRef(n13, QName.createQName("{namespace}fourteen"), n14));
 
         indexer.commit();
@@ -772,11 +867,12 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen\"", null, null);
         assertEquals(0, results.length());
         results.close();
-
+        luceneFTS.resume();
     }
 
-    public void testDeleteContainer()
+    public void testDeleteContainer() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
 
@@ -784,6 +880,7 @@ public class LuceneTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
 
         indexer.deleteNode(new ChildAssocRef(n12, QName.createQName("{namespace}thirteen"), n13));
 
@@ -944,11 +1041,12 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen\"", null, null);
         assertEquals(0, results.length());
         results.close();
-
+        luceneFTS.resume();
     }
 
-    public void testDeleteAndAddReference()
+    public void testDeleteAndAddReference() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
 
@@ -956,6 +1054,7 @@ public class LuceneTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
 
         nodeService.removeChild(n2, n13);
         indexer.deleteChildRelationship(new ChildAssocRef(n2, QName.createQName("{namespace}link"), n13));
@@ -1122,18 +1221,20 @@ public class LuceneTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
 
-        
         nodeService.addChild(n2, n13, QName.createQName("{namespace}link"));
         indexer.createChildRelationship(new ChildAssocRef(n2, QName.createQName("{namespace}link"), n13));
 
         indexer.commit();
 
-        runBaseTests();
+        runBaseTests(); 
+        luceneFTS.resume();
     }
 
-    public void testRenameReference()
+    public void testRenameReference() throws InterruptedException
     {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
 
@@ -1152,12 +1253,13 @@ public class LuceneTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
 
         nodeService.removeChild(n2, n13);
         nodeService.addChild(n2, n13, QName.createQName("{namespace}renamed_link"));
-        
-        indexer.updateChildRelationship(new ChildAssocRef(n2, QName.createQName("namespace", "link"), n13), new ChildAssocRef(n2,
-                QName.createQName("namespace", "renamed_link"), n13));
+
+        indexer.updateChildRelationship(new ChildAssocRef(n2, QName.createQName("namespace", "link"), n13), new ChildAssocRef(n2, QName.createQName("namespace", "renamed_link"),
+                n13));
 
         indexer.commit();
 
@@ -1173,11 +1275,118 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:renamed_link//.\"", null, null);
         assertEquals(3, results.length());
         results.close();
-
+        luceneFTS.resume();
     }
 
-    public void testForKev()
+    public void testDelayIndex() throws InterruptedException
     {
+        luceneFTS.pause();
+        buildBaseIndex();
+        runBaseTests();
+
+        Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
+        searcher.setNameSpaceService(new MockNameService());
+
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-atomic"))
+                + ":\"KEYONE\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-nonatomic"))
+                + ":\"KEYTWO\"", null, null);
+        assertEquals(0, results.length());
+        results.close();
+
+        // Do index
+
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()));
+        indexer.setNodeService(nodeService);
+        indexer.setLuceneIndexLock(luceneIndexLock);
+        indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
+        indexer.updateFullTextSearch(1000);
+        indexer.prepare();
+        indexer.commit();
+
+        searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
+        searcher.setNameSpaceService(new MockNameService());
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-atomic"))
+                + ":\"keyone\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-nonatomic"))
+                + ":\"keytwo\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+        
+        runBaseTests();
+        luceneFTS.resume();
+    }
+    
+    
+    public void testWaitForIndex() throws InterruptedException
+    {
+        luceneFTS.pause();
+        buildBaseIndex();
+        runBaseTests();
+
+        Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
+        searcher.setNameSpaceService(new MockNameService());
+
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-atomic"))
+                + ":\"KEYONE\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-nonatomic"))
+                + ":\"KEYTWO\"", null, null);
+        assertEquals(0, results.length());
+        results.close();
+
+        // Do index
+
+        searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
+        searcher.setNameSpaceService(new MockNameService());
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-atomic"))
+                + ":\"keyone\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+
+        luceneFTS.resume();
+        
+        Thread.sleep(20000);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ACTIVITI_URI, "text-indexed-stored-tokenised-nonatomic"))
+                + ":\"keytwo\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+        
+        runBaseTests();
+    }
+
+    private String escapeQName(QName qName)
+    {
+        StringBuffer buffer = new StringBuffer();
+        String string = qName.toString();
+        for (int i = 0; i < string.length(); i++)
+        {
+            char c = string.charAt(i);
+            if ((c == '{') || (c == '}') || (c == '-') || (c == ':'))
+            {
+                buffer.append('\\');
+            }
+            
+            buffer.append(c);
+        }
+        return buffer.toString();
+    }
+
+    public void testForKev() throws InterruptedException
+    {
+        luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
 
@@ -1191,66 +1400,87 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PARENT:\"" + rootNodeRef.getId() + "\" +QNAME:\"one\"", null, null);
         assertEquals(1, results.length());
         results.close();
+        luceneFTS.resume();
     }
 
-    public void testPerf1()
+    public void testPerf1() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, true);
+        luceneFTS.resume();
     }
 
-    public void testPerf2()
+    public void testPerf2() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
-    public void testPerf3()
+    public void testPerf3() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
-    public void testPerf4()
+    public void testPerf4() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
-    public void testPerf5()
+    public void testPerf5() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
-    public void testPerf6()
+    public void testPerf6() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
-    public void testPerf7()
+    public void testPerf7() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
-    public void testPerf8()
+    public void testPerf8() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
-    public void testPerf9()
+    public void testPerf9() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
-    public void testPerf10()
+    public void testPerf10() throws InterruptedException
     {
+        luceneFTS.pause();
         System.out.println("One minute");
         runPerformanceTest(10000, false);
+        luceneFTS.resume();
     }
 
     private void runPerformanceTest(double time, boolean clear)
@@ -1259,6 +1489,7 @@ public class LuceneTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         if (clear)
         {
             indexer.clearIndex();
@@ -1278,7 +1509,7 @@ public class LuceneTest extends TestCase
                 }
             }
 
-            QName qname = QName.createQName("{namespace}a_"+i);
+            QName qname = QName.createQName("{namespace}a_" + i);
             NodeRef ref = nodeService.createNode(rootNodeRef, qname, DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
             indexer.createNode(new ChildAssocRef(rootNodeRef, qname, ref));
 
@@ -1288,9 +1519,7 @@ public class LuceneTest extends TestCase
         System.out.println("\tCreated " + count + " in " + delta + "   = " + (count / delta));
     }
 
- 
-
-    private static class MockNameService implements NamespaceService
+    public static class MockNameService implements NamespaceService
     {
         private static HashMap<String, String> map = new HashMap<String, String>();
 
@@ -1315,7 +1544,15 @@ public class LuceneTest extends TestCase
 
         public String getNamespaceURI(String prefix) throws NamespaceException
         {
-            return map.get(prefix);
+            String ns = map.get(prefix);
+            if (ns == null)
+            {
+                return prefix;
+            }
+            else
+            {
+                return ns;
+            }
         }
 
         public Collection<String> getPrefixes(String namespaceURI) throws NamespaceException
@@ -1334,14 +1571,14 @@ public class LuceneTest extends TestCase
 
     }
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         // String guid = GUID.generate();
         // System.out.println("GUID is " + guid + " length is " +
         // guid.length());
         LuceneTest test = new LuceneTest();
         test.setUp();
-        test.testStandAloneIndexerCommit();
+        test.testWaitForIndex();
         // test.testStandAloneIndexerCommit();
     }
 }

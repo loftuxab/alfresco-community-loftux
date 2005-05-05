@@ -15,6 +15,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+import com.activiti.repo.dictionary.DictionaryService;
 import com.activiti.repo.ref.StoreRef;
 import com.activiti.repo.search.IndexerException;
 import com.activiti.repo.search.transaction.LuceneIndexLock;
@@ -230,7 +231,7 @@ public abstract class LuceneBase implements Lockable
             if (!IndexReader.indexExists(deltaDir))
             {
                 // Make sure there is something we can read
-                IndexWriter writer = new IndexWriter(deltaDir, new LuceneAnalyser(), true);
+                IndexWriter writer = new IndexWriter(deltaDir, new LuceneAnalyser(dictionaryService), true);
                 writer.setUseCompoundFile(true);
                 writer.close();
             }
@@ -279,7 +280,7 @@ public abstract class LuceneBase implements Lockable
             try
             {
                 boolean create = !IndexReader.indexExists(deltaDir);
-                deltaWriter = new IndexWriter(deltaDir, new LuceneAnalyser(), create);
+                deltaWriter = new IndexWriter(deltaDir, new LuceneAnalyser(dictionaryService), create);
             }
             catch (IOException e)
             {
@@ -375,7 +376,7 @@ public abstract class LuceneBase implements Lockable
 
         if (!IndexReader.indexExists(baseDir))
         {
-            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), true);
+            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
             mainWriter.setUseCompoundFile(true);
             mainWriter.close();
         }
@@ -407,7 +408,7 @@ public abstract class LuceneBase implements Lockable
 
             // Do the append
 
-            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), false);
+            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), false);
             mainWriter.setUseCompoundFile(true);
 
             mainWriter.minMergeDocs = 1000;
@@ -606,6 +607,8 @@ public abstract class LuceneBase implements Lockable
 
     boolean hasWriteLock = false;
 
+    private DictionaryService dictionaryService;
+
     public boolean mainIndexExists()
     {
         try
@@ -650,7 +653,7 @@ public abstract class LuceneBase implements Lockable
 
         if (!IndexReader.indexExists(baseDir))
         {
-            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(), true);
+            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
             mainWriter.setUseCompoundFile(true);
             mainWriter.close();
             mainWriter = null;
@@ -659,5 +662,18 @@ public abstract class LuceneBase implements Lockable
         return IndexReader.open(baseDir);
 
     }
+    
+ 
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+
+    public DictionaryService getDictionaryService()
+    {
+        return dictionaryService;
+    }
+    
 
 }

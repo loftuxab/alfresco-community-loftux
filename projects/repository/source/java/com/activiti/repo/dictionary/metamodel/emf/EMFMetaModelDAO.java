@@ -141,6 +141,8 @@ public class EMFMetaModelDAO implements MetaModelDAO
         return idIndex == null ? null : (M2PropertyType) idIndex.get(propertyType);
     }
 
+ 
+    
     /*
      * (non-Javadoc)
      * 
@@ -254,8 +256,40 @@ public class EMFMetaModelDAO implements MetaModelDAO
     {
 
         Map<QName, EObject> idIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFProperty());
-        return idIndex == null ? null : (M2Property) idIndex.get(propertyName);
-
+        M2Property property = idIndex == null ? null : (M2Property) idIndex.get(propertyName);
+        if(property == null)
+        {
+            reindex();
+            idIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFProperty());
+            return idIndex == null ? null : (M2Property) idIndex.get(propertyName);
+        }
+        else
+        {
+            return property;
+        }
+        
+    }
+    
+    private void reindex()
+    {
+        Map<QName, EObject> typeIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFType());
+        for(EObject eObject: typeIndex.values())
+        {
+            indexObject(eObject);
+        }
+        
+        Map<QName, EObject> aspectIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFAspect());
+        for(EObject eObject: aspectIndex.values())
+        {
+            indexObject(eObject);
+        }
+        
+        Map<QName, EObject> propertyTypeIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFPropertyType());
+        for(EObject eObject: propertyTypeIndex.values())
+        {
+            indexObject(eObject);
+        }
+        
     }
 
 }
