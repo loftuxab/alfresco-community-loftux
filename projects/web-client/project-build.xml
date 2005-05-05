@@ -7,6 +7,17 @@
    <!-- we want to build an EAR file in this project -->
    <target name="package" depends="package-ear" />
 
+   <!--
+   <target name="assemble-ear" depends="package-war">
+      <copy todir="${assemble.dir}">
+         <fileset dir="${dist.dir}" includes="*.war" />
+      </copy>
+      <copy todir="${assemble.dir}/META-INF">
+         <fileset dir="${src.metainf.dir}" includes="jboss-app.xml" />
+      </copy>
+   </target>
+   -->
+
    <target name="package-war" depends="package-jar" description="Packages the WAR file">
       <mkdir dir="${dist.dir}" />
       <war warfile="${dist.dir}\${war.name}" webxml="${src.web.dir}\WEB-INF\web.xml">
