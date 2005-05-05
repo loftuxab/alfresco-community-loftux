@@ -351,14 +351,20 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.version.lightweight.VersionStoreVersionServiceImpl" init-method="initialise">
-            <property name="nodeService">
-            <!-- TODO This should point to the general node service -->	
+         <bean class="com.activiti.repo.version.lightweight.VersionServiceImpl" init-method="initialise">
+             <property name="nodeService">
+             <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
-            </property>
-         	<property name="dbNodeService">
+             </property>
+         	 <property name="dbNodeService">
 				   <ref bean="dbNodeService" />
-				</property>
+			 </property>
+			 <property name="contentService">
+				<ref bean="contentService" />
+			 </property>			 	
+			 <property name="versionContentStore">
+				<ref bean="lightWeightVersionStoreContentStore"/>
+			 </property>
 			 <property name="versionCounterDaoService">
 				<ref bean="versionCounterDaoService"/>
 			 </property>
@@ -391,7 +397,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.version.lightweight.VersionStoreNodeServiceImpl" init-method="initialise">
+         <bean class="com.activiti.repo.version.lightweight.NodeServiceImpl" init-method="initialise">
 			 <property name="nodeService">
 				<!-- TODO This should point to the general node service -->	
 				<ref bean="dbNodeService" />
@@ -413,6 +419,53 @@
          </props>
       </property>
    </bean>
+   
+   <bean id='lightWeightVersionStoreContentService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.content.ContentService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.version.lightweight.ContentServiceImpl">
+			 <property name="dbNodeService">
+				<ref bean="dbNodeService" />
+			</property>	
+			<property name="versionContentStore">
+				<ref bean="lightWeightVersionStoreContentStore"/>
+			</property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <bean id='lightWeightVersionStoreContentStore' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>com.activiti.repo.content.ContentStore</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="com.activiti.repo.content.filestore.FileContentStoreImpl">
+			 <constructor-arg>
+				<value>c:\VersionedContent</value>
+             </constructor-arg>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   
    
    <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
