@@ -164,6 +164,10 @@ public class UIPanel extends SelfRenderingComponent
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
       setExpanded( ((Boolean)values[1]).booleanValue() );
+      this.progressive = (Boolean)values[2];
+      this.border = (String)values[3];
+      this.bgcolor = (String)values[4];
+      this.label = (String)values[5];
    }
    
    /**
@@ -171,10 +175,14 @@ public class UIPanel extends SelfRenderingComponent
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[2];
+      Object values[] = new Object[6];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = (isExpanded() ? Boolean.TRUE : Boolean.FALSE);
+      values[2] = this.progressive;
+      values[3] = this.border;
+      values[4] = this.bgcolor;
+      values[5] = this.label;
       return values;
    }
    

@@ -6,6 +6,7 @@ package org.alfresco.web.ui.common.component;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.faces.component.UICommand;
@@ -43,6 +44,31 @@ public class UIBreadcrumb extends UICommand
    public String getFamily()
    {
       return "awc.faces.Controls";
+   }
+   
+   /**
+    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+    */
+   public void restoreState(FacesContext context, Object state)
+   {
+      Object values[] = (Object[])state;
+      // standard component attributes are restored by the super class
+      super.restoreState(context, values[0]);
+      this.separator = (String)values[1];
+      this.showRoot = (Boolean)values[2];
+   }
+   
+   /**
+    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
+    */
+   public Object saveState(FacesContext context)
+   {
+      Object values[] = new Object[3];
+      // standard component attributes are saved by the super class
+      values[0] = super.saveState(context);
+      values[1] = this.separator;
+      values[2] = this.showRoot;
+      return (values);
    }
    
    /**

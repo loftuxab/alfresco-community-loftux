@@ -36,7 +36,6 @@ public class UIImagePicker extends UIInput
     */
    public void restoreState(FacesContext context, Object state)
    {
-      
       Object values[] = (Object[])state;
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
@@ -47,7 +46,7 @@ public class UIImagePicker extends UIInput
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[8];
+      Object values[] = new Object[1];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       return (values);

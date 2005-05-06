@@ -21,6 +21,31 @@ public class UIModeListItem extends SelfRenderingComponent
    {
       return "awc.faces.Controls";
    }
+
+   /**
+    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
+    */
+   public Object saveState(FacesContext context)
+   {
+      Object values[] = new Object[2];
+      values[0] = super.saveState(context);
+      values[1] = this.value;
+      return ((Object) (values));
+   }
+
+   /**
+    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+    */
+   public void restoreState(FacesContext context, Object state)
+   {
+      Object values[] = (Object[])state;
+      super.restoreState(context, values[0]);
+      this.value = values[1];
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Strongly typed component property accessors
    
    /**
     * Get the value - the value is used in a equals() match against the current value in the
@@ -50,26 +75,9 @@ public class UIModeListItem extends SelfRenderingComponent
       this.value = value;
    }
    
-   /**
-    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
-    */
-   public Object saveState(FacesContext context)
-   {
-      Object values[] = new Object[5];
-      values[0] = super.saveState(context);
-      values[1] = this.value;
-      return ((Object) (values));
-   }
-
-   /**
-    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
-    */
-   public void restoreState(FacesContext context, Object state)
-   {
-      Object values[] = (Object[])state;
-      super.restoreState(context, values[0]);
-      this.value = values[1];
-   }
+   
+   // ------------------------------------------------------------------------------
+   // Private data
    
    /** the component value */
    private Object value = null;

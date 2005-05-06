@@ -14,7 +14,7 @@ import javax.faces.context.ResponseWriter;
 import org.alfresco.web.ui.common.Utils;
 
 /**
- * @author kevinr
+ * @author Kevin Roast
  */
 public class UIMenu extends SelfRenderingComponent
 {

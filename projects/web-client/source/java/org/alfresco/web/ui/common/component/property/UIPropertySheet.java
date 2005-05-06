@@ -137,7 +137,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[8];
+      Object values[] = new Object[4];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.nodeRef;

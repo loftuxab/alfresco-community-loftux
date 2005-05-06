@@ -22,14 +22,18 @@ import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.Utils;
 
 /**
- * @author kevinr
+ * @author Kevin Roast
  */
 public class UIDataPager extends UICommand
 {
+   /**
+    * Default constructor
+    */
    public UIDataPager()
    {
       setRendererType(null);
    }
+   
    
    // ------------------------------------------------------------------------------
    // Component implementation

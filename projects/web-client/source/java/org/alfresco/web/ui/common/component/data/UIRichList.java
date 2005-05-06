@@ -18,7 +18,7 @@ import org.alfresco.web.ui.common.renderer.data.IRichListRenderer;
 import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 
 /**
- * @author kevinr
+ * @author Kevin Roast
  */
 public class UIRichList extends UIComponentBase implements IDataContainer
 {
@@ -68,6 +68,10 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       this.currentPage = ((Integer)values[1]).intValue();
       this.sortColumn = (String)values[2];
       this.sortDescending = ((Boolean)values[3]).booleanValue();
+      this.value = values[4];                      // not serializable!
+      this.dataModel = (IGridDataModel)values[5];  // not serializable!
+      this.viewMode = (String)values[6];
+      this.pageSize = ((Integer)values[7]).intValue();
    }
    
    /**
@@ -75,12 +79,17 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[4];
+      Object values[] = new Object[8];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = Integer.valueOf(this.currentPage);
       values[2] = this.sortColumn;
       values[3] = (this.sortDescending ? Boolean.TRUE : Boolean.FALSE);
+      values[4] = this.value;
+      values[5] = this.dataModel;
+      values[6] = this.viewMode;
+      values[7] = Integer.valueOf(this.pageSize);
+      
       return (values);
    }
    
@@ -369,22 +378,22 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    // ------------------------------------------------------------------------------
    // Private data
    
+   /** map of available IRichListRenderer instances */
+   private final static Map<String, IRichListRenderer> viewRenderers = new HashMap<String, IRichListRenderer>(5);
+   
    // component state
    private int currentPage = 0;
    private String sortColumn = null;
    private boolean sortDescending = true;
    private Object value = null;
-   private final static Map<String, IRichListRenderer> viewRenderers = new HashMap<String, IRichListRenderer>(5);
+   private IGridDataModel dataModel = null;
+   private String viewMode = null;
+   private int pageSize = -1;
    
    // transient component state that exists during a single page refresh only
    private int rowIndex = -1;
    private int maxRowIndex = -1;
-   private IGridDataModel dataModel = null;
-   
-   // component settings set by tag
-   private int pageSize = -1;
    private int pageCount = 1;
-   private String viewMode = null;
    
    private static Logger s_logger = Logger.getLogger(IDataContainer.class);
 }

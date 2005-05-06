@@ -21,10 +21,13 @@ import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.Utils;
 
 /**
- * @author kevinr
+ * @author Kevin Roast
  */
 public class UISortLink extends UICommand
 {
+   /**
+    * Default Constructor
+    */
    public UISortLink()
    {
       setRendererType(null);

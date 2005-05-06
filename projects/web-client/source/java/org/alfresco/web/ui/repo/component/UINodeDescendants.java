@@ -3,8 +3,11 @@
  */
 package org.alfresco.web.ui.repo.component;
 
+import java.util.Map;
+
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import javax.faces.event.ActionEvent;
 
@@ -36,6 +39,31 @@ public class UINodeDescendants extends UICommand
    public String getFamily()
    {
       return "awc.repo.NodeDescendants";
+   }
+   
+   /**
+    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+    */
+   public void restoreState(FacesContext context, Object state)
+   {
+      Object values[] = (Object[])state;
+      // standard component attributes are restored by the super class
+      super.restoreState(context, values[0]);
+      this.maxChildren = (Integer)values[1];
+      this.showEllipses = (Boolean)values[2];
+   }
+   
+   /**
+    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
+    */
+   public Object saveState(FacesContext context)
+   {
+      Object values[] = new Object[3];
+      // standard component attributes are saved by the super class
+      values[0] = super.saveState(context);
+      values[1] = this.maxChildren;
+      values[2] = this.showEllipses;
+      return (values);
    }
    
    
