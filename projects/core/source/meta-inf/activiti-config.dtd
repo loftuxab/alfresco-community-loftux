@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!ELEMENT activiti-config (plug-ins?,config*)>   
+<!ELEMENT alfresco-config (plug-ins?,config*)>   
 <!ELEMENT plug-ins (evaluators?,element-readers?)>
 <!ELEMENT evaluators (evaluator*)>
 <!ELEMENT element-readers (element-reader*)>

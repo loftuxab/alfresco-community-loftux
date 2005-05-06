@@ -6,7 +6,7 @@
 
 <%@ page isELIgnored="false" %>
 
-<%@ page import="com.activiti.web.PanelGenerator" %>
+<%@ page import="org.alfresco.web.PanelGenerator" %>
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
