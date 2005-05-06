@@ -1,7 +1,7 @@
 /*
  * Created on Mar 11, 2005
  */
-package org.alfresco.web.jsf.component.data;
+package org.alfresco.web.ui.common.component.data;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +14,8 @@ import javax.faces.el.ValueBinding;
 import org.apache.log4j.Logger;
 
 import org.alfresco.web.data.IDataContainer;
-import org.alfresco.web.jsf.renderer.data.IRichListRenderer;
-import org.alfresco.web.jsf.renderer.data.RichListRenderer;
+import org.alfresco.web.ui.common.renderer.data.IRichListRenderer;
+import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 
 /**
  * @author kevinr

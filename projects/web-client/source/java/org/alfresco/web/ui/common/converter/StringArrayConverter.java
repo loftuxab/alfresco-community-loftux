@@ -1,4 +1,4 @@
-package org.alfresco.web.jsf.converter;
+package org.alfresco.web.ui.common.converter;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;

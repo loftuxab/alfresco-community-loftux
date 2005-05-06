@@ -1,4 +1,4 @@
-package org.alfresco.web.jsf.component.data;
+package org.alfresco.web.ui.common.component.data;
 
 /**
  * @author kevinr

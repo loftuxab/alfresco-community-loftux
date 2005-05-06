@@ -1,4 +1,4 @@
-package org.alfresco.web.jsf;
+package org.alfresco.web.ui.common;
 
 import javax.faces.component.StateHolder;
 import javax.faces.context.FacesContext;

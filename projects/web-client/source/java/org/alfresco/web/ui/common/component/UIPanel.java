@@ -1,7 +1,7 @@
 /*
  * Created on Mar 30, 2005
  */
-package org.alfresco.web.jsf.component;
+package org.alfresco.web.ui.common.component;
 
 import java.io.IOException;
 import java.util.Map;
@@ -14,7 +14,7 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.el.ValueBinding;
 
 import org.alfresco.web.PanelGenerator;
-import org.alfresco.web.jsf.Utils;
+import org.alfresco.web.ui.common.Utils;
 
 /**
  * @author kevinr

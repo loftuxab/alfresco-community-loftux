@@ -1,4 +1,4 @@
-package org.alfresco.web.jsf.component;
+package org.alfresco.web.ui.common.component;
 
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;

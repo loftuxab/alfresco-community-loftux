@@ -1,7 +1,7 @@
 /*
  * Created on 07-Apr-2005
  */
-package org.alfresco.web.jsf.component.evaluator;
+package org.alfresco.web.ui.common.component.evaluator;
 
 import javax.faces.el.ValueBinding;
 

@@ -1,4 +1,4 @@
-package org.alfresco.web.jsf.component.data;
+package org.alfresco.web.ui.common.component.data;
 
 import java.io.IOException;
 import java.util.Map;
@@ -7,7 +7,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
 import org.alfresco.web.data.IDataContainer;
-import org.alfresco.web.jsf.component.SelfRenderingComponent;
+import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 
 
 /**

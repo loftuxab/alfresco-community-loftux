@@ -1,7 +1,7 @@
 /*
  * Created on Mar 15, 2005
  */
-package org.alfresco.web.jsf;
+package org.alfresco.web.ui.common;
 
 import java.util.Map;
 

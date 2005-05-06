@@ -1,14 +1,14 @@
 /*
  * Created on Mar 14, 2005
  */
-package org.alfresco.web.jsf.renderer.data;
+package org.alfresco.web.ui.common.renderer.data;
 
 import java.io.IOException;
 
 import javax.faces.context.FacesContext;
 
-import org.alfresco.web.jsf.component.data.UIColumn;
-import org.alfresco.web.jsf.component.data.UIRichList;
+import org.alfresco.web.ui.common.component.data.UIColumn;
+import org.alfresco.web.ui.common.component.data.UIRichList;
 
 /**
  * Contract for implementations capable of rendering the columns for a Rich List

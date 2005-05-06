@@ -1,14 +1,14 @@
 /*
  * Created on Mar 30, 2005
  */
-package org.alfresco.web.jsf.tag;
+package org.alfresco.web.ui.common.tag;
 
 import java.util.Random;
 
 import javax.faces.component.UIComponent;
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.jsf.component.UIPanel;
+import org.alfresco.web.ui.common.component.UIPanel;
 
 /**
  * @author kevinr

@@ -1,7 +1,7 @@
 /*
  * Created on 01-Apr-2005
  */
-package org.alfresco.web.jsf.component;
+package org.alfresco.web.ui.common.component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -249,7 +249,7 @@ public class UIBreadcrumb extends UICommand
       }
       
       /**
-       * @see org.alfresco.web.jsf.component.IBreadcrumbHandler#navigationOutcome(org.alfresco.web.jsf.component.UIBreadcrumb)
+       * @see org.alfresco.web.ui.common.component.IBreadcrumbHandler#navigationOutcome(org.alfresco.web.ui.common.component.UIBreadcrumb)
        */
       public String navigationOutcome(UIBreadcrumb breadcrumb)
       {

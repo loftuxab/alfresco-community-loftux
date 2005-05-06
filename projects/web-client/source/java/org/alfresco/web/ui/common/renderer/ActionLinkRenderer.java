@@ -1,7 +1,7 @@
 /*
  * Created on 04-Apr-2005
  */
-package org.alfresco.web.jsf.renderer;
+package org.alfresco.web.ui.common.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -12,9 +12,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
-import org.alfresco.web.jsf.Utils;
-import org.alfresco.web.jsf.component.UIActionLink;
-import org.alfresco.web.jsf.component.UIMenu;
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.UIActionLink;
+import org.alfresco.web.ui.common.component.UIMenu;
 
 /**
  * @author kevinr

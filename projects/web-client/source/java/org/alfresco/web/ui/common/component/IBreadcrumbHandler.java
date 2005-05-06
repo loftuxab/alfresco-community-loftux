@@ -1,7 +1,7 @@
 /*
  * Created on 22-Apr-2005
  */
-package org.alfresco.web.jsf.component;
+package org.alfresco.web.ui.common.component;
 
 import java.io.Serializable;
 

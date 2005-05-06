@@ -1,7 +1,7 @@
 /*
  * Created on Mar 7, 2005
  */
-package org.alfresco.web.jsf.renderer.data;
+package org.alfresco.web.ui.common.renderer.data;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,7 +12,7 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
 import javax.faces.render.Renderer;
 
-import org.alfresco.web.jsf.renderer.BaseRenderer;
+import org.alfresco.web.ui.common.renderer.BaseRenderer;
 
 /**
  * @author kevinr

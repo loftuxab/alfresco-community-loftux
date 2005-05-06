@@ -1,7 +1,7 @@
 /*
  * Created on 01-Apr-2005
  */
-package org.alfresco.web.jsf.renderer;
+package org.alfresco.web.ui.common.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -14,9 +14,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 
-import org.alfresco.web.jsf.Utils;
-import org.alfresco.web.jsf.component.IBreadcrumbHandler;
-import org.alfresco.web.jsf.component.UIBreadcrumb;
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
+import org.alfresco.web.ui.common.component.UIBreadcrumb;
 
 /**
  * Renderer class for the UIBreadcrumb component

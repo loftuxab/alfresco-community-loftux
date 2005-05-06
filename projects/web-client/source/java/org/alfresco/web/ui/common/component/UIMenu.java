@@ -1,7 +1,7 @@
 /*
  * Created on 11-Apr-2005
  */
-package org.alfresco.web.jsf.component;
+package org.alfresco.web.ui.common.component;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -11,7 +11,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
-import org.alfresco.web.jsf.Utils;
+import org.alfresco.web.ui.common.Utils;
 
 /**
  * @author kevinr

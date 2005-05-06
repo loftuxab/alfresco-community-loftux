@@ -1,7 +1,7 @@
 /*
  * Created on 07-Apr-2005
  */
-package org.alfresco.web.jsf.component.evaluator;
+package org.alfresco.web.ui.common.component.evaluator;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ import javax.faces.el.ValueBinding;
 
 import org.apache.log4j.Logger;
 
-import org.alfresco.web.jsf.component.SelfRenderingComponent;
+import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 
 /**
  * @author kevinr

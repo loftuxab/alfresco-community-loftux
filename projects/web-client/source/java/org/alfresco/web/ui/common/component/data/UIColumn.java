@@ -1,7 +1,7 @@
 /*
  * Created on Mar 11, 2005
  */
-package org.alfresco.web.jsf.component.data;
+package org.alfresco.web.ui.common.component.data;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIComponentBase;

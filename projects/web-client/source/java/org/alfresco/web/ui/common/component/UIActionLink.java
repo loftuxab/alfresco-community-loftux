@@ -1,7 +1,7 @@
 /*
  * Created on 04-Apr-2005
  */
-package org.alfresco.web.jsf.component;
+package org.alfresco.web.ui.common.component;
 
 import java.util.HashMap;
 import java.util.Map;

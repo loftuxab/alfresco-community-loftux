@@ -1,11 +1,11 @@
 /*
  * Created on Mar 15, 2005
  */
-package org.alfresco.web.jsf.tag.data;
+package org.alfresco.web.ui.common.tag.data;
 
 import javax.faces.component.UIComponent;
 
-import org.alfresco.web.jsf.tag.HtmlComponentTag;
+import org.alfresco.web.ui.common.tag.HtmlComponentTag;
 
 /**
  * @author kevinr

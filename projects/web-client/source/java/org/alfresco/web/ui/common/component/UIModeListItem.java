@@ -1,7 +1,7 @@
 /*
  * Created on 13-Apr-2005
  */
-package org.alfresco.web.jsf.component;
+package org.alfresco.web.ui.common.component;
 
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;

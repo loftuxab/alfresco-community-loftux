@@ -1,7 +1,7 @@
 /*
  * Created on Mar 11, 2005
  */
-package org.alfresco.web.jsf.component;
+package org.alfresco.web.ui.common.component;
 
 import java.io.IOException;
 import java.util.Iterator;

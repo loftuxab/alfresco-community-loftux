@@ -1,8 +1,8 @@
-package org.alfresco.web.jsf.tag.property;
+package org.alfresco.web.ui.common.tag.property;
 
 import javax.faces.component.UIComponent;
 
-import org.alfresco.web.jsf.tag.BaseComponentTag;
+import org.alfresco.web.ui.common.tag.BaseComponentTag;
 
 /**
  * @author gavinc

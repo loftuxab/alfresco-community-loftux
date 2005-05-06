@@ -1,7 +1,7 @@
 /*
  * Created on 13-Apr-2005
  */
-package org.alfresco.web.jsf.renderer;
+package org.alfresco.web.ui.common.renderer;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -15,10 +15,10 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.FacesEvent;
 
-import org.alfresco.web.jsf.Utils;
-import org.alfresco.web.jsf.component.UIModeList;
-import org.alfresco.web.jsf.component.UIModeListItem;
-import org.alfresco.web.jsf.component.UIBreadcrumb.BreadcrumbEvent;
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.UIModeList;
+import org.alfresco.web.ui.common.component.UIModeListItem;
+import org.alfresco.web.ui.common.component.UIBreadcrumb.BreadcrumbEvent;
 
 /**
  * @author kevinr

@@ -1,7 +1,7 @@
 /*
  * Created on Mar 4, 2005
  */
-package org.alfresco.web.jsf.tag;
+package org.alfresco.web.ui.common.tag;
 
 import javax.faces.FacesException;
 import javax.faces.component.UICommand;
@@ -10,7 +10,7 @@ import javax.faces.el.MethodBinding;
 import javax.faces.el.ValueBinding;
 import javax.faces.webapp.UIComponentTag;
 
-import org.alfresco.web.jsf.ConstantMethodBinding;
+import org.alfresco.web.ui.common.ConstantMethodBinding;
 
 /**
  * @author Kevin Roast

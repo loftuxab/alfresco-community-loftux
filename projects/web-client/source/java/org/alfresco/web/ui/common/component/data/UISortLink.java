@@ -1,7 +1,7 @@
 /*
  * Created on Mar 15, 2005
  */
-package org.alfresco.web.jsf.component.data;
+package org.alfresco.web.ui.common.component.data;
 
 import java.io.IOException;
 import java.util.Map;
@@ -18,7 +18,7 @@ import javax.faces.event.FacesEvent;
 import org.apache.log4j.Logger;
 
 import org.alfresco.web.data.IDataContainer;
-import org.alfresco.web.jsf.Utils;
+import org.alfresco.web.ui.common.Utils;
 
 /**
  * @author kevinr

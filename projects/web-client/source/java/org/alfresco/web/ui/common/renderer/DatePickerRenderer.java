@@ -1,7 +1,7 @@
 /*
  * Created on Mar 3, 2005
  */
-package org.alfresco.web.jsf.renderer;
+package org.alfresco.web.ui.common.renderer;
 
 import java.io.IOException;
 import java.text.DateFormatSymbols;

@@ -1,7 +1,7 @@
 /*
  * Created on 07-Apr-2005
  */
-package org.alfresco.web.jsf.tag.evaluator;
+package org.alfresco.web.ui.common.tag.evaluator;
 
 import javax.faces.component.UIComponent;
 

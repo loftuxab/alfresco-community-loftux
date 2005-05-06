@@ -1,7 +1,7 @@
 /*
  * Created on 01-Apr-2005
  */
-package org.alfresco.web.jsf.tag;
+package org.alfresco.web.ui.common.tag;
 
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;

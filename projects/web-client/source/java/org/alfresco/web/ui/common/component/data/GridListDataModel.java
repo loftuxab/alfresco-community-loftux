@@ -1,7 +1,7 @@
 /*
  * Created on Mar 14, 2005
  */
-package org.alfresco.web.jsf.component.data;
+package org.alfresco.web.ui.common.component.data;
 
 import java.util.List;
 

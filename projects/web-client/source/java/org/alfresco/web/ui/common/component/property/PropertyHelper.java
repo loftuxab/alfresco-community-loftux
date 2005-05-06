@@ -1,4 +1,4 @@
-package org.alfresco.web.jsf.component.property;
+package org.alfresco.web.ui.common.component.property;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
