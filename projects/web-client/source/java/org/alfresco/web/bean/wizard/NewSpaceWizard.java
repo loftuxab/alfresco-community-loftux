@@ -28,8 +28,8 @@ import org.alfresco.repo.search.Searcher;
 import org.alfresco.util.Conversion;
 import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.jsf.Utils;
-import org.alfresco.web.jsf.component.UIModeList;
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.UIModeList;
 
 /**
  * Handler class used by the New Space Wizard 

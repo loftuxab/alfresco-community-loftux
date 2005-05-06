@@ -22,9 +22,9 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.jsf.component.IBreadcrumbHandler;
-import org.alfresco.web.jsf.component.UIBreadcrumb;
-import org.alfresco.web.jsf.component.data.UIRichList;
+import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
+import org.alfresco.web.ui.common.component.UIBreadcrumb;
+import org.alfresco.web.ui.common.component.data.UIRichList;
 
 /**
  * @author Kevin Roast
@@ -238,7 +238,7 @@ public class NavigationBean
       }
 
       /**
-       * @see org.alfresco.web.jsf.component.IBreadcrumbHandler#navigationOutcome(org.alfresco.web.jsf.component.UIBreadcrumb)
+       * @see org.alfresco.web.ui.common.component.IBreadcrumbHandler#navigationOutcome(org.alfresco.web.ui.common.component.UIBreadcrumb)
        */
       public String navigationOutcome(UIBreadcrumb breadcrumb)
       {

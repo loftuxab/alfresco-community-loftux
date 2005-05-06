@@ -19,8 +19,8 @@ import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.jsf.Utils;
-import org.alfresco.web.jsf.renderer.BaseRenderer;
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.renderer.BaseRenderer;
 
 /**
  * @author Kevin Roast

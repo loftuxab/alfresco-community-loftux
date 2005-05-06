@@ -17,8 +17,8 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.jsf.Utils;
-import org.alfresco.web.jsf.component.UIModeList;
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.UIModeList;
 
 /**
  * Handler class used by the Add Content Wizard 

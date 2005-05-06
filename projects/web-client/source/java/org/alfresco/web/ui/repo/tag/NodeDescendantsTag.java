@@ -6,7 +6,7 @@ package org.alfresco.web.ui.repo.tag;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 
-import org.alfresco.web.jsf.tag.HtmlComponentTag;
+import org.alfresco.web.ui.common.tag.HtmlComponentTag;
 
 /**
  * @author Kevin Roast
@@ -45,7 +45,7 @@ public class NodeDescendantsTag extends HtmlComponentTag
    }
    
    /**
-    * @see org.alfresco.web.jsf.tag.HtmlComponentTag#release()
+    * @see org.alfresco.web.ui.common.tag.HtmlComponentTag#release()
     */
    public void release()
    {

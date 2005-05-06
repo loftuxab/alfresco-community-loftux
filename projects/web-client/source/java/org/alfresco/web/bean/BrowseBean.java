@@ -31,12 +31,12 @@ import org.alfresco.repo.search.Value;
 import org.alfresco.util.Conversion;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.jsf.Utils;
-import org.alfresco.web.jsf.component.IBreadcrumbHandler;
-import org.alfresco.web.jsf.component.UIActionLink;
-import org.alfresco.web.jsf.component.UIBreadcrumb;
-import org.alfresco.web.jsf.component.UIModeList;
-import org.alfresco.web.jsf.component.data.UIRichList;
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
+import org.alfresco.web.ui.common.component.UIActionLink;
+import org.alfresco.web.ui.common.component.UIBreadcrumb;
+import org.alfresco.web.ui.common.component.UIModeList;
+import org.alfresco.web.ui.common.component.data.UIRichList;
 
 /**
  * @author Kevin Roast
@@ -578,7 +578,7 @@ public class BrowseBean
       }
 
       /**
-       * @see org.alfresco.web.jsf.component.IBreadcrumbHandler#navigationOutcome(org.alfresco.web.jsf.component.UIBreadcrumb)
+       * @see org.alfresco.web.ui.common.component.IBreadcrumbHandler#navigationOutcome(org.alfresco.web.ui.common.component.UIBreadcrumb)
        */
       public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
