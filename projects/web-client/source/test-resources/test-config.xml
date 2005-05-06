@@ -37,9 +37,9 @@
       </properties>
    </config>
    
-   <config evaluator="object-type" condition="org.alfresco.web.jsf.component.data.UIRichList">
+   <config evaluator="object-type" condition="org.alfresco.web.ui.common.component.data.UIRichList">
       <renderers>
-         <renderer mode="details">org.alfresco.web.jsf.renderer.data.RichListRenderer.DetailsViewRenderer</renderer>
+         <renderer mode="details">org.alfresco.web.ui.common.renderer.data.RichListRenderer.DetailsViewRenderer</renderer>
       </renderers>
    </config>
    

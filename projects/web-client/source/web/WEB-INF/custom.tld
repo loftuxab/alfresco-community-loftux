@@ -8,7 +8,7 @@
    
    <tag>
       <name>inputDatePicker</name>
-      <tagclass>org.alfresco.web.jsf.tag.InputDatePickerTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.InputDatePickerTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -62,7 +62,7 @@
    
    <tag>
       <name>dataList</name>
-      <tagclass>org.alfresco.web.jsf.tag.data.DataGridTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.data.DataGridTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -116,7 +116,7 @@
    
    <tag>
       <name>richList</name>
-      <tagclass>org.alfresco.web.jsf.tag.data.RichListTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.data.RichListTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -212,7 +212,7 @@
    
    <tag>
       <name>column</name>
-      <tagclass>org.alfresco.web.jsf.tag.data.ColumnTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.data.ColumnTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -266,7 +266,7 @@
    
    <tag>
       <name>sortLink</name>
-      <tagclass>org.alfresco.web.jsf.tag.data.SortLinkTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.data.SortLinkTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -332,7 +332,7 @@
 
    <tag>
       <name>dataPager</name>
-      <tagclass>org.alfresco.web.jsf.tag.data.DataPagerTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.data.DataPagerTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -356,7 +356,7 @@
    
    <tag>
       <name>panel</name>
-      <tagclass>org.alfresco.web.jsf.tag.PanelTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.PanelTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -428,7 +428,7 @@
 
    <tag>
       <name>propertySheetGrid</name>
-      <tagclass>org.alfresco.web.jsf.tag.property.PropertySheetGridTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.property.PropertySheetGridTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -476,7 +476,7 @@
    
    <tag>
       <name>property</name>
-      <tagclass>org.alfresco.web.jsf.tag.property.PropertyTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.property.PropertyTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -500,7 +500,7 @@
    
    <tag>
       <name>breadcrumb</name>
-      <tagclass>org.alfresco.web.jsf.tag.BreadcrumbTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.BreadcrumbTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -572,7 +572,7 @@
    
    <tag>
       <name>actionLink</name>
-      <tagclass>org.alfresco.web.jsf.tag.ActionLinkTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.ActionLinkTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -650,7 +650,7 @@
    
    <tag>
       <name>booleanEvaluator</name>
-      <tagclass>org.alfresco.web.jsf.tag.evaluator.BooleanEvaluatorTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.evaluator.BooleanEvaluatorTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -674,7 +674,7 @@
    
    <tag>
       <name>valueSetEvaluator</name>
-      <tagclass>org.alfresco.web.jsf.tag.evaluator.ValueSetEvaluatorTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.evaluator.ValueSetEvaluatorTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -698,7 +698,7 @@
    
    <tag>
       <name>stringEqualsEvaluator</name>
-      <tagclass>org.alfresco.web.jsf.tag.evaluator.StringEqualsEvaluatorTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.evaluator.StringEqualsEvaluatorTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -728,7 +728,7 @@
    
    <tag>
       <name>menu</name>
-      <tagclass>org.alfresco.web.jsf.tag.MenuTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.MenuTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -800,7 +800,7 @@
    
    <tag>
       <name>modeList</name>
-      <tagclass>org.alfresco.web.jsf.tag.ModeListTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.ModeListTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -944,7 +944,7 @@
    
    <tag>
       <name>modeListItem</name>
-      <tagclass>org.alfresco.web.jsf.tag.ModeListItemTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.ModeListItemTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -1076,7 +1076,7 @@
 
    <tag>
       <name>imagePickerRadio</name>
-      <tagclass>org.alfresco.web.jsf.tag.ImagePickerRadioTag</tagclass>
+      <tagclass>org.alfresco.web.ui.common.tag.ImagePickerRadioTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>

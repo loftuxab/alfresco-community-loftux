@@ -15,67 +15,67 @@
    <!-- ==================== COMPONENTS ==================== -->
    <component>
       <component-type>awc.faces.DataGrid</component-type>
-      <component-class>org.alfresco.web.jsf.component.data.UIDataGrid</component-class>
+      <component-class>org.alfresco.web.ui.common.component.data.UIDataGrid</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.RichList</component-type>
-      <component-class>org.alfresco.web.jsf.component.data.UIRichList</component-class>
+      <component-class>org.alfresco.web.ui.common.component.data.UIRichList</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.RichListColumn</component-type>
-      <component-class>org.alfresco.web.jsf.component.data.UIColumn</component-class>
+      <component-class>org.alfresco.web.ui.common.component.data.UIColumn</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.SortLink</component-type>
-      <component-class>org.alfresco.web.jsf.component.data.UISortLink</component-class>
+      <component-class>org.alfresco.web.ui.common.component.data.UISortLink</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.DataPager</component-type>
-      <component-class>org.alfresco.web.jsf.component.data.UIDataPager</component-class>
+      <component-class>org.alfresco.web.ui.common.component.data.UIDataPager</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.PropertySheet</component-type>
-      <component-class>org.alfresco.web.jsf.component.property.UIPropertySheet</component-class>
+      <component-class>org.alfresco.web.ui.common.component.property.UIPropertySheet</component-class>
    </component>
 
    <component>
       <component-type>awc.faces.Property</component-type>
-      <component-class>org.alfresco.web.jsf.component.property.UIProperty</component-class>
+      <component-class>org.alfresco.web.ui.common.component.property.UIProperty</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.Panel</component-type>
-      <component-class>org.alfresco.web.jsf.component.UIPanel</component-class>
+      <component-class>org.alfresco.web.ui.common.component.UIPanel</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.Breadcrumb</component-type>
-      <component-class>org.alfresco.web.jsf.component.UIBreadcrumb</component-class>
+      <component-class>org.alfresco.web.ui.common.component.UIBreadcrumb</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.ActionLink</component-type>
-      <component-class>org.alfresco.web.jsf.component.UIActionLink</component-class>
+      <component-class>org.alfresco.web.ui.common.component.UIActionLink</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.Menu</component-type>
-      <component-class>org.alfresco.web.jsf.component.UIMenu</component-class>
+      <component-class>org.alfresco.web.ui.common.component.UIMenu</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.ModeList</component-type>
-      <component-class>org.alfresco.web.jsf.component.UIModeList</component-class>
+      <component-class>org.alfresco.web.ui.common.component.UIModeList</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.ModeListItem</component-type>
-      <component-class>org.alfresco.web.jsf.component.UIModeListItem</component-class>
+      <component-class>org.alfresco.web.ui.common.component.UIModeListItem</component-class>
    </component>
    
    <component>
@@ -85,29 +85,29 @@
    
    <component>
       <component-type>awc.faces.ImagePicker</component-type>
-      <component-class>org.alfresco.web.jsf.component.UIImagePicker</component-class>
+      <component-class>org.alfresco.web.ui.common.component.UIImagePicker</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.BooleanEvaluator</component-type>
-      <component-class>org.alfresco.web.jsf.component.evaluator.BooleanEvaluator</component-class>
+      <component-class>org.alfresco.web.ui.common.component.evaluator.BooleanEvaluator</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.ValueSetEvaluator</component-type>
-      <component-class>org.alfresco.web.jsf.component.evaluator.ValueSetEvaluator</component-class>
+      <component-class>org.alfresco.web.ui.common.component.evaluator.ValueSetEvaluator</component-class>
    </component>
    
    <component>
       <component-type>awc.faces.StringEqualsEvaluator</component-type>
-      <component-class>org.alfresco.web.jsf.component.evaluator.StringEqualsEvaluator</component-class>
+      <component-class>org.alfresco.web.ui.common.component.evaluator.StringEqualsEvaluator</component-class>
    </component>
 
 
    <!-- ==================== CONVERTERS ==================== -->
    <converter>
       <converter-id>converter:StringArray</converter-id>
-      <converter-class>org.alfresco.web.jsf.converter.StringArrayConverter</converter-class>
+      <converter-class>org.alfresco.web.ui.common.converter.StringArrayConverter</converter-class>
    </converter>
    
    
@@ -120,31 +120,31 @@
          <!-- the renderer type is a convention name - not an actual class -->
          <renderer-type>awc.faces.DatePickerRenderer</renderer-type>
          <!-- the actual renderer class type -->
-         <renderer-class>org.alfresco.web.jsf.renderer.DatePickerRenderer</renderer-class>
+         <renderer-class>org.alfresco.web.ui.common.renderer.DatePickerRenderer</renderer-class>
       </renderer>
       
       <renderer>
          <component-family>awc.faces.Data</component-family>
          <renderer-type>awc.faces.RichListRenderer</renderer-type>
-         <renderer-class>org.alfresco.web.jsf.renderer.data.RichListRenderer</renderer-class>
+         <renderer-class>org.alfresco.web.ui.common.renderer.data.RichListRenderer</renderer-class>
       </renderer>
       
       <renderer>
          <component-family>awc.faces.Controls</component-family>
          <renderer-type>awc.faces.BreadcrumbRenderer</renderer-type>
-         <renderer-class>org.alfresco.web.jsf.renderer.BreadcrumbRenderer</renderer-class>
+         <renderer-class>org.alfresco.web.ui.common.renderer.BreadcrumbRenderer</renderer-class>
       </renderer>
       
       <renderer>
          <component-family>awc.faces.Controls</component-family>
          <renderer-type>awc.faces.ActionLinkRenderer</renderer-type>
-         <renderer-class>org.alfresco.web.jsf.renderer.ActionLinkRenderer</renderer-class>
+         <renderer-class>org.alfresco.web.ui.common.renderer.ActionLinkRenderer</renderer-class>
       </renderer>
       
       <renderer>
          <component-family>awc.faces.Controls</component-family>
          <renderer-type>awc.faces.ModeListRenderer</renderer-type>
-         <renderer-class>org.alfresco.web.jsf.renderer.ModeListRenderer</renderer-class>
+         <renderer-class>org.alfresco.web.ui.common.renderer.ModeListRenderer</renderer-class>
       </renderer>
       
       <renderer>
@@ -156,7 +156,7 @@
       <renderer>
          <component-family>awc.faces.ImagePicker</component-family>
          <renderer-type>awc.faces.Radio</renderer-type>
-         <renderer-class>org.alfresco.web.jsf.renderer.ImagePickerRadioRenderer</renderer-class>
+         <renderer-class>org.alfresco.web.ui.common.renderer.ImagePickerRadioRenderer</renderer-class>
       </renderer>
    </render-kit>
 
