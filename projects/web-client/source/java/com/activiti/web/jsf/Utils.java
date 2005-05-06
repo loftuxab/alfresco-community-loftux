@@ -11,9 +11,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 
-import com.activiti.web.data.IDataContainer;
+import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
 
-import com.sun.faces.renderkit.html_basic.FormRenderer;
+import com.activiti.web.data.IDataContainer;
 
 /**
  * @author kevinr
@@ -168,7 +168,8 @@ public final class Utils
             buf.append("';");
             
             // weak, but this seems to be the way Sun RI do it...
-            FormRenderer.addNeededHiddenField(context, name);
+            //FormRenderer.addNeededHiddenField(context, name);
+            HtmlFormRendererBase.addHiddenCommandParameter(form, name);
          }
       }
       
@@ -181,7 +182,9 @@ public final class Utils
       buf.append(";return false;");
       
       // weak, but this seems to be the way Sun RI do it...
-      FormRenderer.addNeededHiddenField(context, fieldId);
+      //FormRenderer.addNeededHiddenField(context, fieldId);
+      HtmlFormRendererBase.addHiddenCommandParameter(form, fieldId);
+      
       
       return buf.toString();
    }

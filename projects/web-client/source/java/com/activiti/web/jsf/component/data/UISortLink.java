@@ -25,6 +25,11 @@ import com.activiti.web.jsf.Utils;
  */
 public class UISortLink extends UICommand
 {
+   public UISortLink()
+   {
+      setRendererType(null);
+   }
+   
    /**
     * @see javax.faces.component.UIComponent#encodeBegin(javax.faces.context.FacesContext)
     */

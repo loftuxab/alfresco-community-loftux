@@ -5,9 +5,9 @@
   "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-   <display-name>Company Name Web Client</display-name>
+   <display-name>Alfresco Web Client</display-name>
     
-   <description>Company Name Web Client</description>
+   <description>Alfresco Web Client</description>
 
    <context-param>
       <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
@@ -28,6 +28,10 @@
       <param-name>contextConfigLocation</param-name>
       <param-value>classpath:applicationContext.xml /WEB-INF/web-client-application-context.xml</param-value>
    </context-param>
+
+   <listener>
+      <listener-class>org.apache.myfaces.webapp.StartupServletContextListener</listener-class>
+   </listener>
    
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -38,11 +42,13 @@
    </listener>
     
    <!-- Faces Servlet -->
+   <!--
    <servlet>
       <servlet-name>Faces Servlet</servlet-name>
       <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
    </servlet>
+   -->
 
    <!-- Faces Servlet Mapping -->
    <!-- NOTE: not required for portlet URLs? -->

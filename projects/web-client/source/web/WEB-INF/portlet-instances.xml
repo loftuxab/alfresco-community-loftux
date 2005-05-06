@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes"?>
 <instances>
    <instance>
-      <instance-name>JSFTestInstance</instance-name>
-      <component-name>JSFTest</component-name>
+      <instance-name>AlfrescoClientInstance</instance-name>
+      <component-ref>AlfrescoClient</component-ref>
    </instance>
 </instances>

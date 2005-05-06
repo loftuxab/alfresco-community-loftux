@@ -3,6 +3,7 @@
  */
 package com.activiti.web.jsf.component;
 
+import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
 /**
@@ -49,6 +50,26 @@ public class UIModeListItem extends SelfRenderingComponent
       this.value = value;
    }
    
+   /**
+    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
+    */
+   public Object saveState(FacesContext context)
+   {
+      Object values[] = new Object[5];
+      values[0] = super.saveState(context);
+      values[1] = this.value;
+      return ((Object) (values));
+   }
+
+   /**
+    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+    */
+   public void restoreState(FacesContext context, Object state)
+   {
+      Object values[] = (Object[])state;
+      super.restoreState(context, values[0]);
+      this.value = values[1];
+   }
    
    /** the component value */
    private Object value = null;

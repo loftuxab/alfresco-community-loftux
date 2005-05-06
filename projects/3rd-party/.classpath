@@ -2,10 +2,7 @@
 <classpath>
 	<classpathentry exported="true" kind="lib" path="lib/aopalliance.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cglib-full-2.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-collections.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-digester.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.4.jar"/>
@@ -13,9 +10,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hrtlib.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jsf-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jsf-impl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jsf-portlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jstl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jta.jar"/>
@@ -37,5 +31,16 @@
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.resources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.xmi.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-digester-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-el.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-validator.jar"/>
+	<classpathentry exported="true" sourcepath="W:/software/myfaces-1.0.9-src/src/jsfapi" kind="lib" path="lib/myfaces.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path=""/>
 </classpath>

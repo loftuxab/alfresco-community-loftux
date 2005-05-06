@@ -3,10 +3,10 @@
    <page>
       <page-name>web-client</page-name>
       <window>
-         <window-name>JSFTestWindow</window-name>
-         <instance-ref>/web-client.JSFTest.JSFTestInstance</instance-ref>
+         <window-name>AlfrescoClientWindow</window-name>
+         <instance-ref>/web-client.AlfrescoClient.AlfrescoClientInstance</instance-ref>
          <default>true</default>
-         <region>left</region>
+         <region>center</region>
          <height>0</height>
       </window>
    </page>

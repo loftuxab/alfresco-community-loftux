@@ -26,6 +26,11 @@ import com.activiti.web.jsf.Utils;
  */
 public class UIDataPager extends UICommand
 {
+   public UIDataPager()
+   {
+      setRendererType(null);
+   }
+   
    // ------------------------------------------------------------------------------
    // Component implementation
    

@@ -10,7 +10,7 @@ import javax.faces.el.MethodBinding;
 import javax.faces.el.ValueBinding;
 import javax.faces.webapp.UIComponentTag;
 
-import com.sun.faces.util.ConstantMethodBinding;
+import com.activiti.web.jsf.ConstantMethodBinding;
 
 /**
  * @author Kevin Roast
