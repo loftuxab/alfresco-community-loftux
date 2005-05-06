@@ -127,7 +127,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     protected Map<QName, ChildAssocRef> buildNodeGraph() throws Exception
     {
-        String ns = NamespaceService.alfresco_TEST_URI;
+        String ns = NamespaceService.ALFRESCO_TEST_URI;
         QName qname = null;
         ChildAssocRef assoc = null;
         Map<QName, ChildAssocRef> ret = new HashMap<QName, ChildAssocRef>(13);
@@ -300,7 +300,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // create a regular base node
         ChildAssocRef assocRef = nodeService.createNode(
                 rootNodeRef,
-                QName.createQName(NamespaceService.alfresco_TEST_URI, "test-content"),
+                QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test-content"),
                 DictionaryBootstrap.TYPE_BASE);
         NodeRef nodeRef = assocRef.getChildRef();
         // add the content aspect to the node, but don't supply any properties
@@ -365,27 +365,27 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
        // create a folder node
         ChildAssocRef assocRef = nodeService.createNode(
                 rootNodeRef,
-                QName.createQName(NamespaceService.alfresco_TEST_URI, "test-space"),
+                QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test-space"),
                 DictionaryBootstrap.TYPE_FOLDER);
         NodeRef nodeRef = assocRef.getChildRef();
         
         // define properties required for the space aspect
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         
-        QName propCreatedDate = QName.createQName(NamespaceService.alfresco_URI, "createddate");
+        QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
         Date now = new Date( Calendar.getInstance().getTimeInMillis() );
         properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
         
-        QName propModifiedDate = QName.createQName(NamespaceService.alfresco_URI, "modifieddate");
+        QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
         properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
         
-        QName propIcon = QName.createQName(NamespaceService.alfresco_URI, "icon");
+        QName propIcon = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
         properties.put(propIcon, "space.gif");
         
-        QName propDescription = QName.createQName(NamespaceService.alfresco_URI, "description");
+        QName propDescription = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
         properties.put(propDescription, "Short description");
         
-        QName propSpaceType = QName.createQName(NamespaceService.alfresco_URI, "spacetype");
+        QName propSpaceType = QName.createQName(NamespaceService.ALFRESCO_URI, "spacetype");
         properties.put(propSpaceType, "container");
         
         // try and add the aspect to the folder node
@@ -601,12 +601,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetParentAssocs() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        ChildAssocRef n3pn6Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI, "n3_p_n6"));
-        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI, "n5_p_n7"));
-        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI, "n6_p_n8"));
-        ChildAssocRef n7n8Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI, "n7_n8"));
+        ChildAssocRef n3pn6Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n3_p_n6"));
+        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n5_p_n7"));
+        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n6_p_n8"));
+        ChildAssocRef n7n8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n7_n8"));
         // get a child node's parents
-        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI, "n6_p_n8")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n6_p_n8")).getChildRef();
         List<ChildAssocRef> parentAssocs = nodeService.getParentAssocs(n8Ref);
         assertEquals("Incorrect number of parents", 2, parentAssocs.size());
         assertTrue("Expected assoc not found", parentAssocs.contains(n6pn8Ref));
@@ -624,7 +624,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetChildAssocs() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n1Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI,"root_p_n1")).getChildRef();
+        NodeRef n1Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI,"root_p_n1")).getChildRef();
         
         // get the parent node's children
         Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
@@ -727,12 +727,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetPath() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI,"n6_p_n8")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI,"n6_p_n8")).getChildRef();
 
         // get the primary node path for n8
         Path path = nodeService.getPath(n8Ref);
         assertEquals("Primary path incorrect",
-                "/{" + NamespaceService.alfresco_TEST_URI + "}root_p_n1/{" + NamespaceService.alfresco_TEST_URI + "}n1_p_n3/{" + NamespaceService.alfresco_TEST_URI + "}n3_p_n6/{" + NamespaceService.alfresco_TEST_URI + "}n6_p_n8",
+                "/{" + NamespaceService.ALFRESCO_TEST_URI + "}root_p_n1/{" + NamespaceService.ALFRESCO_TEST_URI + "}n1_p_n3/{" + NamespaceService.ALFRESCO_TEST_URI + "}n3_p_n6/{" + NamespaceService.ALFRESCO_TEST_URI + "}n6_p_n8",
                 path.toString());
     }
     
@@ -742,8 +742,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetPaths() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n6Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI,"n3_p_n6")).getChildRef();
-        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.alfresco_TEST_URI,"n6_p_n8")).getChildRef();
+        NodeRef n6Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI,"n3_p_n6")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI,"n6_p_n8")).getChildRef();
         
         // get all paths for the root node
         Collection<Path> paths = nodeService.getPaths(rootNodeRef, false);
@@ -858,7 +858,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     private Map<NodeRef, QName> createLevel(NodeRef container, String root, String filePrefix, String directoryPrefix)
     {
-        String ns = NamespaceService.alfresco_TEST_URI;
+        String ns = NamespaceService.ALFRESCO_TEST_URI;
         QName qname = null;
         ChildAssocRef assoc = null;
         Map<NodeRef, QName> ret = new HashMap<NodeRef, QName>(10);

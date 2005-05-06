@@ -37,35 +37,35 @@ import org.alfresco.util.debug.CodeMonkey;
 public class DictionaryBootstrap
 {   
     // Base type constants
-    public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.alfresco_URI, "base");
+    public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ALFRESCO_URI, "base");
     public static final ClassRef TYPE_BASE = new ClassRef(TYPE_QNAME_BASE);
     
     // Referenceable aspect constants
-    public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.alfresco_URI, "reference");
+    public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "reference");
     public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE);
     public static final String PROP_REFERENCE = "reference";
-    public static final QName PROP_QNAME_REFERENCE = QName.createQName(NamespaceService.alfresco_URI, PROP_REFERENCE);
+    public static final QName PROP_QNAME_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_REFERENCE);
         
     // Container type constants
-    public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.alfresco_URI, "container");
+    public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ALFRESCO_URI, "container");
     public static final ClassRef TYPE_CONTAINER = new ClassRef(TYPE_QNAME_CONTAINER);
-    public static final QName CHILD_ASSOC_CONTENTS = QName.createQName(NamespaceService.alfresco_URI, "contents");
+    public static final QName CHILD_ASSOC_CONTENTS = QName.createQName(NamespaceService.ALFRESCO_URI, "contents");
 
     // Content aspect constants
-    public static final QName ASPECT_QNAME_CONTENT = QName.createQName(NamespaceService.alfresco_URI, "aspect_content");
+    public static final QName ASPECT_QNAME_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_content");
     public static final String PROP_CONTENT_URL = "contentUrl";
-    public static final QName PROP_QNAME_CONTENT_URL = QName.createQName(NamespaceService.alfresco_URI, PROP_CONTENT_URL);
+    public static final QName PROP_QNAME_CONTENT_URL = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_CONTENT_URL);
     public static final String PROP_ENCODING = "encoding";
-    public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.alfresco_URI, PROP_ENCODING);
+    public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_ENCODING);
     public static final String PROP_MIME_TYPE = "mimetype";
-    public static final QName PROP_QNAME_MIME_TYPE = QName.createQName(NamespaceService.alfresco_URI, PROP_MIME_TYPE);
+    public static final QName PROP_QNAME_MIME_TYPE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_MIME_TYPE);
     
     // Categories and roots
     
-    public static final QName ASPECT_QNAME_ROOT = QName.createQName(NamespaceService.alfresco_URI, "aspect_root");
-    public static final QName TYPE_QNAME_CATEGORY = QName.createQName(NamespaceService.alfresco_URI, "category");
-    public static final QName TYPE_QNAME_STOREROOT = QName.createQName(NamespaceService.alfresco_URI, "store_root");
-    public static final QName TYPE_QNAME_CATEGORYROOT = QName.createQName(NamespaceService.alfresco_URI, "category_root");
+    public static final QName ASPECT_QNAME_ROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_root");
+    public static final QName TYPE_QNAME_CATEGORY = QName.createQName(NamespaceService.ALFRESCO_URI, "category");
+    public static final QName TYPE_QNAME_STOREROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "store_root");
+    public static final QName TYPE_QNAME_CATEGORYROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "category_root");
     public static final ClassRef ASPECT_CONTENT = new ClassRef(ASPECT_QNAME_CONTENT);
     public static final ClassRef ASPECT_ROOT = new ClassRef(ASPECT_QNAME_ROOT);
     public static final ClassRef TYPE_CATEGORY = new ClassRef(TYPE_QNAME_CATEGORY);
@@ -74,15 +74,15 @@ public class DictionaryBootstrap
     
 
     // Content type constants
-    public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.alfresco_URI, "content");
+    public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "content");
     public static final ClassRef TYPE_CONTENT = new ClassRef(TYPE_QNAME_CONTENT);
  
     // expected application types
-    public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.alfresco_URI, "folder");
-    public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.alfresco_URI, "file");
+    public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "folder");
+    public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ALFRESCO_URI, "file");
     public static final ClassRef TYPE_FOLDER = new ClassRef(TYPE_QNAME_FOLDER);
     public static final ClassRef TYPE_FILE = new ClassRef(TYPE_QNAME_FILE);
-    public static final QName ASPECT_QNAME_SPACE = QName.createQName(NamespaceService.alfresco_URI, "space");
+    public static final QName ASPECT_QNAME_SPACE = QName.createQName(NamespaceService.ALFRESCO_URI, "space");
     public static final ClassRef ASPECT_SPACE = new ClassRef(ASPECT_QNAME_SPACE);
     public static final String PROP_CREATED_DATE = "createddate";
     public static final String PROP_MODIFIED_DATE = "modifieddate";
@@ -91,8 +91,8 @@ public class DictionaryBootstrap
     public static final String PROP_SPACE_TYPE = "spacetype";
 
     // test types
-    public static final QName TEST_TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.alfresco_TEST_URI, "folder");
-    public static final QName TEST_TYPE_QNAME_FILE = QName.createQName(NamespaceService.alfresco_TEST_URI, "file");
+    public static final QName TEST_TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "folder");
+    public static final QName TEST_TYPE_QNAME_FILE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file");
     public static final ClassRef TEST_TYPE_FOLDER = new ClassRef(TEST_TYPE_QNAME_FOLDER);
     public static final ClassRef TEST_TYPE_FILE = new ClassRef(TEST_TYPE_QNAME_FILE);
 
@@ -207,13 +207,13 @@ public class DictionaryBootstrap
         defaultPrefix.setURI(defaultURI);
         
         // alfresco Namespace
-        M2NamespaceURI alfrescoURI = namespaceDAO.createURI(NamespaceService.alfresco_URI);
-        M2NamespacePrefix alfrescoPrefix = namespaceDAO.createPrefix(NamespaceService.alfresco_PREFIX);
+        M2NamespaceURI alfrescoURI = namespaceDAO.createURI(NamespaceService.ALFRESCO_URI);
+        M2NamespacePrefix alfrescoPrefix = namespaceDAO.createPrefix(NamespaceService.ALFRESCO_PREFIX);
         alfrescoPrefix.setURI(alfrescoURI);
         
         // alfresco Test Namespace
-        M2NamespaceURI alfrescoTestURI = namespaceDAO.createURI(NamespaceService.alfresco_TEST_URI);
-        M2NamespacePrefix alfrescoTestPrefix = namespaceDAO.createPrefix(NamespaceService.alfresco_TEST_PREFIX);
+        M2NamespaceURI alfrescoTestURI = namespaceDAO.createURI(NamespaceService.ALFRESCO_TEST_URI);
+        M2NamespacePrefix alfrescoTestPrefix = namespaceDAO.createPrefix(NamespaceService.ALFRESCO_TEST_PREFIX);
         alfrescoTestPrefix.setURI(alfrescoTestURI);
     }
     
@@ -397,7 +397,7 @@ public class DictionaryBootstrap
     private void createTestModel()
     {
         // Create Test Referencable Aspect
-        M2Aspect referenceAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.alfresco_TEST_URI, "referenceable"));
+        M2Aspect referenceAspect = metaModelDAO.createAspect(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "referenceable"));
         M2Property idProp = referenceAspect.createProperty("id");
         idProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
         idProp.setMandatory(true);

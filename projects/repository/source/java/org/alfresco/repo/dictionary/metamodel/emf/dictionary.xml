@@ -2,50 +2,50 @@
 <xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:datadictionary="http://www.alfresco.com/repo/datadictionary">
   <datadictionary:EMFNamespaceURI emfURI="" emfPrefixes="/1"/>
   <datadictionary:EMFNamespacePrefix emfPrefix="" emfURI="/0"/>
-  <datadictionary:EMFNamespaceURI emfURI="http://www.alfresco.com/1.0" emfPrefixes="/3"/>
-  <datadictionary:EMFNamespacePrefix emfPrefix="act" emfURI="/2"/>
-  <datadictionary:EMFNamespaceURI emfURI="http://www.alfresco.com/test/1.0" emfPrefixes="/5"/>
-  <datadictionary:EMFNamespacePrefix emfPrefix="test" emfURI="/4"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}any" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}text" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}content" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}int" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}long" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}float" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}double" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}date" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}datetime" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}boolean" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}name" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}guid" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFPropertyType qName="{http://www.alfresco.com/1.0}category" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <datadictionary:EMFAspect emfName="{http://www.alfresco.com/1.0}aspect_content">
+  <datadictionary:EMFNamespaceURI emfURI="http://www.alfresco.org/1.0" emfPrefixes="/3"/>
+  <datadictionary:EMFNamespacePrefix emfPrefix="alf" emfURI="/2"/>
+  <datadictionary:EMFNamespaceURI emfURI="http://www.alfresco.org/test/1.0" emfPrefixes="/5"/>
+  <datadictionary:EMFNamespacePrefix emfPrefix="alftest" emfURI="/4"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}any" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}text" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}content" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}int" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}long" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}float" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}double" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}date" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}datetime" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}boolean" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}name" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}guid" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFPropertyType qName="{http://www.alfresco.org/1.0}category" emfAnalyserClassName="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <datadictionary:EMFAspect emfName="{http://www.alfresco.org/1.0}aspect_content">
     <emfProperties emfName="contentUrl" emfType="/7"/>
     <emfProperties emfName="encoding" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="mimetype" emfType="/7" emfMandatory="true"/>
   </datadictionary:EMFAspect>
-  <datadictionary:EMFAspect emfName="{http://www.alfresco.com/1.0}aspect_root"/>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}base"/>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}reference" emfSuperClass="/21">
+  <datadictionary:EMFAspect emfName="{http://www.alfresco.org/1.0}aspect_root"/>
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}base"/>
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}reference" emfSuperClass="/21">
     <emfProperties emfName="reference" emfType="/6" emfMandatory="true"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}content" emfSuperClass="/21" emfDefaultAspects="/19"/>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}container" emfSuperClass="/21">
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}content" emfSuperClass="/21" emfDefaultAspects="/19"/>
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}container" emfSuperClass="/21">
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/21"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}file" emfSuperClass="/23"/>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}folder" emfSuperClass="/21">
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}file" emfSuperClass="/23"/>
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}folder" emfSuperClass="/21">
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/25"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/25"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}category" emfSuperClass="/21">
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}category" emfSuperClass="/21">
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/21"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}store_root" emfSuperClass="/24" emfDefaultAspects="/20"/>
-  <datadictionary:EMFType emfName="{http://www.alfresco.com/1.0}category_root" emfSuperClass="/21" emfDefaultAspects="/20">
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}store_root" emfSuperClass="/24" emfDefaultAspects="/20"/>
+  <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}category_root" emfSuperClass="/21" emfDefaultAspects="/20">
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/27"/>
   </datadictionary:EMFType>
-  <datadictionary:EMFAspect emfName="{http://www.alfresco.com/1.0}space">
+  <datadictionary:EMFAspect emfName="{http://www.alfresco.org/1.0}space">
     <emfProperties emfName="createddate" emfType="/14" emfMandatory="true"/>
     <emfProperties emfName="modifieddate" emfType="/14" emfMandatory="true"/>
     <emfProperties emfName="spacetype" emfType="/7" emfMandatory="true"/>

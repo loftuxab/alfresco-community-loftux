@@ -111,8 +111,8 @@ public class LuceneTest extends TestCase
 
         Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
         testProperties
-                .put(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-atomic"), "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
-        testProperties.put(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-nonatomic"),
+                .put(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"), "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
+        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic"),
                 "TEXT THAT IS INDEXED STORED AND TOKENISED BUT NOT ATOMICALLY KEYTWO");
 
         n1 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}one"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
@@ -147,7 +147,7 @@ public class LuceneTest extends TestCase
 
     private void createTestTypes()
     {
-        testType = QName.createQName(NamespaceService.alfresco_URI, "testType");
+        testType = QName.createQName(NamespaceService.ALFRESCO_URI, "testType");
         testTypeRef = new ClassRef(testType);
 
         M2Type testTypeType = metaModelDAO.createType(testType);
@@ -1287,12 +1287,12 @@ public class LuceneTest extends TestCase
         Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNameSpaceService(new MockNameService());
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-atomic"))
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"))
                 + ":\"KEYONE\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-nonatomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic"))
                 + ":\"KEYTWO\"", null, null);
         assertEquals(0, results.length());
         results.close();
@@ -1311,12 +1311,12 @@ public class LuceneTest extends TestCase
         searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNameSpaceService(new MockNameService());
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-atomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"))
                 + ":\"keyone\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-nonatomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic"))
                 + ":\"keytwo\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -1335,12 +1335,12 @@ public class LuceneTest extends TestCase
         Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNameSpaceService(new MockNameService());
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-atomic"))
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"))
                 + ":\"KEYONE\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-nonatomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic"))
                 + ":\"KEYTWO\"", null, null);
         assertEquals(0, results.length());
         results.close();
@@ -1350,7 +1350,7 @@ public class LuceneTest extends TestCase
         searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNameSpaceService(new MockNameService());
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-atomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"))
                 + ":\"keyone\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -1359,7 +1359,7 @@ public class LuceneTest extends TestCase
         
         Thread.sleep(20000);
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.alfresco_URI, "text-indexed-stored-tokenised-nonatomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic"))
                 + ":\"keytwo\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -1525,8 +1525,8 @@ public class LuceneTest extends TestCase
 
         static
         {
-            map.put(NamespaceService.alfresco_PREFIX, NamespaceService.alfresco_URI);
-            map.put(NamespaceService.alfresco_TEST_PREFIX, NamespaceService.alfresco_TEST_URI);
+            map.put(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+            map.put(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
             map.put(NamespaceService.DEFAULT_PREFIX, "namespace");
             map.put("namespace", "namespace");
 

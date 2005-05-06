@@ -160,10 +160,10 @@ public class HibernateNodeTest extends BaseHibernateTest
         node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_BASE);
         
         // add some aspects
-        QName aspect1 = QName.createQName(NamespaceService.alfresco_TEST_URI, "1");
-        QName aspect2 = QName.createQName(NamespaceService.alfresco_TEST_URI, "2");
-        QName aspect3 = QName.createQName(NamespaceService.alfresco_TEST_URI, "3");
-        QName aspect4 = QName.createQName(NamespaceService.alfresco_TEST_URI, "4");
+        QName aspect1 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "1");
+        QName aspect2 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "2");
+        QName aspect3 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "3");
+        QName aspect4 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "4");
         Set<QName> aspects = node.getAspects();
         aspects.add(aspect1);
         aspects.add(aspect2);

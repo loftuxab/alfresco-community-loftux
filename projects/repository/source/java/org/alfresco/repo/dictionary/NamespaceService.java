@@ -27,32 +27,24 @@ public interface NamespaceService extends NamespacePrefixResolver
     public static final String DEFAULT_PREFIX = "";
     
     /**
-     * alfresco Namespace URI
-     * 
-     * TODO: Adjust with company name
+     * Alfresco Namespace URI
      */
-    public static final String alfresco_URI = "http://www.alfresco.com/1.0";
+    public static final String ALFRESCO_URI = "http://www.alfresco.org/1.0";
     
     /**
-     * alfresco Namespace Prefix
-     * 
-     * TODO: Adjust with company name
+     * Alfresco Namespace Prefix
      */
-    public static final String alfresco_PREFIX = "act";
+    public static final String ALFRESCO_PREFIX = "alf";
 
     /**
-     * alfresco Test Namespace URI
-     * 
-     * TODO: Adjust with company name
+     * Alfresco Test Namespace URI
      */
-    public static final String alfresco_TEST_URI = "http://www.alfresco.com/test/1.0";
+    public static final String ALFRESCO_TEST_URI = "http://www.alfresco.org/test/1.0";
     
     /**
-     * alfresco Test Namespace Prefix
-     * 
-     * TODO: Adjust with company name
+     * Alfresco Test Namespace Prefix
      */
-    public static final String alfresco_TEST_PREFIX = "test";
+    public static final String ALFRESCO_TEST_PREFIX = "alftest";
 
     
     /**

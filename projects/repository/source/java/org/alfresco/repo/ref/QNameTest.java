@@ -194,7 +194,7 @@ public class QNameTest extends TestCase
     {
         try
         {
-            QName noResolver = QName.createQName(NamespaceService.alfresco_PREFIX, "alfresco prefix", null);
+            QName noResolver = QName.createQName(NamespaceService.ALFRESCO_PREFIX, "alfresco prefix", null);
             fail("Null resolver was not caught");
         }
         catch (IllegalArgumentException e)
@@ -202,8 +202,8 @@ public class QNameTest extends TestCase
         }
 
         NamespacePrefixResolver mockResolver = new MockNamespacePrefixResolver();
-        QName qname1 = QName.createQName(NamespaceService.alfresco_PREFIX, "alfresco prefix", mockResolver);
-        assertEquals(NamespaceService.alfresco_URI, qname1.getNamespaceURI());
+        QName qname1 = QName.createQName(NamespaceService.ALFRESCO_PREFIX, "alfresco prefix", mockResolver);
+        assertEquals(NamespaceService.ALFRESCO_URI, qname1.getNamespaceURI());
         QName qname2 = QName.createQName("", "default prefix", mockResolver);
         assertEquals(NamespaceService.DEFAULT_URI, qname2.getNamespaceURI());
         QName qname3 = QName.createQName(null, "null default prefix", mockResolver);
@@ -230,9 +230,9 @@ public class QNameTest extends TestCase
             {
                 return NamespaceService.DEFAULT_URI;
             }
-            else if (prefix.equals(NamespaceService.alfresco_PREFIX))
+            else if (prefix.equals(NamespaceService.ALFRESCO_PREFIX))
             {
-                return NamespaceService.alfresco_URI;
+                return NamespaceService.ALFRESCO_URI;
             }
             throw new NamespaceException("Prefix " + prefix + " not registered");
         }

@@ -26,12 +26,12 @@ public class EMFMetaModelDAOTest extends BaseDictionaryTest
     
     public void testDAOGetClass()
     {
-        QName fileQName = QName.createQName(NamespaceService.alfresco_TEST_URI, "file");
+        QName fileQName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file");
         M2Class m2FileClass = metaModelDao.getClass(fileQName);
         assertNotNull(m2FileClass);
         assertEquals(fileQName, m2FileClass.getQName());
         
-        QName referenceQName = QName.createQName(NamespaceService.alfresco_TEST_URI, "referenceable");
+        QName referenceQName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "referenceable");
         M2Class m2ReferenceClass = metaModelDao.getClass(referenceQName);
         assertNotNull(m2ReferenceClass);
         assertEquals(referenceQName, m2ReferenceClass.getQName());
@@ -39,34 +39,34 @@ public class EMFMetaModelDAOTest extends BaseDictionaryTest
 
     public void testDAOGetType()
     {
-        QName fileQName = QName.createQName(NamespaceService.alfresco_TEST_URI, "file");
+        QName fileQName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file");
         M2Type m2FileClass = metaModelDao.getType(fileQName);
         assertNotNull(m2FileClass);
         assertEquals(fileQName, m2FileClass.getQName());
         
-        QName referenceQName = QName.createQName(NamespaceService.alfresco_TEST_URI, "referenceable");
+        QName referenceQName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "referenceable");
         M2Type m2ReferenceClass = metaModelDao.getType(referenceQName);
         assertNull(m2ReferenceClass);
     }
     
     public void testDAOGetAspect()
     {
-        QName referenceQName = QName.createQName(NamespaceService.alfresco_TEST_URI, "referenceable");
+        QName referenceQName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "referenceable");
         M2Aspect m2ReferenceClass = metaModelDao.getAspect(referenceQName);
         assertNotNull(m2ReferenceClass);
         assertEquals(referenceQName, m2ReferenceClass.getQName());
 
-        QName fileQName = QName.createQName(NamespaceService.alfresco_TEST_URI, "file");
+        QName fileQName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file");
         M2Aspect m2FileClass = metaModelDao.getAspect(fileQName);
         assertNull(m2FileClass);
     }
 
     public void testDAOGetProperty()
     {
-        QName fileQName = QName.createQName(NamespaceService.alfresco_TEST_URI, "file");
+        QName fileQName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file");
         M2Property m2Property = metaModelDao.getProperty(fileQName, "encoding");
         assertNotNull(m2Property);
-        assertEquals(QName.createQName(NamespaceService.alfresco_TEST_URI, "encoding"),
+        assertEquals(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "encoding"),
                 m2Property.getPropertyDefinition().getQName());
     }
 }

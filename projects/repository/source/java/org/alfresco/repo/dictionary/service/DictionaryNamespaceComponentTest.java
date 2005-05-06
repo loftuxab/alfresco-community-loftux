@@ -43,9 +43,9 @@ public class DictionaryNamespaceComponentTest extends BaseDictionaryTest
 
     public void testGetURIFromPrefix()
     {
-        String uri = service.getNamespaceURI(NamespaceService.alfresco_PREFIX);
+        String uri = service.getNamespaceURI(NamespaceService.ALFRESCO_PREFIX);
         assertNotNull(uri);
-        assertEquals(NamespaceService.alfresco_URI, uri);
+        assertEquals(NamespaceService.ALFRESCO_URI, uri);
         try
         {
             String invalidUri = service.getNamespaceURI("garbage");
@@ -58,10 +58,10 @@ public class DictionaryNamespaceComponentTest extends BaseDictionaryTest
 
     public void testGetPrefixesFromURI()
     {
-        Collection<String> prefixes = service.getPrefixes(NamespaceService.alfresco_URI);
+        Collection<String> prefixes = service.getPrefixes(NamespaceService.ALFRESCO_URI);
         assertNotNull(prefixes);
         assertEquals(1, prefixes.size());
-        assertEquals(NamespaceService.alfresco_PREFIX, prefixes.toArray()[0]);
+        assertEquals(NamespaceService.ALFRESCO_PREFIX, prefixes.toArray()[0]);
         
         try
         {

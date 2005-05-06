@@ -34,20 +34,20 @@ public class DictionaryComponentTest extends BaseDictionaryTest
 
     public void testGetClassDefinition()
     {
-        ClassRef fileRef = new ClassRef(QName.createQName(NamespaceService.alfresco_TEST_URI, "file"));
+        ClassRef fileRef = new ClassRef(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file"));
         ClassDefinition fileClass = service.getClass(fileRef);
         assertNotNull(fileClass);
         assertTrue(fileClass instanceof TypeDefinition);
         assertEquals(fileRef, fileClass.getReference());
         assertEquals(false, fileClass.isAspect());
-        assertEquals(QName.createQName(NamespaceService.alfresco_URI, "base"), fileClass.getSuperClass().getQName());
+        assertEquals(QName.createQName(NamespaceService.ALFRESCO_URI, "base"), fileClass.getSuperClass().getQName());
         List<PropertyDefinition> fileProperties = fileClass.getProperties();
         assertNotNull(fileProperties);
         assertEquals(4, fileProperties.size());
         PropertyDefinition encodingProp = fileClass.getProperty("encoding");
         assertNotNull("Encoding property node found class", encodingProp);
         
-        ClassRef folderRef = new ClassRef(QName.createQName(NamespaceService.alfresco_TEST_URI, "folder"));
+        ClassRef folderRef = new ClassRef(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "folder"));
         ClassDefinition folderClass = service.getClass(folderRef);
         assertNotNull(folderClass);
         assertEquals(folderRef, folderClass.getReference());
@@ -60,6 +60,6 @@ public class DictionaryComponentTest extends BaseDictionaryTest
                 contentsAssoc instanceof ChildAssociationDefinition);
         assertEquals(true, contentsAssoc.isChild());
         ClassDefinition toClass = contentsAssoc.getRequiredToClasses().get(0);
-        assertEquals(QName.createQName(NamespaceService.alfresco_TEST_URI, "file"), toClass.getQName());
+        assertEquals(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file"), toClass.getQName());
     }
 }

@@ -58,7 +58,7 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
     public void testQuery() throws Exception
     {
         rootNodeRef = myRootNode;
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"" + NamespaceService.alfresco_TEST_PREFIX + ":root_p_n1\"", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"" + NamespaceService.ALFRESCO_TEST_PREFIX + ":root_p_n1\"", null, null);
         assertEquals(1, results.length());
 
     }
