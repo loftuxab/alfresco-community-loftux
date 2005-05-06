@@ -195,7 +195,7 @@ public class NavigationBean
    {
       String value = null;
       
-      QName propQName = QName.createQName(NamespaceService.alfresco_URI, property);
+      QName propQName = QName.createQName(NamespaceService.ALFRESCO_URI, property);
       Object obj = props.get(propQName);
       
       if (obj != null)

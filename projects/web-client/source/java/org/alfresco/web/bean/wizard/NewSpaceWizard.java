@@ -253,28 +253,28 @@ public class NewSpaceWizard
          }
          
          ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
-                   QName.createQName(NamespaceService.alfresco_URI, this.name),
+                   QName.createQName(NamespaceService.ALFRESCO_URI, this.name),
                    DictionaryBootstrap.TYPE_FOLDER);
          NodeRef nodeRef = assocRef.getChildRef();
          
          // set the properties
          Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-         QName propCreatedDate = QName.createQName(NamespaceService.alfresco_URI, "createddate");
+         QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
          Date now = new Date( Calendar.getInstance().getTimeInMillis() );
          properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
         
-         QName propModifiedDate = QName.createQName(NamespaceService.alfresco_URI, "modifieddate");
+         QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
          properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
         
-         QName propIcon = QName.createQName(NamespaceService.alfresco_URI, "icon");
+         QName propIcon = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
          properties.put(propIcon, this.icon);
         
-         QName propSpaceType = QName.createQName(NamespaceService.alfresco_URI, "spacetype");
+         QName propSpaceType = QName.createQName(NamespaceService.ALFRESCO_URI, "spacetype");
          properties.put(propSpaceType, this.spaceType);
         
          if (this.description != null)
          {
-            QName propDescription = QName.createQName(NamespaceService.alfresco_URI, "description");
+            QName propDescription = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
             properties.put(propDescription, this.description);
          }
          
@@ -642,7 +642,7 @@ public class NewSpaceWizard
       
       if (templates)
       {
-         String actNs = NamespaceService.alfresco_PREFIX;
+         String actNs = NamespaceService.ALFRESCO_PREFIX;
          String s = "PATH:\"/" + actNs + ":Glossary/" + actNs + ":Templates/" + actNs + ":*\"";
          ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
          if (results.length() > 0)

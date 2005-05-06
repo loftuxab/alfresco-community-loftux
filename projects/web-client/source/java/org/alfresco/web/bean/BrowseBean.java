@@ -298,7 +298,7 @@ public class BrowseBean
    {
       String value = null;
       
-      QName propQName = QName.createQName(NamespaceService.alfresco_URI, property);
+      QName propQName = QName.createQName(NamespaceService.ALFRESCO_URI, property);
       Object obj = props.get(propQName);
       
       if (obj != null)
@@ -315,7 +315,7 @@ public class BrowseBean
    
    private static String getValueProperty(ResultSetRow row, String name, boolean convertNull)
    {
-      Value value = row.getValue(QName.createQName(NamespaceService.alfresco_URI, name));
+      Value value = row.getValue(QName.createQName(NamespaceService.ALFRESCO_URI, name));
       String property = null;
       if (value != null)
       {
@@ -609,7 +609,7 @@ public class BrowseBean
    
    private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    
-   private static final String SEARCH_PATH = "PATH:\"/" + NamespaceService.alfresco_PREFIX + ":{0}\"";
+   private static final String SEARCH_PATH = "PATH:\"/" + NamespaceService.ALFRESCO_PREFIX + ":{0}\"";
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
