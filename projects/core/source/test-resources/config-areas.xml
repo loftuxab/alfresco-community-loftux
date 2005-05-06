@@ -1,4 +1,4 @@
-<activiti-config area="test-area">
+<alfresco-config area="test-area">
    
    <config evaluator="string-compare" condition="Area Specific Config">
       <parent-item>
@@ -6,4 +6,4 @@
       </parent-item>
    </config>
    
-</activiti-config>
+</alfresco-config>

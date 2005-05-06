@@ -38,7 +38,7 @@
    </listener>
    
    <listener>
-      <listener-class>com.activiti.web.ContextListener</listener-class>
+      <listener-class>org.alfresco.web.ContextListener</listener-class>
    </listener>
     
    <!-- Faces Servlet -->

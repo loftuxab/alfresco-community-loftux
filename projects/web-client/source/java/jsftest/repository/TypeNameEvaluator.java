@@ -1,7 +1,7 @@
 package jsftest.repository;
 
-import com.activiti.config.evaluator.Evaluator;
-import com.activiti.web.bean.repository.Node;
+import org.alfresco.config.evaluator.Evaluator;
+import org.alfresco.web.bean.repository.Node;
 
 /**
  * Evaluator that tests whether an object is of a particular type
@@ -13,7 +13,7 @@ public class TypeNameEvaluator implements Evaluator
    /**
     * Tests whether the given object has the type defined in the condition
     * 
-    * @see com.activiti.config.evaluator.Evaluator#applies(java.lang.Object, java.lang.String)
+    * @see org.alfresco.config.evaluator.Evaluator#applies(java.lang.Object, java.lang.String)
     */
    public boolean applies(Object obj, String condition)
    {

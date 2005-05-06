@@ -8,7 +8,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.el.ValueBinding;
 import javax.faces.event.ActionEvent;
 
-import com.activiti.repo.ref.NodeRef;
+import org.alfresco.repo.ref.NodeRef;
 
 /**
  * @author Kevin Roast

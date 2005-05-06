@@ -1,8 +1,8 @@
-<activiti-config>
+<alfresco-config>
    
    <plug-ins>
       <evaluators>
-         <evaluator id="type-name" class="com.activiti.config.evaluator.StringEvaluator" />
+         <evaluator id="type-name" class="org.alfresco.config.evaluator.StringEvaluator" />
       </evaluators>
    </plug-ins>
       
@@ -30,4 +30,4 @@
       </properties>
    </config>
    
-</activiti-config>
+</alfresco-config>

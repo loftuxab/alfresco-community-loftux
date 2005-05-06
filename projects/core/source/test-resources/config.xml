@@ -1,4 +1,4 @@
-<activiti-config>
+<alfresco-config>
    
    <config>
       <global-item>The global value</global-item>
@@ -10,4 +10,4 @@
       <override>true</override>
    </config>
    
-</activiti-config>
+</alfresco-config>

@@ -38,8 +38,8 @@
       </property>
       <property name='mappingResources' >
          <list>
-            <value>com/activiti/repo/domain/hibernate/Node.hbm.xml</value>
-            <value>com/activiti/repo/domain/hibernate/Store.hbm.xml</value>
+            <value>com/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
+            <value>com/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
          </list>
       </property>
       <property name='hibernateProperties' >
@@ -57,7 +57,7 @@
    
    <!-- create a transaction manager to handle the Hibernate sessions -->
    <bean id="transactionManager" 
-      class="com.activiti.repo.search.transaction.LuceneTransactionManager">
+      class="org.alfresco.repo.search.transaction.LuceneTransactionManager">
       <property name="sessionFactory">
          <ref local="sessionFactory"/>
       </property>
@@ -67,7 +67,7 @@
    </bean>
    
    <!-- factory for UserTransaction instances -->
-   <bean id="userTransaction" class="com.activiti.util.transaction.UserTransactionFactory">
+   <bean id="userTransaction" class="org.alfresco.util.transaction.UserTransactionFactory">
       <constructor-arg>
          <ref bean="transactionManager" />
       </constructor-arg>
@@ -77,7 +77,7 @@
    </bean>
    
    <!-- use around method calls to debug - see class comments for details -->
-   <bean id="methodCallLogAdvice" class="com.activiti.util.debug.MethodCallLogAdvice" />
+   <bean id="methodCallLogAdvice" class="org.alfresco.util.debug.MethodCallLogAdvice" />
    
    <!--                    -->
    <!--  INTERNAL SERVICES -->
@@ -85,13 +85,13 @@
    
    <bean id='nodeDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
-         <value>com.activiti.repo.node.db.NodeDaoService</value>
+         <value>org.alfresco.repo.node.db.NodeDaoService</value>
       </property>
       <property name='transactionManager'>
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.node.db.hibernate.HibernateNodeDaoServiceImpl" >
+         <bean class="org.alfresco.repo.node.db.hibernate.HibernateNodeDaoServiceImpl" >
             <property name="sessionFactory">
                <ref bean="sessionFactory" />
             </property>
@@ -108,7 +108,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" init-method="init" >
                <constructor-arg>
                   <value>nodeDaoService</value>
                </constructor-arg>
@@ -124,13 +124,13 @@
    <!-- NodeService implemented to persist to Database -->
    <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.node.NodeService</value>
+         <value>org.alfresco.repo.node.NodeService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.node.db.DbNodeServiceImpl">
+         <bean class="org.alfresco.repo.node.db.DbNodeServiceImpl">
             <constructor-arg>
                <ref bean="dictionaryService" />
             </constructor-arg>
@@ -147,7 +147,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" init-method="init" >
                <constructor-arg>
                   <value>dbNodeService</value>
                </constructor-arg>
@@ -160,13 +160,13 @@
    <!-- TODO: To be replaced by use of callbacks using policy framework -->
    <bean id="indexingNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.node.NodeService</value>
+         <value>org.alfresco.repo.node.NodeService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.node.index.IndexingNodeServiceImpl">
+         <bean class="org.alfresco.repo.node.index.IndexingNodeServiceImpl">
             <constructor-arg>
                <ref bean="dbNodeService" />
             </constructor-arg>
@@ -184,13 +184,13 @@
       
    <bean id="contentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.content.ContentService</value>
+         <value>org.alfresco.repo.content.ContentService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.content.RoutingContentServiceImpl" >
+         <bean class="org.alfresco.repo.content.RoutingContentServiceImpl" >
             <constructor-arg>
                <ref bean="indexingNodeService" />
             </constructor-arg>
@@ -212,13 +212,13 @@
       
    <bean id="indexerComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.search.Indexer</value>
+         <value>org.alfresco.repo.search.Indexer</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.search.IndexerComponent" >
+         <bean class="org.alfresco.repo.search.IndexerComponent" >
             <property name="indexerAndSearcherFactory">
                <ref bean="indexerAndSearcherFactory"/>
             </property>
@@ -232,7 +232,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <bean class="com.activiti.util.perf.PerformanceMonitorAdvice" init-method="init" >
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" init-method="init" >
                <constructor-arg>
                   <value>indexerComponent</value>
                </constructor-arg>
@@ -243,13 +243,13 @@
    
    <bean id="searcherComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.search.Searcher</value>
+         <value>org.alfresco.repo.search.Searcher</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.search.SearcherComponent" >
+         <bean class="org.alfresco.repo.search.SearcherComponent" >
             <property name="indexerAndSearcherFactory">
                <ref bean="indexerAndSearcherFactory"/>
             </property>
@@ -269,7 +269,7 @@
 
    
    <bean id="indexerAndSearcherFactory" 
-      class="com.activiti.repo.search.IndexerAndSearcherFactory">
+      class="org.alfresco.repo.search.IndexerAndSearcherFactory">
       <property name="protocolFactories">
          <map>
             <entry key="workspace">
@@ -285,7 +285,7 @@
 
      <!-- Indexer and searchers for lucene -->
     <bean id="luceneIndexerAndSearcherFactory" 
-        class="com.activiti.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
+        class="org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
         <property name="nodeService">
             <ref bean="dbNodeService"/>
         </property>
@@ -305,7 +305,7 @@
     
     <!-- Support for locking lucene indexes for deletion and update -->
     
-    <bean id="luceneIndexLock" class="com.activiti.repo.search.transaction.LuceneIndexLock">
+    <bean id="luceneIndexLock" class="org.alfresco.repo.search.transaction.LuceneIndexLock">
 	</bean>
     
  
@@ -315,13 +315,13 @@
    
    <bean id='simpleLockService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.lock.LockService</value>
+         <value>org.alfresco.repo.lock.LockService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.lock.simple.SimpleLockService" init-method="initialise">
+         <bean class="org.alfresco.repo.lock.simple.SimpleLockService" init-method="initialise">
             <property name="nodeService">
                <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
@@ -345,13 +345,13 @@
    
    <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.version.VersionService</value>
+         <value>org.alfresco.repo.version.VersionService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.version.lightweight.VersionServiceImpl" init-method="initialise">
+         <bean class="org.alfresco.repo.version.lightweight.VersionServiceImpl" init-method="initialise">
              <property name="nodeService">
              <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
@@ -391,13 +391,13 @@
    
    <bean id='lightWeightVersionStoreNodeService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.node.NodeService</value>
+         <value>org.alfresco.repo.node.NodeService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.version.lightweight.NodeServiceImpl" init-method="initialise">
+         <bean class="org.alfresco.repo.version.lightweight.NodeServiceImpl" init-method="initialise">
 			 <property name="nodeService">
 				<!-- TODO This should point to the general node service -->	
 				<ref bean="dbNodeService" />
@@ -422,13 +422,13 @@
    
    <bean id='lightWeightVersionStoreContentService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.content.ContentService</value>
+         <value>org.alfresco.repo.content.ContentService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.version.lightweight.ContentServiceImpl">
+         <bean class="org.alfresco.repo.version.lightweight.ContentServiceImpl">
 			 <property name="dbNodeService">
 				<ref bean="dbNodeService" />
 			</property>	
@@ -446,13 +446,13 @@
    
    <bean id='lightWeightVersionStoreContentStore' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.content.ContentStore</value>
+         <value>org.alfresco.repo.content.ContentStore</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.content.filestore.FileContentStoreImpl">
+         <bean class="org.alfresco.repo.content.filestore.FileContentStoreImpl">
 			 <constructor-arg>
 				<value>c:\VersionedContent</value>
              </constructor-arg>
@@ -469,13 +469,13 @@
    
    <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
-         <value>com.activiti.repo.version.common.counter.VersionCounterDaoService</value>
+         <value>org.alfresco.repo.version.common.counter.VersionCounterDaoService</value>
       </property>
       <property name='transactionManager'>
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="com.activiti.repo.version.common.counter.db.DbVersionCounterDaoServiceImpl" init-method="initialise">
+         <bean class="org.alfresco.repo.version.common.counter.db.DbVersionCounterDaoServiceImpl" init-method="initialise">
             <property name="dataSource">
                <ref bean="dataSource" />
             </property>
@@ -492,24 +492,24 @@
    <!-- Data Dictionary -->
    <!--                 -->
    
-   <bean id="emfResource" class="com.activiti.repo.dictionary.metamodel.emf.EMFResource" init-method="init">
+   <bean id="emfResource" class="org.alfresco.repo.dictionary.metamodel.emf.EMFResource" init-method="init">
    </bean>
    
-   <bean id="metaModelDAO" class="com.activiti.repo.dictionary.metamodel.emf.EMFMetaModelDAO" init-method="init">
+   <bean id="metaModelDAO" class="org.alfresco.repo.dictionary.metamodel.emf.EMFMetaModelDAO" init-method="init">
       <property name='resource'><ref bean="emfResource"/></property>
    </bean>
    
-   <bean id="namespaceDAO" class="com.activiti.repo.dictionary.metamodel.emf.EMFNamespaceDAO" init-method="init">
+   <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.metamodel.emf.EMFNamespaceDAO" init-method="init">
       <property name='resource'><ref bean="emfResource"/></property>
    </bean>
    
    <bean id="dictionaryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.dictionary.DictionaryService</value>
+         <value>org.alfresco.repo.dictionary.DictionaryService</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="com.activiti.repo.dictionary.service.DictionaryComponent" >
+         <bean class="org.alfresco.repo.dictionary.service.DictionaryComponent" >
             <property name="metaModelDAO"><ref bean="metaModelDAO"/></property>
          </bean>
       </property>
@@ -522,11 +522,11 @@
    
    <bean id="namespaceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.dictionary.NamespaceService</value>
+         <value>org.alfresco.repo.dictionary.NamespaceService</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="com.activiti.repo.dictionary.service.DictionaryNamespaceComponent" >
+         <bean class="org.alfresco.repo.dictionary.service.DictionaryNamespaceComponent" >
             <property name="namespaceDAO"><ref bean="namespaceDAO"/></property>
          </bean>
       </property>
@@ -543,11 +543,11 @@
    
    <bean id="policyDefinitionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.policy.PolicyDefinitionService</value>
+         <value>org.alfresco.repo.policy.PolicyDefinitionService</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="com.activiti.repo.policy.impl.PolicyDefinitionServiceImpl">
+         <bean class="org.alfresco.repo.policy.impl.PolicyDefinitionServiceImpl">
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -559,11 +559,11 @@
    
    <bean id="policyRuntimeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.policy.PolicyRuntimeService</value>
+         <value>org.alfresco.repo.policy.PolicyRuntimeService</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="com.activiti.repo.policy.impl.PolicyRuntimeServiceImpl">		
+         <bean class="org.alfresco.repo.policy.impl.PolicyRuntimeServiceImpl">		
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -577,11 +577,11 @@
    
    <bean id="LuceneFullTextSearchIndexer" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexer</value>
+         <value>org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="com.activiti.repo.search.impl.lucene.fts.FullTextSearchIndexerImpl">
+         <bean class="org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexerImpl">
             <property name="luceneIndexerAndSearcherFactory">
                <ref bean="luceneIndexerAndSearcherFactory"/>
             </property>
@@ -601,7 +601,7 @@
     <bean id="ftsIndexerJob" 
         class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass">
-            <value>com.activiti.repo.search.impl.lucene.fts.FTSIndexerJob</value>
+            <value>org.alfresco.repo.search.impl.lucene.fts.FTSIndexerJob</value>
         </property>
         <property name="jobDataAsMap">
             <map>

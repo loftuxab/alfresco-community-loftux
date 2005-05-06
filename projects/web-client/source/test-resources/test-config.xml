@@ -1,9 +1,9 @@
-<activiti-config>
+<alfresco-config>
    
    <plug-ins>
       <evaluators>
          <evaluator id="type-name" class="jsftest.repository.TypeNameEvaluator"/>
-         <evaluator id="aspect" class="com.activiti.web.config.AspectEvaluator"/>
+         <evaluator id="aspect" class="org.alfresco.web.config.AspectEvaluator"/>
       </evaluators>
    </plug-ins>
       
@@ -37,10 +37,10 @@
       </properties>
    </config>
    
-   <config evaluator="object-type" condition="com.activiti.web.jsf.component.data.UIRichList">
+   <config evaluator="object-type" condition="org.alfresco.web.jsf.component.data.UIRichList">
       <renderers>
-         <renderer mode="details">com.activiti.web.jsf.renderer.data.RichListRenderer.DetailsViewRenderer</renderer>
+         <renderer mode="details">org.alfresco.web.jsf.renderer.data.RichListRenderer.DetailsViewRenderer</renderer>
       </renderers>
    </config>
    
-</activiti-config>
+</alfresco-config>

@@ -14,8 +14,8 @@ import javax.faces.event.ActionEvent;
 
 import org.apache.log4j.Logger;
 
-import com.activiti.web.jsf.component.UIActionLink;
-import com.activiti.web.jsf.component.UIBreadcrumb;
+import org.alfresco.web.jsf.component.UIActionLink;
+import org.alfresco.web.jsf.component.UIBreadcrumb;
 
 /**
  * @author kevinr

@@ -15,12 +15,12 @@ import javax.faces.context.FacesContext;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.springframework.web.jsf.FacesContextUtils;
 
-import com.activiti.repo.node.NodeService;
-import com.activiti.repo.ref.ChildAssocRef;
-import com.activiti.repo.ref.NodeRef;
-import com.activiti.web.bean.repository.Repository;
-import com.activiti.web.jsf.Utils;
-import com.activiti.web.jsf.renderer.BaseRenderer;
+import org.alfresco.repo.node.NodeService;
+import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.jsf.Utils;
+import org.alfresco.web.jsf.renderer.BaseRenderer;
 
 /**
  * @author Kevin Roast

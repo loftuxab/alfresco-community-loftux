@@ -1,9 +1,9 @@
-<activiti-config>
+<alfresco-config>
    
    <plug-ins>
       <evaluators>
          <evaluator id="type-name" class="jsftest.repository.TypeNameEvaluator" />
-         <evaluator id="aspect" class="com.activiti.web.config.AspectEvaluator" />
+         <evaluator id="aspect" class="org.alfresco.web.config.AspectEvaluator" />
       </evaluators>
    </plug-ins>
    
@@ -20,4 +20,4 @@
    </config>
    -->
    
-</activiti-config>
+</alfresco-config>
