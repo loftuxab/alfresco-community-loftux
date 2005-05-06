@@ -38,8 +38,8 @@
       </property>
       <property name='mappingResources' >
          <list>
-            <value>com/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
-            <value>com/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
+            <value>org/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
+            <value>org/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
          </list>
       </property>
       <property name='hibernateProperties' >

@@ -24,7 +24,7 @@ public class EMFResource
     /**
      * Default Resource URI
      */
-    public static final String DEFAULT_RESOURCEURI = "classpath:/com/alfresco/repo/dictionary/metamodel/emf/dictionary.xml";
+    public static final String DEFAULT_RESOURCEURI = "classpath:/org/alfresco/repo/dictionary/metamodel/emf/dictionary.xml";
 
     /**
      * Resource URI for Model Definitions
