@@ -1,4 +1,4 @@
-<project name="company-name" default="build-all">
+<project name="alfresco" default="build-all">
 
    <property name="common.dir" value="${basedir}" />
    <import file="${common.dir}/common-init.xml" />

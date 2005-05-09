@@ -1,0 +1,34 @@
+<alfresco-config>
+   
+   <plug-ins>
+      <evaluators>
+         <evaluator id="type-name" class="jsftest.repository.TypeNameEvaluator"/>
+         <evaluator id="aspect" class="org.alfresco.web.config.AspectEvaluator"/>
+      </evaluators>
+   </plug-ins>
+      
+   <!-- define a global config section -->
+   <config>
+      <properties>
+         <property name="name"/>
+      </properties>
+   </config>
+   
+   <config evaluator="type-name" condition="base">
+      <properties>
+         <property name="description"/>
+         <property name="created"/>
+         <property name="modified"/>
+      </properties>
+   </config>
+   
+   <config evaluator="type-name" condition="SOP">
+      <properties>
+         <property name="description"/>
+         <property name="modified"/>
+         <property name="effective"/>
+         <property name="approved"/>
+      </properties>
+   </config>
+
+</alfresco-config>

@@ -4,16 +4,8 @@
 
 <beans>
    
-   <!--
    <bean id="configSource" class="org.alfresco.config.source.WebAppConfigSource">
-      <property name="source"><value>/WEB-INF/web-client-config.xml</value></property>
-   </bean>
-   -->
-   
-   <bean id="configSource" class="org.alfresco.config.source.FileConfigSource">
-      <property name="source">
-         <value>W:\sandbox\projects\web-client\source\test-resources\test-config.xml</value>
-      </property>
+      <property name="source"><value>/WEB-INF/web-client-config.xml,/WEB-INF/web-client-config-zoo.xml</value></property>
    </bean>
    
    <bean id="configService" class="org.alfresco.config.xml.XMLConfigService" init-method="init">
