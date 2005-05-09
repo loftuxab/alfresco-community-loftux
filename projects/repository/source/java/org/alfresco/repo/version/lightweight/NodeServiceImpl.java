@@ -78,8 +78,9 @@ public class NodeServiceImpl extends BaseImpl implements NodeService
      */
     public ChildAssocRef createNode(
 			NodeRef parentRef,
-            QName qname,
-            ClassRef tyepRef) throws InvalidNodeRefException
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
@@ -90,8 +91,9 @@ public class NodeServiceImpl extends BaseImpl implements NodeService
      */
     public ChildAssocRef createNode(
 			NodeRef parentRef,
-            QName qname,
-            ClassRef typeRef,
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName,
             Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
@@ -323,7 +325,7 @@ public class NodeServiceImpl extends BaseImpl implements NodeService
     /**
      * @throws UnsupportedOperationException always
      */
-    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
             throws InvalidNodeRefException, AssociationExistsException
     {
         // This operation is not supported for a verion store
@@ -333,7 +335,7 @@ public class NodeServiceImpl extends BaseImpl implements NodeService
     /**
      * @throws UnsupportedOperationException always
      */
-    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);

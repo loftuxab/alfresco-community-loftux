@@ -78,23 +78,23 @@ public class LuceneCategoryTest extends TestCase
                 "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
         
-        n1 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}one"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
+        n1 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}one"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "value-1");
-        n2 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}two"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
+        n2 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}two"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "value-1");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "value-2");
-        n3 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}three"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n4 = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}four"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n5 = nodeService.createNode(n1, QName.createQName("{namespace}five"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n6 = nodeService.createNode(n1, QName.createQName("{namespace}six"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n7 = nodeService.createNode(n2, QName.createQName("{namespace}seven"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n8 = nodeService.createNode(n2, QName.createQName("{namespace}eight-2"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n9 = nodeService.createNode(n5, QName.createQName("{namespace}nine"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n10 = nodeService.createNode(n5, QName.createQName("{namespace}ten"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n11 = nodeService.createNode(n5, QName.createQName("{namespace}eleven"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n12 = nodeService.createNode(n5, QName.createQName("{namespace}twelve"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n13 = nodeService.createNode(n12, QName.createQName("{namespace}thirteen"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        n14 = nodeService.createNode(n13, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
+        n3 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}three"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n4 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}four"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n5 = nodeService.createNode(n1, null, QName.createQName("{namespace}five"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n6 = nodeService.createNode(n1, null, QName.createQName("{namespace}six"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n7 = nodeService.createNode(n2, null, QName.createQName("{namespace}seven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n8 = nodeService.createNode(n2, null, QName.createQName("{namespace}eight-2"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n9 = nodeService.createNode(n5, null, QName.createQName("{namespace}nine"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n10 = nodeService.createNode(n5, null, QName.createQName("{namespace}ten"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n11 = nodeService.createNode(n5, null, QName.createQName("{namespace}eleven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n12 = nodeService.createNode(n5, null, QName.createQName("{namespace}twelve"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n13 = nodeService.createNode(n12, null, QName.createQName("{namespace}thirteen"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n14 = nodeService.createNode(n13, null, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         
         nodeService.addChild(rootNodeRef, n8, QName.createQName("{namespace}eight-0"));
         nodeService.addChild(n1, n8, QName.createQName("{namespace}eight-1"));
@@ -109,12 +109,12 @@ public class LuceneCategoryTest extends TestCase
         
         // Categories
         
-        catContainer = nodeService.createNode(rootNodeRef, QName.createQName("{namespace}categoryContainer"), DictionaryBootstrap.TYPE_CONTAINER).getChildRef();
-        catRoot = nodeService.createNode(catContainer, QName.createQName("{cat}categoryRoot"), DictionaryBootstrap.TYPE_CATEGORYROOT).getChildRef();
-        catBase = nodeService.createNode(catRoot, QName.createQName("{cat}AssetClass"), DictionaryBootstrap.TYPE_CATEGORY).getChildRef();
-        catOne = nodeService.createNode(catBase, QName.createQName("{cat}Fixed"), DictionaryBootstrap.TYPE_CATEGORY).getChildRef();
-        catTwo = nodeService.createNode(catBase, QName.createQName("{cat}Equity"), DictionaryBootstrap.TYPE_CATEGORY).getChildRef();
-        catThree = nodeService.createNode(catTwo, QName.createQName("{cat}SpecialEquity"), DictionaryBootstrap.TYPE_CATEGORY).getChildRef();
+        catContainer = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}categoryContainer"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        catRoot = nodeService.createNode(catContainer, null, QName.createQName("{cat}categoryRoot"), DictionaryBootstrap.TYPE_QNAME_CATEGORYROOT).getChildRef();
+        catBase = nodeService.createNode(catRoot, null, QName.createQName("{cat}AssetClass"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        catOne = nodeService.createNode(catBase, null, QName.createQName("{cat}Fixed"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        catTwo = nodeService.createNode(catBase, null, QName.createQName("{cat}Equity"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        catThree = nodeService.createNode(catTwo, null, QName.createQName("{cat}SpecialEquity"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
         
         nodeService.addChild(catBase, n1, QName.createQName("{catmember}member"));
         nodeService.addChild(catOne, n2, QName.createQName("{catmember}member"));

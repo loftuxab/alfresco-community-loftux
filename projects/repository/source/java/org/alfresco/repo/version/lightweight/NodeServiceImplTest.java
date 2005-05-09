@@ -243,8 +243,9 @@ public class NodeServiceImplTest extends BaseImplTest
 		{
 			this.lightWeightVersionStoreNodeService.createNode(
 					dummyNodeRef,
+					null,
 					dummyQName,
-					DictionaryBootstrap.TYPE_CONTENT);
+                    DictionaryBootstrap.TYPE_QNAME_CONTENT);
 			fail("This operation is not supported.");
 		}
 		catch (UnsupportedOperationException exception)

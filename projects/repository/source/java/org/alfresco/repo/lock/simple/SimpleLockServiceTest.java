@@ -68,8 +68,9 @@ public class SimpleLockServiceTest extends BaseSpringTest
         // Create node 
         this.parentNode = this.nodeService.createNode(
                 rootNodeRef, 
-                QName.createQName("{}ParentNode"), 
-                DictionaryBootstrap.TYPE_CONTAINER,
+                null, 
+                QName.createQName("{}ParentNode"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
         this.nodeService.addAspect(this.parentNode, lockAspect, new HashMap<QName, Serializable>());
         assertNotNull(this.parentNode);
@@ -77,15 +78,17 @@ public class SimpleLockServiceTest extends BaseSpringTest
         // Add some children to the node
         this.childNode1 = this.nodeService.createNode(
                 this.parentNode,
+                null,
                 QName.createQName("{}ChildNode1"),
-                DictionaryBootstrap.TYPE_CONTAINER,
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
         this.nodeService.addAspect(this.childNode1, lockAspect, new HashMap<QName, Serializable>());
         assertNotNull(this.childNode1);
         this.childNode2 = this.nodeService.createNode(
                 this.parentNode,
+                null,
                 QName.createQName("{}ChildNode2"),
-                DictionaryBootstrap.TYPE_CONTAINER,
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
         this.nodeService.addAspect(this.childNode2, lockAspect, new HashMap<QName, Serializable>());
         assertNotNull(this.childNode2);
@@ -93,8 +96,9 @@ public class SimpleLockServiceTest extends BaseSpringTest
         // Create a node with no lockAspect
         this.noAspectNode = this.nodeService.createNode(
                 rootNodeRef, 
-                QName.createQName("{}noAspectNode"), 
-                DictionaryBootstrap.TYPE_CONTAINER,
+                null, 
+                QName.createQName("{}noAspectNode"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
         assertNotNull(this.noAspectNode);
     }

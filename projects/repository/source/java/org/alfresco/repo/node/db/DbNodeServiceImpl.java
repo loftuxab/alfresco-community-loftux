@@ -188,15 +188,17 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     }
 
     public ChildAssocRef createNode(NodeRef parentRef,
-            QName qname,
-            ClassRef typeRef)
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName)
     {
-        return this.createNode(parentRef, qname, typeRef, null);
+        return this.createNode(parentRef, null, assocQName, nodeTypeQName, null);
     }
 
     public ChildAssocRef createNode(NodeRef parentRef,
-            QName qname,
-            ClassRef typeRef,
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName,
             Map<QName, Serializable> properties)
     {
         CodeMonkey.todo("Check that the child association is allowed"); // TODO
@@ -213,17 +215,17 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             throw new RuntimeException("No store found for parent node: " + parentRef);
         }
         // create the node instance
-        RealNode node = nodeDaoService.newRealNode(store, typeRef);
+        RealNode node = nodeDaoService.newRealNode(store, nodeTypeQName);
         // get the parent node
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // create the association
-        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, qname);
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocQName);
         
         // get the mandatory aspects for the node type
-        TypeDefinition nodeTypeDef = dictionaryService.getType(typeRef);
+        TypeDefinition nodeTypeDef = dictionaryService.getType(new ClassRef(nodeTypeQName));
         if (nodeTypeDef == null)
         {
-            throw new InvalidNodeTypeException(typeRef);
+            throw new InvalidNodeTypeException(new ClassRef(nodeTypeQName));
         }
         List<AspectDefinition> defaultAspectDefs = nodeTypeDef.getDefaultAspects();
         // check that property requirements are met
@@ -717,32 +719,32 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         return assocRef;
     }
 
-    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
             throws InvalidNodeRefException, AssociationExistsException
     {
         CodeMonkey.todo("Check that the association is allowed"); // TODO
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // see if it exists
-        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, qname);
+        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, assocTypeQName);
         if (assoc != null)
         {
-            throw new AssociationExistsException(sourceRef, targetRef, qname);
+            throw new AssociationExistsException(sourceRef, targetRef, assocTypeQName);
         }
         // we are sure that the association doesn't exist - make it
-        assoc = nodeDaoService.newNodeAssoc(sourceNode, targetNode, qname);
+        assoc = nodeDaoService.newNodeAssoc(sourceNode, targetNode, assocTypeQName);
         NodeAssocRef assocRef = assoc.getNodeAssocRef();
         // done
         return assocRef;
     }
 
-    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
             throws InvalidNodeRefException
     {
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // get the association
-        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, qname);
+        NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, assocTypeQName);
         // delete it
         nodeDaoService.deleteNodeAssoc(assoc);
     }

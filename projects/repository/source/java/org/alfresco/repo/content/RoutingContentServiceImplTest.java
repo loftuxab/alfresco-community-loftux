@@ -55,8 +55,9 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
         // create a basic node and add the content aspect
         ChildAssocRef assocRef = nodeService.createNode(
                 rootNodeRef,
+                null,
                 QName.createQName(NamespaceService.ALFRESCO_TEST_PREFIX, GUID.generate()),
-                DictionaryBootstrap.TYPE_BASE);
+                DictionaryBootstrap.TYPE_QNAME_BASE);
         contentNodeRef = assocRef.getChildRef();
         Map<QName, Serializable> properties = nodeService.getProperties(contentNodeRef);
         properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");

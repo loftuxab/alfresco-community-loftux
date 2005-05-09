@@ -308,8 +308,9 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
             // Create a new version history node
             ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                     this.versionStoreRootNodeRef, 
-                    CHILD_QNAME_VERSION_HISTORIES, 
-                    CLASS_REF_VERSION_HISTORY,
+                    null, 
+                    CHILD_QNAME_VERSION_HISTORIES,
+                    CLASS_REF_VERSION_HISTORY.getQName(),
                     props);
             versionHistoryRef = childAssocRef.getChildRef();            
         }
@@ -473,8 +474,9 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
         // Create the new version
         ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                 versionHistoryRef, 
+                null,
                 BaseImpl.CHILD_QNAME_VERSIONS,
-                CLASS_REF_VERSION,
+                CLASS_REF_VERSION.getQName(),
                 props);
         return childAssocRef.getChildRef();
     }
@@ -504,8 +506,9 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
                 // Create the node storing the frozen attribute details
                 this.dbNodeService.createNode(
                         versionRef, 
+                        null,
                         CHILD_QNAME_VERSIONED_ATTRIBUTES,
-                        CLASS_REF_VERSIONED_PROPERTY,
+                        CLASS_REF_VERSIONED_PROPERTY.getQName(),
                         properties);                
             }
         }
@@ -575,8 +578,9 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
             // Create child version reference
             ChildAssocRef newRef = this.dbNodeService.createNode(
                     versionRef,
-                    CHILD_QNAME_VERSIONED_CHILD_ASSOCS,
-                    CLASS_REF_VERSIONED_CHILD_ASSOC, 
+                    null,
+                    CHILD_QNAME_VERSIONED_CHILD_ASSOCS, 
+                    CLASS_REF_VERSIONED_CHILD_ASSOC.getQName(),
                     properties);
         }
         
@@ -605,8 +609,9 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
             // Create child version reference
             ChildAssocRef newRef = this.dbNodeService.createNode(
                     versionRef,
+                    null, 
                     CHILD_QNAME_VERSIONED_ASSOCS, 
-                    CLASS_REF_VERSIONED_ASSOC, 
+                    CLASS_REF_VERSIONED_ASSOC.getQName(),
                     properties);
         }
     }    

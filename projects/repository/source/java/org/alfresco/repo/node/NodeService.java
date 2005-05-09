@@ -55,19 +55,22 @@ public interface NodeService
     public NodeRef getRootNode(StoreRef storeRef) throws InvalidStoreRefException;
 
     /**
-     * @see #createNode(NodeRef, QName, String, Map<String,String>)
+     * @see #createNode(NodeRef, QName, QName, QName, Map<QName,Serializable>)
      */
     public ChildAssocRef createNode(NodeRef parentRef,
-            QName qname,
-            ClassRef typeRef)
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName)
             throws InvalidNodeRefException, InvalidNodeTypeException, PropertyException;
     
     /**
      * Creates a new, non-abstract, real node as a primary child of the given parent node.
      * 
      * @param parentRef the parent node
-     * @param qname the qualified name of the association
-     * @param typeRef a reference to the node type
+     * @param assocTypeQName the type of the association to create.  This is used
+     *      for verification against the data dictionary.
+     * @param assocQName the qualified name of the association
+     * @param nodeTypeQName a reference to the node type
      * @param properties optional map of properties to keyed by their qualified names
      * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent reference is invalid
@@ -77,8 +80,9 @@ public interface NodeService
      * @see org.alfresco.repo.dictionary.DictionaryService
      */
     public ChildAssocRef createNode(NodeRef parentRef,
-            QName qname,
-            ClassRef typeRef,
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName,
             Map<QName, Serializable> properties)
             throws InvalidNodeRefException, InvalidNodeTypeException, PropertyException;
     
@@ -300,22 +304,22 @@ public interface NodeService
      * 
      * @param sourceRef a reference to a <b>real</b> node
      * @param targetRef a reference to a node
-     * @param qname the qualified name of the association
+     * @param assocTypeQName the qualified name of the association type
      * @return Returns a reference to the new association
      * @throws InvalidNodeRefException if either of the nodes could not be found
      * @throws AssociationExistsException
      */
-    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
             throws InvalidNodeRefException, AssociationExistsException;
     
     /**
      * 
      * @param sourceRef the associaton source node
      * @param targetRef the association target node
-     * @param qname the qualified name of the association
+     * @param assocTypeQName the qualified name of the association type
      * @throws InvalidNodeRefException if either of the nodes could not be found
      */
-    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname)
+    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
             throws InvalidNodeRefException;
     
     /**

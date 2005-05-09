@@ -104,8 +104,9 @@ public class BaseImplTest extends BaseSpringTest
         // Create node (this node has some content)
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
-                QName.createQName("{test}MyVersionableNode"), 
-                DictionaryBootstrap.TYPE_CONTAINER,
+                null, 
+                QName.createQName("{test}MyVersionableNode"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(nodeRef, aspectRef, new HashMap<QName, Serializable>());
         
@@ -124,16 +125,18 @@ public class BaseImplTest extends BaseSpringTest
         // Add some children to the node
         NodeRef child1 = this.dbNodeService.createNode(
                 nodeRef,
+                null,
                 QName.createQName("{test}ChildNode1"),
-                DictionaryBootstrap.TYPE_CONTAINER,
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(child1, aspectRef, new HashMap<QName, Serializable>());
         assertNotNull(child1);
         this.versionableNodes.put(child1.getId(), child1);
         NodeRef child2 = this.dbNodeService.createNode(
                 nodeRef,
+                null,
                 QName.createQName("{test}ChildNode2"),
-                DictionaryBootstrap.TYPE_CONTAINER,
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(child2, aspectRef, new HashMap<QName, Serializable>());
         assertNotNull(child2);
@@ -142,8 +145,9 @@ public class BaseImplTest extends BaseSpringTest
         // Create a node that can be associated with the root node
         NodeRef assocNode = this.dbNodeService.createNode(
                 rootNodeRef,
+                null,
                 QName.createQName("{test}MyAssocNode"),
-                DictionaryBootstrap.TYPE_CONTAINER,
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 this.nodeProperties).getChildRef();
         assertNotNull(assocNode);
         this.dbNodeService.createAssociation(nodeRef, assocNode, QName.createQName("{test}MyAssociation"));

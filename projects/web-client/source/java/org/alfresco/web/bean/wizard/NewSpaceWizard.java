@@ -253,8 +253,9 @@ public class NewSpaceWizard
          }
          
          ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
+                   null,
                    QName.createQName(NamespaceService.ALFRESCO_URI, this.name),
-                   DictionaryBootstrap.TYPE_FOLDER);
+                   DictionaryBootstrap.TYPE_QNAME_FOLDER);
          NodeRef nodeRef = assocRef.getChildRef();
          
          // set the properties

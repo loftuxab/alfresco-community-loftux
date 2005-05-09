@@ -75,8 +75,9 @@ public class AbstractPolicyImplTest extends BaseSpringTest
         // Create node 
         this.nodeRef = this.nodeService.createNode(
                 rootNodeRef, 
-                QName.createQName("{}ParentNode"), 
-                DictionaryBootstrap.TYPE_CONTAINER,
+                null, 
+                QName.createQName("{}ParentNode"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
         this.nodeService.addAspect(this.nodeRef, lockAspect, new HashMap<QName, Serializable>());
         assertNotNull(this.nodeRef);
@@ -84,8 +85,9 @@ public class AbstractPolicyImplTest extends BaseSpringTest
         // Create a node with no lockAspect
         this.noAspectNode = this.nodeService.createNode(
                 rootNodeRef, 
-                QName.createQName("{}noAspectNode"), 
-                DictionaryBootstrap.TYPE_CONTAINER,
+                null, 
+                QName.createQName("{}noAspectNode"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
         assertNotNull(this.noAspectNode);
         

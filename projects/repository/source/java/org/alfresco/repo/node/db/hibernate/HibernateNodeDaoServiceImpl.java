@@ -4,14 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.ObjectDeletedException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.TypeDefinition;
@@ -34,6 +26,13 @@ import org.alfresco.repo.node.InvalidNodeTypeException;
 import org.alfresco.repo.node.db.NodeDaoService;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.util.GUID;
+import org.hibernate.ObjectDeletedException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * Hibernate-specific implementation of the persistence-independent <b>node</b> DAO interface
@@ -87,7 +86,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(store);
         // create and assign a root node
-        RealNode rootNode = newRealNode(store, DictionaryBootstrap.TYPE_CONTAINER);
+        RealNode rootNode = newRealNode(store, DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         store.setRootNode(rootNode);
         // done
         return store;
@@ -101,8 +100,9 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return store;
     }
 
-    public RealNode newRealNode(Store store, ClassRef classRef) throws InvalidNodeTypeException
+    public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidNodeTypeException
     {
+        ClassRef classRef = new ClassRef(nodeTypeQName);
         TypeDefinition typeDef = dictionaryService.getType(classRef);
         if (typeDef == null)
         {
@@ -122,7 +122,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // set other required properties
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
 		node.setKey(key);
-        node.setTypeQName(classRef.getQName());
+        node.setTypeQName(nodeTypeQName);
         node.setStore(store);
         // persist the node
         getHibernateTemplate().save(node);

@@ -93,10 +93,11 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * @see #createNode(NodeRef, QName, String, Map<QName,Serializable>)
      */
     public ChildAssocRef createNode(NodeRef parentRef,
-            QName qname,
-            ClassRef typeRef) throws InvalidNodeRefException
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName) throws InvalidNodeRefException
     {
-        return this.createNode(parentRef, qname, typeRef, null);
+        return this.createNode(parentRef, null, assocQName, nodeTypeQName, null);
     }
 
     /**
@@ -106,12 +107,18 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * @see IndexerComponent#createNode(ChildAssocRef)
      */
     public ChildAssocRef createNode(NodeRef parentRef,
-            QName qname,
-            ClassRef typeRef,
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName,
             Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
         // call delegate
-        ChildAssocRef assocRef = nodeServiceDelegate.createNode(parentRef, qname, typeRef, properties);
+        ChildAssocRef assocRef = nodeServiceDelegate.createNode(
+                parentRef,
+                null,
+                assocQName,
+                nodeTypeQName,
+                properties);
         // update index
         indexer.createNode(assocRef);
         // done
@@ -307,17 +314,17 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname) throws InvalidNodeRefException, AssociationExistsException
+    public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName) throws InvalidNodeRefException, AssociationExistsException
     {
-        return nodeServiceDelegate.createAssociation(sourceRef, targetRef, qname);
+        return nodeServiceDelegate.createAssociation(sourceRef, targetRef, assocTypeQName);
     }
 
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName qname) throws InvalidNodeRefException
+    public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName) throws InvalidNodeRefException
     {
-        nodeServiceDelegate.removeAssociation(sourceRef, targetRef, qname);
+        nodeServiceDelegate.removeAssociation(sourceRef, targetRef, assocTypeQName);
     }
 
     /**

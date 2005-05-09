@@ -2,7 +2,6 @@ package org.alfresco.repo.node.db;
 
 import java.util.Collection;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.ContainerNode;
 import org.alfresco.repo.domain.Node;
@@ -55,12 +54,12 @@ public interface NodeDaoService
 
     /**
      * @param store the store to which the node must belong
-     * @param classRef the type of the node
+     * @param nodeTypeQName the type of the node
      * @return Returns a new real node of the given type and attached to the store
      * @throws InvalidNodeTypeException if the node type is invalid or if the node type
      *      is not a valid real node
      */
-    public RealNode newRealNode(Store store, ClassRef classRef) throws InvalidNodeTypeException;
+    public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidNodeTypeException;
     
     /**
      * @param protocol the store protocol
