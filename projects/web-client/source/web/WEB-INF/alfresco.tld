@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
 
+<!-- Alfresco common JSF UI components tag library -->
 <taglib>
    <tlibversion>1.0</tlibversion>
    <jspversion>1.1</jspversion>
@@ -10,6 +11,10 @@
       <name>inputDatePicker</name>
       <tagclass>org.alfresco.web.ui.common.tag.InputDatePickerTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <description>
+         Provides a custom renderer to display an input component with year, month, day drop-downs
+      </description>
       
       <attribute>
          <name>id</name>
@@ -61,63 +66,17 @@
    </tag>
    
    <tag>
-      <name>dataList</name>
-      <tagclass>org.alfresco.web.ui.common.tag.data.DataGridTag</tagclass>
-      <bodycontent>JSP</bodycontent>
-      
-      <attribute>
-         <name>id</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>value</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>binding</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>rendered</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>styleClass</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>style</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>cellspacing</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>cellpadding</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag>
-   
-   <tag>
       <name>richList</name>
       <tagclass>org.alfresco.web.ui.common.tag.data.RichListTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <description>
+         The RichList component is capable of rendering a list of java bean objects in multiple rendering
+         modes. A List of objects is bound to the component through the value attribute and components
+         within the list can bind to specific fields (columns) through getter methods for each bean object
+         within the list. The component provides mechanism to page and sort data through additional
+         components
+      </description>
       
       <attribute>
          <name>id</name>
@@ -215,6 +174,14 @@
       <tagclass>org.alfresco.web.ui.common.tag.data.ColumnTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
+      <description>
+         The column component is a child of a data container component such as the RichList. It should
+         always be contained within such a component. A column is simply a container for other components
+         which are themselves bound to values from the current row supplied when the parent data container
+         iterates over its content. The column has several well known facet components which can be used to
+         specify child components used for specific purposes during the list rendering process.
+      </description>
+      
       <attribute>
          <name>id</name>
          <required>false</required>
@@ -268,6 +235,15 @@
       <name>sortLink</name>
       <tagclass>org.alfresco.web.ui.common.tag.data.SortLinkTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <description>
+         The sortLink component enables the user to sort a dataset by clicking an HTML link. The component
+         must be a child of a data component. It is generally contained inside a header facet component
+         within a column component. It automatically handles sorting of the appropriate data type for the
+         column bean getter method it is bound too. The control displays a small clickable icon to indicate
+         sorting direction and the direction of sorting can be toggled by clicking the icon. The component
+         does not require any developer intervention and therefore does not provide action command listeners.
+      </description>
       
       <attribute>
          <name>id</name>
@@ -335,6 +311,14 @@
       <tagclass>org.alfresco.web.ui.common.tag.data.DataPagerTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
+      <description>
+         The dataPager component enables a user to page through a large dataset. The component must be a
+         child of a data component. It is generally contained within the footer area of a richList component
+         or similar. The component keeps track of the current page and displays it to the user. The
+         component does not require any developer intervention and therefore does not provide action
+         command listeners.
+      </description>
+      
       <attribute>
          <name>id</name>
          <required>false</required>
@@ -358,6 +342,16 @@
       <name>panel</name>
       <tagclass>org.alfresco.web.ui.common.tag.PanelTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <description>
+         The progressive panel component enables the user to hide/show areas of the UI to progressive
+         display more complex areas of the UI as required. It also allows the developer to surround an
+         area of the UI with an attractive graphical border and title label. The component tags can
+         contain any combination of HTML or child JSF components. IMPORTANT NOTE: Currently there is an
+         issue in the SunRI of JSF whereby all child components of the panel must have an id attribute
+         specified if a progressive style panel is used - else an exception will occur when the panel
+         visibility is toggled by the user!
+      </description>
       
       <attribute>
          <name>id</name>
@@ -427,81 +421,16 @@
    </tag>
 
    <tag>
-      <name>propertySheetGrid</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.property.PropertySheetGridTag</tagclass>
-      <bodycontent>JSP</bodycontent>
-      
-      <attribute>
-         <name>id</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>value</name>
-         <required>true</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>binding</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>rendered</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>var</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>columns</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>externalConfig</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag>
-   
-   <tag>
-      <name>property</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.property.PropertyTag</tagclass>
-      <bodycontent>JSP</bodycontent>
-      
-      <attribute>
-         <name>id</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>value</name>
-         <required>true</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>columns</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag>
-   
-   <tag>
       <name>breadcrumb</name>
       <tagclass>org.alfresco.web.ui.common.tag.BreadcrumbTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <description>
+         The breadcrumb component enables the manipulation and display of a separated path string. It
+         displays HTML links to enable the user to immediately select any part of the breadcrumb path.
+         The breadcrumb provides standard action and actionListener command properties for developers to
+         handle user interaction with the component.
+      </description>
       
       <attribute>
          <name>id</name>
@@ -574,6 +503,12 @@
       <name>actionLink</name>
       <tagclass>org.alfresco.web.ui.common.tag.ActionLinkTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <description>
+         The actionLink component provides the user with a clickable link, image or both to represent an
+         action in the UI. The component provides standard action and actionListener command properties
+         for developers to handle user interaction.
+      </description>
       
       <attribute>
          <name>id</name>
@@ -731,6 +666,14 @@
       <tagclass>org.alfresco.web.ui.common.tag.MenuTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
+      <description>
+         The menu component displays a pop-up DHTML menu containing multiple ActionLink components.
+         A simple link and/or image is displayed to the user, which when clicked will pop-up a menu of
+         items. Each item is an ActionLink component with the image part rendered as the icon for the menu
+         item. Evaluators can be used to wrap ActionLink components or simply use the rendered attribute
+         directly to hide/show items as needed.
+      </description>
+      
       <attribute>
          <name>id</name>
          <required>true</required>
@@ -802,6 +745,19 @@
       <name>modeList</name>
       <tagclass>org.alfresco.web.ui.common.tag.ModeListTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <description>
+         The ModeList component displays a graphical list of items, each with a label and optional icon
+         image. Only one of the items can be selected at any time. The currently selected item is shown in
+         a different style. When the selection is changed by the user, the component updates and fires a
+         standard actionListener event. Each item in the ModeList is represented by a ModeListItem
+         component. This component supplies the label, optional icon and also a value which is set as the
+         current value of the ModeList component when it becomes the selected item. The value can be
+         retrieved from the component during the actionListener event handler.
+         This component can be optionally rendered horizontally to display a toolbar like UI element. It
+         also features a large number of configurable CSS style elements to make it highly flexible in
+         rendering style. 
+      </description>
       
       <attribute>
          <name>id</name>
@@ -947,6 +903,10 @@
       <tagclass>org.alfresco.web.ui.common.tag.ListItemTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
+      <description>
+         Represents a single item within the ModeList component.
+      </description>
+      
       <attribute>
          <name>id</name>
          <required>false</required>
@@ -1001,83 +961,19 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
-   
-   <tag>
-      <name>nodeDescendants</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.NodeDescendantsTag</tagclass>
-      <bodycontent>JSP</bodycontent>
-      
-      <attribute>
-         <name>id</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>binding</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>rendered</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>style</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>styleClass</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>maxChildren</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-
-      <attribute>
-         <name>separator</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-
-      <attribute>
-         <name>showEllipses</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-
-      <attribute>
-         <name>action</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-
-      <attribute>
-         <name>actionListener</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-
-      <attribute>
-         <name>value</name>
-         <required>true</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag>
 
    <tag>
       <name>imagePickerRadio</name>
       <tagclass>org.alfresco.web.ui.common.tag.ImagePickerRadioTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      
+      <description>
+         The image picker component displays a list of images, of which one can be selected via radio
+         buttons. The list can be configured to display the images in any number of columns. Each item
+         in the list is represented by the modeListItem tag defined by the ModeList component.
+         A spacing (between the elements in the list) can be configured as well as the inline style or
+         CSS class for the list 
+      </description>
       
       <attribute>
          <name>id</name>
@@ -1133,5 +1029,5 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
-
+   
 </taglib>

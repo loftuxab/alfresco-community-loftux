@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
+<%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <%@ page isELIgnored="false" %>
 
@@ -231,7 +232,7 @@
                         </a:column>--%>
                         
                         <a:column style="text-align:left">
-                           <a:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
+                           <r:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
                         </a:column>
                         
                         <a:column actions="true" style="text-align:right">

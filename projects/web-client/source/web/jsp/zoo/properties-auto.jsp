@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
+<%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
@@ -10,8 +11,8 @@
    
    <h:form id="propertySheetForm3">
    
-      <a:propertySheetGrid value="/sop.txt" var="node3">
-      </a:propertySheetGrid>
+      <r:propertySheetGrid value="/sop.txt" var="node3">
+      </r:propertySheetGrid>
 
       <div style="color:red;"><h:messages/></div>
       <br/>
@@ -25,8 +26,8 @@
    
    <h:form id="propertySheetForm4">
    
-      <a:propertySheetGrid value="/sop.txt" var="node4" externalConfig="true">
-      </a:propertySheetGrid>
+      <r:propertySheetGrid value="/sop.txt" var="node4" externalConfig="true">
+      </r:propertySheetGrid>
    
       <div style="color:red;"><h:messages/></div>
       <br/>

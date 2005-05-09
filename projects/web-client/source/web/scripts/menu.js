@@ -54,6 +54,6 @@ function _menuOut(id)
       _timeoutId = null;
    }
    
-   // hide the menu after 2 seconds delay
-   _timeoutId = window.setTimeout("_hideMenu('" + id + "')", 2000);
+   // hide the menu after a seconds delay
+   _timeoutId = window.setTimeout("_hideMenu('" + id + "')", 1000);
 }

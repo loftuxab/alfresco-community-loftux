@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
+<%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
@@ -10,7 +11,7 @@
    
    <h:form id="propertySheetForm">
    
-      <a:propertySheetGrid value="/gav.doc">
+      <r:propertySheetGrid value="/gav.doc">
          <h:outputText value='#{MockDDService.types[node.type].propertiesMap["name"].displayName}: ' />
          <h:inputText value="#{node.name}" />
          <h:outputText value='#{MockDDService.types[node.type].propertiesMap["description"].displayName}: ' />
@@ -24,7 +25,7 @@
             <f:convertDateTime dateStyle="short" pattern="d/MM/yyyy" />
          </h:inputText>
          <!-- TODO: Put the keywords in here to test the custom converter tag -->
-      </a:propertySheetGrid>
+      </r:propertySheetGrid>
    
       <div style="color:red;"><h:messages/></div>
       <br/>
@@ -38,13 +39,13 @@
    
    <h:form id="propertySheetForm2">
    
-      <a:propertySheetGrid value="/kev.txt" var="node2">
-         <a:property value="name" columns="1" />
-         <a:property value="description" columns="1" />
-         <a:property value="created" columns="1" />
-         <a:property value="modified" columns="2" />
-         <a:property value="non-existent" columns="1" />
-      </a:propertySheetGrid>
+      <r:propertySheetGrid value="/kev.txt" var="node2">
+         <r:property value="name" columns="1" />
+         <r:property value="description" columns="1" />
+         <r:property value="created" columns="1" />
+         <r:property value="modified" columns="2" />
+         <r:property value="non-existent" columns="1" />
+      </r:propertySheetGrid>
 
       <div style="color:red;"><h:messages/></div>
       <br/>
