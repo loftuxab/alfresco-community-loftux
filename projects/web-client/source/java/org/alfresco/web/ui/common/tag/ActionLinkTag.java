@@ -16,7 +16,7 @@ public class ActionLinkTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.ActionLink";
+      return "org.alfresco.faces.ActionLink";
    }
 
    /**
@@ -24,7 +24,7 @@ public class ActionLinkTag extends HtmlComponentTag
     */
    public String getRendererType()
    {
-      return "awc.faces.ActionLinkRenderer";
+      return "org.alfresco.faces.ActionLinkRenderer";
    }
    
    /**

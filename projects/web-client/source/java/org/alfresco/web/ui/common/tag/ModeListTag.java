@@ -16,7 +16,7 @@ public class ModeListTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.ModeList";
+      return "org.alfresco.faces.ModeList";
    }
 
    /**
@@ -24,7 +24,7 @@ public class ModeListTag extends HtmlComponentTag
     */
    public String getRendererType()
    {
-      return "awc.faces.ModeListRenderer";
+      return "org.alfresco.faces.ModeListRenderer";
    }
    
    /**

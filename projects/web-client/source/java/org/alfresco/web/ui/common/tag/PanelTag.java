@@ -20,7 +20,7 @@ public class PanelTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.Panel";
+      return "org.alfresco.faces.Panel";
    }
 
    /**

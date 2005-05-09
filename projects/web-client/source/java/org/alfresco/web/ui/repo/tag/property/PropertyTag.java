@@ -25,7 +25,7 @@ public class PropertyTag extends BaseComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.Property";
+      return "org.alfresco.faces.Property";
    }
    
    /**

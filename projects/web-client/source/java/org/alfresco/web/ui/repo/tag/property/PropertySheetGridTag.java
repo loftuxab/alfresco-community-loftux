@@ -21,7 +21,7 @@ public class PropertySheetGridTag extends BaseComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.PropertySheet";
+      return "org.alfresco.faces.PropertySheet";
    }
 
    /**

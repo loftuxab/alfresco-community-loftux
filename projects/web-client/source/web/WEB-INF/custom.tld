@@ -428,7 +428,7 @@
 
    <tag>
       <name>propertySheetGrid</name>
-      <tagclass>org.alfresco.web.ui.common.tag.property.PropertySheetGridTag</tagclass>
+      <tagclass>org.alfresco.web.ui.repo.tag.property.PropertySheetGridTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -476,7 +476,7 @@
    
    <tag>
       <name>property</name>
-      <tagclass>org.alfresco.web.ui.common.tag.property.PropertyTag</tagclass>
+      <tagclass>org.alfresco.web.ui.repo.tag.property.PropertyTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>
@@ -943,8 +943,8 @@
    </tag>
    
    <tag>
-      <name>modeListItem</name>
-      <tagclass>org.alfresco.web.ui.common.tag.ModeListItemTag</tagclass>
+      <name>listItem</name>
+      <tagclass>org.alfresco.web.ui.common.tag.ListItemTag</tagclass>
       <bodycontent>JSP</bodycontent>
       
       <attribute>

@@ -31,7 +31,7 @@ public class UIBreadcrumb extends UICommand
     */
    public UIBreadcrumb()
    {
-      setRendererType("awc.faces.BreadcrumbRenderer");
+      setRendererType("org.alfresco.faces.BreadcrumbRenderer");
    }
 
 
@@ -43,7 +43,7 @@ public class UIBreadcrumb extends UICommand
     */
    public String getFamily()
    {
-      return "awc.faces.Controls";
+      return "org.alfresco.faces.Controls";
    }
    
    /**

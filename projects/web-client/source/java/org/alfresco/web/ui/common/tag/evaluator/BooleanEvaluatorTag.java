@@ -13,6 +13,6 @@ public class BooleanEvaluatorTag extends GenericEvaluatorTag
     */
    public String getComponentType()
    {
-      return "awc.faces.BooleanEvaluator";
+      return "org.alfresco.faces.BooleanEvaluator";
    }
 }

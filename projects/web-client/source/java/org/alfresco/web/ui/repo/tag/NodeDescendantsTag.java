@@ -18,7 +18,7 @@ public class NodeDescendantsTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.repo.NodeDescendants";
+      return "org.alfresco.faces.NodeDescendants";
    }
 
    /**
@@ -26,7 +26,7 @@ public class NodeDescendantsTag extends HtmlComponentTag
     */
    public String getRendererType()
    {
-      return "awc.repo.NodeDescendantsLinkRenderer";
+      return "org.alfresco.faces.NodeDescendantsLinkRenderer";
    }
 
    /**

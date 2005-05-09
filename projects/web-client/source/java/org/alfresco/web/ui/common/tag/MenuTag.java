@@ -15,7 +15,7 @@ public class MenuTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.Menu";
+      return "org.alfresco.faces.Menu";
    }
 
    /**

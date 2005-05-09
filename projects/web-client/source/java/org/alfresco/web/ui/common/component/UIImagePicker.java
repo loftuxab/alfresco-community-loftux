@@ -20,7 +20,7 @@ public class UIImagePicker extends UIInput
    public UIImagePicker()
    {
       // set the default renderer for an image picker component
-      setRendererType("awc.faces.Radio");
+      setRendererType("org.alfresco.faces.Radio");
    }
    
    /**
@@ -28,7 +28,7 @@ public class UIImagePicker extends UIInput
     */
    public String getFamily()
    {
-      return "awc.faces.ImagePicker";
+      return "org.alfresco.faces.ImagePicker";
    }
    
    /**

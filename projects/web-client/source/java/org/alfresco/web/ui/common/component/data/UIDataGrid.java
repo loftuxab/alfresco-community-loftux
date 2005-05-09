@@ -20,7 +20,7 @@ public class UIDataGrid extends SelfRenderingComponent implements IDataContainer
     */
    public String getFamily()
    {
-      return "awc.faces.Data";
+      return "org.alfresco.faces.Data";
    }
    
    /**

@@ -89,8 +89,8 @@
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <awc:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="1" actionListener="#{AddContentWizard.stepChanged}">
-                                 <awc:modeListItem value="1" label="1. Content Details" />
-                                 <awc:modeListItem value="2" label="2. Summary" />
+                                 <awc:listItem value="1" label="1. Content Details" />
+                                 <awc:listItem value="2" label="2. Summary" />
                               </awc:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>

@@ -30,7 +30,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public UIRichList()
    {
-      setRendererType("awc.faces.RichListRenderer");
+      setRendererType("org.alfresco.faces.RichListRenderer");
       
       // the standard set of view renderers
       IRichListRenderer renderer;
@@ -54,7 +54,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public String getFamily()
    {
-      return "awc.faces.Data";
+      return "org.alfresco.faces.Data";
    }
    
    /**

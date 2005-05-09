@@ -15,7 +15,7 @@ public class StringEqualsEvaluatorTag extends GenericEvaluatorTag
     */
    public String getComponentType()
    {
-      return "awc.faces.StringEqualsEvaluator";
+      return "org.alfresco.faces.StringEqualsEvaluator";
    }
    
    /**

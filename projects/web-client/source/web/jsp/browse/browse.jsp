@@ -85,9 +85,9 @@
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
                               <awc:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
                                     value="#{BrowseBean.browseViewMode}" actionListener="#{BrowseBean.viewModeChanged}">
-                                 <awc:modeListItem value="details" label="List All Items" image="/images/icons/Details.gif" />
-                                 <awc:modeListItem value="icons" label="Dashboard" />
-                                 <awc:modeListItem value="list" label="Browse Items" />
+                                 <awc:listItem value="details" label="List All Items" image="/images/icons/Details.gif" />
+                                 <awc:listItem value="icons" label="Dashboard" />
+                                 <awc:listItem value="list" label="Browse Items" />
                               </awc:modeList>
                            </td>
                         </tr>

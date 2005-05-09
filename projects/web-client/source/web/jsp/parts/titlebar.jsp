@@ -10,8 +10,8 @@
                   <%-- Toolbar --%>
                   <awc:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true" value="1"
                         itemStyleClass="topToolbar" itemLinkStyleClass="topToolbarLink" selectedStyleClass="topToolbarHighlight" selectedLinkStyleClass="topToolbarLinkHighlight">
-                     <awc:modeListItem value="0" label="Company Space" />
-                     <awc:modeListItem value="1" label="My Home" />
+                     <awc:listItem value="0" label="Company Space" />
+                     <awc:listItem value="1" label="My Home" />
                   </awc:modeList>
                </td>
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width=4 height=30></td>

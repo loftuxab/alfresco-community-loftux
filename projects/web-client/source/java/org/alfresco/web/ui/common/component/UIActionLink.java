@@ -23,7 +23,7 @@ public class UIActionLink extends UICommand
     */
    public UIActionLink()
    {
-      setRendererType("awc.faces.ActionLinkRenderer");
+      setRendererType("org.alfresco.faces.ActionLinkRenderer");
    }
    
    
@@ -35,7 +35,7 @@ public class UIActionLink extends UICommand
     */
    public String getFamily()
    {
-      return "awc.faces.Controls";
+      return "org.alfresco.faces.Controls";
    }
    
    /**

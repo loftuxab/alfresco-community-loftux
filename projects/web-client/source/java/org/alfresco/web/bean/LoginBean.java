@@ -1,12 +1,14 @@
 /*
  * Created on Feb 24, 2005
  */
-package jsftest;
+package org.alfresco.web.bean;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
+
+import org.alfresco.web.ui.common.Utils;
 
 /**
  * JSF Managed Bean. Backs the login.jsp view to provide the form fields used
@@ -70,34 +72,19 @@ public class LoginBean
     */
    public String login()
    {
+      // TODO: This must go to the repository via a service to authenticate
+      //       for now only accept admin/admin as username/password
+      
       if (m_name.equals("admin") && m_password.equals("admin"))
       {
          return "success";
       }
       else
       {
-         addErrorMessage("Unknown username/password.");
+         Utils.addErrorMessage("Unknown username/password.");
          return null;
       }
    }
-   
-   
-   // ===========================================================================
-   // Private helpers 
-   
-   /**
-    * Add an ERROR level message that can be displayed by the 'messages' tag
-    * 
-    * @param msg
-    */
-   private void addErrorMessage(String msg)
-   {
-      FacesContext context = FacesContext.getCurrentInstance( );
-      
-      FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg);
-      context.addMessage(null, facesMsg);
-   }
-   
    
    // ===========================================================================
    // Private data

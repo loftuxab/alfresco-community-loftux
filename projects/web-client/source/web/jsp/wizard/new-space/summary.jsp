@@ -84,10 +84,10 @@
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <awc:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="4" actionListener="#{NewSpaceWizard.stepChanged}">
-                                 <awc:modeListItem value="1" label="1. Starting Space" />
-                                 <awc:modeListItem value="2" label="2. Space Options" />
-                                 <awc:modeListItem value="3" label="3. Space Details" />
-                                 <awc:modeListItem value="4" label="4. Summary" />
+                                 <awc:listItem value="1" label="1. Starting Space" />
+                                 <awc:listItem value="2" label="2. Space Options" />
+                                 <awc:listItem value="3" label="3. Space Details" />
+                                 <awc:listItem value="4" label="4. Summary" />
                               </awc:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>

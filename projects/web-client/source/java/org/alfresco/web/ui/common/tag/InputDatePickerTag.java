@@ -36,7 +36,7 @@ public class InputDatePickerTag extends HtmlComponentTag
    {
       // the renderer type is a convention name Id - not an actual class
       // see the <render-kit> in faces-config.xml
-      return "awc.faces.DatePickerRenderer";
+      return "org.alfresco.faces.DatePickerRenderer";
    }
    
    /**

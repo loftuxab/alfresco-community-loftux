@@ -26,7 +26,7 @@ public class UIModeList extends UICommand
     */
    public UIModeList()
    {
-      setRendererType("awc.faces.ModeListRenderer");
+      setRendererType("org.alfresco.faces.ModeListRenderer");
    }
    
    
@@ -38,7 +38,7 @@ public class UIModeList extends UICommand
     */
    public String getFamily()
    {
-      return "awc.faces.Controls";
+      return "org.alfresco.faces.Controls";
    }
    
    /**

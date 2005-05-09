@@ -20,7 +20,7 @@ public class DataGridTag extends BaseComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.DataGrid";
+      return "org.alfresco.faces.DataGrid";
    }
    
    /**

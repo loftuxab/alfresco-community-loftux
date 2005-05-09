@@ -22,9 +22,9 @@
       Basic ModeList<br>
       <awc:modeList itemSpacing="2" iconColumnWidth="0"
             style="background-color:#EEEEEE" selectedStyle="background-color:#FFFFFF;border:solid #444444;border-width:1px">
-         <awc:modeListItem value="1" label="First Item" tooltip="Item Number 1" />
-         <awc:modeListItem value="2" label="Second Item"  tooltip="Item Number 2" />
-         <awc:modeListItem value="3" label="Third Item"  tooltip="Item Number 3" />
+         <awc:listItem value="1" label="First Item" tooltip="Item Number 1" />
+         <awc:listItem value="2" label="Second Item"  tooltip="Item Number 2" />
+         <awc:listItem value="3" label="Third Item"  tooltip="Item Number 3" />
       </awc:modeList>
       <br>
       Modelist with styles applied, icons, title label and the initial value set:<br>
@@ -32,18 +32,18 @@
             style="background-color:#F3F1EB" itemStyle="font-family:Tahoma;font-size:11px"
             selectedStyle="background-color:#EBF1FF;font-family:Tahoma;font-size:11px;border:solid #4444FF;border-width:1px"
             value="1">
-         <awc:modeListItem value="0" label="None" tooltip="No Icon Here" />
-         <awc:modeListItem value="1" label="Details" image="/images/icons/BlueArrow.gif" />
-         <awc:modeListItem value="2" label="Icons" image="/images/icons/BlueArrow.gif" />
-         <awc:modeListItem value="3" label="List" image="/images/icons/BlueArrow.gif" />
+         <awc:listItem value="0" label="None" tooltip="No Icon Here" />
+         <awc:listItem value="1" label="Details" image="/images/icons/BlueArrow.gif" />
+         <awc:listItem value="2" label="Icons" image="/images/icons/BlueArrow.gif" />
+         <awc:listItem value="3" label="List" image="/images/icons/BlueArrow.gif" />
       </awc:modeList>
       <br>
       ModeList rendered horizontally with first item selected:<br>
       <awc:modeList itemSpacing="2" iconColumnWidth="0" horizontal="true" value="1"
             style="background-color:#EEEEEE" selectedStyle="background-color:#FFFFFF;border:solid #444444;border-width:1px">
-         <awc:modeListItem value="1" label="Item 001" tooltip="Item Number 1" />
-         <awc:modeListItem value="2" label="Item 002"  tooltip="Item Number 2" />
-         <awc:modeListItem value="3" label="Item 003"  tooltip="Item Number 3" />
+         <awc:listItem value="1" label="Item 001" tooltip="Item Number 1" />
+         <awc:listItem value="2" label="Item 002"  tooltip="Item Number 2" />
+         <awc:listItem value="3" label="Item 003"  tooltip="Item Number 3" />
       </awc:modeList>
       
       <p>

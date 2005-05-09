@@ -41,7 +41,7 @@ public class ImagePickerRadioTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.ImagePicker";
+      return "org.alfresco.faces.ImagePicker";
    }
 
    /**
@@ -49,7 +49,7 @@ public class ImagePickerRadioTag extends HtmlComponentTag
     */
    public String getRendererType()
    {
-      return "awc.faces.Radio";
+      return "org.alfresco.faces.Radio";
    }
    
    /**

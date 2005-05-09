@@ -12,13 +12,10 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.FacesEvent;
 
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.UIListItem;
 import org.alfresco.web.ui.common.component.UIModeList;
-import org.alfresco.web.ui.common.component.UIModeListItem;
-import org.alfresco.web.ui.common.component.UIBreadcrumb.BreadcrumbEvent;
 
 /**
  * @author kevinr
@@ -134,10 +131,10 @@ public class ModeListRenderer extends BaseRenderer
       for (Iterator i=list.getChildren().iterator(); i.hasNext(); /**/)
       {
          UIComponent child = (UIComponent)i.next();
-         if (child instanceof UIModeListItem && child.isRendered() == true)
+         if (child instanceof UIListItem && child.isRendered() == true)
          {
-            // found a valid UIModeListItem child to render
-            UIModeListItem item = (UIModeListItem)child;
+            // found a valid UIListItem child to render
+            UIListItem item = (UIListItem)child;
             
             // each row is an inner table with a single row and 2 columns
             // first column contains an icon if present, second column contains text

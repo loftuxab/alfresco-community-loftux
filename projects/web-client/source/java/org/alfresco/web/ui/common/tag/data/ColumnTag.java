@@ -18,7 +18,7 @@ public class ColumnTag extends BaseComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.RichListColumn";
+      return "org.alfresco.faces.RichListColumn";
    }
 
    /**

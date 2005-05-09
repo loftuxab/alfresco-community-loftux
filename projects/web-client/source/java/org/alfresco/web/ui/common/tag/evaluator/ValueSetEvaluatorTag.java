@@ -13,6 +13,6 @@ public class ValueSetEvaluatorTag extends GenericEvaluatorTag
     */
    public String getComponentType()
    {
-      return "awc.faces.ValueSetEvaluator";
+      return "org.alfresco.faces.ValueSetEvaluator";
    }
 }

@@ -20,7 +20,7 @@ public class SortLinkTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.SortLink";
+      return "org.alfresco.faces.SortLink";
    }
 
    /**

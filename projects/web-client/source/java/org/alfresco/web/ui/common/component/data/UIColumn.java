@@ -20,7 +20,7 @@ public class UIColumn extends UIComponentBase
     */
    public String getFamily()
    {
-      return "awc.faces.Data";
+      return "org.alfresco.faces.Data";
    }
    
    /**

@@ -9,7 +9,7 @@ import javax.faces.el.ValueBinding;
 /**
  * @author kevinr
  */
-public class UIModeListItem extends SelfRenderingComponent
+public class UIListItem extends SelfRenderingComponent
 {
    // ------------------------------------------------------------------------------
    // Component Impl 
@@ -19,7 +19,7 @@ public class UIModeListItem extends SelfRenderingComponent
     */
    public String getFamily()
    {
-      return "awc.faces.Controls";
+      return "org.alfresco.faces.Controls";
    }
 
    /**

@@ -22,7 +22,7 @@ public abstract class BaseEvaluator extends SelfRenderingComponent
     */
    public final String getFamily()
    {
-      return "awc.faces.evaluators";
+      return "org.alfresco.faces.evaluators";
    }
 
    /**

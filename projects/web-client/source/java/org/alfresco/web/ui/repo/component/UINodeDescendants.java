@@ -26,7 +26,7 @@ public class UINodeDescendants extends UICommand
     */
    public UINodeDescendants()
    {
-      setRendererType("awc.repo.NodeDescendantsLinkRenderer");
+      setRendererType("org.alfresco.faces.NodeDescendantsLinkRenderer");
    }
    
    
@@ -38,7 +38,7 @@ public class UINodeDescendants extends UICommand
     */
    public String getFamily()
    {
-      return "awc.repo.NodeDescendants";
+      return "org.alfresco.faces.NodeDescendants";
    }
    
    /**

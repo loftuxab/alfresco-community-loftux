@@ -21,7 +21,7 @@ public class DataPagerTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.DataPager";
+      return "org.alfresco.faces.DataPager";
    }
 
    /**

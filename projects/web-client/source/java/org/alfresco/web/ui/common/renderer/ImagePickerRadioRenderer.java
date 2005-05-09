@@ -12,11 +12,10 @@ import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
-import org.apache.log4j.Logger;
-
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIImagePicker;
-import org.alfresco.web.ui.common.component.UIModeListItem;
+import org.alfresco.web.ui.common.component.UIListItem;
+import org.apache.log4j.Logger;
 
 /**
  * Renderer for the image picker component that outputs the list of images
@@ -105,10 +104,10 @@ public class ImagePickerRadioRenderer extends BaseRenderer
       for (Iterator i = imagePicker.getChildren().iterator(); i.hasNext(); /**/)
       {
          UIComponent child = (UIComponent)i.next();
-         if (child instanceof UIModeListItem && child.isRendered() == true)
+         if (child instanceof UIListItem && child.isRendered() == true)
          {
-            // found a valid UIModeListItem child to render
-            UIModeListItem item = (UIModeListItem)child;
+            // found a valid UIListItem child to render
+            UIListItem item = (UIListItem)child;
             
             String tooltip = (String)child.getAttributes().get("tooltip");
             

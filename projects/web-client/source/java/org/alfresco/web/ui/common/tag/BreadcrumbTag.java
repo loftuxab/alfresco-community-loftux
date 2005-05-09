@@ -16,7 +16,7 @@ public class BreadcrumbTag extends HtmlComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.Breadcrumb";
+      return "org.alfresco.faces.Breadcrumb";
    }
 
    /**
@@ -24,7 +24,7 @@ public class BreadcrumbTag extends HtmlComponentTag
     */
    public String getRendererType()
    {
-      return "awc.faces.BreadcrumbRenderer";
+      return "org.alfresco.faces.BreadcrumbRenderer";
    }
 
    /**

@@ -8,14 +8,14 @@ import javax.faces.component.UIComponent;
 /**
  * @author kevinr
  */
-public class ModeListItemTag extends BaseComponentTag
+public class ListItemTag extends BaseComponentTag
 {
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
     */
    public String getComponentType()
    {
-      return "awc.faces.ModeListItem";
+      return "org.alfresco.faces.ListItem";
    }
 
    /**

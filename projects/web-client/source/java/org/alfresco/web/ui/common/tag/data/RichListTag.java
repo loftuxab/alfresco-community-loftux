@@ -21,7 +21,7 @@ public class RichListTag extends BaseComponentTag
     */
    public String getComponentType()
    {
-      return "awc.faces.RichList";
+      return "org.alfresco.faces.RichList";
    }
 
    /**
@@ -29,7 +29,7 @@ public class RichListTag extends BaseComponentTag
     */
    public String getRendererType()
    {
-      return "awc.faces.RichListRenderer";
+      return "org.alfresco.faces.RichListRenderer";
    }
 
    /**
