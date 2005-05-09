@@ -45,7 +45,7 @@
       <td>
          <%-- Example of a tag utilising an Input Component with a custom renderer.
               The renderer handles encoding and decoding of date values to UI elements --%>
-         <awc:inputDatePicker id="joined" value="#{UserListBean.user.dateJoined}" startYear="1996" yearCount="10"/>
+         <a:inputDatePicker id="joined" value="#{UserListBean.user.dateJoined}" startYear="1996" yearCount="10"/>
       </td>
    </tr>
    

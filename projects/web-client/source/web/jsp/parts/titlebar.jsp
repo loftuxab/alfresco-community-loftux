@@ -8,11 +8,11 @@
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width=28 height=30></td>
                <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/titlebar_bg.gif)">
                   <%-- Toolbar --%>
-                  <awc:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true" value="1"
+                  <a:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true" value="1"
                         itemStyleClass="topToolbar" itemLinkStyleClass="topToolbarLink" selectedStyleClass="topToolbarHighlight" selectedLinkStyleClass="topToolbarLinkHighlight">
-                     <awc:listItem value="0" label="Company Space" />
-                     <awc:listItem value="1" label="My Home" />
-                  </awc:modeList>
+                     <a:listItem value="0" label="Company Space" />
+                     <a:listItem value="1" label="My Home" />
+                  </a:modeList>
                </td>
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width=4 height=30></td>
             </tr>
@@ -23,7 +23,7 @@
       <td>
          <table cellspacing=2 cellpadding=0 width=100%>
             <tr>
-               <td><awc:actionLink value="#{msg.toggle_shelf}" image="/images/icons/shelf.gif" actionListener="#{NavigationBean.toggleShelf}" showLink="false" /></td>
+               <td><a:actionLink value="#{msg.toggle_shelf}" image="/images/icons/shelf.gif" actionListener="#{NavigationBean.toggleShelf}" showLink="false" /></td>
                <td width=8>&nbsp;</td>
                <td><img src="<%=request.getContextPath()%>/images/icons/Help_icon.gif" width=15 height=15></td>
                <td><h:outputText value="#{msg.help}"/></td>

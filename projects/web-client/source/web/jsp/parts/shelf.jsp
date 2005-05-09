@@ -1,5 +1,5 @@
 <%-- Shelf area --%>
-<awc:panel id="shelfPanel" expanded="#{NavigationBean.shelfExpanded}">
+<a:panel id="shelfPanel" expanded="#{NavigationBean.shelfExpanded}">
    <table cellspacing=0 cellpadding=0 width=100% bgcolor='#ffffff'>
       <tr>
          <td><img src="<%=request.getContextPath()%>/images/parts/headbar_begin.gif" width=4 height=33></td>
@@ -24,4 +24,4 @@
          <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_9.gif" width=4 height=4></td>
       </tr>
    </table>
-</awc:panel>
+</a:panel>

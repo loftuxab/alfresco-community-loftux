@@ -12,7 +12,7 @@
       <%-- Breadcrumb component --%>
       <div style="padding-left:8px" class="headbarTitle">
          <h:outputText value="#{msg.location}"/>:&nbsp;
-         <awc:breadcrumb value="#{NavigationBean.location}" styleClass="headbarLink" />
+         <a:breadcrumb value="#{NavigationBean.location}" styleClass="headbarLink" />
       </div>
    </td>
    <td style="background-image: url(<%=request.getContextPath()%>/images/parts/headbar_6.gif)"></td>

@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
-<%@ taglib uri="/WEB-INF/custom.tld" prefix="awc" %>
+<%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 
 <%@ page isELIgnored="false" %>
 
@@ -82,13 +82,13 @@
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
-                              <awc:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
+                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="3" actionListener="#{NewSpaceWizard.stepChanged}">
-                                 <awc:listItem value="1" label="1. Starting Space" />
-                                 <awc:listItem value="2" label="2. Space Options" />
-                                 <awc:listItem value="3" label="3. Space Details" />
-                                 <awc:listItem value="4" label="4. Summary" />
-                              </awc:modeList>
+                                 <a:listItem value="1" label="1. Starting Space" />
+                                 <a:listItem value="2" label="2. Space Options" />
+                                 <a:listItem value="3" label="3. Space Details" />
+                                 <a:listItem value="4" label="4. Summary" />
+                              </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                            
@@ -124,22 +124,22 @@
                                     <td>Choose space icon:</td>
                                     <td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                                       <awc:imagePickerRadio columns="7" spacing="4" value="#{NewSpaceWizard.icon}">
-                                          <awc:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
-                                          <awc:listItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
-                                          <awc:listItem value="space-icon-www" image="/images/icons/space-icon-www.gif" />
-                                          <awc:listItem value="space-icon-world" image="/images/icons/space-icon-world.gif" />
-                                          <awc:listItem value="space-icon-spanner" image="/images/icons/space-icon-spanner.gif" />
-                                          <awc:listItem value="space-icon-public" image="/images/icons/space-icon-public.gif" />
-                                          <awc:listItem value="space-icon-orange-ball" image="/images/icons/space-icon-orange-ball.gif" />
-                                          <awc:listItem value="space-icon-lock" image="/images/icons/space-icon-lock.gif" />
-                                          <awc:listItem value="space-icon-library" image="/images/icons/space-icon-library.gif" />
-                                          <awc:listItem value="space-icon-images" image="/images/icons/space-icon-images.gif" />
-                                          <awc:listItem value="space-icon-id" image="/images/icons/space-icon-id.gif" />
-                                          <awc:listItem value="space-icon-glasses" image="/images/icons/space-icon-glasses.gif" />
-                                          <awc:listItem value="space-icon-download" image="/images/icons/space-icon-download.gif" />
-                                          <awc:listItem value="space-icon-documents" image="/images/icons/space-icon-documents.gif" />
-                                       </awc:imagePickerRadio>
+                                       <a:imagePickerRadio columns="7" spacing="4" value="#{NewSpaceWizard.icon}">
+                                          <a:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
+                                          <a:listItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
+                                          <a:listItem value="space-icon-www" image="/images/icons/space-icon-www.gif" />
+                                          <a:listItem value="space-icon-world" image="/images/icons/space-icon-world.gif" />
+                                          <a:listItem value="space-icon-spanner" image="/images/icons/space-icon-spanner.gif" />
+                                          <a:listItem value="space-icon-public" image="/images/icons/space-icon-public.gif" />
+                                          <a:listItem value="space-icon-orange-ball" image="/images/icons/space-icon-orange-ball.gif" />
+                                          <a:listItem value="space-icon-lock" image="/images/icons/space-icon-lock.gif" />
+                                          <a:listItem value="space-icon-library" image="/images/icons/space-icon-library.gif" />
+                                          <a:listItem value="space-icon-images" image="/images/icons/space-icon-images.gif" />
+                                          <a:listItem value="space-icon-id" image="/images/icons/space-icon-id.gif" />
+                                          <a:listItem value="space-icon-glasses" image="/images/icons/space-icon-glasses.gif" />
+                                          <a:listItem value="space-icon-download" image="/images/icons/space-icon-download.gif" />
+                                          <a:listItem value="space-icon-documents" image="/images/icons/space-icon-documents.gif" />
+                                       </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                     </td>
                                  </tr>

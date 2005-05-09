@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
-<%@ taglib uri="/WEB-INF/custom.tld" prefix="awc" %>
+<%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 
 <%@ page isELIgnored="false" %>
 
@@ -93,13 +93,13 @@
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
-                              <awc:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
+                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="2" actionListener="#{NewSpaceWizard.stepChanged}">
-                                 <awc:listItem value="1" label="1. Starting Space" />
-                                 <awc:listItem value="2" label="2. Space Options" />
-                                 <awc:listItem value="3" label="3. Space Details" />
-                                 <awc:listItem value="4" label="4. Summary" />
-                              </awc:modeList>
+                                 <a:listItem value="1" label="1. Starting Space" />
+                                 <a:listItem value="2" label="2. Space Options" />
+                                 <a:listItem value="3" label="3. Space Details" />
+                                 <a:listItem value="4" label="4. Summary" />
+                              </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                            
@@ -123,15 +123,15 @@
                                  <tr>
                                     <td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                                       <awc:imagePickerRadio columns="4" spacing="4" value="#{NewSpaceWizard.spaceType}"
+                                       <a:imagePickerRadio columns="4" spacing="4" value="#{NewSpaceWizard.spaceType}"
                                                              onclick="javascript:itemSelected(this);">
-                                          <awc:listItem value="container" label="Container" tooltip="Container"
+                                          <a:listItem value="container" label="Container" tooltip="Container"
                                                             image="/images/icons/space.gif" />
-                                          <awc:listItem value="wiki" label="Wiki" tooltip="Wiki"
+                                          <a:listItem value="wiki" label="Wiki" tooltip="Wiki"
                                                             image="/images/icons/wiki.gif" />
-                                          <awc:listItem value="discussion" label="Discussion" tooltip="Discussion"
+                                          <a:listItem value="discussion" label="Discussion" tooltip="Discussion"
                                                             image="/images/icons/discussion.gif" />
-                                       </awc:imagePickerRadio>
+                                       </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                     </td>
                                  </tr>
