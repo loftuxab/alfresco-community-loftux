@@ -97,11 +97,29 @@ public class NavigationBean
    }
    
    /**
+    * @return Returns the search text.
+    */
+   public String getSearchText()
+   {
+      return this.searchText;
+   }
+   
+   /**
+    * @param searchText    The search text to set.
+    */
+   public void setSearchText(String searchText)
+   {
+      this.searchText = searchText;
+      
+      UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
+   }
+   
+   /**
     * @return Returns the currently browsing node Id.
     */
    public String getCurrentNodeId()
    {
-      return currentNodeId;
+      return this.currentNodeId;
    }
    
    /**
@@ -146,6 +164,10 @@ public class NavigationBean
          
          this.currentNodeId = currentNodeId;
       }
+      
+      this.searchText = null;
+      
+      UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
    }
    
    /**
@@ -247,7 +269,6 @@ public class NavigationBean
          // TEMP!
          setCurrentNodeId(null);
          setLocation( (List)breadcrumb.getValue() );
-         
          return "browse";
       }
       
@@ -268,6 +289,9 @@ public class NavigationBean
    
    /** Node we are currently in the context of */
    private String currentNodeId;
+   
+   /** Search text we are currently using */
+   private String searchText;
    
    /** bag of displayable properties for the current node */
    private Map<String, String> nodeProperties = new HashMap<String, String>(7, 1.0f);

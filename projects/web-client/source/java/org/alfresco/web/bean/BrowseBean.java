@@ -20,6 +20,7 @@ import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.value.ValueConverter;
@@ -33,13 +34,20 @@ import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
+import org.alfresco.web.ui.repo.component.UISimpleSearch;
 import org.apache.log4j.Logger;
 
 /**
  * @author Kevin Roast
  */
-public class BrowseBean
+public class BrowseBean implements IContextListener
 {
+   public BrowseBean()
+   {
+      UIContextService.getInstance(FacesContext.getCurrentInstance()).registerBean(this);
+   }
+   
+   
    // ------------------------------------------------------------------------------
    // Bean property getters and setters 
    
@@ -124,21 +132,76 @@ public class BrowseBean
    }
    
    /**
+    * @param browseRichList The browseRichList to set.
+    */
+   public void setBrowseRichList(UIRichList browseRichList)
+   {
+      this.browseRichList = browseRichList;
+   }
+   
+   /**
+    * @return Returns the browseRichList.
+    */
+   public UIRichList getBrowseRichList()
+   {
+      return this.browseRichList;
+   }
+   
+   /**
+    * @param detailsRichList The detailsRichList to set.
+    */
+   public void setDetailsRichList(UIRichList detailsRichList)
+   {
+      this.detailsRichList = detailsRichList;
+   }
+   
+   /**
+    * @return Returns the detailsRichList.
+    */
+   public UIRichList getDetailsRichList()
+   {
+      return this.detailsRichList;
+   }
+   
+   /**
     * Page accessed bean method to get the nodes currently being browsed
     * 
     * @return List of Node objects for the current browse location
     */
    public List<Node> getNodes()
    {
-      s_logger.info("getNodes() called in BrowseBean, querying...");
-      
-      return queryBrowseNodes(getNavigator().getCurrentNodeId());
+      List<Node> nodes = null;
+      if (navigator.getSearchText() == null)
+      {
+         s_logger.info("getNodes() called in BrowseBean, querying nodes...");
+         nodes = queryBrowseNodes(getNavigator().getCurrentNodeId());
+      }
+      else
+      {
+         s_logger.info("getNodes() called in BrowseBean, searching nodes...");
+         nodes = searchBrowseNodes(navigator.getSearchText());
+      }
+      return nodes;
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // IContextListener implementation 
+   
+   /**
+    * @see org.alfresco.web.bean.IContextListener#contextUpdated()
+    */
+   public void contextUpdated()
+   {
+      s_logger.info("*****contextUpdated() listener called");
+      invalidateComponents();
    }
    
    
    // ------------------------------------------------------------------------------
    // Navigation action event handlers 
    
+
    /**
     * Change the current view mode based on user selection
     * 
@@ -239,54 +302,76 @@ public class BrowseBean
          items = Collections.<Node>emptyList();
       }
       
-      /* -- Example of Search code -- leave here for now
-       * -- Note: The passed in path was "*" for a root node search
-      
-      // get the searcher object and perform the search of the root node
-      String s = MessageFormat.format(SEARCH_PATH, new Object[] {path});
-      ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
-      
-      // create a list of items from the results
-      List<Node> items = new ArrayList<Node>(results.length());
-      if (results.length() != 0)
+      return items;
+   }
+   
+   /**
+    * Search for a list of nodes using the specific search string
+    * 
+    * @param searchText       Search text
+    * 
+    * @return a List of Node object found from the search
+    */
+   private List<Node> searchBrowseNodes(String searchText)
+   {
+      List<Node> items = null;
+      try
       {
-         for (ResultSetRow row: results)
+         // get the searcher object and perform the search of the root node
+         String s = MessageFormat.format(SEARCH_PATH, new Object[] {"*"});
+         ResultSet results = this.searchService.query(Repository.getStoreRef(), "lucene", s, null, null);
+         
+         // create a list of items from the results
+         items = new ArrayList<Node>(results.length());
+         if (results.length() != 0)
          {
-            Node node = new Node(row.getQName().getNamespaceURI());  // TODO: where does Type come from?
-            Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
-            
-            String name = row.getQName().getLocalName();
-            props.put("name", name);
-            
-            props.put("description", getValueProperty(row, "description", true));
-            
-            String createdDate = getValueProperty(row, "createddate", false);
-            if (createdDate != null)
+            for (ResultSetRow row: results)
             {
-               props.put("createddate", Conversion.dateFromXmlDate(createdDate));
+               NodeRef ref = row.getNodeRef();
+               Node node = new Node(ref, row.getQName().getNamespaceURI());
+               Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
+               
+               // name and ID always exist
+               props.put("id", ref.getId());
+               props.put("name", row.getQName().getLocalName());
+               props.put("nodeRef", ref);
+               
+               // other properties which may exist
+               props.put("description", getValueProperty(row, "description", true));
+               
+               String createdDate = getValueProperty(row, "createddate", false);
+               if (createdDate != null)
+               {
+                  props.put("createddate", Conversion.dateFromXmlDate(createdDate));
+               }
+               else
+               {
+                  // TODO: a null created/modified date shouldn't happen!?
+                  props.put("createddate", null);
+               }
+               
+               String modifiedDate = getValueProperty(row, "modifieddate", false);
+               if (modifiedDate != null)
+               {
+                  props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
+               }
+               else
+               {
+                  // TODO: a null created/modified date shouldn't happen!?
+                  props.put("modifieddate", null);
+               }
+               
+               node.setProperties(props);
+               
+               items.add(node);
             }
-            else
-            {
-               // TODO: a null created/modified date shouldn't happen!?
-               props.put("createddate", null);
-            }
-            
-            String modifiedDate = getValueProperty(row, "modifieddate", false);
-            if (modifiedDate != null)
-            {
-               props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
-            }
-            else
-            {
-               // TODO: a null created/modified date shouldn't happen!?
-               props.put("modifieddate", null);
-            }
-            
-            node.setProperties(props);
-            
-            items.add(node);
          }
-      }*/
+      }
+      catch (Exception err)
+      {
+         Utils.addErrorMessage( ERROR_SEARCH );
+         items = Collections.EMPTY_LIST;
+      }
       
       return items;
    }
@@ -331,6 +416,22 @@ public class BrowseBean
    // ------------------------------------------------------------------------------
    // Navigation action event handlers
 
+   /**
+    * Action called from the Simple Search component
+    * 
+    */
+   public void search(ActionEvent event)
+   {
+      // setup the search text string on the top-level navigation handler
+      UISimpleSearch search = (UISimpleSearch)event.getComponent();
+      navigator.setSearchText(search.getLastSearch());
+      
+      // TODO: should search event handler and state be on NavigationHandler? As it's top-level
+      //       even though it ends up in the browse screen for display???
+      //       need to do this - else other breadcrumb handlers cannot know to clear "last search"!
+      //       BUT if we do this - how do we refresh the grid components?!
+   }
+   
    /**
     * Action called when a folder space is clicked.
     * Navigate into the space.
@@ -430,6 +531,7 @@ public class BrowseBean
             props.put("name", qname.getLocalName());
             node.setProperties(props);
             
+            // prepare a node for the action context
             setActionSpace(node);
          }
          catch (InvalidNodeRefException refErr)
@@ -439,9 +541,10 @@ public class BrowseBean
       }
       else
       {
-         s_logger.warn("WARNING: setActionSpace called without a Space Id!");
          setActionSpace(null);
       }
+      
+      invalidateComponents();
    }
    
    /**
@@ -492,7 +595,7 @@ public class BrowseBean
             // clear action context
             setActionSpace(null);
             
-            // setting the outcome will refresh the browse screen
+            // setting the outcome will show the browse view
             outcome = "browse";
          }
          catch (Throwable err)
@@ -508,6 +611,7 @@ public class BrowseBean
       return outcome;
    }   
    
+   
    // ------------------------------------------------------------------------------
    // Private helpers 
    
@@ -516,9 +620,9 @@ public class BrowseBean
     * location path and also updates the list components in the UI.
     * 
     * @param ref     NodeRef of the selected space
-    * @param link    UIComponent responsible for the UI update
+    * @param comp    UIComponent responsible for the UI update
     */
-   private void refreshUI(NodeRef ref, UIComponent link)
+   private void refreshUI(NodeRef ref, UIComponent comp)
    {
       // get the current breadcrumb location and append a new handler to it
       // our handler know the ID of the selected node and the display label for it
@@ -528,23 +632,20 @@ public class BrowseBean
       
       // set the current node Id ready for page refresh
       getNavigator().setCurrentNodeId(ref.getId());
+   }
+   
+   private void invalidateComponents()
+   {
+      s_logger.info("**********INVALIDTING COMPONENTS");
       
       // clear the value for the list component - will cause it to re-bind to it's data and refresh
-      // TODO: need a decoupled way to refresh components - a view-local context event service?
-      // TODO: remove this weakness - use direct component binding here? e.g. a ref in this class
-      UIRichList richList = (UIRichList)link.findComponent("browseList");
-      if (richList != null)
-      {
-         s_logger.info("Clearing 'browseList' data source.");
-         richList.setValue(null);
-      }
-      richList = (UIRichList)link.findComponent("detailsList");
-      if (richList != null)
-      {
-         s_logger.info("Clearing 'detailsList' data source.");
-         richList.setValue(null);
-      }
+      s_logger.info("Clearing 'browseList' data source.");
+      this.browseRichList.setValue(null);
+      
+      s_logger.info("Clearing 'detailsList' data source.");
+      this.detailsRichList.setValue(null);
    }
+   
 
    // ------------------------------------------------------------------------------
    // Inner classes
@@ -586,10 +687,9 @@ public class BrowseBean
          // All browse breadcrumb element relate to a Node Id - when selected we
          // set the current node id
          getNavigator().setCurrentNodeId(this.nodeId);
-         
          getNavigator().setLocation( (List)breadcrumb.getValue() );
          
-         // return to browse page
+         // force return to browse page
          return "browse";
       }
       
@@ -607,6 +707,9 @@ public class BrowseBean
    // Private data
    
    private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
+   private static final String ERROR_SEARCH  = "Search failed during to a system error.";
+   
+   private static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
    
    private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    
@@ -620,6 +723,10 @@ public class BrowseBean
    
    /** The NavigationBean reference */
    private NavigationBean navigator;
+   
+   private UIRichList detailsRichList;
+   
+   private UIRichList browseRichList;
    
    /** The current space and it's properties - if any */
    private Node actionSpace;

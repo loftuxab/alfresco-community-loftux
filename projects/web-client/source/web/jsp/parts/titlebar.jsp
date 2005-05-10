@@ -38,12 +38,15 @@
                <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_begin.gif" width=4 height=30></td>
                <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/searchbar_bg.gif)">
                   <%--<span style="white-space:nowrap">--%>
+                  <%--
                   <table cellspacing=4 cellpadding=0>
                      <tr>
                         <td><img src="<%=request.getContextPath()%>/images/icons/search_controls.gif" width=27 height=13 style="padding-top:2px"></td>
                         <td><h:inputText styleClass="userInputForm" id="search" maxlength="255" style="width:90px;padding-top:3px" /></td>
                      </tr>
                   </table>
+                  --%>
+                  <r:simpleSearch actionListener="#{BrowseBean.search}" action="browse" />
                </td>
                <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_end.gif" width=4 height=30></td>
             </tr>

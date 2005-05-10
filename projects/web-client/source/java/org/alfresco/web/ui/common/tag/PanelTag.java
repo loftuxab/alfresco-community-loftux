@@ -75,7 +75,7 @@ public class PanelTag extends HtmlComponentTag
       UIComponent component = getComponentInstance();
       if (component instanceof UIPanel)
       {
-         if (((UIPanel)component).isExpanded() == true)
+         if (((UIPanel)component).isExpanded() == true && component.isRendered() == true)
          {
             return EVAL_BODY_INCLUDE;
          }

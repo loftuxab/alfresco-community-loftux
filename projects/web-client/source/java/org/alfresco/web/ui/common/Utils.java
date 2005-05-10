@@ -185,6 +185,36 @@ public final class Utils
       //FormRenderer.addNeededHiddenField(context, fieldId);
       HtmlFormRendererBase.addHiddenCommandParameter(form, fieldId);
       
+      return buf.toString();
+   }
+   
+   /**
+    * Generate the JavaScript to submit the parent Form.
+    * 
+    * @param context       FacesContext
+    * @param component     UIComponent to generate JavaScript for
+    * 
+    * @return JavaScript event code
+    */
+   public static String generateFormSubmit(FacesContext context, UIComponent component)
+   {
+      UIForm form = Utils.getParentForm(context, component);
+      if (form == null)
+      {
+         throw new IllegalStateException("Must nest components inside UIForm to generate form submit!");
+      }
+      
+      String formClientId = form.getClientId(context);
+      
+      StringBuilder buf = new StringBuilder(48);
+      
+      buf.append("document.forms[");
+      buf.append("'");
+      buf.append(formClientId);
+      buf.append("'");
+      buf.append("].submit()");
+      
+      buf.append(";return false;");
       
       return buf.toString();
    }
@@ -198,12 +228,13 @@ public final class Utils
     * @param width         Width in pixels
     * @param height        Height in pixels
     * @param alt           Optional alt/title text
+    * @param onclick       JavaScript onclick event handler code
     * 
     * @return Populated <code>img</code> tag
     */
-   public static String buildImageTag(FacesContext context, String image, int width, int height, String alt)
+   public static String buildImageTag(FacesContext context, String image, int width, int height, String alt, String onclick)
    {
-      StringBuilder buf = new StringBuilder(128);
+      StringBuilder buf = new StringBuilder(200);
       
       buf.append("<img src='")
          .append(context.getExternalContext().getRequestContextPath())
@@ -224,9 +255,33 @@ public final class Utils
             .append('"');
       }
       
+      if (onclick != null)
+      {
+         buf.append(" onclick=\"")
+            .append(onclick)
+            .append("\" style='cursor:pointer'");
+      }
+      
       buf.append('>');
       
       return buf.toString();
+   }
+   
+   /**
+    * Build a context path safe image tag for the supplied image path.
+    * Image path should be supplied with a leading slash '/'.
+    * 
+    * @param context       FacesContext
+    * @param image         The local image path from the web folder with leading slash '/'
+    * @param width         Width in pixels
+    * @param height        Height in pixels
+    * @param alt           Optional alt/title text
+    * 
+    * @return Populated <code>img</code> tag
+    */
+   public static String buildImageTag(FacesContext context, String image, int width, int height, String alt)
+   {
+      return buildImageTag(context, image, width, height, alt, null);
    }
    
    /**

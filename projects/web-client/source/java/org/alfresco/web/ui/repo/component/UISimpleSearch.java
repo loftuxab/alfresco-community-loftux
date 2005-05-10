@@ -1,0 +1,245 @@
+/*
+ * Created on 09-May-2005
+ */
+package org.alfresco.web.ui.repo.component;
+
+import java.io.IOException;
+import java.util.Map;
+
+import javax.faces.component.NamingContainer;
+import javax.faces.component.UICommand;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIForm;
+import javax.faces.context.FacesContext;
+import javax.faces.context.ResponseWriter;
+import javax.faces.event.ActionEvent;
+
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.SelfRenderingComponent;
+import org.alfresco.web.ui.repo.component.property.UIPropertySheet;
+import org.apache.log4j.Logger;
+
+/**
+ * @author Kevin Roast
+ */
+public class UISimpleSearch extends UICommand
+{
+   // ------------------------------------------------------------------------------
+   // Component implementation
+   
+   /**
+    * Default Constructor
+    */
+   public UISimpleSearch()
+   {
+      // specifically set the renderer type to null to indicate to the framework
+      // that this component renders itself - there is no abstract renderer class
+      setRendererType(null);
+   }
+   
+   /**
+    * @see javax.faces.component.UIComponent#getFamily()
+    */
+   public String getFamily()
+   {
+      return "org.alfresco.faces.SimpleSearch";
+   }
+
+   /**
+    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+    */
+   public void restoreState(FacesContext context, Object state)
+   {
+      Object values[] = (Object[])state;
+      // standard component attributes are restored by the super class
+      super.restoreState(context, values[0]);
+      this.lastSearch = (String)values[1];
+      this.searchOption = ((Integer)values[2]).intValue();
+   }
+   
+   /**
+    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
+    */
+   public Object saveState(FacesContext context)
+   {
+      Object values[] = new Object[3];
+      // standard component attributes are saved by the super class
+      values[0] = super.saveState(context);
+      values[1] = this.lastSearch;
+      values[2] = Integer.valueOf(this.searchOption);
+      return (values);
+   }
+   
+   /**
+    * @see javax.faces.component.UIComponentBase#encodeBegin(javax.faces.context.FacesContext)
+    */
+   public void encodeBegin(FacesContext context) throws IOException
+   {
+      if (isRendered() == false)
+      {
+         return;
+      }
+      
+      ResponseWriter out = context.getResponseWriter();
+      
+      // script for dynamic advanced search menu drop-down options
+      out.write("<script>");
+      out.write("function _searchDropdown() {" +
+            "if (document.getElementById('_search').style.display == 'none') {" + 
+            "   document.getElementById('_search').style.display = '';" + 
+            "} else {" + 
+            "   document.getElementById('_search').style.display = 'none';" + 
+            "} }");
+      out.write("</script>");
+      
+      // outer table containing search drop-down icon, text box and Go search button
+      out.write("<table cellspacing=4 cellpadding=0>");
+      out.write("<tr><td style='padding-top:2px'>");
+      
+      out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13, "Options", "javascript:_searchDropdown();"));
+      
+      String searchSubmit = Utils.generateFormSubmit(context, this, getHiddenFieldName(context, this), getClientId(context));
+      String searchImage = Utils.buildImageTag(context, "/images/icons/search_icon.gif", 15, 15, "Go", searchSubmit);
+      
+      // dynamic DIV area containing search options
+      out.write("<div id='_search' style='position:absolute;display:none;padding-left:8px;'>");
+      out.write("<table border=0 bgcolor='#eeeeee' style='border-top:thin solid #FFFFFF;border-left:thin solid #FFFFFF;border-right:thin solid #444444;border-bottom:thin solid #444444;' cellspacing=4 cellpadding=0>");
+      // TODO: configure message, configure Go button text?
+      out.write("<tr><td class='userInputForm'><nobr>What would you like to search?</nobr></td></tr>");
+      
+      String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
+      String radioOption = "<tr><td class='userInputForm'><input type='radio' name='" + optionFieldName + "'";
+      out.write(radioOption);
+      out.write(" VALUE='0'");
+      if (getSearchMode() == 0) out.write(" CHECKED");
+      out.write("> All Items</td></tr>");
+      out.write(radioOption);
+      out.write(" VALUE='1'");
+      if (getSearchMode() == 1) out.write(" CHECKED");
+      out.write("> File Names and Contents</td></tr>");
+      out.write(radioOption);
+      out.write(" VALUE='2'");
+      if (getSearchMode() == 2) out.write(" CHECKED");
+      out.write("> File Names only</td></tr>");
+      out.write(radioOption);
+      out.write(" VALUE='3'");
+      if (getSearchMode() == 3) out.write(" CHECKED");
+      out.write("> Space Names only</td></tr>");
+      
+      // TODO: add ENTER key capturing! - do not allow default Submit button to click!
+      out.write("<tr><td><table width=100%><tr><td>" +
+                "<input type='button' value='Close' class='userInputForm' onclick=\"javascript: document.getElementById('_search').style.display='none';\">" + 
+                "</td><td align=right>");
+      out.write(searchImage);
+      out.write("</td></tr></table></td></tr>");
+      out.write("</table></div>");
+      
+      // input text box
+      out.write("</td><td>");
+      out.write("<input name='");
+      out.write(getClientId(context));
+      // TODO: style and class from component properties!
+      out.write("' class='userInputForm' type='text' maxlength='255' style='width:90px;padding-top:3px' value=\"");
+      // output previous search text stored in this component!
+      out.write(getLastSearch());
+      out.write("\">");
+      
+      // search Go image
+      out.write("</td><td>");
+      out.write(searchImage);
+      
+      // end outer table
+      out.write("</td></tr></table>");
+   }
+   
+   /**
+    * @see javax.faces.component.UIComponentBase#decode(javax.faces.context.FacesContext)
+    */
+   public void decode(FacesContext context)
+   {
+      Map requestMap = context.getExternalContext().getRequestParameterMap();
+      String fieldId = getHiddenFieldName(context, this);
+      String value = (String)requestMap.get(fieldId);
+      // we are clicked if the hidden field contained our client id
+      if (value != null && value.equals(this.getClientId(context)))
+      {
+         String searchText = (String)requestMap.get(getClientId(context));
+         logger.info("*****Search text set to: " + searchText);
+         
+         // TODO: strip or escape undesirable characters - for screen and search API
+         searchText = searchText.replace('"', ' ');
+         setLastSearch(searchText);
+         
+         int option = -1;
+         String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
+         String optionStr = (String)requestMap.get(optionFieldName);
+         if (optionStr.length() != 0)
+         {
+            option = Integer.parseInt(optionStr);
+         }
+         logger.info("*****Search option set to: " + option);
+         
+         setSearchMode(option);
+         
+         // queue event so system can perform a search
+         ActionEvent event = new ActionEvent(this);
+         this.queueEvent(event);
+      }
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Strongly typed component property accessors
+   
+   public void setLastSearch(String text)
+   {
+      if (text != null)
+      {
+         this.lastSearch = text;
+      }
+   }
+   
+   public String getLastSearch()
+   {
+      return this.lastSearch;
+   }
+   
+   public void setSearchMode(int option)
+   {
+      if (option >= 0 && option < 4)
+      {
+         this.searchOption = option;
+      }
+   }
+   
+   public int getSearchMode()
+   {
+      return this.searchOption;
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Private helpers
+   
+   /**
+    * Get the hidden field name for this actionlink.
+    * Build a shared field name from the parent form name and the string "act".
+    * 
+    * @return hidden field name shared by all action links within the Form.
+    */
+   private static String getHiddenFieldName(FacesContext context, UIComponent component)
+   {
+      return Utils.getParentForm(context, component).getClientId(context) + NamingContainer.SEPARATOR_CHAR + "act";
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Private data
+   
+   private static Logger logger = Logger.getLogger(UISimpleSearch.class);
+   
+   private static final String OPTION_PARAM = "_option";
+   
+   private String lastSearch = "";
+   private int searchOption = 0;
+}

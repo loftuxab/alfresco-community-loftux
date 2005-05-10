@@ -51,35 +51,58 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing=4 cellpadding=0 width=100%>
                         <tr valign=top>
-                           <td width=30>
-                              <img src="<%=request.getContextPath()%>/images/ball_big.gif" width=26 height=27>
-                           </td>
-                           <td>
-                              <%-- Summary --%>
-                              <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" /></div>
-                              <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainSubText"><h:outputText value="#{msg.view_description}" /></div>
-                              <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" /></div>
-                              <div class="mainSubText">There are currently 2 members of this space</div>
-                           </td>
-                           <td bgcolor="#495F69" width=1></td>
-                           <td width=100 style="padding-left:2px">
-                              <%-- Current object actions --%>
-                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
-                              <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" />
-                              <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
-                                 <f:param name="id" value="#{NavigationBean.currentNodeId}" />
-                              </a:actionLink>
-                              <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" />
-                              <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" />
-                              <%-- TODO: add real actions --%>
-                              <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
-                                 <a:actionLink value="Change Details" image="/images/icons/Change_details.gif" />
-                                 <a:actionLink value="Cut" image="/images/icons/cut.gif" />
-                                 <a:actionLink value="Copy" image="/images/icons/copy.gif" />
-                                 <a:actionLink value="Paste" image="/images/icons/paste.gif" />
-                              </a:menu>
-                           </td>
+ 
+                           <%-- actions for browse mode --%>
+                           <a:panel id="browse-actions" rendered="#{NavigationBean.searchText == null}">
+                              <td width=30>
+                                 <img src="<%=request.getContextPath()%>/images/ball_big.gif" width=26 height=27>
+                              </td>
+                              <td>
+                                 <%-- Summary --%>
+                                 <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" /></div>
+                                 <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                                 <div class="mainSubText"><h:outputText value="#{msg.view_description}" /></div>
+                                 <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" /></div>
+                                 <div class="mainSubText">There are currently 2 members of this space</div>
+                              </td>
+                              <td bgcolor="#495F69" width=1></td>
+                              <td width=100 style="padding-left:2px">
+                                 <%-- Current object actions --%>
+                                 <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
+                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{BrowseBean.spaceActionSetup}" />
+                                 <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
+                                    <f:param name="id" value="#{NavigationBean.currentNodeId}" />
+                                 </a:actionLink>
+                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent"  actionListener="#{BrowseBean.spaceActionSetup}"/>
+                                 <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" />
+                                 <%-- TODO: add real actions --%>
+                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
+                                    <a:actionLink value="Change Details" image="/images/icons/Change_details.gif" />
+                                    <a:actionLink value="Cut" image="/images/icons/cut.gif" />
+                                    <a:actionLink value="Copy" image="/images/icons/copy.gif" />
+                                    <a:actionLink value="Paste" image="/images/icons/paste.gif" />
+                                 </a:menu>
+                              </td>
+                           </a:panel>
+                           
+                           <%-- actions for search results mode --%>
+                           <a:panel id="search-actions" rendered="#{NavigationBean.searchText != null}">
+                              <td width=30>
+                                 <img src="<%=request.getContextPath()%>/images/icons/search_large.gif" width=28 height=28>
+                              </td>
+                              <td>
+                                 <%-- Summary --%>
+                                 <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" /></div>
+                                 <div class="mainTitle"><h:outputText value="#{msg.search_results}" /></div>
+                                 <div class="mainSubText"><h:outputText value="#{msg.search_description}" /></div>
+                              </td>
+                              <td bgcolor="#495F69" width=1></td>
+                              <td width=100 style="padding-left:2px">
+                                 <%-- Current object actions --%>
+                                 <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
+                              </td>
+                           </a:panel>
+                           
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100>
                               <%-- Details View settings --%>
@@ -137,7 +160,7 @@
                      <a:panel id="spaces-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
                      <%-- Browse - details/icons mode --%>
-                     <a:richList id="detailsList" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
+                     <a:richList id="detailsList" binding="#{BrowseBean.detailsRichList}" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
                            width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
                         <a:column primary="true" width="200" style="padding:2px;text-align:left">
@@ -206,7 +229,7 @@
                      </a:richList>
                      
                      <%-- Browse - list mode --%>
-                     <a:richList id="browseList" viewMode="list" rendered="#{BrowseBean.browseViewMode == 'list'}" pageSize="5" style="padding:2px" rowStyleClass="recordSetRowAlt"
+                     <a:richList id="browseList" binding="#{BrowseBean.browseRichList}" viewMode="list" rendered="#{BrowseBean.browseViewMode == 'list'}" pageSize="5" style="padding:2px" rowStyleClass="recordSetRowAlt"
                            width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
                         <a:column primary="true" style="padding:2px;text-align:left">
@@ -275,6 +298,7 @@
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>
+
                
                <%-- Error Messages --%>
                <tr valign=top>

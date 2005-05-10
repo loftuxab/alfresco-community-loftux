@@ -35,9 +35,6 @@ public class ActionLinkRenderer extends BaseRenderer
       // we are clicked if the hidden field contained our client id
       if (value != null && value.equals(component.getClientId(context)))
       {
-         ActionEvent event = new ActionEvent(component);
-         component.queueEvent(event);
-         
          // get all the params for this actionlink, see if any values have been set
          // on the request which match our params and set them into the component
          UIActionLink link = (UIActionLink)component;
@@ -52,6 +49,9 @@ public class ActionLinkRenderer extends BaseRenderer
                destParams.put(name, paramValue);
             }
          }
+         
+         ActionEvent event = new ActionEvent(component);
+         component.queueEvent(event);
       }
    }
    
