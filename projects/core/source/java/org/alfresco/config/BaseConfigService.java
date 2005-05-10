@@ -35,18 +35,18 @@ public abstract class BaseConfigService implements ConfigService
    
    protected ConfigSource configSource;
    protected ConfigImpl globalConfig;
-   protected Map evaluators;
-   protected Map sectionsByArea;
-   protected List sections;
+   protected Map<String, Evaluator> evaluators;
+   protected Map<String, List<ConfigSection>> sectionsByArea;
+   protected List<ConfigSection> sections;
    
    /**
     * @see org.alfresco.config.ConfigService#init()
     */
    public void init()
    {
-      this.sections = new ArrayList();
-      this.sectionsByArea = new HashMap();
-      this.evaluators = new HashMap();
+      this.sections = new ArrayList<ConfigSection>();
+      this.sectionsByArea = new HashMap<String, List<ConfigSection>>();
+      this.evaluators = new HashMap<String, Evaluator>();
       this.globalConfig = new ConfigImpl();
       
       // Add the built-in evaluators
@@ -251,10 +251,10 @@ public abstract class BaseConfigService implements ConfigService
          if (area != null && area.length() > 0)
          {
             // get the list of sections for the given area name (create the list if required)
-            List areaSections = (List)this.sectionsByArea.get(area);
+            List<ConfigSection> areaSections = this.sectionsByArea.get(area);
             if (areaSections == null)
             {
-               areaSections = new ArrayList();
+               areaSections = new ArrayList<ConfigSection>();
                this.sectionsByArea.put(area, areaSections);
             }
             
