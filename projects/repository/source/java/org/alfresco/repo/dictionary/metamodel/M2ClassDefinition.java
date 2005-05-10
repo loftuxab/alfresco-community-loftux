@@ -101,7 +101,8 @@ public class M2ClassDefinition implements ClassDefinition
      */
     public ClassDefinition getSuperClass()
     {
-        return m2Class.getSuperClass().getClassDefinition();
+        M2Class superClass = m2Class.getSuperClass();
+        return (superClass == null) ? null : m2Class.getSuperClass().getClassDefinition();
     }
     
     /**

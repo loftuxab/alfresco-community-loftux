@@ -19,18 +19,6 @@ import java.util.Set;
 import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.TermQuery;
-
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryRef;
 import org.alfresco.repo.dictionary.PropertyDefinition;
@@ -46,6 +34,19 @@ import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.impl.lucene.fts.FTSIndexerAware;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
+import org.alfresco.repo.value.ValueConverter;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TermQuery;
+
 import com.vladium.utils.timing.ITimer;
 import com.vladium.utils.timing.TimerFactory;
 
@@ -828,6 +829,16 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
         }
 
+        StringBuffer aspectBuffer = new StringBuffer();
+        for(ClassRef classRef : nodeService.getAspects(nodeRef))
+        {
+            if(aspectBuffer.length() > 0)
+            {
+                aspectBuffer.append(";");
+            }
+            aspectBuffer.append(classRef.getQName().toString());
+        }
+        
         int containerCount = 0;
         for (Iterator<Path> it = paths.iterator(); it.hasNext(); /**/)
         {
@@ -851,7 +862,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 // TODO: - should be able to get the property by its QName?
 
                 PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
-                PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
+                PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.TEXT));
                 if (propertyDefinition != null)
                 {
                     index = propertyDefinition.isIndexed();
@@ -865,7 +876,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 // PropertyTypeDefinition propDef = null;
                 Serializable value = properties.get(propertyQName);
                 // convert value to String
-                String strValue = value.toString();
+                String strValue = ValueConverter.convert(String.class, value);
 
                 // TODO: Need converter here
                 // Conversion should be done in the anlyser as we may take
@@ -964,6 +975,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
 
                 doc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getParentRef().getId(), true, true, false));
+                doc.add(new Field("TYPE", nodeService.getType(nodeRef).getQName().toString(), true, true, true));
+                doc.add(new Field("ASPECT", aspectBuffer.toString(), true, true, true));
 
                 Counter counter = nodeCounts.get(qNameRef);
                 // If we have something in a container with root aspect we will
@@ -1041,7 +1054,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             Searcher searcher = getSearcher();
             Hits hits = searcher.search(booleanQuery);
-            LuceneResultSet results = new LuceneResultSet(store, hits, searcher);
+            LuceneResultSet results = new LuceneResultSet(store, hits, searcher, nodeService);
             int count = 0;
             for (ResultSetRow row : results)
             {
@@ -1074,7 +1087,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     // TODO: - should be able to get the property by its QName?
 
                     PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
-                    PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
+                    PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.TEXT));
                     if (propertyDefinition != null)
                     {
                         index = propertyDefinition.isIndexed();

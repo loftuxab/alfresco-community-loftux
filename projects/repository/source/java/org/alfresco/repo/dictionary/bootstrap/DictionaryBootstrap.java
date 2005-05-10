@@ -24,6 +24,8 @@ import org.alfresco.repo.dictionary.metamodel.emf.EMFNamespaceDAO;
 import org.alfresco.repo.dictionary.metamodel.emf.EMFResource;
 import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.search.impl.lucene.analysis.DateAnalyser;
+import org.alfresco.repo.search.impl.lucene.analysis.IntegerAnalyser;
 import org.alfresco.repo.version.Version;
 import org.alfresco.repo.version.VersionService;
 import org.alfresco.repo.version.lightweight.Const;
@@ -230,7 +232,7 @@ public class DictionaryBootstrap
         M2PropertyType CONTENT = metaModelDAO.createPropertyType(PropertyTypeDefinition.CONTENT);
         CONTENT.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType INT = metaModelDAO.createPropertyType(PropertyTypeDefinition.INT);
-        INT.setAnalyserClassName(StandardAnalyzer.class.getName());
+        INT.setAnalyserClassName(IntegerAnalyser.class.getName());
         M2PropertyType LONG = metaModelDAO.createPropertyType(PropertyTypeDefinition.LONG);
         LONG.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType FLOAT = metaModelDAO.createPropertyType(PropertyTypeDefinition.FLOAT);
@@ -238,17 +240,22 @@ public class DictionaryBootstrap
         M2PropertyType DOUBLE = metaModelDAO.createPropertyType(PropertyTypeDefinition.DOUBLE);
         DOUBLE.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType DATE = metaModelDAO.createPropertyType(PropertyTypeDefinition.DATE);
-        DATE.setAnalyserClassName(StandardAnalyzer.class.getName());
+        DATE.setAnalyserClassName(DateAnalyser.class.getName());
         M2PropertyType DATETIME = metaModelDAO.createPropertyType(PropertyTypeDefinition.DATETIME);
-        DATETIME.setAnalyserClassName(StandardAnalyzer.class.getName());
+        DATETIME.setAnalyserClassName(DateAnalyser.class.getName());
         M2PropertyType BOOLEAN = metaModelDAO.createPropertyType(PropertyTypeDefinition.BOOLEAN);
         BOOLEAN.setAnalyserClassName(StandardAnalyzer.class.getName());
-        M2PropertyType NAME = metaModelDAO.createPropertyType(PropertyTypeDefinition.NAME);
-        NAME.setAnalyserClassName(StandardAnalyzer.class.getName());
+        M2PropertyType QNAME = metaModelDAO.createPropertyType(PropertyTypeDefinition.QNAME);
+        QNAME.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType GUID = metaModelDAO.createPropertyType(PropertyTypeDefinition.GUID);
         GUID.setAnalyserClassName(StandardAnalyzer.class.getName());
         M2PropertyType CATEGORY = metaModelDAO.createPropertyType(PropertyTypeDefinition.CATEGORY);
         CATEGORY.setAnalyserClassName(StandardAnalyzer.class.getName());
+        M2PropertyType NODE_REF = metaModelDAO.createPropertyType(PropertyTypeDefinition.NODE_REF);
+        NODE_REF.setAnalyserClassName(StandardAnalyzer.class.getName());
+        M2PropertyType PATH = metaModelDAO.createPropertyType(PropertyTypeDefinition.PATH);
+        PATH.setAnalyserClassName(StandardAnalyzer.class.getName());
+        
     }
     
 
@@ -303,7 +310,7 @@ public class DictionaryBootstrap
         M2Type referenceType = metaModelDAO.createType(TYPE_QNAME_REFERENCE);
         referenceType.setSuperClass(baseType);
         M2Property referenceProp = referenceType.createProperty(PROP_REFERENCE);
-        referenceProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        referenceProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NODE_REF));
         referenceProp.setMandatory(true);
         referenceProp.setMultiValued(false);
 
@@ -407,12 +414,12 @@ public class DictionaryBootstrap
         // Create Test Base Type
         M2Type baseType = metaModelDAO.createType(TYPE_QNAME_BASE);
         M2Property primaryTypeProp = baseType.createProperty("primaryType");
-        primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
+        primaryTypeProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         primaryTypeProp.setMandatory(true);
         primaryTypeProp.setProtected(true);
         primaryTypeProp.setMultiValued(false);
         M2Property aspectsProp = baseType.createProperty("aspects");
-        aspectsProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NAME));
+        aspectsProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         aspectsProp.setMandatory(false);
         aspectsProp.setProtected(true);
         aspectsProp.setMultiValued(true);
@@ -459,13 +466,13 @@ public class DictionaryBootstrap
         
         // Create the lock owner property
         M2Property lockOwnerProperty = lockAspect.createProperty(LockService.PROP_LOCK_OWNER);
-        lockOwnerProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        lockOwnerProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         lockOwnerProperty.setMandatory(false);
         lockOwnerProperty.setMultiValued(false);
         
         // Create the lock type property
         M2Property lockTypeProperty = lockAspect.createProperty(LockService.PROP_LOCK_TYPE);
-        lockTypeProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        lockTypeProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         lockTypeProperty.setMandatory(false);
         lockTypeProperty.setMultiValued(false);
         
@@ -491,7 +498,7 @@ public class DictionaryBootstrap
         
         // Create assocQName property
         M2Property assocQNameProperty = versionedAttributeType.createProperty(Const.PROP_QNAME);
-        assocQNameProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        assocQNameProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         assocQNameProperty.setMandatory(true);
         assocQNameProperty.setMultiValued(false);
         
@@ -514,7 +521,7 @@ public class DictionaryBootstrap
         
         // Create qname property
         M2Property qname2 = versionedChildAssocType.createProperty(Const.PROP_ASSOC_QNAME);
-        qname2.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        qname2.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         qname2.setMandatory(true);
         qname2.setMultiValued(false);
                 
@@ -531,7 +538,7 @@ public class DictionaryBootstrap
         
         // Create qname property
         M2Property qname3 = versionedAssocType.createProperty(Const.PROP_ASSOC_QNAME);
-        qname3.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        qname3.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         qname3.setMandatory(true);
         qname3.setMultiValued(false);
         
@@ -591,7 +598,7 @@ public class DictionaryBootstrap
         // Create frozen aspect property
         M2Property frozenAspects = versionType.createProperty(
                 Version.PROP_FROZEN_ASPECTS);
-        frozenAspects.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
+        frozenAspects.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         frozenAspects.setMandatory(false);
         frozenAspects.setMultiValued(true);
         

@@ -5,20 +5,21 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.io.IOException;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searcher;
-import org.saxpath.SAXPathException;
-
+import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.EmptyResultSet;
 import org.alfresco.repo.search.QueryParameter;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.SearcherException;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Searcher;
+import org.saxpath.SAXPathException;
+
 import com.werken.saxpath.XPathReader;
 
 /**
@@ -46,6 +47,10 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
 
     private NamespaceService nameSpaceService;
 
+    private NodeService nodeService;
+    
+    private DictionaryService dictionaryService;
+
     /*
      * Searcher implementation
      */
@@ -58,11 +63,11 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             {
                 try
                 {
-                    Query query = LuceneQueryParser.parse(queryString, DEFAULT_FIELD, new StandardAnalyzer(), nameSpaceService);
+                    Query query = LuceneQueryParser.parse(queryString, DEFAULT_FIELD, new LuceneAnalyser(dictionaryService), nameSpaceService, dictionaryService);
                     Searcher searcher = getSearcher();
 
                     Hits hits = searcher.search(query);
-                    return new LuceneResultSet(store, hits, searcher);
+                    return new LuceneResultSet(store, hits, searcher, nodeService);
 
                 }
                 catch (ParseException e)
@@ -86,7 +91,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     Query query = handler.getQuery();
                     Searcher searcher = getSearcher();
                     Hits hits = searcher.search(query);
-                    return new LuceneResultSet(store, hits, searcher);
+                    return new LuceneResultSet(store, hits, searcher, nodeService);
 
                 }
                 catch (SAXPathException e)
@@ -155,4 +160,18 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
     {
         return mainIndexExists();
     }
+
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+    
+    
+    
+    
 }

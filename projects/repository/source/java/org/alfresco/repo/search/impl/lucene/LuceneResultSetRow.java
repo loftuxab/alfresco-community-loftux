@@ -7,20 +7,17 @@
  */
 package org.alfresco.repo.search.impl.lucene;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-
-import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.ResultSetRow;
-import org.alfresco.repo.search.StringValue;
-import org.alfresco.repo.search.Value;
+import org.alfresco.repo.search.AbstractResultSetRow;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 
 /**
  * A row ina result set. Created on the fly.
@@ -28,22 +25,16 @@ import org.alfresco.repo.search.Value;
  * @author andyh
  * 
  */
-public class LuceneResultSetRow implements ResultSetRow
+public class LuceneResultSetRow extends AbstractResultSetRow
 {
-    /**
-     * The containing result set
-     */
-    private LuceneResultSet resultSet;
-
-    /**
-     * The current position in the containing result set
-     */
-    private int position;
+    
 
     /**
      * The current document - cached so we do not get it for each value
      */
     private Document document;
+    
+    private Map<Path, Serializable> properties;
 
     /**
      * Wrap a position in a lucene Hits class with node support
@@ -51,11 +42,9 @@ public class LuceneResultSetRow implements ResultSetRow
      * @param resultSet
      * @param position
      */
-    public LuceneResultSetRow(LuceneResultSet resultSet, int position)
+    public LuceneResultSetRow(LuceneResultSet resultSet, int index)
     {
-        super();
-        this.resultSet = resultSet;
-        this.position = position;
+        super(resultSet, index);
     }
 
     /**
@@ -67,7 +56,7 @@ public class LuceneResultSetRow implements ResultSetRow
     {
         if (document == null)
         {
-            document = resultSet.getDocument(position);
+            document = ((LuceneResultSet)getResultSet()).getDocument(getIndex());
         }
         return document;
     }
@@ -76,57 +65,42 @@ public class LuceneResultSetRow implements ResultSetRow
      * ResultSetRow implementation
      */
 
-    public Value[] getValues()
+    public Map<Path, Serializable> getValues()
     {
-        Document doc = getDocument();
-        List<Value> values = new ArrayList<Value>();
-        Enumeration e = doc.fields();
-        while (e.hasMoreElements())
+        if(properties == null)
         {
-            Field field = (Field) e.nextElement();
-            // Only returns parameters
-            // Id, parents etc has separate support
-            if (field.name().charAt(0) == '@')
+            properties = new LinkedHashMap<Path, Serializable>();
+            LuceneResultSet lrs = (LuceneResultSet)getResultSet();
+            Map<QName, Serializable> byQname = lrs.getNodeService().getProperties(lrs.getNodeRef(getIndex()));
+            for(QName qname: byQname.keySet())
             {
-                values.add(new StringValue(field.stringValue()));
+                Serializable value = byQname.get(qname);
+                Path path = new Path();
+                path.append(new Path.SelfElement());
+                path.append(new Path.AttributeElement(qname));
+                properties.put(path, value);
             }
         }
-        return values.toArray(new Value[0]);
+        return Collections.unmodifiableMap(properties);
     }
 
-    public Value getValue(Path path)
+    public Serializable getValue(Path path)
     {
         // TODO: implement path base look up against the document or via the
         // node service
         throw new UnsupportedOperationException();
     }
 
-    public NodeRef getNodeRef()
-    {
-        return resultSet.getNodeRef(position);
-    }
+  
 
-    public float getScore()
-    {
-        return resultSet.getScore(position);
-    }
-
-    public ResultSet getResultSet()
-    {
-        return resultSet;
-    }
-
-    public Value getValue(QName qname)
+    public Serializable getValue(QName qname)
     {
         Document doc = getDocument();
-        Value value = new StringValue(doc.get("@" + qname));
+        Serializable value = doc.get("@" + qname);
         return value;
     }
     
-    public int getIndex()
-    {
-        return position;
-    }
+ 
 
    public QName getQName()
    {

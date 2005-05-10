@@ -1,5 +1,6 @@
 package org.alfresco.repo.ref;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -28,8 +29,12 @@ import java.util.LinkedList;
  * 
  * @author Derek Hulley
  */
-public final class Path implements Iterable<Path.Element>
+public final class Path implements Iterable<Path.Element>, Serializable
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3905520514524328247L;
     private LinkedList<Element> elements;
     
     public Path()
@@ -132,7 +137,7 @@ public final class Path implements Iterable<Path.Element>
      * <p>
      * In <b>/x/y/z</b>, elements are <b>x</b>, <b>y</b> and <b>z</b>.
      */
-    public abstract static class Element
+    public abstract static class Element implements Serializable
     {
         /**
          * @return Returns the path element portion including leading '/' and never null
@@ -154,6 +159,10 @@ public final class Path implements Iterable<Path.Element>
      */
     public static class ChildAssocElement extends Element
     {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 3689352104636790840L;
         private ChildAssocRef ref;
         
         /**
@@ -188,10 +197,67 @@ public final class Path implements Iterable<Path.Element>
     }
 
     /**
+     * Represents a qualified path to an attribute,
+     * including the sibling for repeated properties/attributes to retrieve e.g. <b>/@{namespace}name[5]</b> 
+     */
+    public static class AttributeElement extends Element
+    {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 3256727281668863544L;
+        private QName attribute;
+        private int position = -1;
+        
+        /**
+         * @param ref a reference to the specific parent-child association
+         */
+        public AttributeElement(QName attribute)
+        {
+            this.attribute = attribute;
+        }
+        
+        public AttributeElement(QName attribute, int position)
+        {
+            this(attribute);
+            this.position = position;
+        }
+        
+        public String getElementString()
+        {
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("/@").append(attribute);
+            
+            if (position > -1)
+            {
+                sb.append("[").append(position).append("]");
+            }
+            return sb.toString();
+        }
+        
+        public QName getQName()
+        {
+            return attribute;
+        }
+        
+        public int position()
+        {
+            return position;
+        }
+    }
+
+    
+    
+    /**
      * Represents the <b>//</b> or <b>/descendant-or-self::node()</b> xpath element
      */
     public static class DescendentOrSelfElement extends Element
     {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 3258410616875005237L;
+
         public String getElementString()
         {
             return "/descendant-or-self::node()";
@@ -203,6 +269,11 @@ public final class Path implements Iterable<Path.Element>
      */
     public static class SelfElement extends Element
     {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 3834311739151300406L;
+
         public String getElementString()
         {
             return "/.";
@@ -214,6 +285,11 @@ public final class Path implements Iterable<Path.Element>
      */
     public static class ParentElement extends Element
     {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 3689915080477456179L;
+
         public String getElementString()
         {
             return "/..";

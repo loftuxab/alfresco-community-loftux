@@ -117,12 +117,11 @@ public class PathTokenFilter extends Tokenizer
         Token nameToken = null;
         Token countToken = null;
         Token namespaceToken = null;
-        boolean isFirst = true;
         while ((t = nextToken()) != null)
         {
             String text = t.termText();
             
-            if(isFirst && text.equals(pathSeparator))
+            if((text.length() == 0) || text.equals(pathSeparator))
             {
                 break;
             }

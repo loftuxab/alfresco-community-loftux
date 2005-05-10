@@ -88,5 +88,7 @@ public interface MetaModelDAO
      * @return  the property type
      */
     public M2PropertyType createPropertyType(QName typeName);
+
+    public Collection<QName> getAspects();
         
 }

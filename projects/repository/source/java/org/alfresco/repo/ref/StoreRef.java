@@ -9,7 +9,10 @@ import java.io.Serializable;
  */
 public final class StoreRef implements EntityRef, Serializable
 {
-    private static final long serialVersionUID = 3258410625464940344L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3905808565129394486L;
 
     public static final String PROTOCOL_WORKSPACE = "workspace";
     

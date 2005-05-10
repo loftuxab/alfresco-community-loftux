@@ -24,7 +24,7 @@ public interface DictionaryService
     
 //    DDRef[] getTypes(String namespace);
     
-//    DDRef[] getAspects();
+    Collection<ClassRef> getAspects();
     
 //    DDRef[] getAspects(String namespace);
 

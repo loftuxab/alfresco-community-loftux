@@ -6,16 +6,17 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.io.IOException;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.Searcher;
-
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.ResultSet;
+import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.ResultSetRowIterator;
 import org.alfresco.repo.search.SearcherException;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.Searcher;
 
 /**
  * Implementation of a ResultSet on top of Lucene Hits class.
@@ -37,6 +38,8 @@ public class LuceneResultSet implements ResultSet
     StoreRef storeRef;
 
     private Searcher searcher;
+    
+    private NodeService nodeService;
 
     /**
      * Wrap a lucene seach result with node support
@@ -44,12 +47,13 @@ public class LuceneResultSet implements ResultSet
      * @param storeRef
      * @param hits
      */
-    public LuceneResultSet(StoreRef storeRef, Hits hits, Searcher searcher)
+    public LuceneResultSet(StoreRef storeRef, Hits hits, Searcher searcher, NodeService nodeService)
     {
         super();
         this.hits = hits;
         this.storeRef = storeRef;
         this.searcher = searcher;
+        this.nodeService = nodeService;
     }
 
     /*
@@ -124,4 +128,24 @@ public class LuceneResultSet implements ResultSet
         }
     }
 
+    public NodeService getNodeService()
+    {
+        return nodeService;
+    }
+
+    public ResultSetRow getRow(int i)
+    {
+        if(i < length())
+        {
+           return new LuceneResultSetRow(this, i);
+        }
+        else
+        {
+            throw new SearcherException("Invalid row");
+        }
+    }
+    
+
+    
+    
 }

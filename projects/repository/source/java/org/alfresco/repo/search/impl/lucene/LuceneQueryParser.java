@@ -7,20 +7,33 @@
  */
 package org.alfresco.repo.search.impl.lucene;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import org.alfresco.repo.dictionary.ClassDefinition;
+import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.search.impl.lucene.query.PathQuery;
+import org.alfresco.repo.search.impl.lucene.query.RelativeStructuredFieldPosition;
+import org.alfresco.repo.search.impl.lucene.query.StructuredFieldPosition;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryParser.CharStream;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParserTokenManager;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.saxpath.SAXPathException;
 
-import org.alfresco.repo.dictionary.NamespaceService;
 import com.werken.saxpath.XPathReader;
 
 public class LuceneQueryParser extends QueryParser
 {
     private NamespaceService nameSpaceService;
+    
+    private DictionaryService dictionaryService;
     
     /**
      * Parses a query string, returning a {@link org.apache.lucene.search.Query}.
@@ -34,10 +47,11 @@ public class LuceneQueryParser extends QueryParser
      * @throws ParseException
      *             if the parsing fails
      */
-    static public Query parse(String query, String field, Analyzer analyzer, NamespaceService nameSpaceService) throws ParseException
+    static public Query parse(String query, String field, Analyzer analyzer, NamespaceService nameSpaceService, DictionaryService dictionaryService) throws ParseException
     {
         LuceneQueryParser parser = new LuceneQueryParser(field, analyzer);
         parser.setNameSpaceService(nameSpaceService);
+        parser.setDictionaryService(dictionaryService);
         return parser.parse(query);
     }
 
@@ -75,6 +89,81 @@ public class LuceneQueryParser extends QueryParser
                 reader.parse(queryText);
                 return handler.getQuery();
             }
+            else if (field.equals("QNAME"))
+            {
+                XPathReader reader = new XPathReader();
+                LuceneXPathHandler handler = new LuceneXPathHandler();
+                handler.setNameSpaceService(nameSpaceService);
+                reader.setXPathHandler(handler);
+                reader.parse(queryText);
+                return handler.getQuery();
+            }
+            else if (field.equals("TYPE"))
+            {
+                ClassDefinition target = dictionaryService.getType(new ClassRef(QName.createQName(queryText)));
+                QName targetQName = target.getQName();
+                HashSet<QName> subclasses = new HashSet<QName>();
+                for(ClassRef classRef :  dictionaryService.getTypes())
+                {
+                    ClassDefinition current = dictionaryService.getType(classRef);
+                    QName currentQname = current.getQName();
+                    while( (current != null) && !current.getQName().equals(targetQName))
+                    {
+                        current = current.getSuperClass();
+                        currentQname = (current == null) ? null : current.getQName();
+                    }
+                    if(current != null)
+                    {
+                        subclasses.add(classRef.getQName());
+                    }
+                }
+                
+                BooleanQuery booleanQuery = new BooleanQuery();
+                for(QName qname: subclasses)
+                { 
+                   PathQuery pathQuery =  new PathQuery();
+                   ArrayList<StructuredFieldPosition> answer = new ArrayList<StructuredFieldPosition>(2);
+                   answer.add(new RelativeStructuredFieldPosition(qname.getNamespaceURI()));
+                   answer.add(new RelativeStructuredFieldPosition(qname.getLocalName()));
+                   pathQuery.appendQuery(answer);
+                   pathQuery.setQnameField(field);
+                   booleanQuery.add(pathQuery, false, false);
+                }
+                return booleanQuery;
+            }
+            else if (field.equals("ASPECT"))
+            {
+                ClassDefinition target = dictionaryService.getAspect(new ClassRef(QName.createQName(queryText)));
+                QName targetQName = target.getQName();
+                HashSet<QName> subclasses = new HashSet<QName>();
+                for(ClassRef classRef : dictionaryService.getAspects())
+                {
+                    ClassDefinition current = dictionaryService.getAspect(classRef);
+                    QName currentQname = current.getQName();
+                    while( (current != null) && !current.getQName().equals(targetQName))
+                    {
+                        current = current.getSuperClass();
+                        currentQname = (current == null) ? null : current.getQName();
+                    }
+                    if(current != null)
+                    {
+                        subclasses.add(classRef.getQName());
+                    }
+                }
+                
+                BooleanQuery booleanQuery = new BooleanQuery();
+                for(QName qname: subclasses)
+                { 
+                   PathQuery pathQuery =  new PathQuery();
+                   ArrayList<StructuredFieldPosition> answer = new ArrayList<StructuredFieldPosition>(2);
+                   answer.add(new RelativeStructuredFieldPosition(qname.getNamespaceURI()));
+                   answer.add(new RelativeStructuredFieldPosition(qname.getLocalName()));
+                   pathQuery.appendQuery(answer);
+                   pathQuery.setQnameField(field);
+                   booleanQuery.add(pathQuery, false, false);
+                }
+                return booleanQuery;
+            }
             else
             {
                 return super.getFieldQuery(field, queryText);
@@ -86,5 +175,11 @@ public class LuceneQueryParser extends QueryParser
         }
 
     }
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+    
 
 }

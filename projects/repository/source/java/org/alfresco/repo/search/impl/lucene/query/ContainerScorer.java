@@ -6,13 +6,12 @@ package org.alfresco.repo.search.impl.lucene.query;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
+import org.alfresco.repo.search.impl.lucene.analysis.PathTokenFilter;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Weight;
-
-import org.alfresco.repo.search.impl.lucene.analysis.PathTokenFilter;
 
 /**
  * The scorer for structured field queries.

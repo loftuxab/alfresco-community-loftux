@@ -292,4 +292,10 @@ public class EMFMetaModelDAO implements MetaModelDAO
         
     }
 
+    public Collection<QName> getAspects()
+    {
+        Map<QName, EObject> objectIndex = classIndex.get(EmfPackage.eINSTANCE.getEMFAspect());
+        return objectIndex == null ? null : objectIndex.keySet();
+    }
+
 }

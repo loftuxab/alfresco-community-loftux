@@ -9,7 +9,12 @@ import java.io.Serializable;
  */
 public class NodeRef implements EntityRef, Serializable
 {
-    private static final long serialVersionUID = 3834308453517833270L;
+   
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3760844584074227768L;
 
     private static final String URI_FILLER = "/";
 

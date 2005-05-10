@@ -7,17 +7,16 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-
 import org.alfresco.repo.dictionary.DictionaryRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.impl.lucene.analysis.PathAnalyser;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 /**
  * Analyse properties according to the property definition.
@@ -85,6 +84,14 @@ public class LuceneAnalyser extends Analyzer
         {
             analyser = new PathAnalyser();
         }
+        else if (fieldName.equals("TYPE"))
+        {
+            analyser = new PathAnalyser();
+        }
+        else if (fieldName.equals("ASPECT"))
+        {
+            analyser = new PathAnalyser();
+        }
         else if (fieldName.equals("ANCESTOR"))
         {
             analyser = new WhitespaceAnalyzer();
@@ -93,7 +100,7 @@ public class LuceneAnalyser extends Analyzer
         {
             QName propertyQName = QName.createQName(fieldName.substring(1));
             PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
-            PropertyTypeDefinition propertyType = dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.ANY));
+            PropertyTypeDefinition propertyType = dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.TEXT));
             if(propertyDefinition != null)
             {
                propertyType = propertyDefinition.getPropertyType();

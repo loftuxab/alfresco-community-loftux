@@ -18,6 +18,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.Path;
+import org.alfresco.repo.ref.QName;
+
 /**
  * Support for generic conversion between types.
  * 
@@ -625,6 +629,15 @@ public class ValueConverter
             }
 
         });
+        
+        map.put(QName.class, new Converter<String, QName>()
+                {
+                    public QName convert(String source)
+                    {
+                        return QName.createQName(source);
+                    }
+
+                });
 
         //
         // Number to Subtypes and Date
@@ -933,6 +946,54 @@ public class ValueConverter
         map.put(String.class, new Converter<BigDecimal, String>()
         {
             public String convert(BigDecimal source)
+            {
+                return source.toString();
+            }
+
+        });
+        
+        //
+        // QName
+        //
+
+        map = new HashMap<Class, Converter>();
+        conversions.put(QName.class, map);
+
+        map.put(String.class, new Converter<QName, String>()
+        {
+            public String convert(QName source)
+            {
+                return source.toString();
+            }
+
+        });
+        
+        //
+        // NodeRef
+        //
+        
+        map = new HashMap<Class, Converter>();
+        conversions.put(NodeRef.class, map);
+
+        map.put(String.class, new Converter<NodeRef, String>()
+        {
+            public String convert(NodeRef source)
+            {
+                return source.toString();
+            }
+
+        });
+        
+        //
+        // Path
+        //
+        
+        map = new HashMap<Class, Converter>();
+        conversions.put(Path.class, map);
+
+        map.put(String.class, new Converter<Path, String>()
+        {
+            public String convert(Path source)
             {
                 return source.toString();
             }

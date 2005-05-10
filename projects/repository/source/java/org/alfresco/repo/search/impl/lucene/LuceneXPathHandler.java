@@ -9,12 +9,6 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.util.ArrayList;
 
-import org.apache.lucene.search.Query;
-import org.saxpath.Axis;
-import org.saxpath.Operator;
-import org.saxpath.SAXPathException;
-import org.saxpath.XPathHandler;
-
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.search.impl.lucene.analysis.PathTokenFilter;
 import org.alfresco.repo.search.impl.lucene.query.AbsoluteStructuredFieldPosition;
@@ -23,6 +17,10 @@ import org.alfresco.repo.search.impl.lucene.query.PathQuery;
 import org.alfresco.repo.search.impl.lucene.query.RelativeStructuredFieldPosition;
 import org.alfresco.repo.search.impl.lucene.query.SelfAxisStructuredFieldPosition;
 import org.alfresco.repo.search.impl.lucene.query.StructuredFieldPosition;
+import org.saxpath.Axis;
+import org.saxpath.Operator;
+import org.saxpath.SAXPathException;
+import org.saxpath.XPathHandler;
 
 public class LuceneXPathHandler implements XPathHandler
 {
@@ -39,7 +37,7 @@ public class LuceneXPathHandler implements XPathHandler
         super();
     }
 
-    public Query getQuery()
+    public PathQuery getQuery()
     {
         return this.query;
     }

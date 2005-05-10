@@ -3,12 +3,11 @@
  */
 package org.alfresco.repo.search.transaction;
 
+import org.alfresco.repo.search.IndexerException;
+import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
-
-import org.alfresco.repo.search.IndexerException;
-import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory;
 
 /**
  * This Transaction Manager is intended to wrap one of the existing spring

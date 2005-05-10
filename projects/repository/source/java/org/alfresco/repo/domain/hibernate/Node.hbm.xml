@@ -39,7 +39,7 @@
             <column name="guid" length="36" />
          </key>
          <map-key column="qname" type="string" length="100" />
-         <element column="property_value" type="serializable" />
+         <element column="property_value" type="serializable" length="16383" />
       </map>
       <set
             name="aspects"

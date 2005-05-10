@@ -51,4 +51,10 @@ public class EmptyResultSet implements ResultSet
     {
 
     }
+
+    public ResultSetRow getRow(int i)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
 }

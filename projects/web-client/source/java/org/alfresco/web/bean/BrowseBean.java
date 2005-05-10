@@ -11,13 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-
-import org.alfresco.web.ui.repo.component.UINodeDescendants;
-import org.apache.log4j.Logger;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.InvalidNodeRefException;
@@ -27,7 +22,7 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.Searcher;
-import org.alfresco.repo.search.Value;
+import org.alfresco.repo.value.ValueConverter;
 import org.alfresco.util.Conversion;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -37,6 +32,8 @@ import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
 import org.alfresco.web.ui.common.component.data.UIRichList;
+import org.alfresco.web.ui.repo.component.UINodeDescendants;
+import org.apache.log4j.Logger;
 
 /**
  * @author Kevin Roast
@@ -239,7 +236,7 @@ public class BrowseBean
       catch (InvalidNodeRefException refErr)
       {
          Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {parentNodeId}) );
-         items = Collections.EMPTY_LIST;
+         items = Collections.<Node>emptyList();
       }
       
       /* -- Example of Search code -- leave here for now
@@ -315,11 +312,11 @@ public class BrowseBean
    
    private static String getValueProperty(ResultSetRow row, String name, boolean convertNull)
    {
-      Value value = row.getValue(QName.createQName(NamespaceService.ALFRESCO_URI, name));
+      Serializable value = row.getValue(QName.createQName(NamespaceService.ALFRESCO_URI, name));
       String property = null;
       if (value != null)
       {
-         property = value.getString();
+         property = ValueConverter.convert(String.class, value);
       }
       
       if (convertNull == true && property == null)
@@ -558,6 +555,10 @@ public class BrowseBean
    private class BrowseBreadcrumbHandler implements IBreadcrumbHandler
    {
       /**
+     * 
+     */
+    private static final long serialVersionUID = 3833183653173016630L;
+    /**
        * Constructor
        * 
        * @param nodeId     The nodeID for this browse navigation element

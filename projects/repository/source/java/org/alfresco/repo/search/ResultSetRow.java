@@ -4,6 +4,9 @@
  */
 package org.alfresco.repo.search;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
@@ -23,7 +26,7 @@ public interface ResultSetRow
      * 
      * @return
      */
-    public Value[] getValues();
+    public Map<Path, Serializable> getValues();
 
     /**
      * Get a node property by path
@@ -31,7 +34,7 @@ public interface ResultSetRow
      * @param path
      * @return
      */
-    public Value getValue(Path path);
+    public Serializable getValue(Path path);
 
     /**
      * Get a node value by name
@@ -39,8 +42,8 @@ public interface ResultSetRow
      * @param qname
      * @return
      */
-    public Value getValue(QName qname);
-
+    public Serializable getValue(QName qname);
+    
     /**
      * The refernce to the node that equates to this row in the result set
      * 

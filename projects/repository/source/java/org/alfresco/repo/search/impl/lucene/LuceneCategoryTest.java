@@ -9,8 +9,7 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.util.Random;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import junit.framework.TestCase;
 
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
@@ -20,11 +19,11 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.search.impl.lucene.LuceneTest.MockNameService;
+import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
-
-import junit.framework.TestCase;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class LuceneCategoryTest extends TestCase
 {
@@ -55,6 +54,7 @@ public class LuceneCategoryTest extends TestCase
     private NodeRef catOne;
     private NodeRef catTwo;
     private NodeRef catThree;
+    private FullTextSearchIndexer luceneFTS;
 
     public LuceneCategoryTest()
     {
@@ -72,6 +72,7 @@ public class LuceneCategoryTest extends TestCase
         nodeService = (NodeService)ctx.getBean("dbNodeService");
         luceneIndexLock = (LuceneIndexLock)ctx.getBean("luceneIndexLock");
         dictionaryService = (DictionaryService)ctx.getBean("dictionaryService");
+        luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
         
         StoreRef storeRef = nodeService.createStore(
                 StoreRef.PROTOCOL_WORKSPACE,
@@ -145,6 +146,7 @@ public class LuceneCategoryTest extends TestCase
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.clearIndex();
         indexer.createNode(new ChildAssocRef(null, null, rootNodeRef));
         indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}one"), n1));
@@ -176,7 +178,10 @@ public class LuceneCategoryTest extends TestCase
     {
         buildBaseIndex();
         
-        Searcher searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
+        
+        searcher.setNodeService(nodeService);
+        searcher.setDictionaryService(dictionaryService);
         searcher.setNameSpaceService(new MockNameService());
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:categoryContainer\"", null, null);
         assertEquals(1, results.length());

@@ -103,4 +103,11 @@ public class DictionaryComponent implements DictionaryService
        M2PropertyType m2PropertyType = metaModelDAO.getPropertyType(propertyTypeRef.getQName());
        return m2PropertyType == null ? null : m2PropertyType.getPropertyTypeDefinition();
     }
+
+    public Collection<ClassRef> getAspects()
+    {
+        Collection<QName> qnames = metaModelDAO.getAspects();
+        Collection<ClassRef> classRefs = M2References.createQNameClassRefCollection(qnames);
+        return classRefs;
+    }
 }
