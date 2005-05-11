@@ -9,6 +9,7 @@
 
 <%@ page import="org.alfresco.web.PanelGenerator" %>
 
+
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
@@ -59,28 +60,27 @@
                               </td>
                               <td>
                                  <%-- Summary --%>
-                                 <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" /></div>
-                                 <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                                 <div class="mainSubText"><h:outputText value="#{msg.view_description}" /></div>
-                                 <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" /></div>
+                                 <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" id="msg1" /></div>
+                                 <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" id="msg2" /></div>
+                                 <div class="mainSubText"><h:outputText value="#{msg.view_description}" id="msg3" /></div>
+                                 <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
                                  <div class="mainSubText">There are currently 2 members of this space</div>
                               </td>
                               <td bgcolor="#495F69" width=1></td>
                               <td width=100 style="padding-left:2px">
                                  <%-- Current object actions --%>
-                                 <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
-                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{BrowseBean.spaceActionSetup}" />
-                                 <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
-                                    <f:param name="id" value="#{NavigationBean.currentNodeId}" />
+                                 <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
+                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{BrowseBean.spaceActionSetup}" id="link1" />
+                                 <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}" id="link2" >
+                                    <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                  </a:actionLink>
-                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent"  actionListener="#{BrowseBean.spaceActionSetup}"/>
-                                 <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" />
-                                 <%-- TODO: add real actions --%>
-                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
-                                    <a:actionLink value="Change Details" image="/images/icons/Change_details.gif" />
-                                    <a:actionLink value="Cut" image="/images/icons/cut.gif" />
-                                    <a:actionLink value="Copy" image="/images/icons/copy.gif" />
-                                    <a:actionLink value="Paste" image="/images/icons/paste.gif" />
+                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" actionListener="#{BrowseBean.spaceActionSetup}" id="link3" />
+                                 <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" id="link4" />
+                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
+                                    <a:actionLink value="Change Details" image="/images/icons/Change_details.gif" id="link5" />
+                                    <a:actionLink value="Cut" image="/images/icons/cut.gif" id="link6" />
+                                    <a:actionLink value="Copy" image="/images/icons/copy.gif" id="link7" />
+                                    <a:actionLink value="Paste" image="/images/icons/paste.gif" id="link8" />
                                  </a:menu>
                               </td>
                            </a:panel>
@@ -92,14 +92,14 @@
                               </td>
                               <td>
                                  <%-- Summary --%>
-                                 <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" /></div>
-                                 <div class="mainTitle"><h:outputText value="#{msg.search_results}" /></div>
-                                 <div class="mainSubText"><h:outputText value="#{msg.search_description}" /></div>
+                                 <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" id="msg10" /></div>
+                                 <div class="mainTitle"><h:outputText value="#{msg.search_results}" id="msg11" /></div>
+                                 <div class="mainSubText"><h:outputText value="#{msg.search_description}" id="msg12" /></div>
                               </td>
                               <td bgcolor="#495F69" width=1></td>
                               <td width=100 style="padding-left:2px">
                                  <%-- Current object actions --%>
-                                 <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
+                                 <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg13" /><br>
                               </td>
                            </a:panel>
                            
@@ -323,8 +323,10 @@
     </table>
     
     <%-- TEMP! --%>
+    <%--
     <p>
     <h:commandButton id="show-zoo-page" value="Show Zoo" action="showZoo" />
+    --%>
     
     </h:form>
     
