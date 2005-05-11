@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -19,11 +20,14 @@ import java.util.Set;
 import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 
+import org.alfresco.repo.dictionary.AspectDefinition;
+import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryRef;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.dictionary.TypeDefinition;
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -123,7 +127,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         format.setMaximumFractionDigits(3);
 
     }
-    
+
     /*
      * Indexer Implementation
      */
@@ -582,7 +586,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     private List<Command> deltaDeletes = new ArrayList<Command>(10000);
 
     private FTSIndexerAware callBack;
-    
+
     private int remainingCount = 0;
 
     private ArrayList<Helper> toFTSIndex = new ArrayList<Helper>();
@@ -803,46 +807,16 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         // occurs
 
         ClassRef nodeTypeRef = nodeService.getType(nodeRef);
-
-        Map<ChildAssocRef, Counter> nodeCounts = new HashMap<ChildAssocRef, Counter>(5);
-
+        Map<ChildAssocRef, Counter> nodeCounts = getNodeCounts(nodeRef);
         List<Document> docs = new ArrayList<Document>();
-
         ChildAssocRef qNameRef = null;
-
         Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+        Collection<Path> paths = getIndexablePaths(nodeRef, properties);
+        String aspects = getAspects(nodeRef);
 
-        Collection<Path> paths = nodeService.getPaths(nodeRef, false);
-
-        Set<NodeRef> parentSet = new LinkedHashSet<NodeRef>();
-        List<ChildAssocRef> parentAssocs = nodeService.getParentAssocs(nodeRef);
-        // count the number of times the association is duplicated
-        for (ChildAssocRef assoc : parentAssocs)
-        {
-            Counter counter = nodeCounts.get(assoc);
-            if (counter == null)
-            {
-                counter = new Counter();
-                nodeCounts.put(assoc, counter);
-            }
-            counter.incrementParentCount();
-
-        }
-
-        StringBuffer aspectBuffer = new StringBuffer();
-        for(ClassRef classRef : nodeService.getAspects(nodeRef))
-        {
-            if(aspectBuffer.length() > 0)
-            {
-                aspectBuffer.append(";");
-            }
-            aspectBuffer.append(classRef.getQName().toString());
-        }
-        
         int containerCount = 0;
         for (Iterator<Path> it = paths.iterator(); it.hasNext(); /**/)
         {
-
             Path path = it.next();
 
             // Lucene flags in order are: Stored, indexed, tokenised
@@ -855,39 +829,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             boolean isAtomic = true;
             for (QName propertyQName : properties.keySet())
             {
-                boolean store = true;
-                boolean index = true;
-                boolean tokenise = true;
-                boolean atomic = true;
-                // TODO: - should be able to get the property by its QName?
-
-                PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
-                PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.TEXT));
-                if (propertyDefinition != null)
-                {
-                    index = propertyDefinition.isIndexed();
-                    store = propertyDefinition.isStoredInIndex();
-                    tokenise = propertyDefinition.isTokenisedInIndex();
-                    atomic = propertyDefinition.isIndexedAtomically();
-                }
-
-                isAtomic &= atomic;
-
-                // PropertyTypeDefinition propDef = null;
-                Serializable value = properties.get(propertyQName);
-                // convert value to String
-                String strValue = ValueConverter.convert(String.class, value);
-
-                // TODO: Need converter here
-                // Conversion should be done in the anlyser as we may take
-                // advantage of tokenisation
-
-                // Need to add with the correct language based analyser
-                if (index && atomic)
-                {
-                    doc.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
-                }
-
+                isAtomic = indexProperty(properties, doc, isAtomic, propertyQName);
             }
 
             // Paths
@@ -910,12 +852,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getChildRef());
                 if (!elit.hasNext())
                 {
-                    if (cae.getRef().getQName() != null)
-                    {
-                        qNameBuffer.append(cae.getRef().getQName().toString());
-                    }
+
                     if (cae.getRef().getParentRef() != null)
                     {
+                        if (cae.getRef().getQName() != null)
+                        {
+                            qNameBuffer.append(cae.getRef().getQName().toString());
+                        }
                         doc.add(new Field("PARENT", cae.getRef().getParentRef().getId(), true, true, false));
                     }
                     qNameRef = cae.getRef();
@@ -925,7 +868,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 {
                     pathBuffer.append("/");
                 }
-                if (cae.getRef().getQName() != null)
+                if ((cae.getRef().getParentRef() != null) && (cae.getRef().getQName() != null))
                 {
                     pathBuffer.append(cae.getRef().getQName().toString());
                 }
@@ -976,7 +919,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
                 doc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getParentRef().getId(), true, true, false));
                 doc.add(new Field("TYPE", nodeService.getType(nodeRef).getQName().toString(), true, true, true));
-                doc.add(new Field("ASPECT", aspectBuffer.toString(), true, true, true));
+                doc.add(new Field("ASPECT", aspects, true, true, true));
 
                 Counter counter = nodeCounts.get(qNameRef);
                 // If we have something in a container with root aspect we will
@@ -990,8 +933,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 doc.add(new Field("ISNODE", "T", true, true, false));
                 if (isAtomic)
                 {
-                    doc.add(new Field("FTSSTATUS", "Clean", true, true, false)); 
-                }   
+                    doc.add(new Field("FTSSTATUS", "Clean", true, true, false));
+                }
                 else
                 {
                     if (isNew)
@@ -1013,6 +956,158 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
 
         return docs;
+    }
+
+    private boolean indexProperty(Map<QName, Serializable> properties, Document doc, boolean isAtomic, QName propertyQName)
+    {
+        boolean store = true;
+        boolean index = true;
+        boolean tokenise = true;
+        boolean atomic = true;
+        // TODO: - should be able to get the property by its QName?
+        PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
+        PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.TEXT));
+        if (propertyDefinition != null)
+        {
+            index = propertyDefinition.isIndexed();
+            store = propertyDefinition.isStoredInIndex();
+            tokenise = propertyDefinition.isTokenisedInIndex();
+            atomic = propertyDefinition.isIndexedAtomically();
+        }
+        isAtomic &= atomic;
+        // PropertyTypeDefinition propDef = null;
+        Serializable value = properties.get(propertyQName);
+        // convert value to String
+        String strValue = ValueConverter.convert(String.class, value);
+        // Need to add with the correct language based analyser
+        if (index && atomic)
+        {
+            doc.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
+        }
+        return isAtomic;
+    }
+
+    private String getAspects(NodeRef nodeRef)
+    {
+        String aspects;
+        StringBuffer aspectBuffer = new StringBuffer();
+        for (ClassRef classRef : nodeService.getAspects(nodeRef))
+        {
+            if (aspectBuffer.length() > 0)
+            {
+                aspectBuffer.append(";");
+            }
+            aspectBuffer.append(classRef.getQName().toString());
+        }
+        aspects = aspectBuffer.toString();
+        return aspects;
+    }
+
+    private Map<ChildAssocRef, Counter> getNodeCounts(NodeRef nodeRef)
+    {
+        Map<ChildAssocRef, Counter> nodeCounts = new HashMap<ChildAssocRef, Counter>(5);
+        List<ChildAssocRef> parentAssocs = nodeService.getParentAssocs(nodeRef);
+        // count the number of times the association is duplicated
+        for (ChildAssocRef assoc : parentAssocs)
+        {
+            Counter counter = nodeCounts.get(assoc);
+            if (counter == null)
+            {
+                counter = new Counter();
+                nodeCounts.put(assoc, counter);
+            }
+            counter.incrementParentCount();
+
+        }
+        return nodeCounts;
+    }
+
+    private Collection<Path> getIndexablePaths(NodeRef nodeRef, Map<QName, Serializable> properties)
+    {
+        Collection<Path> directPaths = nodeService.getPaths(nodeRef, false);
+        Collection<Path> categoryPaths = getCategoryPaths(nodeRef, properties);
+        Collection<Path> paths = new ArrayList<Path>(directPaths.size() + categoryPaths.size());
+        paths.addAll(directPaths);
+        paths.addAll(categoryPaths);
+        return paths;
+    }
+
+    private Collection<Path> getCategoryPaths(NodeRef nodeRef, Map<QName, Serializable> properties)
+    {
+        Set<Path> categoryPaths = new HashSet<Path>();
+        Set<ClassRef> aspects = nodeService.getAspects(nodeRef);
+        for (ClassRef classRef : aspects)
+        {
+
+            AspectDefinition aspDef = getDictionaryService().getAspect(classRef);
+            if (isCategorised(aspDef))
+            {
+                for (PropertyDefinition propDef : aspDef.getProperties())
+                {
+                    if (propDef.getPropertyType().getName().equals(PropertyTypeDefinition.CATEGORY))
+                    {
+                        for (NodeRef catRef : ValueConverter.getCollection(NodeRef.class, properties.get(propDef.getQName())))
+                        {
+                            // NodeRef catRef =
+                            // (NodeRef)properties.get(propDef.getQName());
+                            if (catRef != null)
+                            {
+                                Set<Path> aspectPaths = new HashSet<Path>();
+                                for (Path path : nodeService.getPaths(catRef, false))
+                                {
+                                    if (path.first() instanceof Path.ChildAssocElement)
+                                    {
+                                        Path.ChildAssocElement cae = (Path.ChildAssocElement) path.first();
+                                        if ((cae.getRef().getParentRef() == null) && (cae.getRef().getQName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORYROOT)))
+                                        {
+                                            aspectPaths.add(path);
+                                        }
+                                    }
+                                }
+                                // TODO: Add category reuse
+                                categoryPaths.addAll(aspectPaths);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Add member final element
+        for (Path path : categoryPaths)
+        {
+            if (path.last() instanceof Path.ChildAssocElement)
+            {
+                Path.ChildAssocElement cae = (Path.ChildAssocElement) path.last();
+                path.append(new Path.ChildAssocElement(new ChildAssocRef(cae.getRef().getChildRef(), QName.createQName("member"), nodeRef)));
+            }
+        }
+        return categoryPaths;
+    }
+
+    private boolean isCategorised(AspectDefinition aspDef)
+    {
+        AspectDefinition current = aspDef;
+        ClassDefinition nextDefinition;
+        while (current != null)
+        {
+            if (current.getQName().equals(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION))
+            {
+                return true;
+            }
+            else
+            {
+                nextDefinition = current.getSuperClass();
+                if (nextDefinition instanceof AspectDefinition)
+                {
+                    current = (AspectDefinition) nextDefinition;
+                }
+                else
+                {
+                    current = null;
+                }
+            }
+        }
+        return false;
     }
 
     public void startTimer()
@@ -1139,7 +1234,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
 
             remainingCount = count - writer.docCount();
-            
+
         }
         catch (IOException e)
         {
@@ -1183,9 +1278,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             this.action = action;
         }
     }
-    
+
     private FullTextSearchIndexer luceneFullTextSearchIndexer;
-    
+
     public void setLuceneFullTextSearchIndexer(FullTextSearchIndexer luceneFullTextSearchIndexer)
     {
         this.luceneFullTextSearchIndexer = luceneFullTextSearchIndexer;

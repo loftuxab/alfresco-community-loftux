@@ -40,12 +40,16 @@
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/27"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/27"/>
   </datadictionary:EMFType>
+  <datadictionary:EMFAspect emfName="{http://www.alfresco.org/1.0}aspect_categorisation"/>
+  <datadictionary:EMFAspect emfName="{http://www.alfresco.org/1.0}aspect_gen_categorisation" emfSuperClass="/29">
+    <emfProperties emfName="categorisation" emfType="/18" emfMandatory="true" emfMultiple="true" emfStoredInIndex="true" emfTokenisedInIndex="true"/>
+  </datadictionary:EMFAspect>
   <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}category" emfSuperClass="/23">
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/23"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}store_root" emfSuperClass="/26" emfDefaultAspects="/22"/>
   <datadictionary:EMFType emfName="{http://www.alfresco.org/1.0}category_root" emfSuperClass="/23" emfDefaultAspects="/22">
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/29"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="*" emfRequiredToClasses="/31"/>
   </datadictionary:EMFType>
   <datadictionary:EMFAspect emfName="{http://www.alfresco.org/1.0}space">
     <emfProperties emfName="createddate" emfType="/14" emfMandatory="true"/>
@@ -84,11 +88,11 @@
     <emfProperties emfName="frozenAspects" emfType="/16" emfMultiple="true"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedAttributes"/>
     <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="versionedChildAssocs"/>
-    <emfAssociations emfName="successor" emfRequiredToClasses="/38"/>
+    <emfAssociations emfName="successor" emfRequiredToClasses="/40"/>
   </datadictionary:EMFType>
   <datadictionary:EMFType emfName="{http://www.alfresco.com/lightWeightVersionStore/1.0}versionHistory" emfSuperClass="/26">
     <emfProperties emfName="versionedNodeId" emfType="/17" emfMandatory="true"/>
-    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/38"/>
-    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/38"/>
+    <emfAssociations xsi:type="datadictionary:EMFChildAssociation" emfName="version" emfMandatory="true" emfRequiredToClasses="/40"/>
+    <emfAssociations emfName="rootVersion" emfMandatory="true" emfMultiple="false" emfRequiredToClasses="/40"/>
   </datadictionary:EMFType>
 </xmi:XMI>

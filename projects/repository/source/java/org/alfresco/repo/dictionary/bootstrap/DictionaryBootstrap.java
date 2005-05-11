@@ -61,15 +61,19 @@ public class DictionaryBootstrap
     public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_ENCODING);
     public static final String PROP_MIME_TYPE = "mimetype";
     public static final QName PROP_QNAME_MIME_TYPE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_MIME_TYPE);
+    public static final ClassRef ASPECT_CONTENT = new ClassRef(ASPECT_QNAME_CONTENT);
     
     // Categories and roots
     
     public static final QName ASPECT_QNAME_ROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_root");
+    public static final QName ASPECT_QNAME_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_categorisation");
+    public static final QName ASPECT_QNAME_GEN_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_gen_categorisation");
     public static final QName TYPE_QNAME_CATEGORY = QName.createQName(NamespaceService.ALFRESCO_URI, "category");
     public static final QName TYPE_QNAME_STOREROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "store_root");
-    public static final QName TYPE_QNAME_CATEGORYROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "category_root");
-    public static final ClassRef ASPECT_CONTENT = new ClassRef(ASPECT_QNAME_CONTENT);
+    public static final QName TYPE_QNAME_CATEGORYROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "category_root");  
     public static final ClassRef ASPECT_ROOT = new ClassRef(ASPECT_QNAME_ROOT);
+    public static final ClassRef ASPECT_CATEGORISATION = new ClassRef(ASPECT_QNAME_CATEGORISATION);
+    public static final ClassRef ASPECT_GEN_CATEGORISATION = new ClassRef(ASPECT_QNAME_GEN_CATEGORISATION);
     public static final ClassRef TYPE_CATEGORY = new ClassRef(TYPE_QNAME_CATEGORY);
     public static final ClassRef TYPE_STOREROOT = new ClassRef(TYPE_QNAME_STOREROOT);
     public static final ClassRef TYPE_CATEGORYROOT = new ClassRef(TYPE_QNAME_CATEGORYROOT);
@@ -344,6 +348,23 @@ public class DictionaryBootstrap
         foldersAssoc.getRequiredToClasses().add(fileType);
         foldersAssoc.setMandatory(false);
         foldersAssoc.setMultiValued(true);
+        
+        // Create Category Aspect
+        
+        M2Aspect categorisationAspect = metaModelDAO.createAspect(ASPECT_QNAME_CATEGORISATION);
+        
+        // Create general categorisation aspect for adhoc categorisation
+        
+        M2Aspect generalCategorisation = metaModelDAO.createAspect(ASPECT_QNAME_GEN_CATEGORISATION);
+        generalCategorisation.setSuperClass(metaModelDAO.getAspect(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION));
+        M2Property genCatProp = generalCategorisation.createProperty("categorisation");
+        genCatProp.setIndexed(true);
+        genCatProp.setIndexedAtomically(true);
+        genCatProp.setMandatory(true);
+        genCatProp.setMultiValued(true);
+        genCatProp.setStoredInIndex(true);
+        genCatProp.setTokenisedInIndex(true);
+        genCatProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.CATEGORY));
         
         // Create Category Type
         

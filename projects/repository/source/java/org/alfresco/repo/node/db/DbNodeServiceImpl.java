@@ -171,7 +171,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // assign the root aspect - this is expected of all roots, even store roots
         addAspect(rootNode.getNodeRef(),
                 DictionaryBootstrap.ASPECT_ROOT,
-                Collections.EMPTY_MAP);
+                Collections.<QName, Serializable>emptyMap());
         // done
         StoreRef storeRef = store.getStoreRef();
         return storeRef;
@@ -833,7 +833,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         if (isRoot && !(primaryOnly && hasParents))  // exclude primary search with parents present
         {
             // create a one-sided assoc ref for the root node and prepend to the stack
-            ChildAssocRef assocRef = new ChildAssocRef(null, null, getRootNode(currentNode.getNodeRef().getStoreRef()));
+            ChildAssocRef assocRef = new ChildAssocRef(null, getType(currentNodeRef).getQName(), getRootNode(currentNode.getNodeRef().getStoreRef()));
             // create a path to save and add the 'root' assoc
             Path pathToSave = new Path();
             Path.ChildAssocElement first = null;

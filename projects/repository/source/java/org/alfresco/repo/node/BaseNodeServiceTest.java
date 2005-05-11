@@ -809,7 +809,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     
     
-    public void testAddPerformance() throws Exception
+    public void xtestAddPerformance() throws Exception
     {
         timer.start();
         Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
@@ -819,7 +819,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         
     }
     
-    public void testAddPerformance2() throws Exception
+    public void xtestAddPerformance2() throws Exception
     {
         timer.stop();
         System.out.println("Created in "+timer.getDuration());
@@ -831,7 +831,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         setComplete();
     }
     
-    public void testAddPerformance3() throws Exception
+    public void xtestAddPerformance3() throws Exception
     {
         timer.stop();
         System.out.println("Created in "+timer.getDuration());
@@ -845,7 +845,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         System.out.println("Created in "+timer.getDuration());
     }
     
-    public void testAddPerformance4() throws Exception
+    public void xtestAddPerformance4() throws Exception
     {
         timer.stop();
         System.out.println("Created in "+timer.getDuration());

@@ -9,7 +9,6 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,7 +16,6 @@ import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.AbstractResultSetRow;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 
 /**
  * A row ina result set. Created on the fly.
@@ -95,9 +93,10 @@ public class LuceneResultSetRow extends AbstractResultSetRow
 
     public Serializable getValue(QName qname)
     {
-        Document doc = getDocument();
-        Serializable value = doc.get("@" + qname);
-        return value;
+        Path path = new Path();
+        path.append(new Path.SelfElement());
+        path.append(new Path.AttributeElement(qname));
+       return getValues().get(path);
     }
     
  

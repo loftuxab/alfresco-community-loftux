@@ -617,7 +617,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -774,19 +774,25 @@ public class LuceneTest extends TestCase
         
         // Type search tests
         
+        QName qname = QName.createQName(NamespaceService.ALFRESCO_URI, "int-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "int-ista")) + ":\"01\"", null, null);
+                +escapeQName(qname) + ":\"01\"", null, null);
         assertEquals(1, results.length());
+        assertNotNull(results.getRow(0).getValue(qname));
         results.close();
         
+        qname = QName.createQName(NamespaceService.ALFRESCO_URI, "long-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "long-ista")) + ":\"2\"", null, null);
+                +escapeQName(qname) + ":\"2\"", null, null);
         assertEquals(1, results.length());
+        assertNotNull(results.getRow(0).getValue(qname));
         results.close();
         
+        qname = QName.createQName(NamespaceService.ALFRESCO_URI, "float-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "float-ista")) + ":\"3.4\"", null, null);
+                +escapeQName(qname) + ":\"3.4\"", null, null);
         assertEquals(1, results.length());
+        assertNotNull(results.getRow(0).getValue(qname));
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
@@ -865,7 +871,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
 
         // //*
 
@@ -919,7 +925,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
 
         // //*
 
@@ -938,7 +944,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef);
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
 
         // //*
 
@@ -1003,7 +1009,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -1179,7 +1185,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -1354,7 +1360,7 @@ public class LuceneTest extends TestCase
         indexer.commit();
 
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one\"", null, null);
@@ -1535,7 +1541,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
 
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:link//.\"", null, null);
         assertEquals(3, results.length());
@@ -1562,7 +1568,7 @@ public class LuceneTest extends TestCase
         runBaseTests();
 
         searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
         searcher.setDictionaryService(dictionaryService);
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:link//.\"", null, null);
@@ -1582,7 +1588,7 @@ public class LuceneTest extends TestCase
         runBaseTests();
 
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
 
@@ -1608,7 +1614,7 @@ public class LuceneTest extends TestCase
         indexer.commit();
 
         searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
         searcher.setDictionaryService(dictionaryService);
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"))
@@ -1634,7 +1640,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
 
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
                 + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic")) + ":\"KEYONE\"", null, null);
@@ -1651,7 +1657,7 @@ public class LuceneTest extends TestCase
         searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"))
                 + ":\"keyone\"", null, null);
@@ -1694,7 +1700,7 @@ public class LuceneTest extends TestCase
         runBaseTests();
 
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
-        searcher.setNameSpaceService(new MockNameService());
+        searcher.setNameSpaceService(new MockNameService("namespace"));
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
 
@@ -1832,11 +1838,15 @@ public class LuceneTest extends TestCase
         {
             map.put(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
             map.put(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
-            map.put(NamespaceService.DEFAULT_PREFIX, "namespace");
             map.put("namespace", "namespace");
 
         }
 
+        MockNameService(String defaultUri)
+        {
+            map.put(NamespaceService.DEFAULT_PREFIX, defaultUri);
+        }
+        
         public Collection<String> getURIs()
         {
             return map.values();

@@ -127,9 +127,34 @@ public final class Path implements Iterable<Path.Element>, Serializable
         StringBuilder sb = new StringBuilder(128);
         for (Element element : elements)
         {
+            if((sb.length() > 1) || ((sb.length() == 1) && (sb.charAt(0) != '/')))
+            {
+                sb.append("/");
+            }
             sb.append(element.getElementString());
         }
         return sb.toString();
+    }
+    
+    
+    public boolean equals(Object o)
+    {
+        if(o == this)
+        {
+            return true;
+        }
+        if(!(o instanceof Path))
+        {
+            return false;
+        }
+        Path other = (Path)o;
+        return this.elements.equals(other.elements);
+    }
+
+    
+    public int hashCode()
+    {
+        return elements.hashCode();
     }
     
     /**
@@ -177,12 +202,12 @@ public final class Path implements Iterable<Path.Element>, Serializable
             StringBuilder sb = new StringBuilder(32);
             if (ref.getParentRef() == null)
             {
-                // there is no parent, i.e. it is a reference to a root node
+                sb.append("/");
             }
             else
             {
                 // a parent is present
-                sb.append("/").append(ref.getQName());
+                sb.append(ref.getQName());
             }
             if (ref.getNthSibling() > -1)
             {
@@ -194,6 +219,25 @@ public final class Path implements Iterable<Path.Element>, Serializable
         {
             return ref;
         }
+        public boolean equals(Object o)
+        {
+            if(o == this)
+            {
+                return true;
+            }
+            if(!(o instanceof ChildAssocElement))
+            {
+                return false;
+            }
+            ChildAssocElement other = (ChildAssocElement)o;
+            return this.ref.equals(other.ref);
+        }
+        
+        public int hashCode()
+        {
+            return ref.hashCode();
+        }
+        
     }
 
     /**
@@ -226,7 +270,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
         public String getElementString()
         {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("/@").append(attribute);
+            sb.append("@").append(attribute);
             
             if (position > -1)
             {
@@ -244,6 +288,25 @@ public final class Path implements Iterable<Path.Element>, Serializable
         {
             return position;
         }
+        
+        public boolean equals(Object o)
+        {
+            if(o == this)
+            {
+                return true;
+            }
+            if(!(o instanceof AttributeElement))
+            {
+                return false;
+            }
+            AttributeElement other = (AttributeElement)o;
+            return this.getQName().equals(other.getQName()) && (this.position() == other.position());
+        }
+        
+        public int hashCode()
+        {
+            return getQName().hashCode()*32 + position();
+        }
     }
 
     
@@ -260,7 +323,25 @@ public final class Path implements Iterable<Path.Element>, Serializable
 
         public String getElementString()
         {
-            return "/descendant-or-self::node()";
+            return "descendant-or-self::node()";
+        }
+        
+        public boolean equals(Object o)
+        {
+            if(o == this)
+            {
+                return true;
+            }
+            if(!(o instanceof DescendentOrSelfElement))
+            {
+                return false;
+            }
+            return true;
+        }
+        
+        public int hashCode()
+        {
+            return "descendant-or-self::node()".hashCode();
         }
     }
     
@@ -276,7 +357,25 @@ public final class Path implements Iterable<Path.Element>, Serializable
 
         public String getElementString()
         {
-            return "/.";
+            return ".";
+        }
+        
+        public boolean equals(Object o)
+        {
+            if(o == this)
+            {
+                return true;
+            }
+            if(!(o instanceof SelfElement))
+            {
+                return false;
+            }
+            return true;
+        }
+        
+        public int hashCode()
+        {
+            return ".".hashCode();
         }
     }
     
@@ -292,7 +391,27 @@ public final class Path implements Iterable<Path.Element>, Serializable
 
         public String getElementString()
         {
-            return "/..";
+            return "..";
+        }
+        
+        public boolean equals(Object o)
+        {
+            if(o == this)
+            {
+                return true;
+            }
+            if(!(o instanceof ParentElement))
+            {
+                return false;
+            }
+            return true;
+        }
+        
+        public int hashCode()
+        {
+            return "..".hashCode();
         }
     }
+
+  
 }
