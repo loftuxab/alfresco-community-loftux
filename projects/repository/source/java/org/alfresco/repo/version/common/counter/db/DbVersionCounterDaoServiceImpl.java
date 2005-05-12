@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
+import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Version counter Db DAO service implemtation.
@@ -18,8 +19,12 @@ import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
  */
 public class DbVersionCounterDaoServiceImpl implements VersionCounterDaoService
 {
-    // TODO these queries need to moved to a query register at some point
-    
+	static
+	{
+		// TODO 
+		CodeMonkey.todo("the queries need to moved to a query register at some point");
+	}
+	
     /**
      * SQL - create table
      */

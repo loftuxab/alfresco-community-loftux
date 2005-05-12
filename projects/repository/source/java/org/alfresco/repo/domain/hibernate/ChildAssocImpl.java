@@ -43,7 +43,9 @@ public class ChildAssocImpl implements ChildAssoc
         {
             childAssocRef = new ChildAssocRef(getParent().getNodeRef(),
                     QName.createQName(getNamespaceUri(), getLocalName()),
-                    getChild().getNodeRef());
+                    getChild().getNodeRef(),
+                    this.isPrimary,
+                    -1);
         }
         return childAssocRef;
     }

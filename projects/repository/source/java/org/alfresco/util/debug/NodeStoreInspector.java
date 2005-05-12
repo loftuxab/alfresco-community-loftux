@@ -9,9 +9,12 @@ import java.util.Map;
 
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.repo.ref.qname.QNamePattern;
+import org.alfresco.repo.ref.qname.RegexQNamePattern;
 
 /**
  * Debug class that has methods to inspect the contents of a node store.
@@ -94,6 +97,23 @@ public class NodeStoreInspector
                     append("\n");
                 
                 builder.append(outputNode(iIndent+2, nodeService, childAssocRef.getChildRef()));
+            }
+        }
+        catch (Exception exception)
+        {
+            // Ignore for now since this means it is not a container type
+        }
+		
+		try
+        {
+            Collection<NodeAssocRef> assocRefs = nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+            for (NodeAssocRef assocRef : assocRefs)
+            {
+                builder.
+                    append(getIndent(iIndent+1)).
+                    append("-> associated to ").
+                    append(assocRef.getTargetRef().getId()).
+                    append("\n");
             }
         }
         catch (Exception exception)

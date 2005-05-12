@@ -47,7 +47,15 @@ public class DictionaryBootstrap
     public static final ClassRef TYPE_REFERENCE = new ClassRef(TYPE_QNAME_REFERENCE);
     public static final String PROP_REFERENCE = "reference";
     public static final QName PROP_QNAME_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_REFERENCE);
-        
+      
+	// Copy aspect constants
+	public static final String ASPECT_NAME_COPY = "copy";
+	public static final QName ASPECT_QNAME_COPY = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_COPY);
+	public static final ClassRef ASPECT_COPY = new ClassRef(ASPECT_QNAME_COPY);
+	
+	public static final String PROP_COPY_REFERENCE = "copyReference";
+	public static final QName PROP_QNAME_COPY_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_COPY_REFERENCE);
+	
     // Container type constants
     public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ALFRESCO_URI, "container");
     public static final ClassRef TYPE_CONTAINER = new ClassRef(TYPE_QNAME_CONTAINER);
@@ -103,7 +111,7 @@ public class DictionaryBootstrap
     public static final ClassRef TEST_TYPE_FILE = new ClassRef(TEST_TYPE_QNAME_FILE);
 
     private NamespaceDAO namespaceDAO = null;
-    private MetaModelDAO metaModelDAO = null;
+    private MetaModelDAO metaModelDAO = null;	
 
     /**
      * @param namespaceDAO  the namespace DAO to bootstrap with
@@ -317,6 +325,13 @@ public class DictionaryBootstrap
         referenceProp.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NODE_REF));
         referenceProp.setMandatory(true);
         referenceProp.setMultiValued(false);
+		
+		// Create copy aspect
+		M2Aspect copyAspect = metaModelDAO.createAspect(ASPECT_QNAME_COPY);
+		M2Property copyReferenceProperty = copyAspect.createProperty(PROP_COPY_REFERENCE);
+		copyReferenceProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY)); // TODO should be type NodeRef
+		copyReferenceProperty.setMandatory(true);
+		copyReferenceProperty.setMultiValued(false);
 
         // Create Content Type
         CodeMonkey.todo("Need to add description to the type definition"); // TODO

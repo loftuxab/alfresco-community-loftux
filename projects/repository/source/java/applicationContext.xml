@@ -538,6 +538,34 @@
    </bean>
    
    <!--                 -->
+   <!-- Node Operations Service -->
+   <!--                 -->
+   
+   <bean id="nodeOperationsService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.repo.node.operations.NodeOperationsService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl">
+            <property name="dictionaryService">
+               <ref bean="dictionaryService" />
+            </property>
+            <property name="nodeService">
+               <ref bean="dbNodeService" />
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean> 
+   
+   <!--                 -->
    <!-- Policy Franeworks Services -->
    <!--                 -->
    

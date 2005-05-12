@@ -76,7 +76,7 @@ public class M2AssociationDefinition implements AssociationDefinition
         if (assocRef == null)
         {
             assocRef = new AssociationRef(getContainerClass().getReference(),
-                    getName().toString());
+                    m2Association.getName());
         }
         return assocRef;
     }

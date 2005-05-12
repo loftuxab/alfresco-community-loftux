@@ -139,6 +139,4 @@ public interface VersionService
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef)
         throws AspectMissingException;       
-
-    // TODO figure out what is still missing, eg restore, getState ...
 }

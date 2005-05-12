@@ -483,8 +483,6 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
     
     /**
      * Takes the current state of the node and 'freezes' it on the version node.
-     * <p>
-     * TODO describe how children are frozen and how this behaviour can be overridden.
      * 
      * @param nodeRef     the node reference
      * @param versionRef  the version node reference
