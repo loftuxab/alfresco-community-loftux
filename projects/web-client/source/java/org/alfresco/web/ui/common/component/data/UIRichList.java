@@ -175,6 +175,12 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public int getPageSize()
    {
+      ValueBinding vb = getValueBinding("pageSize");
+      if (vb != null)
+      {
+         this.pageSize = ((Integer)vb.getValue(getFacesContext())).intValue();
+      }
+      
       return this.pageSize;
    }
    
@@ -185,8 +191,11 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public void setPageSize(int val)
    {
-      // TODO: value binding code
-      this.pageSize = val;
+      if (val >= -1)
+      {
+         this.pageSize = val;
+         setCurrentPage(0);
+      }
    }
    
    /**
@@ -309,8 +318,8 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          this.pageCount = 1;
          this.maxRowIndex = (rowCount - 1);
       }
-      //if (s_logger.isDebugEnabled())
-      //   s_logger.debug("Bound datasource: PageSize: " + this.pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
+      if (s_logger.isDebugEnabled())
+         s_logger.debug("Bound datasource: PageSize: " + this.pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
    }
    
    /**

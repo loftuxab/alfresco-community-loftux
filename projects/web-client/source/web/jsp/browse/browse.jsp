@@ -160,8 +160,8 @@
                      <a:panel id="spaces-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
                      <%-- Spaces List --%>
-                     <a:richList id="spacesList" binding="#{BrowseBean.spacesRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.pageSize}"
-                           style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
+                     <a:richList id="spacesList" binding="#{BrowseBean.spacesRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="10"
+                           style="padding:2px;padding-top:6px;" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
                            value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
                         <%-- Primary column for details view mode --%>
@@ -289,8 +289,8 @@
                      <a:panel id="content-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_content}">
                      
                      <%-- Content list --%>
-                     <a:richList id="contentRichList" binding="#{BrowseBean.contentRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.pageSize}"
-                           style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
+                     <a:richList id="contentRichList" binding="#{BrowseBean.contentRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="10"
+                           style="padding:2px;padding-top:6px;" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
                            value="#{BrowseBean.content}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
                         <%-- Primary column for details view mode --%>

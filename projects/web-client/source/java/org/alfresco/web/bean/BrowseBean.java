@@ -831,9 +831,11 @@ public class BrowseBean implements IContextListener
    /** The NavigationBean reference */
    private NavigationBean navigator;
    
+   /** Component references */
    private UIRichList spacesRichList;
    private UIRichList contentRichList;
    
+   /** Transient lists */
    private List<Node> containerNodes = null;
    private List<Node> contentNodes = null;
    
