@@ -174,12 +174,12 @@ public class BrowseBean implements IContextListener
       List<Node> nodes = null;
       if (navigator.getSearchText() == null)
       {
-         s_logger.info("getNodes() called in BrowseBean, querying nodes...");
+         //s_logger.info("getNodes() called in BrowseBean, querying nodes...");
          nodes = queryBrowseNodes(getNavigator().getCurrentNodeId());
       }
       else
       {
-         s_logger.info("getNodes() called in BrowseBean, searching nodes...");
+         //s_logger.info("getNodes() called in BrowseBean, searching nodes...");
          nodes = searchBrowseNodes(navigator.getSearchText());
       }
       return nodes;
@@ -316,11 +316,15 @@ public class BrowseBean implements IContextListener
    private List<Node> searchBrowseNodes(String searchText)
    {
       List<Node> items = null;
+      
+      // get the searcher object and perform the search of the root node
+      String query = searchText;
+      String s = MessageFormat.format(SEARCH_PATH, new Object[] {query});
       try
       {
-         // get the searcher object and perform the search of the root node
-         String s = MessageFormat.format(SEARCH_PATH, new Object[] {"*"});
+         s_logger.info("*****Searching using path: " + s);
          ResultSet results = this.searchService.query(Repository.getStoreRef(), "lucene", s, null, null);
+         s_logger.info("*****Search results returned: " + results.length());
          
          // create a list of items from the results
          items = new ArrayList<Node>(results.length());
@@ -370,7 +374,8 @@ public class BrowseBean implements IContextListener
       }
       catch (Exception err)
       {
-         Utils.addErrorMessage( ERROR_SEARCH );
+         s_logger.info("Search failed for: " + s);
+         Utils.addErrorMessage( MessageFormat.format(ERROR_SEARCH, new Object[] {err.getMessage()}) );
          items = Collections.EMPTY_LIST;
       }
       
@@ -478,9 +483,9 @@ public class BrowseBean implements IContextListener
          List<IBreadcrumbHandler> location = this.navigator.getLocation();
          ChildAssocRef parentAssocRef = nodeService.getPrimaryParent(nodeRef);
          
-         s_logger.info("*****Selected item getPrimaryParent().getChildRef() noderef Id:  " + parentAssocRef.getChildRef().getId());
-         s_logger.info("*****Selected item getPrimaryParent().getParentRef() noderef Id: " + parentAssocRef.getParentRef().getId());
-         s_logger.info("*****Current value getNavigator().getCurrentNodeId() noderef Id: " + getNavigator().getCurrentNodeId());
+         //s_logger.info("*****Selected item getPrimaryParent().getChildRef() noderef Id:  " + parentAssocRef.getChildRef().getId());
+         //s_logger.info("*****Selected item getPrimaryParent().getParentRef() noderef Id: " + parentAssocRef.getParentRef().getId());
+         //s_logger.info("*****Current value getNavigator().getCurrentNodeId() noderef Id: " + getNavigator().getCurrentNodeId());
          
          if (nodeEvent.IsParent == false)
          {
@@ -639,11 +644,8 @@ public class BrowseBean implements IContextListener
    {
       s_logger.info("**********INVALIDTING COMPONENTS");
       
-      // clear the value for the list component - will cause it to re-bind to it's data and refresh
-      s_logger.info("Clearing 'browseList' data source.");
+      // clear the value for the list components - will cause re-bind to it's data and refresh
       this.browseRichList.setValue(null);
-      
-      s_logger.info("Clearing 'detailsList' data source.");
       this.detailsRichList.setValue(null);
    }
    
@@ -708,13 +710,16 @@ public class BrowseBean implements IContextListener
    // Private data
    
    private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
-   private static final String ERROR_SEARCH  = "Search failed during to a system error.";
+   private static final String ERROR_SEARCH  = "Search failed during to a system error: {0}";
    
    private static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
    
    private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    
-   private static final String SEARCH_PATH = "PATH:\"/" + NamespaceService.ALFRESCO_PREFIX + ":{0}\"";
+   //private static final String SEARCH_PATH1 = "PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":{0}\"";
+   // TODO: AndyH said he will fix QNAME to prepend // later - so this should work in the future
+   //private static final String SEARCH_PATH2 = "+QNAME:\"" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   private static final String SEARCH_PATH  = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;

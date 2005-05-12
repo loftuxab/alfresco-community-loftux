@@ -21,7 +21,7 @@ public final class UIContextService
    }
    
    /**
-    * Returns a ThreadLocal instance of the UIContextService
+    * Returns a Session local instance of the UIContextService
     * 
     * @return UIContextService for this Thread
     */
