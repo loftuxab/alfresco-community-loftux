@@ -159,18 +159,15 @@
                      
                      <a:panel id="spaces-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
-                     <%-- Browse - details/icons mode --%>
-                     <a:richList id="detailsList" binding="#{BrowseBean.detailsRichList}" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}" viewMode="#{BrowseBean.browseViewMode}" pageSize="10" style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt"
-                           width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
+                     <%-- Spaces List --%>
+                     <a:richList id="spacesList" binding="#{BrowseBean.spacesRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.pageSize}"
+                           style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
+                           value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
-                        <a:column primary="true" width="200" style="padding:2px;text-align:left">
+                        <%-- Primary column for details view mode --%>
+                        <a:column primary="true" width="200" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
                            <f:facet name="header">
                               <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
-                           </f:facet>
-                           <f:facet name="large-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/folder_large.png" actionListener="#{BrowseBean.clickSpace}" showLink="false">
-                                 <f:param name="id" value="#{r.id}" />
-                              </a:actionLink>
                            </f:facet>
                            <f:facet name="small-icon">
                               <a:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{BrowseBean.clickSpace}" showLink="false">
@@ -182,57 +179,20 @@
                            </a:actionLink>
                         </a:column>
                         
-                        <a:column style="text-align:left">
-                           <f:facet name="header">
-                              <a:sortLink label="Description" value="description" styleClass="header"/>
+                        <%-- Primary column for icons view mode --%>
+                        <a:column primary="true" style="padding:2px;text-align:left;vertical-align:top;" rendered="#{BrowseBean.browseViewMode == 'icons'}">
+                           <f:facet name="large-icon">
+                              <a:actionLink value="#{r.name}" image="/images/icons/folder_large.png" actionListener="#{BrowseBean.clickSpace}" showLink="false">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
                            </f:facet>
-                           <h:outputText value="#{r.description}" />
-                        </a:column>
-                        
-                        <a:column style="text-align:left">
-                           <f:facet name="header">
-                              <a:sortLink label="Created Date" value="createddate" styleClass="header"/>
-                           </f:facet>
-                           <h:outputText value="#{r.createddate}">
-                              <f:convertDateTime dateStyle="long" />
-                           </h:outputText>
-                        </a:column>
-                        
-                        <a:column style="text-align:left">
-                           <f:facet name="header">
-                              <a:sortLink label="Modified Date" value="modifieddate" styleClass="header"/>
-                           </f:facet>
-                           <h:outputText value="#{r.modifieddate}">
-                              <f:convertDateTime dateStyle="long" />
-                           </h:outputText>
-                        </a:column>
-                        
-                        <a:column actions="true" style="text-align:left">
-                           <f:facet name="header">
-                              <h:outputText value="#{msg.actions}"/>
-                           </f:facet>
-                           <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickSpace}" styleClass="header">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
-                           <%-- TODO: add real actions --%>
-                           <a:menu id="actionsMenu1" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                           </a:menu>
                         </a:column>
                         
-                        <a:dataPager/>
-                     </a:richList>
-                     
-                     <%-- Browse - list mode --%>
-                     <a:richList id="browseList" binding="#{BrowseBean.browseRichList}" viewMode="list" rendered="#{BrowseBean.browseViewMode == 'list'}" pageSize="5" style="padding:2px" rowStyleClass="recordSetRowAlt"
-                           width="100%" value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
-                        
-                        <a:column primary="true" style="padding:2px;text-align:left">
+                        <%-- Primary column for list view mode --%>
+                        <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
                            <f:facet name="small-icon">
                               <a:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{BrowseBean.clickSpace}" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
@@ -243,29 +203,65 @@
                            </a:actionLink>
                         </a:column>
                         
+                        <%-- Description column for all view modes --%>
                         <a:column style="text-align:left">
+                           <f:facet name="header">
+                              <a:sortLink label="Description" value="description" styleClass="header"/>
+                           </f:facet>
                            <h:outputText value="#{r.description}" />
                         </a:column>
                         
-                        <%--<a:column style="text-align:left;">
-                           <h:outputText value="Modified Date:" />
+                        <%-- Created Date column for details view mode --%>
+                        <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
+                           <f:facet name="header">
+                              <a:sortLink label="Created Date" value="createddate" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.createddate}">
+                              <f:convertDateTime dateStyle="long" />
+                           </h:outputText>
+                        </a:column>
+                        
+                        <%-- Modified Date column for details/icons view modes --%>
+                        <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
+                           <f:facet name="header">
+                              <a:sortLink label="Modified Date" value="modifieddate" styleClass="header"/>
+                           </f:facet>
                            <h:outputText value="#{r.modifieddate}">
                               <f:convertDateTime dateStyle="long" />
                            </h:outputText>
-                        </a:column>--%>
+                        </a:column>
                         
-                        <a:column style="text-align:left">
+                        <%-- Node Descendants links for list view mode --%>
+                        <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
                            <r:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
                         </a:column>
                         
-                        <a:column actions="true" style="text-align:right">
+                        <%-- Actions column for browse/icons view modes --%>
+                        <a:column actions="true" style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
+                           <f:facet name="header">
+                              <h:outputText value="#{msg.actions}"/>
+                           </f:facet>
+                           <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
+                           <a:menu id="actionsMenu1" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                           </a:menu>
+                        </a:column>
+                        
+                        <%-- Actions column for list view mode --%>
+                        <a:column actions="true" style="text-align:right" rendered="#{BrowseBean.browseViewMode == 'list'}">
                            <a:actionLink value="#{msg.edit}" styleClass="inlineAction" />
                            <a:actionLink value="#{msg.cut}" styleClass="inlineAction" />
                            <a:actionLink value="#{msg.copy}" styleClass="inlineAction" />
                            <a:actionLink value="#{msg.delete}" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
-                           <%-- TODO: add real actions --%>
                            <a:menu id="actionsMenu2" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
@@ -291,7 +287,120 @@
                      <div style="padding:4px">
                      
                      <a:panel id="content-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_content}">
-                        <p>
+                     
+                     <%-- Content list --%>
+                     <a:richList id="contentRichList" binding="#{BrowseBean.contentRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.pageSize}"
+                           style="padding:2px" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
+                           value="#{BrowseBean.content}" var="r" initialSortColumn="name" initialSortDescending="true">
+                        
+                        <%-- Primary column for details view mode --%>
+                        <a:column primary="true" width="200" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
+                           <f:facet name="header">
+                              <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
+                           </f:facet>
+                           <f:facet name="small-icon">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.clickContent}" showLink="false">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                           </f:facet>
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
+                        </a:column>
+                        
+                        <%-- Primary column for icons view mode --%>
+                        <a:column primary="true" style="padding:2px;text-align:left;vertical-align:top;" rendered="#{BrowseBean.browseViewMode == 'icons'}">
+                           <f:facet name="large-icon">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file_large.gif" actionListener="#{BrowseBean.clickContent}" showLink="false">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                           </f:facet>
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" styleClass="header">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
+                        </a:column>
+                        
+                        <%-- Primary column for list view mode --%>
+                        <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
+                           <f:facet name="small-icon">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.clickContent}" showLink="false">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                           </f:facet>
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" styleClass="title">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
+                        </a:column>
+                        
+                        <%-- Description column for all view modes --%>
+                        <a:column style="text-align:left">
+                           <f:facet name="header">
+                              <a:sortLink label="Description" value="description" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.description}" />
+                        </a:column>
+                        
+                        <%-- Created Date column for details view mode --%>
+                        <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
+                           <f:facet name="header">
+                              <a:sortLink label="Created Date" value="createddate" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.createddate}">
+                              <f:convertDateTime dateStyle="long" />
+                           </h:outputText>
+                        </a:column>
+                        
+                        <%-- Modified Date column for details/icons view modes --%>
+                        <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
+                           <f:facet name="header">
+                              <a:sortLink label="Modified Date" value="modifieddate" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.modifieddate}">
+                              <f:convertDateTime dateStyle="long" />
+                           </h:outputText>
+                        </a:column>
+                        
+                        <%-- Node Descendants links for list view mode --%>
+                        <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
+                           <r:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
+                        </a:column>
+                        
+                        <%-- Actions column for browse/icons view modes --%>
+                        <a:column actions="true" style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
+                           <f:facet name="header">
+                              <h:outputText value="#{msg.actions}"/>
+                           </f:facet>
+                           <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
+                           <a:menu id="actionsMenu3" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                           </a:menu>
+                        </a:column>
+                        
+                        <%-- Actions column for list view mode --%>
+                        <a:column actions="true" style="text-align:right" rendered="#{BrowseBean.browseViewMode == 'list'}">
+                           <a:actionLink value="#{msg.edit}" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.cut}" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.copy}" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.delete}" styleClass="inlineAction">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
+                           <a:menu id="actionsMenu4" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
+                           </a:menu>
+                        </a:column>
+                        
+                        <a:dataPager/>
+                     </a:richList>
+                        
                      </a:panel>
                      
                      </div>

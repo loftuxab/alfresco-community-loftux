@@ -95,7 +95,7 @@ public class UIColumn extends UIComponentBase
    /**
     * @return true if this is the primary column
     */
-   public boolean isPrimaryColumn()
+   public boolean getPrimary()
    {
       return this.primary;
    }
@@ -111,7 +111,7 @@ public class UIColumn extends UIComponentBase
    /**
     * @return true if this is the column containing actions for the current row
     */
-   public boolean isActionsColumn()
+   public boolean getActions()
    {
       return this.actions;
    }
@@ -123,7 +123,6 @@ public class UIColumn extends UIComponentBase
    {
       this.actions = actions;
    }
-   
    
    
    // ------------------------------------------------------------------------------

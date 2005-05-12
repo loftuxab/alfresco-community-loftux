@@ -241,6 +241,8 @@ public class NavigationBean
     */
    private class NavigationBreadcrumbHandler implements IBreadcrumbHandler
    {
+      private static final long serialVersionUID = 4833194653193016638L;
+      
       /**
        * Constructor
        * 

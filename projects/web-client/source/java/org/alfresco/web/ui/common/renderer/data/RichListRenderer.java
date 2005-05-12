@@ -16,6 +16,7 @@ import javax.faces.context.ResponseWriter;
 import org.alfresco.web.ui.common.component.data.UIColumn;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
+import org.apache.log4j.Logger;
 
 /**
  * @author kevinr
@@ -133,7 +134,7 @@ public class RichListRenderer extends BaseRenderer
     */
    public static class DetailsViewRenderer implements IRichListRenderer
    {
-      private static final String VIEWMODEID = "details";
+      public static final String VIEWMODEID = "details";
       
       /**
        * @see org.alfresco.web.ui.common.renderer.data.IRichListRenderer#getViewModeID()
@@ -157,20 +158,23 @@ public class RichListRenderer extends BaseRenderer
          {
             UIColumn column = columns[i];
             
-            // render column header tag
-            out.write("<th");
-            outputAttribute(out, column.getAttributes().get("width"), "width");
-            outputAttribute(out, column.getAttributes().get("style"), "style");
-            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
-            out.write('>');
-            
-            // output the header facet if any
-            UIComponent header = column.getHeader();
-            if (header != null)
+            if (column.isRendered() == true)
             {
-               header.encodeBegin(context);
-               header.encodeChildren(context);
-               header.encodeEnd(context);
+               // render column header tag
+               out.write("<th");
+               outputAttribute(out, column.getAttributes().get("width"), "width");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+               out.write('>');
+               
+               // output the header facet if any
+               UIComponent header = column.getHeader();
+               if (header != null)
+               {
+                  header.encodeBegin(context);
+                  header.encodeChildren(context);
+                  header.encodeEnd(context);
+               }
             }
             
             // we don't render child controls for the header row
@@ -205,28 +209,31 @@ public class RichListRenderer extends BaseRenderer
          {
             UIColumn column = columns[i];
             
-            out.write("<td");
-            outputAttribute(out, column.getAttributes().get("style"), "style");
-            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
-            out.write('>');
-            
-            // for details view, we show the small column icon for the first column
-            if (i == 0)
+            if (column.isRendered() == true)
             {
-               UIComponent smallIcon = column.getSmallIcon();
-               if (smallIcon != null)
+               out.write("<td");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+               out.write('>');
+               
+               // for details view, we show the small column icon for the first column
+               if (i == 0)
                {
-                  smallIcon.encodeBegin(context);
-                  smallIcon.encodeChildren(context);
-                  smallIcon.encodeEnd(context);
-                  out.write("&nbsp;");
+                  UIComponent smallIcon = column.getSmallIcon();
+                  if (smallIcon != null)
+                  {
+                     smallIcon.encodeBegin(context);
+                     smallIcon.encodeChildren(context);
+                     smallIcon.encodeEnd(context);
+                     out.write("&nbsp;");
+                  }
                }
-            }
-            
-            if (column.getChildCount() != 0)
-            {
-               // allow child controls inside the columns to render themselves
-               encodeRecursive(context, column);
+               
+               if (column.getChildCount() != 0)
+               {
+                  // allow child controls inside the columns to render themselves
+                  encodeRecursive(context, column);
+               }
             }
             
             out.write("</td>");
@@ -269,7 +276,7 @@ public class RichListRenderer extends BaseRenderer
       // maximum displayable textual lines within a single item cell
       private final static int MAX_DISPLAYABLE_LINES = 3;
       
-      private static final String VIEWMODEID = "list";
+      public static final String VIEWMODEID = "list";
       
       /**
        * @see org.alfresco.web.ui.common.renderer.data.IRichListRenderer#getViewModeID()
@@ -288,26 +295,30 @@ public class RichListRenderer extends BaseRenderer
          ResponseWriter out = context.getResponseWriter();
          
          // render column headers as labels
-         out.write("<tr>");
+         // TODO: add "showHeaders" to RichList to allow hiding of header facets for some view modes
+         /*out.write("<tr>");
          for (int i=0; i<columns.length; i++)
          {
             UIColumn column = columns[i];
             
-            out.write("<th>");
-            
-            // output the header facet if any
-            UIComponent header = column.getHeader();
-            if (header != null)
+            if (column.isRendered() == true)
             {
-               header.encodeBegin(context);
-               header.encodeChildren(context);
-               header.encodeEnd(context);
+               out.write("<th>");
+               
+               // output the header facet if any
+               UIComponent header = column.getHeader();
+               if (header != null)
+               {
+                  header.encodeBegin(context);
+                  header.encodeChildren(context);
+                  header.encodeEnd(context);
+               }
             }
             
             // we don't render child controls for the header row
             out.write("</th>");
          }
-         out.write("</tr>");
+         out.write("</tr>");*/
          
          this.rowIndex = 0;
       }
@@ -332,20 +343,32 @@ public class RichListRenderer extends BaseRenderer
          }
          
          // find the actions column if it exists
+         // and the primary column (which must exist)
+         UIColumn primaryColumn = null;
          UIColumn actionsColumn = null;
          for (int i=0; i<columns.length; i++)
          {
-            if (columns[i].isActionsColumn() == true)
+            if (columns[i].isRendered() == true)
             {
-               actionsColumn = columns[i];
-               break;
+               if (columns[i].getPrimary() == true)
+               {
+                  primaryColumn = columns[i];
+               }
+               else if (columns[i].getActions() == true)
+               {
+                  actionsColumn = columns[i];
+               }
             }
          }
-         
-         // first column cell contains the small icon
-         if (columns.length != 0)
+         if (primaryColumn == null)
          {
-            UIColumn column = columns[0];
+            logger.warn("No primary column found for RichList definition: " + richList.getId());
+         }
+         
+         // primary column cell contains the small icon
+         if (primaryColumn != null)
+         {
+            UIColumn column = primaryColumn;
             
             // output row or alt style row if set
             out.write("<tr valign=top");
@@ -397,11 +420,13 @@ public class RichListRenderer extends BaseRenderer
          }
          
          // render remaining columns as lines of data up to a max display limit
-         for (int i = 1; i < columns.length; i++)
+         for (int i = 0; i < columns.length; i++)
          {
             UIColumn column = columns[i];
             
-            if (i < MAX_DISPLAYABLE_LINES && column.isActionsColumn() == false)
+            int count = 1;
+            if (column.isRendered() == true && count < MAX_DISPLAYABLE_LINES &&
+                column.getActions() == false && column.getPrimary() == false)
             {
                // output row or alt style row if set
                out.write("<tr valign=top");
@@ -416,6 +441,8 @@ public class RichListRenderer extends BaseRenderer
                   encodeRecursive(context, column);
                }
                out.write("</td><td></td></tr>");
+               
+               count++;
             }
          }
          
@@ -468,7 +495,7 @@ public class RichListRenderer extends BaseRenderer
       
       private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='height:4px'></div></td></tr>";
       
-      private static final String VIEWMODEID = "icons";
+      public static final String VIEWMODEID = "icons";
       
       /**
        * @see org.alfresco.web.ui.common.renderer.data.IRichListRenderer#getViewModeID()
@@ -504,48 +531,68 @@ public class RichListRenderer extends BaseRenderer
             out.write('>');
          }
          
-         // output first column as the icon label
+         // find primary column (which must exist)
+         UIColumn primaryColumn = null;
+         for (int i=0; i<columns.length; i++)
+         {
+            if (columns[i].isRendered() == true && columns[i].getPrimary() == true)
+            {
+               primaryColumn = columns[i];
+               break;
+            }
+         }
+         if (primaryColumn == null)
+         {
+            logger.warn("No primary column found for RichList definition: " + richList.getId());
+         }
+         
+         // output primary column as the icon label
          out.write("<td width=");
          out.write(COLUMN_PERCENT);
          out.write("><table cellspacing=0 cellpadding=2 border=0>");
-         if (columns.length != 0)
+         if (primaryColumn != null)
          {
-            UIColumn column = columns[0];
+            UIColumn column = primaryColumn;
             
-            out.write("<tr><td rowspan=10");
-            outputAttribute(out, column.getAttributes().get("style"), "style");
-            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
-            out.write('>');
-            
-            // output the large icon for this column
-            UIComponent largeIcon = column.getLargeIcon();
-            if (largeIcon != null)
+            if (column.isRendered() == true)
             {
-               largeIcon.encodeBegin(context);
-               largeIcon.encodeChildren(context);
-               largeIcon.encodeEnd(context);
+               out.write("<tr><td rowspan=10");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+               out.write('>');
+               
+               // output the large icon for this column
+               UIComponent largeIcon = column.getLargeIcon();
+               if (largeIcon != null)
+               {
+                  largeIcon.encodeBegin(context);
+                  largeIcon.encodeChildren(context);
+                  largeIcon.encodeEnd(context);
+               }
+               out.write("</td>");
+               
+               // start the next cell which contains the first column component
+               out.write("<td");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+               out.write('>');
+               if (column.getChildCount() != 0)
+               {
+                  // allow child controls inside the columns to render themselves
+                  encodeRecursive(context, column);
+               }
+               out.write("</td></tr>");
             }
-            out.write("</td>");
-            
-            // start the next cell which contains the first column component
-            out.write("<td");
-            outputAttribute(out, column.getAttributes().get("style"), "style");
-            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
-            out.write('>');
-            if (column.getChildCount() != 0)
-            {
-               // allow child controls inside the columns to render themselves
-               encodeRecursive(context, column);
-            }
-            out.write("</td></tr>");
          }
          
          // render remaining columns as lines of data up to a max display limit
-         for (int i=1; i<columns.length; i++)
+         for (int i=0; i<columns.length; i++)
          {
             UIColumn column = columns[i];
             
-            if (i < MAX_DISPLAYABLE_LINES || column.isActionsColumn() == true)
+            int count = 1;
+            if (column.isRendered() == true && column.getPrimary() == false &&
+                (count < MAX_DISPLAYABLE_LINES || column.getActions() == true) )
             {
                out.write("<tr><td");
                outputAttribute(out, column.getAttributes().get("style"), "style");
@@ -557,6 +604,8 @@ public class RichListRenderer extends BaseRenderer
                   encodeRecursive(context, column);
                }
                out.write("</td></tr>");
+               
+               count++;
             }
          }
          
@@ -600,4 +649,7 @@ public class RichListRenderer extends BaseRenderer
       
       private int rowIndex = 0;
    }
+   
+   
+   private static Logger logger = Logger.getLogger(RichListRenderer.class);
 }
