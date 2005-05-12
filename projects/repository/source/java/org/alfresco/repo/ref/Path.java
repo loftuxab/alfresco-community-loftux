@@ -44,11 +44,8 @@ public final class Path implements Iterable<Path.Element>, Serializable
     }
     
     /**
-     * Get a typed iterator over the path elements.
-     * 
-     * @return
+     * @return Returns a typed iterator over the path elements
      */
-    
     public Iterator<Path.Element> iterator()
     {
        return elements.iterator();

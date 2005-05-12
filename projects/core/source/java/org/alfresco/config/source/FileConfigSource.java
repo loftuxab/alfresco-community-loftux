@@ -4,52 +4,59 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 
 import org.alfresco.config.ConfigException;
 
 /**
- * ConfigSource implementation that gets its data via a file.
+ * ConfigSource implementation that gets its data via a file or files.
  * 
  * @author gavinc
  */
 public class FileConfigSource extends BaseConfigSource
 {
-   /**
-    * Default Constructor
-    */
-   public FileConfigSource()
-   {
-      super();
-   }
-   
-   /**
-    * Constructs an HTTPConfigSource using the list of file paths
-    * 
-    * @param source List of file paths to get config from
-    */
-   public FileConfigSource(String source)
-   {
-      super();
-      
-      this.setSource(source);
-   }
+    /**
+     * Constructs a file configuration source that uses a single file
+     * 
+     * @param filename the name of the file from which to get config
+     * 
+     * @see FileConfigSource#FileConfigSource(List<String>)
+     */
+    public FileConfigSource(String filename)
+    {
+        this(Collections.singletonList(filename));
+    }
+    
+    /**
+     * @param sources
+     *            List of file paths to get config from
+     */
+    public FileConfigSource(List<String> sourceStrings)
+    {
+        super(sourceStrings);
+    }
 
-   /**
-    * @see org.alfresco.config.source.BaseConfigSource#getInputStream(java.lang.String)
-    */
-   public InputStream getInputStream(String source)
-   {
-      InputStream is = null;
-      
-      try
-      {
-         is = new BufferedInputStream(new FileInputStream(source));
-      }
-      catch (IOException ioe)
-      {
-         throw new ConfigException("Failed to obtain input stream to file: " + source, ioe);
-      }
-      
-      return is;
-   }
+    /**
+     * @param sourceString
+     *            a valid filename as accepted by the
+     *            {@link java.io.File#File(java.lang.String) file constructor}
+     * @return Returns a stream onto the file
+     */
+    protected InputStream getInputStream(String sourceString)
+    {
+        InputStream is = null;
+
+        try
+        {
+            is = new BufferedInputStream(new FileInputStream(sourceString));
+        }
+        catch (IOException ioe)
+        {
+            throw new ConfigException("Failed to obtain input stream to file: " +
+                    sourceString, ioe);
+        }
+
+        return is;
+    }
 }

@@ -1,6 +1,7 @@
 package org.alfresco.config.source;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * ConfigSource implementation that gets its data via the class path.
@@ -9,30 +10,21 @@ import java.io.InputStream;
  */
 public class ClassPathConfigSource extends BaseConfigSource
 {
-   /**
-    * Default Constructor
-    */
-   public ClassPathConfigSource()
+    /**
+     * Constructs an ClassPathConfigSource using the list of classpath
+     * elements
+     * 
+     * @param source List of classpath resources to get config from
+     */
+   public ClassPathConfigSource(List<String> sourceStrings)
    {
-      super();
-   }
-   
-   /**
-    * Constructs an ClassPathConfigSource using the list of files
-    * 
-    * @param source List of files to get config from
-    */
-   public ClassPathConfigSource(String source)
-   {
-      super();
-      
-      this.setSource(source);
+      super(sourceStrings);
    }
 
    /**
-    * @see org.alfresco.config.source.BaseConfigSource#getInputStream(java.lang.String)
+    * Not implemented
     */
-   public InputStream getInputStream(String source)
+   public InputStream getInputStream(String sourceString)
    {
       throw new UnsupportedOperationException();
    }

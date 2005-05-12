@@ -13,7 +13,7 @@ import org.alfresco.config.ConfigElement;
  */
 public class PropertiesConfigElement extends GenericConfigElement
 {
-   private List properties = new ArrayList();
+   private List<String> properties = new ArrayList<String>();
    private boolean kidsPopulated = false;
    
    /**
@@ -27,12 +27,12 @@ public class PropertiesConfigElement extends GenericConfigElement
    /**
     * @see org.alfresco.config.element.GenericConfigElement#getChildren()
     */
-   public List getChildren()
+   public List<ConfigElement> getChildren()
    {
       // lazily build the list of generic config elements representing
       // the properties as the caller may not even call this method
       
-      List kids = null;
+      List<ConfigElement> kids = null;
       
       if (this.properties.size() > 0)
       {

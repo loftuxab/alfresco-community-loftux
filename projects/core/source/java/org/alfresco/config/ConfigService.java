@@ -18,13 +18,6 @@ public interface ConfigService
    public void destroy();
    
    /**
-    * Sets the config source to use to retrieve the configuration data
-    * 
-    * @param configSource ConfigSource implementation to use
-    */
-   public void setConfigSource(ConfigSource configSource);
-   
-   /**
     * Retrieves the configuration for the given object
     * 
     * @param object The object to use as the basis of the lookup

@@ -1,6 +1,7 @@
 package org.alfresco.config.source;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * ConfigSource implementation that gets its data via HTTP.
@@ -10,29 +11,19 @@ import java.io.InputStream;
 public class HTTPConfigSource extends BaseConfigSource
 {
    /**
-    * Default Constructor
-    */
-   public HTTPConfigSource()
-   {
-      super();
-   }
-   
-   /**
     * Constructs an HTTPConfigSource using the list of URLs
     * 
     * @param source List of URLs to get config from
     */
-   public HTTPConfigSource(String source)
+   public HTTPConfigSource(List<String> sourceStrings)
    {
-      super();
-      
-      this.setSource(source);
+      super(sourceStrings);
    }
 
    /**
-    * @see org.alfresco.config.source.BaseConfigSource#getInputStream(java.lang.String)
+    * Not implemented
     */
-   public InputStream getInputStream(String source)
+   public InputStream getInputStream(String sourceString)
    {
       throw new UnsupportedOperationException();
    }

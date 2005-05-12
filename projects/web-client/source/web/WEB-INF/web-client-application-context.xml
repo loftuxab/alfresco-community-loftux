@@ -1,15 +1,21 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
-
 <beans>
    
    <bean id="configSource" class="org.alfresco.config.source.WebAppConfigSource">
-      <property name="source"><value>/WEB-INF/web-client-config.xml,/WEB-INF/web-client-config-zoo.xml</value></property>
+      <constructor-arg>
+         <list>
+            <value>/WEB-INF/web-client-config.xml</value>
+            <value>/WEB-INF/web-client-config-zoo.xml</value>
+         </list>
+      </constructor-arg>
    </bean>
    
    <bean id="configService" class="org.alfresco.config.xml.XMLConfigService" init-method="init">
-      <property name="configSource"><ref bean="configSource"/></property>
+      <constructor-arg>
+         <ref bean="configSource"/>
+      </constructor-arg>
    </bean>
    
 </beans>
