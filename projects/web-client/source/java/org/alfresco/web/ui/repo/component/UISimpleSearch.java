@@ -90,16 +90,23 @@ public class UISimpleSearch extends UICommand
             "} else {" + 
             "   document.getElementById('_search').style.display = 'none';" + 
             "} }");
+      out.write("function _noenter(event) {" +
+            "if (event && event.keyCode == 13) {" +
+            "   _searchSubmit();return false; }" +
+            "else {" +
+            "   return true; } }");
+      out.write("function _searchSubmit() {");
+      out.write(Utils.generateFormSubmit(context, this, getHiddenFieldName(context, this), getClientId(context)));
+      out.write("}");
       out.write("</script>");
       
       // outer table containing search drop-down icon, text box and Go search button
       out.write("<table cellspacing=4 cellpadding=0>");
       out.write("<tr><td style='padding-top:2px'>");
       
-      out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13, "Options", "javascript:_searchDropdown();"));
+      String searchImage = Utils.buildImageTag(context, "/images/icons/search_icon.gif", 15, 15, "Go", "_searchSubmit();");
       
-      String searchSubmit = Utils.generateFormSubmit(context, this, getHiddenFieldName(context, this), getClientId(context));
-      String searchImage = Utils.buildImageTag(context, "/images/icons/search_icon.gif", 15, 15, "Go", searchSubmit);
+      out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13, "Options", "javascript:_searchDropdown();"));
       
       // dynamic DIV area containing search options
       out.write("<div id='_search' style='position:absolute;display:none;padding-left:8px;'>");
@@ -126,9 +133,9 @@ public class UISimpleSearch extends UICommand
       if (getSearchMode() == 3) out.write(" CHECKED");
       out.write("> Space Names only</td></tr>");
       
-      // TODO: add ENTER key capturing! - do not allow default Submit button to click!
+      // close button
       out.write("<tr><td><table width=100%><tr><td>" +
-                "<input type='button' value='Close' class='userInputForm' onclick=\"javascript: document.getElementById('_search').style.display='none';\">" + 
+                "<input type='button' value='Close' class='userInputForm' onclick=\"document.getElementById('_search').style.display='none';\">" + 
                 "</td><td align=right>");
       out.write(searchImage);
       out.write("</td></tr></table></td></tr>");
@@ -139,7 +146,8 @@ public class UISimpleSearch extends UICommand
       out.write("<input name='");
       out.write(getClientId(context));
       // TODO: style and class from component properties!
-      out.write("' class='userInputForm' type='text' maxlength='255' style='width:90px;padding-top:3px' value=\"");
+      out.write("' onkeypress=\"return _noenter(event)\"");
+      out.write(" class='userInputForm' type='text' maxlength='255' style='width:90px;padding-top:3px' value=\"");
       // output previous search text stored in this component!
       out.write(getLastSearch());
       out.write("\">");
