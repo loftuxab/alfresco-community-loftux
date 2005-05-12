@@ -55,7 +55,7 @@ public interface ConfigElement
      * 
      * @return The list of children.
      */
-    public List getChildren();
+    public List<ConfigElement> getChildren();
 
     /**
      * Determines whether this config element has any children. It is more

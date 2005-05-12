@@ -65,7 +65,7 @@ public class ConfigImpl implements Config
         String name = newConfigElement.getName();
         if (this.configElements.containsKey(name))
         {
-            ConfigElement existing = (ConfigElement) this.configElements.get(name);
+            ConfigElement existing = this.configElements.get(name);
             ConfigElement combined = existing.combine(newConfigElement);
             this.configElements.put(name, combined);
 

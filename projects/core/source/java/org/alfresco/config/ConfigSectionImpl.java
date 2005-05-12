@@ -40,7 +40,7 @@ public class ConfigSectionImpl implements ConfigSection
     /**
      * @see org.alfresco.config.ConfigSection#getConfigElements()
      */
-    public List getConfigElements()
+    public List<ConfigElement> getConfigElements()
     {
         return this.configElements;
     }

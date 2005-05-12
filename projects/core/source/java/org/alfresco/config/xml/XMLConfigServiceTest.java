@@ -1,12 +1,9 @@
 package org.alfresco.config.xml;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
-
-import org.apache.log4j.Logger;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
@@ -14,6 +11,7 @@ import org.alfresco.config.ConfigException;
 import org.alfresco.config.ConfigService;
 import org.alfresco.config.element.PropertiesConfigElement;
 import org.alfresco.config.source.FileConfigSource;
+import org.apache.log4j.Logger;
 
 /**
  * Unit tests for the XML based configuration service
@@ -193,9 +191,8 @@ public class XMLConfigServiceTest extends TestCase
         // get all the property names using the ConfigElement interface methods
         List kids = propsToDisplay.getChildren();
         List<String> propNames = new ArrayList<String>();
-        for (Iterator iter = kids.iterator(); iter.hasNext();)
+        for (ConfigElement propElement : propsToDisplay.getChildren())
         {
-            ConfigElement propElement = (ConfigElement) iter.next();
             String value = propElement.getValue();
             assertNull("property value should be null", value);
             String propName = propElement.getAttribute("name");
