@@ -37,10 +37,10 @@ public class PropertiesElementReader implements ConfigElementReader
          
          configElement = new PropertiesConfigElement();
          
-         Iterator properties = element.elementIterator(ELEMENT_PROPERTY);
+         Iterator<Element> properties = element.elementIterator(ELEMENT_PROPERTY);
          while (properties.hasNext())
          {
-            Element property = (Element)properties.next();
+            Element property = properties.next();
             String propName = property.attributeValue(ATTR_NAME);
             configElement.addProperty(propName);
          }

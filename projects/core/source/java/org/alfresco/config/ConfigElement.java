@@ -31,7 +31,7 @@ public interface ConfigElement
      * 
      * @return The list of attrbiutes
      */
-    public Map getAttributes();
+    public Map<String, String> getAttributes();
 
     /**
      * Determines whether the config element has the named attribute

@@ -1,7 +1,12 @@
 package org.alfresco.config.source;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Collections;
 import java.util.List;
+
+import org.alfresco.config.ConfigException;
 
 /**
  * ConfigSource implementation that gets its data via HTTP.
@@ -10,6 +15,18 @@ import java.util.List;
  */
 public class HTTPConfigSource extends BaseConfigSource
 {
+   /**
+     * Constructs an HTTP configuration source that uses a single URL
+     * 
+     * @param url the url of the file from which to get config
+     * 
+     * @see HTTPConfigSource#HTTPConfigSource(List<String>)
+     */
+    public HTTPConfigSource(String url)
+    {
+        this(Collections.singletonList(url));
+    }
+    
    /**
     * Constructs an HTTPConfigSource using the list of URLs
     * 
@@ -21,10 +38,25 @@ public class HTTPConfigSource extends BaseConfigSource
    }
 
    /**
-    * Not implemented
+    * Retrieves an input stream over HTTP for the given URL
+    * 
+    * @param sourceString URL to retrieve config data from
+    * @return The input stream
     */
    public InputStream getInputStream(String sourceString)
    {
-      throw new UnsupportedOperationException();
+      InputStream is = null;
+      
+      try
+      {
+         URL url = new URL(sourceString);
+         is = new BufferedInputStream(url.openStream());
+      }
+      catch (Throwable e)
+      {
+         throw new ConfigException("Failed to obtain input stream to URL: " + sourceString, e);
+      }
+      
+      return is;
    }
 }

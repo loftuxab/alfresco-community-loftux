@@ -44,10 +44,10 @@ public class GenericElementReader implements ConfigElementReader
    private void processChildren(Element element, GenericConfigElement parentConfig)
    {
       // get the list of children for the given element
-      Iterator children = element.elementIterator();
+      Iterator<Element> children = element.elementIterator();
       while (children.hasNext())
       {
-         Element child = (Element)children.next();
+         Element child = children.next();
          GenericConfigElement childConfigElement = createConfigElement(child);
          parentConfig.addChild(childConfigElement);
          
@@ -79,10 +79,10 @@ public class GenericElementReader implements ConfigElementReader
          }
       }
       
-      Iterator attrs = element.attributeIterator();
+      Iterator<Attribute> attrs = element.attributeIterator();
       while (attrs.hasNext())
       {
-         Attribute attr = (Attribute)attrs.next();
+         Attribute attr = attrs.next();
          String attrName = attr.getName();
          String attrValue = attr.getValue();
          

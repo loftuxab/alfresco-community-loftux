@@ -90,7 +90,14 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         }
         catch (Throwable e)
         {
-            throw new ConfigException("Failed to parse config stream", e);
+            if (e instanceof ConfigException)
+            {
+               throw (ConfigException)e;
+            }
+            else
+            {
+               throw new ConfigException("Failed to parse config stream", e);
+            }
         }
     }
 

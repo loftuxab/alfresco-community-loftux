@@ -165,16 +165,16 @@ public abstract class BaseConfigService implements ConfigService
             for (int x = 0; x < areas.length; x++)
             {
                 String area = areas[x];
-                List areaSections = (List) this.sectionsByArea.get(area);
+                List<ConfigSection> areaSections = this.sectionsByArea.get(area);
                 if (areaSections == null)
                 {
                     throw new ConfigException("Requested area '" + area + "' has not been defined");
                 }
 
-                Iterator iterAreaSections = areaSections.iterator();
+                Iterator<ConfigSection> iterAreaSections = areaSections.iterator();
                 while (iterAreaSections.hasNext())
                 {
-                    ConfigSection section = (ConfigSection) iterAreaSections.next();
+                    ConfigSection section = iterAreaSections.next();
                     processSection(section, object, results);
                 }
             }
@@ -183,10 +183,10 @@ public abstract class BaseConfigService implements ConfigService
         {
             // add all the config elements from all sections (that match) to the
             // results
-            Iterator sections = this.sections.iterator();
+            Iterator<ConfigSection> sections = this.sections.iterator();
             while (sections.hasNext())
             {
-                ConfigSection section = (ConfigSection) sections.next();
+                ConfigSection section = sections.next();
                 processSection(section, object, results);
             }
         }
@@ -209,7 +209,13 @@ public abstract class BaseConfigService implements ConfigService
     {
         for (InputStream inputStream : this.configSource)
         {
+            if (logger.isDebugEnabled())
+               logger.debug("Commencing parse of input stream");
+            
             parse(inputStream);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Completed parse of input stream");
         }
     }
 
@@ -303,7 +309,8 @@ public abstract class BaseConfigService implements ConfigService
         {
             Class clazz = Class.forName(className);
             evaluator = (Evaluator) clazz.newInstance();
-        } catch (Throwable e)
+        } 
+        catch (Throwable e)
         {
             throw new ConfigException("Could not instantiate evaluator for '" + name + "' with class: " + className, e);
         }

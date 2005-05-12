@@ -3,14 +3,15 @@ package org.alfresco.config.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.ConfigService;
 import org.alfresco.config.element.PropertiesConfigElement;
+import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.source.FileConfigSource;
+import org.alfresco.config.source.HTTPConfigSource;
+import org.alfresco.util.BaseTest;
 import org.apache.log4j.Logger;
 
 /**
@@ -18,12 +19,10 @@ import org.apache.log4j.Logger;
  * 
  * @author gavinc
  */
-public class XMLConfigServiceTest extends TestCase
+public class XMLConfigServiceTest extends BaseTest
 {
     private static Logger logger = Logger.getLogger(XMLConfigServiceTest.class);
-
-    private String resourcesDir = "w:/alfresco/HEAD/projects/core/source/test-resources/";
-
+    
     /**
      * @see junit.framework.TestCase#setUp()
      */
@@ -40,7 +39,7 @@ public class XMLConfigServiceTest extends TestCase
     public void testConfig()
     {
         // setup the config service
-        String configFile = this.resourcesDir + "config.xml";
+        String configFile = getResourcesDir() + "config.xml";
         ConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
         svc.init();
 
@@ -74,6 +73,37 @@ public class XMLConfigServiceTest extends TestCase
     }
 
     /**
+     * Tests the use of the class path source config
+     * 
+     * TODO: Enable this test when we have a classpath config resource to load!
+     */
+    public void xtestClasspathSource()
+    {
+        String configFile = "org/alfresco/config-classpath.xml"; 
+        ConfigService svc = new XMLConfigService(new ClassPathConfigSource(configFile));
+        svc.init();
+        
+        Config config = svc.getGlobalConfig();
+        assertNotNull(config);
+    }
+    
+    /**
+     * Tests the use of the HTTP source config
+     * 
+     * TODO: Enable this test when we have an HTTP config resource to load!
+     */
+    public void xtestHTTPSource()
+    {
+        List<String> configFile = new ArrayList<String>(1);
+        configFile.add("http://localhost:8080/web-client/config-http.xml");
+        ConfigService svc = new XMLConfigService(new HTTPConfigSource(configFile));
+        svc.init();
+        
+        Config config = svc.getGlobalConfig();
+        assertNotNull(config);
+    }
+    
+    /**
      * Tests the config service's ability to load multiple files and merge the
      * results
      */
@@ -81,8 +111,8 @@ public class XMLConfigServiceTest extends TestCase
     {
         // setup the config service
         List<String> configFiles = new ArrayList<String>(2);
-        configFiles.add(this.resourcesDir + "config.xml");
-        configFiles.add(this.resourcesDir + "config-multi.xml");
+        configFiles.add(getResourcesDir() + "config.xml");
+        configFiles.add(getResourcesDir() + "config-multi.xml");
         ConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.init();
 
@@ -127,8 +157,8 @@ public class XMLConfigServiceTest extends TestCase
     {
         // setup the config service
         List<String> configFiles = new ArrayList<String>(2);
-        configFiles.add(this.resourcesDir + "config.xml");
-        configFiles.add(this.resourcesDir + "config-areas.xml");
+        configFiles.add(getResourcesDir() + "config.xml");
+        configFiles.add(getResourcesDir() + "config-areas.xml");
         ConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.init();
 
@@ -179,7 +209,7 @@ public class XMLConfigServiceTest extends TestCase
     public void testGenericConfigElement()
     {
         // setup the config service
-        String configFiles = this.resourcesDir + "config-properties.xml";
+        String configFiles = getResourcesDir() + "config-properties.xml";
         ConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.init();
 
@@ -189,7 +219,7 @@ public class XMLConfigServiceTest extends TestCase
         assertNotNull("properties config should not be null", propsToDisplay);
 
         // get all the property names using the ConfigElement interface methods
-        List kids = propsToDisplay.getChildren();
+        List<ConfigElement> kids = propsToDisplay.getChildren();
         List<String> propNames = new ArrayList<String>();
         for (ConfigElement propElement : propsToDisplay.getChildren())
         {
@@ -213,7 +243,7 @@ public class XMLConfigServiceTest extends TestCase
     public void testGetProperties()
     {
         // setup the config service
-        String configFiles = this.resourcesDir + "config-properties.xml";
+        String configFiles = getResourcesDir() + "config-properties.xml";
         ConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.init();
 
@@ -224,7 +254,12 @@ public class XMLConfigServiceTest extends TestCase
 
         // get all the property names using the PropertiesConfigElement
         // implementation
-        List propNames = propsToDisplay.getProperties();
+        List<String> propNames = propsToDisplay.getProperties();
+        
+        // make sure the generic interfaces are also returning the correct data
+        List<ConfigElement> kids = propsToDisplay.getChildren();
+        assertNotNull("kids should not be null", kids);
+        assertTrue("There should be more than one child", kids.size() > 1);
 
         logger.info("propNames = " + propNames);
         assertEquals("There should be 5 properties", propNames.size() == 5, true);

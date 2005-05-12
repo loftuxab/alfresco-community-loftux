@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -24,6 +25,18 @@ public class WebAppConfigSource extends BaseConfigSource implements ServletConte
 {
     private ServletContext servletCtx;
 
+    /**
+     * Constructs a webapp configuration source that uses a single file
+     * 
+     * @param filename the name of the file from which to get config
+     * 
+     * @see WebAppConfigSource#WebAppConfigSource(List<String>)
+     */
+    public WebAppConfigSource(String filename)
+    {
+        this(Collections.singletonList(filename));
+    }
+    
     /**
      * @param sources
      *            List of paths to files in a web application

@@ -85,7 +85,7 @@
    <target name="run-tests" depends="package-jar"
            description="Runs the projects unit tests">
       <mkdir dir="${test.results.dir}" />
-      <junit printsummary="yes" fork="yes" haltonfailure="yes">
+      <junit printsummary="yes" fork="yes" haltonfailure="yes" dir="${basedir}">
          <!-- TODO: Try and include the previous classpath rather than re-specify -->
 <!--         <classpath refid="java.classpath"/> -->
          <classpath>

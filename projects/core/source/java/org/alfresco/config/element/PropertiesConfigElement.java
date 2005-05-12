@@ -11,7 +11,7 @@ import org.alfresco.config.ConfigElement;
  * 
  * @author gavinc
  */
-public class PropertiesConfigElement extends GenericConfigElement
+public class PropertiesConfigElement extends ConfigElementAdapter
 {
    private List<String> properties = new ArrayList<String>();
    private boolean kidsPopulated = false;
@@ -38,12 +38,12 @@ public class PropertiesConfigElement extends GenericConfigElement
       {
          if (this.kidsPopulated == false)
          {
-            Iterator props = this.properties.iterator();
+            Iterator<String> props = this.properties.iterator();
             while (props.hasNext())
             {
                GenericConfigElement ce = new GenericConfigElement("property");
-               ce.addAttribute("name", (String)props.next());
-               addChild(ce);
+               ce.addAttribute("name", props.next());
+               this.children.add(ce);
             }
             
             this.kidsPopulated = true;
@@ -63,7 +63,7 @@ public class PropertiesConfigElement extends GenericConfigElement
       PropertiesConfigElement combined = new PropertiesConfigElement();
       
       // add all the existing properties
-      Iterator props = this.getProperties().iterator();
+      Iterator<String> props = this.getProperties().iterator();
       while (props.hasNext())
       {
          combined.addProperty((String)props.next());
@@ -84,7 +84,7 @@ public class PropertiesConfigElement extends GenericConfigElement
     * 
     * @return List of property names
     */
-   public List getProperties()
+   public List<String> getProperties()
    {
       return this.properties;
    }
