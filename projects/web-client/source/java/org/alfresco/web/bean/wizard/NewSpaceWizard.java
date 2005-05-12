@@ -271,8 +271,12 @@ public class NewSpaceWizard
             
             // set the properties
             Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-            QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+            
+            QName propName = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
+            properties.put(propName, this.name);
+            
+            QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
             properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
            
             QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
