@@ -151,7 +151,7 @@
                                  </tr>
                                  <tr>
                                     <td align="middle">Name:</td>
-                                    <td><h:inputText value="#{NewSpaceWizard.templateName}" size="35" />&nbsp;*</td>
+                                    <td><h:inputText value="#{NewSpaceWizard.templateName}" size="35" disabled="true" />&nbsp;*</td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>

@@ -61,6 +61,10 @@
          <value>#{indexingNodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>contentService</property-name>
+         <value>#{contentService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
       </managed-property>
@@ -140,7 +144,7 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>addContent</from-outcome>
-         <to-view-id>/jsp/wizard/add-content/details.jsp</to-view-id>
+         <to-view-id>/jsp/wizard/add-content/upload.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

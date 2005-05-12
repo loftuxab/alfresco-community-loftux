@@ -13,6 +13,7 @@ import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
+import javax.transaction.UserTransaction;
 
 import org.apache.log4j.Logger;
 
@@ -30,6 +31,7 @@ import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIModeList;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -240,48 +242,67 @@ public class NewSpaceWizard
       }
       else
       {
-         // get the node service and create the space (just create a folder for now)
-         NodeRef parentNodeRef;
-         String nodeId = getNavigator().getCurrentNodeId();
-         if (nodeId == null)
+         UserTransaction tx = null;
+      
+         try
          {
-            parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+                    FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx.begin();
+            
+            // get the node service and create the space (just create a folder for now)
+            NodeRef parentNodeRef;
+            String nodeId = getNavigator().getCurrentNodeId();
+            if (nodeId == null)
+            {
+               parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+            }
+            else
+            {
+               parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
+            }
+            
+            ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
+                      null,
+                      QName.createQName(NamespaceService.ALFRESCO_URI, this.name),
+                      DictionaryBootstrap.TYPE_QNAME_FOLDER);
+            
+            NodeRef nodeRef = assocRef.getChildRef();
+            
+            // set the properties
+            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+            QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
+            Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+            properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
+           
+            QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
+            properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
+           
+            QName propIcon = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
+            properties.put(propIcon, this.icon);
+           
+            QName propSpaceType = QName.createQName(NamespaceService.ALFRESCO_URI, "spacetype");
+            properties.put(propSpaceType, this.spaceType);
+           
+            if (this.description != null)
+            {
+               QName propDescription = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
+               properties.put(propDescription, this.description);
+            }
+            
+            // add the space aspect to the folder
+            this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
+
+            // commit the transaction
+            tx.commit();
          }
-         else
+         catch (Exception e)
          {
-            parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
+            // rollback the transaction
+            try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+            throw new RuntimeException(e);
          }
-         
-         ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
-                   null,
-                   QName.createQName(NamespaceService.ALFRESCO_URI, this.name),
-                   DictionaryBootstrap.TYPE_QNAME_FOLDER);
-         NodeRef nodeRef = assocRef.getChildRef();
-         
-         // set the properties
-         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-         QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
-         Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-         properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
         
-         QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
-         properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
-        
-         QName propIcon = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
-         properties.put(propIcon, this.icon);
-        
-         QName propSpaceType = QName.createQName(NamespaceService.ALFRESCO_URI, "spacetype");
-         properties.put(propSpaceType, this.spaceType);
-        
-         if (this.description != null)
-         {
-            QName propDescription = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
-            properties.put(propDescription, this.description);
-         }
-         
-         // add the space aspect to the folder
-         this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
-         
          // reset the state
          reset();
          

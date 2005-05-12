@@ -5,17 +5,21 @@
         <description>Alfresco Client Portlet</description>
         <portlet-name>AlfrescoClient</portlet-name>
         <display-name>Alfresco Portlet</display-name>
-        <portlet-class>org.apache.myfaces.portlet.MyFacesGenericPortlet</portlet-class>
+        <portlet-class>org.alfresco.web.MyFacesPortlet</portlet-class>
         
         <init-param>
            <name>default-view</name>
            <value>/jsp/login.jsp</value>
         </init-param>
+        
+        <init-param>
+           <name>error-page</name>
+           <value>/jsp/error.jsp</value>
+        </init-param>
 
         <supports>
             <mime-type>text/html</mime-type>
             <portlet-mode>VIEW</portlet-mode>
-            <portlet-mode>EDIT</portlet-mode>
             <portlet-mode>HELP</portlet-mode>
         </supports>
 

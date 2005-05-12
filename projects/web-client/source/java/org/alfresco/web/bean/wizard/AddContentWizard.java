@@ -1,24 +1,34 @@
 package org.alfresco.web.bean.wizard;
 
+import java.io.File;
+import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.transaction.UserTransaction;
 
-import org.apache.log4j.Logger;
-
+import org.alfresco.repo.content.ContentService;
+import org.alfresco.repo.content.ContentWriter;
+import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
+import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.util.Conversion;
 import org.alfresco.web.bean.NavigationBean;
-import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIModeList;
+import org.apache.log4j.Logger;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Handler class used by the Add Content Wizard 
@@ -31,14 +41,15 @@ public class AddContentWizard
    private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
 
    // add content wizard specific properties
-   private String file;
+   private File file;
    private String name;
    private String owner;
    private boolean overwrite;
+   private ContentService contentService;
       
    // common wizard properties
    private int currentStep = 1;
-   private boolean finishDisabled = false;
+   private boolean finishDisabled = true;
    private String currentSpaceName;
    private NodeService nodeService;
    private NavigationBean navigator;
@@ -75,6 +86,22 @@ public class AddContentWizard
       this.navigator = navigator;
    }
    
+   /**
+    * @return Returns the contentService.
+    */
+   public ContentService getContentService()
+   {
+      return contentService;
+   }
+
+   /**
+    * @param contentService The contentService to set.
+    */
+   public void setContentService(ContentService contentService)
+   {
+      this.contentService = contentService;
+   }
+
    /**
     * @return Returns the currentStep.
     */
@@ -152,15 +179,15 @@ public class AddContentWizard
    /**
     * @return Returns the file.
     */
-   public String getFile()
+   public File getFile()
    {
       return file;
    }
-
+   
    /**
     * @param file The file to set.
     */
-   public void setFile(String file)
+   public void setFile(File file)
    {
       this.file = file;
    }
@@ -279,7 +306,76 @@ public class AddContentWizard
       if (logger.isDebugEnabled())
          logger.debug(getSummary());
       
-      // String nodeId = getNavigator().getCurrentNodeId();
+      UserTransaction tx = null;
+      
+      try
+      {
+         tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+                 FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+         tx.begin();
+         
+         // TODO: The current node id should be stored rather than retrieved so 
+         //       restoration from the shelf behaves correctly.
+         // get the node ref of the node that will contain the content
+         NodeRef containerNodeRef;
+         String nodeId = getNavigator().getCurrentNodeId();
+         if (nodeId == null)
+         {
+            containerNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+         }
+         else
+         {
+            containerNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
+         }
+         
+         // TODO: deal with existing files and determine what to do from the
+         //       this.overwrite member variable
+         
+         // create the node to represent the node
+         String assocName = this.name.replace('.', '-');
+         ChildAssocRef assocRef = this.nodeService.createNode(containerNodeRef,
+                null,
+                QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
+                DictionaryBootstrap.TYPE_QNAME_FILE);
+         NodeRef fileNodeRef = assocRef.getChildRef();
+         
+         // add the name, created and modified date as properties for now
+         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+         Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+         
+         QName propName = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
+         properties.put(propName, this.name);
+         
+         QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
+         properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
+        
+         QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
+         properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
+         
+         // add the properties to the node
+         nodeService.setProperties(fileNodeRef, properties);
+         
+         // get a writer for the content and put the file
+         ContentWriter writer = contentService.getWriter(fileNodeRef);
+         writer.putContent(this.file);
+         
+         // commit the transaction
+         tx.commit();
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new RuntimeException(e);
+      }
+      finally
+      {
+         // delete the temporary file we uploaded earlier
+         if (this.file != null)
+         {
+            this.file.delete();
+         }
+      }
       
       // reset the state
       reset();
@@ -297,6 +393,12 @@ public class AddContentWizard
     */
    public String cancel()
    {
+      // delete the temporary file we uploaded earlier
+      if (this.file != null)
+      {
+         this.file.delete();
+      }
+      
       // reset the state
       reset();
       
@@ -313,6 +415,12 @@ public class AddContentWizard
     */
    public String minimise()
    {
+      // delete the temporary file we uploaded earlier
+      if (this.file != null)
+      {
+         this.file.delete();
+      }
+      
       // navigate
       navigate("/jsp/browse/browse.jsp");
       
@@ -325,9 +433,8 @@ public class AddContentWizard
    public String getSummary()
    {
       StringBuilder builder = new StringBuilder();
-      builder.append("File: ").append(this.file).append("<br/>");
-      builder.append("Name: ").append(this.name).append("<br/>");
-      builder.append("Owner: ").append(this.owner).append("<br/>");
+      builder.append("Into Space: ").append(this.currentSpaceName).append("<br/>");
+      builder.append("File Name: ").append(this.name).append("<br/>");
       builder.append("Overwrite: ").append(this.overwrite).append("<br/>");
       
       return builder.toString();
@@ -382,7 +489,7 @@ public class AddContentWizard
       {
          case 1:
          {
-            page = dir + "details.jsp";
+            page = dir + "upload.jsp";
             break;
          }
          case 2:
@@ -405,8 +512,14 @@ public class AddContentWizard
     */
    private void evaluateFinishButtonState()
    {
-      // always enabled for now
-      this.finishDisabled = false;
+      if (this.file == null)
+      {
+         this.finishDisabled = true;
+      }
+      else
+      {
+         this.finishDisabled = false;
+      }
    }
    
    /**

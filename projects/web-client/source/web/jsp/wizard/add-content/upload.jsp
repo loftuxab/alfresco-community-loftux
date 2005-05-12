@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
+<%@ taglib uri="http://myfaces.apache.org/extensions" prefix="x"%>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 
 <%@ page isELIgnored="false" %>
@@ -16,7 +17,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <h:form id="add-content-details">
+   <h:form id="add-content-upload-start">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -77,7 +78,7 @@
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_8.gif)"></td>
                   <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width="4" height="9"></td>
                </tr>
-               
+                              
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
@@ -93,8 +94,10 @@
                                  <a:listItem value="2" label="2. Summary" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>
+                           </td>   
                            
+                           </h:form>
+                        
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
@@ -111,20 +114,19 @@
                                  <tr>
                                     <td>Locate file:</td>
                                     <td>
-                                       <h:inputText id="file" value="#{AddContentWizard.file}" size="35" />&nbsp;*
+                                       <form name="upload-form" method="post" enctype="multipart/form-data" 
+                                             action="<portlet:actionURL></portlet:actionURL>">
+                                          <input type="file" size="30" name="file"/>&nbsp;
+                                          <input type="submit" value="Upload" />
+                                       </form>
                                     </td>
                                  </tr>
+                                 
+                                 <h:form id="add-content-upload-end">
+                                 
                                  <tr>
-                                    <td>Name:</td>
-                                    <td>
-                                       <h:inputText id="name" value="#{AddContentWizard.name}" size="35" />&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Owner:</td>
-                                    <td>
-                                       <h:inputText id="owner" value="#{AddContentWizard.owner}" size="35" />&nbsp;*
-                                    </td>
+                                    <td>Uploaded file:</td>
+                                    <td><h:outputText value="#{AddContentWizard.name}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
@@ -132,7 +134,7 @@
                                  </tr>
                                  <tr>
                                     <td colspan="2" valign="middle">
-                                       <h:selectBooleanCheckbox value="#{AddContentWizard.overwrite}"/>&nbsp;
+                                       <input name="overwrite" type="checkbox" />&nbsp;
                                        Overwrite existing files with the same name
                                     </td>
                                  </tr>
@@ -143,7 +145,6 @@
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
-                           
                            <td valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
@@ -207,6 +208,6 @@
        </tr>
     </table>
     
-    </h:form>
+  </h:form>
     
 </f:view>

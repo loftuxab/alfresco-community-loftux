@@ -284,6 +284,14 @@ a.headbarLink
    background-color:#5D747F;
 }
 
+.topToolbarTitle
+{
+   background-color:#5D747F;
+   color: #ffffff;
+   font-weight: bold;
+   padding-left: 5px;
+}
+
 a.topToolbarLink
 {
    color:#ffffff;
