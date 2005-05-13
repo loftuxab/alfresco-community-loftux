@@ -135,6 +135,23 @@ public class BrowseBean implements IContextListener
    }
    
    /**
+    * @return The document node being used for the current operation
+    */
+   public Node getDocument()
+   {
+      return document;
+   }
+
+   /**
+    * @param document The document node to be used for the current operation
+    */
+   public void setDocument(Node document)
+   {
+      this.document = document;
+   }
+
+
+   /**
     * @param contentRichList The contentRichList to set.
     */
    public void setContentRichList(UIRichList browseRichList)
@@ -547,6 +564,32 @@ public class BrowseBean implements IContextListener
     */
    public void clickContent(ActionEvent event)
    {
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         if (s_logger.isDebugEnabled())
+            s_logger.debug("Setup for action, setting current document to: " + id);
+         
+         try
+         {
+            // creat the node ref, then our node representation
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+            Node node = new Node(ref, "FILE");
+            
+            // remember the document
+            setDocument(node);
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+         }
+      }
+      else
+      {
+         setDocument(null);
+      }
    }
    
    /**
@@ -841,6 +884,9 @@ public class BrowseBean implements IContextListener
    
    /** The current space and it's properties - if any */
    private Node actionSpace;
+   
+   /** The current document */
+   private Node document;
    
    /** The current browse view mode - set to a well known IRichListRenderer name */
    private String browseViewMode = "details";

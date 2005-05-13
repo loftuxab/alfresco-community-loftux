@@ -300,11 +300,11 @@
                               <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.clickContent}" showLink="false">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </f:facet>
-                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}">
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" action="showDocDetails">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                         </a:column>
@@ -312,11 +312,11 @@
                         <%-- Primary column for icons view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left;vertical-align:top;" rendered="#{BrowseBean.browseViewMode == 'icons'}">
                            <f:facet name="large-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/file_large.gif" actionListener="#{BrowseBean.clickContent}" showLink="false">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file_large.gif" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </f:facet>
-                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" styleClass="header">
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" styleClass="header">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                         </a:column>
@@ -324,11 +324,11 @@
                         <%-- Primary column for list view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.clickContent}" showLink="false">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </f:facet>
-                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" styleClass="title">
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" styleClass="title">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                         </a:column>

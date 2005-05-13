@@ -130,12 +130,12 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <%
                                  AddContentWizard wiz = (AddContentWizard)session.getAttribute("javax.portlet.p.AlfrescoClientInstance.AlfrescoClientWindow?AddContentWizard");
-                                 if (wiz.getName() != null) {
+                                 if (wiz.getFileName() != null) {
                                  %>
                                     <tr>
                                        <td>
                                           <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                          The file "<h:outputText value="#{AddContentWizard.name}" />" was uploaded successfully.
+                                          The file "<h:outputText value="#{AddContentWizard.fileName}" />" was uploaded successfully.
                                        </td>
                                     </tr>
                                  <% } %>

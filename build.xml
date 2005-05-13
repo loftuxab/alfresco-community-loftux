@@ -40,7 +40,7 @@
    
    <target name="deploy-web-client" depends="common-init" description="Deploys the web client to a running JBoss server">
       <input message="Enter name of temporary JBoss folder" addproperty="jboss.tmp.deploy.dirname" />
-      <property name="jboss.tmp.deploy.dir" value="${deploy.dir}/../tmp/deploy/${jboss.tmp.deploy.dirname}" />
+      <property name="jboss.tmp.deploy.dir" value="${deploy.dir}/../tmp/deploy/${jboss.tmp.deploy.dirname}/web-client-exp.war" />
       <available file="${jboss.tmp.deploy.dir}" type="dir" property="jboss.tmp.deploy.dir.present" />
       <fail unless="jboss.tmp.deploy.dir.present"
             message="The temporary folder you entered does not exist, has JBoss been restarted?" />

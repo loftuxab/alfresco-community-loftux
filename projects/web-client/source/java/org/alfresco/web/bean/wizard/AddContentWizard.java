@@ -23,6 +23,8 @@ import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.util.Conversion;
+import org.alfresco.web.MyFacesPortlet;
+import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -42,7 +44,7 @@ public class AddContentWizard
 
    // add content wizard specific properties
    private File file;
-   private String name;
+   private String fileName;
    private String owner;
    private boolean overwrite;
    private ContentService contentService;
@@ -177,35 +179,39 @@ public class AddContentWizard
    }
 
    /**
-    * @return Returns the file.
+    * @return Returns the name of the file
     */
-   public File getFile()
+   public String getFileName()
    {
-      return file;
-   }
-   
-   /**
-    * @param file The file to set.
-    */
-   public void setFile(File file)
-   {
-      this.file = file;
-   }
-
-   /**
-    * @return Returns the name.
-    */
-   public String getName()
-   {
-      return name;
+      // try and retrieve the file and filename from the file upload bean
+      // representing the file we previously uploaded.
+      FacesContext ctx = FacesContext.getCurrentInstance();
+      FileUploadBean fileBean = (FileUploadBean)ctx.getExternalContext().getSessionMap().
+         get(MyFacesPortlet.FILE_UPLOAD_BEAN_NAME);
+      if (fileBean != null)
+      {
+         this.file = fileBean.getFile();
+         this.fileName = fileBean.getFileName();
+      }
+      
+      return this.fileName;
    }
 
    /**
-    * @param name The name to set.
+    * @param fileName The name of the file
     */
-   public void setName(String name)
+   public void setFileName(String fileName)
    {
-      this.name = name;
+      this.fileName = fileName;
+      
+      // we also need to keep the file upload bean in sync
+      FacesContext ctx = FacesContext.getCurrentInstance();
+      FileUploadBean fileBean = (FileUploadBean)ctx.getExternalContext().getSessionMap().
+         get(MyFacesPortlet.FILE_UPLOAD_BEAN_NAME);
+      if (fileBean != null)
+      {
+         fileBean.setFileName(this.fileName);
+      }
    }
 
    /**
@@ -332,7 +338,7 @@ public class AddContentWizard
          //       this.overwrite member variable
          
          // create the node to represent the node
-         String assocName = this.name.replace('.', '-');
+         String assocName = this.fileName.replace('.', '-');
          ChildAssocRef assocRef = this.nodeService.createNode(containerNodeRef,
                 null,
                 QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
@@ -344,7 +350,7 @@ public class AddContentWizard
          Date now = new Date( Calendar.getInstance().getTimeInMillis() );
          
          QName propName = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
-         properties.put(propName, this.name);
+         properties.put(propName, this.fileName);
          
          QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
          properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
@@ -370,11 +376,7 @@ public class AddContentWizard
       }
       finally
       {
-         // delete the temporary file we uploaded earlier
-         if (this.file != null)
-         {
-            this.file.delete();
-         }
+         clearUpload();
       }
       
       // reset the state
@@ -393,13 +395,8 @@ public class AddContentWizard
     */
    public String cancel()
    {
-      // delete the temporary file we uploaded earlier
-      if (this.file != null)
-      {
-         this.file.delete();
-      }
-      
       // reset the state
+      clearUpload();
       reset();
       
       // navigate
@@ -415,11 +412,7 @@ public class AddContentWizard
     */
    public String minimise()
    {
-      // delete the temporary file we uploaded earlier
-      if (this.file != null)
-      {
-         this.file.delete();
-      }
+      clearUpload();
       
       // navigate
       navigate("/jsp/browse/browse.jsp");
@@ -434,8 +427,8 @@ public class AddContentWizard
    {
       StringBuilder builder = new StringBuilder();
       builder.append("Into Space: ").append(this.currentSpaceName).append("<br/>");
-      builder.append("File Name: ").append(this.name).append("<br/>");
-      builder.append("Overwrite: ").append(this.overwrite).append("<br/>");
+      builder.append("File Name: ").append(this.fileName).append("<br/>");
+      //builder.append("Overwrite: ").append(this.overwrite).append("<br/>");
       
       return builder.toString();
    }
@@ -512,7 +505,7 @@ public class AddContentWizard
     */
    private void evaluateFinishButtonState()
    {
-      if (this.file == null)
+      if (this.fileName == null)
       {
          this.finishDisabled = true;
       }
@@ -520,6 +513,20 @@ public class AddContentWizard
       {
          this.finishDisabled = false;
       }
+   }
+   
+   private void clearUpload()
+   {
+      // delete the temporary file we uploaded earlier
+      if (this.file != null)
+      {
+         this.file.delete();
+      }
+      
+      // remove the file upload bean from the session
+      FacesContext ctx = FacesContext.getCurrentInstance();
+      FileUploadBean fileBean = (FileUploadBean)ctx.getExternalContext().getSessionMap().
+         remove(MyFacesPortlet.FILE_UPLOAD_BEAN_NAME);
    }
    
    /**
@@ -531,7 +538,7 @@ public class AddContentWizard
       this.currentStep = 1;
       this.currentSpaceName = null;
       this.finishDisabled = false;
-      this.name = null;
+      this.fileName = null;
       this.owner = null;
       this.file = null;
       this.overwrite = false;

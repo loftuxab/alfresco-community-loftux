@@ -171,6 +171,10 @@
          <from-outcome>addContent</from-outcome>
          <to-view-id>/jsp/wizard/add-content/upload.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>showDocDetails</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click, finish on dialog) -->

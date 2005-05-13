@@ -23,6 +23,7 @@ import javax.portlet.RenderResponse;
 import javax.portlet.UnavailableException;
 
 import org.alfresco.web.bean.ErrorBean;
+import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.wizard.AddContentWizard;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -32,7 +33,8 @@ import org.apache.myfaces.portlet.MyFacesGenericPortlet;
 
 public class MyFacesPortlet extends MyFacesGenericPortlet
 {
-   public static final String ERROR_BEAN_NAME = "ErrorBean";
+   public static final String FILE_UPLOAD_BEAN_NAME = "alfresco.UploadBean";
+   public static final String ERROR_BEAN_NAME = "alfresco.ErrorBean";
    public static final String INSTANCE_NAME = "AlfrescoClientInstance";
    public static final String WINDOW_NAME = "AlfrescoClientWindow";
    public static final String MANAGED_BEAN_PREFIX = "javax.portlet.p." + INSTANCE_NAME + 
@@ -68,44 +70,42 @@ public class MyFacesPortlet extends MyFacesGenericPortlet
          // NOTE: Due to filters not being called within portlets we can not make use
          //       of the MyFaces file upload support, therefore we are using a pure
          //       portlet request/action to handle file uploads until there is a 
-         //       solution. As there are only a couple of places in the app we handle
-         //       file uploads they are dealt with specifically in here.
+         //       solution.
          
          if (isMultipart)
          {
             if (logger.isDebugEnabled())
                logger.debug("Handling multipart request...");
-            
+
             PortletSession session = request.getPortletSession();
-            AddContentWizard wizard = (AddContentWizard)session.
-               getAttribute(MANAGED_BEAN_PREFIX + "AddContentWizard", PortletSession.APPLICATION_SCOPE);
-            if (wizard == null)
-            {
-               throw new IllegalStateException("The AddContentWizard bean needs to be in the session");
-            }
             
             // get the file from the request and put it in the session
             DiskFileItemFactory factory = new DiskFileItemFactory();
             PortletFileUpload upload = new PortletFileUpload(factory);
-            String sPath = "";
-            List fileItems = upload.parseRequest(request);
-            Iterator iter = fileItems.iterator();
+            List<FileItem> fileItems = upload.parseRequest(request);
+            Iterator<FileItem> iter = fileItems.iterator();
             while(iter.hasNext())
             {
-               FileItem item = (FileItem)iter.next();
+               FileItem item = iter.next();
                String filename = item.getName();
                if(item.isFormField() == false)
                {
                   File tempFile = File.createTempFile("alfresco", ".upload");
                   tempFile.deleteOnExit();
                   item.write(tempFile);
-                  wizard.setFile(tempFile);
-                  wizard.setName(filename);
+                  FileUploadBean bean = new FileUploadBean();
+                  bean.setFile(tempFile);
+                  bean.setFileName(filename);
+                  bean.setFilePath(tempFile.getAbsolutePath());
+                  session.setAttribute(FILE_UPLOAD_BEAN_NAME, bean, PortletSession.PORTLET_SCOPE);
                }
             }
             
-            // redirect back to the add content wizard for now
-            response.setRenderParameter(VIEW_ID, "/jsp/wizard/add-content/details.jsp");
+            // it doesn't matter what the value is we just need the VIEW_ID parameter
+            // to tell the faces portlet bridge to treat the request as a JSF request,
+            // this will send us back to the same page we came from, which is fine for
+            // most scenarios.
+            response.setRenderParameter(VIEW_ID, "a-jsf-page");
          }
          else
          {
