@@ -81,14 +81,7 @@
                         <tr>
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0">
-                                 <tr>
-                                    <td colspan="2" class="mainSubTitle">Space Properties</td>
-                                 </tr>
-                                 <tr>
-                                    <td colspan="2" class="mainSubText">Enter information about the new space.</td>
-                                 </tr>
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
                                     <td colspan="2" class="wizardSectionHeading">Space Properties</td>
                                  </tr>
@@ -111,6 +104,7 @@
                                  <tr>
                                     <td>Choose space icon:</td>
                                     <td>
+                                       <table border="0" cellpadding="0" cellspacing="0"><tr><td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                                        <a:imagePickerRadio columns="7" spacing="4" value="#{NewSpaceDialog.icon}">
                                           <a:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
@@ -129,11 +123,12 @@
                                           <a:listItem value="space-icon-documents" image="/images/icons/space-icon-documents.gif" />
                                        </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                                       </td></tr></table>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2">To create your space click OK.</td>
+                                    <td colspan="2">To create your space click Create Space.</td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -144,13 +139,18 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="OK" action="#{NewSpaceDialog.finish}" styleClass="wizardButton" />
+                                       <h:commandButton value="Create Space" action="#{NewSpaceDialog.finish}" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Cancel" action="#{NewSpaceDialog.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceDialog.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="Minimise to Shelf" action="#{NewSpaceDialog.minimise}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

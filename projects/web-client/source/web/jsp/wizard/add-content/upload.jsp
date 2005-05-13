@@ -8,6 +8,7 @@
 <%@ page isELIgnored="false" %>
 
 <%@ page import="org.alfresco.web.PanelGenerator" %>
+<%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
@@ -57,13 +58,7 @@
                            <td>
                               <h:outputText value="#{AddContentWizard.currentSpaceName}" styleClass="mainSubTitle"/><br/>
                               <div class="mainTitle">Add Content</div>
-                              <div class="mainSubText">Use this page to enter details about the content.</div>
-                           </td>
-                           <td bgcolor="#495F69" width="1"></td>
-                           <td width="100" style="padding-left:2px">
-                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}"/><br>
-                              <h:outputText styleClass="mainSubText" value="#{msg.add_multiple_files}"/><br>
-                              <h:outputText styleClass="mainSubText" value="#{msg.import_directory}"/>
+                              <div class="mainSubText">Use this wizard to add a document to a space.</div>
                            </td>
                         </tr>
                      </table>
@@ -90,7 +85,7 @@
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="1" actionListener="#{AddContentWizard.stepChanged}">
-                                 <a:listItem value="1" label="1. Content Details" />
+                                 <a:listItem value="1" label="1. Upload Document" />
                                  <a:listItem value="2" label="2. Summary" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
@@ -100,47 +95,53 @@
                         
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                              <table cellpadding="2" cellspacing="2" border="0">
                                  <tr>
-                                    <td colspan="2" class="mainSubTitle">Step 1 - Content Details</td>
+                                    <td class="mainSubTitle">Step 1 - Upload Document</td>
                                  </tr>
                                  <tr>
-                                    <td colspan="2" class="mainSubText">Enter information about the content.</td>
+                                    <td class="mainSubText">Locate and upload your document to the repository.</td>
                                  </tr>
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Details</td>
+                                    <td class="mainSubText">1. Locate document to upload</td>
                                  </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <form name="upload-form" method="post" enctype="multipart/form-data" 
+                                       action="<portlet:actionURL></portlet:actionURL>">
                                  <tr>
-                                    <td>Locate file:</td>
                                     <td>
-                                       <form name="upload-form" method="post" enctype="multipart/form-data" 
-                                             action="<portlet:actionURL></portlet:actionURL>">
-                                          <input type="file" size="30" name="file"/>&nbsp;
-                                          <input type="submit" value="Upload" />
-                                       </form>
-                                    </td>
-                                 </tr>
-                                 
-                                 <h:form id="add-content-upload-end">
-                                 
-                                 <tr>
-                                    <td>Uploaded file:</td>
-                                    <td><h:outputText value="#{AddContentWizard.name}" /></td>
-                                 </tr>
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading">&nbsp;Other Options</td>
-                                 </tr>
-                                 <tr>
-                                    <td colspan="2" valign="middle">
-                                       <input name="overwrite" type="checkbox" />&nbsp;
-                                       Overwrite existing files with the same name
+                                       Location:<input style="margin-left:12px;" type="file" size="50" name="file"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2">To continue click Next.</td>
+                                    <td class="mainSubText">2. Click upload</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <input style="margin-left:12px;" type="submit" value="Upload" />
+                                    </td>
+                                 </tr>
+                                 
+                                 </form>
+                                 <h:form id="add-content-upload-end">
+                                 
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <%
+                                 AddContentWizard wiz = (AddContentWizard)session.getAttribute("javax.portlet.p.AlfrescoClientInstance.AlfrescoClientWindow?AddContentWizard");
+                                 if (wiz.getName() != null) {
+                                 %>
+                                    <tr>
+                                       <td>
+                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                          The file "<h:outputText value="#{AddContentWizard.name}" />" was uploaded successfully.
+                                       </td>
+                                    </tr>
+                                 <% } %>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>To continue click Next.</td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>

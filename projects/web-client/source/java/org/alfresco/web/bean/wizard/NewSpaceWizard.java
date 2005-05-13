@@ -759,6 +759,7 @@ public class NewSpaceWizard
       this.currentStep = 1;
       this.createFrom = "scratch";
       this.spaceType = "container";
+      this.currentSpaceName = null;
       this.existingSpaceId = null;
       this.templateSpaceId = null;
       this.copyPolicy = "structure";
