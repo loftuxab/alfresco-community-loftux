@@ -150,7 +150,6 @@ public class BrowseBean implements IContextListener
       this.document = document;
    }
 
-
    /**
     * @param contentRichList The contentRichList to set.
     */
@@ -401,10 +400,10 @@ public class BrowseBean implements IContextListener
       try
       {
          if (s_logger.isDebugEnabled())
-            s_logger.debug("*****Searching using path: " + s);
+            s_logger.debug("Searching using path: " + s);
          ResultSet results = this.searchService.query(Repository.getStoreRef(), "lucene", s, null, null);
          if (s_logger.isDebugEnabled())
-            s_logger.debug("*****Search results returned: " + results.length());
+            s_logger.debug("Search results returned: " + results.length());
          
          // create a list of items from the results
          this.containerNodes = new ArrayList<Node>(results.length());
@@ -549,7 +548,7 @@ public class BrowseBean implements IContextListener
             //       this will hide the nasty code required to get simple props like "name"!
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             
-            // refresh UI basedon node selection
+            // refresh UI based on node selection
             refreshUI(ref, link);
          }
          catch (InvalidNodeRefException refErr)
@@ -606,7 +605,7 @@ public class BrowseBean implements IContextListener
       }
       
       if (s_logger.isDebugEnabled())
-         s_logger.debug("*****Selected noderef Id: " + nodeRef.getId());
+         s_logger.debug("*Selected noderef Id: " + nodeRef.getId());
       
       try
       {
@@ -617,9 +616,9 @@ public class BrowseBean implements IContextListener
          
          if (s_logger.isDebugEnabled())
          {
-            s_logger.debug("*****Selected item getPrimaryParent().getChildRef() noderef Id:  " + parentAssocRef.getChildRef().getId());
-            s_logger.debug("*****Selected item getPrimaryParent().getParentRef() noderef Id: " + parentAssocRef.getParentRef().getId());
-            s_logger.debug("*****Current value getNavigator().getCurrentNodeId() noderef Id: " + getNavigator().getCurrentNodeId());
+            s_logger.debug("Selected item getPrimaryParent().getChildRef() noderef Id:  " + parentAssocRef.getChildRef().getId());
+            s_logger.debug("Selected item getPrimaryParent().getParentRef() noderef Id: " + parentAssocRef.getParentRef().getId());
+            s_logger.debug("Current value getNavigator().getCurrentNodeId() noderef Id: " + getNavigator().getCurrentNodeId());
          }
          
          if (nodeEvent.IsParent == false)
@@ -779,10 +778,13 @@ public class BrowseBean implements IContextListener
       getNavigator().setCurrentNodeId(ref.getId());
    }
    
+   /**
+    * Invalidate list component state after an action which changes the UI context
+    */
    private void invalidateComponents()
    {
       if (s_logger.isDebugEnabled())
-         s_logger.debug("**********INVALIDTING COMPONENTS");
+         s_logger.debug("Invalidating UI List Components...");
       
       // clear the value for the list components - will cause re-bind to it's data and refresh
       if (this.contentRichList != null)
