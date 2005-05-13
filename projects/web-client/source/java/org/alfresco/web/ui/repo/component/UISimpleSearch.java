@@ -12,7 +12,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.FacesEvent;
 
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
@@ -35,6 +37,7 @@ public class UISimpleSearch extends UICommand
       // specifically set the renderer type to null to indicate to the framework
       // that this component renders itself - there is no abstract renderer class
       setRendererType(null);
+      logger.debug("=====UISimpleSearch: Constructed: \"\"");
    }
    
    /**
@@ -55,6 +58,7 @@ public class UISimpleSearch extends UICommand
       super.restoreState(context, values[0]);
       this.lastSearch = (String)values[1];
       this.searchOption = ((Integer)values[2]).intValue();
+      logger.debug("=====UISimpleSearch: Restoring state: " + this.lastSearch);
    }
    
    /**
@@ -67,9 +71,65 @@ public class UISimpleSearch extends UICommand
       values[0] = super.saveState(context);
       values[1] = this.lastSearch;
       values[2] = Integer.valueOf(this.searchOption);
+      logger.debug("=====UISimpleSearch: Saving state: " + this.lastSearch);
       return (values);
    }
    
+   /**
+    * @see javax.faces.component.UIComponentBase#decode(javax.faces.context.FacesContext)
+    */
+   public void decode(FacesContext context)
+   {
+      Map requestMap = context.getExternalContext().getRequestParameterMap();
+      String fieldId = getHiddenFieldName(context, this);
+      String value = (String)requestMap.get(fieldId);
+      // we are clicked if the hidden field contained our client id
+      if (value != null && value.equals(this.getClientId(context)))
+      {
+         String searchText = (String)requestMap.get(getClientId(context));
+         
+         // TODO: strip or escape undesirable characters - for screen and search API
+         searchText = searchText.replace('"', ' ');
+         if (searchText.length() != 0)
+         {
+            if (logger.isDebugEnabled())
+               logger.debug("*****Search text set to: " + searchText);
+            int option = -1;
+            String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
+            String optionStr = (String)requestMap.get(optionFieldName);
+            if (optionStr.length() != 0)
+            {
+               option = Integer.parseInt(optionStr);
+            }
+            if (logger.isDebugEnabled())
+               logger.debug("*****Search option set to: " + option);
+            
+            // queue event so system can perform a search and update the component
+            SearchEvent event = new SearchEvent(this, searchText, option);
+            this.queueEvent(event);
+         }
+      }
+   }
+   
+   /**
+    * @see javax.faces.component.UICommand#broadcast(javax.faces.event.FacesEvent)
+    */
+   public void broadcast(FacesEvent event) throws AbortProcessingException
+   {
+      if (event instanceof SearchEvent)
+      {
+         SearchEvent searchEvent = (SearchEvent)event;
+         this.setLastSearch(searchEvent.SearchText);
+         this.setSearchMode(searchEvent.SearchMode);
+         
+         if (logger.isDebugEnabled())
+         {
+            logger.debug("=====Handled search event: " + this.getLastSearch());
+         }
+      }
+      super.broadcast(event);
+   }
+
    /**
     * @see javax.faces.component.UIComponentBase#encodeBegin(javax.faces.context.FacesContext)
     */
@@ -160,45 +220,13 @@ public class UISimpleSearch extends UICommand
       out.write("</td></tr></table>");
    }
    
-   /**
-    * @see javax.faces.component.UIComponentBase#decode(javax.faces.context.FacesContext)
-    */
-   public void decode(FacesContext context)
-   {
-      Map requestMap = context.getExternalContext().getRequestParameterMap();
-      String fieldId = getHiddenFieldName(context, this);
-      String value = (String)requestMap.get(fieldId);
-      // we are clicked if the hidden field contained our client id
-      if (value != null && value.equals(this.getClientId(context)))
-      {
-         String searchText = (String)requestMap.get(getClientId(context));
-         logger.info("*****Search text set to: " + searchText);
-         
-         // TODO: strip or escape undesirable characters - for screen and search API
-         searchText = searchText.replace('"', ' ');
-         setLastSearch(searchText);
-         
-         int option = -1;
-         String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
-         String optionStr = (String)requestMap.get(optionFieldName);
-         if (optionStr.length() != 0)
-         {
-            option = Integer.parseInt(optionStr);
-         }
-         logger.info("*****Search option set to: " + option);
-         
-         setSearchMode(option);
-         
-         // queue event so system can perform a search
-         ActionEvent event = new ActionEvent(this);
-         this.queueEvent(event);
-      }
-   }
-   
    
    // ------------------------------------------------------------------------------
    // Strongly typed component property accessors
    
+   /**
+    * Set the last search text value
+    */
    public void setLastSearch(String text)
    {
       if (text != null)
@@ -207,6 +235,9 @@ public class UISimpleSearch extends UICommand
       }
    }
    
+   /**
+    * Get the last set search text value
+    */
    public String getLastSearch()
    {
       return this.lastSearch;
@@ -249,5 +280,29 @@ public class UISimpleSearch extends UICommand
    private static final String OPTION_PARAM = "_option";
    
    private String lastSearch = "";
+   
+   // TODO: add constants for the 4 search modes here
    private int searchOption = 0;
+   
+   
+   // ------------------------------------------------------------------------------
+   // Inner classes
+   
+   /**
+    * Class representing a search execution from the UISimpleSearch component.
+    */
+   public static class SearchEvent extends ActionEvent
+   {
+      private static final long serialVersionUID = 3918135612344774322L;
+
+      public SearchEvent(UIComponent component, String text, int mode)
+      {
+         super(component);
+         SearchText = text;
+         SearchMode = mode;
+      }
+      
+      public String SearchText;
+      public int SearchMode;
+   }
 }
