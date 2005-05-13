@@ -51,6 +51,27 @@
    
    <managed-bean>
       <description>
+         The bean that backs up the New Space Dialog
+      </description>
+      <managed-bean-name>NewSpaceDialog</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.wizard.NewSpaceWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the Add Content Wizard
       </description>
       <managed-bean-name>AddContentWizard</managed-bean-name>
@@ -136,6 +157,10 @@
       <from-view-id>/jsp/browse/browse.jsp</from-view-id>
       <navigation-case>
          <from-outcome>createSpace</from-outcome>
+         <to-view-id>/jsp/dialog/new-space.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>createAdvancedSpace</from-outcome>
          <to-view-id>/jsp/wizard/new-space/create-from.jsp</to-view-id>
       </navigation-case>
       <navigation-case>

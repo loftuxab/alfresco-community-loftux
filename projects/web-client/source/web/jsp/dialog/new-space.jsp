@@ -17,7 +17,7 @@
    <f:loadBundle basename="messages" var="msg"/>
    
    <%-- REPLACE ME: set the form name here --%>
-   <h:form id="new-space-create-from">
+   <h:form id="new-space">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -25,7 +25,7 @@
       <%-- Title bar --%>
       <tr>
          <td colspan="2">
-            <%@ include file="../../parts/titlebar.jsp" %>
+            <%@ include file="../parts/titlebar.jsp" %>
          </td>
       </tr>
       
@@ -33,14 +33,14 @@
       <tr valign="top">
          <%-- Shelf --%>
          <td>
-            <%@ include file="../../parts/shelf.jsp" %>
+            <%@ include file="../parts/shelf.jsp" %>
          </td>
          
          <%-- Work Area --%>
          <td width="100%">
             <table cellspacing="0" cellpadding="0" width="100%">
                <%-- Breadcrumb --%>
-               <%@ include file="../../parts/breadcrumb.jsp" %>
+               <%@ include file="../parts/breadcrumb.jsp" %>
                
                <%-- Status and Actions --%>
                <tr>
@@ -55,9 +55,9 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
                            </td>
                            <td>
-                              <h:outputText value="#{NewSpaceWizard.currentSpaceName}" styleClass="mainSubTitle"/><br/>
-                              <div class="mainTitle">New Space</div>
-                              <div class="mainSubText">Use this wizard to create a new space.</div>
+                              <h:outputText value="#{NewSpaceDialog.currentSpaceName}" styleClass="mainSubTitle"/><br/>
+                              <div class="mainTitle">Create Space</div>
+                              <div class="mainSubText">Use this dialog to create a new space.</div>
                            </td>
                         </tr>
                      </table>
@@ -79,44 +79,61 @@
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
-                           <td width="20%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
-                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                    value="1" actionListener="#{NewSpaceWizard.stepChanged}">
-                                 <a:listItem value="1" label="1. Starting Space" />
-                                 <a:listItem value="2" label="2. Space Options" />
-                                 <a:listItem value="3" label="3. Space Details" />
-                                 <a:listItem value="4" label="4. Summary" />
-                              </a:modeList>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>
-                           
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                              <table cellpadding="2" cellspacing="2" border="0">
                                  <tr>
-                                    <td class="mainSubTitle">Step 1 - Starting Space</td>
+                                    <td colspan="2" class="mainSubTitle">Space Properties</td>
                                  </tr>
                                  <tr>
-                                    <td class="mainSubText">Choose how you want to create your space.</td>
+                                    <td colspan="2" class="mainSubText">Enter information about the new space.</td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>How do you want to create your space?</td>
+                                    <td colspan="2" class="wizardSectionHeading">Space Properties</td>
                                  </tr>
                                  <tr>
+                                    <td>Name:</td>
                                     <td>
-                                       <h:selectOneRadio value="#{NewSpaceWizard.createFrom}" layout="pageDirection">
-                                          <f:selectItem itemValue="scratch" itemLabel="From scratch" />
-                                          <f:selectItem itemValue="existing" itemLabel="Based on an existing space" />
-                                          <f:selectItem itemValue="template" itemLabel="Using a template" />
-                                       </h:selectOneRadio>
+                                       <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" />&nbsp;*
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>Description:</td>
+                                    <td>
+                                       <h:inputText value="#{NewSpaceDialog.description}" size="35" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>To continue click Next.</td>
+                                    <td colspan="2" class="wizardSectionHeading">&nbsp;Other Options</td>
+                                 </tr>
+                                 <tr>
+                                    <td>Choose space icon:</td>
+                                    <td>
+                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                                       <a:imagePickerRadio columns="7" spacing="4" value="#{NewSpaceDialog.icon}">
+                                          <a:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
+                                          <a:listItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
+                                          <a:listItem value="space-icon-www" image="/images/icons/space-icon-www.gif" />
+                                          <a:listItem value="space-icon-world" image="/images/icons/space-icon-world.gif" />
+                                          <a:listItem value="space-icon-spanner" image="/images/icons/space-icon-spanner.gif" />
+                                          <a:listItem value="space-icon-public" image="/images/icons/space-icon-public.gif" />
+                                          <a:listItem value="space-icon-orange-ball" image="/images/icons/space-icon-orange-ball.gif" />
+                                          <a:listItem value="space-icon-lock" image="/images/icons/space-icon-lock.gif" />
+                                          <a:listItem value="space-icon-library" image="/images/icons/space-icon-library.gif" />
+                                          <a:listItem value="space-icon-images" image="/images/icons/space-icon-images.gif" />
+                                          <a:listItem value="space-icon-id" image="/images/icons/space-icon-id.gif" />
+                                          <a:listItem value="space-icon-glasses" image="/images/icons/space-icon-glasses.gif" />
+                                          <a:listItem value="space-icon-download" image="/images/icons/space-icon-download.gif" />
+                                          <a:listItem value="space-icon-documents" image="/images/icons/space-icon-documents.gif" />
+                                       </a:imagePickerRadio>
+                                       <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td colspan="2">To create your space click OK.</td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -127,26 +144,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" 
-                                                        disabled="#{NewSpaceWizard.finishDisabled}" styleClass="wizardButton" />
+                                       <h:commandButton value="OK" action="#{NewSpaceDialog.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Minimise To Shelf" action="#{NewSpaceWizard.minimise}" 
-                                                        styleClass="wizardButton" />
+                                       <h:commandButton value="Cancel" action="#{NewSpaceDialog.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
@@ -154,6 +158,16 @@
                            </td>
                         </tr>
                      </table>
+                  </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
+               </tr>
+               
+               <%-- Error Messages --%>
+               <tr valign="top">
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
+                  <td>
+                     <%-- messages tag to show messages not handled by other specific message tags --%>
+                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

@@ -81,6 +81,7 @@
                                     <a:actionLink value="Cut" image="/images/icons/cut.gif" id="link6" />
                                     <a:actionLink value="Copy" image="/images/icons/copy.gif" id="link7" />
                                     <a:actionLink value="Paste" image="/images/icons/paste.gif" id="link8" />
+                                    <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{BrowseBean.spaceActionSetup}" id="link9" />
                                  </a:menu>
                               </td>
                            </a:panel>

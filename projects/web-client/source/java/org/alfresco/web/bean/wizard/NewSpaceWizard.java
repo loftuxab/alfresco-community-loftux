@@ -1,6 +1,7 @@
 package org.alfresco.web.bean.wizard;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -19,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -41,6 +43,7 @@ import org.springframework.web.jsf.FacesContextUtils;
 public class NewSpaceWizard
 {
    private static Logger logger = Logger.getLogger(NewSpaceWizard.class);
+   private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
    
    // new space wizard specific properties
    private String createFrom = "scratch";
@@ -133,7 +136,33 @@ public class NewSpaceWizard
     */
    public String getCurrentSpaceName()
    {
-      return currentSpaceName;
+      // NOTE: We do this ourself rather than using the browse bean as when the 
+      //       wizard potentially gets restored from the shelf the current node
+      //       may have changed from when the wizard was launched. That means we
+      //       should also store the current id too!
+      
+      if (this.currentSpaceName == null)
+      {
+         String spaceName = "Alfresco Home";
+         String currentNodeId = this.navigator.getCurrentNodeId();
+         if (currentNodeId != null)
+         {
+            try
+            {
+               NodeRef ref = new NodeRef(Repository.getStoreRef(), currentNodeId);
+               QName qname = this.nodeService.getPrimaryParent(ref).getQName();
+               spaceName = qname.getLocalName();
+            }
+            catch (InvalidNodeRefException refErr)
+            {
+               Utils.addErrorMessage(MessageFormat.format(ERROR_NODEREF, new Object[] {currentNodeId}));
+            }
+         }
+         
+         this.currentSpaceName = spaceName;
+      }
+      
+      return this.currentSpaceName;
    }
 
    /**

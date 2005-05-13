@@ -55,7 +55,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
                            </td>
                            <td>
-                              <div class="mainSubTitle">Space Name</div>
+                              <h:outputText value="#{NewSpaceWizard.currentSpaceName}" styleClass="mainSubTitle"/><br/>
                               <div class="mainTitle">New Space</div>
                               <div class="mainSubText">Use this wizard to create a new space.</div>
                            </td>
