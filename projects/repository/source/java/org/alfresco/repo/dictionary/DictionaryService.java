@@ -28,6 +28,9 @@ public interface DictionaryService
     
 //    DDRef[] getAspects(String namespace);
 
+    // TODO:
+    //boolean isDefined(ClassRef classRef);
+    
     /**
      * Gets a Class Definition
      *

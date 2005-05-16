@@ -569,6 +569,12 @@
    <!-- Policy Franeworks Services -->
    <!--                 -->
    
+   <bean id="policyComponent" class="org.alfresco.repo.service.PolicyComponentImpl">
+	   <constructor-arg index="0">
+	      <ref bean="dictionaryService"/>
+      </constructor-arg>
+   </bean>
+   
    <bean id="policyDefinitionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.repo.policy.PolicyDefinitionService</value>
