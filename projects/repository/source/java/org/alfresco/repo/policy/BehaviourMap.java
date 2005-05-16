@@ -7,35 +7,35 @@ import java.util.List;
 import java.util.Map;
 
 
-/*package*/ class BehaviourMap<B, P extends Policy>
+/*package*/ class BehaviourMap<B>
 {
 
-    private Map<B, BehaviourDefinition<B, ? extends P>> index = new HashMap<B, BehaviourDefinition<B, ? extends P>>();
-    private List<BehaviourChangeListener<B, ? extends P>> listeners = new ArrayList<BehaviourChangeListener<B, ? extends P>>();
+    private Map<B, BehaviourDefinition<B>> index = new HashMap<B, BehaviourDefinition<B>>();
+    private List<BehaviourChangeListener<B>> listeners = new ArrayList<BehaviourChangeListener<B>>();
     
 
-    public void addChangeListener(BehaviourChangeListener<B, P> listener)
+    public void addChangeListener(BehaviourChangeListener<B> listener)
     {
         listeners.add(listener);
     }
     
     
-    public void put(B binding, BehaviourDefinition<B, ? extends P> behaviour)
+    public void put(B binding, BehaviourDefinition<B> behaviour)
     {
         index.put(binding, behaviour);
-        for (BehaviourChangeListener<B, ? extends P> listener : listeners)
+        for (BehaviourChangeListener<B> listener : listeners)
         {
             listener.addition(binding, behaviour.getBehaviour());
         }
     }
     
-    public BehaviourDefinition<B, ? extends P> get(B binding)
+    public BehaviourDefinition<B> get(B binding)
     {
         return index.get(binding);
     }
 
     
-    public Collection<BehaviourDefinition<B, ? extends P>> getAll()
+    public Collection<BehaviourDefinition<B>> getAll()
     {
         return index.values();
     }

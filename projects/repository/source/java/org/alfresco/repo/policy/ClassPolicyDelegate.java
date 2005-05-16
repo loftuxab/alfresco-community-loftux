@@ -7,12 +7,13 @@ import org.alfresco.repo.dictionary.ClassRef;
 public class ClassPolicyDelegate<P extends ClassPolicy>
 {
 
-    private PolicyDelegateCache<ClassRef, ClassPolicy, P> delegateCache;
+//    private PolicyDelegateCache<ClassRef, ClassPolicy, P> delegateCache;
+    private PolicyDelegateCache<ClassRef, P> delegateCache;
 
 
-    /*package*/ ClassPolicyDelegate(Class policyClass, BehaviourIndex<ClassRef, ClassPolicy> query)
+    /*package*/ ClassPolicyDelegate(Class<P> policyClass, BehaviourIndex<ClassRef> query)
     {
-        delegateCache = new PolicyDelegateCache<ClassRef, ClassPolicy, P>(policyClass, query);
+        delegateCache = new PolicyDelegateCache<ClassRef, P>(policyClass, query);
         
         // TODO: Get list of all registered behaviours for policy
         //       thus testing pre-registered behaviours - add getList(policy) to delegate cache

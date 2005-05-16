@@ -24,7 +24,7 @@ public class PolicyComponentImpl implements PolicyComponent
 
     private DictionaryService dictionary;
     
-    private Map<QName, ClassBehaviourIndex<ClassPolicy>> classPolicies = new HashMap<QName, ClassBehaviourIndex<ClassPolicy>>();
+    private Map<QName, ClassBehaviourIndex> classPolicies = new HashMap<QName, ClassBehaviourIndex>();
     
     
     public PolicyComponentImpl(DictionaryService dictionary)
@@ -40,16 +40,16 @@ public class PolicyComponentImpl implements PolicyComponent
         ParameterCheck.mandatory("Policy interface class", policy);
         PolicyDefinition definition = createPolicyDefinition(policy);
         registeredPolicies.put(new PolicyKey(definition.getType(), definition.getName()), definition);
-        return new ClassPolicyDelegate<T>(definition.getPolicyInterface(), getClassBehaviourIndex(definition.getName()));
+        return new ClassPolicyDelegate<T>(policy, getClassBehaviourIndex(definition.getName()));
     }
 
     
-    private synchronized ClassBehaviourIndex<ClassPolicy> getClassBehaviourIndex(QName policy)
+    private synchronized ClassBehaviourIndex getClassBehaviourIndex(QName policy)
     {
-        ClassBehaviourIndex<ClassPolicy> index = classPolicies.get(policy);
+        ClassBehaviourIndex index = classPolicies.get(policy);
         if (index == null)
         {
-            index = new ClassBehaviourIndex<ClassPolicy>(dictionary);
+            index = new ClassBehaviourIndex(dictionary);
             classPolicies.put(policy, index);
         }
         return index;
@@ -74,7 +74,7 @@ public class PolicyComponentImpl implements PolicyComponent
     }
 
 
-    public <P extends ClassPolicy> BehaviourDefinition<ClassRef, P> bindClassBehaviour(QName policy, ClassRef classRef, Behaviour<P> behaviour)
+    public BehaviourDefinition<ClassRef> bindClassBehaviour(QName policy, ClassRef classRef, Behaviour behaviour)
     {
         // Validate arguments
         ParameterCheck.mandatory("Policy", policy);
@@ -82,14 +82,14 @@ public class PolicyComponentImpl implements PolicyComponent
         ParameterCheck.mandatory("Behaviour", behaviour);
 
         // Create behaviour definition and bind to policy
-        BehaviourDefinition<ClassRef, P> definition = createBehaviourDefinition(PolicyType.Class, policy, classRef, behaviour);
+        BehaviourDefinition<ClassRef> definition = createBehaviourDefinition(PolicyType.Class, policy, classRef, behaviour);
         getClassBehaviourIndex(policy).putClassBehaviour(definition);
         
         return definition;
     }
 
     
-    private <B, P extends ClassPolicy> BehaviourDefinition<B, P> createBehaviourDefinition(PolicyType type, QName policy, B binding, Behaviour<P> behaviour)
+    private <B> BehaviourDefinition<B> createBehaviourDefinition(PolicyType type, QName policy, B binding, Behaviour behaviour)
     {
         // Determine if policy has already been registered
         PolicyDefinition policyDefinition = getRegisteredPolicy(type, policy);
@@ -104,7 +104,7 @@ public class PolicyComponentImpl implements PolicyComponent
         }
         
         // Construct the definition
-        return new BehaviourDefinitionImpl<B, P>(type, policy, binding, behaviour);
+        return new BehaviourDefinitionImpl<B>(type, policy, binding, behaviour);
     }
     
 
@@ -228,16 +228,16 @@ public class PolicyComponentImpl implements PolicyComponent
     }
     
 
-    /*package*/ class BehaviourDefinitionImpl<B, P extends Policy> implements BehaviourDefinition<B, P>
+    /*package*/ class BehaviourDefinitionImpl<B> implements BehaviourDefinition<B>
     {
         
         private PolicyType type;
         private QName policy;
         private B binding;
-        private Behaviour<P> behaviour;
+        private Behaviour behaviour;
         
         
-        /*package*/ BehaviourDefinitionImpl(PolicyType type, QName policy, B binding, Behaviour<P> behaviour)
+        /*package*/ BehaviourDefinitionImpl(PolicyType type, QName policy, B binding, Behaviour behaviour)
         {
             this.type = type;
             this.policy = policy;
@@ -267,7 +267,7 @@ public class PolicyComponentImpl implements PolicyComponent
             return binding;
         }
         
-        public Behaviour<P> getBehaviour()
+        public Behaviour getBehaviour()
         {
             return behaviour;
         }

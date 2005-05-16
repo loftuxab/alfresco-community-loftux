@@ -4,7 +4,7 @@ import org.alfresco.repo.ref.QName;
 
 
 
-public interface BehaviourDefinition<B, P extends Policy>
+public interface BehaviourDefinition<B>
 {
     public QName getPolicy();
     
@@ -12,6 +12,6 @@ public interface BehaviourDefinition<B, P extends Policy>
     
     public B getBinding();
     
-    public Behaviour<P> getBehaviour();
+    public Behaviour getBehaviour();
     
 }

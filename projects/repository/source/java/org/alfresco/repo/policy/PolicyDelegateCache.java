@@ -9,23 +9,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/*package*/ class PolicyDelegateCache<B, IP extends Policy, P extends IP>
+/*package*/ class PolicyDelegateCache<B, P extends Policy>
 {
 
-    private BehaviourIndex<B, IP> index;
+    private BehaviourIndex<B> index;
     private Class<P> policyClass;
 
     private Map<B, P> aggregateCache = new HashMap<B, P>();
     private Map<B, List<P>> listCache = new HashMap<B, List<P>>();
     
 
-    /*package*/ PolicyDelegateCache(Class<P> policyClass, BehaviourIndex<B, IP> index)
+    /*package*/ PolicyDelegateCache(Class<P> policyClass, BehaviourIndex<B> index)
     {
         this.policyClass = policyClass;
         this.index = index;
-        this.index.addChangeListener(new BehaviourChangeListener<B, IP>()
+        this.index.addChangeListener(new BehaviourChangeListener<B>()
         {
-            public void addition(B binding, Behaviour<? extends IP> behaviour)
+            public void addition(B binding, Behaviour behaviour)
             {
                 if (binding == null)
                 {
@@ -73,11 +73,11 @@ import java.util.Map;
         if (policyInterfaces == null)
         {
             policyInterfaces = new ArrayList<P>();
-            Collection<BehaviourDefinition<? extends Object, ? extends IP>> behaviourDefs = index.find(key);
-            for (BehaviourDefinition<? extends Object, ? extends IP> behaviourDef : behaviourDefs)
+            Collection<BehaviourDefinition<? extends Object>> behaviourDefs = index.find(key);
+            for (BehaviourDefinition<? extends Object> behaviourDef : behaviourDefs)
             {
                 PolicyDefinition policyDef = behaviourDef.getPolicyDefinition();
-                Behaviour<? extends IP> behaviour = behaviourDef.getBehaviour();
+                Behaviour behaviour = behaviourDef.getBehaviour();
                 P policyIF = behaviour.getInterface(policyClass);
                 policyInterfaces.add(policyIF);
             }
@@ -86,6 +86,24 @@ import java.util.Map;
         }
         
         return policyInterfaces;
+    }
+    
+    
+    private void clearCache(Map<B, ?> cache, B binding)
+    {
+        if (binding == null)
+        {
+            cache.clear();
+        }
+        else
+        {
+            for (B cachedBinding : cache.keySet())
+            {
+                // TODO:
+            }
+            
+        }
+        
     }
     
     

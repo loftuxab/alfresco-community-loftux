@@ -9,7 +9,7 @@ import java.util.Map;
 import org.alfresco.util.ParameterCheck;
 
 
-public class JavaBehaviour<P extends Policy> implements Behaviour<P>
+public class JavaBehaviour implements Behaviour
 {
 
     private Object instance;
@@ -26,7 +26,7 @@ public class JavaBehaviour<P extends Policy> implements Behaviour<P>
     }
 
 
-    public synchronized <T extends P> T getInterface(Class<T> policy)
+    public synchronized <T> T getInterface(Class<T> policy)
     {
         ParameterCheck.mandatory("Policy class", policy);
         Object proxy = proxies.get(policy);

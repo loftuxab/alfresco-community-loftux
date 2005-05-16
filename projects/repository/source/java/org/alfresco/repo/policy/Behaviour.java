@@ -1,10 +1,10 @@
 package org.alfresco.repo.policy;
 
 
-public interface Behaviour<P extends Policy>
+public interface Behaviour
 {
 
-    public <T extends P> T getInterface(Class<T> policy);
+    public <T> T getInterface(Class<T> policy);
     
     public String getDescription();
     

@@ -48,7 +48,7 @@ public class PolicyComponentTest extends TestCase
 
     public void testJavaBehaviour()
     {
-        Behaviour<TestPolicy> validBehaviour = new JavaBehaviour<TestPolicy>(this, "validTest");
+        Behaviour validBehaviour = new JavaBehaviour(this, "validTest");
         TestPolicy policy = validBehaviour.getInterface(TestPolicy.class);
         assertNotNull(policy);
         String result = policy.test("argument");
@@ -113,7 +113,7 @@ public class PolicyComponentTest extends TestCase
     public void testBindBehaviour()
     {
         QName policyName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test");
-        Behaviour<ClassPolicy> validBehaviour = new JavaBehaviour<ClassPolicy>(this, "validTest");
+        Behaviour validBehaviour = new JavaBehaviour(this, "validTest");
         
         // Test null policy
         try
@@ -148,7 +148,7 @@ public class PolicyComponentTest extends TestCase
         catch(IllegalArgumentException e) {}
 
         // Test invalid behaviour (for registered policy)
-        Behaviour<ClassPolicy> invalidBehaviour = new JavaBehaviour<ClassPolicy>(this, "methoddoesnotexist");
+        Behaviour invalidBehaviour = new JavaBehaviour(this, "methoddoesnotexist");
         policyComponent.registerClassPolicy(TestPolicy.class);
         try
         {
@@ -179,7 +179,7 @@ public class PolicyComponentTest extends TestCase
         
         // Register Behaviour
         QName policyName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test");
-        Behaviour<ClassPolicy> validBehaviour = new JavaBehaviour<ClassPolicy>(this, "validTest");
+        Behaviour validBehaviour = new JavaBehaviour(this, "validTest");
         policyComponent.bindClassBehaviour(policyName, new ClassRef(FILE_TYPE), validBehaviour);
         
         // Test delegates
