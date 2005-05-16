@@ -156,8 +156,7 @@ public class NavigationBean
             // setup some properties
             this.nodeProperties.clear();
             this.nodeProperties.put("id", currentNodeId);
-            //String name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
-            String name = getQNameProperty(props, "name", true);
+            String name = getNameForNode(ref);
             this.nodeProperties.put("name", name);
             String desc = getQNameProperty(props, "description", true);
             this.nodeProperties.put("description", desc);
@@ -229,6 +228,34 @@ public class NavigationBean
    
    // ------------------------------------------------------------------------------
    // Private helpers
+   
+   /**
+    * Helper to get the display name for a Node.
+    * The method will attempt to use the "name" attribute, if not found it will revert to using
+    * the QName.getLocalName() retrieved from the primary parent relationship.
+    * 
+    * @param ref     NodeRef
+    * 
+    * @return display name string for the specified Node.
+    */
+   private String getNameForNode(NodeRef ref)
+   {
+      String name;
+      
+      // try to find a display "name" property for this node
+      Object nameProp = this.nodeService.getProperty(ref, QNAME_NAME);
+      if (nameProp != null)
+      {
+         name = nameProp.toString();
+      }
+      else
+      {
+         // revert to using QName if not found
+         name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
+      }
+      
+      return name;
+   }
    
    private static String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
    {
@@ -306,6 +333,8 @@ public class NavigationBean
    // Private data
    
    private static Logger s_logger = Logger.getLogger(NavigationBean.class);
+   
+   private static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;

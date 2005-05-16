@@ -750,34 +750,6 @@ public class BrowseBean implements IContextListener
    }
    
    /**
-    * Helper to get the display name for a Node.
-    * The method will attempt to use the "name" attribute, if not found it will revert to using
-    * the QName.getLocalName() retrieved from the primary parent relationship.
-    * 
-    * @param ref     NodeRef
-    * 
-    * @return display name string for the specified Node.
-    */
-   private String getNameForNode(NodeRef ref)
-   {
-      String name;
-      
-      // try to find a display "name" property for this node
-      Object nameProp = this.nodeService.getProperty(ref, QNAME_NAME);
-      if (nameProp != null)
-      {
-         name = nameProp.toString();
-      }
-      else
-      {
-         // revert to using QName if not found
-         name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
-      }
-      
-      return name;
-   }
-   
-   /**
     * Handler called upon the completion of the Delete Space page
     * 
     * @return outcome
@@ -846,6 +818,34 @@ public class BrowseBean implements IContextListener
    
    // ------------------------------------------------------------------------------
    // Private helpers 
+   
+   /**
+    * Helper to get the display name for a Node.
+    * The method will attempt to use the "name" attribute, if not found it will revert to using
+    * the QName.getLocalName() retrieved from the primary parent relationship.
+    * 
+    * @param ref     NodeRef
+    * 
+    * @return display name string for the specified Node.
+    */
+   private String getNameForNode(NodeRef ref)
+   {
+      String name;
+      
+      // try to find a display "name" property for this node
+      Object nameProp = this.nodeService.getProperty(ref, QNAME_NAME);
+      if (nameProp != null)
+      {
+         name = nameProp.toString();
+      }
+      else
+      {
+         // revert to using QName if not found
+         name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
+      }
+      
+      return name;
+   }
    
    /**
     * Refresh the UI after a Space selection change. Adds the selected space to the breadcrumb
