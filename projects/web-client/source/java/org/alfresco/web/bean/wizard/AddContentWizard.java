@@ -362,7 +362,7 @@ public class AddContentWizard
          nodeService.setProperties(fileNodeRef, properties);
          
          // get a writer for the content and put the file
-         ContentWriter writer = contentService.getWriter(fileNodeRef);
+         ContentWriter writer = contentService.getUpdatingWriter(fileNodeRef);
          writer.putContent(this.file);
          
          // commit the transaction

@@ -34,11 +34,34 @@ public interface ContentService
      */
     public ContentReader getReader(NodeRef nodeRef);
 
+	/**
+	 * Gets a writer for the content associated with the given node.
+	 * <p>
+	 * There is no work performed to update the node to point to the
+	 * new {@link ContentWriter#getContentUrl() content URL}.
+	 * 
+     * @param nodeRef a reference to a node.
+     * @return Returns a writer for the content associated with the node.
+	 */
+	public ContentWriter getWriter(NodeRef nodeRef);
+	
     /**
      * Gets a writer for the content associated with the given node.
+     * <p>
+     * When the writer output stream is closed the node will automatically
+     * be updated to point to the new
+     * {@link ContentWriter#getContentUrl() content URL}.
      * 
      * @param nodeRef a reference to a node with the <b>content</b> aspect.
      * @return Returns a writer for the content associated with the node.
      */
-    public ContentWriter getWriter(NodeRef nodeRef);
+    public ContentWriter getUpdatingWriter(NodeRef nodeRef);
+    
+    /**
+     * Gets a writer to a temporary location.  The longevity of the stored
+     * temporary content is determined by the system.
+     * 
+     * @return Returns a writer onto a temporary location
+     */
+    public ContentWriter getTempWriter();
 }

@@ -4,6 +4,7 @@ import org.alfresco.repo.content.filestore.FileContentStoreImpl;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.util.AspectMissingException;
 import org.alfresco.util.debug.CodeMonkey;
 
@@ -15,6 +16,9 @@ import org.alfresco.util.debug.CodeMonkey;
  */
 public class RoutingContentServiceImpl implements ContentService
 {
+    public static final StoreRef TEMP_STOREREF = new StoreRef("tempstore", "files");
+    public static final NodeRef TEMP_NODEREF = new NodeRef(TEMP_STOREREF, "tempfile");
+
     private NodeService nodeService;
     /** TEMPORARY until we have a map to choose from at runtime */
     private ContentStore store;
@@ -63,6 +67,20 @@ public class RoutingContentServiceImpl implements ContentService
     {
         CodeMonkey.todo("Choose the store to write to at runtime");  // TODO
         ContentWriter writer = store.getWriter(nodeRef);
+        // give back to the client
+        return writer;
+    }
+
+	/**
+	 * Add a listener to the plain writer
+	 * 
+	 * @see #getWriter(NodeRef)
+	 */
+    public ContentWriter getUpdatingWriter(NodeRef nodeRef)
+    {
+		// get the plain writer
+		ContentWriter writer = getWriter(nodeRef);
+		// get URL that is going to be written to
         String contentUrl = writer.getContentUrl();
         // need a listener to update the node when the stream closes
         WriteStreamListener listener = new WriteStreamListener(nodeRef, contentUrl);
@@ -70,6 +88,16 @@ public class RoutingContentServiceImpl implements ContentService
         writer.addListener(listener);
         // give back to the client
         return writer;
+    }
+
+    /**
+     * @return Returns a writer to a temporary location
+     * 
+     * @see RoutingContentServiceImpl#TEMP_NODEREF
+     */
+    public ContentWriter getTempWriter()
+    {
+        return store.getWriter(TEMP_NODEREF);
     }
 
     /**
@@ -105,4 +133,5 @@ public class RoutingContentServiceImpl implements ContentService
                     contentUrl);
         }
     }
+
 }

@@ -7,6 +7,7 @@ import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.ContentWriter;
+import org.alfresco.repo.content.RoutingContentServiceImpl;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.util.AspectMissingException;
@@ -67,12 +68,29 @@ public class ContentServiceImpl extends BaseImpl implements ContentService
         return reader;
     }
 
-    /**
-     * @see org.alfresco.repo.content.ContentService#getWriter(org.alfresco.repo.ref.NodeRef)
+	/**
+     * @throws UnsupportedOperationException the content cannot be written to
      */
     public ContentWriter getWriter(NodeRef nodeRef)
+	{
+        // Error since the content of a versioned node can not written to
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+	}
+
+	/**
+     * @throws UnsupportedOperationException the content cannot be written to
+     */
+    public ContentWriter getUpdatingWriter(NodeRef nodeRef)
     {
         // Error since the content of a versioned node can not written to
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
+    /**
+     * Returns a writer onto an imaginary temporary node reference
+     */
+    public ContentWriter getTempWriter()
+    {
+        return getWriter(RoutingContentServiceImpl.TEMP_NODEREF);
     }        
 }

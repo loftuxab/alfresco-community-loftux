@@ -12,6 +12,9 @@ import org.alfresco.repo.ref.NodeRef;
  * <code>NodeRef</code>.  Problems such as whether the node exists or
  * not are irrelevant - rather the <code>NodeRef</code> should be regarded
  * as key against which to store the content.
+ * <p>
+ * The nature of the API means that it is <b>never</b> possible to
+ * dictate the location of a write operation.
  * 
  * @author Derek Hulley
  */
@@ -29,14 +32,19 @@ public interface ContentStore
     public ContentReader getReader(String contentUrl);
 
     /**
-     * Get the accessor with which to write to the content
-     * associated with the given <code>NodeRef</code>.    The
-     * writer is <b>stateful</b> and should <b>only be used once</b>.
+     * Get the accessor with which to write content associated with
+     * the given <code>NodeRef</code>.    The writer is <b>stateful</b>
+     * and should <b>only be used once</b>.
+     * <p>
+     * Every call to this method will return a writer onto a <b>new</b>
+     * content URL.  It is never possible to write the same physical
+     * location twice. 
      * 
      * @param nodeRef the key against which the content is stored
      * @return Returns a write-only content accessor
      * 
      * @see ContentWriter#addListener(ContentStreamListener)
+     * @see ContentWriter#getContentUrl()
      */
-    public ContentWriter getWriter(NodeRef nodeRef);
+	public ContentWriter getWriter(NodeRef nodeRef);
 }

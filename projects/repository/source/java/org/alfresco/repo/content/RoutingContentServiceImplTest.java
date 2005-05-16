@@ -79,8 +79,40 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
         assertNotNull(getUserTransaction());
         assertFalse(getUserTransaction() == getUserTransaction());  // ensure txn instances aren't shared 
     }
+	
+	/**
+	 * Tests simple writes that don't automatically update the node content URL
+	 */
+	public void testSimpleWrite() throws Exception
+	{
+		// get a writer to an arbitrary node
+		ContentWriter writer = contentService.getWriter(contentNodeRef);
+		assertNotNull("Writer should not be null", writer);
+		
+		// put some content
+		writer.putContent(SOME_CONTENT);
+		
+		// get the reader for the node
+		ContentReader reader = contentService.getReader(contentNodeRef);
+		assertNull("No reader should yet be available for the node", reader);
+	}
     
-    public void testSimplePutContent() throws Exception
+    public void testTempWrite() throws Exception
+    {
+        // get a temporary writer
+        ContentWriter writer1 = contentService.getTempWriter();
+        // and another
+        ContentWriter writer2 = contentService.getTempWriter();
+        
+        // check
+        assertNotSame("Temp URLs must be different",
+                writer1.getContentUrl(), writer2.getContentUrl());
+    }
+    
+	/**
+	 * Tests the automatic updating of nodes' content URLs
+	 */
+    public void testUpdatingWrite() throws Exception
     {
         // check that the content URL property has not been set
         String contentUrl = (String) nodeService.getProperty(contentNodeRef, DictionaryBootstrap.PROP_QNAME_CONTENT_URL); 
@@ -91,7 +123,7 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
         assertNull("No reader should be available for new node", reader);
         
         // get the writer
-        ContentWriter writer = contentService.getWriter(contentNodeRef);
+        ContentWriter writer = contentService.getUpdatingWriter(contentNodeRef);
         assertNotNull("No writer received", writer);
         // write some content directly
         writer.putContent(SOME_CONTENT);
@@ -130,9 +162,9 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
         setComplete();
         endTransaction();
         
-        ContentWriter writer1 = contentService.getWriter(contentNodeRef);
-        ContentWriter writer2 = contentService.getWriter(contentNodeRef);
-        ContentWriter writer3 = contentService.getWriter(contentNodeRef);
+        ContentWriter writer1 = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer2 = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer3 = contentService.getUpdatingWriter(contentNodeRef);
         
         writer1.putContent("writer1 wrote this");
         writer2.putContent("writer2 wrote this");
@@ -154,9 +186,9 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
         txn.begin();
         txn.setRollbackOnly();
 
-        ContentWriter writer1 = contentService.getWriter(contentNodeRef);
-        ContentWriter writer2 = contentService.getWriter(contentNodeRef);
-        ContentWriter writer3 = contentService.getWriter(contentNodeRef);
+        ContentWriter writer1 = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer2 = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer3 = contentService.getUpdatingWriter(contentNodeRef);
         
         writer1.putContent("writer1 wrote this");
         writer2.putContent("writer2 wrote this");
@@ -196,7 +228,7 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
         ContentReader reader = contentService.getReader(contentNodeRef);
         assertNull("Reader should not be available", reader);
         
-        ContentWriter threadWriter = contentService.getWriter(contentNodeRef);
+        ContentWriter threadWriter = contentService.getUpdatingWriter(contentNodeRef);
         String threadContent = "Thread content";
         WriteThread thread = new WriteThread(threadWriter, threadContent);
         // kick off thread
@@ -207,7 +239,7 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
             wait(10);
         }
         // write to the content
-        ContentWriter writer = contentService.getWriter(contentNodeRef);
+        ContentWriter writer = contentService.getUpdatingWriter(contentNodeRef);
         writer.putContent(SOME_CONTENT);
         
         // fire thread up again

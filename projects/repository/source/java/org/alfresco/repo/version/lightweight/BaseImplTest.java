@@ -119,7 +119,7 @@ public class BaseImplTest extends BaseSpringTest
         this.versionableNodes.put(nodeRef.getId(), nodeRef);
         
         // Add the content to the node
-        ContentWriter contentWriter = this.contentService.getWriter(nodeRef);
+        ContentWriter contentWriter = this.contentService.getUpdatingWriter(nodeRef);
         contentWriter.putContent(TEST_CONTENT);
         
         // Add some children to the node

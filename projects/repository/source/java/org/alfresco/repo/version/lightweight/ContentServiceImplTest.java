@@ -60,7 +60,7 @@ public class ContentServiceImplTest extends BaseImplTest
         assertEquals(TEST_CONTENT, contentReader.getContentString());
         
         // Now update the content and verison again
-        ContentWriter contentWriter = this.contentService.getWriter(versionableNode);
+        ContentWriter contentWriter = this.contentService.getUpdatingWriter(versionableNode);
         assertNotNull(contentWriter);
         contentWriter.putContent(UPDATED_CONTENT);        
         Version version2 = createVersion(versionableNode, this.versionProperties);
@@ -85,7 +85,7 @@ public class ContentServiceImplTest extends BaseImplTest
         // Get writer is not supported by the version content service
         try
         {
-            this.versionContentService.getWriter(version.getNodeRef());
+            this.versionContentService.getUpdatingWriter(version.getNodeRef());
             fail("This operation is not supported.");
         }
         catch (UnsupportedOperationException exception)
