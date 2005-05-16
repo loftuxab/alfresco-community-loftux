@@ -1,7 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
 <%@ taglib uri="http://myfaces.apache.org/extensions" prefix="x"%>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
@@ -10,6 +9,8 @@
 
 <%@ page import="org.alfresco.web.PanelGenerator" %>
 <%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
+
+<r:page>
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
@@ -108,8 +109,8 @@
                                     <td class="mainSubText">1. Locate document to upload</td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
-                                 <form name="upload-form" method="post" enctype="multipart/form-data" 
-                                       action="<portlet:actionURL></portlet:actionURL>">
+                                 
+                                 <r:uploadForm>
                                  <tr>
                                     <td>
                                        Location:<input style="margin-left:12px;" type="file" size="50" name="file"/>
@@ -124,19 +125,22 @@
                                        <input style="margin-left:12px;" type="submit" value="Upload" />
                                     </td>
                                  </tr>
+                                 </r:uploadForm>
                                  
-                                 </form>
                                  <h:form id="add-content-upload-end">
-                                 
                                  <tr><td class="paddingRow"></td></tr>
                                  <%
                                  AddContentWizard wiz = (AddContentWizard)session.getAttribute("javax.portlet.p.AlfrescoClientInstance.AlfrescoClientWindow?AddContentWizard");
-                                 if (wiz.getFileName() != null) {
+                                 if (wiz == null)
+                                 {
+                                 	wiz = (AddContentWizard)session.getAttribute("AddContentWizard");
+                                 }
+                                 if (wiz != null && wiz.getFileName() != null) {
                                  %>
                                     <tr>
                                        <td>
                                           <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                          The file "<h:outputText value="#{AddContentWizard.fileName}" />" was uploaded successfully.
+                                          The file "<%=wiz.getFileName()%>" was uploaded successfully.
                                        </td>
                                     </tr>
                                  <% } %>
@@ -213,3 +217,5 @@
   </h:form>
     
 </f:view>
+
+</r:page>

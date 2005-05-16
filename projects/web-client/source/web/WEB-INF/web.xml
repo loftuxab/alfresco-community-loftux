@@ -8,7 +8,13 @@
    <display-name>Alfresco Web Client</display-name>
     
    <description>Alfresco Web Client</description>
-
+   
+   <context-param>
+      <param-name>org.alfresco.SERVER_TYPE</param-name>
+      <!--<param-value>servlet</param-value>-->
+      <param-value>portlet</param-value>
+   </context-param>
+   
    <context-param>
       <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
       <param-value>server</param-value>
@@ -71,6 +77,28 @@
    <listener>
       <listener-class>org.alfresco.web.ContextListener</listener-class>
    </listener>
+   
+   <!-- Faces Servlet -->
+   <servlet>
+      <servlet-name>Faces Servlet</servlet-name>
+      <servlet-class>org.alfresco.web.AlfrescoFacesServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
+   
+   <servlet>
+      <servlet-name>uploadFile</servlet-name>
+      <servlet-class>org.alfresco.web.UploadFileServlet</servlet-class>
+   </servlet>
+  
+   <servlet-mapping>
+      <servlet-name>Faces Servlet</servlet-name>
+      <url-pattern>/faces/*</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+      <servlet-name>uploadFile</servlet-name>
+      <url-pattern>/uploadFileServlet</url-pattern>
+   </servlet-mapping>
     
    <session-config>
       <session-timeout>30</session-timeout>

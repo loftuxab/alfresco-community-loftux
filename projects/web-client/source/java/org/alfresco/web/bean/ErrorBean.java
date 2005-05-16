@@ -10,7 +10,26 @@ import java.io.StringWriter;
  */
 public class ErrorBean
 {
+   public static final String ERROR_BEAN_NAME = "alfresco.ErrorBean";
+   
+   private String returnPage;
    private Throwable lastError;
+
+   /**
+    * @return Returns the page to go back to after the error has been displayed
+    */
+   public String getReturnPage()
+   {
+      return returnPage;
+   }
+
+   /**
+    * @param returnPage The page to return to after showing the error
+    */
+   public void setReturnPage(String returnPage)
+   {
+      this.returnPage = returnPage;
+   }
 
    /**
     * @return Returns the lastError.

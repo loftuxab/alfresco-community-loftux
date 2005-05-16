@@ -1,11 +1,13 @@
 package org.alfresco.config;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 /**
  * Exception thrown by the config service
  * 
  * @author gavinc
  */
-public class ConfigException extends RuntimeException
+public class ConfigException extends AlfrescoRuntimeException
 {
     private static final long serialVersionUID = 3257008761007847733L;
 

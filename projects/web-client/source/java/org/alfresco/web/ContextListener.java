@@ -22,7 +22,14 @@ import org.alfresco.web.bean.repository.Repository;
  */
 public class ContextListener implements ServletContextListener, HttpSessionListener
 {
+   private static boolean inPortlet = true;
+   private static final String SERVER_TYPE = "org.alfresco.SERVER_TYPE";
    private static Logger logger = Logger.getLogger(ContextListener.class);
+   
+   public static boolean inPortletServer()
+   {
+      return inPortlet;
+   }
    
    /**
     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
@@ -37,6 +44,16 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       {
          // create the store
          nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, Repository.REPOSITORY_STORE);
+      }
+      
+      // determine what type of server we are using, servlet or portlet, default to portlet
+      String serverType = event.getServletContext().getInitParameter(SERVER_TYPE);
+      if (serverType != null && serverType.equalsIgnoreCase("servlet"))
+      {
+         inPortlet = false;
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Running in servlet mode");
       }
    }
 

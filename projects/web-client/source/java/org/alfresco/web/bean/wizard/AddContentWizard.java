@@ -13,6 +13,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.NamespaceService;
@@ -23,7 +24,6 @@ import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.util.Conversion;
-import org.alfresco.web.MyFacesPortlet;
 import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.repository.Repository;
@@ -187,7 +187,7 @@ public class AddContentWizard
       // representing the file we previously uploaded.
       FacesContext ctx = FacesContext.getCurrentInstance();
       FileUploadBean fileBean = (FileUploadBean)ctx.getExternalContext().getSessionMap().
-         get(MyFacesPortlet.FILE_UPLOAD_BEAN_NAME);
+         get(FileUploadBean.FILE_UPLOAD_BEAN_NAME);
       if (fileBean != null)
       {
          this.file = fileBean.getFile();
@@ -207,7 +207,7 @@ public class AddContentWizard
       // we also need to keep the file upload bean in sync
       FacesContext ctx = FacesContext.getCurrentInstance();
       FileUploadBean fileBean = (FileUploadBean)ctx.getExternalContext().getSessionMap().
-         get(MyFacesPortlet.FILE_UPLOAD_BEAN_NAME);
+         get(FileUploadBean.FILE_UPLOAD_BEAN_NAME);
       if (fileBean != null)
       {
          fileBean.setFileName(this.fileName);
@@ -526,7 +526,7 @@ public class AddContentWizard
       // remove the file upload bean from the session
       FacesContext ctx = FacesContext.getCurrentInstance();
       FileUploadBean fileBean = (FileUploadBean)ctx.getExternalContext().getSessionMap().
-         remove(MyFacesPortlet.FILE_UPLOAD_BEAN_NAME);
+         remove(FileUploadBean.FILE_UPLOAD_BEAN_NAME);
    }
    
    /**

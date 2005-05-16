@@ -225,4 +225,23 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
+   
+   <tag>
+      <name>page</name>
+      <tagclass>org.alfresco.web.ui.repo.tag.PageTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>title</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
+   
+   <tag>
+      <name>uploadForm</name>
+      <tagclass>org.alfresco.web.ui.repo.tag.UploadFormTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+   </tag>
+   
 </taglib>

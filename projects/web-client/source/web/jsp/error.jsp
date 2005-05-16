@@ -1,8 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <%@ page isELIgnored="false" %>
+
+<r:page>
 
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
@@ -23,16 +24,10 @@
    </tr>
    <tr>
       <td>
-         <p><r:systemError styleClass="errorMessage" detailsStyleClass="mainSubTextSmall" /></p>
-      </td>
-   </tr>
-   <tr>
-      <td>
-         <p><a href="<portlet:renderURL portletMode="view" windowState="normal"><portlet:param name="org.apache.myfaces.portlet.MyFacesGenericPortlet.VIEW_ID" value="last-jsf-page"/></portlet:renderURL>">
-            Return to application
-         </a></p>
+         <r:systemError styleClass="errorMessage" detailsStyleClass="mainSubTextSmall" 
+                        showDetails="false" />
       </td>
    </tr>
 </table>
 
-
+</r:page>

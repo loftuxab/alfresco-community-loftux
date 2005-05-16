@@ -35,6 +35,7 @@
       <echo>common.lib.dir = ${common.lib.dir}</echo>
       <echo>version.number = ${version.number}</echo>
       <echo>jboss.home = ${jboss.home}</echo>
+      <echo>tomcat.home = ${tomcat.home}</echo>
       <echo>deploy.dir = ${deploy.dir}</echo>
    </target>
 

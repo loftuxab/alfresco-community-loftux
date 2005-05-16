@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.Writer;
 
 import javax.portlet.PortletSession;
+import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.alfresco.web.MyFacesPortlet;
+import org.alfresco.web.ContextListener;
 import org.alfresco.web.bean.ErrorBean;
 
 /**
@@ -86,12 +88,12 @@ public class SystemErrorTag extends TagSupport
       if (renderReq != null)
       {
          PortletSession session = renderReq.getPortletSession();
-         errorBean = (ErrorBean)session.getAttribute(MyFacesPortlet.ERROR_BEAN_NAME);
+         errorBean = (ErrorBean)session.getAttribute(ErrorBean.ERROR_BEAN_NAME);
       }
       else
       {
          errorBean = (ErrorBean)pageContext.getSession().
-                        getAttribute(MyFacesPortlet.ERROR_BEAN_NAME);
+                        getAttribute(ErrorBean.ERROR_BEAN_NAME);
       }
 
       if (errorBean != null)
@@ -119,11 +121,11 @@ public class SystemErrorTag extends TagSupport
          
          // work out initial state
          boolean hidden = !this.showDetails; 
-         String display = "none";
+         String display = "inline";
          String toggleTitle = "Hide";
-         if (this.showDetails)
+         if (hidden)
          {
-            display = "inline";
+            display = "none";
             toggleTitle = "Show";
          }
          
@@ -163,6 +165,39 @@ public class SystemErrorTag extends TagSupport
          out.write(">");
          out.write(errorDetails);
          out.write("</div>");
+         
+         // output a link to return to the application
+         out.write("\n<div style='padding-top:16px;'><a href='");
+         
+         if (ContextListener.inPortletServer())
+         {
+            RenderResponse renderResp  = (RenderResponse)pageContext.getRequest().
+                                   getAttribute("javax.portlet.response");
+            if (renderResp == null)
+            {
+               throw new IllegalStateException("RenderResponse object is null");
+            }
+            
+            PortletURL url = renderResp.createRenderURL();
+            // NOTE: we don't have to specify the page for the portlet, just the VIEW_ID parameter
+            //       being present will cause the same JSF view to be re-displayed
+            url.setParameter("org.apache.myfaces.portlet.MyFacesGenericPortlet.VIEW_ID", "same-jsf-page");
+            out.write(url.toString());
+         }
+         else
+         {
+            String returnPage = errorBean.getReturnPage();
+            if (returnPage == null)
+            {
+               out.write("javascript:history.back();");
+            }
+            else
+            {
+               out.write(returnPage);
+            }
+         }
+         
+         out.write("'>Return to application</a></div>");
       }
       catch (IOException ioe)
       {

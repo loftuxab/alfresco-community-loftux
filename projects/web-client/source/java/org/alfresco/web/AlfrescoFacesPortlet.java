@@ -5,14 +5,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.faces.FactoryFinder;
-import javax.faces.application.ApplicationFactory;
-import javax.faces.application.ViewHandler;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
-import javax.faces.context.FacesContextFactory;
-import javax.faces.lifecycle.Lifecycle;
-import javax.faces.lifecycle.LifecycleFactory;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
@@ -22,19 +14,17 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.UnavailableException;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
-import org.alfresco.web.bean.wizard.AddContentWizard;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.portlet.MyFacesGenericPortlet;
 
-public class MyFacesPortlet extends MyFacesGenericPortlet
+public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
 {
-   public static final String FILE_UPLOAD_BEAN_NAME = "alfresco.UploadBean";
-   public static final String ERROR_BEAN_NAME = "alfresco.ErrorBean";
    public static final String INSTANCE_NAME = "AlfrescoClientInstance";
    public static final String WINDOW_NAME = "AlfrescoClientWindow";
    public static final String MANAGED_BEAN_PREFIX = "javax.portlet.p." + INSTANCE_NAME + 
@@ -43,7 +33,7 @@ public class MyFacesPortlet extends MyFacesGenericPortlet
    private static final String ERROR_PAGE_PARAM = "error-page";
    private static final String ERROR_OCCURRED = "error-occurred";
    
-   private static Logger logger = Logger.getLogger(MyFacesPortlet.class);
+   private static Logger logger = Logger.getLogger(AlfrescoFacesPortlet.class);
    
    private String errorPage;
 
@@ -76,7 +66,7 @@ public class MyFacesPortlet extends MyFacesGenericPortlet
          {
             if (logger.isDebugEnabled())
                logger.debug("Handling multipart request...");
-
+            
             PortletSession session = request.getPortletSession();
             
             // get the file from the request and put it in the session
@@ -84,6 +74,7 @@ public class MyFacesPortlet extends MyFacesGenericPortlet
             PortletFileUpload upload = new PortletFileUpload(factory);
             List<FileItem> fileItems = upload.parseRequest(request);
             Iterator<FileItem> iter = fileItems.iterator();
+            FileUploadBean bean = new FileUploadBean();
             while(iter.hasNext())
             {
                FileItem item = iter.next();
@@ -93,11 +84,11 @@ public class MyFacesPortlet extends MyFacesGenericPortlet
                   File tempFile = File.createTempFile("alfresco", ".upload");
                   tempFile.deleteOnExit();
                   item.write(tempFile);
-                  FileUploadBean bean = new FileUploadBean();
                   bean.setFile(tempFile);
                   bean.setFileName(filename);
                   bean.setFilePath(tempFile.getAbsolutePath());
-                  session.setAttribute(FILE_UPLOAD_BEAN_NAME, bean, PortletSession.PORTLET_SCOPE);
+                  session.setAttribute(FileUploadBean.FILE_UPLOAD_BEAN_NAME, bean, 
+                                       PortletSession.PORTLET_SCOPE);
                }
             }
             
@@ -121,6 +112,8 @@ public class MyFacesPortlet extends MyFacesGenericPortlet
          }
          else
          {
+            logger.warn("No error page configured, re-throwing exception");
+            
             if (e instanceof PortletException)
             {
                throw (PortletException)e;
@@ -142,12 +135,12 @@ public class MyFacesPortlet extends MyFacesGenericPortlet
    {
       // get the error bean from the session and set the error that occurred.
       PortletSession session = request.getPortletSession();
-      ErrorBean errorBean = (ErrorBean)session.getAttribute(ERROR_BEAN_NAME, 
+      ErrorBean errorBean = (ErrorBean)session.getAttribute(ErrorBean.ERROR_BEAN_NAME, 
                              PortletSession.PORTLET_SCOPE);
       if (errorBean == null)
       {
          errorBean = new ErrorBean();
-         session.setAttribute(ERROR_BEAN_NAME, errorBean, PortletSession.PORTLET_SCOPE);
+         session.setAttribute(ErrorBean.ERROR_BEAN_NAME, errorBean, PortletSession.PORTLET_SCOPE);
       }
       errorBean.setLastError(error);
       
