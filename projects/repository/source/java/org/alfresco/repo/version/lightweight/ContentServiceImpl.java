@@ -7,7 +7,6 @@ import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.content.RoutingContentServiceImpl;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.util.AspectMissingException;
@@ -87,10 +86,10 @@ public class ContentServiceImpl extends BaseImpl implements ContentService
     }
 
     /**
-     * Returns a writer onto an imaginary temporary node reference
+     * Returns a writer onto an anonymous location
      */
     public ContentWriter getTempWriter()
     {
-        return getWriter(RoutingContentServiceImpl.TEMP_NODEREF);
+        return versionContentStore.getWriter();
     }        
 }

@@ -4,7 +4,6 @@ import org.alfresco.repo.content.filestore.FileContentStoreImpl;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.util.AspectMissingException;
 import org.alfresco.util.debug.CodeMonkey;
 
@@ -16,9 +15,6 @@ import org.alfresco.util.debug.CodeMonkey;
  */
 public class RoutingContentServiceImpl implements ContentService
 {
-    public static final StoreRef TEMP_STOREREF = new StoreRef("tempstore", "files");
-    public static final NodeRef TEMP_NODEREF = new NodeRef(TEMP_STOREREF, "tempfile");
-
     private NodeService nodeService;
     /** TEMPORARY until we have a map to choose from at runtime */
     private ContentStore store;
@@ -91,13 +87,11 @@ public class RoutingContentServiceImpl implements ContentService
     }
 
     /**
-     * @return Returns a writer to a temporary location
-     * 
-     * @see RoutingContentServiceImpl#TEMP_NODEREF
+     * @return Returns a writer to an anonymous location
      */
     public ContentWriter getTempWriter()
     {
-        return store.getWriter(TEMP_NODEREF);
+        return store.getWriter();
     }
 
     /**

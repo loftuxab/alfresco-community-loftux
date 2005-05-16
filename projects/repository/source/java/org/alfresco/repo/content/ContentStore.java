@@ -1,6 +1,7 @@
 package org.alfresco.repo.content;
 
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.StoreRef;
 
 /**
  * Provides low-level retrieval of content
@@ -20,6 +21,9 @@ import org.alfresco.repo.ref.NodeRef;
  */
 public interface ContentStore
 {
+    public static final StoreRef TEMP_STOREREF = new StoreRef("tempstore", "files");
+    public static final NodeRef TEMP_NODEREF = new NodeRef(TEMP_STOREREF, "tempfile");
+
     /**
      * Get the accessor with which to read from the content
      * at the given URL.  The reader is <b>stateful</b> and
@@ -30,6 +34,23 @@ public interface ContentStore
      *      is present at the URL given
      */
     public ContentReader getReader(String contentUrl);
+    
+    /**
+     * Get an accessor with which to write content to an anonymous location
+     * within the store.  The writer is <b>stateful</b> and should
+     * <b>only be used once</b>.
+     * <p>
+     * Every call to this method will return a writer onto a <b>new</b>
+     * content URL.  It is never possible to write the same physical
+     * location twice.
+     *  
+     * @return Returns a write-only content accessor
+     *
+     * @see #getWriter(NodeRef)
+     * @see ContentWriter#addListener(ContentStreamListener)
+     * @see ContentWriter#getContentUrl()
+     */
+    public ContentWriter getWriter();
 
     /**
      * Get the accessor with which to write content associated with
@@ -43,6 +64,7 @@ public interface ContentStore
      * @param nodeRef the key against which the content is stored
      * @return Returns a write-only content accessor
      * 
+     * @see #getWriter()
      * @see ContentWriter#addListener(ContentStreamListener)
      * @see ContentWriter#getContentUrl()
      */

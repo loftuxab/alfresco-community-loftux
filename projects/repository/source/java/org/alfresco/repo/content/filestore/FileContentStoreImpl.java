@@ -87,6 +87,10 @@ public class FileContentStoreImpl implements ContentStore
         return file;
     }
     
+    /**
+     * This implementation requires that the URL start with
+     * {@link FileContentStoreImpl#STORE_PROTOCOL }.
+     */
     public ContentReader getReader(String contentUrl)
     {
         if (!contentUrl.startsWith(FileContentStoreImpl.STORE_PROTOCOL))
@@ -114,7 +118,19 @@ public class FileContentStoreImpl implements ContentStore
             throw new ContentIOException("Failed to get reader for URL: " + contentUrl, e);
         }
     }
+    
+    /**
+     * @see #getWriter(NodeRef)
+     * @see ContentStore#TEMP_NODEREF
+     */
+    public ContentWriter getWriter()
+    {
+        return getWriter(ContentStore.TEMP_NODEREF);
+    }
 
+    /**
+     * Generates a unique filename based on the given node reference.
+     */
     public ContentWriter getWriter(NodeRef nodeRef)
     {
         try
