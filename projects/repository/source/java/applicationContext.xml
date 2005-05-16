@@ -569,7 +569,7 @@
    <!-- Policy Franeworks Services -->
    <!--                 -->
    
-   <bean id="policyComponent" class="org.alfresco.repo.service.PolicyComponentImpl">
+   <bean id="policyComponent" class="org.alfresco.repo.policy.PolicyComponentImpl">
 	   <constructor-arg index="0">
 	      <ref bean="dictionaryService"/>
       </constructor-arg>
