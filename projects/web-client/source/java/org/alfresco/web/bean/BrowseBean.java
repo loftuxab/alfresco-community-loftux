@@ -119,6 +119,22 @@ public class BrowseBean implements IContextListener
    }
    
    /**
+    * @return Returns the browsePageSize.
+    */
+   public int getBrowsePageSize()
+   {
+      return browsePageSize;
+   }
+   
+   /**
+    * @param browsePageSize The browsePageSize to set.
+    */
+   public void setBrowsePageSize(int browsePageSize)
+   {
+      this.browsePageSize = browsePageSize;
+   }
+   
+   /**
     * @return Returns the Space Node being used for the current browse screen action.
     */
    public Node getActionSpace()
@@ -201,7 +217,7 @@ public class BrowseBean implements IContextListener
          }
          else
          {
-            searchBrowseNodes(navigator.getSearchText());
+            searchBrowseNodes(navigator.getSearchText(), navigator.getSearchMode());
          }
       }
       List<Node> result = this.containerNodes;
@@ -226,7 +242,7 @@ public class BrowseBean implements IContextListener
          }
          else
          {
-            searchBrowseNodes(navigator.getSearchText());
+            searchBrowseNodes(navigator.getSearchText(), navigator.getSearchMode());
          }
       }
       List<Node> result = this.contentNodes;
@@ -268,21 +284,23 @@ public class BrowseBean implements IContextListener
       // set the page size based on the style of display
       if (viewMode.equals(RichListRenderer.DetailsViewRenderer.VIEWMODEID))
       {
-         this.spacesRichList.setPageSize(10);
+         setBrowsePageSize(10);
       }
       else if (viewMode.equals(RichListRenderer.IconViewRenderer.VIEWMODEID))
       {
-         this.spacesRichList.setPageSize(12);
+         setBrowsePageSize(12);
       }
       else if (viewMode.equals(RichListRenderer.ListViewRenderer.VIEWMODEID))
       {
-         this.spacesRichList.setPageSize(5);
+         setBrowsePageSize(5);
       }
       else
       {
          // in-case another view mode appears
-         this.spacesRichList.setPageSize(10);
+         setBrowsePageSize(10);
       }
+      if (s_logger.isDebugEnabled())
+         s_logger.debug("Browse view page size set to: " + getBrowsePageSize());
       
       // push the view mode into the lists
       setBrowseViewMode(viewMode);
@@ -391,17 +409,17 @@ public class BrowseBean implements IContextListener
     * Search for a list of nodes using the specific search string
     * 
     * @param searchText       Search text
+    * @param searchMode       Search mode to use (see UISimpleSearch constants)
     */
-   private void searchBrowseNodes(String searchText)
+   private void searchBrowseNodes(String searchText, int searchMode)
    {
       // get the searcher object and perform the search of the root node
-      String query = searchText;
-      String s = MessageFormat.format(SEARCH_PATH, new Object[] {query});
+      String query = buildSearchQuery(searchText, searchMode);
       try
       {
          if (s_logger.isDebugEnabled())
-            s_logger.debug("Searching using path: " + s);
-         ResultSet results = this.searchService.query(Repository.getStoreRef(), "lucene", s, null, null);
+            s_logger.debug("Searching using path: " + query);
+         ResultSet results = this.searchService.query(Repository.getStoreRef(), "lucene", query, null, null);
          if (s_logger.isDebugEnabled())
             s_logger.debug("Search results returned: " + results.length());
          
@@ -468,11 +486,51 @@ public class BrowseBean implements IContextListener
       }
       catch (Exception err)
       {
-         s_logger.info("Search failed for: " + s);
+         s_logger.info("Search failed for: " + query);
          Utils.addErrorMessage( MessageFormat.format(ERROR_SEARCH, new Object[] {err.getMessage()}) );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
       }
+   }
+
+   /**
+    * Build the search query string
+    * 
+    * @param text    Search text
+    * @param mode    Search mode
+    * 
+    * @return prepared search query string
+    */
+   private String buildSearchQuery(String text, int mode)
+   {
+      String query;
+      switch (mode)
+      {
+         case UISimpleSearch.SEARCH_ALL:
+            query = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:" + text + "*";
+            //query = MessageFormat.format(SEARCH_ALL, new Object[] {text});
+            break;
+         
+         case UISimpleSearch.SEARCH_FILE_NAMES:
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:" + text + "*";
+            //query = MessageFormat.format(SEARCH_FILE_NAME, new Object[] {text});
+            break;
+         
+         case UISimpleSearch.SEARCH_FILE_NAMES_CONTENTS:
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:" + text + "*";
+            //query = MessageFormat.format(SEARCH_FILE_NAME_CONTENT, new Object[] {text});
+            break;
+         
+         case UISimpleSearch.SEARCH_SPACE_NAMES:
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:" + text + "*";
+            //query = MessageFormat.format(SEARCH_FOLDER_NAME, new Object[] {text});
+            break;
+         
+         default:
+            throw new IllegalStateException("Unknown search mode specified: " + mode);
+      }
+      
+      return query;
    }
    
    private static String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
@@ -524,11 +582,9 @@ public class BrowseBean implements IContextListener
       // setup the search text string on the top-level navigation handler
       UISimpleSearch search = (UISimpleSearch)event.getComponent();
       navigator.setSearchText(search.getLastSearch());
+      navigator.setSearchMode(search.getSearchMode());
       
-      // TODO: should search event handler and state be on NavigationHandler? As it's top-level
-      //       even though it ends up in the browse screen for display???
-      //       need to do this - else other breadcrumb handlers cannot know to clear "last search"!
-      //       BUT if we do this - how do we refresh the grid components?!
+      navigateBrowseScreen();
    }
    
    /**
@@ -797,6 +853,26 @@ public class BrowseBean implements IContextListener
       }
    }
    
+   /**
+    * @return whether the current View ID is the "browse" screen
+    */
+   private boolean isViewCurrent()
+   {
+      return (FacesContext.getCurrentInstance().getViewRoot().getViewId().equals(BROWSE_VIEW_ID));
+   }
+   
+   /**
+    * Perform navigation to the browse screen if it is not already the current View
+    */
+   private void navigateBrowseScreen()
+   {
+      if (isViewCurrent() == false)
+      {
+         FacesContext fc = FacesContext.getCurrentInstance();
+         fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "browse");
+      }
+   }
+   
 
    // ------------------------------------------------------------------------------
    // Inner classes
@@ -838,8 +914,8 @@ public class BrowseBean implements IContextListener
          getNavigator().setCurrentNodeId(this.nodeId);
          getNavigator().setLocation( (List)breadcrumb.getValue() );
          
-         // force return to browse page
-         return "browse";
+         // return to browse page if required
+         return (isViewCurrent() ? null : "browse"); 
       }
       
       public String getNodeId()
@@ -858,14 +934,19 @@ public class BrowseBean implements IContextListener
    private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
    private static final String ERROR_SEARCH  = "Search failed during to a system error: {0}";
    
-   private static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
+   public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
    
    private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    
    //private static final String SEARCH_PATH1 = "PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":{0}\"";
    // TODO: AndyH said he will fix QNAME to prepend // later - so this should work in the future
    //private static final String SEARCH_PATH2 = "+QNAME:\"" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   private static final String SEARCH_PATH  = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   private static final String SEARCH_PATH         = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   
+   private static final String SEARCH_ALL               = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   private static final String SEARCH_FILE_NAME         = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   private static final String SEARCH_FILE_NAME_CONTENT = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   private static final String SEARCH_FOLDER_NAME       = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
@@ -892,4 +973,7 @@ public class BrowseBean implements IContextListener
    
    /** The current browse view mode - set to a well known IRichListRenderer name */
    private String browseViewMode = "details";
+   
+   /** The current browse view page size */
+   private int browsePageSize = 10;
 }

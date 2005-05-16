@@ -37,7 +37,7 @@
             <tr>
                <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_begin.gif" width=4 height=30></td>
                <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/searchbar_bg.gif)">
-                  <r:simpleSearch id="search" actionListener="#{BrowseBean.search}" action="browse" />
+                  <r:simpleSearch id="search" actionListener="#{BrowseBean.search}" />
                </td>
                <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_end.gif" width=4 height=30></td>
             </tr>

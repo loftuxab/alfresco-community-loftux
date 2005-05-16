@@ -115,6 +115,22 @@ public class NavigationBean
    }
    
    /**
+    * @return Returns the search Mode (see UISimpleSearch constants)
+    */
+   public int getSearchMode()
+   {
+      return searchMode;
+   }
+
+   /**
+    * @param searchMode The searchMode to set (see UISimpleSearch constants).
+    */
+   public void setSearchMode(int searchMode)
+   {
+      this.searchMode = searchMode;
+   }
+   
+   /**
     * @return Returns the currently browsing node Id.
     */
    public String getCurrentNodeId()
@@ -266,12 +282,19 @@ public class NavigationBean
        */
       public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
-         // TODO: replace this one we have home folders etc.!
-         
+         // TODO: replace this temp code one we have home folders etc.!
          // TEMP!
          setCurrentNodeId(null);
          setLocation( (List)breadcrumb.getValue() );
-         return "browse";
+         FacesContext fc = FacesContext.getCurrentInstance();
+         if (fc.getViewRoot().getViewId().equals(BrowseBean.BROWSE_VIEW_ID))
+         {
+            return null;
+         }
+         else
+         {
+            return "browse";
+         }
       }
       
       private String label;
@@ -294,6 +317,9 @@ public class NavigationBean
    
    /** Search text we are currently using */
    private String searchText;
+   
+   /** Search mode we are currently using */
+   private int searchMode;
    
    /** bag of displayable properties for the current node */
    private Map<String, String> nodeProperties = new HashMap<String, String>(7, 1.0f);

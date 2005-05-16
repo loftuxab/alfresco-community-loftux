@@ -292,20 +292,21 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    {
       int rowCount = getDataModel().size();
       // if a page size is specified, then we use that
-      if (this.pageSize != -1)
+      int pageSize = getPageSize();
+      if (pageSize != -1)
       {
          // calc start row index based on current page index
-         this.rowIndex = (this.currentPage * this.pageSize) - 1;
+         this.rowIndex = (this.currentPage * pageSize) - 1;
          
          // calc total number of pages available
          this.pageCount = (rowCount / this.pageSize) + 1;
-         if (rowCount % this.pageSize == 0 && this.pageCount != 1)
+         if (rowCount % pageSize == 0 && this.pageCount != 1)
          {
             this.pageCount--;
          }
          
          // calc the maximum row index that can be returned
-         this.maxRowIndex = this.rowIndex + this.pageSize;
+         this.maxRowIndex = this.rowIndex + pageSize;
          if (this.maxRowIndex >= rowCount)
          {
             this.maxRowIndex = rowCount - 1;
@@ -319,7 +320,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          this.maxRowIndex = (rowCount - 1);
       }
       if (s_logger.isDebugEnabled())
-         s_logger.debug("Bound datasource: PageSize: " + this.pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
+         s_logger.debug("Bound datasource: PageSize: " + pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
    }
    
    /**

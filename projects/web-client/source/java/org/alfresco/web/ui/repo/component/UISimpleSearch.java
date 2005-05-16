@@ -37,7 +37,6 @@ public class UISimpleSearch extends UICommand
       // specifically set the renderer type to null to indicate to the framework
       // that this component renders itself - there is no abstract renderer class
       setRendererType(null);
-      logger.debug("=====UISimpleSearch: Constructed: \"\"");
    }
    
    /**
@@ -58,7 +57,6 @@ public class UISimpleSearch extends UICommand
       super.restoreState(context, values[0]);
       this.lastSearch = (String)values[1];
       this.searchOption = ((Integer)values[2]).intValue();
-      logger.debug("=====UISimpleSearch: Restoring state: " + this.lastSearch);
    }
    
    /**
@@ -71,7 +69,6 @@ public class UISimpleSearch extends UICommand
       values[0] = super.saveState(context);
       values[1] = this.lastSearch;
       values[2] = Integer.valueOf(this.searchOption);
-      logger.debug("=====UISimpleSearch: Saving state: " + this.lastSearch);
       return (values);
    }
    
@@ -93,7 +90,7 @@ public class UISimpleSearch extends UICommand
          if (searchText.length() != 0)
          {
             if (logger.isDebugEnabled())
-               logger.debug("*****Search text set to: " + searchText);
+               logger.debug("*****Search text submitted: " + searchText);
             int option = -1;
             String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
             String optionStr = (String)requestMap.get(optionFieldName);
@@ -102,7 +99,7 @@ public class UISimpleSearch extends UICommand
                option = Integer.parseInt(optionStr);
             }
             if (logger.isDebugEnabled())
-               logger.debug("*****Search option set to: " + option);
+               logger.debug("*****Search option submitted: " + option);
             
             // queue event so system can perform a search and update the component
             SearchEvent event = new SearchEvent(this, searchText, option);
@@ -118,14 +115,10 @@ public class UISimpleSearch extends UICommand
    {
       if (event instanceof SearchEvent)
       {
+         // update the component parameters from the search event details
          SearchEvent searchEvent = (SearchEvent)event;
          this.setLastSearch(searchEvent.SearchText);
          this.setSearchMode(searchEvent.SearchMode);
-         
-         if (logger.isDebugEnabled())
-         {
-            logger.debug("=====Handled search event: " + this.getLastSearch());
-         }
       }
       super.broadcast(event);
    }
@@ -142,7 +135,7 @@ public class UISimpleSearch extends UICommand
       
       ResponseWriter out = context.getResponseWriter();
       
-      // script for dynamic advanced search menu drop-down options
+      // script for dynamic simple search menu drop-down options
       out.write("<script>");
       out.write("function _searchDropdown() {" +
             "if (document.getElementById('_search').style.display == 'none') {" + 
@@ -160,7 +153,7 @@ public class UISimpleSearch extends UICommand
       out.write("}");
       out.write("</script>");
       
-      // outer table containing search drop-down icon, text box and Go search button
+      // outer table containing search drop-down icon, text box and search Go image button
       out.write("<table cellspacing=4 cellpadding=0>");
       out.write("<tr><td style='padding-top:2px'>");
       
@@ -174,6 +167,7 @@ public class UISimpleSearch extends UICommand
       // TODO: configure message, configure Go button text?
       out.write("<tr><td class='userInputForm'><nobr>What would you like to search?</nobr></td></tr>");
       
+      // output each option - setting the current one to CHECKED
       String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
       String radioOption = "<tr><td class='userInputForm'><input type='radio' name='" + optionFieldName + "'";
       out.write(radioOption);
@@ -212,7 +206,7 @@ public class UISimpleSearch extends UICommand
       out.write(getLastSearch());
       out.write("\">");
       
-      // search Go image
+      // search Go image button
       out.write("</td><td>");
       out.write(searchImage);
       
@@ -236,21 +230,30 @@ public class UISimpleSearch extends UICommand
    }
    
    /**
-    * Get the last set search text value
+    * @return The last set search text value
     */
    public String getLastSearch()
    {
       return this.lastSearch;
    }
    
+   /**
+    * Set the current search mode (see constants)
+    * 
+    * @param option     Search mode option (see constants)
+    */
    public void setSearchMode(int option)
    {
+      // see constants below
       if (option >= 0 && option < 4)
       {
          this.searchOption = option;
       }
    }
    
+   /** 
+    * @return The current search mode (see constants) 
+    */
    public int getSearchMode()
    {
       return this.searchOption;
@@ -279,10 +282,17 @@ public class UISimpleSearch extends UICommand
    
    private static final String OPTION_PARAM = "_option";
    
+   /** last search string */
    private String lastSearch = "";
    
-   // TODO: add constants for the 4 search modes here
-   private int searchOption = 0;
+   /** last used search option mode */
+   private int searchOption = SEARCH_ALL;
+   
+   /** Search mode constants */
+   public final static int SEARCH_ALL = 0;
+   public final static int SEARCH_FILE_NAMES_CONTENTS = 1;
+   public final static int SEARCH_FILE_NAMES = 2;
+   public final static int SEARCH_SPACE_NAMES = 3;
    
    
    // ------------------------------------------------------------------------------

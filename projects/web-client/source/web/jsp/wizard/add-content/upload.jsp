@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>
 <%@ taglib uri="http://myfaces.apache.org/extensions" prefix="x"%>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
+<%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <%@ page isELIgnored="false" %>
 
