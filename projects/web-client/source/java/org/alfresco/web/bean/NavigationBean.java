@@ -156,7 +156,8 @@ public class NavigationBean
             // setup some properties
             this.nodeProperties.clear();
             this.nodeProperties.put("id", currentNodeId);
-            String name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
+            //String name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
+            String name = getQNameProperty(props, "name", true);
             this.nodeProperties.put("name", name);
             String desc = getQNameProperty(props, "description", true);
             this.nodeProperties.put("description", desc);

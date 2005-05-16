@@ -336,7 +336,6 @@ public class BrowseBean implements IContextListener
          this.contentNodes = new ArrayList<Node>(childRefs.size());
          for (ChildAssocRef ref: childRefs)
          {
-            // display name is the QName localname part
             QName qname = ref.getQName();
             
             // create our Node representation
@@ -348,7 +347,7 @@ public class BrowseBean implements IContextListener
             
             // name and ID always exist
             props.put("id", ref.getChildRef().getId());
-            props.put("name", qname.getLocalName());
+            props.put("name", getNameForNode(ref.getChildRef()));
             props.put("nodeRef", ref.getChildRef());
             
             // other properties which may exist
@@ -436,7 +435,12 @@ public class BrowseBean implements IContextListener
                
                // name and ID always exist
                props.put("id", ref.getId());
-               props.put("name", row.getQName().getLocalName());
+               String name = getValueProperty(row, "name", false);
+               if (name == null)
+               {
+                  name = getNameForNode(ref);
+               }
+               props.put("name", name);
                props.put("nodeRef", ref);
                
                // other properties which may exist
@@ -726,7 +730,7 @@ public class BrowseBean implements IContextListener
             // name and ID always exist
             Map<String, Object> props = new HashMap<String, Object>(3, 1.0f);
             props.put("id", id);
-            props.put("name", qname.getLocalName());
+            props.put("name", getNameForNode(ref));
             node.setProperties(props);
             
             // prepare a node for the action context
@@ -743,6 +747,34 @@ public class BrowseBean implements IContextListener
       }
       
       invalidateComponents();
+   }
+   
+   /**
+    * Helper to get the display name for a Node.
+    * The method will attempt to use the "name" attribute, if not found it will revert to using
+    * the QName.getLocalName() retrieved from the primary parent relationship.
+    * 
+    * @param ref     NodeRef
+    * 
+    * @return display name string for the specified Node.
+    */
+   private String getNameForNode(NodeRef ref)
+   {
+      String name;
+      
+      // try to find a display "name" property for this node
+      Object nameProp = this.nodeService.getProperty(ref, QNAME_NAME);
+      if (nameProp != null)
+      {
+         name = nameProp.toString();
+      }
+      else
+      {
+         // revert to using QName if not found
+         name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
+      }
+      
+      return name;
    }
    
    /**
@@ -827,7 +859,7 @@ public class BrowseBean implements IContextListener
       // get the current breadcrumb location and append a new handler to it
       // our handler know the ID of the selected node and the display label for it
       List<IBreadcrumbHandler> location = this.navigator.getLocation();
-      String name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
+      String name = getNameForNode(ref);
       location.add(new BrowseBreadcrumbHandler(ref.getId(), name));
       
       // set the current node Id ready for page refresh
@@ -935,6 +967,8 @@ public class BrowseBean implements IContextListener
    private static final String ERROR_SEARCH  = "Search failed during to a system error: {0}";
    
    public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
+   
+   private static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
    
    private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    

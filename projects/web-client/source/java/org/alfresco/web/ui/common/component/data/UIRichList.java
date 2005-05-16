@@ -379,6 +379,9 @@ public class UIRichList extends UIComponentBase implements IDataContainer
             // delegate to the data model to sort its contents
             this.dataModel.sort(initialSortColumn, descending, IDataContainer.SORT_CASEINSENSITIVE);
          }
+         
+         // reset current page
+         this.currentPage = 0;
       }
       
       return this.dataModel;
