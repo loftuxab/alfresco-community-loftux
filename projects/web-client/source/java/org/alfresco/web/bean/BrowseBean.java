@@ -359,43 +359,6 @@ public class BrowseBean implements IContextListener
             // create our Node representation
             MapNode node = new MapNode(ref.getChildRef(), this.nodeService);
             
-//            // convert the rest of the well known properties
-//            Map<QName, Serializable> childProps = this.nodeService.getProperties(ref.getChildRef());
-//            
-//            // name and ID always exist
-//            props.put("id", nodeRef.getId());
-//            props.put("name", RepoUtils.getNameForNode(this.nodeService, nodeRef));
-//            props.put("nodeRef", nodeRef);
-//            
-//            // other properties which may exist
-//            String description = RepoUtils.getQNameProperty(childProps, "description", true);
-//            props.put("description", description);
-//            
-//            String createdDate = RepoUtils.getQNameProperty(childProps, "createddate", false);
-//            if (createdDate != null)
-//            {
-//               props.put("createddate", Conversion.dateFromXmlDate(createdDate));
-//            }
-//            else
-//            {
-//               // TODO: a null created/modified date shouldn't happen!? - remove this later
-//               props.put("createddate", null);
-//            }
-//            
-//            String modifiedDate = RepoUtils.getQNameProperty(childProps, "modifieddate", false);
-//            if (modifiedDate != null)
-//            {
-//               props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
-//            }
-//            else
-//            {
-//               // TODO: a null created/modified date shouldn't happen!?
-//               props.put("modifieddate", null);
-//            }
-//            
-//            // push the propeties into the Node
-//            node.setProperties(props);
-            
             // TODO: resolve icon etc. some how using this e.g. on either make an ActionLink image
             //       property smart or better set in the Node wrapper as property
             if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
@@ -576,8 +539,6 @@ public class BrowseBean implements IContextListener
       {
          try
          {
-            // TODO: wrap up common property set in the Node bean - and hide the NodeService usage
-            //       this will hide the nasty code required to get simple props like "name"!
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             
             // refresh UI based on node selection
@@ -921,9 +882,6 @@ public class BrowseBean implements IContextListener
    
    private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    
-   //private static final String SEARCH_PATH1 = "PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":{0}\"";
-   // TODO: AndyH said he will fix QNAME to prepend // later - so this should work in the future
-   //private static final String SEARCH_PATH2 = "+QNAME:\"" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
    //private static final String SEARCH_ALL               = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
    //private static final String SEARCH_FILE_NAME         = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
    //private static final String SEARCH_FILE_NAME_CONTENT = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
