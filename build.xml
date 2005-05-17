@@ -37,8 +37,14 @@
    <target name="deploy" depends="common-init" description="Deploys to JBoss">
       <copy file="${basedir}/projects/web-client/build/dist/web-client.ear" todir="${deploy.dir}" />
    </target>
-   
-   <target name="deploy-exploded-web-client-jboss" depends="common-init" description="Deploys the web client to a running JBoss server">
+
+   <target name="deploy-tomcat" depends="common-init" description="Deploys to Tomcat">
+      <delete dir="${tomcat.home}/webapps/web-client" includeEmptyDirs="true" quiet="yes" />
+      <delete dir="${tomcat.home}/work/catalina/localhost/web-client" includeEmptyDirs="true" quiet="yes" />
+      <copy file="${basedir}/projects/web-client/build/dist/web-client.war" todir="${tomcat.home}/webapps" />
+   </target>
+
+   <target name="deploy-exploded-web-client-jboss" depends="common-init">
       <input message="Enter name of temporary JBoss folder" addproperty="jboss.tmp.deploy.dirname" />
       <property name="jboss.tmp.deploy.dir" value="${deploy.dir}/../tmp/deploy/${jboss.tmp.deploy.dirname}/web-client-exp.war" />
       <available file="${jboss.tmp.deploy.dir}" type="dir" property="jboss.tmp.deploy.dir.present" />
@@ -48,18 +54,25 @@
          <fileset dir="projects/web-client/source/web" excludes="WEB-INF/**" />
       </copy>
    </target>
-   
+
+   <target name="build-tomcat" depends="common-init">
+      <subant target="build">
+         <fileset dir="." includes="**/project-build.xml" />
+      </subant>
+      <antcall target="deploy-tomcat" />
+   </target>
+
    <target name="incremental-tomcat" depends="common-init">
       <subant target="incremental">
          <fileset dir="." includes="**/project-build.xml" />
       </subant>
       <antcall target="deploy-tomcat" />
    </target>
-   
-   <target name="deploy-tomcat" depends="common-init" description="Deploys to Tomcat">
-      <delete dir="${tomcat.home}/webapps/web-client" includeEmptyDirs="true" quiet="yes" />
-      <delete dir="${tomcat.home}/work/catalina/localhost/web-client" includeEmptyDirs="true" quiet="yes" />
-      <copy file="${basedir}/projects/web-client/build/dist/web-client.war" todir="${tomcat.home}/webapps" />
+
+   <target name="deploy-exploded-web-client-tomcat" depends="common-init">
+      <copy todir="${tomcat.home}/webapps/web-client" verbose="true">
+         <fileset dir="projects/web-client/source/web" excludes="WEB-INF/**" />
+      </copy>
    </target>
 
 </project>

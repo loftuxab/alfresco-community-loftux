@@ -21,7 +21,7 @@ public class TypeNameEvaluator implements Evaluator
       
       if (obj instanceof Node)
       {
-         String typeName = ((Node)obj).getType();
+         String typeName = ((Node)obj).getTypeName();
          result = typeName.equalsIgnoreCase(condition);
       }
       

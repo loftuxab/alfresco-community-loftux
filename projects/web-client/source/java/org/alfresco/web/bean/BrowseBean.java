@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +25,7 @@ import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.value.ValueConverter;
-import org.alfresco.util.Conversion;
+import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -339,53 +338,53 @@ public class BrowseBean implements IContextListener
             QName qname = ref.getQName();
             
             // create our Node representation
-            Node node = new Node(ref.getChildRef(), qname.getNamespaceURI());  // TODO: where does Type come from?
-            Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
-            
-            // convert the rest of the well known properties
-            Map<QName, Serializable> childProps = this.nodeService.getProperties(ref.getChildRef());
-            
-            // name and ID always exist
-            props.put("id", ref.getChildRef().getId());
-            props.put("name", getNameForNode(ref.getChildRef()));
-            props.put("nodeRef", ref.getChildRef());
-            
-            // other properties which may exist
-            String description = getQNameProperty(childProps, "description", true);
-            props.put("description", description);
-            
-            String createdDate = getQNameProperty(childProps, "createddate", false);
-            if (createdDate != null)
-            {
-               props.put("createddate", Conversion.dateFromXmlDate(createdDate));
-            }
-            else
-            {
-               // TODO: a null created/modified date shouldn't happen!? - remove this later
-               props.put("createddate", null);
-            }
-            
-            String modifiedDate = getQNameProperty(childProps, "modifieddate", false);
-            if (modifiedDate != null)
-            {
-               props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
-            }
-            else
-            {
-               // TODO: a null created/modified date shouldn't happen!?
-               props.put("modifieddate", null);
-            }
-            
-            // push the propeties into the Node
-            node.setProperties(props);
+            MapNode node = new MapNode(ref.getChildRef(), this.nodeService);
+//            Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
+//            
+//            // convert the rest of the well known properties
+//            Map<QName, Serializable> childProps = this.nodeService.getProperties(ref.getChildRef());
+//            
+//            // name and ID always exist
+//            props.put("id", ref.getChildRef().getId());
+//            props.put("name", getNameForNode(ref.getChildRef()));
+//            props.put("nodeRef", ref.getChildRef());
+//            
+//            // other properties which may exist
+//            String description = getQNameProperty(childProps, "description", true);
+//            props.put("description", description);
+//            
+//            String createdDate = getQNameProperty(childProps, "createddate", false);
+//            if (createdDate != null)
+//            {
+//               props.put("createddate", Conversion.dateFromXmlDate(createdDate));
+//            }
+//            else
+//            {
+//               // TODO: a null created/modified date shouldn't happen!? - remove this later
+//               props.put("createddate", null);
+//            }
+//            
+//            String modifiedDate = getQNameProperty(childProps, "modifieddate", false);
+//            if (modifiedDate != null)
+//            {
+//               props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
+//            }
+//            else
+//            {
+//               // TODO: a null created/modified date shouldn't happen!?
+//               props.put("modifieddate", null);
+//            }
+//            
+//            // push the propeties into the Node
+//            node.setProperties(props);
             
             // TODO: resolve icon etc. some how using this e.g. on either make an ActionLink image
             //       property smart or better set in the Node wrapper as property
-            if (nodeService.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_SPACE))
+            if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
             {
                this.containerNodes.add(node);
             }
-            else if (nodeService.getType(ref.getChildRef()).equals(DictionaryBootstrap.TYPE_FILE))
+            else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
             {
                this.contentNodes.add(node);
             }
@@ -430,53 +429,53 @@ public class BrowseBean implements IContextListener
             for (ResultSetRow row: results)
             {
                NodeRef ref = row.getNodeRef();
-               Node node = new Node(ref, row.getQName().getNamespaceURI());
-               Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
-               
-               // name and ID always exist
-               props.put("id", ref.getId());
-               String name = getValueProperty(row, "name", false);
-               if (name == null)
-               {
-                  name = getNameForNode(ref);
-               }
-               props.put("name", name);
-               props.put("nodeRef", ref);
-               
-               // other properties which may exist
-               props.put("description", getValueProperty(row, "description", true));
-               
-               String createdDate = getValueProperty(row, "createddate", false);
-               if (createdDate != null)
-               {
-                  props.put("createddate", Conversion.dateFromXmlDate(createdDate));
-               }
-               else
-               {
-                  // TODO: a null created/modified date shouldn't happen!?
-                  props.put("createddate", null);
-               }
-               
-               String modifiedDate = getValueProperty(row, "modifieddate", false);
-               if (modifiedDate != null)
-               {
-                  props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
-               }
-               else
-               {
-                  // TODO: a null created/modified date shouldn't happen!?
-                  props.put("modifieddate", null);
-               }
-               
-               node.setProperties(props);
+               MapNode node = new MapNode(ref, this.nodeService);
+//               Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
+//               
+//               // name and ID always exist
+//               props.put("id", ref.getId());
+//               String name = getValueProperty(row, "name", false);
+//               if (name == null)
+//               {
+//                  name = getNameForNode(ref);
+//               }
+//               props.put("name", name);
+//               props.put("nodeRef", ref);
+//               
+//               // other properties which may exist
+//               props.put("description", getValueProperty(row, "description", true));
+//               
+//               String createdDate = getValueProperty(row, "createddate", false);
+//               if (createdDate != null)
+//               {
+//                  props.put("createddate", Conversion.dateFromXmlDate(createdDate));
+//               }
+//               else
+//               {
+//                  // TODO: a null created/modified date shouldn't happen!?
+//                  props.put("createddate", null);
+//               }
+//               
+//               String modifiedDate = getValueProperty(row, "modifieddate", false);
+//               if (modifiedDate != null)
+//               {
+//                  props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
+//               }
+//               else
+//               {
+//                  // TODO: a null created/modified date shouldn't happen!?
+//                  props.put("modifieddate", null);
+//               }
+//               
+//               node.setProperties(props);
                
                // TODO: resolve icon etc. some how using this e.g. on either make an ActionLink image
                //       property smart or better set in the Node wrapper as property
-               if (nodeService.hasAspect(ref, DictionaryBootstrap.ASPECT_SPACE))
+               if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
                {
                   this.containerNodes.add(node);
                }
-               else if (nodeService.getType(ref).equals(DictionaryBootstrap.TYPE_FILE))
+               else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
                {
                   this.contentNodes.add(node);
                }
@@ -635,7 +634,7 @@ public class BrowseBean implements IContextListener
          {
             // creat the node ref, then our node representation
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, "FILE");
+            Node node = new Node(ref, this.nodeService);
             
             // remember the document
             setDocument(node);
@@ -725,13 +724,7 @@ public class BrowseBean implements IContextListener
             QName qname = this.nodeService.getPrimaryParent(ref).getQName();
             
             // create our Node representation
-            Node node = new Node(ref, qname.getNamespaceURI());  // TODO: where does Type come from?
-            // TEMP: until we have a proper Node wrapper with lazy getting of props etc.
-            // name and ID always exist
-            Map<String, Object> props = new HashMap<String, Object>(3, 1.0f);
-            props.put("id", id);
-            props.put("name", getNameForNode(ref));
-            node.setProperties(props);
+            Node node = new Node(ref, this.nodeService);
             
             // prepare a node for the action context
             setActionSpace(node);

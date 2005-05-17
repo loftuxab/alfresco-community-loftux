@@ -77,7 +77,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       if (howManyKids == 0)
       {
          DataDictionary dd = new DataDictionary();
-         MetaData metaData = dd.getMetaData(this.node.getType());
+         MetaData metaData = dd.getMetaData(this.node.getTypeName());
             
          if (externalConfig != null && externalConfig.booleanValue())
          {
@@ -154,25 +154,25 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       // use the value to get hold of the actual object
       if (this.node == null)
       {
-         String path = (String)getAttributes().get("value");
-      
-         if (path == null)
+         Object value = getAttributes().get("value");
+         
+         if (value == null)
          {
             ValueBinding vb = getValueBinding("value");
             if (vb != null)
             {
-               path = (String)vb.getValue(getFacesContext());
+               value = vb.getValue(getFacesContext());
             }
          }
          
-         this.nodeRef = NodeService.getNodeRef(path);
-         // TODO: This needs refactoring - it is still using old NodeRef - should be using new one,
-         //       should pass a real NodeRef into the new Node() constructor.
-         this.node = new Node(new org.alfresco.repo.ref.NodeRef(Repository.getStoreRef(), ""), NodeService.getType(this.nodeRef));
-         this.node.setProperties(NodeService.getProperties(this.nodeRef));
+         // TODO: for now we presume the object is a Node, but we need to support id's too
+         if (value instanceof Node)
+         {
+            this.node = (Node)value;
+         }
       }
       
-      return node;
+      return this.node;
    }
    
    /**

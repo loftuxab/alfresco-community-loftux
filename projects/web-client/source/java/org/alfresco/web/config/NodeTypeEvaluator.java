@@ -23,7 +23,7 @@ public class NodeTypeEvaluator implements Evaluator
       
       if (obj instanceof Node)
       {
-         String type = (String)((Node)obj).getType();
+         String type = (String)((Node)obj).getTypeName();
          if (type != null)
          {
             result = type.equalsIgnoreCase(condition);

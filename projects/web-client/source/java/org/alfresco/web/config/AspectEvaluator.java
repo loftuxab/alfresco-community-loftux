@@ -1,6 +1,7 @@
 package org.alfresco.web.config;
 
 import java.util.List;
+import java.util.Set;
 
 import org.alfresco.config.evaluator.Evaluator;
 import org.alfresco.web.bean.repository.Node;
@@ -25,7 +26,7 @@ public class AspectEvaluator implements Evaluator
       
       if (obj instanceof Node)
       {
-         List aspects = ((Node)obj).getAspects();
+         Set aspects = ((Node)obj).getAspects();
          if (aspects != null)
          {
             result = aspects.contains(condition);

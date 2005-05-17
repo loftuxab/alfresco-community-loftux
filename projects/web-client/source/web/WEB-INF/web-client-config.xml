@@ -2,10 +2,30 @@
    
    <plug-ins>
       <evaluators>
-         <evaluator id="type-name" class="jsftest.repository.TypeNameEvaluator" />
+         <evaluator id="node-type" class="org.alfresco.web.config.NodeTypeEvaluator" />
          <evaluator id="aspect" class="org.alfresco.web.config.AspectEvaluator" />
       </evaluators>
+      <!--
+      <element-readers>
+         <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
+      </element-readers>
+      -->
    </plug-ins>
+   
+   <config>
+      <server>
+         <mode>servlet</mode>
+         <error-page>/jsp/error.jsp</error-page>
+      </server>
+   </config>
+   
+   <config evaluator="node-type" condition="file">
+      <properties>
+         <property name="name" />
+         <property name="createddate" />
+         <property name="modifieddate" />
+      </properties>
+   </config>
    
    <!--
    <config evaluator="string-compare" condition="wizard:new-space">

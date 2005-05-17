@@ -3,6 +3,7 @@ package org.alfresco.web;
 import java.io.IOException;
 
 import javax.faces.webapp.FacesServlet;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -14,7 +15,7 @@ import org.alfresco.web.bean.ErrorBean;
 import org.apache.log4j.Logger;
 
 /**
- * Wrapper around standard faces servlet to handle errors
+ * Wrapper around standard faces servlet to provide error handling
  * 
  * @author gavinc
  */
@@ -25,7 +26,8 @@ public class AlfrescoFacesServlet extends FacesServlet
    /**
     * @see javax.servlet.Servlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
     */
-   public void service(ServletRequest request, ServletResponse response) throws IOException, ServletException
+   public void service(ServletRequest request, ServletResponse response) 
+      throws IOException, ServletException
    {
       try
       {
@@ -33,7 +35,12 @@ public class AlfrescoFacesServlet extends FacesServlet
       }
       catch (Throwable error)
       {
+         // ******************************************************************
          // TODO: configure the error page and re-throw error if not specified
+         //       we also need to calculate the return page so we don't rely
+         //       on the browser history - we may also want to do a forward
+         //       instead of a redirect!!
+         // ******************************************************************
          
          // get the error bean from the session and set the error that occurred.
          HttpSession session = ((HttpServletRequest)request).getSession();
@@ -48,8 +55,30 @@ public class AlfrescoFacesServlet extends FacesServlet
          if (logger.isDebugEnabled())
             logger.debug("An error has occurred, redirecting to error page: /jsp/error.jsp");
          
-         ((HttpServletResponse)response).sendRedirect(((HttpServletRequest)request).getContextPath() + 
-                                                         "/jsp/error.jsp");
+         HttpServletResponse resp = (HttpServletResponse)response;
+         if (response.isCommitted() == false)
+         {
+            ((HttpServletResponse)response).sendRedirect(((HttpServletRequest)request).
+                  getContextPath() + "/jsp/error.jsp");
+         }
+         else
+         {
+            if (logger.isDebugEnabled())
+               logger.debug("Response is already committed, re-throwing error");
+            
+            if (error instanceof IOException)
+            {
+               throw (IOException)error;
+            }
+            else if (error instanceof ServletException)
+            {
+               throw (ServletException)error;
+            }
+            else
+            {
+               throw new ServletException(error);
+            }
+         }
       }
    }
    

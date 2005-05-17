@@ -73,7 +73,7 @@ public class UIProperty extends UIPanel implements NamingContainer
          }
    
          DataDictionary dd = new DataDictionary();
-         MetaData metaData = dd.getMetaData(node.getType());
+         MetaData metaData = dd.getMetaData(node.getTypeName());
          Property prop = (Property)metaData.getPropertiesMap().get(propertyName); 
          
          if (prop == null)

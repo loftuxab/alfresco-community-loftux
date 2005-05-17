@@ -1,63 +1,84 @@
 package org.alfresco.web.bean.repository;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
+import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
+import org.apache.log4j.Logger;
 
 /**
  * Lighweight client side representation of a node held in the repository. 
  * 
- * TODO: This object should be retrieved via Spring (singleton = false)
- *       and then the nodeService etc. can be injected in here and be
- *       used to find metadata etc.
- * 
- * 
  * @author gavinc
  */
-public class Node implements Serializable, Map<String, Object>
+public class Node implements Serializable
 {
    private static final long serialVersionUID = 3544390322739034169L;
 
    private static Logger logger = Logger.getLogger(Node.class);
    
    private NodeRef nodeRef;
-   private String type;
-   private Map<String, Object> properties = new HashMap(7, 1.0f);
+   private String name;
+   private ClassRef type;
+   private String path;
+   private String id;
+   private Set aspects = null;
+   private Map<String, Object> properties = new HashMap<String, Object>(7, 1.0f);
+   
+   private boolean propsRetrieved = false;
+   private NodeService nodeService;
    
    /**
     * Constructor
     * 
-    * @param nodeRef    The NodeRef this Node wrapper represents
-    * @param type       Type of the Node this represents
+    * @param nodeRef The NodeRef this Node wrapper represents
+    * @param nodeService The node service to use to retrieve data for this node 
     */
-   public Node(NodeRef nodeRef, String type)
+   public Node(NodeRef nodeRef, NodeService nodeService)
    {
       if (nodeRef == null)
       {
-         throw new IllegalArgumentException("NodeRef must be specified during creation of a Node.");
+         throw new IllegalArgumentException("NodeRef must be specified for creation of a Node.");
       }
-      if (type == null || type.length() == 0)
+      
+      if (nodeService == null)
       {
-         throw new IllegalArgumentException("Node Type must be specified during the creation of a Node.");
+         throw new IllegalArgumentException("The NodeService must be supplied for creation of a Node.");
       }
       
-      this.type = type;
       this.nodeRef = nodeRef;
+      this.id = nodeRef.getId();
+      this.nodeService = nodeService;
+   }
+
+   /**
+    * @return All the properties known about this node.
+    */
+   public Map<String, Object> getProperties()
+   {
+      if (this.propsRetrieved == false)
+      {
+         // TODO: How are we going to deal with namespaces, JSF won't understand so
+         //       we will need some sort of mechanism to deal with it????
+         //       For now just get the local name of each property.
+         
+         Map<QName, Serializable> props = this.nodeService.getProperties(this.nodeRef);
+         
+         for (QName qname: props.keySet())
+         {
+            String localName = qname.getLocalName();
+            this.properties.put(localName, props.get(qname));
+         }
+         
+         this.propsRetrieved = true;
+      }
       
-      // also add the type to the properties so it can be retrieved
-      // that way too (for value binding expressions)
-      // TODO: this needs to reviewed though as we don't want this appearing as a property!
-      //       we should have several types of Node (e.g. Node as as interface) Map type used for datagrids
-      // IMPORTANT: these props will be lost if you call setProperties() later!
-      this.properties.put("type", this.type);
-      this.properties.put("nodeRef", this.nodeRef);
+      return properties;
    }
 
    /**
@@ -71,12 +92,22 @@ public class Node implements Serializable, Map<String, Object>
    /**
     * @return Returns the type.
     */
-   public String getType()
+   public ClassRef getType()
    {
-      // TODO: Use the node service to retrieve the type and
-      //       remove the type from the constructor
+      if (this.type == null)
+      {
+         this.type = this.nodeService.getType(this.nodeRef);
+      }
       
       return type;
+   }
+   
+   /**
+    * @return Returns the type name as a string.
+    */
+   public String getTypeName()
+   {
+      return getType().getQName().getLocalName();
    }
    
    /**
@@ -84,17 +115,42 @@ public class Node implements Serializable, Map<String, Object>
     */
    public String getName()
    {
-      return this.properties.get("name").toString();
+      if (this.name == null)
+      {
+         // try and get the name from the properties first
+         this.name = (String)getProperties().get("name");
+         
+         // if we didn't find it as a property get the name from the association name
+         if (this.name == null)
+         {
+            this.name = this.nodeService.getPrimaryParent(this.nodeRef).getQName().getLocalName(); 
+         }
+      }
+      
+      return this.name;
    }
 
    /**
     * @return The list of aspects applied to this node
     */
-   public List getAspects()
+   public Set getAspects()
    {
-      // TODO: Use the node service to retrieve the aspects
+      if (this.aspects == null)
+      {
+         this.aspects = this.nodeService.getAspects(this.nodeRef);
+      }
       
-      return null;
+      return this.aspects;
+   }
+   
+   /**
+    * @param aspect The aspect to test for
+    * @return true if the node has the aspect false otherwise
+    */
+   public boolean hasAspect(ClassRef aspect)
+   {
+      Set aspects = getAspects();
+      return aspects.contains(aspect);
    }
 
    /**
@@ -102,158 +158,33 @@ public class Node implements Serializable, Map<String, Object>
     */
    public String getId()
    {
-      return this.properties.get("id").toString();
+      return this.id;
    }
 
+   /**
+    * @return The path for the node
+    */
    public String getPath()
    {
-      // TODO: Use the node service to retrieve the path
+      if (this.path == null)
+      {
+         this.path = this.nodeService.getPath(this.nodeRef).toString();
+      }
       
-      return null;
+      return this.path;
    }
    
-   /**
-    * @param properties The properties to set.
-    */
-   public void setProperties(Map<String, Object> properties)
-   {
-      // TODO: Use the node service to retrieve the properties,
-      //       this will probably be done in the constructor so
-      //       this method can be removed.
-      
-      this.properties = properties;
-      
-      // also add the type to the properties so it can be retrieved
-      // that way too (for value binding expressions), this needs to
-      // reviewed though as we don't want this appearing as a property!
-      this.properties.put("type", this.type);
-   }
-   
-   /**
-    * Used to save the properties edited by the user
-    * 
-    * @return The outcome string
-    */
-   public String persist()
-   {
-      logger.debug("Updating properties for: " + this + "; properties = " + this.properties);
-      
-      // TODO: Use whatever service to persist the Node back to the repository
-      
-      return "success";
-   }
-
-   
-   // ------------------------------------------------------------------------------
-   // Map implementation - allows the Node bean to be accessed using JSF expression syntax 
-   
-   /**
-    * @see java.util.Map#clear()
-    */
-   public void clear()
-   {
-      this.properties.clear();
-   }
-
-   /**
-    * @see java.util.Map#containsKey(java.lang.Object)
-    */
-   public boolean containsKey(Object key)
-   {
-      return this.properties.containsKey(key);
-   }
-
-   /**
-    * @see java.util.Map#containsValue(java.lang.Object)
-    */
-   public boolean containsValue(Object value)
-   {
-      return this.properties.containsKey(value);
-   }
-
-   /**
-    * @see java.util.Map#entrySet()
-    */
-   public Set entrySet()
-   {
-      return this.properties.entrySet();
-   }
-
-   /**
-    * @see java.util.Map#get(java.lang.Object)
-    */
-   public Object get(Object key)
-   {
-      return this.properties.get(key);
-   }
-
-   /**
-    * @see java.util.Map#isEmpty()
-    */
-   public boolean isEmpty()
-   {
-      return this.properties.isEmpty();
-   }
-
-   /**
-    * @see java.util.Map#keySet()
-    */
-   public Set keySet()
-   {
-      return this.properties.keySet();
-   }
-
-   /**
-    * @see java.util.Map#put(K, V)
-    */
-   public Object put(String key, Object value)
-   {
-      return this.properties.put(key, value);
-   }
-
-   /**
-    * @see java.util.Map#putAll(java.util.Map)
-    */
-   public void putAll(Map t)
-   {
-      this.properties.putAll(t);
-   }
-
-   /**
-    * @see java.util.Map#remove(java.lang.Object)
-    */
-   public Object remove(Object key)
-   {
-      return this.properties.remove(key);
-   }
-
-   /**
-    * @see java.util.Map#size()
-    */
-   public int size()
-   {
-      return this.properties.size();
-   }
-
-   /**
-    * @see java.util.Map#values()
-    */
-   public Collection values()
-   {
-      return this.properties.values();
-   }
-
-   /**
-    * @see java.lang.Object#toString()
-    */
-//   public String toString()
+//   /**
+//    * Used to save the properties edited by the user
+//    * 
+//    * @return The outcome string
+//    */
+//   public String persist()
 //   {
-//      StringBuilder buffer = new StringBuilder();
-//      buffer.append(super.toString());
-//      buffer.append(" (type=").append(this.type);
-//      buffer.append(" properties=").append(this.properties).append(")");
-//      return buffer.toString();
-//   }
-   
-   
+//      logger.debug("Updating properties for: " + this + "; properties = " + this.properties);
+//      
+//      // TODO: Use whatever service to persist the Node back to the repository
+//      
+//      return "success";
+//   }   
 }

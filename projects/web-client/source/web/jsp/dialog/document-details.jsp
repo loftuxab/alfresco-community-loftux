@@ -58,7 +58,7 @@
                            <td>
                               <div class="mainSubTitle"/>Space Name</div>
                               <div class="mainTitle">Details of 'document'</div>
-                              <div class="mainSubText">Use this page to view the details about the content, then click Close.</div>
+                              <div class="mainSubText">Use this page to view the details about the content.</div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=100 style="padding-left:2px">
@@ -92,7 +92,18 @@
                               <br/>
                               <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" 
                                        progressive="true"><br/>
-                                 Properties go here!
+                                 <table border="0" cellpadding="2" cellspacing="0">
+                                    <tr><td style="border-bottom: 1px solid black;">General</td></tr>
+                                    <tr>
+                                       <td>
+                                       <r:propertySheetGrid value="#{BrowseBean.document}" var="generalProps">
+                                          <r:property value="name" columns="2" />
+                                          <r:property value="createddate" columns="2" />
+                                          <r:property value="modifieddate" columns="2" />
+                                       </r:propertySheetGrid>
+                                       </td>
+                                    </tr>
+                                 </table>
                               </a:panel>
                               <br/>
                               <a:panel label="Workflow" id="workflow-panel" border="greyround" bgcolor="#eaeaea" 
