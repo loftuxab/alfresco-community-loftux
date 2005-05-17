@@ -95,7 +95,7 @@ public class LuceneQueryParser extends QueryParser
                 LuceneXPathHandler handler = new LuceneXPathHandler();
                 handler.setNameSpaceService(nameSpaceService);
                 reader.setXPathHandler(handler);
-                reader.parse(queryText);
+                reader.parse("//"+queryText);
                 return handler.getQuery();
             }
             else if (field.equals("TYPE"))

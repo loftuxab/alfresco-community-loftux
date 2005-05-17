@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -802,160 +803,193 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private List<Document> createDocuments(NodeRef nodeRef, boolean isNew)
     {
-        // Create mutiple containers
-        // For each node and directory create a copy for each parent in which it
-        // occurs
-
         ClassRef nodeTypeRef = nodeService.getType(nodeRef);
         Map<ChildAssocRef, Counter> nodeCounts = getNodeCounts(nodeRef);
         List<Document> docs = new ArrayList<Document>();
         ChildAssocRef qNameRef = null;
         Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-        Collection<Path> paths = getIndexablePaths(nodeRef, properties);
+
+        Collection<Path> directPaths = nodeService.getPaths(nodeRef, false);
+        Collection<Path> categoryPaths = getCategoryPaths(nodeRef, properties);
+        Collection<Path> paths = new ArrayList<Path>(directPaths.size() + categoryPaths.size());
+        paths.addAll(directPaths);
+        paths.addAll(categoryPaths);
+
         String aspects = getAspects(nodeRef);
+
+        Document xdoc = new Document();
+        xdoc.add(new Field("ID", nodeRef.getId(), true, true, false));
+        boolean isAtomic = true;
+        for (QName propertyQName : properties.keySet())
+        {
+            isAtomic = indexProperty(properties, xdoc, isAtomic, propertyQName);
+        }
+
+        boolean isRoot = nodeRef.equals(nodeService.getRootNode(nodeRef.getStoreRef()));
+
+        StringBuffer parentBuffer = new StringBuffer();
+        StringBuffer qNameBuffer = new StringBuffer();
 
         int containerCount = 0;
         for (Iterator<Path> it = paths.iterator(); it.hasNext(); /**/)
         {
             Path path = it.next();
-
             // Lucene flags in order are: Stored, indexed, tokenised
-            // ID
-            Document doc = new Document();
-            doc.add(new Field("ID", nodeRef.getId(), true, true, false));
 
-            // Properties
+            qNameRef = getLastRefOrNull(path);
 
-            boolean isAtomic = true;
-            for (QName propertyQName : properties.keySet())
+            String pathString = path.toString();
+            if ((pathString.length() > 0) && (pathString.charAt(0) == '/'))
             {
-                isAtomic = indexProperty(properties, doc, isAtomic, propertyQName);
+                pathString = pathString.substring(1);
             }
 
-            // Paths
+            String parentString = getParentString(path);
 
-            StringBuilder qNameBuffer = new StringBuilder();
-            StringBuilder pathBuffer = new StringBuilder();
-            StringBuilder parentBuffer = new StringBuilder();
-
-            ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>();
-
-            int pathLength = 0;
-            for (Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
+            if (isRoot)
             {
-                Path.Element element = elit.next();
-                if (!(element instanceof Path.ChildAssocElement))
-                {
-                    throw new IndexerException("Confused path: " + path);
-                }
-                Path.ChildAssocElement cae = (Path.ChildAssocElement) element;
-                parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getChildRef());
-                if (!elit.hasNext())
-                {
-
-                    if (cae.getRef().getParentRef() != null)
-                    {
-                        if (cae.getRef().getQName() != null)
-                        {
-                            qNameBuffer.append(cae.getRef().getQName().toString());
-                        }
-                        doc.add(new Field("PARENT", cae.getRef().getParentRef().getId(), true, true, false));
-                    }
-                    qNameRef = cae.getRef();
-                }
-
-                if (pathBuffer.length() > 0)
-                {
-                    pathBuffer.append("/");
-                }
-                if ((cae.getRef().getParentRef() != null) && (cae.getRef().getQName() != null))
-                {
-                    pathBuffer.append(cae.getRef().getQName().toString());
-                }
-                pathLength++;
+                // Root node
             }
-
-            for (NodeRef ref : parentsInDepthOrderStartingWithSelf)
-            {
-                if (parentBuffer.length() > 0)
-                {
-                    parentBuffer.append(" ");
-                }
-                parentBuffer.append(ref.getId());
-            }
-
-            parentsInDepthOrderStartingWithSelf.clear();
-
-            // Root Node
-            if (nodeRef.equals(nodeService.getRootNode(nodeRef.getStoreRef())))
-            {
-                // TODO: Does the root element have a QName?
-                doc.add(new Field("ISCONTAINER", "T", true, true, false));
-                doc.add(new Field("PATH", ";", true, true, true));
-                doc.add(new Field("ISROOT", "T", true, true, false));
-                doc.add(new Field("ISNODE", "T", true, true, false));
-                docs.add(doc);
-            }
-            else if (pathLength == 1)
+            else if (path.size() == 1)
             {
                 // Pseudo root node ignore
             }
             else
             // not a root node
             {
-                doc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
-
-                TypeDefinition nodeTypeDef = getDictionaryService().getType(nodeTypeRef);
-                // check for child associations
-                if (nodeTypeDef.getChildAssociations().size() > 0)
-                {
-                    Document directoryEntry = new Document();
-                    directoryEntry.add(new Field("ID", nodeRef.getId(), true, true, false));
-                    directoryEntry.add(new Field("PATH", pathBuffer.toString(), true, true, true));
-                    directoryEntry.add(new Field("ANCESTOR", parentBuffer.toString(), true, true, true));
-                    directoryEntry.add(new Field("ISCONTAINER", "T", true, true, false));
-                    docs.add(directoryEntry);
-                }
-
-                doc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getParentRef().getId(), true, true, false));
-                doc.add(new Field("TYPE", nodeService.getType(nodeRef).getQName().toString(), true, true, true));
-                doc.add(new Field("ASPECT", aspects, true, true, true));
-
                 Counter counter = nodeCounts.get(qNameRef);
                 // If we have something in a container with root aspect we will
                 // not find it
+
+                if ((counter == null) || (counter.getRepeat() < counter.getCountInParent()))
+                {
+                    if ((qNameRef != null) && (qNameRef.getParentRef() != null) && (qNameRef.getQName() != null))
+                    {
+                        if (qNameBuffer.length() > 0)
+                        {
+                            qNameBuffer.append(";/");
+                        }
+                        qNameBuffer.append(qNameRef.getQName().toString());
+                        // if(parentBuffer.length() > 0)
+                        // {
+                        // parentBuffer.append(" ");
+                        // }
+                        // parentBuffer.append(qNameRef.getParentRef().getId());
+                        xdoc.add(new Field("PARENT", qNameRef.getParentRef().getId(), true, true, false));
+
+                    }
+                }
+
                 if (counter != null)
                 {
                     counter.increment();
                 }
 
-                doc.add(new Field("ISROOT", "F", true, true, false));
-                doc.add(new Field("ISNODE", "T", true, true, false));
-                if (isAtomic)
+                TypeDefinition nodeTypeDef = getDictionaryService().getType(nodeTypeRef);
+                // check for child associations
+                if (nodeTypeDef.getChildAssociations().size() > 0)
                 {
-                    doc.add(new Field("FTSSTATUS", "Clean", true, true, false));
-                }
-                else
-                {
-                    if (isNew)
+                    if (directPaths.contains(path))
                     {
-                        doc.add(new Field("FTSSTATUS", "New", true, true, false));
+                        Document directoryEntry = new Document();
+                        directoryEntry.add(new Field("ID", nodeRef.getId(), true, true, false));
+                        directoryEntry.add(new Field("PATH", pathString, true, true, true));
+                        directoryEntry.add(new Field("ANCESTOR", parentString, true, true, true));
+                        directoryEntry.add(new Field("ISCONTAINER", "T", true, true, false));
+                        docs.add(directoryEntry);
                     }
-                    else
-                    {
-                        doc.add(new Field("FTSSTATUS", "Dirty", true, true, false));
-                    }
-                }
-                doc.add(new Field("TX", deltaId, true, true, false));
-
-                if ((counter == null) || counter.getRepeat() == 1)
-                {
-                    docs.add(doc);
                 }
             }
         }
 
+        // Root Node
+        if (isRoot)
+        {
+            // TODO: Does the root element have a QName?
+            xdoc.add(new Field("ISCONTAINER", "T", true, true, false));
+            xdoc.add(new Field("PATH", "", true, true, true));
+            xdoc.add(new Field("QNAME", "", true, true, true));
+            xdoc.add(new Field("ISROOT", "T", true, true, false));
+            xdoc.add(new Field("ISNODE", "T", true, true, false));
+            docs.add(xdoc);
+
+        }
+        else
+        // not a root node
+        {
+            xdoc.add(new Field("QNAME", qNameBuffer.toString(), true, true, true));
+            // xdoc.add(new Field("PARENT", parentBuffer.toString(), true, true,
+            // true));
+
+            xdoc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getParentRef().getId(), true, true, false));
+            xdoc.add(new Field("TYPE", nodeService.getType(nodeRef).getQName().toString(), true, true, true));
+            xdoc.add(new Field("ASPECT", aspects, true, true, true));
+
+            xdoc.add(new Field("ISROOT", "F", true, true, false));
+            xdoc.add(new Field("ISNODE", "T", true, true, false));
+            if (isAtomic)
+            {
+                xdoc.add(new Field("FTSSTATUS", "Clean", true, true, false));
+            }
+            else
+            {
+                if (isNew)
+                {
+                    xdoc.add(new Field("FTSSTATUS", "New", true, true, false));
+                }
+                else
+                {
+                    xdoc.add(new Field("FTSSTATUS", "Dirty", true, true, false));
+                }
+            }
+            xdoc.add(new Field("TX", deltaId, true, true, false));
+
+            // {
+            docs.add(xdoc);
+            // }
+        }
+
         return docs;
+    }
+
+    private String getParentString(Path path)
+    {
+        StringBuilder parentBuffer = new StringBuilder();
+        ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>();
+        for (Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
+        {
+            Path.Element element = elit.next();
+            if (!(element instanceof Path.ChildAssocElement))
+            {
+                throw new IndexerException("Confused path: " + path);
+            }
+            Path.ChildAssocElement cae = (Path.ChildAssocElement) element;
+            parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getChildRef());
+
+        }
+        for (NodeRef ref : parentsInDepthOrderStartingWithSelf)
+        {
+            if (parentBuffer.length() > 0)
+            {
+                parentBuffer.append(" ");
+            }
+            parentBuffer.append(ref.getId());
+        }
+        parentsInDepthOrderStartingWithSelf.clear();
+        return parentBuffer.toString();
+    }
+
+    private ChildAssocRef getLastRefOrNull(Path path)
+    {
+        if (path.last() instanceof Path.ChildAssocElement)
+        {
+            Path.ChildAssocElement cae = (Path.ChildAssocElement) path.last();
+            return cae.getRef();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     private boolean indexProperty(Map<QName, Serializable> properties, Document doc, boolean isAtomic, QName propertyQName)
@@ -975,7 +1009,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             atomic = propertyDefinition.isIndexedAtomically();
         }
         isAtomic &= atomic;
-        // PropertyTypeDefinition propDef = null;
         Serializable value = properties.get(propertyQName);
         // convert value to String
         String strValue = ValueConverter.convert(String.class, value);
@@ -995,7 +1028,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             if (aspectBuffer.length() > 0)
             {
-                aspectBuffer.append(";");
+                aspectBuffer.append(";/");
             }
             aspectBuffer.append(classRef.getQName().toString());
         }
@@ -1022,23 +1055,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return nodeCounts;
     }
 
-    private Collection<Path> getIndexablePaths(NodeRef nodeRef, Map<QName, Serializable> properties)
-    {
-        Collection<Path> directPaths = nodeService.getPaths(nodeRef, false);
-        Collection<Path> categoryPaths = getCategoryPaths(nodeRef, properties);
-        Collection<Path> paths = new ArrayList<Path>(directPaths.size() + categoryPaths.size());
-        paths.addAll(directPaths);
-        paths.addAll(categoryPaths);
-        return paths;
-    }
-
     private Collection<Path> getCategoryPaths(NodeRef nodeRef, Map<QName, Serializable> properties)
     {
-        Set<Path> categoryPaths = new HashSet<Path>();
+        ArrayList<Path> categoryPaths = new ArrayList<Path>();
         Set<ClassRef> aspects = nodeService.getAspects(nodeRef);
+
         for (ClassRef classRef : aspects)
         {
-
             AspectDefinition aspDef = getDictionaryService().getAspect(classRef);
             if (isCategorised(aspDef))
             {
@@ -1064,7 +1087,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                         }
                                     }
                                 }
-                                // TODO: Add category reuse
+                                // Could filter paths here if we do not want Ir
+                                // to appears as region if we have region
+                                // classification
                                 categoryPaths.addAll(aspectPaths);
                             }
                         }
@@ -1081,7 +1106,48 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 path.append(new Path.ChildAssocElement(new ChildAssocRef(cae.getRef().getChildRef(), QName.createQName("member"), nodeRef)));
             }
         }
-        return categoryPaths;
+        // Filter paths to available aspects
+        // Build Qnames
+        Set<QName> qnames = new HashSet<QName>();
+        for (ClassRef classRef : aspects)
+        {
+            qnames.add(classRef.getQName());
+        }
+        for (ListIterator<Path> it = categoryPaths.listIterator(); it.hasNext(); /**/)
+        {
+            Path path = it.next();
+            Path.ChildAssocElement firstRelativeLink = null;
+            for (Iterator<Path.Element> elementit = path.iterator(); elementit.hasNext(); /**/)
+            {
+                Path.Element element = elementit.next();
+                if (element instanceof Path.ChildAssocElement)
+                {
+                    Path.ChildAssocElement test = (Path.ChildAssocElement)element;
+                    if((test.getRef().getParentRef() != null) && (test.getRef().getQName() != null))
+                    {
+                        firstRelativeLink = test;
+                        break;
+                    }
+                }
+
+            }
+            if (firstRelativeLink != null)
+            {
+                if (!qnames.contains(firstRelativeLink.getRef().getQName()))
+                {
+                    it.remove();
+                }
+            }
+            else
+            {
+                it.remove();
+            }
+
+        }
+
+        HashSet<Path> unique = new HashSet<Path>();
+        unique.addAll(categoryPaths);
+        return unique;
     }
 
     private boolean isCategorised(AspectDefinition aspDef)

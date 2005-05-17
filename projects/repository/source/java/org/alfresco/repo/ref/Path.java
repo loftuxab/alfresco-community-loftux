@@ -116,6 +116,11 @@ public final class Path implements Iterable<Path.Element>, Serializable
         return elements.getLast();
     }
     
+    public int size()
+    {
+        return elements.size();
+    }
+    
     /**
      * @return Returns a string path made up of the component elements of this instance
      */

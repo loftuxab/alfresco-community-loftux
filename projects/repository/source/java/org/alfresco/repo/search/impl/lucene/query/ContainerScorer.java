@@ -55,13 +55,8 @@ public class ContainerScorer extends Scorer
     // The frequency of the terms in the doc (0.0f or 1.0f)
     float freq = 0.0f;
 
-    private DecimalFormat nf;
-
+    // A term position to find all container entries (there is no better way of finding the set of rquired containers)
     private TermPositions containers;
-
-    // CachingTermPositions[] dtps;
-
-    // boolean excludeDepthTerms;
 
     /**
      * The arguments here follow the same pattern as used by the PhraseQuery.
@@ -89,7 +84,6 @@ public class ContainerScorer extends Scorer
         this.positions = positions;
         this.norms = norms;
         this.root = root;
-        this.nf = new DecimalFormat(PathTokenFilter.INTEGER_FORMAT);
         this.containers = containers;
     }
 
@@ -100,8 +94,10 @@ public class ContainerScorer extends Scorer
      */
     public boolean next() throws IOException
     {
+        // If there is no filtering
         if (allContainers())
         {
+            // containers and roots must be in sync or the index is broken
             while (more)
             {
                 if (containers.next() && root.next())
@@ -134,11 +130,18 @@ public class ContainerScorer extends Scorer
             {
                 return true;
             }
+            // drop through to the normal find sequence
         }
 
         return findNext();
     }
 
+    /**
+     * Are we looking for all containers?
+     * If there are no positions we must have a better filter
+     *  
+     * @return
+     */
     private boolean allContainers()
     {
         if (positions.length == 0)
@@ -185,6 +188,7 @@ public class ContainerScorer extends Scorer
 
     private boolean found() throws IOException
     {
+        // No predicate test if there are no positions
         if (positions.length == 0)
         {
             return true;
@@ -207,7 +211,9 @@ public class ContainerScorer extends Scorer
             return false;
         }
 
-        // We have duplicate entries
+        // We have duplicate entries - suport should be improved but it is not used at the moment
+        // This shuld work akin to the leaf scorer 
+        // It would compact the index
         // The match must be in a known term range
         int count = root.freq();
         int start = 0;
@@ -251,6 +257,7 @@ public class ContainerScorer extends Scorer
         }
         else
         {
+            // Check non // ending patterns end at the end of the available pattern
             if (positions[positions.length - 1].isTerminal())
             {
                 return ((offset+1) == end);
@@ -262,6 +269,17 @@ public class ContainerScorer extends Scorer
         }
     }
 
+    /**
+     * For // type pattern matches we need to test patterns of variable greedyness.
+     *
+     * 
+     * @param start
+     * @param end
+     * @param currentPosition
+     * @param currentOffset
+     * @return
+     * @throws IOException
+     */
     private int checkTail(int start, int end, int currentPosition, int currentOffset) throws IOException
     {
         int offset = currentOffset;
@@ -297,11 +315,13 @@ public class ContainerScorer extends Scorer
         if (min == max)
         {
             // If we were at a match just do next on all terms
+            // They all must move on
             doNextOnAll();
         }
         else
         {
             // We are in a range - try and skip to the max position on all terms
+            // Only some need to move on - some may move past the current max and set a new target
             skipToMax();
         }
     }
@@ -340,7 +360,8 @@ public class ContainerScorer extends Scorer
             }
         }
 
-        // Do the root term
+        // Do the root term - it must always exists as the path could well have mutiple entries
+        // If an entry in the index does not have a root terminal it is broken
         if (root.next())
         {
             rootDoc = root.doc();
@@ -417,7 +438,7 @@ public class ContainerScorer extends Scorer
 
     /*
      * Adjust the min and max values Convenience boolean to set or adjust the
-     * miniumu.
+     * minimum.
      */
     private void adjustMinMax(int doc, boolean setMin)
     {
@@ -470,8 +491,29 @@ public class ContainerScorer extends Scorer
     {
         if (allContainers())
         {
-            return containers.skipTo(target);
+            containers.skipTo(target);
+            root.skipTo(containers.doc()); // must match
+            if (check(0, root.nextPosition()))
+            {
+                return true;
+            }
+            while (more)
+            {
+                if (containers.next() && root.next())
+                {
+                    if (check(0, root.nextPosition()))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    more = false;
+                    return false;
+                }
+            }
         }
+
         max = target;
         return findNext();
     }
@@ -483,6 +525,7 @@ public class ContainerScorer extends Scorer
      */
     public Explanation explain(int doc) throws IOException
     {
+        // TODO: Work out what a proper explanation would be here? 
         Explanation tfExplanation = new Explanation();
 
         while (next() && doc() < doc)

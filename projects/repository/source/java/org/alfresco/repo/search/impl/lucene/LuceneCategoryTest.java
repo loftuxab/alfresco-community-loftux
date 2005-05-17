@@ -25,9 +25,11 @@ import org.alfresco.repo.dictionary.metamodel.MetaModelDAO;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.ResultSet;
+import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.impl.lucene.LuceneTest.MockNameService;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
@@ -133,19 +135,27 @@ public class LuceneCategoryTest extends TestCase
         
         catContainer = nodeService.createNode(rootNodeRef, null, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryContainer"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         catRoot = nodeService.createNode(catContainer, null, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryRoot"), DictionaryBootstrap.TYPE_QNAME_CATEGORYROOT).getChildRef();
-        catACBase = nodeService.createNode(catRoot, null, QName.createQName(NamespaceService.ALFRESCO_URI, "AssetClass"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catACOne = nodeService.createNode(catACBase, null, QName.createQName(NamespaceService.ALFRESCO_URI, "Fixed"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catACTwo = nodeService.createNode(catACBase, null, QName.createQName(NamespaceService.ALFRESCO_URI, "Equity"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catACThree = nodeService.createNode(catACTwo, null, QName.createQName(NamespaceService.ALFRESCO_URI, "SpecialEquity"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        
+       
+       
         
         catRBase = nodeService.createNode(catRoot, null, QName.createQName(NamespaceService.ALFRESCO_URI, "Region"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
         catROne = nodeService.createNode(catRBase, null, QName.createQName(NamespaceService.ALFRESCO_URI, "Europe"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
         catRTwo = nodeService.createNode(catRBase, null, QName.createQName(NamespaceService.ALFRESCO_URI, "RestOfWorld"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
         catRThree = nodeService.createNode(catRTwo, null, QName.createQName(NamespaceService.ALFRESCO_URI, "US"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
         
-        nodeService.addAspect(n1, new ClassRef(regionCategorisationQName), createMap("region", catRBase));
+        nodeService.addChild(catRoot, catRBase, QName.createQName(NamespaceService.ALFRESCO_URI, "InvestmentRegion"));
+        nodeService.addChild(catRoot, catRBase, QName.createQName(NamespaceService.ALFRESCO_URI, "MarketingRegion"));
+        
+        
+        catACBase = nodeService.createNode(catRoot, null, QName.createQName(NamespaceService.ALFRESCO_URI, "AssetClass"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        catACOne = nodeService.createNode(catACBase, null, QName.createQName(NamespaceService.ALFRESCO_URI, "Fixed"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        catACTwo = nodeService.createNode(catACBase, null, QName.createQName(NamespaceService.ALFRESCO_URI, "Equity"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        catACThree = nodeService.createNode(catACTwo, null, QName.createQName(NamespaceService.ALFRESCO_URI, "SpecialEquity"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        
+        
+       
         nodeService.addAspect(n1, new ClassRef(assetClassCategorisationQName), createMap("assetClass", catACBase));
+        nodeService.addAspect(n1, new ClassRef(regionCategorisationQName), createMap("region", catRBase));
         
         nodeService.addAspect(n2, new ClassRef(assetClassCategorisationQName), createMap("assetClass", catACOne));
         nodeService.addAspect(n3, new ClassRef(assetClassCategorisationQName), createMap("assetClass", catACOne));
@@ -277,12 +287,19 @@ public class LuceneCategoryTest extends TestCase
         indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}two"), n2));
         indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}three"), n3));
         indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}four"), n4));
+        
         indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}categoryContainer"), catContainer));
         indexer.createNode(new ChildAssocRef(catContainer, QName.createQName("{cat}categoryRoot"), catRoot));
         indexer.createNode(new ChildAssocRef(catRoot, QName.createQName("{cat}AssetClass"), catACBase));
         indexer.createNode(new ChildAssocRef(catACBase, QName.createQName("{cat}Fixed"), catACOne));
         indexer.createNode(new ChildAssocRef(catACBase, QName.createQName("{cat}Equity"), catACTwo));
         indexer.createNode(new ChildAssocRef(catACTwo, QName.createQName("{cat}SpecialEquity"), catACThree));
+        
+        indexer.createNode(new ChildAssocRef(catRoot, QName.createQName(NamespaceService.ALFRESCO_URI, "Region"), catRBase));
+        indexer.createNode(new ChildAssocRef(catRBase, QName.createQName(NamespaceService.ALFRESCO_URI, "Europe"), catROne));
+        indexer.createNode(new ChildAssocRef(catRBase, QName.createQName(NamespaceService.ALFRESCO_URI, "RestOfWorld"), catRTwo));
+        indexer.createNode(new ChildAssocRef(catRTwo, QName.createQName(NamespaceService.ALFRESCO_URI, "US"), catRThree));
+        
         indexer.createNode(new ChildAssocRef(n1, QName.createQName("{namespace}five"), n5));
         indexer.createNode(new ChildAssocRef(n1, QName.createQName("{namespace}six"), n6));
         indexer.createNode(new ChildAssocRef(n2, QName.createQName("{namespace}seven"), n7));
@@ -352,15 +369,17 @@ public class LuceneCategoryTest extends TestCase
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Fixed/member\"", null, null);
+        printPaths(results);
         assertEquals(8, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Equity/member\"", null, null);
+        printPaths(results);
         assertEquals(8, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Equity/alf:SpecialEquity/member//.\"", null, null);
-        assertEquals(3, results.length());
+        assertEquals(1, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Equity/alf:SpecialEquity/member//*\"", null, null);
@@ -371,10 +390,59 @@ public class LuceneCategoryTest extends TestCase
         assertEquals(1, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Equity/member\"   AND PATH:\"/alf:AssetClass/alf:Fixed/member\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PATH:\"/alf:AssetClass/alf:Equity/member\" AND +PATH:\"/alf:AssetClass/alf:Fixed/member\"", null, null);
+        printPaths(results);
         assertEquals(3, results.length());
         results.close();
         
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Equity/member\" PATH:\"/alf:AssetClass/alf:Fixed/member\"", null, null);
+        printPaths(results);
+        assertEquals(13, results.length());
+        results.close();
         
+        // Region 
+        
+        assertEquals(4, nodeService.getChildAssocs(catRoot).size());
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region\"", null, null);
+        printPaths(results);
+        assertEquals(1, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region/member\"", null, null);
+        printPaths(results);
+        assertEquals(12, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region/alf:Europe/member\"", null, null);
+        printPaths(results);
+        assertEquals(2, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region/alf:RestOfWorld/member\"", null, null);
+        printPaths(results);
+        assertEquals(3, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region//member\"", null, null);
+        printPaths(results);
+        assertEquals(17, results.length());
+        results.close();
+        
+        
+    }
+    
+    void printPaths(ResultSet results)
+    {
+        System.out.println("\n\n");
+
+        for (ResultSetRow row : results)
+        {
+            System.out.println(row.getNodeRef());
+            for (Path path : nodeService.getPaths(row.getNodeRef(), false))
+            {
+                System.out.println("\t" + path);
+            }
+        }
     }
 }

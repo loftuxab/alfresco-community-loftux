@@ -33,7 +33,7 @@ public class LeafScorer extends Scorer
         }
     }
 
-    private Counter currentCounter;
+    private int counter;
 
     private int countInCounter;
 
@@ -51,6 +51,10 @@ public class LeafScorer extends Scorer
 
     HashMap<String, Counter> parentIds = new HashMap<String, Counter>();
 
+    HashMap<String, Counter> selfIds = null;
+
+    boolean hasSelfScorer;
+
     IndexReader reader;
 
     private TermPositions allNodes;
@@ -59,13 +63,28 @@ public class LeafScorer extends Scorer
 
     HashSet<String> selfLinks = new HashSet<String>();
 
-    public LeafScorer(Weight weight, TermPositions level0, ContainerScorer containerScorer, StructuredFieldPosition[] sfps, TermPositions allNodes, IndexReader reader,
-            Similarity similarity, byte[] norms)
+    private TermPositions root;
+
+    private int rootDoc;
+
+    public LeafScorer(Weight weight, TermPositions root, TermPositions level0, ContainerScorer containerScorer, StructuredFieldPosition[] sfps, TermPositions allNodes,
+            HashMap<String, Counter> selfIds, IndexReader reader, Similarity similarity, byte[] norms)
     {
         super(similarity);
+        this.root = root;
         this.containerScorer = containerScorer;
         this.sfps = sfps;
         this.allNodes = allNodes;
+        if (selfIds == null)
+        {
+            this.selfIds = new HashMap<String, Counter>();
+            hasSelfScorer = false;
+        }
+        else
+        {
+            this.selfIds = selfIds;
+            hasSelfScorer = true;
+        }
         this.reader = reader;
         this.level0 = level0;
         try
@@ -95,6 +114,17 @@ public class LeafScorer extends Scorer
                     parentIds.put(id.stringValue(), counter);
                 }
                 counter.count++;
+
+                if (!hasSelfScorer)
+                {
+                    counter = selfIds.get(id.stringValue());
+                    if (counter == null)
+                    {
+                        counter = new Counter();
+                        selfIds.put(id.stringValue(), counter);
+                    }
+                    counter.count++;
+                }
             }
         }
         else if (level0 != null)
@@ -114,6 +144,14 @@ public class LeafScorer extends Scorer
                         parentIds.put(id.stringValue(), counter);
                     }
                     counter.count++;
+
+                    counter = selfIds.get(id.stringValue());
+                    if (counter == null)
+                    {
+                        counter = new Counter();
+                        selfIds.put(id.stringValue(), counter);
+                    }
+                    counter.count++;
                 }
             }
             if (parentIds.size() != 1)
@@ -125,22 +163,25 @@ public class LeafScorer extends Scorer
 
     public boolean next() throws IOException
     {
-        if (currentCounter != null)
+
+        if (countInCounter < counter)
         {
-            if (countInCounter < currentCounter.count)
-            {
-                countInCounter++;
-                return true;
-            }
+            countInCounter++;
+            return true;
+        }
+        else
+        {
+            countInCounter = 1;
+            counter = 0;
         }
 
         if (allNodes())
         {
             while (more)
             {
-                if (allNodes.next())
+                if (allNodes.next() && root.next())
                 {
-                    if (containersIncludeCurrent())
+                    if (check())
                     {
                         return true;
                     }
@@ -233,6 +274,20 @@ public class LeafScorer extends Scorer
                 }
             }
         }
+
+        // Do the root
+        if (root.doc() < max)
+        {
+            if (root.skipTo(max))
+            {
+                rootDoc = root.doc();
+            }
+            else
+            {
+                more = false;
+                return;
+            }
+        }
     }
 
     private void move() throws IOException
@@ -269,6 +324,29 @@ public class LeafScorer extends Scorer
                     more = false;
                     return;
                 }
+            }
+        }
+
+        // Do the root term
+        if (root.next())
+        {
+            rootDoc = root.doc();
+        }
+        else
+        {
+            more = false;
+            return;
+        }
+        if (root.doc() < max)
+        {
+            if (root.skipTo(max))
+            {
+                rootDoc = root.doc();
+            }
+            else
+            {
+                more = false;
+                return;
             }
         }
     }
@@ -310,17 +388,43 @@ public class LeafScorer extends Scorer
             return false;
         }
 
-        // We have a single entry - no max constraint in match term
-        if (check(0, -1))
+        if (rootDoc != max)
         {
-            return true;
+            return false;
         }
 
-        // We had checks to do and they all failed.
-        return false;
+        return check();
     }
 
-    private boolean check(int start, int end) throws IOException
+    private boolean check() throws IOException
+    {
+        // We have duplicate entries
+        // The match must be in a known term range
+        int count = root.freq();
+        int start = 0;
+        int end = -1;
+        for (int i = 0; i < count; i++)
+        {
+            if (i == 0)
+            {
+                // First starts at zero
+                start = 0;
+                end = root.nextPosition();
+            }
+            else
+            {
+                start = end + 1;
+                end = root.nextPosition();
+            }
+
+            check(start, end, i);
+
+        }
+        // We had checks to do and they all failed.
+        return this.counter > 0;
+    }
+
+    private boolean check(int start, int end, int position) throws IOException
     {
         int offset = 0;
         for (int i = 0, l = sfps.length; i < l; i++)
@@ -344,48 +448,61 @@ public class LeafScorer extends Scorer
             }
         }
 
-        return containersIncludeCurrent();
+        Field[] fields = reader.document(doc()).getFields("PARENT");
+        String parentID = null;
+        if ((fields != null) && (fields.length > position) && (fields[position] != null))
+        {
+            parentID = fields[position].stringValue();
+        }
+
+        return containersIncludeCurrent(parentID);
 
     }
 
-    private boolean containersIncludeCurrent() throws IOException
+    private boolean containersIncludeCurrent(String parentID) throws IOException
     {
         if ((containerScorer != null) || (level0 != null))
         {
+            if (sfps.length == 0)
+            {
+                return false;
+            }
             Document document = reader.document(doc());
             StructuredFieldPosition last = sfps[sfps.length - 1];
             Field field;
             field = document.getField("ID");
             String id = field.stringValue();
-            if ((last.linkSelf() && parentIds.containsKey(id)))
+            if ((last.linkSelf() && selfIds.containsKey(id)))
             {
-                Counter counter = parentIds.get(id);
+                Counter counter = selfIds.get(id);
                 if (counter != null)
                 {
-                    if(!selfLinks.contains(id))
+                    if (!selfLinks.contains(id))
                     {
-                       currentCounter = counter;
-                       countInCounter = 1;
-                       selfLinks.add(id);
-                       return true;
-                    }
-                }
-            }
-            else if (last.linkParent())
-            {
-                field = document.getField("PARENT");
-                if (field != null)
-                {
-                    Counter counter = parentIds.get(field.stringValue());
-                    if (counter != null)
-                    {
-                        currentCounter = counter;
-                        countInCounter = 1;
+                        this.counter += counter.count;
+                        selfLinks.add(id);
                         return true;
                     }
                 }
             }
-            
+            if ((parentID != null) && (parentID.length() > 0) && last.linkParent())
+            {
+                if (!selfLinks.contains(id))
+                {
+                    // field = document.getField("PARENT");
+                    // if (field != null)
+                    // {
+                    // Counter counter = parentIds.get(field.stringValue());
+                    Counter counter = parentIds.get(parentID);
+                    if (counter != null)
+                    {
+                        this.counter += counter.count;
+                        return true;
+                    }
+                    // }
+                }
+            }
+
             return false;
         }
         else
@@ -410,10 +527,35 @@ public class LeafScorer extends Scorer
 
     public boolean skipTo(int target) throws IOException
     {
+
+        countInCounter = 1;
+        counter = 0;
+
         if (allNodes())
         {
-            return allNodes.skipTo(target);
+            allNodes.skipTo(target);
+            root.skipTo(allNodes.doc()); // must match
+            if (check())
+            {
+                return true;
+            }
+            while (more)
+            {
+                if (allNodes.next() && root.next())
+                {
+                    if (check())
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    more = false;
+                    return false;
+                }
+            }
         }
+
         max = target;
         return findNext();
     }

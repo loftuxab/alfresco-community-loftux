@@ -179,6 +179,9 @@ public class LuceneTest extends TestCase
         testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "noderef-ista"), n1);
         testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "path-ista"), nodeService.getPath(n3));
 
+        Map<QName, Serializable> contentProperties = new HashMap<QName, Serializable>();
+        contentProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "encoding"), "woof");
+        contentProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype"), "woof");
         
         n4 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}four"), testTypeRef.getQName(), testProperties).getChildRef();
         
@@ -198,7 +201,7 @@ public class LuceneTest extends TestCase
         n11 = nodeService.createNode(n5, null, QName.createQName("{namespace}eleven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         n12 = nodeService.createNode(n5, null, QName.createQName("{namespace}twelve"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         n13 = nodeService.createNode(n12, null, QName.createQName("{namespace}thirteen"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n14 = nodeService.createNode(n13, null, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n14 = nodeService.createNode(n13, null, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_QNAME_CONTENT, contentProperties).getChildRef();
 
         nodeService.addChild(rootNodeRef, n8, QName.createQName("{namespace}eight-0"));
         nodeService.addChild(n1, n8, QName.createQName("{namespace}eight-1"));
@@ -769,6 +772,12 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen//.\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen//.//.\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
