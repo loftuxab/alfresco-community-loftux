@@ -82,8 +82,8 @@
 
    <!-- ==================== CONVERTERS ==================== -->
    <converter>
-      <converter-id>converter:StringArray</converter-id>
-      <converter-class>org.alfresco.web.ui.common.converter.StringArrayConverter</converter-class>
+      <converter-id>org.alfresco.faces.XMLDataConverter</converter-id>
+      <converter-class>org.alfresco.web.ui.common.converter.XMLDateConverter</converter-class>
    </converter>
    
    

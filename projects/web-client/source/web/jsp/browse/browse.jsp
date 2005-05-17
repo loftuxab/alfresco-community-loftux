@@ -218,7 +218,7 @@
                               <a:sortLink label="Created Date" value="createddate" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.createddate}">
-                              <f:convertDateTime dateStyle="long" />
+                              <a:convertXMLDate dateStyle="long" />
                            </h:outputText>
                         </a:column>
                         
@@ -228,7 +228,7 @@
                               <a:sortLink label="Modified Date" value="modifieddate" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.modifieddate}">
-                              <f:convertDateTime dateStyle="long" />
+                              <a:convertXMLDate dateStyle="long" />
                            </h:outputText>
                         </a:column>
                         
@@ -331,7 +331,7 @@
                               <a:sortLink label="Created Date" value="createddate" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.createddate}">
-                              <f:convertDateTime dateStyle="long" />
+                              <a:convertXMLDate dateStyle="long" />
                            </h:outputText>
                         </a:column>
                         
@@ -341,7 +341,7 @@
                               <a:sortLink label="Modified Date" value="modifieddate" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.modifieddate}">
-                              <f:convertDateTime dateStyle="long" />
+                              <a:convertXMLDate dateStyle="long" />
                            </h:outputText>
                         </a:column>
                         

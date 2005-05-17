@@ -1029,5 +1029,51 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
+   
+   <tag>
+      <name>convertXMLDate</name>
+      <tagclass>org.alfresco.web.ui.common.tag.XMLDateConverterTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <description>
+         Allows the XMLDateConverter to be used on a page
+      </description>
+      
+      <attribute>
+         <name>dateStyle</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>locale</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>pattern</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>timeStyle</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>timeZone</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>type</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
 
 </taglib>

@@ -22,6 +22,8 @@ import org.alfresco.util.Conversion;
 public class MapNode extends Node implements Map<String, Object>
 {
    private static final long serialVersionUID = 4051322327734433079L;
+   
+   private boolean propsInitialised = false;
 
    /**
     * Constructor
@@ -77,7 +79,7 @@ public class MapNode extends Node implements Map<String, Object>
    {
       Object obj = null;
       
-      // there are some properties that aren't available as properties
+      // there are some things that aren't available as properties
       // but from method calls, so for these handle them individually
       Map<String, Object> props = getProperties();
       if (propsInitialised == false)
@@ -86,6 +88,7 @@ public class MapNode extends Node implements Map<String, Object>
          props.put("id", this.getId());
          props.put("type", this.getType());
          props.put("name", this.getName());
+         props.put("path", this.getPath());
          props.put("nodeRef", this.getNodeRef());
          
          propsInitialised = true;
@@ -98,12 +101,6 @@ public class MapNode extends Node implements Map<String, Object>
       if (obj == null && key.equals("description"))
       {
          obj = "";
-      }
-      
-      if (obj != null && (key.equals("createddate") || key.equals("modifieddate")))
-      {
-         String date = obj.toString();
-         obj = Conversion.dateFromXmlDate(date);
       }
       
       return obj; 
@@ -164,6 +161,4 @@ public class MapNode extends Node implements Map<String, Object>
    {
       return getProperties().values();
    }
-   
-   private boolean propsInitialised = false;
 }
