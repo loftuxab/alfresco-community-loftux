@@ -57,11 +57,11 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"/>Space Name</div>
-                              <div class="mainTitle">Details of 'document'</div>
+                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText">Use this page to view the details about the content.</div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
-                           <td width=100 style="padding-left:2px">
+                           <td width=110 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" /><br>
                            </td>

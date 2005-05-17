@@ -16,6 +16,7 @@ import javax.faces.event.ActionEvent;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -83,6 +84,22 @@ public class BrowseBean implements IContextListener
    public void setSearchService(Searcher searchService)
    {
       this.searchService = searchService;
+   }
+   
+   /**
+    * @return Returns the Lock Service.
+    */
+   public LockService getLockService()
+   {
+      return lockService;
+   }
+   
+   /**
+    * @param lockService The Lock Service to set.
+    */
+   public void setLockService(LockService lockService)
+   {
+      this.lockService = lockService;
    }
    
    /**
@@ -267,7 +284,6 @@ public class BrowseBean implements IContextListener
    // ------------------------------------------------------------------------------
    // Navigation action event handlers 
    
-
    /**
     * Change the current view mode based on user selection
     * 
@@ -337,23 +353,25 @@ public class BrowseBean implements IContextListener
          {
             QName qname = ref.getQName();
             
+            // create our Node representation from the NodeRef
+            NodeRef nodeRef = ref.getChildRef();
+            
             // create our Node representation
             MapNode node = new MapNode(ref.getChildRef(), this.nodeService);
-//            Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
-//            
+            
 //            // convert the rest of the well known properties
 //            Map<QName, Serializable> childProps = this.nodeService.getProperties(ref.getChildRef());
 //            
 //            // name and ID always exist
-//            props.put("id", ref.getChildRef().getId());
-//            props.put("name", getNameForNode(ref.getChildRef()));
-//            props.put("nodeRef", ref.getChildRef());
+//            props.put("id", nodeRef.getId());
+//            props.put("name", RepoUtils.getNameForNode(this.nodeService, nodeRef));
+//            props.put("nodeRef", nodeRef);
 //            
 //            // other properties which may exist
-//            String description = getQNameProperty(childProps, "description", true);
+//            String description = RepoUtils.getQNameProperty(childProps, "description", true);
 //            props.put("description", description);
 //            
-//            String createdDate = getQNameProperty(childProps, "createddate", false);
+//            String createdDate = RepoUtils.getQNameProperty(childProps, "createddate", false);
 //            if (createdDate != null)
 //            {
 //               props.put("createddate", Conversion.dateFromXmlDate(createdDate));
@@ -364,7 +382,7 @@ public class BrowseBean implements IContextListener
 //               props.put("createddate", null);
 //            }
 //            
-//            String modifiedDate = getQNameProperty(childProps, "modifieddate", false);
+//            String modifiedDate = RepoUtils.getQNameProperty(childProps, "modifieddate", false);
 //            if (modifiedDate != null)
 //            {
 //               props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
@@ -386,6 +404,9 @@ public class BrowseBean implements IContextListener
             }
             else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
             {
+               // special properties to be used by the value binding components on the page
+               node.put("locked", isNodeLocked(nodeRef));
+               
                this.contentNodes.add(node);
             }
             else
@@ -430,53 +451,18 @@ public class BrowseBean implements IContextListener
             {
                NodeRef ref = row.getNodeRef();
                MapNode node = new MapNode(ref, this.nodeService);
-//               Map<String, Object> props = new HashMap<String, Object>(7, 1.0f);
-//               
-//               // name and ID always exist
-//               props.put("id", ref.getId());
-//               String name = getValueProperty(row, "name", false);
-//               if (name == null)
-//               {
-//                  name = getNameForNode(ref);
-//               }
-//               props.put("name", name);
-//               props.put("nodeRef", ref);
-//               
-//               // other properties which may exist
-//               props.put("description", getValueProperty(row, "description", true));
-//               
-//               String createdDate = getValueProperty(row, "createddate", false);
-//               if (createdDate != null)
-//               {
-//                  props.put("createddate", Conversion.dateFromXmlDate(createdDate));
-//               }
-//               else
-//               {
-//                  // TODO: a null created/modified date shouldn't happen!?
-//                  props.put("createddate", null);
-//               }
-//               
-//               String modifiedDate = getValueProperty(row, "modifieddate", false);
-//               if (modifiedDate != null)
-//               {
-//                  props.put("modifieddate", Conversion.dateFromXmlDate(createdDate));
-//               }
-//               else
-//               {
-//                  // TODO: a null created/modified date shouldn't happen!?
-//                  props.put("modifieddate", null);
-//               }
-//               
-//               node.setProperties(props);
                
-               // TODO: resolve icon etc. some how using this e.g. on either make an ActionLink image
-               //       property smart or better set in the Node wrapper as property
+               // TODO: resolve icon e.g. either make an ActionLink image property smart or
+               //       better set in the Node wrapper as property?
                if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
                {
                   this.containerNodes.add(node);
                }
                else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
                {
+                  // special properties to be used by the value binding components on the page
+                  node.put("locked", isNodeLocked(ref));
+                  
                   this.contentNodes.add(node);
                }
                else
@@ -497,6 +483,29 @@ public class BrowseBean implements IContextListener
    }
 
    /**
+    * Return whether a Node is current Locked
+    * 
+    * @param ref NodeRef
+    * 
+    * @return whether a Node is current Locked
+    */
+   private Boolean isNodeLocked(NodeRef ref)
+   {
+      Boolean locked = Boolean.FALSE;
+      if (nodeService.hasAspect(ref, LockService.ASPECT_CLASS_REF_LOCK))
+      {
+         // TODO: replace username with real user name ref here!
+         LockService.LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);
+         if (lockStatus == LockService.LockStatus.LOCKED || lockStatus == LockService.LockStatus.LOCK_OWNER)
+         {
+            locked = Boolean.TRUE;
+         }
+      }
+      
+      return locked;
+   }
+
+   /**
     * Build the search query string
     * 
     * @param text    Search text
@@ -507,26 +516,26 @@ public class BrowseBean implements IContextListener
    private String buildSearchQuery(String text, int mode)
    {
       String query;
+      
+      // search against the "name" attribute
+      String nameAttr = RepoUtils.escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "name"));
+      
       switch (mode)
       {
          case UISimpleSearch.SEARCH_ALL:
-            query = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:" + text + "*";
-            //query = MessageFormat.format(SEARCH_ALL, new Object[] {text});
+            query = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +@" + nameAttr + ":\"" + text + "*\"";
             break;
          
          case UISimpleSearch.SEARCH_FILE_NAMES:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:" + text + "*";
-            //query = MessageFormat.format(SEARCH_FILE_NAME, new Object[] {text});
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +@" + nameAttr + ":\"" + text + "*\"";
             break;
          
          case UISimpleSearch.SEARCH_FILE_NAMES_CONTENTS:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:" + text + "*";
-            //query = MessageFormat.format(SEARCH_FILE_NAME_CONTENT, new Object[] {text});
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +@" + nameAttr + ":\"" + text + "*\"";
             break;
          
          case UISimpleSearch.SEARCH_SPACE_NAMES:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:" + text + "*";
-            //query = MessageFormat.format(SEARCH_FOLDER_NAME, new Object[] {text});
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +@" + nameAttr + ":\"" + text + "*\"";
             break;
          
          default:
@@ -534,42 +543,6 @@ public class BrowseBean implements IContextListener
       }
       
       return query;
-   }
-   
-   private static String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
-   {
-      String value = null;
-      
-      QName propQName = QName.createQName(NamespaceService.ALFRESCO_URI, property);
-      Object obj = props.get(propQName);
-      
-      if (obj != null)
-      {
-         value = obj.toString();
-      }
-      else if (convertNull == true && obj == null)
-      {
-         value = "";
-      }
-      
-      return value;
-   }
-   
-   private static String getValueProperty(ResultSetRow row, String name, boolean convertNull)
-   {
-      Serializable value = row.getValue(QName.createQName(NamespaceService.ALFRESCO_URI, name));
-      String property = null;
-      if (value != null)
-      {
-         property = ValueConverter.convert(String.class, value);
-      }
-      
-      if (convertNull == true && property == null)
-      {
-         property = "";
-      }
-      
-      return property;
    }
    
    
@@ -614,39 +587,6 @@ public class BrowseBean implements IContextListener
          {
             Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
          }
-      }
-   }
-   
-   /**
-    * Action called when a content item is clicked.
-    */
-   public void clickContent(ActionEvent event)
-   {
-      UIActionLink link = (UIActionLink)event.getComponent();
-      Map<String, String> params = link.getParameterMap();
-      String id = params.get("id");
-      if (id != null && id.length() != 0)
-      {
-         if (s_logger.isDebugEnabled())
-            s_logger.debug("Setup for action, setting current document to: " + id);
-         
-         try
-         {
-            // creat the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
-            
-            // remember the document
-            setDocument(node);
-         }
-         catch (InvalidNodeRefException refErr)
-         {
-            Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
-         }
-      }
-      else
-      {
-         setDocument(null);
       }
    }
    
@@ -708,7 +648,7 @@ public class BrowseBean implements IContextListener
     * 
     * @param event   ActionEvent
     */
-   public void spaceActionSetup(ActionEvent event)
+   public void setupSpaceAction(ActionEvent event)
    {
       UIActionLink link = (UIActionLink)event.getComponent();
       Map<String, String> params = link.getParameterMap();
@@ -720,10 +660,8 @@ public class BrowseBean implements IContextListener
          
          try
          {
+            // create the node ref, then our node representation
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            QName qname = this.nodeService.getPrimaryParent(ref).getQName();
-            
-            // create our Node representation
             Node node = new Node(ref, this.nodeService);
             
             // prepare a node for the action context
@@ -740,6 +678,43 @@ public class BrowseBean implements IContextListener
       }
       
       invalidateComponents();
+   }
+   
+   /**
+    * Action event called by all Browse actions that need to setup a Content Document context
+    * before an action page/wizard is called. The context will be a Node in setDocument() which
+    * can be retrieved on the action page from BrowseBean.getDocument().
+    * 
+    * @param event   ActionEvent
+    */
+   public void setupContentAction(ActionEvent event)
+   {
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         if (s_logger.isDebugEnabled())
+            s_logger.debug("Setup for action, setting current document to: " + id);
+         
+         try
+         {
+            // create the node ref, then our node representation
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+            Node node = new Node(ref, this.nodeService);
+            
+            // remember the document
+            setDocument(node);
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+         }
+      }
+      else
+      {
+         setDocument(null);
+      }
    }
    
    /**
@@ -806,39 +781,19 @@ public class BrowseBean implements IContextListener
       }
       
       return outcome;
-   }   
+   }
+   
+   /**
+    * Action called upon completion of the Check Out file page
+    */
+   public String checkoutFileOK()
+   {
+      return "browse";
+   }
    
    
    // ------------------------------------------------------------------------------
-   // Private helpers 
-   
-   /**
-    * Helper to get the display name for a Node.
-    * The method will attempt to use the "name" attribute, if not found it will revert to using
-    * the QName.getLocalName() retrieved from the primary parent relationship.
-    * 
-    * @param ref     NodeRef
-    * 
-    * @return display name string for the specified Node.
-    */
-   private String getNameForNode(NodeRef ref)
-   {
-      String name;
-      
-      // try to find a display "name" property for this node
-      Object nameProp = this.nodeService.getProperty(ref, QNAME_NAME);
-      if (nameProp != null)
-      {
-         name = nameProp.toString();
-      }
-      else
-      {
-         // revert to using QName if not found
-         name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
-      }
-      
-      return name;
-   }
+   // Private helpers
    
    /**
     * Refresh the UI after a Space selection change. Adds the selected space to the breadcrumb
@@ -852,7 +807,7 @@ public class BrowseBean implements IContextListener
       // get the current breadcrumb location and append a new handler to it
       // our handler know the ID of the selected node and the display label for it
       List<IBreadcrumbHandler> location = this.navigator.getLocation();
-      String name = getNameForNode(ref);
+      String name = RepoUtils.getNameForNode(this.nodeService, ref);
       location.add(new BrowseBreadcrumbHandler(ref.getId(), name));
       
       // set the current node Id ready for page refresh
@@ -956,30 +911,32 @@ public class BrowseBean implements IContextListener
    // ------------------------------------------------------------------------------
    // Private data
    
+   // TODO: TEMP! Replace this once we have "users" in the system!
+   private static final String USERNAME = "admin";
+   
    private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
    private static final String ERROR_SEARCH  = "Search failed during to a system error: {0}";
    
    public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
-   
-   private static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
    
    private static Logger s_logger = Logger.getLogger(BrowseBean.class);
    
    //private static final String SEARCH_PATH1 = "PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":{0}\"";
    // TODO: AndyH said he will fix QNAME to prepend // later - so this should work in the future
    //private static final String SEARCH_PATH2 = "+QNAME:\"" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   private static final String SEARCH_PATH         = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   
-   private static final String SEARCH_ALL               = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   private static final String SEARCH_FILE_NAME         = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   private static final String SEARCH_FILE_NAME_CONTENT = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   private static final String SEARCH_FOLDER_NAME       = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   //private static final String SEARCH_ALL               = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   //private static final String SEARCH_FILE_NAME         = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   //private static final String SEARCH_FILE_NAME_CONTENT = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
+   //private static final String SEARCH_FOLDER_NAME       = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
    
    /** The SearchService to be used by the bean */
    private Searcher searchService;
+   
+   /** The LockService to be used by the bean */
+   private LockService lockService;
    
    /** The NavigationBean reference */
    private NavigationBean navigator;

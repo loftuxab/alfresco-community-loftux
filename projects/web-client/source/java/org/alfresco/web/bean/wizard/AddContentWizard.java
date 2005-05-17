@@ -26,6 +26,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.util.Conversion;
 import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.NavigationBean;
+import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIModeList;
@@ -139,8 +140,7 @@ public class AddContentWizard
             try
             {
                NodeRef ref = new NodeRef(Repository.getStoreRef(), currentNodeId);
-               QName qname = this.nodeService.getPrimaryParent(ref).getQName();
-               spaceName = qname.getLocalName();
+               spaceName = RepoUtils.getNameForNode(this.nodeService, ref);
             }
             catch (InvalidNodeRefException refErr)
             {

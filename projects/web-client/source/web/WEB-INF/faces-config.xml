@@ -127,6 +127,10 @@
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
       </managed-property>
+      <managed-property>
+         <property-name>lockService</property-name>
+         <value>#{simpleLockService}</value>
+      </managed-property>
    </managed-bean>
    
    
@@ -165,7 +169,7 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>deleteSpace</from-outcome>
-         <to-view-id>/jsp/browse/delete-space.jsp</to-view-id>
+         <to-view-id>/jsp/dialog/delete-space.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>addContent</from-outcome>
@@ -175,6 +179,16 @@
          <from-outcome>showDocDetails</from-outcome>
          <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
+      </navigation-case>
+      <!--
+      <navigation-case>
+         <from-outcome>checkinFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkin-file.jsp</to-view-id>
+      </navigation-case>
+      -->
    </navigation-rule>
    
    <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click, finish on dialog) -->

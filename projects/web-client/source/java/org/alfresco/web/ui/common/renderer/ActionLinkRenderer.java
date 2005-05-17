@@ -15,6 +15,7 @@ import javax.faces.event.ActionEvent;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIMenu;
+import org.apache.log4j.Logger;
 
 /**
  * @author kevinr
@@ -259,4 +260,7 @@ public class ActionLinkRenderer extends BaseRenderer
       }
       return (parent != null);
    }
+   
+   
+   private static Logger logger = Logger.getLogger(ActionLinkRenderer.class);
 }

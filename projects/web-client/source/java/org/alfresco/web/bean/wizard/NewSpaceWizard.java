@@ -30,6 +30,7 @@ import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.util.Conversion;
 import org.alfresco.web.bean.NavigationBean;
+import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIModeList;
@@ -150,8 +151,7 @@ public class NewSpaceWizard
             try
             {
                NodeRef ref = new NodeRef(Repository.getStoreRef(), currentNodeId);
-               QName qname = this.nodeService.getPrimaryParent(ref).getQName();
-               spaceName = qname.getLocalName();
+               spaceName = RepoUtils.getNameForNode(this.nodeService, ref);
             }
             catch (InvalidNodeRefException refErr)
             {

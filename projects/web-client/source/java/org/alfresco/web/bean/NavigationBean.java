@@ -156,9 +156,9 @@ public class NavigationBean
             // setup some properties
             this.nodeProperties.clear();
             this.nodeProperties.put("id", currentNodeId);
-            String name = getNameForNode(ref);
+            String name = RepoUtils.getNameForNode(this.nodeService, ref);
             this.nodeProperties.put("name", name);
-            String desc = getQNameProperty(props, "description", true);
+            String desc = RepoUtils.getQNameProperty(props, "description", true);
             this.nodeProperties.put("description", desc);
             
             this.currentNodeId = currentNodeId;
@@ -229,52 +229,6 @@ public class NavigationBean
    // ------------------------------------------------------------------------------
    // Private helpers
    
-   /**
-    * Helper to get the display name for a Node.
-    * The method will attempt to use the "name" attribute, if not found it will revert to using
-    * the QName.getLocalName() retrieved from the primary parent relationship.
-    * 
-    * @param ref     NodeRef
-    * 
-    * @return display name string for the specified Node.
-    */
-   private String getNameForNode(NodeRef ref)
-   {
-      String name;
-      
-      // try to find a display "name" property for this node
-      Object nameProp = this.nodeService.getProperty(ref, QNAME_NAME);
-      if (nameProp != null)
-      {
-         name = nameProp.toString();
-      }
-      else
-      {
-         // revert to using QName if not found
-         name = this.nodeService.getPrimaryParent(ref).getQName().getLocalName();
-      }
-      
-      return name;
-   }
-   
-   private static String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
-   {
-      String value = null;
-      
-      QName propQName = QName.createQName(NamespaceService.ALFRESCO_URI, property);
-      Object obj = props.get(propQName);
-      
-      if (obj != null)
-      {
-         value = obj.toString();
-      }
-      else if (convertNull == true && obj == null)
-      {
-         value = "";
-      }
-      
-      return value;
-   }
    
    
    // ------------------------------------------------------------------------------

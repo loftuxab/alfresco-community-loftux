@@ -67,21 +67,21 @@
                                  <div class="mainSubText">There are currently 2 members of this space</div>
                               </td>
                               <td bgcolor="#495F69" width=1></td>
-                              <td width=100 style="padding-left:2px">
+                              <td width=110 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
-                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{BrowseBean.spaceActionSetup}" id="link1" />
-                                 <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}" id="link2" >
+                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link1" />
+                                 <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link2" >
                                     <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                  </a:actionLink>
-                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" actionListener="#{BrowseBean.spaceActionSetup}" id="link3" />
+                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" actionListener="#{BrowseBean.setupSpaceAction}" id="link3" />
                                  <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" id="link4" />
                                  <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
                                     <a:actionLink value="Change Details" image="/images/icons/Change_details.gif" id="link5" />
                                     <a:actionLink value="Cut" image="/images/icons/cut.gif" id="link6" />
                                     <a:actionLink value="Copy" image="/images/icons/copy.gif" id="link7" />
                                     <a:actionLink value="Paste" image="/images/icons/paste.gif" id="link8" />
-                                    <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{BrowseBean.spaceActionSetup}" id="link9" />
+                                    <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link9" />
                                  </a:menu>
                               </td>
                            </a:panel>
@@ -98,14 +98,14 @@
                                  <div class="mainSubText"><h:outputText value="#{msg.search_description}" id="msg12" /></div>
                               </td>
                               <td bgcolor="#495F69" width=1></td>
-                              <td width=100 style="padding-left:2px">
+                              <td width=110 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg13" /><br>
                               </td>
                            </a:panel>
                            
                            <td bgcolor="#495F69" width=1></td>
-                           <td width=100>
+                           <td width=110>
                               <%-- Details View settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
@@ -237,33 +237,17 @@
                            <r:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
                         </a:column>
                         
-                        <%-- Actions column for browse/icons view modes --%>
-                        <a:column actions="true" style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
+                        <%-- Actions column --%>
+                        <a:column actions="true" style="text-align:left">
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
-                           <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
                            <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
                            <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
+                           <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                            <a:menu id="actionsMenu1" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                           </a:menu>
-                        </a:column>
-                        
-                        <%-- Actions column for list view mode --%>
-                        <a:column actions="true" style="text-align:right" rendered="#{BrowseBean.browseViewMode == 'list'}">
-                           <a:actionLink value="#{msg.edit}" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.cut}" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.copy}" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.delete}" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.spaceActionSetup}">
-                              <f:param name="id" value="#{r.id}" />
-                           </a:actionLink>
-                           <a:menu id="actionsMenu2" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
@@ -300,11 +284,11 @@
                               <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" showLink="false">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </f:facet>
-                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" action="showDocDetails">
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                         </a:column>
@@ -312,11 +296,11 @@
                         <%-- Primary column for icons view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left;vertical-align:top;" rendered="#{BrowseBean.browseViewMode == 'icons'}">
                            <f:facet name="large-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/file_large.gif" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" showLink="false">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file_large.gif" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </f:facet>
-                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" styleClass="header">
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="header">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                         </a:column>
@@ -324,11 +308,11 @@
                         <%-- Primary column for list view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" showLink="false">
+                              <a:actionLink value="#{r.name}" image="/images/icons/file.gif" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </f:facet>
-                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickContent}" action="showDocDetails" styleClass="title">
+                           <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="title">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                         </a:column>
@@ -366,8 +350,8 @@
                            <r:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
                         </a:column>
                         
-                        <%-- Actions column for browse/icons view modes --%>
-                        <a:column actions="true" style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
+                        <%-- Actions column --%>
+                        <a:column actions="true" style="text-align:left">
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
@@ -377,22 +361,17 @@
                            <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
-                           <a:menu id="actionsMenu3" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                              <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
-                           </a:menu>
-                        </a:column>
-                        
-                        <%-- Actions column for list view mode --%>
-                        <a:column actions="true" style="text-align:right" rendered="#{BrowseBean.browseViewMode == 'list'}">
-                           <a:actionLink value="#{msg.edit}" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.cut}" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.copy}" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.delete}" styleClass="inlineAction">
-                              <f:param name="id" value="#{r.id}" />
-                           </a:actionLink>
-                           <a:menu id="actionsMenu4" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                           <a:booleanEvaluator value="#{r.locked == false}">
+                              <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{BrowseBean.setupContentAction}" action="checkoutFile">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                           </a:booleanEvaluator>
+                           <a:booleanEvaluator value="#{r.locked == true}">
+                              <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{BrowseBean.setupContentAction}" action="checkinFile">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                           </a:booleanEvaluator>
+                           <a:menu id="actionsMenu2" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />

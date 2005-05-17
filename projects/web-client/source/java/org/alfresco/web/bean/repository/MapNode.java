@@ -34,6 +34,7 @@ public class MapNode extends Node implements Map<String, Object>
       super(nodeRef, nodeService);
    }
    
+   
    // ------------------------------------------------------------------------------
    // Map implementation - allows the Node bean to be accessed using JSF expression syntax 
    
@@ -78,33 +79,31 @@ public class MapNode extends Node implements Map<String, Object>
       
       // there are some properties that aren't available as properties
       // but from method calls, so for these handle them individually
-      if (key.equals("id"))
+      Map<String, Object> props = getProperties();
+      if (propsInitialised == false)
       {
-         obj = this.getId();
-      }
-      else if (key.equals("type"))
-      {
-         obj = this.getTypeName();
-      }
-      else if (key.equals("name"))
-      {
-         obj = this.getName();
-      }
-      else
-      {
-         obj = getProperties().get(key);
+         // well known properties required as publically accessable map attributes
+         props.put("id", this.getId());
+         props.put("type", this.getType());
+         props.put("name", this.getName());
+         props.put("nodeRef", this.getNodeRef());
          
-         // temp HACK
-         if (obj == null && key.equals("description"))
-         {
-            obj = "";
-         }
-         
-         if (obj != null && (key.equals("createddate") || key.equals("modifieddate")))
-         {
-            String date = obj.toString();
-            obj = Conversion.dateFromXmlDate(date);
-         }
+         propsInitialised = true;
+      }
+      
+      obj = props.get(key);
+      
+      // temp HACK
+      // TODO: should use data dictionary to decide on conversion here?!
+      if (obj == null && key.equals("description"))
+      {
+         obj = "";
+      }
+      
+      if (obj != null && (key.equals("createddate") || key.equals("modifieddate")))
+      {
+         String date = obj.toString();
+         obj = Conversion.dateFromXmlDate(date);
       }
       
       return obj; 
@@ -165,4 +164,6 @@ public class MapNode extends Node implements Map<String, Object>
    {
       return getProperties().values();
    }
+   
+   private boolean propsInitialised = false;
 }

@@ -18,8 +18,8 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
-   <h:form id="new-space">
+   <%-- set the form name here --%>
+   <h:form id="checkout-file">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -54,12 +54,13 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
+                              <h:graphicImage id="wizard-logo" url="/images/icons/CheckOut.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value="#{NewSpaceDialog.currentSpaceName}" /></div>
-                              <div class="mainTitle">Create Space</div>
-                              <div class="mainSubText">Use this dialog to create a new space.</div>
+                              <div class="mainSubTitle">Checkout '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
+                              <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
+                              <div class="mainSubText">Use this page to enter information about the checkout.</div>
                            </td>
                         </tr>
                      </table>
@@ -82,81 +83,66 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Space Properties</td>
-                                 </tr>
-                                 <tr>
-                                    <td>Name:</td>
-                                    <td>
-                                       <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" />&nbsp;*
+                                    <td><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
+                                    <td>A copy of the file '<h:outputText value="#{BrowseBean.document.name}" />' will be made for you to work with.
+                                        When you have completed your changes you need to check the file in to allow other to view your changes.
                                     </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Description:</td>
-                                    <td>
-                                       <h:inputText value="#{NewSpaceDialog.description}" size="35" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading">&nbsp;Other Options</td>
-                                 </tr>
-                                 <tr>
-                                    <td>Choose space icon:</td>
-                                    <td>
-                                       <table border="0" cellpadding="0" cellspacing="0"><tr><td>
-                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                                       <a:imagePickerRadio columns="7" spacing="4" value="#{NewSpaceDialog.icon}">
-                                          <a:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
-                                          <a:listItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
-                                          <a:listItem value="space-icon-www" image="/images/icons/space-icon-www.gif" />
-                                          <a:listItem value="space-icon-world" image="/images/icons/space-icon-world.gif" />
-                                          <a:listItem value="space-icon-spanner" image="/images/icons/space-icon-spanner.gif" />
-                                          <a:listItem value="space-icon-public" image="/images/icons/space-icon-public.gif" />
-                                          <a:listItem value="space-icon-orange-ball" image="/images/icons/space-icon-orange-ball.gif" />
-                                          <a:listItem value="space-icon-lock" image="/images/icons/space-icon-lock.gif" />
-                                          <a:listItem value="space-icon-library" image="/images/icons/space-icon-library.gif" />
-                                          <a:listItem value="space-icon-images" image="/images/icons/space-icon-images.gif" />
-                                          <a:listItem value="space-icon-id" image="/images/icons/space-icon-id.gif" />
-                                          <a:listItem value="space-icon-glasses" image="/images/icons/space-icon-glasses.gif" />
-                                          <a:listItem value="space-icon-download" image="/images/icons/space-icon-download.gif" />
-                                          <a:listItem value="space-icon-documents" image="/images/icons/space-icon-documents.gif" />
-                                       </a:imagePickerRadio>
-                                       <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                                       </td></tr></table>
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2">To create your space click Create Space.</td>
                                  </tr>
                               </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "yellowInner"); %>
                            </td>
                            
-                           <td valign="top">
+                           <td valign="top" colspan=2>
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Create Space" action="#{NewSpaceDialog.finish}" styleClass="wizardButton" />
+                                       <h:commandButton value="Check Out" action="#{BrowseBean.checkoutFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
+                                 <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceDialog.cancel}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Minimise to Shelf" action="#{NewSpaceDialog.minimise}" styleClass="wizardButton" />
+                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                           </td>
+                        </tr>
+                        
+                        <tr>
+                           <td width="100%" valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                                 <tr>
+                                    <td class="mainSubText">Where do you want to keep the copy of this file?.</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <h:selectOneRadio value="current" layout="pageDirection">
+                                          <f:selectItem itemValue="current" itemLabel="In the current space" />
+                                          <f:selectItem itemValue="other" itemLabel="Space:" />
+                                       </h:selectOneRadio>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td><h:selectBooleanCheckbox value="false"/>&nbsp;Always checkout items to:</td>
+                                 </tr>
+                                 <tr>
+                                    <td style="padding-left:24px;">
+                                       <h:selectOneRadio value="current" layout="pageDirection">
+                                          <f:selectItem itemValue="current" itemLabel="The containing space of the original file" />
+                                          <f:selectItem itemValue="other" itemLabel="Space:" />
+                                       </h:selectOneRadio>
+                                    </td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
                         </tr>
                      </table>

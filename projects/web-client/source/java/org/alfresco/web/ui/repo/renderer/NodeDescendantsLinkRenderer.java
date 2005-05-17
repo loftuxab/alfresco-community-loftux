@@ -155,7 +155,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
       
       if (ellipses == false)
       {
-         // label is the name of the child node
+         // label is the name of the child node assoc
          buf.append(Utils.encode(childRef.getQName().getLocalName()));
       }
       else

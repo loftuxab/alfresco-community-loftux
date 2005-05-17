@@ -175,10 +175,10 @@ public class RichListRenderer extends BaseRenderer
                   header.encodeChildren(context);
                   header.encodeEnd(context);
                }
+               
+               // we don't render child controls for the header row
+               out.write("</th>");
             }
-            
-            // we don't render child controls for the header row
-            out.write("</th>");
          }
          out.write("</tr>");
          
@@ -234,9 +234,9 @@ public class RichListRenderer extends BaseRenderer
                   // allow child controls inside the columns to render themselves
                   encodeRecursive(context, column);
                }
+               
+               out.write("</td>");
             }
-            
-            out.write("</td>");
          }
          out.write("</tr>");
       }
@@ -404,7 +404,7 @@ public class RichListRenderer extends BaseRenderer
             // output actions column if any
             if (actionsColumn != null)
             {
-               out.write("<td");
+               out.write("<td align=right");
                outputAttribute(out, actionsColumn.getAttributes().get("style"), "style");
                outputAttribute(out, actionsColumn.getAttributes().get("styleClass"), "class");
                out.write('>');
@@ -414,9 +414,10 @@ public class RichListRenderer extends BaseRenderer
                   // allow child controls inside the columns to render themselves
                   encodeRecursive(context, actionsColumn);
                }
+               out.write("</td>");
             }
             
-            out.write("</td></tr>");
+            out.write("</tr>");
          }
          
          // render remaining columns as lines of data up to a max display limit
