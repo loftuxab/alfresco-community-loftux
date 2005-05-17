@@ -230,7 +230,6 @@ public class NavigationBean
    // Private helpers
    
    
-   
    // ------------------------------------------------------------------------------
    // Inner classes
    
@@ -287,8 +286,6 @@ public class NavigationBean
    // Private data
    
    private static Logger s_logger = Logger.getLogger(NavigationBean.class);
-   
-   private static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;

@@ -523,19 +523,19 @@ public class BrowseBean implements IContextListener
       switch (mode)
       {
          case UISimpleSearch.SEARCH_ALL:
-            query = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +@" + nameAttr + ":\"" + text + "*\"";
+            query = "+@" + nameAttr + ":\"" + text + "*\"";
             break;
          
          case UISimpleSearch.SEARCH_FILE_NAMES:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +@" + nameAttr + ":\"" + text + "*\"";
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\""   + " +@" + nameAttr + ":\"" + text + "*\"";
             break;
          
          case UISimpleSearch.SEARCH_FILE_NAMES_CONTENTS:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +@" + nameAttr + ":\"" + text + "*\"";
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\""   + " +@" + nameAttr + ":\"" + text + "*\"";
             break;
          
          case UISimpleSearch.SEARCH_SPACE_NAMES:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +@" + nameAttr + ":\"" + text + "*\"";
+            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +@" + nameAttr + ":\"" + text + "*\"";
             break;
          
          default:
