@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 
-/*package*/ class BehaviourMap<B>
+/*package*/ class BehaviourMap<B extends BehaviourBinding>
 {
 
     private Map<B, BehaviourDefinition<B>> index = new HashMap<B, BehaviourDefinition<B>>();
@@ -20,12 +20,13 @@ import java.util.Map;
     }
     
     
-    public void put(B binding, BehaviourDefinition<B> behaviour)
+    public void put(BehaviourDefinition<B> behaviourDefinition)
     {
-        index.put(binding, behaviour);
+        B binding = behaviourDefinition.getBinding();
+        index.put(binding, behaviourDefinition);
         for (BehaviourChangeListener<B> listener : listeners)
         {
-            listener.addition(binding, behaviour.getBehaviour());
+            listener.addition(binding, behaviourDefinition.getBehaviour());
         }
     }
     

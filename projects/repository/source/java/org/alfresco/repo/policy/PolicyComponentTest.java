@@ -12,7 +12,7 @@ import org.alfresco.repo.dictionary.metamodel.M2ChildAssociation;
 import org.alfresco.repo.dictionary.metamodel.M2Property;
 import org.alfresco.repo.dictionary.metamodel.M2Type;
 import org.alfresco.repo.dictionary.metamodel.MetaModelDAO;
-import org.alfresco.repo.policy.PolicyComponentImpl.PolicyKey;
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.QName;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -41,8 +41,9 @@ public class PolicyComponentTest extends TestCase
     @Override
     protected void setUp() throws Exception
     {
+        NodeService nodeService = (NodeService)ctx.getBean("indexingNodeService");
         DictionaryService dictionary = (DictionaryService)ctx.getBean("dictionaryService");
-        policyComponent = new PolicyComponentImpl(dictionary); 
+        policyComponent = new PolicyComponentImpl(nodeService, dictionary); 
     }
 
 
@@ -53,16 +54,6 @@ public class PolicyComponentTest extends TestCase
         assertNotNull(policy);
         String result = policy.test("argument");
         assertEquals("ValidTest: argument", result);
-    }
-    
-    
-    public void testPolicyKey()
-    {
-        PolicyKey key1 = new PolicyKey(PolicyType.Class, BASE_TYPE);
-        PolicyKey key2 = new PolicyKey(PolicyType.Class, BASE_TYPE);
-        PolicyKey key3 = new PolicyKey(PolicyType.Property, BASE_TYPE);
-        assertEquals(key1, key2);
-        assertEquals(key1.equals(key3), false);
     }
     
     
@@ -160,10 +151,10 @@ public class PolicyComponentTest extends TestCase
         // Test valid behaviour (for registered policy)
         try
         {
-            BehaviourDefinition definition = policyComponent.bindClassBehaviour(policyName, new ClassRef(FILE_TYPE), validBehaviour);
+            BehaviourDefinition<ClassBehaviourBinding> definition = policyComponent.bindClassBehaviour(policyName, new ClassRef(FILE_TYPE), validBehaviour);
             assertNotNull(definition);
             assertEquals(policyName, definition.getPolicy());
-            assertEquals(new ClassRef(FILE_TYPE), definition.getBinding());
+            assertEquals(new ClassRef(FILE_TYPE), definition.getBinding().getClassRef());
         }
         catch(PolicyException e)
         {
@@ -177,12 +168,12 @@ public class PolicyComponentTest extends TestCase
         // Register Policy
         ClassPolicyDelegate<TestPolicy> delegate = policyComponent.registerClassPolicy(TestPolicy.class);
         
-        // Register Behaviour
+        // Bind Behaviour
         QName policyName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test");
         Behaviour validBehaviour = new JavaBehaviour(this, "validTest");
         policyComponent.bindClassBehaviour(policyName, new ClassRef(FILE_TYPE), validBehaviour);
         
-        // Test delegates
+        // Test delegate lists
         Collection<TestPolicy> folderPolicies = delegate.getList(new ClassRef(FOLDER_TYPE));
         assertNotNull(folderPolicies);
         assertEquals(0, folderPolicies.size());
@@ -196,13 +187,132 @@ public class PolicyComponentTest extends TestCase
         }
         TestPolicy filePolicy = delegate.get(new ClassRef(FILE_TYPE));
         
-        
+        // Test delegate
+        TestPolicy singlePolicy = delegate.get(new ClassRef(FILE_TYPE));
+        assertNotNull(singlePolicy);
+        String singleResult = singlePolicy.test("argument");
+        assertEquals("ValidTest: argument", singleResult);
     }
     
+    
+    public void testOverride()
+    {
+        // Register Policy
+        ClassPolicyDelegate<TestPolicy> delegate = policyComponent.registerClassPolicy(TestPolicy.class);
+        
+        // Bind Behaviour
+        QName policyName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test");
+        Behaviour baseBehaviour = new JavaBehaviour(this, "baseTest");
+        policyComponent.bindClassBehaviour(policyName, new ClassRef(BASE_TYPE), baseBehaviour);
+        Behaviour folderBehaviour = new JavaBehaviour(this, "folderTest");
+        policyComponent.bindClassBehaviour(policyName, new ClassRef(FOLDER_TYPE), folderBehaviour);
+
+        // Invoke Policies        
+        TestPolicy basePolicy = delegate.get(new ClassRef(BASE_TYPE));
+        String baseResult = basePolicy.test("base");
+        assertEquals("Base: base", baseResult);
+        TestPolicy filePolicy = delegate.get(new ClassRef(FILE_TYPE));
+        String fileResult = filePolicy.test("file");
+        assertEquals("Base: file", fileResult);
+        TestPolicy folderPolicy = delegate.get(new ClassRef(FOLDER_TYPE));
+        String folderResult = folderPolicy.test("folder");
+        assertEquals("Folder: folder", folderResult);
+    }
+    
+    
+    public void testCache()
+    {
+        // Register Policy
+        ClassPolicyDelegate<TestPolicy> delegate = policyComponent.registerClassPolicy(TestPolicy.class);
+        
+        // Bind Behaviour
+        QName policyName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test");
+        Behaviour baseBehaviour = new JavaBehaviour(this, "baseTest");
+        policyComponent.bindClassBehaviour(policyName, new ClassRef(BASE_TYPE), baseBehaviour);
+        Behaviour folderBehaviour = new JavaBehaviour(this, "folderTest");
+        policyComponent.bindClassBehaviour(policyName, new ClassRef(FOLDER_TYPE), folderBehaviour);
+
+        // Invoke Policies        
+        TestPolicy basePolicy = delegate.get(new ClassRef(BASE_TYPE));
+        String baseResult = basePolicy.test("base");
+        assertEquals("Base: base", baseResult);
+        TestPolicy filePolicy = delegate.get(new ClassRef(FILE_TYPE));
+        String fileResult = filePolicy.test("file");
+        assertEquals("Base: file", fileResult);
+        TestPolicy folderPolicy = delegate.get(new ClassRef(FOLDER_TYPE));
+        String folderResult = folderPolicy.test("folder");
+        assertEquals("Folder: folder", folderResult);
+        
+        // Retrieve delegates again        
+        TestPolicy basePolicy2 = delegate.get(new ClassRef(BASE_TYPE));
+        assertTrue(basePolicy == basePolicy2);
+        TestPolicy filePolicy2 = delegate.get(new ClassRef(FILE_TYPE));
+        assertTrue(filePolicy == filePolicy2);
+        TestPolicy folderPolicy2 = delegate.get(new ClassRef(FOLDER_TYPE));
+        assertTrue(folderPolicy == folderPolicy2);
+        
+        // Bind new behaviour (forcing base & file cache resets)
+        Behaviour newBaseBehaviour = new JavaBehaviour(this, "newBaseTest");
+        policyComponent.bindClassBehaviour(policyName, new ClassRef(BASE_TYPE), newBaseBehaviour);
+
+        // Invoke Policies        
+        TestPolicy basePolicy3 = delegate.get(new ClassRef(BASE_TYPE));
+        assertTrue(basePolicy3 != basePolicy2);
+        String baseResult3 = basePolicy3.test("base");
+        assertEquals("NewBase: base", baseResult3);
+        TestPolicy filePolicy3 = delegate.get(new ClassRef(FILE_TYPE));
+        assertTrue(filePolicy3 != filePolicy2);
+        String fileResult3 = filePolicy3.test("file");
+        assertEquals("NewBase: file", fileResult3);
+        TestPolicy folderPolicy3 = delegate.get(new ClassRef(FOLDER_TYPE));
+        assertTrue(folderPolicy3 == folderPolicy2);
+        String folderResult3 = folderPolicy3.test("folder");
+        assertEquals("Folder: folder", folderResult3);
+        
+        // Bind new behaviour (forcing file cache reset)
+        Behaviour fileBehaviour = new JavaBehaviour(this, "fileTest");
+        policyComponent.bindClassBehaviour(policyName, new ClassRef(FILE_TYPE), fileBehaviour);
+
+        // Invoke Policies        
+        TestPolicy basePolicy4 = delegate.get(new ClassRef(BASE_TYPE));
+        assertTrue(basePolicy4 == basePolicy3);
+        String baseResult4 = basePolicy4.test("base");
+        assertEquals("NewBase: base", baseResult4);
+        TestPolicy filePolicy4 = delegate.get(new ClassRef(FILE_TYPE));
+        assertTrue(filePolicy4 != filePolicy3);
+        String fileResult4 = filePolicy4.test("file");
+        assertEquals("File: file", fileResult4);
+        TestPolicy folderPolicy4 = delegate.get(new ClassRef(FOLDER_TYPE));
+        assertTrue(folderPolicy4 == folderPolicy4);
+        String folderResult4 = folderPolicy4.test("folder");
+        assertEquals("Folder: folder", folderResult4);
+    }
+
     
     public String validTest(String argument)
     {
         return "ValidTest: " + argument;
+    }
+
+    
+    public String baseTest(String argument)
+    {
+        return "Base: " + argument;
+    }
+
+    public String newBaseTest(String argument)
+    {
+        return "NewBase: " + argument;
+    }
+    
+    public String fileTest(String argument)
+    {
+        return "File: " + argument;
+    }
+    
+    public String folderTest(String argument)
+    {
+        return "Folder: " + argument;
     }
     
     

@@ -4,19 +4,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
+
 
 public class ClassPolicyDelegate<P extends ClassPolicy>
 {
 
-//    private PolicyDelegateCache<ClassRef, ClassPolicy, P> delegateCache;
-    private PolicyDelegateCache<ClassRef, P> delegateCache;
+    private NodeService nodeService;
+    private DictionaryService dictionary;
+    private CachedPolicyFactory<ClassBehaviourBinding, P> factory;
 
 
-    /*package*/ ClassPolicyDelegate(Class<P> policyClass, BehaviourIndex<ClassRef> query)
+    /*package*/ ClassPolicyDelegate(NodeService nodeService, DictionaryService dictionary, Class<P> policyClass, BehaviourIndex<ClassBehaviourBinding> index)
     {
-        delegateCache = new PolicyDelegateCache<ClassRef, P>(policyClass, query);
+        this.nodeService = nodeService;
+        this.dictionary = dictionary;
+        this.factory = new CachedPolicyFactory<ClassBehaviourBinding, P>(policyClass, index);
         
         // TODO: Get list of all registered behaviours for policy
         //       thus testing pre-registered behaviours - add getList(policy) to delegate cache
@@ -25,12 +30,12 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
 
     public P get(ClassRef classRef)
     {
-        return delegateCache.get(classRef);
+        return factory.create(new ClassBehaviourBinding(dictionary, classRef));
     }
 
     public Collection<P> getList(ClassRef classRef)
     {
-        return delegateCache.getList(classRef);
+        return factory.createList(new ClassBehaviourBinding(dictionary, classRef));
     }
 	
 	/**
@@ -41,7 +46,7 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
 	 * @param nodeRef	   the node reference
 	 * @return			   a collection of the policy behaviours
 	 */
-	public Collection<P> getList(NodeService nodeService, NodeRef nodeRef)
+	public Collection<P> getList(NodeRef nodeRef)
 	{
 		Collection<P> result = new ArrayList<P>();
 		
@@ -58,5 +63,12 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
 		
 		return result;
 	}
+    
+    
+    public P get(NodeRef nodeRef)
+    {
+        return factory.toPolicy(getList(nodeRef));
+    }
+    
     
 }

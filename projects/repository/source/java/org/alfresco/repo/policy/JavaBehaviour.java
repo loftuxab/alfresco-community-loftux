@@ -1,6 +1,7 @@
 package org.alfresco.repo.policy;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -85,7 +86,15 @@ public class JavaBehaviour implements Behaviour
         {
             // TODO: Handle toString, equals & hashCode
             
-            return delegateMethod.invoke(instance, args);
+            try
+            {
+                return delegateMethod.invoke(instance, args);
+            }
+            catch (InvocationTargetException e)
+            {
+                throw e.getCause();
+            }
+            
         }
     }
     

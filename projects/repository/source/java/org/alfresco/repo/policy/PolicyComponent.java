@@ -17,9 +17,9 @@ public interface PolicyComponent
     
     public boolean isRegisteredPolicy(PolicyType policyType, QName policy);
     
-    public BehaviourDefinition<ClassRef> bindClassBehaviour(QName policy, ClassRef classRef, Behaviour behaviour);
+    public BehaviourDefinition<ClassBehaviourBinding> bindClassBehaviour(QName policy, ClassRef classRef, Behaviour behaviour);
     
-    //TODO: public <P extends ClassPolicy> BehaviourDefinition<ClassRef, P> bindClassBehaviour(QName policy, Object service, Behaviour<P> behaviour);
+    public BehaviourDefinition<ServiceBehaviourBinding> bindClassBehaviour(QName policy, Object service, Behaviour behaviour);
     
     //TODO: public BehaviourDefinition bindPropertyBehaviour(QName policy, ClassRef classRef, QName property, Behaviour behaviour);
 

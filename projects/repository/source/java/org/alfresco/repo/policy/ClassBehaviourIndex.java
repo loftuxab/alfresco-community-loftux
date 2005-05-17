@@ -4,40 +4,33 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
-import org.alfresco.repo.dictionary.DictionaryService;
 
-
-/*package*/ class ClassBehaviourIndex implements BehaviourIndex<ClassRef>
+/*package*/ class ClassBehaviourIndex implements BehaviourIndex<ClassBehaviourBinding>
 {
 
-    private DictionaryService dictionary;
-    private BehaviourMap<ClassRef> classMap = new BehaviourMap<ClassRef>();
-    private BehaviourMap<Object> serviceMap = new BehaviourMap<Object>();    
-    private List<BehaviourChangeListener<ClassRef>> listeners = new ArrayList<BehaviourChangeListener<ClassRef>>();
+    private BehaviourMap<ClassBehaviourBinding> classMap = new BehaviourMap<ClassBehaviourBinding>();
+    private BehaviourMap<ServiceBehaviourBinding> serviceMap = new BehaviourMap<ServiceBehaviourBinding>();    
+    private List<BehaviourChangeListener<ClassBehaviourBinding>> listeners = new ArrayList<BehaviourChangeListener<ClassBehaviourBinding>>();
 
     
-    /*package*/ ClassBehaviourIndex(DictionaryService dictionary)
+    /*package*/ ClassBehaviourIndex()
     {
-        this.dictionary = dictionary;
-
-        this.classMap.addChangeListener(new BehaviourChangeListener<ClassRef>()
+        this.classMap.addChangeListener(new BehaviourChangeListener<ClassBehaviourBinding>()
         {
-            public void addition(ClassRef binding, Behaviour behaviour)
+            public void addition(ClassBehaviourBinding binding, Behaviour behaviour)
             {
-                for (BehaviourChangeListener<ClassRef> listener : listeners)
+                for (BehaviourChangeListener<ClassBehaviourBinding> listener : listeners)
                 {
                     listener.addition(binding, behaviour);
                 }
             }
         });
 
-        this.serviceMap.addChangeListener(new BehaviourChangeListener<Object>()
+        this.serviceMap.addChangeListener(new BehaviourChangeListener<ServiceBehaviourBinding>()
         {
-            public void addition(Object binding, Behaviour behaviour)
+            public void addition(ServiceBehaviourBinding binding, Behaviour behaviour)
             {
-                for (BehaviourChangeListener<ClassRef> listener : listeners)
+                for (BehaviourChangeListener<ClassBehaviourBinding> listener : listeners)
                 {
                     listener.addition(null, behaviour);
                 }
@@ -46,32 +39,30 @@ import org.alfresco.repo.dictionary.DictionaryService;
     }
 
     
-    public Collection<BehaviourDefinition<? extends Object>> getAll()
+    public Collection<BehaviourDefinition> getAll()
     {
-        List<BehaviourDefinition<? extends Object>> all = new ArrayList<BehaviourDefinition<? extends Object>>(classMap.size() + serviceMap.size());
+        List<BehaviourDefinition> all = new ArrayList<BehaviourDefinition>(classMap.size() + serviceMap.size());
         all.addAll(classMap.getAll());
         all.addAll(serviceMap.getAll());
         return all;
     }
     
 
-    public Collection<BehaviourDefinition<? extends Object>> find(ClassRef key)
+    public Collection<BehaviourDefinition> find(ClassBehaviourBinding binding)
     {
         // Find class behaviour by scanning up the class hierarchy
-        BehaviourDefinition<ClassRef> behaviour = null;        
-        ClassDefinition classDefinition = dictionary.getClass(key);
-        while(classDefinition != null)
+        BehaviourDefinition behaviour = null;
+        while(behaviour == null && binding != null)
         {
-            behaviour = classMap.get(classDefinition.getReference());
-            if (behaviour != null)
+            behaviour = classMap.get(binding);
+            if (behaviour == null)
             {
-                break;
+                binding = (ClassBehaviourBinding)binding.generaliseBinding();
             }
-            classDefinition = classDefinition.getSuperClass();
         }
 
         // Build complete list of behaviours (class and service level)
-        List<BehaviourDefinition<? extends Object>> behaviours = new ArrayList<BehaviourDefinition<? extends Object>>();
+        List<BehaviourDefinition> behaviours = new ArrayList<BehaviourDefinition>();
         if (behaviour != null)
         {
             behaviours.add(behaviour);
@@ -81,27 +72,21 @@ import org.alfresco.repo.dictionary.DictionaryService;
     }
 
 
-    public void addChangeListener(BehaviourChangeListener<ClassRef> listener)
+    public void addChangeListener(BehaviourChangeListener<ClassBehaviourBinding> listener)
     {
         listeners.add(listener);
     }
 
     
-    public void putClassBehaviour(BehaviourDefinition<ClassRef> behaviour)
+    public void putClassBehaviour(BehaviourDefinition<ClassBehaviourBinding> behaviour)
     {
-        ClassRef classRef = behaviour.getBinding();
-        ClassDefinition definition = dictionary.getClass(classRef);
-        if (definition == null)
-        {
-            throw new IllegalArgumentException("Cannot bind to class " + classRef + " as it is not defined");
-        }
-        classMap.put(classRef, behaviour);
+        classMap.put(behaviour);
     }
 
     
-    public void putServiceBehaviour(BehaviourDefinition<Object> behaviour)
+    public void putServiceBehaviour(BehaviourDefinition<ServiceBehaviourBinding> behaviour)
     {
-        serviceMap.put(behaviour.getBinding(), behaviour);
+        serviceMap.put(behaviour);
     }
 
 

@@ -2,7 +2,7 @@ package org.alfresco.repo.policy;
 
 
 
-public interface BehaviourChangeListener<B>
+/*package*/ interface BehaviourChangeListener<B extends BehaviourBinding>
 {
     public void addition(B binding, Behaviour behaviour);
 

@@ -7,9 +7,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.util.ParameterCheck;
 
@@ -22,13 +24,15 @@ public class PolicyComponentImpl implements PolicyComponent
 
     private Map<PolicyKey, PolicyDefinition> registeredPolicies;; 
 
+    private NodeService nodeService;
     private DictionaryService dictionary;
     
     private Map<QName, ClassBehaviourIndex> classPolicies = new HashMap<QName, ClassBehaviourIndex>();
     
     
-    public PolicyComponentImpl(DictionaryService dictionary)
+    public PolicyComponentImpl(NodeService nodeService, DictionaryService dictionary)
     {
+        this.nodeService = nodeService;
         this.dictionary = dictionary;
         this.registeredPolicies = new HashMap<PolicyKey, PolicyDefinition>();
     }
@@ -40,7 +44,7 @@ public class PolicyComponentImpl implements PolicyComponent
         ParameterCheck.mandatory("Policy interface class", policy);
         PolicyDefinition definition = createPolicyDefinition(policy);
         registeredPolicies.put(new PolicyKey(definition.getType(), definition.getName()), definition);
-        return new ClassPolicyDelegate<T>(policy, getClassBehaviourIndex(definition.getName()));
+        return new ClassPolicyDelegate<T>(nodeService, dictionary, policy, getClassBehaviourIndex(definition.getName()));
     }
 
     
@@ -49,7 +53,7 @@ public class PolicyComponentImpl implements PolicyComponent
         ClassBehaviourIndex index = classPolicies.get(policy);
         if (index == null)
         {
-            index = new ClassBehaviourIndex(dictionary);
+            index = new ClassBehaviourIndex();
             classPolicies.put(policy, index);
         }
         return index;
@@ -74,22 +78,46 @@ public class PolicyComponentImpl implements PolicyComponent
     }
 
 
-    public BehaviourDefinition<ClassRef> bindClassBehaviour(QName policy, ClassRef classRef, Behaviour behaviour)
+    public BehaviourDefinition<ClassBehaviourBinding> bindClassBehaviour(QName policy, ClassRef classRef, Behaviour behaviour)
     {
         // Validate arguments
         ParameterCheck.mandatory("Policy", policy);
         ParameterCheck.mandatory("Class Reference", classRef);
         ParameterCheck.mandatory("Behaviour", behaviour);
 
+        // Validate Binding
+        ClassDefinition classDefinition = dictionary.getClass(classRef);
+        if (classDefinition == null)
+        {
+            throw new IllegalArgumentException("Class " + classRef + " has not been defined in the data dictionary");
+        }
+        
         // Create behaviour definition and bind to policy
-        BehaviourDefinition<ClassRef> definition = createBehaviourDefinition(PolicyType.Class, policy, classRef, behaviour);
+        ClassBehaviourBinding binding = new ClassBehaviourBinding(dictionary, classRef);
+        BehaviourDefinition<ClassBehaviourBinding> definition = createBehaviourDefinition(PolicyType.Class, policy, binding, behaviour);
         getClassBehaviourIndex(policy).putClassBehaviour(definition);
         
         return definition;
     }
-
     
-    private <B> BehaviourDefinition<B> createBehaviourDefinition(PolicyType type, QName policy, B binding, Behaviour behaviour)
+    
+    public BehaviourDefinition<ServiceBehaviourBinding> bindClassBehaviour(QName policy, Object service, Behaviour behaviour)
+    {
+        // Validate arguments
+        ParameterCheck.mandatory("Policy", policy);
+        ParameterCheck.mandatory("Service", service);
+        ParameterCheck.mandatory("Behaviour", behaviour);
+        
+        // Create behaviour definition and bind to policy
+        ServiceBehaviourBinding binding = new ServiceBehaviourBinding(service);
+        BehaviourDefinition<ServiceBehaviourBinding> definition = createBehaviourDefinition(PolicyType.Class, policy, binding, behaviour);
+        getClassBehaviourIndex(policy).putServiceBehaviour(definition);
+        
+        return definition;
+    }    
+    
+    
+    private <B extends BehaviourBinding> BehaviourDefinition<B> createBehaviourDefinition(PolicyType type, QName policy, B binding, Behaviour behaviour)
     {
         // Determine if policy has already been registered
         PolicyDefinition policyDefinition = getRegisteredPolicy(type, policy);
@@ -152,7 +180,7 @@ public class PolicyComponentImpl implements PolicyComponent
     }
 
     
-    /*package*/ static class PolicyKey
+    private static class PolicyKey
     {
         private PolicyType type;
         private QName policy;
@@ -228,7 +256,7 @@ public class PolicyComponentImpl implements PolicyComponent
     }
     
 
-    /*package*/ class BehaviourDefinitionImpl<B> implements BehaviourDefinition<B>
+    /*package*/ class BehaviourDefinitionImpl<B extends BehaviourBinding> implements BehaviourDefinition<B>
     {
         
         private PolicyType type;
@@ -272,5 +300,7 @@ public class PolicyComponentImpl implements PolicyComponent
             return behaviour;
         }
 
-    }    
+    }
+
+
 }
