@@ -94,16 +94,7 @@ public class MapNode extends Node implements Map<String, Object>
          propsInitialised = true;
       }
       
-      obj = props.get(key);
-      
-      // temp HACK
-      // TODO: should use data dictionary to decide on conversion here?!
-      if (obj == null && key.equals("description"))
-      {
-         obj = "";
-      }
-      
-      return obj; 
+      return props.get(key); 
    }
 
    /**
