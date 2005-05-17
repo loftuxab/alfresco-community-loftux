@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.util.Conversion;
 
 /**
  * Lighweight client side representation of a node held in the repository, which
@@ -97,6 +98,12 @@ public class MapNode extends Node implements Map<String, Object>
          if (obj == null && key.equals("description"))
          {
             obj = "";
+         }
+         
+         if (obj != null && (key.equals("createddate") || key.equals("modifieddate")))
+         {
+            String date = obj.toString();
+            obj = Conversion.dateFromXmlDate(date);
          }
       }
       
