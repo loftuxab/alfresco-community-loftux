@@ -153,7 +153,9 @@ public class RichListRenderer extends BaseRenderer
          ResponseWriter out = context.getResponseWriter();
          
          // render column headers as labels
-         out.write("<tr>");
+         out.write("<tr");
+         outputAttribute(out, richList.getAttributes().get("headerStyleClass"), "class");
+         out.write('>');
          for (int i=0; i<columns.length; i++)
          {
             UIColumn column = columns[i];
@@ -296,14 +298,21 @@ public class RichListRenderer extends BaseRenderer
          
          // render column headers as labels
          // TODO: add "showHeaders" to RichList to allow hiding of header facets for some view modes
-         /*out.write("<tr>");
+         /*
+         out.write("<tr");
+         outputAttribute(out, richList.getAttributes().get("headerStyleClass"), "class");
+         out.write('>');
          for (int i=0; i<columns.length; i++)
          {
             UIColumn column = columns[i];
             
             if (column.isRendered() == true)
             {
-               out.write("<th>");
+               out.write("<th");
+               outputAttribute(out, column.getAttributes().get("width"), "width");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+               out.write('>');
                
                // output the header facet if any
                UIComponent header = column.getHeader();
@@ -318,7 +327,8 @@ public class RichListRenderer extends BaseRenderer
             // we don't render child controls for the header row
             out.write("</th>");
          }
-         out.write("</tr>");*/
+         out.write("</tr>");
+         */
          
          this.rowIndex = 0;
       }
@@ -448,7 +458,7 @@ public class RichListRenderer extends BaseRenderer
          }
          
          // end row and output a blank padding row/div
-         out.write("</table></td></tr><tr colspan=99><td><div style='height:4px'></div></td></tr>");
+         out.write("</table></td></tr><tr colspan=99><td><div style='padding:3px'></div></td></tr>");
          
          this.rowIndex++;
       }
@@ -494,7 +504,7 @@ public class RichListRenderer extends BaseRenderer
       // maximum displayable textual lines within a single item cell
       private final static int MAX_DISPLAYABLE_LINES = 3;
       
-      private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='height:4px'></div></td></tr>";
+      private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='padding:3px'></div</td></tr>";
       
       public static final String VIEWMODEID = "icons";
       

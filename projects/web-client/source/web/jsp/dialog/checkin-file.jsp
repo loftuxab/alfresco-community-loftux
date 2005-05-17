@@ -9,7 +9,7 @@
 <%@ page import="org.alfresco.web.PanelGenerator" %>
 
 <r:page>
-   
+
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
@@ -19,7 +19,7 @@
    <f:loadBundle basename="messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="checkout-file">
+   <h:form id="checkin-file">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -54,13 +54,13 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/CheckOut.gif" />
+                              <h:graphicImage id="wizard-logo" url="/images/icons/CheckIn.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle">Check Out '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainSubTitle">Check In '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText">Use this page to enter information about the checkout.</div>
+                              <div class="mainSubText">Current status is 'draft'.</div>
+                              <div class="mainSubText">Use this page to check in your working copy for other team members to work with.</div>
                            </td>
                         </tr>
                      </table>
@@ -83,24 +83,40 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
-                                    <td>A copy of the file '<h:outputText value="#{BrowseBean.document.name}" />' will be made for you to work with.
-                                        When you have completed your changes you need to check the file in to allow other to view your changes.
+                                    <td class="wizardSectionHeading">Working copy location</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <h:selectOneRadio value="current" layout="pageDirection">
+                                          <f:selectItem itemValue="current" itemLabel="Use copy in current space" />
+                                          <f:selectItem itemValue="other" itemLabel="Locate copy on my computer" />
+                                       </h:selectOneRadio>
+                                       <br>
+                                       TODO: Add upload component.
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td class="wizardSectionHeading">Check In options</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       TODO: Add check in options.
                                     </td>
                                  </tr>
                               </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "yellowInner"); %>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
                            
-                           <td valign="top" rowspan=2>
+                           <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Check Out" action="#{BrowseBean.checkoutFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="Check In" action="#{BrowseBean.checkinFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
@@ -111,38 +127,6 @@
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>
-                        </tr>
-                        
-                        <tr>
-                           <td width="100%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
-                                 <tr>
-                                    <td class="mainSubText">Where do you want to keep the copy of this file?</td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <h:selectOneRadio value="current" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="In the current space" />
-                                          <f:selectItem itemValue="other" itemLabel="Space:" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td><h:selectBooleanCheckbox value="false"/>&nbsp;Always checkout items to:</td>
-                                 </tr>
-                                 <tr>
-                                    <td style="padding-left:24px;">
-                                       <h:selectOneRadio value="current" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="The containing space of the original file" />
-                                          <f:selectItem itemValue="other" itemLabel="Space:" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
-                              </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
                         </tr>
                      </table>

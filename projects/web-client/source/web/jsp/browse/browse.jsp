@@ -160,9 +160,11 @@
                      
                      <a:panel id="spaces-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
+                     <div style="padding:3px"></div>
+                     
                      <%-- Spaces List --%>
                      <a:richList id="spacesList" binding="#{BrowseBean.spacesRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
-                           style="padding:2px;padding-top:6px;" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
+                           styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
                            value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
                         <%-- Primary column for details view mode --%>
@@ -273,9 +275,11 @@
                      
                      <a:panel id="content-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_content}">
                      
+                     <div style="padding:3px"></div>
+                     
                      <%-- Content list --%>
                      <a:richList id="contentRichList" binding="#{BrowseBean.contentRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
-                           style="padding:2px;padding-top:6px;" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
+                           styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
                            value="#{BrowseBean.content}" var="r" initialSortColumn="name" initialSortDescending="true">
                         
                         <%-- Primary column for details view mode --%>
@@ -291,6 +295,7 @@
                            <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
+                           <h:graphicImage url="/images/icons/locked.gif" width="15" height="12" rendered="#{r.locked == true}" />
                         </a:column>
                         
                         <%-- Primary column for icons view mode --%>
@@ -303,6 +308,7 @@
                            <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="header">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
+                           <h:graphicImage url="/images/icons/attachment.gif" width="15" height="12" rendered="#{r.locked == true}" />
                         </a:column>
                         
                         <%-- Primary column for list view mode --%>
@@ -315,6 +321,7 @@
                            <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="title">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
+                           <h:graphicImage url="/images/icons/attachment.gif" width="15" height="12" rendered="#{r.locked == true}" />
                         </a:column>
                         
                         <%-- Description column for all view modes --%>

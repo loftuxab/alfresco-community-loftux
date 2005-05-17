@@ -228,7 +228,8 @@ a.headbarLink
 
 .recordSet
 {
-   width: 100%;
+   padding: 2px;
+   border-spacing: 1px;
 }
 
 .recordSetRow
@@ -247,11 +248,6 @@ a.headbarLink
    color: #1B3557;
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-weight: bold;
-}
-
-.recordSetCell
-{
-   font-family: Tahoma, Arial, Helvetica, sans-serif;
 }
 
 .errorMessage

@@ -183,12 +183,10 @@
          <from-outcome>checkoutFile</from-outcome>
          <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
       </navigation-case>
-      <!--
       <navigation-case>
          <from-outcome>checkinFile</from-outcome>
          <to-view-id>/jsp/dialog/checkin-file.jsp</to-view-id>
       </navigation-case>
-      -->
    </navigation-rule>
    
    <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click, finish on dialog) -->

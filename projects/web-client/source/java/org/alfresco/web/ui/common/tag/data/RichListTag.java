@@ -43,11 +43,14 @@ public class RichListTag extends BaseComponentTag
       this.initialSortColumn = null;
       this.initialSortDescending = null;
       this.listConfig = null;
-      this.viewMode = null;
-      this.pageSize = null;
+      this.viewMode = null;      
       this.style = null;
       this.styleClass = null;
+      this.rowStyleClass = null;
+      this.altRowStyleClass = null;
+      this.headerStyleClass = null;
       this.width = null;
+      this.pageSize = null;
    }
    
    /**
@@ -66,6 +69,7 @@ public class RichListTag extends BaseComponentTag
       setStringProperty(component, "styleClass", this.styleClass);
       setStringProperty(component, "rowStyleClass", this.rowStyleClass);
       setStringProperty(component, "altRowStyleClass", this.altRowStyleClass);
+      setStringProperty(component, "headerStyleClass", this.headerStyleClass);
       setStringProperty(component, "width", this.width);
       setIntProperty(component, "pageSize", this.pageSize);
    }
@@ -193,10 +197,23 @@ public class RichListTag extends BaseComponentTag
    {
       this.width = width;
    }
+   
+   /**
+    * Set the header row CSS Class
+    *
+    * @param headerStyleClass     the header row CSS Class
+    */
+   public void setHeaderStyleClass(String headerStyleClass)
+   {
+      this.headerStyleClass = headerStyleClass;
+   }
 
 
    // ------------------------------------------------------------------------------
    // Private data
+   
+   /** the header row CSS Class */
+   private String headerStyleClass;
    
    /** the row CSS Class */
    private String rowStyleClass;

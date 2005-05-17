@@ -728,7 +728,7 @@ public class BrowseBean implements IContextListener
             // clear action context
             setActionSpace(null);
             
-            // setting the outcome will show the browse view
+            // setting the outcome will show the browse view again
             outcome = "browse";
          }
          catch (Throwable err)
@@ -749,7 +749,88 @@ public class BrowseBean implements IContextListener
     */
    public String checkoutFileOK()
    {
-      return "browse";
+      String outcome = null;
+      
+      Node node = getDocument();
+      if (node != null)
+      {
+         try
+         {
+            if (s_logger.isDebugEnabled())
+               s_logger.debug("Trying to lock content node Id: " + node.getId());
+            
+            // lock the node, adding the Lock aspect if required
+            if (node.hasAspect(LockService.ASPECT_CLASS_REF_LOCK) == false)
+            {
+               this.nodeService.addAspect(node.getNodeRef(), LockService.ASPECT_CLASS_REF_LOCK, Collections.<QName, Serializable>emptyMap());
+            }
+            this.lockService.lock(node.getNodeRef(), USERNAME, LockService.LockType.READ_ONLY_LOCK);
+            
+            // TODO: checkout the node content etc.
+            
+            // clear action context
+            setDocument(null);
+            
+            // refresh the UI, setting the outcome will show the browse view
+            invalidateComponents();
+            
+            outcome = "browse";
+         }
+         catch (Throwable err)
+         {
+            Utils.addErrorMessage("Unable to lock Content Node due to system error: " + err.getMessage());
+         }
+      }
+      else
+      {
+         s_logger.warn("WARNING: checkoutFileOK called without a current Document!");
+      }
+      
+      return outcome;
+   }
+   
+   /**
+    * Action called upon completion of the Check In file page
+    */
+   public String checkinFileOK()
+   {
+      String outcome = null;
+      
+      Node node = getDocument();
+      if (node != null)
+      {
+         try
+         {
+            if (s_logger.isDebugEnabled())
+               s_logger.debug("Trying to unlock content node Id: " + node.getId());
+            
+            // lock the node, adding the Lock aspect if required
+            if (node.hasAspect(LockService.ASPECT_CLASS_REF_LOCK) == true)
+            {
+               this.lockService.unlock(node.getNodeRef(), USERNAME);
+            }
+            
+            // TODO: checkin the node content etc.
+            
+            // clear action context
+            setDocument(null);
+            
+            // refresh the UI, setting the outcome will show the browse view
+            invalidateComponents();
+            
+            outcome = "browse";
+         }
+         catch (Throwable err)
+         {
+            Utils.addErrorMessage("Unable to unlock Content Node due to system error: " + err.getMessage());
+         }
+      }
+      else
+      {
+         s_logger.warn("WARNING: checkinFileOK called without a current Document!");
+      }
+      
+      return outcome;
    }
    
    
