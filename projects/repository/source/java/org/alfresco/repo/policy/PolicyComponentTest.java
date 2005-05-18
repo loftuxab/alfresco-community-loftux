@@ -20,30 +20,36 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class PolicyComponentTest extends TestCase
 {
+    private static ApplicationContext ctx;
+    private static QName BASE_TYPE;
+    private static QName FILE_TYPE;
+    private static QName FOLDER_TYPE;
+    private static QName INVALID_TYPE;
 
-    private static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-    
-    private static QName BASE_TYPE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "base");
-    private static QName FILE_TYPE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file");
-    private static QName FOLDER_TYPE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "folder");
-    private static QName INVALID_TYPE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "classdoesnotexist");
-    
-    
     static
     {
+        // Initialise application context
+        ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+
+        // Construct Test Model Types
+        BASE_TYPE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "base");
+        FILE_TYPE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "file");
+        FOLDER_TYPE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "folder");
+        INVALID_TYPE = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "classdoesnotexist");
         MetaModelDAO metaModelDAO = (MetaModelDAO)ctx.getBean("metaModelDAO");
         createTestTypes(metaModelDAO);
     }
 
+    private NodeService nodeService = null;
     private PolicyComponent policyComponent = null;
-    
+
 
     @Override
     protected void setUp() throws Exception
     {
-        NodeService nodeService = (NodeService)ctx.getBean("indexingNodeService");
+        nodeService = (NodeService)ctx.getBean("indexingNodeService");
         DictionaryService dictionary = (DictionaryService)ctx.getBean("dictionaryService");
-        policyComponent = new PolicyComponentImpl(nodeService, dictionary); 
+        policyComponent = new PolicyComponentImpl(dictionary); 
     }
 
 
@@ -168,30 +174,36 @@ public class PolicyComponentTest extends TestCase
         // Register Policy
         ClassPolicyDelegate<TestPolicy> delegate = policyComponent.registerClassPolicy(TestPolicy.class);
         
-        // Bind Behaviour
+        // Bind Class Behaviour
         QName policyName = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test");
-        Behaviour validBehaviour = new JavaBehaviour(this, "validTest");
-        policyComponent.bindClassBehaviour(policyName, new ClassRef(FILE_TYPE), validBehaviour);
+        Behaviour fileBehaviour = new JavaBehaviour(this, "fileTest");
+        policyComponent.bindClassBehaviour(policyName, new ClassRef(FILE_TYPE), fileBehaviour);
+
+        // Test NOOP Policy delegate
+        Collection<TestPolicy> basePolicies = delegate.getList(new ClassRef(BASE_TYPE));
+        assertNotNull(basePolicies);
+        assertTrue(basePolicies.size() == 0);
+        TestPolicy basePolicy = delegate.get(new ClassRef(BASE_TYPE));
+        assertNotNull(basePolicy);
         
-        // Test delegate lists
-        Collection<TestPolicy> folderPolicies = delegate.getList(new ClassRef(FOLDER_TYPE));
-        assertNotNull(folderPolicies);
-        assertEquals(0, folderPolicies.size());
+        // Test single Policy delegate
         Collection<TestPolicy> filePolicies = delegate.getList(new ClassRef(FILE_TYPE));
         assertNotNull(filePolicies);
-        assertEquals(1, filePolicies.size());
-        for (TestPolicy policy : filePolicies)
-        {
-            String result = policy.test("argument");
-            assertEquals("ValidTest: argument", result);
-        }
+        assertTrue(filePolicies.size() == 1);
         TestPolicy filePolicy = delegate.get(new ClassRef(FILE_TYPE));
-        
-        // Test delegate
-        TestPolicy singlePolicy = delegate.get(new ClassRef(FILE_TYPE));
-        assertNotNull(singlePolicy);
-        String singleResult = singlePolicy.test("argument");
-        assertEquals("ValidTest: argument", singleResult);
+        assertNotNull(filePolicy);
+        assertEquals(filePolicies.iterator().next(), filePolicy);
+
+        // Bind Service Behaviour
+        Behaviour serviceBehaviour = new JavaBehaviour(this, "serviceTest");
+        policyComponent.bindClassBehaviour(policyName, this, serviceBehaviour);
+
+        // Test multi Policy delegate
+        Collection<TestPolicy> file2Policies = delegate.getList(new ClassRef(FILE_TYPE));
+        assertNotNull(file2Policies);
+        assertTrue(file2Policies.size() == 2);
+        TestPolicy filePolicy2 = delegate.get(new ClassRef(FILE_TYPE));
+        assertNotNull(filePolicy2);
     }
     
     
@@ -288,33 +300,10 @@ public class PolicyComponentTest extends TestCase
         assertEquals("Folder: folder", folderResult4);
     }
 
-    
-    public String validTest(String argument)
-    {
-        return "ValidTest: " + argument;
-    }
 
-    
-    public String baseTest(String argument)
-    {
-        return "Base: " + argument;
-    }
-
-    public String newBaseTest(String argument)
-    {
-        return "NewBase: " + argument;
-    }
-    
-    public String fileTest(String argument)
-    {
-        return "File: " + argument;
-    }
-    
-    public String folderTest(String argument)
-    {
-        return "Folder: " + argument;
-    }
-    
+    //
+    // The following interfaces represents policies
+    //
     
     public interface TestPolicy extends ClassPolicy
     {
@@ -338,7 +327,46 @@ public class PolicyComponentTest extends TestCase
         public void b();
     }
     
+    
+    //
+    // The following methods represent Java Behaviours
+    // 
+    
+    public String validTest(String argument)
+    {
+        return "ValidTest: " + argument;
+    }
+    
+    public String baseTest(String argument)
+    {
+        return "Base: " + argument;
+    }
 
+    public String newBaseTest(String argument)
+    {
+        return "NewBase: " + argument;
+    }
+    
+    public String fileTest(String argument)
+    {
+        return "File: " + argument;
+    }
+    
+    public String folderTest(String argument)
+    {
+        return "Folder: " + argument;
+    }
+    
+    public String serviceTest(String argument)
+    {
+        return "Service: " + argument;
+    }
+
+    /**
+     * Helper to create Model to test with
+     * 
+     * @param metaModelDAO  the meta-model DAO
+     */
     private static void createTestTypes(MetaModelDAO metaModelDAO)
     {
         // Create Test Base Type

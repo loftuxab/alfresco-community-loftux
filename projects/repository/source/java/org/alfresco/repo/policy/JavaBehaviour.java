@@ -10,14 +10,33 @@ import java.util.Map;
 import org.alfresco.util.ParameterCheck;
 
 
+/**
+ * Java based Behaviour.
+ * 
+ * This behavior acts like a delegate (a method pointer).  The pointer is
+ * represented by an instance object and method name.
+ * 
+ * @author David Caruana
+ *
+ */
 public class JavaBehaviour implements Behaviour
 {
-
+    // The object instance holding the method
     private Object instance;
+    
+    // The method name
     private String method;
+    
+    // Cache of interface proxies (by interface class)
     private Map<Class, Object> proxies = new HashMap<Class, Object>();
     
-    
+
+    /**
+     * Construct.
+     * 
+     * @param instance  the object instance holding the method
+     * @param method  the method name
+     */
     public JavaBehaviour(Object instance, String method)
     {
         ParameterCheck.mandatory("Instance", instance);
@@ -27,26 +46,40 @@ public class JavaBehaviour implements Behaviour
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.Behaviour#getInterface(java.lang.Class)
+     */
     public synchronized <T> T getInterface(Class<T> policy)
     {
         ParameterCheck.mandatory("Policy class", policy);
         Object proxy = proxies.get(policy);
         if (proxy == null)
         {
-            InvocationHandler handler = getDelegateHandler(instance, method, policy);
-            proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{policy}, handler);
+            InvocationHandler handler = getInvocationHandler(instance, method, policy);
+            proxy = Proxy.newProxyInstance(policy.getClassLoader(), new Class[]{policy}, handler);
             proxies.put(policy, proxy);
         }
         return (T)proxy;
     }
 
-    public String getDescription()
+
+    @Override
+    public String toString()
     {
-        return "Java behaviour[class=" + instance.getClass() + ", method=" + method + ", instance=" + instance.toString();
+        return "Java method[class=" + instance.getClass().getName() + ", method=" + method + "]";
     }
 
     
-    private <T> InvocationHandler getDelegateHandler(Object instance, String method, Class<T> policyIF)
+    /**
+     * Gets the Invocation Handler.
+     * 
+     * @param <T>  the policy interface class
+     * @param instance  the object instance
+     * @param method  the method name
+     * @param policyIF  the policy interface class  
+     * @return  the invocation handler
+     */
+    private <T> InvocationHandler getInvocationHandler(Object instance, String method, Class<T> policyIF)
     {
         Method[] policyIFMethods = policyIF.getMethods();
         if (policyIFMethods.length != 1)
@@ -58,7 +91,7 @@ public class JavaBehaviour implements Behaviour
         {
             Class instanceClass = instance.getClass();
             Method delegateMethod = instanceClass.getMethod(method, (Class[])policyIFMethods[0].getParameterTypes());
-            return new DelegateHandler(instance, delegateMethod);
+            return new JavaMethodInvocationHandler(instance, delegateMethod);
         }
         catch (NoSuchMethodException e)
         {
@@ -67,25 +100,52 @@ public class JavaBehaviour implements Behaviour
     }
     
     
-
-    private static class DelegateHandler implements InvocationHandler
+    /**
+     * Java Method Invocation Handler
+     * 
+     * @author David Caruana
+     */
+    private static class JavaMethodInvocationHandler implements InvocationHandler
     {
-
         private Object instance;
         private Method delegateMethod;
         
-        
-        public DelegateHandler(Object instance, Method delegateMethod)
+        /**
+         * Constuct.
+         * 
+         * @param instance  the object instance holding the method
+         * @param delegateMethod  the method to invoke
+         */
+        private JavaMethodInvocationHandler(Object instance, Method delegateMethod)
         {
             this.instance = instance;
             this.delegateMethod = delegateMethod;
         }
 
-        
+        /* (non-Javadoc)
+         * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
+         */
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            // TODO: Handle toString, equals & hashCode
+            // Handle Object level methods
+            if (method.getName().equals("toString"))
+            {
+                return toString();
+            }
+            else if (method.getName().equals("hashCode"))
+            {
+                return hashCode();
+            }
+            else if (method.getName().equals("equals"))
+            {
+                if (Proxy.isProxyClass(args[0].getClass()))
+                {
+                    return equals(Proxy.getInvocationHandler(args[0]));
+                }
+                return false;
+            }
             
+            // Delegate to designated method pointer
             try
             {
                 return delegateMethod.invoke(instance, args);
@@ -94,9 +154,34 @@ public class JavaBehaviour implements Behaviour
             {
                 throw e.getCause();
             }
-            
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            else if (obj == null || !(obj instanceof JavaMethodInvocationHandler))
+            {
+                return false;
+            }
+            JavaMethodInvocationHandler other = (JavaMethodInvocationHandler)obj;
+            return instance.equals(other.instance) && delegateMethod.equals(other.delegateMethod);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return 37 * instance.hashCode() + delegateMethod.hashCode();
+        }
+
+        @Override
+        public String toString()
+        {
+            return "JavaBehaviour[instance=" + instance.hashCode() + ", method=" + delegateMethod.toString() + "]";
         }
     }
-    
     
 }

@@ -2,7 +2,7 @@ package org.alfresco.repo.policy;
 
 
 /**
- * Base Exception of Policy Exceptions.
+ * Base Policy Exception.
  * 
  * @author David Caruana
  */
@@ -20,5 +20,4 @@ public class PolicyException extends RuntimeException
     {
        super(msg, cause);
     }
-
 }
