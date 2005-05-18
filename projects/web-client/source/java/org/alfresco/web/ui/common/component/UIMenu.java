@@ -69,7 +69,7 @@ public class UIMenu extends SelfRenderingComponent
       
       // output the hidden DIV section to contain the menu item table
       // also output the javascript handlers used to hide the menu after a delay of non-use
-      out.write("<div id='");
+      out.write("<br><div id='");
       out.write(menuId);
       out.write("' onmouseover=\"javascript:_menuIn('");
       out.write(menuId);

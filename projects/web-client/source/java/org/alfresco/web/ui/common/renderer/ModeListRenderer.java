@@ -127,6 +127,8 @@ public class ModeListRenderer extends BaseRenderer
       
       ResponseWriter out = context.getResponseWriter();
       
+      String selectedImage = (String)attrs.get("selectedImage");
+      
       // get the child components
       for (Iterator i=list.getChildren().iterator(); i.hasNext(); /**/)
       {
@@ -147,7 +149,8 @@ public class ModeListRenderer extends BaseRenderer
             outputAttribute(out, attrs.get("itemSpacing"), "cellspacing");
             
             // if selected value render different style for the item
-            if (item.getValue().equals(list.getValue()))
+            boolean selected = item.getValue().equals(list.getValue());
+            if (selected == true)
             {
                outputAttribute(out, attrs.get("selectedStyleClass"), "class");
                outputAttribute(out, attrs.get("selectedStyle"), "style");
@@ -166,16 +169,26 @@ public class ModeListRenderer extends BaseRenderer
                outputAttribute(out, list.getIconColumnWidth(), "width");
                out.write(">");
                
-               String image = (String)child.getAttributes().get("image"); 
-               if (image != null)
+               // if the "selectedImage" property is set and this item is selected then show it
+               if (selected == true && selectedImage != null)
                {
-                  out.write( Utils.buildImageTag(context, image, (String)child.getAttributes().get("tooltip")) );
+                  out.write( Utils.buildImageTag(context, selectedImage, (String)child.getAttributes().get("tooltip")) );
+               }
+               else
+               {
+                  // else show the image set for the individual item 
+                  String image = (String)child.getAttributes().get("image"); 
+                  if (image != null)
+                  {
+                     out.write( Utils.buildImageTag(context, image, (String)child.getAttributes().get("tooltip")) );
+                  }
                }
                
                out.write("</td>");
             }
             
             // output item link
+            // TODO: add "disabled" flag! to render a non-clickable icon (+styles?)
             out.write("<td>");
             out.write("<a href='#' onclick=\"");
             // generate javascript to submit the value of the child component

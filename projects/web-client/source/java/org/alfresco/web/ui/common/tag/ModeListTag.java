@@ -45,6 +45,7 @@ public class ModeListTag extends HtmlComponentTag
       setStringProperty(component, "selectedStyleClass", this.selectedStyleClass);
       setStringProperty(component, "selectedLinkStyle", this.selectedLinkStyle);
       setStringProperty(component, "selectedLinkStyleClass", this.selectedLinkStyleClass);
+      setStringProperty(component, "selectedImage", this.selectedImage);
       setIntProperty(component, "itemSpacing", this.itemSpacing);
       setIntProperty(component, "iconColumnWidth", this.iconColumnWidth);
       setIntProperty(component, "width", this.width);
@@ -69,6 +70,7 @@ public class ModeListTag extends HtmlComponentTag
       this.selectedStyleClass = null;
       this.selectedLinkStyle = null;
       this.selectedLinkStyleClass = null;
+      this.selectedImage = null;
       this.itemSpacing = null;
       this.iconColumnWidth = null;
       this.horizontal = null;
@@ -258,7 +260,20 @@ public class ModeListTag extends HtmlComponentTag
    {
       this.selectedLinkStyleClass = selectedLinkStyleClass;
    }
+   
+   /**
+    * Set the image to show instead of the ListItem icon when the item is selected
+    * 
+    * @param selectedImage     the selected image
+    */
+   public void setSelectedImage(String selectedImage)
+   {
+      this.selectedImage = selectedImage;
+   }
 
+
+   /** the selectedImage */
+   private String selectedImage;
 
    /** the labelStyle */
    private String labelStyle;

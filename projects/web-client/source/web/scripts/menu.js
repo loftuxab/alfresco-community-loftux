@@ -20,7 +20,7 @@ function _toggleMenu(menuId)
    // toggle visibility of the specified element id
    if (document.getElementById(menuId).style.display == 'none')
    {
-      document.getElementById(menuId).style.display = '';
+      document.getElementById(menuId).style.display = 'block';
       _lastMenu = menuId;
    }
    else

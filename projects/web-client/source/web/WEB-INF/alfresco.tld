@@ -854,6 +854,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>selectedImage</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
 
       <attribute>
          <name>itemSpacing</name>
