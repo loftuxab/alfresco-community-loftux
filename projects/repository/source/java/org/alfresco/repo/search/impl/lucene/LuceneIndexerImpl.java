@@ -853,8 +853,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
         boolean isRoot = nodeRef.equals(nodeService.getRootNode(nodeRef.getStoreRef()));
 
-        StringBuffer parentBuffer = new StringBuffer();
-        StringBuffer qNameBuffer = new StringBuffer();
+        StringBuilder parentBuffer = new StringBuilder();
+        StringBuilder qNameBuffer = new StringBuilder(64);
 
         int containerCount = 0;
         for (Iterator<Pair<Path, QName>> it = paths.iterator(); it.hasNext(); /**/)
