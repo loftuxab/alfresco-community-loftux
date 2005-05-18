@@ -571,9 +571,6 @@
    
    <bean id="policyComponent" class="org.alfresco.repo.policy.PolicyComponentImpl">
 	   <constructor-arg index="0">
-	      <ref bean="indexingNodeService"/>
-      </constructor-arg>
-	   <constructor-arg index="1">
 	      <ref bean="dictionaryService"/>
       </constructor-arg>
    </bean>
