@@ -178,7 +178,12 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       ValueBinding vb = getValueBinding("pageSize");
       if (vb != null)
       {
-         this.pageSize = ((Integer)vb.getValue(getFacesContext())).intValue();
+         int pageSize = ((Integer)vb.getValue(getFacesContext())).intValue();
+         if (pageSize != this.pageSize)
+         {
+            // force a reset of the current page - else the bind may show a page that isn't there
+            setPageSize(pageSize);
+         }
       }
       
       return this.pageSize;

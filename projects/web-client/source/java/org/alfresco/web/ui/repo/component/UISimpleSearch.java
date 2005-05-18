@@ -162,10 +162,10 @@ public class UISimpleSearch extends UICommand
       out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13, "Options", "javascript:_searchDropdown();"));
       
       // dynamic DIV area containing search options
-      out.write("<div id='_search' style='position:absolute;display:none;padding-left:8px;'>");
+      out.write("<div id='_search' style='position:absolute;display:none;padding-left:4px;'>");
       out.write("<table border=0 bgcolor='#eeeeee' style='border-top:thin solid #FFFFFF;border-left:thin solid #FFFFFF;border-right:thin solid #444444;border-bottom:thin solid #444444;' cellspacing=4 cellpadding=0>");
       // TODO: configure message, configure Go button text?
-      out.write("<tr><td class='userInputForm'><nobr>What would you like to search?</nobr></td></tr>");
+      //out.write("<tr><td class='userInputForm'><nobr>What would you like to search?</nobr></td></tr>");
       
       // output each option - setting the current one to CHECKED
       String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;

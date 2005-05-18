@@ -95,12 +95,18 @@
                                  <%-- Summary --%>
                                  <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" id="msg10" /></div>
                                  <div class="mainTitle"><h:outputText value="#{msg.search_results}" id="msg11" /></div>
-                                 <div class="mainSubText"><h:outputText value="#{msg.search_description}" id="msg12" /></div>
+                                 <div class="mainSubText">
+                                    <h:outputFormat value="#{msg.search_detail}" id="msg12">
+                                       <f:param value="#{NavigationBean.searchText}" id="param2" />
+                                    </h:outputFormat>
+                                 </div>
+                                 <div class="mainSubText"><h:outputText value="#{msg.search_description}" id="msg13" /></div>
                               </td>
                               <td bgcolor="#495F69" width=1></td>
                               <td width=110 style="padding-left:2px">
                                  <%-- Current object actions --%>
-                                 <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg13" /><br>
+                                 <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg14" /><br>
+                                 <a:actionLink value="#{msg.close_search}" image="/images/icons/delete.gif" padding="4" actionListener="#{BrowseBean.closeSearch}" id="link20" />
                               </td>
                            </a:panel>
                            
@@ -110,9 +116,9 @@
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
                                     value="#{BrowseBean.browseViewMode}" actionListener="#{BrowseBean.viewModeChanged}">
-                                 <a:listItem value="details" label="List All Items" image="/images/icons/Details.gif" />
-                                 <a:listItem value="icons" label="Dashboard" />
-                                 <a:listItem value="list" label="Browse Items" />
+                                 <a:listItem value="details" label="Details View" image="/images/icons/Details.gif" />
+                                 <a:listItem value="icons" label="Icon View" />
+                                 <a:listItem value="list" label="Browse View" />
                               </a:modeList>
                            </td>
                         </tr>
@@ -130,13 +136,13 @@
                </tr>
                
                <%-- Toolbar --%>
+               <%-- NOTE: removed toolbar until multi-select implemented
                <tr style="padding-top:4px">
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
                   <td>
                      <table cellspacing=0 cellpadding=4>
                         <tr>
                            <td>
-                              <%-- Toolbar actions --%>
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "bluetoolbar", "#E9F0F4"); %>
                                  <table cellspacing=0 cellpadding=0><tr>
                                     <td><a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
@@ -151,6 +157,7 @@
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>
+               --%>
                
                <%-- Details - Spaces --%>
                <tr valign=top>
@@ -308,7 +315,7 @@
                            <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="header">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
-                           <h:graphicImage url="/images/icons/attachment.gif" width="15" height="12" rendered="#{r.locked == true}" />
+                           <h:graphicImage url="/images/icons/locked.gif" width="15" height="12" rendered="#{r.locked == true}" />
                         </a:column>
                         
                         <%-- Primary column for list view mode --%>
@@ -321,7 +328,7 @@
                            <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="title">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
-                           <h:graphicImage url="/images/icons/attachment.gif" width="15" height="12" rendered="#{r.locked == true}" />
+                           <h:graphicImage url="/images/icons/locked.gif" width="15" height="12" rendered="#{r.locked == true}" />
                         </a:column>
                         
                         <%-- Description column for all view modes --%>
@@ -387,7 +394,7 @@
                         
                         <a:dataPager/>
                      </a:richList>
-                        
+                     
                      </a:panel>
                      
                      </div>

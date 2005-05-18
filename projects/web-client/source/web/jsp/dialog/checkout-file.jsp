@@ -129,18 +129,6 @@
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td><h:selectBooleanCheckbox value="false"/>&nbsp;Always checkout items to:</td>
-                                 </tr>
-                                 <tr>
-                                    <td style="padding-left:24px;">
-                                       <h:selectOneRadio value="current" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="The containing space of the original file" />
-                                          <f:selectItem itemValue="other" itemLabel="Space:" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>

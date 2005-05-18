@@ -229,11 +229,11 @@ public class BrowseBean implements IContextListener
       {
          if (navigator.getSearchText() == null)
          {
-            queryBrowseNodes(getNavigator().getCurrentNodeId());
+            queryBrowseNodes(this.navigator.getCurrentNodeId());
          }
          else
          {
-            searchBrowseNodes(navigator.getSearchText(), navigator.getSearchMode());
+            searchBrowseNodes(this.navigator.getSearchText(), this.navigator.getSearchMode());
          }
       }
       List<Node> result = this.containerNodes;
@@ -254,11 +254,11 @@ public class BrowseBean implements IContextListener
       {
          if (navigator.getSearchText() == null)
          {
-            queryBrowseNodes(getNavigator().getCurrentNodeId());
+            queryBrowseNodes(this.navigator.getCurrentNodeId());
          }
          else
          {
-            searchBrowseNodes(navigator.getSearchText(), navigator.getSearchMode());
+            searchBrowseNodes(this.navigator.getSearchText(), this.navigator.getSearchMode());
          }
       }
       List<Node> result = this.contentNodes;
@@ -303,7 +303,7 @@ public class BrowseBean implements IContextListener
       }
       else if (viewMode.equals(RichListRenderer.IconViewRenderer.VIEWMODEID))
       {
-         setBrowsePageSize(12);
+         setBrowsePageSize(9);
       }
       else if (viewMode.equals(RichListRenderer.ListViewRenderer.VIEWMODEID))
       {
@@ -514,7 +514,6 @@ public class BrowseBean implements IContextListener
 
    /**
     * Action called from the Simple Search component
-    * 
     */
    public void search(ActionEvent event)
    {
@@ -524,6 +523,15 @@ public class BrowseBean implements IContextListener
       navigator.setSearchMode(search.getSearchMode());
       
       navigateBrowseScreen();
+   }
+   
+   /**
+    * Action calle to Close the search dialog by returning to the last view node Id
+    */
+   public void closeSearch(ActionEvent event)
+   {
+      // set the current node Id ready for page refresh
+      this.navigator.setCurrentNodeId( this.navigator.getCurrentNodeId() );
    }
    
    /**
@@ -853,7 +861,7 @@ public class BrowseBean implements IContextListener
       location.add(new BrowseBreadcrumbHandler(ref.getId(), name));
       
       // set the current node Id ready for page refresh
-      getNavigator().setCurrentNodeId(ref.getId());
+      this.navigator.setCurrentNodeId(ref.getId());
    }
    
    /**
