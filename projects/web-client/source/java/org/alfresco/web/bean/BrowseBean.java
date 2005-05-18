@@ -359,8 +359,7 @@ public class BrowseBean implements IContextListener
             // create our Node representation
             MapNode node = new MapNode(ref.getChildRef(), this.nodeService);
             
-            // TODO: resolve icon etc. some how using this e.g. on either make an ActionLink image
-            //       property smart or better set in the Node wrapper as property
+            // look for Space or File nodes
             if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
             {
                this.containerNodes.add(node);
@@ -415,8 +414,7 @@ public class BrowseBean implements IContextListener
                NodeRef ref = row.getNodeRef();
                MapNode node = new MapNode(ref, this.nodeService);
                
-               // TODO: resolve icon e.g. either make an ActionLink image property smart or
-               //       better set in the Node wrapper as property?
+               // look for Space or File nodes
                if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
                {
                   this.containerNodes.add(node);

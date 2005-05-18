@@ -162,9 +162,8 @@ public class UISimpleSearch extends UICommand
       out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13, "Options", "javascript:_searchDropdown();"));
       
       // dynamic DIV area containing search options
-      out.write("<div id='_search' style='position:absolute;display:none;padding-left:4px;'>");
+      out.write("<br><div id='_search' style='position:absolute;display:none'>");
       out.write("<table border=0 bgcolor='#eeeeee' style='border-top:thin solid #FFFFFF;border-left:thin solid #FFFFFF;border-right:thin solid #444444;border-bottom:thin solid #444444;' cellspacing=4 cellpadding=0>");
-      // TODO: configure message, configure Go button text?
       //out.write("<tr><td class='userInputForm'><nobr>What would you like to search?</nobr></td></tr>");
       
       // output each option - setting the current one to CHECKED
@@ -173,19 +172,19 @@ public class UISimpleSearch extends UICommand
       out.write(radioOption);
       out.write(" VALUE='0'");
       if (getSearchMode() == 0) out.write(" CHECKED");
-      out.write("> All Items</td></tr>");
+      out.write("><nobr>All Items</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='1'");
       if (getSearchMode() == 1) out.write(" CHECKED");
-      out.write("> File Names and Contents</td></tr>");
+      out.write("><nobr>File Names and Contents</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='2'");
       if (getSearchMode() == 2) out.write(" CHECKED");
-      out.write("> File Names only</td></tr>");
+      out.write("><nobr>File Names only</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='3'");
       if (getSearchMode() == 3) out.write(" CHECKED");
-      out.write("> Space Names only</td></tr>");
+      out.write("><nobr>Space Names only</nobr></td></tr>");
       
       // close button
       out.write("<tr><td><table width=100%><tr><td>" +
