@@ -8,9 +8,20 @@
 package org.alfresco.repo.search.impl.lucene.query;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
+import org.alfresco.repo.dictionary.AspectDefinition;
+import org.alfresco.repo.dictionary.ClassDefinition;
+import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.PropertyDefinition;
+import org.alfresco.repo.dictionary.PropertyTypeDefinition;
+import org.alfresco.repo.dictionary.TypeDefinition;
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.SearcherException;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -51,6 +62,8 @@ public class LeafScorer extends Scorer
 
     HashMap<String, Counter> parentIds = new HashMap<String, Counter>();
 
+    HashMap<String, List<String>> categories = new HashMap<String, List<String>>();
+
     HashMap<String, Counter> selfIds = null;
 
     boolean hasSelfScorer;
@@ -67,8 +80,10 @@ public class LeafScorer extends Scorer
 
     private int rootDoc;
 
+    DictionaryService dictionaryService;
+
     public LeafScorer(Weight weight, TermPositions root, TermPositions level0, ContainerScorer containerScorer, StructuredFieldPosition[] sfps, TermPositions allNodes,
-            HashMap<String, Counter> selfIds, IndexReader reader, Similarity similarity, byte[] norms)
+            HashMap<String, Counter> selfIds, IndexReader reader, Similarity similarity, byte[] norms, DictionaryService dictionaryService)
     {
         super(similarity);
         this.root = root;
@@ -87,6 +102,7 @@ public class LeafScorer extends Scorer
         }
         this.reader = reader;
         this.level0 = level0;
+        this.dictionaryService = dictionaryService;
         try
         {
             initialise();
@@ -124,6 +140,24 @@ public class LeafScorer extends Scorer
                         selfIds.put(id.stringValue(), counter);
                     }
                     counter.count++;
+                }
+
+                Field isCategory = document.getField("ISCATEGORY");
+                if (isCategory != null)
+                {
+                    Field path = document.getField("PATH");
+                    String pathString = path.stringValue();
+                    if ((pathString.length() > 0) && (pathString.charAt(0) == '/'))
+                    {
+                        pathString = pathString.substring(1);
+                    }
+                    List<String> list = categories.get(id.stringValue());
+                    if (list == null)
+                    {
+                        list = new ArrayList<String>();
+                        categories.put(id.stringValue(), list);
+                    }
+                    list.add(pathString);
                 }
             }
         }
@@ -448,18 +482,24 @@ public class LeafScorer extends Scorer
             }
         }
 
-        Field[] fields = reader.document(doc()).getFields("PARENT");
+        Field[] parentFields = reader.document(doc()).getFields("PARENT");
+        Field[] linkFields = reader.document(doc()).getFields("LINKASPECT");
         String parentID = null;
-        if ((fields != null) && (fields.length > position) && (fields[position] != null))
+        String linkAspect = null;
+        if ((parentFields != null) && (parentFields.length > position) && (parentFields[position] != null))
         {
-            parentID = fields[position].stringValue();
+            parentID = parentFields[position].stringValue();
+        }
+        if ((linkFields != null) && (linkFields.length > position) && (linkFields[position] != null))
+        {
+            linkAspect = linkFields[position].stringValue();
         }
 
-        return containersIncludeCurrent(parentID);
+        return containersIncludeCurrent(parentID, linkAspect);
 
     }
 
-    private boolean containersIncludeCurrent(String parentID) throws IOException
+    private boolean containersIncludeCurrent(String parentID, String aspectQName) throws IOException
     {
         if ((containerScorer != null) || (level0 != null))
         {
@@ -489,17 +529,79 @@ public class LeafScorer extends Scorer
             {
                 if (!selfLinks.contains(id))
                 {
-                    // field = document.getField("PARENT");
-                    // if (field != null)
-                    // {
-                    // Counter counter = parentIds.get(field.stringValue());
-                    Counter counter = parentIds.get(parentID);
-                    if (counter != null)
+                    if (categories.containsKey(parentID))
                     {
-                        this.counter += counter.count;
-                        return true;
+                        Field typeField = document.getField("TYPE");
+                        if ((typeField != null) && (typeField.stringValue() != null))
+                        {
+                            ClassRef typeRef = new ClassRef(QName.createQName(typeField.stringValue()));
+                            if (isCategory(typeRef))
+                            {
+                                Counter counter = parentIds.get(parentID);
+                                if (counter != null)
+                                {
+                                    this.counter += counter.count;
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if (aspectQName != null)
+                        {
+                            ClassRef classRef = new ClassRef(QName.createQName(aspectQName));
+                            AspectDefinition aspDef = dictionaryService.getAspect(classRef);
+                            if (isCategorised(aspDef))
+                            {
+                                for (PropertyDefinition propDef : aspDef.getProperties())
+                                {
+                                    if (propDef.getPropertyType().getName().equals(PropertyTypeDefinition.CATEGORY))
+                                    {
+                                        // get field and compare to ID
+                                        // Check in path as QName
+                                        // somewhere
+                                        Field[] categoryFields = document.getFields("@" + propDef.getQName());
+                                        if (categoryFields != null)
+                                        {
+                                            for (Field categoryField : categoryFields)
+                                            {
+                                                if ((categoryField != null) && (categoryField.stringValue() != null))
+                                                {
+                                                    if (categoryField.stringValue().endsWith(parentID))
+                                                    {
+                                                        int count = 0;
+                                                        List<String> paths = categories.get(parentID);
+                                                        if (paths != null)
+                                                        {
+                                                            for (String path : paths)
+                                                            {
+                                                                if (path.indexOf(aspectQName) != -1)
+                                                                {
+                                                                    count++;
+                                                                }
+                                                            }
+                                                        }
+                                                        this.counter += count;
+                                                        return count > 0;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
                     }
-                    // }
+                    else
+                    {
+                        Counter counter = parentIds.get(parentID);
+                        if (counter != null)
+                        {
+                            this.counter += counter.count;
+                            return true;
+                        }
+                    }
+
                 }
             }
 
@@ -509,6 +611,62 @@ public class LeafScorer extends Scorer
         {
             return true;
         }
+    }
+
+    private boolean isCategory(ClassRef classRef)
+    {
+        if (classRef == null)
+        {
+            return false;
+        }
+        TypeDefinition current = dictionaryService.getType(classRef);
+        ClassDefinition nextDefinition;
+        while (current != null)
+        {
+            if (current.getQName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORY))
+            {
+                return true;
+            }
+            else
+            {
+                nextDefinition = current.getSuperClass();
+                if (nextDefinition instanceof TypeDefinition)
+                {
+                    current = (TypeDefinition) nextDefinition;
+                }
+                else
+                {
+                    current = null;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isCategorised(AspectDefinition aspDef)
+    {
+        AspectDefinition current = aspDef;
+        ClassDefinition nextDefinition;
+        while (current != null)
+        {
+            if (current.getQName().equals(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION))
+            {
+                return true;
+            }
+            else
+            {
+                nextDefinition = current.getSuperClass();
+                if (nextDefinition instanceof AspectDefinition)
+                {
+                    current = (AspectDefinition) nextDefinition;
+                }
+                else
+                {
+                    current = null;
+                }
+            }
+        }
+        return false;
     }
 
     public int doc()

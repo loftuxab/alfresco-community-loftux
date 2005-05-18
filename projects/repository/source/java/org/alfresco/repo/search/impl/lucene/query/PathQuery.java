@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.repo.dictionary.DictionaryService;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Explanation;
@@ -44,7 +45,7 @@ public class PathQuery extends Query
 
     private List<StructuredFieldPosition> qNameStructuredFieldPositions = new ArrayList<StructuredFieldPosition>();
 
-    
+    private DictionaryService dictionarySertvice;
 
     /**
      * The base query
@@ -52,9 +53,10 @@ public class PathQuery extends Query
      * @param query
      */
 
-    public PathQuery()
+    public PathQuery(DictionaryService dictionarySertvice)
     {
         super();
+        this.dictionarySertvice = dictionarySertvice;
     }
 
     public void setQuery(List<StructuredFieldPosition> path, List<StructuredFieldPosition> qname)
@@ -230,7 +232,7 @@ public class PathQuery extends Query
          */
         public Scorer scorer(IndexReader reader) throws IOException
         {
-            return PathScorer.createPathScorer(getSimilarity(searcher), PathQuery.this, reader, this);
+            return PathScorer.createPathScorer(getSimilarity(searcher), PathQuery.this, reader, this, dictionarySertvice);
             
 //            if ((pathStructuredFieldPositions.size() + qNameStructuredFieldPositions.size()) == 0) // optimize
 //                // zero-term

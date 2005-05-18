@@ -6,13 +6,13 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -51,9 +51,6 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
-
-import com.vladium.utils.timing.ITimer;
-import com.vladium.utils.timing.TimerFactory;
 
 /**
  * The implementation of the lucene based indexer. Supports basic transactional
@@ -105,11 +102,17 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private boolean isModified = false;
 
+    /**
+     * Flag to indicte if we are doing an in transactional delta or a batch
+     * update to the index. If true, we are just fixing up non atomically
+     * indexed things from one or more other updates.
+     */
+
     private Boolean isFTSUpdate = null;
 
-    DecimalFormat format;
+    // DecimalFormat xformat;
 
-    ITimer timer;
+    // ITimer timer;
 
     /**
      * Setter for getting the node service via IOC Used in the Spring container
@@ -121,11 +124,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     {
         this.nodeService = nodeService;
 
-        timer = TimerFactory.newTimer();
+        // timer = TimerFactory.newTimer();
 
-        format = new DecimalFormat();
-        format.setMinimumFractionDigits(3);
-        format.setMaximumFractionDigits(3);
+        // format = new DecimalFormat();
+        // format.setMinimumFractionDigits(3);
+        // format.setMaximumFractionDigits(3);
 
     }
 
@@ -800,6 +803,28 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
 
     }
+    
+    private class Pair<F, S>
+    {
+        private F first;
+        private S second;
+        
+        public Pair(F first, S second)
+        {
+            this.first = first;
+            this.second = second;
+        }
+        
+        public F getFirst()
+        {
+            return first;
+        }
+        
+        public S getSecond()
+        {
+            return second;
+        }
+    }
 
     private List<Document> createDocuments(NodeRef nodeRef, boolean isNew)
     {
@@ -810,12 +835,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
 
         Collection<Path> directPaths = nodeService.getPaths(nodeRef, false);
-        Collection<Path> categoryPaths = getCategoryPaths(nodeRef, properties);
-        Collection<Path> paths = new ArrayList<Path>(directPaths.size() + categoryPaths.size());
-        paths.addAll(directPaths);
+        Collection<Pair<Path, QName>> categoryPaths = getCategoryPaths(nodeRef, properties);
+        Collection<Pair<Path, QName>> paths = new ArrayList<Pair<Path, QName>>(directPaths.size() + categoryPaths.size());
+        for(Path path: directPaths)
+        {
+           paths.add(new Pair<Path, QName>(path, null));
+        }
         paths.addAll(categoryPaths);
-
-        String aspects = getAspects(nodeRef);
 
         Document xdoc = new Document();
         xdoc.add(new Field("ID", nodeRef.getId(), true, true, false));
@@ -831,26 +857,26 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         StringBuffer qNameBuffer = new StringBuffer();
 
         int containerCount = 0;
-        for (Iterator<Path> it = paths.iterator(); it.hasNext(); /**/)
+        for (Iterator<Pair<Path, QName>> it = paths.iterator(); it.hasNext(); /**/)
         {
-            Path path = it.next();
+            Pair<Path, QName> pair = it.next();
             // Lucene flags in order are: Stored, indexed, tokenised
 
-            qNameRef = getLastRefOrNull(path);
+            qNameRef = getLastRefOrNull(pair.getFirst());
 
-            String pathString = path.toString();
+            String pathString = pair.getFirst().toString();
             if ((pathString.length() > 0) && (pathString.charAt(0) == '/'))
             {
                 pathString = pathString.substring(1);
             }
 
-            String parentString = getParentString(path);
+            String parentString = getParentString(pair.getFirst());
 
             if (isRoot)
             {
                 // Root node
             }
-            else if (path.size() == 1)
+            else if (pair.getFirst().size() == 1)
             {
                 // Pseudo root node ignore
             }
@@ -870,13 +896,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             qNameBuffer.append(";/");
                         }
                         qNameBuffer.append(qNameRef.getQName().toString());
-                        // if(parentBuffer.length() > 0)
-                        // {
-                        // parentBuffer.append(" ");
-                        // }
-                        // parentBuffer.append(qNameRef.getParentRef().getId());
                         xdoc.add(new Field("PARENT", qNameRef.getParentRef().getId(), true, true, false));
-
+                        xdoc.add(new Field("LINKASPECT", (pair.getSecond() == null) ? "" : pair.getSecond().toString(), true, true, false));
                     }
                 }
 
@@ -889,13 +910,19 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 // check for child associations
                 if (nodeTypeDef.getChildAssociations().size() > 0)
                 {
-                    if (directPaths.contains(path))
+                    if (directPaths.contains(pair.getFirst()))
                     {
                         Document directoryEntry = new Document();
                         directoryEntry.add(new Field("ID", nodeRef.getId(), true, true, false));
                         directoryEntry.add(new Field("PATH", pathString, true, true, true));
                         directoryEntry.add(new Field("ANCESTOR", parentString, true, true, true));
                         directoryEntry.add(new Field("ISCONTAINER", "T", true, true, false));
+
+                        if (isCategory(getDictionaryService().getType(nodeService.getType(nodeRef))))
+                        {
+                            directoryEntry.add(new Field("ISCATEGORY", "T", true, true, false));
+                        }
+
                         docs.add(directoryEntry);
                     }
                 }
@@ -922,8 +949,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // true));
 
             xdoc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getParentRef().getId(), true, true, false));
-            xdoc.add(new Field("TYPE", nodeService.getType(nodeRef).getQName().toString(), true, true, true));
-            xdoc.add(new Field("ASPECT", aspects, true, true, true));
+            xdoc.add(new Field("TYPE", nodeService.getType(nodeRef).getQName().toString(), true, true, false));
+            for (ClassRef classRef : nodeService.getAspects(nodeRef))
+            {
+                xdoc.add(new Field("ASPECT", classRef.getQName().toString(), true, true, false));
+            }
 
             xdoc.add(new Field("ISROOT", "F", true, true, false));
             xdoc.add(new Field("ISNODE", "T", true, true, false));
@@ -998,7 +1028,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         boolean index = true;
         boolean tokenise = true;
         boolean atomic = true;
-        // TODO: - should be able to get the property by its QName?
         PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
         PropertyTypeDefinition propertyType = getDictionaryService().getPropertyType(new DictionaryRef(PropertyTypeDefinition.TEXT));
         if (propertyDefinition != null)
@@ -1011,29 +1040,16 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         isAtomic &= atomic;
         Serializable value = properties.get(propertyQName);
         // convert value to String
-        String strValue = ValueConverter.convert(String.class, value);
-        // Need to add with the correct language based analyser
-        if (index && atomic)
+        for (String strValue : ValueConverter.getCollection(String.class, value))
         {
-            doc.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
+            // String strValue = ValueConverter.convert(String.class, value);
+            // TODO: Need to add with the correct language based analyser
+            if (index && atomic)
+            {
+                doc.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
+            }
         }
         return isAtomic;
-    }
-
-    private String getAspects(NodeRef nodeRef)
-    {
-        String aspects;
-        StringBuffer aspectBuffer = new StringBuffer();
-        for (ClassRef classRef : nodeService.getAspects(nodeRef))
-        {
-            if (aspectBuffer.length() > 0)
-            {
-                aspectBuffer.append(";/");
-            }
-            aspectBuffer.append(classRef.getQName().toString());
-        }
-        aspects = aspectBuffer.toString();
-        return aspects;
     }
 
     private Map<ChildAssocRef, Counter> getNodeCounts(NodeRef nodeRef)
@@ -1055,9 +1071,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return nodeCounts;
     }
 
-    private Collection<Path> getCategoryPaths(NodeRef nodeRef, Map<QName, Serializable> properties)
+    private Collection<Pair<Path, QName>> getCategoryPaths(NodeRef nodeRef, Map<QName, Serializable> properties)
     {
-        ArrayList<Path> categoryPaths = new ArrayList<Path>();
+        ArrayList<Pair<Path, QName>> categoryPaths = new ArrayList<Pair<Path, QName>>();
         Set<ClassRef> aspects = nodeService.getAspects(nodeRef);
 
         for (ClassRef classRef : aspects)
@@ -1065,17 +1081,15 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             AspectDefinition aspDef = getDictionaryService().getAspect(classRef);
             if (isCategorised(aspDef))
             {
+                LinkedList <Pair<Path, QName>> aspectPaths = new LinkedList<Pair<Path, QName>>();
                 for (PropertyDefinition propDef : aspDef.getProperties())
                 {
                     if (propDef.getPropertyType().getName().equals(PropertyTypeDefinition.CATEGORY))
                     {
                         for (NodeRef catRef : ValueConverter.getCollection(NodeRef.class, properties.get(propDef.getQName())))
                         {
-                            // NodeRef catRef =
-                            // (NodeRef)properties.get(propDef.getQName());
                             if (catRef != null)
-                            {
-                                Set<Path> aspectPaths = new HashSet<Path>();
+                            {       
                                 for (Path path : nodeService.getPaths(catRef, false))
                                 {
                                     if (path.first() instanceof Path.ChildAssocElement)
@@ -1083,71 +1097,33 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                         Path.ChildAssocElement cae = (Path.ChildAssocElement) path.first();
                                         if ((cae.getRef().getParentRef() == null) && (cae.getRef().getQName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORYROOT)))
                                         {
-                                            aspectPaths.add(path);
+                                            if(path.toString().indexOf(aspDef.getQName().toString()) != -1)
+                                            {
+                                                aspectPaths.add(new Pair<Path, QName>(path, aspDef.getQName()));
+                                            }
                                         }
                                     }
                                 }
-                                // Could filter paths here if we do not want Ir
-                                // to appears as region if we have region
-                                // classification
-                                categoryPaths.addAll(aspectPaths);
+                                
                             }
                         }
                     }
                 }
+                categoryPaths.addAll(aspectPaths);
             }
         }
         // Add member final element
-        for (Path path : categoryPaths)
+        for (Pair<Path, QName> pair : categoryPaths)
         {
-            if (path.last() instanceof Path.ChildAssocElement)
+            if (pair.getFirst().last() instanceof Path.ChildAssocElement)
             {
-                Path.ChildAssocElement cae = (Path.ChildAssocElement) path.last();
-                path.append(new Path.ChildAssocElement(new ChildAssocRef(cae.getRef().getChildRef(), QName.createQName("member"), nodeRef)));
+                Path.ChildAssocElement cae = (Path.ChildAssocElement) pair.getFirst().last();
+                pair.getFirst().append(new Path.ChildAssocElement(new ChildAssocRef(cae.getRef().getChildRef(), QName.createQName("member"), nodeRef)));
             }
         }
-        // Filter paths to available aspects
-        // Build Qnames
-        Set<QName> qnames = new HashSet<QName>();
-        for (ClassRef classRef : aspects)
-        {
-            qnames.add(classRef.getQName());
-        }
-        for (ListIterator<Path> it = categoryPaths.listIterator(); it.hasNext(); /**/)
-        {
-            Path path = it.next();
-            Path.ChildAssocElement firstRelativeLink = null;
-            for (Iterator<Path.Element> elementit = path.iterator(); elementit.hasNext(); /**/)
-            {
-                Path.Element element = elementit.next();
-                if (element instanceof Path.ChildAssocElement)
-                {
-                    Path.ChildAssocElement test = (Path.ChildAssocElement)element;
-                    if((test.getRef().getParentRef() != null) && (test.getRef().getQName() != null))
-                    {
-                        firstRelativeLink = test;
-                        break;
-                    }
-                }
+ 
 
-            }
-            if (firstRelativeLink != null)
-            {
-                if (!qnames.contains(firstRelativeLink.getRef().getQName()))
-                {
-                    it.remove();
-                }
-            }
-            else
-            {
-                it.remove();
-            }
-
-        }
-
-        HashSet<Path> unique = new HashSet<Path>();
-        unique.addAll(categoryPaths);
-        return unique;
+        return categoryPaths;
     }
 
     private boolean isCategorised(AspectDefinition aspDef)
@@ -1176,17 +1152,48 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return false;
     }
 
-    public void startTimer()
+    private boolean isCategory(TypeDefinition typeDef)
     {
-        timer.reset();
-        timer.start();
+        if (typeDef == null)
+        {
+            return false;
+        }
+        TypeDefinition current = typeDef;
+        ClassDefinition nextDefinition;
+        while (current != null)
+        {
+            if (current.getQName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORY))
+            {
+                return true;
+            }
+            else
+            {
+                nextDefinition = current.getSuperClass();
+                if (nextDefinition instanceof TypeDefinition)
+                {
+                    current = (TypeDefinition) nextDefinition;
+                }
+                else
+                {
+                    current = null;
+                }
+            }
+        }
+        return false;
     }
 
-    public void outputTime(String message)
-    {
-        timer.stop();
-        System.out.println(message + " in " + format.format(timer.getDuration()));
-    }
+    // public void startTimer()
+    // {
+    // timer.reset();
+    // timer.start();
+    // }
+    //
+    // public void outputTime(String message)
+    // {
+    // timer.stop();
+    // System.out.println(message + " in " +
+    // format.format(timer.getDuration()));
+    // }
 
     public void clearIndex()
     {
@@ -1259,18 +1266,21 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
                     Serializable value = properties.get(propertyQName);
                     // convert value to String
-                    String strValue = value.toString();
-
-                    // TODO: Need converter here
-                    // Conversion should be done in the anlyser as we may take
-                    // advantage of tokenisation
-
-                    // Need to add with the correct language based analyser
-                    if (index && !atomic)
+                    for (String strValue : ValueConverter.getCollection(String.class, value))
                     {
-                        String fieldName = "@" + propertyQName;
-                        document.removeFields(fieldName);
-                        document.add(new Field(fieldName, strValue, store, index, tokenise));
+
+                        // TODO: Need converter here
+                        // Conversion should be done in the anlyser as we may
+                        // take
+                        // advantage of tokenisation
+
+                        // Need to add with the correct language based analyser
+                        if (index && !atomic)
+                        {
+                            String fieldName = "@" + propertyQName;
+                            document.removeFields(fieldName);
+                            document.add(new Field(fieldName, strValue, store, index, tokenise));
+                        }
                     }
 
                 }

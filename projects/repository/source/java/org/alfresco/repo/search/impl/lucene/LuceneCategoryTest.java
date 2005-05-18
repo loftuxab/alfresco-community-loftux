@@ -179,6 +179,7 @@ public class LuceneCategoryTest extends TestCase
         nodeService.addAspect(n5, new ClassRef(regionCategorisationQName), createMap("region", catRTwo));
         
         nodeService.addAspect(n5, new ClassRef(investmentRegionCategorisationQName), createMap("investmentRegion", catRBase));
+        nodeService.addAspect(n5, new ClassRef(marketingRegionCategorisationQName), createMap("marketingRegion", catRBase));
         nodeService.addAspect(n6, new ClassRef(investmentRegionCategorisationQName), createMap("investmentRegion", catRBase));
         nodeService.addAspect(n7, new ClassRef(investmentRegionCategorisationQName), createMap("investmentRegion", catRBase));
         nodeService.addAspect(n8, new ClassRef(investmentRegionCategorisationQName), createMap("investmentRegion", catRBase));
@@ -324,7 +325,15 @@ public class LuceneCategoryTest extends TestCase
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
         searcher.setNameSpaceService(new MockNameService(""));
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer\"", null, null);
+        ResultSet results;
+        
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:MarketingRegion//member\"", null, null);
+        //printPaths(results);
+        assertEquals(6, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
@@ -369,12 +378,12 @@ public class LuceneCategoryTest extends TestCase
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Fixed/member\"", null, null);
-        printPaths(results);
+        //printPaths(results);
         assertEquals(8, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Equity/member\"", null, null);
-        printPaths(results);
+        //printPaths(results);
         assertEquals(8, results.length());
         results.close();
         
@@ -391,12 +400,12 @@ public class LuceneCategoryTest extends TestCase
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PATH:\"/alf:AssetClass/alf:Equity/member\" AND +PATH:\"/alf:AssetClass/alf:Fixed/member\"", null, null);
-        printPaths(results);
+        //printPaths(results);
         assertEquals(3, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Equity/member\" PATH:\"/alf:AssetClass/alf:Fixed/member\"", null, null);
-        printPaths(results);
+        //printPaths(results);
         assertEquals(13, results.length());
         results.close();
         
@@ -405,34 +414,57 @@ public class LuceneCategoryTest extends TestCase
         assertEquals(4, nodeService.getChildAssocs(catRoot).size());
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region\"", null, null);
-        printPaths(results);
+        //printPaths(results);
         assertEquals(1, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region/member\"", null, null);
-        printPaths(results);
-        assertEquals(12, results.length());
+        //printPaths(results);
+        assertEquals(1, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region/alf:Europe/member\"", null, null);
-        printPaths(results);
+        //printPaths(results);
         assertEquals(2, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region/alf:RestOfWorld/member\"", null, null);
-        printPaths(results);
-        assertEquals(3, results.length());
+        //printPaths(results);
+        assertEquals(2, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:Region//member\"", null, null);
-        printPaths(results);
-        assertEquals(17, results.length());
+        //printPaths(results);
+        assertEquals(5, results.length());
         results.close();
         
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:InvestmentRegion//member\"", null, null);
+        //printPaths(results);
+        assertEquals(5, results.length());
+        results.close();
         
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:MarketingRegion//member\"", null, null);
+        //printPaths(results);
+        assertEquals(6, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PATH:\"/alf:AssetClass/alf:Fixed/member\" AND +PATH:\"/alf:Region/alf:Europe/member\"", null, null);
+        //printPaths(results);
+        assertEquals(2, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PATH:\"/alf:categoryContainer/alf:categoryRoot/alf:AssetClass/alf:Fixed/member\" AND +PATH:\"/alf:categoryContainer/alf:categoryRoot/alf:Region/alf:Europe/member\"", null, null);
+        //printPaths(results);
+        assertEquals(2, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:AssetClass/alf:Equity/member\" PATH:\"/alf:MarketingRegion/member\"", null, null);
+        //printPaths(results);
+        assertEquals(9, results.length());
+        results.close();
     }
     
-    void printPaths(ResultSet results)
+    void xprintPaths(ResultSet results)
     {
         System.out.println("\n\n");
 

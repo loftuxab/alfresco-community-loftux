@@ -19,12 +19,14 @@ import org.alfresco.repo.search.impl.lucene.query.PathQuery;
 import org.alfresco.repo.search.impl.lucene.query.RelativeStructuredFieldPosition;
 import org.alfresco.repo.search.impl.lucene.query.StructuredFieldPosition;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.CharStream;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParserTokenManager;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.saxpath.SAXPathException;
 
 import com.werken.saxpath.XPathReader;
@@ -85,6 +87,7 @@ public class LuceneQueryParser extends QueryParser
                 XPathReader reader = new XPathReader();
                 LuceneXPathHandler handler = new LuceneXPathHandler();
                 handler.setNameSpaceService(nameSpaceService);
+                handler.setDictionaryService(dictionaryService);
                 reader.setXPathHandler(handler);
                 reader.parse(queryText);
                 return handler.getQuery();
@@ -94,6 +97,7 @@ public class LuceneQueryParser extends QueryParser
                 XPathReader reader = new XPathReader();
                 LuceneXPathHandler handler = new LuceneXPathHandler();
                 handler.setNameSpaceService(nameSpaceService);
+                handler.setDictionaryService(dictionaryService);
                 reader.setXPathHandler(handler);
                 reader.parse("//"+queryText);
                 return handler.getQuery();
@@ -117,17 +121,11 @@ public class LuceneQueryParser extends QueryParser
                         subclasses.add(classRef.getQName());
                     }
                 }
-                
                 BooleanQuery booleanQuery = new BooleanQuery();
                 for(QName qname: subclasses)
                 { 
-                   PathQuery pathQuery =  new PathQuery();
-                   ArrayList<StructuredFieldPosition> answer = new ArrayList<StructuredFieldPosition>(2);
-                   answer.add(new RelativeStructuredFieldPosition(qname.getNamespaceURI()));
-                   answer.add(new RelativeStructuredFieldPosition(qname.getLocalName()));
-                   pathQuery.appendQuery(answer);
-                   pathQuery.setQnameField(field);
-                   booleanQuery.add(pathQuery, false, false);
+                   TermQuery termQuery =  new TermQuery(new Term(field, qname.toString()));
+                   booleanQuery.add(termQuery, false, false);
                 }
                 return booleanQuery;
             }
@@ -154,13 +152,8 @@ public class LuceneQueryParser extends QueryParser
                 BooleanQuery booleanQuery = new BooleanQuery();
                 for(QName qname: subclasses)
                 { 
-                   PathQuery pathQuery =  new PathQuery();
-                   ArrayList<StructuredFieldPosition> answer = new ArrayList<StructuredFieldPosition>(2);
-                   answer.add(new RelativeStructuredFieldPosition(qname.getNamespaceURI()));
-                   answer.add(new RelativeStructuredFieldPosition(qname.getLocalName()));
-                   pathQuery.appendQuery(answer);
-                   pathQuery.setQnameField(field);
-                   booleanQuery.add(pathQuery, false, false);
+                    TermQuery termQuery =  new TermQuery(new Term(field, qname.toString()));
+                    booleanQuery.add(termQuery, false, false);
                 }
                 return booleanQuery;
             }

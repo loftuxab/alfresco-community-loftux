@@ -86,6 +86,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     XPathReader reader = new XPathReader();
                     LuceneXPathHandler handler = new LuceneXPathHandler();
                     handler.setNameSpaceService(nameSpaceService);
+                    handler.setDictionaryService(dictionaryService);
                     reader.setXPathHandler(handler);
                     reader.parse(queryString);
                     Query query = handler.getQuery();

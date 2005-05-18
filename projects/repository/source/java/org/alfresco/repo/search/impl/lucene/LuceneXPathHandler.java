@@ -9,6 +9,7 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.util.ArrayList;
 
+import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.search.impl.lucene.analysis.PathTokenFilter;
 import org.alfresco.repo.search.impl.lucene.query.AbsoluteStructuredFieldPosition;
@@ -31,6 +32,8 @@ public class LuceneXPathHandler implements XPathHandler
     int absolutePosition = 0;
 
     private NamespaceService nameSpaceService;
+
+    private DictionaryService dictionaryService;
 
     public LuceneXPathHandler()
     {
@@ -444,7 +447,7 @@ public class LuceneXPathHandler implements XPathHandler
 
     public void startXPath() throws SAXPathException
     {
-        query = new PathQuery();
+        query = new PathQuery(dictionaryService);
     }
 
     public void variableReference(String arg0, String arg1) throws SAXPathException
@@ -457,5 +460,13 @@ public class LuceneXPathHandler implements XPathHandler
     {
         this.nameSpaceService = nameSpaceService;
     }
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+    
+    
+    
 
 }

@@ -10,6 +10,7 @@ package org.alfresco.repo.search.impl.lucene.query;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.search.impl.lucene.query.LeafScorer.Counter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -18,7 +19,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Weight;
 
@@ -33,7 +33,7 @@ public class PathScorer extends Scorer
     }
   
 
-    public static PathScorer createPathScorer(Similarity similarity, PathQuery pathQuery, IndexReader reader, Weight weight) throws IOException
+    public static PathScorer createPathScorer(Similarity similarity, PathQuery pathQuery, IndexReader reader, Weight weight, DictionaryService dictionarySertvice) throws IOException
     {
         Scorer selfScorer = null;
         HashMap<String, Counter> selfIds = null;
@@ -41,13 +41,13 @@ public class PathScorer extends Scorer
         StructuredFieldPosition last = pathQuery.getQNameStructuredFieldPositions().get(pathQuery.getQNameStructuredFieldPositions().size() - 1);
         if (last.linkSelf())
         {
-            PathQuery selfQuery = new PathQuery();
+            PathQuery selfQuery = new PathQuery(dictionarySertvice);
             selfQuery.setQuery(pathQuery.getPathStructuredFieldPositions(), pathQuery.getQNameStructuredFieldPositions());
             selfQuery.removeDescendantAndSelf();
             if (!selfQuery.isEmpty())
             {
                selfIds = new HashMap<String, Counter>();
-               selfScorer = PathScorer.createPathScorer(similarity, selfQuery, reader, weight);
+               selfScorer = PathScorer.createPathScorer(similarity, selfQuery, reader, weight, dictionarySertvice);
                selfIds.clear();
                while (selfScorer.next())
                {
@@ -132,7 +132,7 @@ public class PathScorer extends Scorer
         }
 
         LeafScorer ls = new LeafScorer(weight, rootLeafPositions, level0, cs, (StructuredFieldPosition[]) pathQuery.getQNameStructuredFieldPositions().toArray(new StructuredFieldPosition[] {}), nodePositions,
-                selfIds, reader, similarity, reader.norms(pathQuery.getQnameField()));
+                selfIds, reader, similarity, reader.norms(pathQuery.getQnameField()), dictionarySertvice);
 
         return new PathScorer(similarity, ls);
     }

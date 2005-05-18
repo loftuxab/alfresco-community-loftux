@@ -86,11 +86,11 @@ public class LuceneAnalyser extends Analyzer
         }
         else if (fieldName.equals("TYPE"))
         {
-            analyser = new PathAnalyser();
+            throw new UnsupportedOperationException("TYPE mut not be tokenised");
         }
         else if (fieldName.equals("ASPECT"))
         {
-            analyser = new PathAnalyser();
+            throw new UnsupportedOperationException("ASPECT mut not be tokenised");
         }
         else if (fieldName.equals("ANCESTOR"))
         {
