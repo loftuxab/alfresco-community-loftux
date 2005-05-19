@@ -38,6 +38,11 @@ public final class UIContextService
       return service;
    }
    
+   /**
+    * Register a bean to be informed of context events
+    * 
+    * @param bean    Conforming to the IContextListener interface
+    */
    public void registerBean(IContextListener bean)
    {
       if (bean == null)
@@ -48,6 +53,25 @@ public final class UIContextService
       this.registeredBeans.put(bean.getClass(), bean);
    }
    
+   /**
+    * Remove a bean reference from those notified of changes
+    * 
+    * @param bean    Conforming to the IContextListener interface
+    */
+   public void unregisterBean(IContextListener bean)
+   {
+      if (bean == null)
+      {
+         throw new IllegalArgumentException("Bean reference specified cannot be null!");
+      }
+      
+      this.registeredBeans.remove(bean);
+   }
+   
+   /**
+    * Call to notify all register beans that the UI context has changed and they should
+    * refresh themselves as appropriate.
+    */
    public void notifyBeans()
    {
       for (IContextListener listener: this.registeredBeans.values())
@@ -60,5 +84,6 @@ public final class UIContextService
    /** key for the UI context service in the session */
    private final static String CONTEXT_KEY = "__uiContextService";
    
+   /** Map of bean registered against the context service */
    private Map<Class, IContextListener> registeredBeans = new HashMap<Class, IContextListener>(7, 1.0f);
 }

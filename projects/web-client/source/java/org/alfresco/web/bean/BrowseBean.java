@@ -756,7 +756,7 @@ public class BrowseBean implements IContextListener
    /**
     * Action called upon completion of the Check Out file page
     */
-   public String checkoutFileOK()
+   public String checkoutFile()
    {
       String outcome = null;
       
@@ -777,17 +777,15 @@ public class BrowseBean implements IContextListener
             
             // TODO: checkout the node content etc.
             
-            // clear action context
-            setDocument(null);
-            
-            // refresh the UI, setting the outcome will show the browse view
-            invalidateComponents();
-            
-            outcome = "browse";
+            // show the page that display the checkout link
+            //
+            // TODO: setup appropriate context for this - should we move checkout into a separate bean?
+            //
+            outcome = "checkoutFileLink";
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to lock Content Node due to system error: " + err.getMessage());
+            Utils.addErrorMessage("Unable to checkout Content Node due to system error: " + err.getMessage());
          }
       }
       else
@@ -796,6 +794,43 @@ public class BrowseBean implements IContextListener
       }
       
       return outcome;
+   }
+   
+   /**
+    * Action called upon completion of the Check Out file Link download page
+    */
+   public String checkoutFileOK()
+   {
+      String outcome = null;
+      
+      Node node = getDocument();
+      if (node != null)
+      {
+         // TODO: checkout the node content etc.
+         
+         // clear action context
+         setDocument(null);
+         
+         // refresh the UI, setting the outcome will show the browse view
+         invalidateComponents();
+         
+         outcome = "browse";
+      }
+      else
+      {
+         s_logger.warn("WARNING: checkoutFileOK called without a current Document!");
+      }
+      
+      return outcome;
+   }
+   
+   /**
+    * Action to undo the checkout of a document and return to the browse screen.
+    */
+   public String undoCheckout()
+   {
+      // TODO: implement undo checkout
+      return "browse";
    }
    
    /**
@@ -831,7 +866,7 @@ public class BrowseBean implements IContextListener
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to unlock Content Node due to system error: " + err.getMessage());
+            Utils.addErrorMessage("Unable to checkout Content Node due to system error: " + err.getMessage());
          }
       }
       else

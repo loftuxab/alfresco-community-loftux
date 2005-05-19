@@ -57,7 +57,8 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/CheckOut.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle">Check Out '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainTitle">Check Out '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Use this page to enter information about the checkout.</div>
@@ -84,10 +85,10 @@
                         <tr>
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                              <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
-                                    <td><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
-                                    <td>A copy of the file '<h:outputText value="#{BrowseBean.document.name}" />' will be made for you to work with.
+                                    <td valign=top style="padding-top:2px"><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
+                                    <td>A copy of the file '<h:outputText value="#{BrowseBean.document.name}" />' will be made for you to work with.<br>
                                         When you have completed your changes you need to check the file in to allow other to view your changes.
                                     </td>
                                  </tr>
@@ -100,7 +101,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Check Out" action="#{BrowseBean.checkoutFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="Check Out" action="#{BrowseBean.checkoutFile}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>

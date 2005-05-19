@@ -9,7 +9,7 @@
 <%@ page import="org.alfresco.web.PanelGenerator" %>
 
 <r:page>
-
+   
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
@@ -19,7 +19,7 @@
    <f:loadBundle basename="messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="checkin-file">
+   <h:form id="checkout-link">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -54,14 +54,14 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/CheckIn.gif" />
+                              <h:graphicImage id="wizard-logo" url="/images/icons/CheckOut.gif" />
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Check In '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainTitle">Check Out of '<h:outputText value="#{BrowseBean.document.name}" />' Complete</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText">Current status is 'draft'.</div>
-                              <div class="mainSubText">Use this page to check in your working copy for other team members to work with.</div>
+                              <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
+                              <div class="mainSubText">Use this page to edit the checked out file or undo the check out.</div>
                            </td>
                         </tr>
                      </table>
@@ -84,50 +84,66 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
+                              <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
-                                    <td class="wizardSectionHeading">Working copy location</td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <h:selectOneRadio value="current" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="Use copy in current space" />
-                                          <f:selectItem itemValue="other" itemLabel="Locate copy on my computer" />
-                                       </h:selectOneRadio>
-                                       <br>
-                                       TODO: Add upload component.
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td class="wizardSectionHeading">Check In options</td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       TODO: Add check in options.
+                                    <td valign=top style="padding-top:2px"><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
+                                    <td>A copy of the file '<h:outputText value="#{BrowseBean.document.name}" />' is now checked out to you for editing.<br>
+                                        To edit the file follow the instructions below then click OK.<br>
+                                        To undo the checkout click Undo Checkout.
                                     </td>
                                  </tr>
                               </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "yellowInner"); %>
                            </td>
                            
-                           <td width="100%" valign="top">
+                           <td valign="top" rowspan=2>
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Check In" action="#{BrowseBean.checkinFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="OK" action="#{BrowseBean.checkoutFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
+                                       <h:commandButton value="Undo Checkout" action="#{BrowseBean.undoCheckout}" styleClass="dialogControls" />
+                                    </td>
+                                 </tr>
+                                 <tr><td class="dialogButtonSpacing"></td></tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Close" action="browse" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                           </td>
+                        </tr>
+                        
+                        <tr>
+                           <td width="100%" valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                                 <tr>
+                                    <td class="mainSubText">
+                                       To edit the working copy of the file, click the link below.
+                                       Depending on your browser settings, you may want to right click on the link and select Save As Target.
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       ===TODO: FILE LINK HERE===
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       When download is complete, click OK.
+                                    </td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
                         </tr>
                      </table>

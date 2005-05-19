@@ -129,7 +129,7 @@
       </managed-property>
       <managed-property>
          <property-name>lockService</property-name>
-         <value>#{simpleLockService}</value>
+         <value>#{lockService}</value>
       </managed-property>
    </managed-bean>
    
@@ -186,6 +186,14 @@
       <navigation-case>
          <from-outcome>checkinFile</from-outcome>
          <to-view-id>/jsp/dialog/checkin-file.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/checkout-file.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>checkoutFileLink</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file-link.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
