@@ -69,7 +69,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       }
       
       // force retrieval of node info
-      getNode(); 
+      getNode();
       
       if (howManyKids == 0)
       {

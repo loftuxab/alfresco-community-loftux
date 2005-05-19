@@ -99,6 +99,9 @@ public class UIProperty extends UIPanel implements NamingContainer
                // not in the node's set of properties
                String msg = "Property '"+ propertyName + "' is not available for this node";
                Utils.addErrorMessage(msg);
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Added global error message: " + msg);
             }
          }
          else

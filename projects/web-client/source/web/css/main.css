@@ -342,3 +342,9 @@ a.topToolbarLinkHighlight
 	height: 5px;
 }
 
+.docDetailsLabel
+{
+   padding-right: 20px;
+   color: #93a8b2;
+}
+

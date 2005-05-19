@@ -93,14 +93,12 @@
                               <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" 
                                        progressive="true"><br/>
                                  <table border="0" cellpadding="0" cellspacing="0">
-                                    <tr><td style="border-bottom: 1px solid black;">General</td></tr>
+                                    <tr><td style="border-bottom: 1px solid black;padding-bottom:2px;">General</td></tr>
                                     <tr>
-                                       <td>
+                                       <td style="padding-top:6px;">
                                        <r:propertySheetGrid id="general-props" value="#{BrowseBean.document}" var="generalProps" 
-                                                            columns="1" mode="view" labelWidth="70">
+                                                            columns="1" mode="view" labelStyleClass="docDetailsLabel" externalConfig="true">
                                           <r:property name="name" displayLabel="File Name" />
-                                          <r:property name="createddate" displayLabel="Created" />
-                                          <r:property name="modifieddate" displayLabel="Modified" />
                                        </r:propertySheetGrid>
                                        </td>
                                     </tr>

@@ -17,7 +17,7 @@ public class PropertySheetGridTag extends BaseComponentTag
    private String externalConfig;
    private String readOnly;
    private String mode;
-   private String labelWidth;
+   private String labelStyleClass;
    private String cellpadding;
    private String cellspacing;
    
@@ -86,13 +86,13 @@ public class PropertySheetGridTag extends BaseComponentTag
    }
    
    /**
-    * @param labelWidth Sets the label column width
+    * @param labelStyleClass Sets the style class for the label column
     */
-   public void setLabelWidth(String labelWidth)
+   public void setLabelStyleClass(String labelStyleClass)
    {
-      this.labelWidth = labelWidth;
+      this.labelStyleClass = labelStyleClass;
    }
-   
+
    /**
     * @param cellpadding Sets the cellpadding for the grid
     */
@@ -120,7 +120,7 @@ public class PropertySheetGridTag extends BaseComponentTag
       setStringProperty(component, "mode", this.mode);
       setStringStaticProperty(component, "var", this.var);
       setIntProperty(component, "columns", this.columns);
-      setIntStaticProperty(component, "labelWidth", this.labelWidth);
+      setStringStaticProperty(component, "labelStyleClass", this.labelStyleClass);
       setBooleanProperty(component, "externalConfig", this.externalConfig);
       setBooleanProperty(component, "readOnly", this.readOnly);
       setStringStaticProperty(component, "cellpadding", this.cellpadding);
@@ -138,7 +138,7 @@ public class PropertySheetGridTag extends BaseComponentTag
       this.externalConfig = null;
       this.readOnly = null;
       this.mode = null;
-      this.labelWidth = null;
+      this.labelStyleClass = null;
       this.cellpadding = null;
       this.cellspacing = null;
       

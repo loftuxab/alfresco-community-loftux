@@ -9,6 +9,7 @@ import javax.faces.context.ResponseWriter;
 
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
 import org.alfresco.web.ui.repo.component.property.UIProperty;
+import org.apache.log4j.Logger;
 
 /**
  * Renderer for the UIProperty component
@@ -17,6 +18,8 @@ import org.alfresco.web.ui.repo.component.property.UIProperty;
  */
 public class PropertyRenderer extends BaseRenderer
 {
+   private static Logger logger = Logger.getLogger(PropertyRenderer.class);
+   
    /**
     * @see javax.faces.render.Renderer#encodeBegin(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
     */
@@ -46,37 +49,35 @@ public class PropertyRenderer extends BaseRenderer
       
       // make sure there are exactly 2 child components
       int count = property.getChildCount();
-      if (count != 2)
+      
+      if (logger.isDebugEnabled())
+         logger.debug("property has " + count + " children");
+      
+      if (count == 2)
       {
-         throw new IllegalStateException("There should be 2 child components for a property");
+         // get the label and the control
+         List<UIComponent> kids = property.getChildren();
+         UIComponent label = kids.get(0);
+         UIComponent control = kids.get(1);
+         
+         // place a style class on the label column if necessary
+         String labelStylceClass = (String)property.getParent().getAttributes().get("labelStyleClass");
+         out.write("</td><td");
+         if (labelStylceClass != null)
+         {
+            outputAttribute(out, labelStylceClass, "class");
+         }
+         
+         // close the <td> 
+         out.write(">");
+         // encode the label
+         encodeRecursive(context, label);
+         // encode the control
+         context.getResponseWriter().write("</td><td>");
+         encodeRecursive(context, control);
+         
+         // NOTE: we'll allow the property sheet's grid renderer close off the last <td>
       }
-      
-      // get the label and the control
-      List<UIComponent> kids = property.getChildren();
-      UIComponent label = kids.get(0);
-      UIComponent control = kids.get(1);
-      
-      // place a width on the label column if necessary
-      Integer labelWidth = (Integer)property.getParent().getAttributes().get("labelWidth");
-      out.write("</td><td");
-      if (labelWidth != null)
-      {
-         outputAttribute(out, labelWidth, "width");
-      }
-      
-      out.write(">");
-      // render the label
-      label.encodeBegin(context);
-      label.encodeChildren(context);
-      label.encodeEnd(context);
-      
-      // render the control
-      context.getResponseWriter().write("</td><td>");
-      control.encodeBegin(context);
-      control.encodeChildren(context);
-      control.encodeEnd(context);
-      
-      // NOTE: we'll allow the property sheet's grid renderer close off the last <td>
    }
 
    /**

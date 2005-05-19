@@ -54,7 +54,7 @@
       </attribute>
       
       <attribute>
-         <name>labelWidth</name>
+         <name>labelStyleClass</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
