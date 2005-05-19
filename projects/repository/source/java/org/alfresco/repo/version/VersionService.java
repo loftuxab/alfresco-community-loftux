@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.util.AspectMissingException;
 
@@ -25,23 +24,6 @@ public interface VersionService
      * The version store protocol label, used in store references
      */
     public static final String VERSION_STORE_PROTOCOL = "versionStore";
-    
-    /**
-     * Version namespace
-     */
-    public static final String VERSION_NAMESPACE =  "http://www.alfresco.com/version/1.0";
-    
-    /**
-     * Aspect name
-     */
-    public static final String ASPECT_VERSION = "version";
-    public static final QName ASPECT_QNAME_VERSION = QName.createQName(VERSION_NAMESPACE, ASPECT_VERSION);
-    
-    /**
-     * The current version label attribute name
-     */
-    public static final String PROP_CURRENT_VERSION_LABEL = "currentVersionLabel";
-    public static final QName PROP_QNAME_CURRENT_VERSION_LABEL = QName.createQName(VERSION_NAMESPACE, PROP_CURRENT_VERSION_LABEL);
     
     /**
      * Gets the reference to the version store

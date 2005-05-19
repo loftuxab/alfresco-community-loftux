@@ -2,8 +2,6 @@ package org.alfresco.repo.dictionary.bootstrap;
 
 import java.io.File;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryException;
 import org.alfresco.repo.dictionary.NamespaceService;
@@ -22,14 +20,13 @@ import org.alfresco.repo.dictionary.metamodel.NamespaceDAO;
 import org.alfresco.repo.dictionary.metamodel.emf.EMFMetaModelDAO;
 import org.alfresco.repo.dictionary.metamodel.emf.EMFNamespaceDAO;
 import org.alfresco.repo.dictionary.metamodel.emf.EMFResource;
-import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.impl.lucene.analysis.DateAnalyser;
 import org.alfresco.repo.search.impl.lucene.analysis.IntegerAnalyser;
 import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionService;
 import org.alfresco.repo.version.lightweight.Const;
 import org.alfresco.util.debug.CodeMonkey;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 /**
  * Provides support for creating initial set of meta-data.
@@ -86,6 +83,29 @@ public class DictionaryBootstrap
     public static final ClassRef TYPE_STOREROOT = new ClassRef(TYPE_QNAME_STOREROOT);
     public static final ClassRef TYPE_CATEGORYROOT = new ClassRef(TYPE_QNAME_CATEGORYROOT);
     
+	/**
+     * Lock aspect QName and ClassRef
+     */
+    public final static String ASPECT_LOCK = "lock";
+    public final static QName ASPECT_QNAME_LOCK = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_LOCK);
+    public final static ClassRef ASPECT_CLASS_REF_LOCK = new ClassRef(ASPECT_QNAME_LOCK);
+    
+    /**
+     * Lock aspect attribute names
+     */
+    public final static String PROP_LOCK_OWNER = "lockOwner";
+    public final static QName PROP_QNAME_LOCK_OWNER = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_LOCK_OWNER);
+    public final static String PROP_LOCK_TYPE = "lockType";
+    public final static QName PROP_QNAME_LOCK_TYPE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_LOCK_TYPE);
+	
+	/**
+	 * Version aspect name and attributes
+	 */
+	public static final String ASPECT_VERSION = "version";
+	public static final QName ASPECT_QNAME_VERSION = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_VERSION);
+	public static final ClassRef ASPECT_CLASS_REF_VERSION = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION);
+	public static final String PROP_CURRENT_VERSION_LABEL = "currentVersionLabel";
+	public static final QName PROP_QNAME_CURRENT_VERSION_LABEL = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_CURRENT_VERSION_LABEL);
 
     // Content type constants
     public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "content");
@@ -498,16 +518,16 @@ public class DictionaryBootstrap
         // Lock Aspect Model Defintions
         
         // Create the lock aspect
-        M2Aspect lockAspect = metaModelDAO.createAspect(LockService.ASPECT_QNAME_LOCK);
+        M2Aspect lockAspect = metaModelDAO.createAspect(ASPECT_QNAME_LOCK);
         
         // Create the lock owner property
-        M2Property lockOwnerProperty = lockAspect.createProperty(LockService.PROP_LOCK_OWNER);
+        M2Property lockOwnerProperty = lockAspect.createProperty(PROP_LOCK_OWNER);
         lockOwnerProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         lockOwnerProperty.setMandatory(false);
         lockOwnerProperty.setMultiValued(false);
         
         // Create the lock type property
-        M2Property lockTypeProperty = lockAspect.createProperty(LockService.PROP_LOCK_TYPE);
+        M2Property lockTypeProperty = lockAspect.createProperty(PROP_LOCK_TYPE);
         lockTypeProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         lockTypeProperty.setMandatory(false);
         lockTypeProperty.setMultiValued(false);
@@ -517,10 +537,10 @@ public class DictionaryBootstrap
         // Version Aspect Model Defintions
         
         // Create version aspect
-        M2Aspect versionAspect = metaModelDAO.createAspect(VersionService.ASPECT_QNAME_VERSION);
+        M2Aspect versionAspect = metaModelDAO.createAspect(DictionaryBootstrap.ASPECT_QNAME_VERSION);
         
         // Create current version label property
-        M2Property currentVersionLabelProperty = versionAspect.createProperty(VersionService.PROP_CURRENT_VERSION_LABEL);
+        M2Property currentVersionLabelProperty = versionAspect.createProperty(DictionaryBootstrap.PROP_CURRENT_VERSION_LABEL);
         currentVersionLabelProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
         currentVersionLabelProperty.setMandatory(false); 
         currentVersionLabelProperty.setMultiValued(false);

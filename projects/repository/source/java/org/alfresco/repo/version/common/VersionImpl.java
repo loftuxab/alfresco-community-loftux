@@ -11,6 +11,7 @@ import java.util.Map;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.version.Version;
 import org.alfresco.repo.version.VersionServiceException;
+import org.alfresco.repo.version.VersionType;
 
 /**
  * Version class implementation.
@@ -87,9 +88,9 @@ public class VersionImpl implements Version
      * 
      * @return  the value of the version type as an enum value
      */
-    public VersionTypeEnum getVersionType()
+    public VersionType getVersionType()
     {
-        return (VersionTypeEnum)this.versionProperties.get(PROP_VERSION_TYPE);
+        return (VersionType)this.versionProperties.get(PROP_VERSION_TYPE);
     }
     
     /**

@@ -38,13 +38,6 @@ public interface Version extends Serializable
     public static final String PROP_FROZEN_ASPECTS = "frozenAspects";
     
     /**
-     * Version type enum 
-     * 
-     * @author Roy Wetherall
-     */
-    public enum VersionTypeEnum {MAJOR, MINOR};
-    
-    /**
      * Helper method to get the created date from the version property data.
      * 
      * @return  the date the version was created
@@ -63,7 +56,7 @@ public interface Version extends Serializable
      * 
      * @return  the value of the version type as an enum value
      */
-    public VersionTypeEnum getVersionType();
+    public VersionType getVersionType();
     
     /**
      * Helper method to get the version description.

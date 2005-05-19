@@ -19,7 +19,6 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.qname.RegexQNamePattern;
 import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionService;
 
 /**
  * @author Roy Wetherall
@@ -207,7 +206,7 @@ public class NodeServiceImplTest extends BaseImplTest
         
         boolean test2 = this.lightWeightVersionStoreNodeService.hasAspect(
                 version.getNodeRef(),
-                new ClassRef(VersionService.ASPECT_QNAME_VERSION));
+                new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION));
         assertTrue(test2);
     }
 

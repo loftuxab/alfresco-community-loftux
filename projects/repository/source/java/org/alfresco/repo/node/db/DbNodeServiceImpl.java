@@ -34,6 +34,7 @@ import org.alfresco.repo.node.InvalidNodeTypeException;
 import org.alfresco.repo.node.InvalidStoreRefException;
 import org.alfresco.repo.node.PropertyException;
 import org.alfresco.repo.node.StoreExistsException;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.EntityRef;
 import org.alfresco.repo.ref.NodeAssocRef;
@@ -43,6 +44,8 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.util.debug.CodeMonkey;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * Node service using database persistence layer to fulfill functionality
@@ -55,9 +58,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     private final NodeDaoService nodeDaoService;
     
     public DbNodeServiceImpl(
+			PolicyComponent policyComponent,
             DictionaryService dictionaryService,
             NodeDaoService nodeDaoService)
     {
+		super(policyComponent);
+		
         this.dictionaryService = dictionaryService;
         this.nodeDaoService = nodeDaoService;
     }
@@ -206,6 +212,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             properties = Collections.emptyMap();
         }
+		
+		// Invoke policy behaviour
+		invokeBeforeUpdate(parentRef);
+		invokeBeforeCreate(parentRef, assocTypeQName, assocQName, nodeTypeQName);
         
         // get the store that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
@@ -244,8 +254,13 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             this.setProperties(node.getNodeRef(), properties);
         }
         
-        // done
-        return assoc.getChildAssocRef();
+        // Invoke policy behaviour
+        ChildAssocRef childAssocRef = assoc.getChildAssocRef();
+		invokeOnCreate(childAssocRef);
+		invokeOnUpdate(parentRef);
+		
+		// done
+		return childAssocRef;
     }
 
     public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
@@ -297,7 +312,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             }
             QName qname = propertyDef.getQName();
             // is it present?
-            if (properties.get(qname) == null)
+            if (properties.containsKey(qname) == false)
             {
                 // not present
                 throw new PropertyException("Mandatory property value not supplied: " + qname,
@@ -337,6 +352,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             Map<QName, Serializable> aspectProperties)
             throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
+		// Invoke policy behaviours
+		invokeBeforeUpdate(nodeRef);
+		
         // get the aspect
         AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
         if (aspectDef == null)
@@ -350,11 +368,16 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // physically attach the aspect to the node
         node.getAspects().add(aspectRef.getQName());
         
-        // attach the properties to the current node properties
-        Map<QName, Serializable> nodeProperties = getProperties(nodeRef);
-        nodeProperties.putAll(aspectProperties);
-        setProperties(nodeRef, nodeProperties);
-        // done
+		if (aspectProperties != null)
+		{
+			// attach the properties to the current node properties
+		    Map<QName, Serializable> nodeProperties = getProperties(nodeRef);
+		    nodeProperties.putAll(aspectProperties);
+		    setProperties(nodeRef, nodeProperties);
+		}
+		
+		// Invoke policy behaviours
+		invokeOnUpdate(nodeRef);
     }
 
     /**
@@ -363,6 +386,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     public void removeAspect(NodeRef nodeRef, ClassRef aspectRef)
             throws InvalidNodeRefException, InvalidAspectException
     {
+		// Invoke policy behaviours
+		invokeBeforeUpdate(nodeRef);
+		
         // get the aspect
         AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
         if (aspectDef == null)
@@ -398,8 +424,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
                 nodeProperties.remove(propertyDef.getQName().toString());
             }
         }
-        // done
-        return;
+		
+		// Invoke policy behaviours
+		invokeOnUpdate(nodeRef);
     }
 
     /**
@@ -439,16 +466,27 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 
     public void deleteNode(NodeRef nodeRef)
     {
+		// Invoke policy behaviours
+		invokeBeforeDelete(nodeRef);
+		
 		// get the store
 		StoreRef storeRef = nodeRef.getStoreRef();
         // get the node
         Node node = getNodeNotNull(nodeRef);
+		// get type QName
+		QName typeQName = node.getTypeQName();
         // delete it
         nodeDaoService.deleteNode(node);
+		
+		// Invoke policy behaviours
+		invokeOnDelete(typeQName, nodeRef);
     }
 
     public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
     {
+		// Invoke policy behaviours
+		invokeBeforeUpdate(parentRef);
+		
         CodeMonkey.todo("Check that the child association is allowed"); // TODO
         // check that both nodes belong to the same store
         if (!parentRef.getStoreRef().equals(childRef.getStoreRef()))
@@ -466,12 +504,18 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node childNode = getNodeNotNull(childRef);
         // make the association
         ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, childNode, false, qname);
-        // done
+
+		// Invoke policy behaviours
+		invokeOnUpdate(parentRef);
+		
         return assoc.getChildAssocRef();
     }
 
     public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
     {
+		// Invoke policy behaviours
+		invokeBeforeUpdate(parentRef);
+		
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         Node childNode = getNodeNotNull(childRef);
         NodeKey childNodeKey = childNode.getKey();
@@ -504,12 +548,19 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             nodeDaoService.deleteNode(childNode);
             deletedRefs.add(childNode.getNodeRef());    // save for return value
         }
+
+		// Invoke policy behaviours
+		invokeOnUpdate(parentRef);
+		
         // done
         return deletedRefs;
     }
 
     public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
     {
+		// Invoke policy behaviours
+		invokeBeforeUpdate(parentRef);
+		
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
 
         // maintain a list of deleted entities
@@ -535,6 +586,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
                 deletedRefs.add(childNode.getNodeRef());    // save for return value
             }
         }
+
+		// Invoke policy behaviours
+		invokeOnUpdate(parentRef);
+		
         // done
         return deletedRefs;
     }
@@ -574,6 +629,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      */
     public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
+		// Invoke policy behaviours
+		invokeBeforeUpdate(nodeRef);
+		
         if (properties == null)
         {
             throw new IllegalArgumentException("Properties may not be null");
@@ -594,13 +652,15 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         for (QName qname : properties.keySet())
         {
             Serializable value = properties.get(qname);
-            if (value == null)
-            {
-                throw new IllegalArgumentException("Property values may not be null: " + qname);
-            }
+          //  if (value == null)
+          //  {
+          //      throw new IllegalArgumentException("Property values may not be null: " + qname);
+          //  }
             nodeProperties.put(qname.toString(), properties.get(qname));
         }
-        // done
+
+		// Invoke policy behaviours
+		invokeOnUpdate(nodeRef);
     }
 
     /**
@@ -610,15 +670,16 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      */
     public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException
     {
-        if (value == null)
-        {
-            throw new IllegalArgumentException("Property values may not be null: " + qname);
-        }
+		// Invoke policy behaviours
+		invokeBeforeUpdate(nodeRef);
+		
         Node node = getNodeNotNull(nodeRef);
         Map<String, Serializable> properties = node.getProperties();
         // Null value means remove property
         properties.put(qname.toString(), value);
-        // done
+
+		// Invoke policy behaviours
+		invokeOnUpdate(nodeRef);
     }
 
     /**
@@ -722,6 +783,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     public NodeAssocRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
             throws InvalidNodeRefException, AssociationExistsException
     {
+		// Invoke policy behaviours
+		invokeBeforeUpdate(sourceRef);
+		
         CodeMonkey.todo("Check that the association is allowed"); // TODO
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
@@ -734,19 +798,28 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // we are sure that the association doesn't exist - make it
         assoc = nodeDaoService.newNodeAssoc(sourceNode, targetNode, assocTypeQName);
         NodeAssocRef assocRef = assoc.getNodeAssocRef();
-        // done
+
+		// Invoke policy behaviours
+		invokeOnUpdate(sourceRef);
+		
         return assocRef;
     }
 
     public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
             throws InvalidNodeRefException
     {
+		// Invoke policy behaviours
+		invokeBeforeUpdate(sourceRef);
+		
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // get the association
         NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, assocTypeQName);
         // delete it
         nodeDaoService.deleteNodeAssoc(assoc);
+		
+		// Invoke policy behaviours
+		invokeOnUpdate(sourceRef);
     }
 
     /**

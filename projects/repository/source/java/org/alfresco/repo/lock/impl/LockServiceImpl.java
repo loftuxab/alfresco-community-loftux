@@ -1,39 +1,52 @@
 /**
  * Created on Apr 14, 2005
  */
-package org.alfresco.repo.lock.simple;
+package org.alfresco.repo.lock.impl;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
+import org.alfresco.repo.lock.LockStatus;
+import org.alfresco.repo.lock.LockType;
+import org.alfresco.repo.lock.NodeLockedException;
 import org.alfresco.repo.lock.UnableToAquireLockException;
 import org.alfresco.repo.lock.UnableToReleaseLockException;
-import org.alfresco.repo.lock.LockService.LockType;
-import org.alfresco.repo.lock.common.VersionServicePolicyImpl;
 import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.policy.PolicyRuntimeService;
+import org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl.CopyDetails;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.version.policy.OnBeforeCreateVersionPolicy;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.util.AspectMissingException;
+import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Simple Lock service implementation
  * 
  * @author Roy Wetherall
  */
-public class SimpleLockService implements LockService
+public class LockServiceImpl implements LockService
 {
     /**
      * The node service
      */
-    private NodeService nodeService = null;
+    private NodeService nodeService;
     
     /**
-     * The policy runtime service
+     * The policy component
      */
-    private PolicyRuntimeService policyRuntimeService = null;
+    private PolicyComponent policyComponent;
+	
+	/**
+	 * List of node ref's to ignore when checking for locks
+	 */
+	private Set<NodeRef> ignoreNodeRefs = new HashSet<NodeRef>();
     
     /**
      * Set the node service
@@ -45,27 +58,40 @@ public class SimpleLockService implements LockService
         this.nodeService = nodeService;
     }
     
-    /**
-     * Set the policy runtime service
-     * 
-     * @param policyRuntimeService  the policy runtime service
-     */
-    public void setPolicyRuntimeService(
-            PolicyRuntimeService policyRuntimeService)
-    {
-        this.policyRuntimeService = policyRuntimeService;
-    }
+	/**
+	 * Sets the policy component
+	 * 
+	 * @param policyComponent the policy componentO
+	 */
+    public void setPolicyComponent(PolicyComponent policyComponent) 
+	{
+		this.policyComponent = policyComponent;
+	}
     
     /**
      * Initialise methods called by Spring framework
      */
     public void initialise()
     {
-        // Register the behaviours
-        this.policyRuntimeService.registerBehaviour(
-                OnBeforeCreateVersionPolicy.class, 
-                new VersionServicePolicyImpl(this),
-                LockService.ASPECT_QNAME_LOCK);
+        // Register the various class behaviours to enable lock checking
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateVersion"),
+				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				new JavaBehaviour(this, "checkForLock"));	
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeUpdate"),
+				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				new JavaBehaviour(this, "checkForLock"));
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDelete"),
+				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				new JavaBehaviour(this, "checkForLock"));
+		
+		// Register onCopy class behaviour
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
+				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				new JavaBehaviour(this, "onCopy"));
     }
     
     /**
@@ -91,9 +117,17 @@ public class SimpleLockService implements LockService
         }
         else if (LockStatus.NO_LOCK.equals(currentLockStatus) == true)
         {
-            // Set the current user as the lock owner
-            this.nodeService.setProperty(nodeRef, PROP_QNAME_LOCK_OWNER, userRef);
-            this.nodeService.setProperty(nodeRef, PROP_QNAME_LOCK_TYPE, lockType);
+			this.ignoreNodeRefs.add(nodeRef);
+			try
+			{
+	            // Set the current user as the lock owner
+	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER, userRef);
+	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE, lockType);
+			}
+			finally
+			{
+				this.ignoreNodeRefs.remove(nodeRef);
+			}
         }        
     }
 
@@ -145,9 +179,17 @@ public class SimpleLockService implements LockService
         }
         else if (LockStatus.LOCK_OWNER.equals(lockStatus) == true)
         {
-            // Clear the lock owner
-            this.nodeService.setProperty(nodeRef, PROP_QNAME_LOCK_OWNER, null);
-            this.nodeService.setProperty(nodeRef, PROP_QNAME_LOCK_TYPE, null);
+			this.ignoreNodeRefs.add(nodeRef);
+			try
+			{
+	            // Clear the lock owner
+	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER, null);
+	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE, null);
+			}
+			finally
+			{
+				this.ignoreNodeRefs.remove(nodeRef);
+			}
         }      
     }
 
@@ -195,7 +237,7 @@ public class SimpleLockService implements LockService
         LockStatus result = LockStatus.NO_LOCK;
         
         // Get the current lock owner
-        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, PROP_QNAME_LOCK_OWNER);
+        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER);
         if (currentUserRef != null && currentUserRef.length() != 0)
         {
             if (currentUserRef.equals(userRef) == true)
@@ -222,7 +264,7 @@ public class SimpleLockService implements LockService
         checkForLockApsect(nodeRef);
         
         // Return the lock type enum
-        return (LockType)this.nodeService.getProperty(nodeRef, PROP_QNAME_LOCK_TYPE);        
+        return (LockType)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE);        
     }
     
     /**
@@ -236,11 +278,81 @@ public class SimpleLockService implements LockService
         throws AspectMissingException
     {
         // Get the class ref for the lock aspect
-        ClassRef lockAspect = new ClassRef(ASPECT_QNAME_LOCK);
+        ClassRef lockAspect = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_LOCK);
         
         if (this.nodeService.hasAspect(nodeRef, lockAspect) == false)
         {
             throw new AspectMissingException(lockAspect, nodeRef);
         }
     }
+	
+	/**
+     * @see LockService#checkForLock(NodeRef)
+     */
+    public void checkForLock(NodeRef nodeRef)
+		throws NodeLockedException
+    {
+		CodeMonkey.todo("We should be looking up the current user here.");
+		
+        // Check the lock
+        checkForLockWithUser(nodeRef, LockService.LOCK_USER);
+    }
+    
+    /**
+     * @see LockService#checkForLockWithUser(NodeRef, String)
+     */
+    public void checkForLockWithUser(NodeRef nodeRef, String userRef)
+        throws NodeLockedException
+    {     
+		// Ensure we have found a node reference
+        if (nodeRef != null && userRef != null)
+        {
+			// Check to see if should just ignore this node
+			if (this.ignoreNodeRefs.contains(nodeRef) == false)
+			{
+	            try
+	            {
+	                LockType lockType = getLockType(nodeRef);
+	                if (LockType.WRITE_LOCK.equals(lockType) == true)
+	                {
+	                    // Get the current lock status on the node ref
+	                    LockStatus currentLockStatus = getLockStatus(nodeRef, userRef);
+	                    
+	                    if (LockStatus.LOCKED.equals(currentLockStatus) == true)
+	                    {
+	                        // Error since we are trying to preform an operation on a locked node
+	                        throw new NodeLockedException(nodeRef);
+	                    }
+	                }
+	                else if (LockType.READ_ONLY_LOCK.equals(lockType) == true)
+	                {
+	                    // Error since there is a read only lock on this object and all 
+	                    // modifications are prevented
+	                    throw new NodeLockedException(nodeRef);
+	                }
+	            }
+	            catch (AspectMissingException exception)
+	            {
+	                // Ignore since this indicates that the node does not have the lock  
+	                // aspect applied
+	            }
+			}
+        }
+    }	
+	
+	/**
+	 * OnCopy behaviour implementation for the lock aspect.
+	 * <p>
+	 * Ensures that the propety values of the lock aspect are not copied onto
+	 * the destination node.
+	 * 
+	 * @param sourceClassRef  the source class reference
+	 * @param sourceNodeRef	  the source node reference
+	 * @param copyDetails	  the copy details
+	 */
+	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	{
+		// Add the lock aspect, but do not copy any of the properties
+		copyDetails.addAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK);
+	}
 }

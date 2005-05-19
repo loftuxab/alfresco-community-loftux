@@ -238,7 +238,17 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 				true);		
 		checkCopiedNode(this.sourceNodeRef, copy2, true, true, true);
 		
-		// TODO check that a copy of a copy works correctly
+		// Check that a copy of a copy works correctly
+		NodeRef copyOfCopy = this.nodeOperationsService.copy(
+				copy,
+				this.rootNodeRef,
+				null,
+				QName.createQName("{test}copyOfCopy"));
+		checkCopiedNode(copy, copyOfCopy, true, true, false);
+		
+        // TODO check copying from a versioned copy
+		// TODO check copying from a lockable copy
+		// TODO check copying from a node with content
 		
 		// TODO check copying to a different store
 		
@@ -251,6 +261,11 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Copy nodes within the same store
 		this.nodeOperationsService.copy(this.sourceNodeRef, this.destinationNodeRef);
 		checkCopiedNode(this.sourceNodeRef, this.destinationNodeRef, false, true, false);
+		
+		// TODO check copying from a copy
+		// TODO check copying from a versioned copy
+		// TODO check copying from a lockable copy
+		// TODO check copying from a node with content
 		
 		// TODO check copying nodes between stores
 		

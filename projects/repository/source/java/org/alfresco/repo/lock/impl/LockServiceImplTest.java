@@ -1,7 +1,7 @@
 /**
  * Created on Apr 19, 2005
  */
-package org.alfresco.repo.lock.simple;
+package org.alfresco.repo.lock.impl;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -9,10 +9,10 @@ import java.util.HashMap;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
-import org.alfresco.repo.lock.LockService.LockType;
+import org.alfresco.repo.lock.LockStatus;
+import org.alfresco.repo.lock.LockType;
 import org.alfresco.repo.lock.UnableToAquireLockException;
 import org.alfresco.repo.lock.UnableToReleaseLockException;
-import org.alfresco.repo.lock.LockService.LockStatus;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -25,7 +25,7 @@ import org.alfresco.util.BaseSpringTest;
  * 
  * @author Roy Wetherall
  */
-public class SimpleLockServiceTest extends BaseSpringTest
+public class LockServiceImplTest extends BaseSpringTest
 {
     private static final String USER_REF1 = "userRef1";
     private static final String USER_REF2 = "userRef2";
@@ -50,10 +50,10 @@ public class SimpleLockServiceTest extends BaseSpringTest
     protected void onSetUpInTransaction() throws Exception
     {
         this.nodeService = (NodeService)applicationContext.getBean("dbNodeService");
-        this.lockService = (LockService)applicationContext.getBean("simpleLockService");
+        this.lockService = (LockService)applicationContext.getBean("lockService");
         
         // Get the lock aspect class ref
-        ClassRef lockAspect = new ClassRef(LockService.ASPECT_QNAME_LOCK);
+        ClassRef lockAspect = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_LOCK);
         
         // Create the node properties
         HashMap<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
@@ -237,7 +237,7 @@ public class SimpleLockServiceTest extends BaseSpringTest
         assertEquals(LockStatus.NO_LOCK, lockStatus1);
         
         // Simulate the node being locked by user1
-        this.nodeService.setProperty(this.parentNode, LockService.PROP_QNAME_LOCK_OWNER, USER_REF1);
+        this.nodeService.setProperty(this.parentNode, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER, USER_REF1);
         
         // Check for locked status
         LockStatus lockStatus2 = this.lockService.getLockStatus(this.parentNode, USER_REF2);

@@ -13,7 +13,7 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.version.Version;
 import org.alfresco.repo.version.VersionServiceException;
-import org.alfresco.repo.version.Version.VersionTypeEnum;
+import org.alfresco.repo.version.VersionType;
 
 import junit.framework.TestCase;
 
@@ -34,7 +34,7 @@ public class VersionImplTest extends TestCase
     private final static String VALUE_2 = "value2";
     private final static String VALUE_3 = "value3";  
     private final static String VALUE_DESCRIPTION = "This string describes the version details.";
-    private final static VersionTypeEnum VERSION_TYPE = VersionTypeEnum.MINOR;
+    private final static VersionType VERSION_TYPE = VersionType.MINOR;
     
     /**
      * Version labels
@@ -108,7 +108,7 @@ public class VersionImplTest extends TestCase
      */
     public void testGetVersionType()
     {
-        VersionTypeEnum versionType = this.version.getVersionType();
+        VersionType versionType = this.version.getVersionType();
         assertEquals(VERSION_TYPE, versionType);
     }
     

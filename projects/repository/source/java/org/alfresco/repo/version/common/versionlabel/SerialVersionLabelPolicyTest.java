@@ -6,7 +6,7 @@ import java.util.HashMap;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.Version.VersionTypeEnum;
+import org.alfresco.repo.version.VersionType;
 import org.alfresco.repo.version.common.VersionImpl;
 
 import junit.framework.TestCase;
@@ -28,7 +28,7 @@ public class SerialVersionLabelPolicyTest extends TestCase
         NodeRef dummyNodeRef = new NodeRef(new StoreRef("", ""), "");
         
         HashMap<String, Serializable> versionProp1 = new HashMap<String, Serializable>();
-        versionProp1.put(Version.PROP_VERSION_TYPE, VersionTypeEnum.MINOR);
+        versionProp1.put(Version.PROP_VERSION_TYPE, VersionType.MINOR);
         
         String initialVersion = policy.getVersionLabelValue(
                 null,
@@ -51,7 +51,7 @@ public class SerialVersionLabelPolicyTest extends TestCase
         Version version2 = new VersionImpl(versionProp3, dummyNodeRef);
         
         HashMap<String, Serializable> versionProp4 = new HashMap<String, Serializable>();
-        versionProp4.put(Version.PROP_VERSION_TYPE, VersionTypeEnum.MAJOR);
+        versionProp4.put(Version.PROP_VERSION_TYPE, VersionType.MAJOR);
         
         String verisonLabel2 = policy.getVersionLabelValue(
                 version2,

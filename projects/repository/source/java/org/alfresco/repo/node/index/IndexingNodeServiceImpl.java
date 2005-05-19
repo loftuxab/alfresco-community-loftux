@@ -15,6 +15,7 @@ import org.alfresco.repo.node.InvalidStoreRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.PropertyException;
 import org.alfresco.repo.node.StoreExistsException;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.EntityRef;
 import org.alfresco.repo.ref.NodeAssocRef;
@@ -38,11 +39,16 @@ import org.alfresco.repo.search.IndexerComponent;
  */
 public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
 {
-    private final NodeService nodeServiceDelegate;
-    private final Indexer indexer;
+    private NodeService nodeServiceDelegate;
+    private Indexer indexer;
 
-    public IndexingNodeServiceImpl(NodeService nodeServiceDelegate, Indexer indexer)
+    public IndexingNodeServiceImpl(
+			PolicyComponent policyComponent,
+			NodeService nodeServiceDelegate, 
+			Indexer indexer)
     {
+		super(policyComponent);
+		
         this.nodeServiceDelegate = nodeServiceDelegate;
         this.indexer = indexer;
     }

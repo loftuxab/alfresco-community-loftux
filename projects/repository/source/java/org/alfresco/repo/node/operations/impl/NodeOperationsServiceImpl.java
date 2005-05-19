@@ -4,6 +4,7 @@
 package org.alfresco.repo.node.operations.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +14,17 @@ import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.node.operations.NodeOperationsServiceException;
+import org.alfresco.repo.node.operations.NodeOperationsServicePolicies;
+import org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyPolicy;
+import org.alfresco.repo.policy.ClassPolicyDelegate;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -40,6 +47,16 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * The dictionary service
 	 */
 	private DictionaryService dictionaryService; 	
+	
+	/**
+	 * Policy component
+	 */
+	private PolicyComponent policyComponent;
+
+	/**
+	 * Policy delegates
+	 */
+	private ClassPolicyDelegate<OnCopyPolicy> onCopyDelegate;
     
     /**
      * Set the node service
@@ -60,7 +77,32 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	{
 		this.dictionaryService = dictionaryService;
 	}
+	
+	/**
+	 * Sets the policy component
+	 * 
+	 * @param policyComponent  the policy component
+	 */
+	public void setPolicyComponent(PolicyComponent policyComponent) 
+	{
+		this.policyComponent = policyComponent;
+	}
     
+	/**
+	 * Initialise method
+	 */
+	public void init()
+	{
+		// Register the policies
+		this.onCopyDelegate = this.policyComponent.registerClassPolicy(NodeOperationsServicePolicies.OnCopyPolicy.class);
+		
+		// Register policy behaviours
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
+				DictionaryBootstrap.ASPECT_COPY,
+				new JavaBehaviour(this, "copyAspectOnCopy"));
+	}
+	
     /**
      * @see com.activiti.repo.node.copy.NodeCopyService#copy(com.activiti.repo.ref.NodeRef, com.activiti.repo.ref.NodeRef, com.activiti.repo.ref.QName, QName, boolean)
      */
@@ -131,8 +173,8 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 		ClassRef sourceClassRef = this.nodeService.getType(sourceNodeRef);		
 		CopyDetails copyDetails = new CopyDetails(sourceClassRef);
 		
-		// TODO call the appropriate policy
-		defaultOnCopy(sourceClassRef, sourceNodeRef, copyDetails);
+		// Invoke the onCopy behaviour
+		invokeOnCopy(sourceClassRef, sourceNodeRef, copyDetails);
 		
 		// TODO 
 		CodeMonkey.todo("What do we do aboout props and assocs that are on the node node but not part of the type definition?");
@@ -141,12 +183,34 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 		Set<ClassRef> sourceAspects = this.nodeService.getAspects(sourceNodeRef);
 		for (ClassRef sourceAspect : sourceAspects) 
 		{
-			// Call the onCopy policy for the aspect
-			// TODO call the appropriate policy
-			defaultOnCopy(sourceAspect, sourceNodeRef, copyDetails);
+			// Invoke the onCopy behaviour
+			invokeOnCopy(sourceAspect, sourceNodeRef, copyDetails);
 		}
 		
 		return copyDetails;
+	}
+	
+	/**
+	 * Invoke the correct onCopy behaviour
+	 * 
+	 * @param sourceClassRef	source class reference
+	 * @param sourceNodeRef		source node reference
+	 * @param copyDetails		the copy details
+	 */
+	private void invokeOnCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	{
+		Collection<NodeOperationsServicePolicies.OnCopyPolicy> policies = this.onCopyDelegate.getList(sourceClassRef);
+		if (policies.isEmpty() == true)
+		{
+			defaultOnCopy(sourceClassRef, sourceNodeRef, copyDetails);
+		}
+		else
+		{
+			for (NodeOperationsServicePolicies.OnCopyPolicy policy : policies) 
+			{
+				policy.onCopy(sourceClassRef, sourceNodeRef, copyDetails);
+			}
+		}
 	}
 	
 	/**
@@ -393,6 +457,22 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 		copyAspects(destinationNodeRef, copyDetails);
 		copyAssociations(destinationNodeRef, copyDetails, false);
     }
+	
+	/**
+	 * OnCopy behaviour registered for the copy aspect.  
+	 * <p>
+	 * Doing nothing in this behaviour ensures that the copy aspect found on the source node does not get 
+	 * copied onto the destination node.
+	 * 
+	 * @param sourceClassRef	the source class reference
+	 * @param sourceNodeRef		the source node reference
+	 * @param copyDetails	    the copy details
+	 */
+	public void copyAspectOnCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	{
+		// Do nothing.  This will ensure that copy aspect on the source node does not get copied onto
+		// the destination node.
+	}
 	
 	/**
 	 * Aspect copy details class.  Contains the details of an aspect that should be copied.

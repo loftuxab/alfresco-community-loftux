@@ -6,7 +6,6 @@ package org.alfresco.repo.lock;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-import org.alfresco.repo.lock.LockService.LockStatus;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.util.AspectMissingException;
 

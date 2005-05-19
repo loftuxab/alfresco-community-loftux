@@ -99,7 +99,7 @@ public class BaseImplTest extends BaseSpringTest
         this.versionableNodes = new HashMap<String, NodeRef>();
         
         // Get the version aspect class reference
-        ClassRef aspectRef = new ClassRef(VersionService.ASPECT_QNAME_VERSION);
+        ClassRef aspectRef = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION);
         
         // Create node (this node has some content)
         NodeRef nodeRef = this.dbNodeService.createNode(
@@ -241,7 +241,7 @@ public class BaseImplTest extends BaseSpringTest
         // Check the node ref for the current version
         String currentVersionLabel = (String)this.dbNodeService.getProperty(
                 versionableNode,
-                VersionService.PROP_QNAME_CURRENT_VERSION_LABEL);
+                DictionaryBootstrap.PROP_QNAME_CURRENT_VERSION_LABEL);
         assertEquals(newVersion.getVersionLabel(), currentVersionLabel);
     }
     

@@ -14,9 +14,12 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
+import org.alfresco.repo.lock.LockStatus;
+import org.alfresco.repo.lock.LockType;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -453,11 +456,11 @@ public class BrowseBean implements IContextListener
    private Boolean isNodeLocked(NodeRef ref)
    {
       Boolean locked = Boolean.FALSE;
-      if (nodeService.hasAspect(ref, LockService.ASPECT_CLASS_REF_LOCK))
+      if (nodeService.hasAspect(ref, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK))
       {
          // TODO: replace username with real user name ref here!
-         LockService.LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);
-         if (lockStatus == LockService.LockStatus.LOCKED || lockStatus == LockService.LockStatus.LOCK_OWNER)
+         LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);
+         if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
          {
             locked = Boolean.TRUE;
          }
@@ -766,11 +769,11 @@ public class BrowseBean implements IContextListener
                s_logger.debug("Trying to lock content node Id: " + node.getId());
             
             // lock the node, adding the Lock aspect if required
-            if (node.hasAspect(LockService.ASPECT_CLASS_REF_LOCK) == false)
+            if (node.hasAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK) == false)
             {
-               this.nodeService.addAspect(node.getNodeRef(), LockService.ASPECT_CLASS_REF_LOCK, Collections.<QName, Serializable>emptyMap());
+               this.nodeService.addAspect(node.getNodeRef(), DictionaryBootstrap.ASPECT_CLASS_REF_LOCK, Collections.<QName, Serializable>emptyMap());
             }
-            this.lockService.lock(node.getNodeRef(), USERNAME, LockService.LockType.READ_ONLY_LOCK);
+            this.lockService.lock(node.getNodeRef(), USERNAME, LockType.READ_ONLY_LOCK);
             
             // TODO: checkout the node content etc.
             
@@ -811,7 +814,7 @@ public class BrowseBean implements IContextListener
                s_logger.debug("Trying to unlock content node Id: " + node.getId());
             
             // lock the node, adding the Lock aspect if required
-            if (node.hasAspect(LockService.ASPECT_CLASS_REF_LOCK) == true)
+            if (node.hasAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK) == true)
             {
                this.lockService.unlock(node.getNodeRef(), USERNAME);
             }

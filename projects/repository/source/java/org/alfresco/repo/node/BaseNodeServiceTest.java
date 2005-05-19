@@ -591,12 +591,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // set the property value to null
         try
         {
-            nodeService.setProperty(rootNodeRef, qnameProperty2, null);
-            fail("Null property value not detected");
+            nodeService.setProperty(rootNodeRef, qnameProperty2, null);            
         }
         catch (IllegalArgumentException e)
         {
-            // expected
+			fail("Null property values are allowed");
         }
         // try setting null value as part of complete set
         try
@@ -604,11 +603,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             properties = nodeService.getProperties(rootNodeRef);
             properties.put(qnameProperty1, null);
             nodeService.setProperties(rootNodeRef, properties);
-            fail("Failed to detect null value in property map");
         }
         catch (IllegalArgumentException e)
         {
-            // expected
+            fail("Null property values are allowed in the map");
         }
     }
     

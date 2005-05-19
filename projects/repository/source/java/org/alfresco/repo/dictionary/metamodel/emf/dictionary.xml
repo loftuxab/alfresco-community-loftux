@@ -61,11 +61,11 @@
     <emfProperties emfName="icon" emfType="/7" emfMandatory="true"/>
     <emfProperties emfName="description" emfType="/7"/>
   </datadictionary:EMFAspect>
-  <datadictionary:EMFAspect emfName="{http://www.alfresco.com/lock/1.0}lock">
+  <datadictionary:EMFAspect emfName="{http://www.alfresco.org/1.0}lock">
     <emfProperties emfName="lockOwner" emfType="/7"/>
     <emfProperties emfName="lockType" emfType="/7"/>
   </datadictionary:EMFAspect>
-  <datadictionary:EMFAspect emfName="{http://www.alfresco.com/version/1.0}version">
+  <datadictionary:EMFAspect emfName="{http://www.alfresco.org/1.0}version">
     <emfProperties emfName="currentVersionLabel" emfType="/7"/>
   </datadictionary:EMFAspect>
   <datadictionary:EMFType emfName="{http://www.alfresco.com/lightWeightVersionStore/1.0}versionedProperty" emfSuperClass="/23">

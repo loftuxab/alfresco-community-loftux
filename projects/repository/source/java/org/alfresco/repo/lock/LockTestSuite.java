@@ -1,7 +1,7 @@
 package org.alfresco.repo.lock;
 
-import org.alfresco.repo.lock.common.AbstractPolicyImplTest;
-import org.alfresco.repo.lock.simple.SimpleLockServiceTest;
+import org.alfresco.repo.lock.impl.LockBehaviourImplTest;
+import org.alfresco.repo.lock.impl.LockServiceImplTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -11,8 +11,8 @@ public class LockTestSuite extends TestSuite
     public static Test suite() 
     {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(AbstractPolicyImplTest.class);
-        suite.addTestSuite(SimpleLockServiceTest.class);
+        suite.addTestSuite(LockBehaviourImplTest.class);
+        suite.addTestSuite(LockServiceImplTest.class);
         return suite;
     }
 }

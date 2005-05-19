@@ -7,8 +7,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.Version.VersionTypeEnum;
 import org.alfresco.repo.version.VersionLabelPolicy;
+import org.alfresco.repo.version.VersionType;
 
 /**
  * The serial version label policy.
@@ -38,8 +38,8 @@ public class SerialVersionLabelPolicy implements VersionLabelPolicy
         {
             serialVersionNumber = new SerialVersionLabel(preceedingVersion.getVersionLabel());
             
-            VersionTypeEnum versionType = (VersionTypeEnum)versionProperties.get(Version.PROP_VERSION_TYPE);
-            if (VersionTypeEnum.MAJOR.equals(versionType) == true)
+            VersionType versionType = (VersionType)versionProperties.get(Version.PROP_VERSION_TYPE);
+            if (VersionType.MAJOR.equals(versionType) == true)
             {
                 serialVersionNumber.majorIncrement();
             }

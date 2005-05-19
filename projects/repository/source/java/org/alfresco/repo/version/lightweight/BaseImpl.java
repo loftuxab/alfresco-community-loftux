@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
@@ -269,7 +270,7 @@ public abstract class BaseImpl implements Const
         // TODO use the searcher to retrieve the version node
         
         NodeRef result = null;
-        String versionLabel = (String)this.nodeService.getProperty(nodeRef, VersionService.PROP_QNAME_CURRENT_VERSION_LABEL);
+        String versionLabel = (String)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_CURRENT_VERSION_LABEL);
         
         Collection<ChildAssocRef> versions = this.dbNodeService.getChildAssocs(versionHistory);
         for (ChildAssocRef version : versions)
@@ -295,7 +296,7 @@ public abstract class BaseImpl implements Const
     protected void checkForVersionAspect(NodeRef nodeRef)
        throws AspectMissingException
     {
-        ClassRef aspectRef = new ClassRef(VersionService.ASPECT_QNAME_VERSION);
+        ClassRef aspectRef = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION);
         
         if (this.dbNodeService.hasAspect(nodeRef, aspectRef) == false)
         {

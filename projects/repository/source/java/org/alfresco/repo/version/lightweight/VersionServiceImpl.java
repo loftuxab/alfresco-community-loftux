@@ -16,8 +16,8 @@ import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
-import org.alfresco.repo.policy.PolicyDefinitionService;
-import org.alfresco.repo.policy.PolicyRuntimeService;
+import org.alfresco.repo.policy.ClassPolicyDelegate;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -29,9 +29,11 @@ import org.alfresco.repo.version.VersionHistory;
 import org.alfresco.repo.version.VersionLabelPolicy;
 import org.alfresco.repo.version.VersionService;
 import org.alfresco.repo.version.VersionServiceException;
+import org.alfresco.repo.version.VersionServicePolicies;
+import org.alfresco.repo.version.VersionServicePolicies.BeforeCreateVersionPolicy;
+import org.alfresco.repo.version.VersionServicePolicies.OnCreateVersionPolicy;
 import org.alfresco.repo.version.common.VersionUtil;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
-import org.alfresco.repo.version.policy.OnBeforeCreateVersionPolicy;
 import org.alfresco.util.AspectMissingException;
 
 /**
@@ -59,14 +61,9 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
     private VersionLabelPolicy versionLabelPolicy;
     
     /**
-     * Policy definition service
+     * Policy component
      */
-    private PolicyDefinitionService policyDefinitionService;
-    
-    /**
-     * Policy runtime service
-     */
-    private PolicyRuntimeService policyRuntimeService;
+	private PolicyComponent policyComponent;
     
     /**
      * The generic content service
@@ -77,6 +74,12 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
      * The version store content store
      */
     private ContentStore versionContentStore;
+	
+	/**
+	 * Policy delegates
+	 */
+	private ClassPolicyDelegate<BeforeCreateVersionPolicy> beforeCreateVersionDelegate;
+	private ClassPolicyDelegate<OnCreateVersionPolicy> onCreateVersionDelegate;
     
     /**
      * Sets the version counter service
@@ -97,28 +100,16 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
     {
         this.versionLabelPolicy = versionLabelPolicy;
     }
-        
-    /**
-     * Sets the policy defintion service
-     * 
-     * @param policyDefintionService  the policy definition service
-     */
-    public void setPolicyDefinitionService(
-            PolicyDefinitionService policyDefinitionService)
-    {
-        this.policyDefinitionService = policyDefinitionService;
-    }
     
-    /**
-     * Sets the policy runtime service
-     * 
-     * @param policyRuntimeService  the policy runtime service
-     */
-    public void setPolicyRuntimeService(
-            PolicyRuntimeService policyRuntimeService)
-    {
-        this.policyRuntimeService = policyRuntimeService;
-    }
+	/**
+	 * Sets the policy component
+	 * 
+	 * @param policyComponent  the policy component
+	 */
+    public void setPolicyComponent(PolicyComponent policyComponent) 
+	{
+		this.policyComponent = policyComponent;
+	}
     
     /**
      * Set the generic content service
@@ -147,7 +138,8 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
         super.initialise();
         
         // Register the policies
-        this.policyDefinitionService.registerPolicy(this, OnBeforeCreateVersionPolicy.class);
+        this.beforeCreateVersionDelegate = this.policyComponent.registerClassPolicy(VersionServicePolicies.BeforeCreateVersionPolicy.class);
+		this.onCreateVersionDelegate = this.policyComponent.registerClassPolicy(VersionServicePolicies.OnCreateVersionPolicy.class);
     }
     
     /**
@@ -280,15 +272,8 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
         // Check for the version aspect
         checkForVersionAspect(nodeRef);
         
-        // Call the onBeforeCreateVersionPolicy 
-        OnBeforeCreateVersionPolicy policy = this.policyRuntimeService.getClassBehaviour(
-                OnBeforeCreateVersionPolicy.class, 
-                this.nodeService,
-                nodeRef);
-        if (policy != null)
-        {
-            policy.OnBeforeCreateVersion(nodeRef);
-        }
+        // Call the policy behaviour
+		this.beforeCreateVersionDelegate.get(this.nodeService, nodeRef).beforeCreateVersion(nodeRef);		
         
         // TODO we need some way of 'locking' the current node to ensure no modifications (or other versions) 
         //      can take place untill the versioning process is complete
@@ -368,7 +353,7 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
         // Set the new version label on the versioned node
         this.dbNodeService.setProperty(
                 nodeRef, 
-                VersionService.PROP_QNAME_CURRENT_VERSION_LABEL, 
+                DictionaryBootstrap.PROP_QNAME_CURRENT_VERSION_LABEL, 
                 version.getVersionLabel());
         
         // Return the data object representing the newly created version

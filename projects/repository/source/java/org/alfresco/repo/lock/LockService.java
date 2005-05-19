@@ -7,10 +7,9 @@ package org.alfresco.repo.lock;
 
 import java.util.Collection;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
 import org.alfresco.util.AspectMissingException;
+import org.alfresco.util.debug.CodeMonkey;
 
 
 /**
@@ -20,37 +19,10 @@ import org.alfresco.util.AspectMissingException;
  */
 public interface LockService
 {
+	// TODO this is the lock user to use for the time being
+	public final static String LOCK_USER = "admin";
+        
     /**
-     * Lock namespace
-     */
-    public final static String NAMESPACE_LOCK = "http://www.alfresco.com/lock/1.0";
-    
-    /**
-     * Lock aspect QName and ClassRef
-     */
-    public final static String ASPECT_LOCK = "lock";
-    public final static QName ASPECT_QNAME_LOCK = QName.createQName(NAMESPACE_LOCK, ASPECT_LOCK);
-    public final static ClassRef ASPECT_CLASS_REF_LOCK = new ClassRef(ASPECT_QNAME_LOCK);
-    
-    /**
-     * Lock aspect attribute names
-     */
-    public final static String PROP_LOCK_OWNER = "lockOwner";
-    public final static QName PROP_QNAME_LOCK_OWNER = QName.createQName(NAMESPACE_LOCK, PROP_LOCK_OWNER);
-    public final static String PROP_LOCK_TYPE = "lockType";
-    public final static QName PROP_QNAME_LOCK_TYPE = QName.createQName(NAMESPACE_LOCK, PROP_LOCK_TYPE);
-    
-    /**
-     * Enum used to indicate lock status
-     */
-    public enum LockStatus {NO_LOCK, LOCKED, LOCK_OWNER};
-    
-    /**
-     * Enum used to indicate lock type
-     */
-    public enum LockType {READ_ONLY_LOCK, WRITE_LOCK};
-    
-   /**
     * Places a lock on a node.  
     * <p>
     * The lock prevents any other user or process from comitting updates 
@@ -211,4 +183,34 @@ public interface LockService
     */
    public LockType getLockType(NodeRef nodeRef)
        throws AspectMissingException;
+   
+   /**
+    * Checks to see if the node is locked or not.  Gets the user reference from the current 
+    * session.
+    * <p>
+    * Throws a NodeLockedException based on the lock status of the lock, the user ref and the
+    * lock type.
+    * 
+    * @param nodeRef   the node reference
+    * @throws NodeLockedException
+    *                  thrown if the node is determined to be locked based on the user ref and lock 
+    *                  type
+    */
+   public void checkForLock(NodeRef nodeRef)
+   	  throws NodeLockedException;
+   
+   /**
+    * Checks to see if the node is locked or not.
+    * <p>
+    * Throws a NodeLockedException based on the lock status of the lock, the user ref and the
+    * lock type.
+    * 
+    * @param nodeRef   the node reference
+    * @param userRef   the user reference
+    * @throws NodeLockedException
+    *                  thrown if the node is determined to be locked based on the user ref and lock 
+    *                  type
+    */
+   public void checkForLockWithUser(NodeRef nodeRef, String userRef)
+       throws NodeLockedException;
 }

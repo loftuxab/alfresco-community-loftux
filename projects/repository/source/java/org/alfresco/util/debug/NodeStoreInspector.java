@@ -7,13 +7,13 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
+import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.repo.ref.qname.RegexQNamePattern;
 
 /**
@@ -72,54 +72,69 @@ public class NodeStoreInspector
           //  append(nodeType.toString()).
           //  append(")\n");
         
-        Map<QName, Serializable> props = nodeService.getProperties(nodeRef);
-        for (QName name : props.keySet())
-        {
-            builder.
-                append(getIndent(iIndent+1)).
-                append("@").
-                append(name.getLocalName()).
-                append(" = ").
-                append(props.get(name).toString()).
-                append("\n");
-            
-        }
-        
-        try
-        {
-            Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
-            for (ChildAssocRef childAssocRef : childAssocRefs)
-            {
-                builder.
-                    append(getIndent(iIndent+1)).
-                    append("-> ").
-                    append(childAssocRef.getQName().getLocalName()).
-                    append("\n");
-                
-                builder.append(outputNode(iIndent+2, nodeService, childAssocRef.getChildRef()));
-            }
-        }
-        catch (Exception exception)
-        {
-            // Ignore for now since this means it is not a container type
-        }
-		
 		try
-        {
-            Collection<NodeAssocRef> assocRefs = nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
-            for (NodeAssocRef assocRef : assocRefs)
-            {
-                builder.
-                    append(getIndent(iIndent+1)).
-                    append("-> associated to ").
-                    append(assocRef.getTargetRef().getId()).
-                    append("\n");
-            }
-        }
-        catch (Exception exception)
-        {
-            // Ignore for now since this means it is not a container type
-        }
+		{
+	        Map<QName, Serializable> props = nodeService.getProperties(nodeRef);
+	        for (QName name : props.keySet())
+	        {
+				String valueAsString = "null";
+				Serializable value = props.get(name);
+				if (value != null)
+				{
+					valueAsString = value.toString();
+				}
+				
+	            builder.
+	                append(getIndent(iIndent+1)).
+	                append("@").
+	                append(name.getLocalName()).
+	                append(" = ").
+	                append(valueAsString).
+	                append("\n");
+	            
+	        }
+	        
+	        try
+	        {
+	            Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
+	            for (ChildAssocRef childAssocRef : childAssocRefs)
+	            {
+	                builder.
+	                    append(getIndent(iIndent+1)).
+	                    append("-> ").
+	                    append(childAssocRef.getQName().getLocalName()).
+	                    append("\n");
+	                
+	                builder.append(outputNode(iIndent+2, nodeService, childAssocRef.getChildRef()));
+	            }
+	        }
+	        catch (Exception exception)
+	        {
+	            // Ignore for now since this means it is not a container type
+				exception.printStackTrace();
+	        }
+			
+			try
+	        {
+	            Collection<NodeAssocRef> assocRefs = nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+	            for (NodeAssocRef assocRef : assocRefs)
+	            {
+	                builder.
+	                    append(getIndent(iIndent+1)).
+	                    append("-> associated to ").
+	                    append(assocRef.getTargetRef().getId()).
+	                    append("\n");
+	            }
+	        }
+	        catch (Exception exception)
+	        {
+	            // Ignore for now since this means it is not a container type
+				exception.printStackTrace();
+	        }
+		}
+		catch (InvalidNodeRefException invalidNode)
+		{
+		}
         
         return builder.toString();
     }

@@ -130,8 +130,11 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.node.db.DbNodeServiceImpl">
-            <constructor-arg>
+         <bean class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init">
+			<constructor-arg>
+				<ref bean="policyComponent"/>
+			</constructor-arg>
+			<constructor-arg>
                <ref bean="dictionaryService" />
             </constructor-arg>
             <constructor-arg>
@@ -166,13 +169,16 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.node.index.IndexingNodeServiceImpl">
-            <constructor-arg>
+         <bean class="org.alfresco.repo.node.index.IndexingNodeServiceImpl" init-method="init">
+			<constructor-arg>
+				<ref bean="policyComponent"/>
+			</constructor-arg>
+		    <constructor-arg>
                <ref bean="dbNodeService" />
             </constructor-arg>
             <constructor-arg>
                <ref bean="indexerComponent" />
-            </constructor-arg>
+            </constructor-arg>					
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -310,10 +316,10 @@
     
  
    <!--                               -->
-   <!--  Simple Lock Service           -->
+   <!--  Lock Service           -->
    <!--                               -->
    
-   <bean id='simpleLockService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id='lockService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.repo.lock.LockService</value>
       </property>
@@ -321,14 +327,14 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.lock.simple.SimpleLockService" init-method="initialise">
+         <bean class="org.alfresco.repo.lock.impl.LockServiceImpl" init-method="initialise">
             <property name="nodeService">
                <!-- TODO This should point to the general node service -->	
                <ref bean="dbNodeService" />
-            </property>         
-			<property name="policyRuntimeService">
-				<ref bean="policyRuntimeService"></ref>
-			</property>
+            </property>     
+			<property name="policyComponent">
+				<ref bean="policyComponent"/>
+			</property>    
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -374,11 +380,8 @@
 			 <property name="dictionaryService">
 			   <ref bean="dictionaryService" />
 			 </property>
-			 <property name="policyDefinitionService">
-				<ref bean="policyDefinitionService"/>
-			 </property>
-			 <property name="policyRuntimeService">
-				<ref bean="policyRuntimeService"/>
+			 <property name="policyComponent">
+				<ref bean="policyComponent"/>
 			 </property>
          </bean>
       </property>
@@ -464,8 +467,7 @@
          </props>
       </property>
    </bean>
-   
-   
+      
    
    <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>
@@ -538,7 +540,7 @@
    </bean>
    
    <!--                 -->
-   <!-- Node Operations Service -->
+   <!-- Node Operations Service (should change to the workspace service)-->
    <!--                 -->
    
    <bean id="nodeOperationsService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -549,12 +551,49 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl">
+         <bean class="org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl" init-method="init">
             <property name="dictionaryService">
                <ref bean="dictionaryService" />
             </property>
             <property name="nodeService">
                <ref bean="dbNodeService" />
+            </property>    
+			<property name="policyComponent">
+				<ref bean="policyComponent"/>
+			</property> 
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean> 
+   
+   <!--                 -->
+   <!-- Version Operations Service (should change to the checkIn CheckOut service) -->
+   <!--                 -->
+
+   <bean id="versionOperationsService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.repo.version.operations.VersionOperationsService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="org.alfresco.repo.version.operations.impl.VersionOperationsServiceImpl">
+            <property name="nodeService">
+               <ref bean="dbNodeService" />
+            </property>
+            <property name="versionService">
+               <ref bean="lightWeightVersionStoreVersionService" />
+            </property>
+            <property name="lockService">
+               <ref bean="lockService" />
+            </property>
+            <property name="nodeOperationsService">
+               <ref bean="nodeOperationsService" />
             </property>
          </bean>
       </property>
@@ -563,49 +602,20 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
-   </bean> 
+   </bean>
    
    <!--                 -->
    <!-- Policy Franeworks Services -->
    <!--                 -->
    
-   <bean id="policyComponent" class="org.alfresco.repo.policy.PolicyComponentImpl">
+    <bean id="policyComponent" class="org.alfresco.repo.policy.PolicyComponentImpl">
+	   <constructor-arg index="0">
+	      <ref bean="indexingNodeService"/>
+       </constructor-arg>
 	   <constructor-arg index="0">
 	      <ref bean="dictionaryService"/>
-      </constructor-arg>
+       </constructor-arg>
    </bean>
-   
-   <bean id="policyDefinitionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.repo.policy.PolicyDefinitionService</value>
-      </property>
-      <property name="transactionManager"><ref bean="transactionManager"/></property>
-      <property name="target">
-         <bean class="org.alfresco.repo.policy.impl.PolicyDefinitionServiceImpl">
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean>
-   
-   <bean id="policyRuntimeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.repo.policy.PolicyRuntimeService</value>
-      </property>
-      <property name="transactionManager"><ref bean="transactionManager"/></property>
-      <property name="target">
-         <bean class="org.alfresco.repo.policy.impl.PolicyRuntimeServiceImpl">		
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean> 
    
    <!-- Bean to support full text search -->
    
