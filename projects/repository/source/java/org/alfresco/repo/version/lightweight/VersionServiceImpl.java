@@ -16,6 +16,7 @@ import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl.CopyDetails;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -141,6 +142,22 @@ public class VersionServiceImpl extends BaseImpl implements VersionService
         this.beforeCreateVersionDelegate = this.policyComponent.registerClassPolicy(VersionServicePolicies.BeforeCreateVersionPolicy.class);
 		this.onCreateVersionDelegate = this.policyComponent.registerClassPolicy(VersionServicePolicies.OnCreateVersionPolicy.class);
     }
+	
+	/**
+	 * OnCopy behaviour implementation for the version aspect.
+	 * <p>
+	 * Ensures that the propety values of the version aspect are not copied onto
+	 * the destination node.
+	 * 
+	 * @param sourceClassRef  the source class reference
+	 * @param sourceNodeRef	  the source node reference
+	 * @param copyDetails	  the copy details
+	 */
+	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	{
+		// Add the version aspect, but do not copy any of the properties
+		copyDetails.addAspect(DictionaryBootstrap.ASPECT_CLASS_REF_VERSION);
+	}
     
     /**
      * @see org.alfresco.repo.version.VersionService#createVersion(NodeRef, Map<String, Serializable>)

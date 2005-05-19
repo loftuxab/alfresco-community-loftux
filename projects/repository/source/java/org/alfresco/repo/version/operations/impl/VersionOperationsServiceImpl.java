@@ -6,11 +6,16 @@ package org.alfresco.repo.version.operations.impl;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.lock.LockType;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
+import org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl.CopyDetails;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -18,7 +23,6 @@ import org.alfresco.repo.version.VersionService;
 import org.alfresco.repo.version.operations.VersionOperationsService;
 import org.alfresco.repo.version.operations.VersionOperationsServiceException;
 import org.alfresco.util.AspectMissingException;
-import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Version opertaions service implementation
@@ -53,6 +57,11 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	 * The node operations service
 	 */
 	private NodeOperationsService nodeOperationsService;
+	
+	/**
+	 * Policy component
+	 */
+	private PolicyComponent policyComponent;
 	
 	/**
 	 * Set the node service
@@ -96,6 +105,42 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	}
 	
 	/**
+	 * Sets the policy component
+	 * 
+	 * @param policyComponent  the policy component
+	 */
+	public void setPolicyComponent(PolicyComponent policyComponent) 
+	{
+		this.policyComponent = policyComponent;
+	}
+	
+	/**
+	 * Initialise method
+	 */
+	public void init()
+	{
+		// Register copy behaviour for the working copy aspect
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
+				DictionaryBootstrap.ASPECT_WORKING_COPY,
+				new JavaBehaviour(this, "onCopy"));
+	}
+	
+	/**
+	 * onCopy policy behaviour
+	 * 
+	 * @see org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyPolicy#onCopy(ClassRef, NodeRef, CopyDetails)
+	 * 
+	 * @param sourceClassRef  the source class reference
+	 * @param sourceNodeRef	  the source node reference
+	 * @param copyDetails	  the copy details
+	 */
+	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	{
+		// Do nothing to ensure that the working copy aspect does not appear on the copy
+	}
+	
+	/**
 	 * @see org.alfresco.repo.version.operations.VersionOperationsService#checkout(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName)
 	 */
 	public NodeRef checkout(
@@ -104,8 +149,19 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 			QName destinationAssocTypeQName, 
 			QName destinationAssocQName) 
 	{
-		// TODO 
-		CodeMonkey.todo("Should check that the node is versionable and lockable and that it is not a working copy already.");
+		// TODO should this be done here ??
+		
+		// Apply the lock aspect if required
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK) == false)
+		{
+			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK, null);
+		}
+		
+		// Apply the version aspect if required
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_VERSION) == false)
+		{
+			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_VERSION, null);
+		}
 		
 		// Make the working copy
 		NodeRef workingCopy = this.nodeOperationsService.copy(
@@ -115,12 +171,10 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 				destinationAssocQName);
 		
 		// Apply the working copy aspect to the working copy
-		// TODO
-		CodeMonkey.todo("Need to apply the working copy aspect here.");
+		this.nodeService.addAspect(workingCopy, DictionaryBootstrap.ASPECT_WORKING_COPY, null);
 		
 		// Get the current user reference to use as the lock owner
-		// TODO
-		CodeMonkey.todo("Need to be able to get the current user reference.");
+		// TODO Need to be able to get the current user reference.
 		
 		// Lock the origional node
 		this.lockService.lock(nodeRef, LockService.LOCK_USER, LockType.READ_ONLY_LOCK);
@@ -137,8 +191,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		// Find the primary parent in order to determine where to put the copy
 		ChildAssocRef childAssocRef = this.nodeService.getPrimaryParent(nodeRef);
 		
-		//TODO
-		CodeMonkey.todo("The destination assoc type qname should come from the child assoc ref.");
+		//TODO The destination assoc type qname should come from the child assoc ref.
 		return checkout(nodeRef, childAssocRef.getParentRef(), null, childAssocRef.getQName());		
 	}
 
@@ -153,10 +206,14 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	{
 		NodeRef nodeRef = null;
 		
-		// TODO
-		CodeMonkey.todo("Should check that the node is a working copy.");
+		// Check that we have been handed a working copy
+		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_WORKING_COPY) == false)
+		{
+			// Error since we have not been passed a working copy
+			throw new AspectMissingException(DictionaryBootstrap.ASPECT_WORKING_COPY, workingCopyNodeRef);
+		}
 		
-		// TODO sort out the content ...
+		// TODO sort out the content ... 
 		
 		// Check that the working node still has the copy aspect applied
 		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_COPY) == true)
@@ -177,8 +234,6 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 			
 			if (versionProperties != null)
 			{
-				// TODO what do we do if neither of the node's are versionable ??
-				
 				// Create the new version
 				this.versionService.createVersion(nodeRef, versionProperties);
 			}
@@ -232,8 +287,12 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	{
 		NodeRef nodeRef = null;
 		
-		// TODO
-		CodeMonkey.todo("Ensure that the node is a working copy");
+		// Check that we have been handed a working copy
+		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_WORKING_COPY) == false)
+		{
+			// Error since we have not been passed a working copy
+			throw new AspectMissingException(DictionaryBootstrap.ASPECT_WORKING_COPY, workingCopyNodeRef);
+		}
 		
 		// Ensure that the node has the copy aspect
 		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_COPY) == true)
@@ -246,8 +305,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 				throw new VersionOperationsServiceException(ERR_BAD_COPY);
 			}
 			
-			// TODO
-			CodeMonkey.todo("Need to get the current user reference.");
+			// TODO Need to get the current user reference
 			
 			// Release the lock on the origional node
 			this.lockService.unlock(nodeRef, LockService.LOCK_USER);

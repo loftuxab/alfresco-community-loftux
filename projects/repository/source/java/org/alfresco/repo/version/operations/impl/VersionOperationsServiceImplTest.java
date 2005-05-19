@@ -102,6 +102,10 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		NodeRef workingCopy = this.versionOperationsService.checkout(this.nodeRef, this.rootNodeRef, null, QName.createQName("{test}workingCopy"));
 		assertNotNull(workingCopy);
 		
+		// Ensure that the working copy aspect has been applied
+		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_WORKING_COPY));
+			
+		
 		// Dump the store so we can have a look at what is going on
 		System.out.println(
 				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));

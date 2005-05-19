@@ -582,7 +582,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.version.operations.impl.VersionOperationsServiceImpl">
+         <bean class="org.alfresco.repo.version.operations.impl.VersionOperationsServiceImpl" init-method="init">
             <property name="nodeService">
                <ref bean="dbNodeService" />
             </property>
@@ -594,6 +594,9 @@
             </property>
             <property name="nodeOperationsService">
                <ref bean="nodeOperationsService" />
+            </property>			
+            <property name="policyComponent">
+               <ref bean="policyComponent" />
             </property>
          </bean>
       </property>
