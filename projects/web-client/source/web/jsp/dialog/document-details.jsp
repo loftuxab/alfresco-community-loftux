@@ -97,7 +97,7 @@
                                     <tr>
                                        <td style="padding-top:6px;">
                                        <r:propertySheetGrid id="general-props" value="#{BrowseBean.document}" var="generalProps" 
-                                                            columns="1" mode="view" labelStyleClass="docDetailsLabel" externalConfig="true">
+                                                            columns="1" mode="view" labelStyleClass="docDetailsLabel">
                                           <r:property name="name" displayLabel="File Name" />
                                        </r:propertySheetGrid>
                                        </td>
