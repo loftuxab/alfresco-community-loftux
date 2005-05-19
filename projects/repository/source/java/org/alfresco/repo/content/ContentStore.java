@@ -27,7 +27,7 @@ public interface ContentStore
     /**
      * Get the accessor with which to read from the content
      * at the given URL.  The reader is <b>stateful</b> and
-     * should <b>only be used once</b>.
+     * can <b>only be used once</b>.
      * 
      * @param contentUrl the store-specific URL where the content is located
      * @return Returns a read-only content accessor or null if no content
@@ -37,7 +37,7 @@ public interface ContentStore
     
     /**
      * Get an accessor with which to write content to an anonymous location
-     * within the store.  The writer is <b>stateful</b> and should
+     * within the store.  The writer is <b>stateful</b> and can
      * <b>only be used once</b>.
      * <p>
      * Every call to this method will return a writer onto a <b>new</b>
@@ -55,7 +55,7 @@ public interface ContentStore
     /**
      * Get the accessor with which to write content associated with
      * the given <code>NodeRef</code>.    The writer is <b>stateful</b>
-     * and should <b>only be used once</b>.
+     * and can <b>only be used once</b>.
      * <p>
      * Every call to this method will return a writer onto a <b>new</b>
      * content URL.  It is never possible to write the same physical

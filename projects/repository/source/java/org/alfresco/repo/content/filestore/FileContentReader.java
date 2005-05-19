@@ -5,12 +5,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.alfresco.repo.content.AbstractContentReader;
+import org.alfresco.repo.content.ContentIOException;
+import org.alfresco.repo.content.ContentReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.Assert;
-
-import org.alfresco.repo.content.AbstractContentReaderImpl;
-import org.alfresco.repo.content.ContentIOException;
 
 /**
  * Provides direct access to a local file.
@@ -19,37 +18,36 @@ import org.alfresco.repo.content.ContentIOException;
  * 
  * @author Derek Hulley
  */
-public class FileContentReader extends AbstractContentReaderImpl
+public class FileContentReader extends AbstractContentReader
 {
     private static final Log logger = LogFactory.getLog(FileContentReader.class);
     
     private File file;
-    private String contentUrl;
     
     /**
      * @param file the file for reading and writing
      */
     public FileContentReader(File file)
     {
-        Assert.notNull(file);
+        super(FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
+        
         this.file = file;
-        this.contentUrl = FileContentStoreImpl.STORE_PROTOCOL + file.getAbsolutePath();
     }
     
-    public String toString()
+    /**
+     * @return Returns the file that this reader accesses
+     */
+    public File getFile()
     {
-        StringBuilder sb = new StringBuilder(100);
-        sb.append("FileContentReader")
-          .append("[ url=").append(contentUrl)
-          .append("]");
-        return sb.toString();
-    }
-    
-    public String getContentUrl() throws ContentIOException
-    {
-        return contentUrl;
+        return file;
     }
 
+    @Override
+    protected ContentReader createReader() throws ContentIOException
+    {
+        return new FileContentReader(this.file);
+    }
+    
     @Override
     protected InputStream getDirectInputStream() throws ContentIOException
     {

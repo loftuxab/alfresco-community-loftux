@@ -1,5 +1,6 @@
 package org.alfresco.repo.content;
 
+import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.ref.NodeRef;
 
 /**
@@ -64,4 +65,6 @@ public interface ContentService
      * @return Returns a writer onto a temporary location
      */
     public ContentWriter getTempWriter();
+    
+//    public ContentTransformer getTransformer(String sourceMimetype, String targetMimetype);
 }

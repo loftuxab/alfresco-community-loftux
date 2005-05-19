@@ -5,12 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.alfresco.repo.content.AbstractContentWriter;
+import org.alfresco.repo.content.ContentIOException;
+import org.alfresco.repo.content.ContentReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.Assert;
-
-import org.alfresco.repo.content.AbstractContentWriterImpl;
-import org.alfresco.repo.content.ContentIOException;
 
 /**
  * Provides direct access to a local file.
@@ -19,12 +18,11 @@ import org.alfresco.repo.content.ContentIOException;
  * 
  * @author Derek Hulley
  */
-public class FileContentWriter extends AbstractContentWriterImpl
+public class FileContentWriter extends AbstractContentWriter
 {
     private static final Log logger = LogFactory.getLog(FileContentWriter.class);
     
     private File file;
-    private String contentUrl;
     
     /**
      * @param file the file for reading and writing.  This will most likely be directly
@@ -32,27 +30,30 @@ public class FileContentWriter extends AbstractContentWriterImpl
      */
     public FileContentWriter(File file)
     {
-        super();
-        Assert.notNull(file);
+        super(FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
+        
         this.file = file;
-        this.contentUrl = FileContentStoreImpl.STORE_PROTOCOL + file.getAbsolutePath();
     }
     
-    public String toString()
+    /**
+     * @return Returns the file that this writer accesses
+     */
+    public File getFile()
     {
-        StringBuilder sb = new StringBuilder(100);
-        sb.append("FileContentWriter")
-          .append("[ url=").append(contentUrl)
-          .append("]");
-        return sb.toString();
-    }
-    
-    public String getContentUrl() throws ContentIOException
-    {
-        return contentUrl;
+        return file;
     }
 
+    /**
+     * The URL of the write is known from the start and this method contract states
+     * that no consideration needs to be taken w.r.t. the stream state.
+     */
     @Override
+    protected ContentReader createReader() throws ContentIOException
+    {
+        return new FileContentReader(this.file);
+    }
+    
+   @Override
     protected OutputStream getDirectOutputStream() throws ContentIOException
     {
         try

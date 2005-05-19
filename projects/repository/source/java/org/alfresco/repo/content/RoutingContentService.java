@@ -1,6 +1,6 @@
 package org.alfresco.repo.content;
 
-import org.alfresco.repo.content.filestore.FileContentStoreImpl;
+import org.alfresco.repo.content.filestore.FileContentStore;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
@@ -13,7 +13,7 @@ import org.alfresco.util.debug.CodeMonkey;
  * 
  * @author Derek Hulley
  */
-public class RoutingContentServiceImpl implements ContentService
+public class RoutingContentService implements ContentService
 {
     private NodeService nodeService;
     /** TEMPORARY until we have a map to choose from at runtime */
@@ -25,11 +25,11 @@ public class RoutingContentServiceImpl implements ContentService
      *      content writes
      * @param storeRoot temporary measure to set a working store root
      */
-    public RoutingContentServiceImpl(NodeService nodeService, String storeRoot)
+    public RoutingContentService(NodeService nodeService, String storeRoot)
     {
         CodeMonkey.todo("The store root should be set on the store directly and via a config file");  // TODO
         this.nodeService = nodeService;
-        this.store = new FileContentStoreImpl(storeRoot);
+        this.store = new FileContentStore(storeRoot);
     }
 
     public ContentReader getReader(NodeRef nodeRef)
@@ -54,6 +54,18 @@ public class RoutingContentServiceImpl implements ContentService
         
         CodeMonkey.todo("Choose the store to read from at runtime");  // TODO
         ContentReader reader = store.getReader(contentUrl);
+        
+        // get the content mimetype
+        String mimetype = (String) nodeService.getProperty(
+                nodeRef,
+                DictionaryBootstrap.PROP_QNAME_MIME_TYPE);
+        reader.setMimetype(mimetype);
+        // get the content encoding
+        String encoding = (String) nodeService.getProperty(
+                nodeRef,
+                DictionaryBootstrap.PROP_QNAME_ENCODING);
+        reader.setEncoding(encoding);
+        
         // we don't listen for anything
         // result may be null - but interface contract says we may return null
         return reader;
@@ -63,6 +75,18 @@ public class RoutingContentServiceImpl implements ContentService
     {
         CodeMonkey.todo("Choose the store to write to at runtime");  // TODO
         ContentWriter writer = store.getWriter(nodeRef);
+
+        // get the content mimetype
+        String mimetype = (String) nodeService.getProperty(
+                nodeRef,
+                DictionaryBootstrap.PROP_QNAME_MIME_TYPE);
+        writer.setMimetype(mimetype);
+        // get the content encoding
+        String encoding = (String) nodeService.getProperty(
+                nodeRef,
+                DictionaryBootstrap.PROP_QNAME_ENCODING);
+        writer.setEncoding(encoding);
+        
         // give back to the client
         return writer;
     }

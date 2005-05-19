@@ -12,11 +12,11 @@ import org.alfresco.repo.ref.StoreRef;
 /**
  * Tests read and write functionality for the store.
  * 
- * @see org.alfresco.repo.content.filestore.FileContentStoreImpl
+ * @see org.alfresco.repo.content.filestore.FileContentStore
  * 
  * @author Derek Hulley
  */
-public class FileContentStoreImplTest extends AbstractContentReadWriteTest
+public class FileContentStoreTest extends AbstractContentReadWriteTest
 {
     private ContentReader reader;
     private ContentWriter writer;
@@ -31,7 +31,7 @@ public class FileContentStoreImplTest extends AbstractContentReadWriteTest
         File tempFile = File.createTempFile(getName(), ".tmp");
         File tempDir = tempFile.getParentFile();
         assertTrue(tempDir.isDirectory());
-        ContentStore store = new FileContentStoreImpl(tempDir.getAbsolutePath());
+        ContentStore store = new FileContentStore(tempDir.getAbsolutePath());
         
         StoreRef storeRef = new StoreRef(getName(), "test");
         NodeRef nodeRef = new NodeRef(storeRef, "GUID-12345");

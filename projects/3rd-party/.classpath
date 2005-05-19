@@ -1,164 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/aopalliance.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/cglib-full-2.0.2.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.4.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/ehcache-0.9.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/hrtlib.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/jsp.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/jstl.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/jta.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/jug.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/junit.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.8.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/lucene-1.4.3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/quartz.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/saxpath.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/servlet.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/spring.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/spring-aop.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/spring-mock.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/standard.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/common.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/common.resources.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.resources.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.xmi.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.6.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.2.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-digester-1.5.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-el.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-validator.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" sourcepath="W:/software/myfaces-1.0.9-src/combined-src" kind="lib" path="lib/myfaces.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/portlet-api-lib.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.1-dev.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lib/aopalliance.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cglib-full-2.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ehcache-0.9.jar"/>
+	<classpathentry exported="true" sourcepath="src/hibernate3_src.zip" kind="lib" path="lib/hibernate3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hrtlib.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jstl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jta.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jug.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-1.4.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/quartz.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/saxpath.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
+	<classpathentry exported="true" sourcepath="src/spring_src.zip" kind="lib" path="lib/spring.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-aop.jar"/>
+	<classpathentry exported="true" sourcepath="src/spring-mock_src.zip" kind="lib" path="lib/spring-mock.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/standard.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/eclipse/common.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/eclipse/common.resources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.resources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.xmi.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-digester-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-el.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-validator.jar"/>
+	<classpathentry exported="true" sourcepath="W:/software/myfaces-1.0.9-src/combined-src" kind="lib" path="lib/myfaces.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/portlet-api-lib.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.1-dev.jar"/>
+	<classpathentry exported="true" sourcepath="src/jooconverter_src.zip" kind="lib" path="lib/jooconverter.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/openoffice/jurt.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/openoffice/jut.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/openoffice/ridl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/openoffice/sandbox.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/openoffice/juh.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/openoffice/unoil.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

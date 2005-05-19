@@ -26,11 +26,11 @@ import org.alfresco.util.GUID;
  * 
  * @author Derek Hulley
  */
-public class FileContentStoreImpl implements ContentStore
+public class FileContentStore implements ContentStore
 {
     public static final String STORE_PROTOCOL = "file://";
     
-    private static final Log logger = LogFactory.getLog(FileContentStoreImpl.class);
+    private static final Log logger = LogFactory.getLog(FileContentStore.class);
     
     private File rootDirectory;
 
@@ -38,7 +38,7 @@ public class FileContentStoreImpl implements ContentStore
      * @param rootDirectory the root under which files will be stored.  The
      *      directory will be created if it does not exist.
      */
-    public FileContentStoreImpl(String rootDirectoryStr)
+    public FileContentStore(String rootDirectoryStr)
     {
         rootDirectory = new File(rootDirectoryStr);
         if (!rootDirectory.exists())
@@ -89,15 +89,15 @@ public class FileContentStoreImpl implements ContentStore
     
     /**
      * This implementation requires that the URL start with
-     * {@link FileContentStoreImpl#STORE_PROTOCOL }.
+     * {@link FileContentStore#STORE_PROTOCOL }.
      */
     public ContentReader getReader(String contentUrl)
     {
-        if (!contentUrl.startsWith(FileContentStoreImpl.STORE_PROTOCOL))
+        if (!contentUrl.startsWith(FileContentStore.STORE_PROTOCOL))
         {
             throw new RuntimeException(
                     "This store is reserved for URLs starting with " +
-                    FileContentStoreImpl.STORE_PROTOCOL + ": \n" +
+                    FileContentStore.STORE_PROTOCOL + ": \n" +
                     "   store: " + this);
         }
         try

@@ -79,6 +79,22 @@
    <!-- use around method calls to debug - see class comments for details -->
    <bean id="methodCallLogAdvice" class="org.alfresco.util.debug.MethodCallLogAdvice" />
    
+   <!--                        -->
+   <!-- CONFIGURATION SERVICES -->
+   <!--                        -->
+
+   <bean id="repoConfigService" class="org.alfresco.config.xml.XMLConfigService" init-method="init">
+      <constructor-arg>
+         <bean class="org.alfresco.config.source.ClassPathConfigSource">
+            <constructor-arg>
+               <list>
+                  <value>org/alfresco/repo/content/mimetype-map.xml</value>
+               </list>
+            </constructor-arg>
+         </bean>
+      </constructor-arg>
+   </bean>
+   
    <!--                    -->
    <!--  INTERNAL SERVICES -->
    <!--                    -->
@@ -187,6 +203,24 @@
          </props>
       </property>
    </bean>
+
+   <bean id="mimetypeMap" class="org.alfresco.repo.content.MimetypeMap" init-method="init" >
+      <constructor-arg>
+         <ref bean="repoConfigService" />
+      </constructor-arg>
+   </bean>
+   
+   <bean id="contentTransformerRegistry" class="org.alfresco.repo.content.transform.ContentTransformerRegistry" >
+      <constructor-arg>
+         <list>
+            <bean class="org.alfresco.repo.content.transform.UnoContentTransformer" />
+            <bean class="org.alfresco.repo.content.transform.StringExtractingContentTransformer" />
+         </list>
+      </constructor-arg>
+      <constructor-arg>
+         <ref bean="mimetypeMap" />
+      </constructor-arg>
+   </bean>
       
    <bean id="contentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
@@ -196,7 +230,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.content.RoutingContentServiceImpl" >
+         <bean class="org.alfresco.repo.content.RoutingContentService" >
             <constructor-arg>
                <ref bean="indexingNodeService" />
             </constructor-arg>
@@ -455,7 +489,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.content.filestore.FileContentStoreImpl">
+         <bean class="org.alfresco.repo.content.filestore.FileContentStore">
 			 <constructor-arg>
 				<value>c:\VersionedContent</value>
              </constructor-arg>

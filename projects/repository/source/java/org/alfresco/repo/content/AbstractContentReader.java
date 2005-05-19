@@ -9,6 +9,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.util.FileCopyUtils;
 
 /**
@@ -20,19 +23,32 @@ import org.springframework.util.FileCopyUtils;
  * 
  * @author Derek Hulley
  */
-public abstract class AbstractContentReaderImpl implements ContentReader
+public abstract class AbstractContentReader extends AbstractContent implements ContentReader
 {
+    private static final Log logger = LogFactory.getLog(AbstractContentReader.class);
+    
     private List<ContentStreamListener> listeners;
     private InputStream inputStream;
+    private boolean streamClosed;
     
     /**
-     * @param nodeService the service that will be used to update the node properties
-     * @param nodeRef a node - should have the <b>content</b> aspect
-     * @param contentUrl the new content URL.  The node will be updated during close.
+     * @param contentUrl the content URL
      */
-    protected AbstractContentReaderImpl()
+    protected AbstractContentReader(String contentUrl)
     {
+        super(contentUrl);
+        
         listeners = new ArrayList<ContentStreamListener>(2);
+        streamClosed = false;     // just to be explicit
+        // add a stream close listener by default
+        ContentStreamListener streamCloseListener = new ContentStreamListener()
+            {
+                public void contentStreamClosed() throws ContentIOException
+                {
+                    streamClosed = true;
+                }
+            };
+        listeners.add(streamCloseListener);
     }
     
     /**
@@ -46,6 +62,49 @@ public abstract class AbstractContentReaderImpl implements ContentReader
             throw new RuntimeException("InputStream is already in use");
         }
         listeners.add(listener);
+    }
+
+    /**
+     * A factory method for subclasses to implement that will ensure the proper
+     * implementation of the {@link ContentReader#getReader()} method.
+     * <p>
+     * Only the instance need be constructed.  The required mimetype, encoding, etc
+     * will be copied across by this class.
+     *  
+     * @return Returns a reader onto the location referenced by this instance.
+     *      The instance must <b>always</b> be a new instance.
+     * @throws ContentIOException
+     */
+    protected abstract ContentReader createReader() throws ContentIOException;
+    
+    /**
+     * Performs checks and copies required reader attributes
+     */
+    public final ContentReader getReader() throws ContentIOException
+    {
+        ContentReader reader = createReader();
+        if (reader == null)
+        {
+            throw new AlfrescoRuntimeException("ContentReader failed to create new reader: \n" +
+                    "   reader: " + this);
+        }
+        else if (reader.getContentUrl() == null || !reader.getContentUrl().equals(getContentUrl()))
+        {
+            throw new AlfrescoRuntimeException("ContentReader has different URL: \n" +
+                    "   reader: " + this + "\n" +
+                    "   new reader: " + reader);
+        }
+        // copy across common attributes
+        reader.setMimetype(this.getMimetype());
+        reader.setEncoding(this.getEncoding());
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Reader spawned new reader: \n" +
+                    "   reader: " + this + "\n" +
+                    "   new reader: " + reader);
+        }
+        return reader;
     }
 
     /**
@@ -81,6 +140,14 @@ public abstract class AbstractContentReaderImpl implements ContentReader
         return callbackIs;
     }
     
+    /**
+     * An automatically created listener sets the flag
+     */
+    public final boolean isClosed()
+    {
+        return streamClosed;
+    }
+
     /**
      * Copies the {@link #getContentInputStream() input stream} to the given
      * <code>OutputStream</code>
@@ -119,15 +186,24 @@ public abstract class AbstractContentReaderImpl implements ContentReader
         }
     }
 
+    /**
+     * Makes use of the encoding, if available, to convert bytes to a string.
+     * 
+     * @see Content#getEncoding()
+     */
     public final String getContentString() throws ContentIOException
     {
         try
         {
+            // read from the stream into a byte[]
             InputStream is = getContentInputStream();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             FileCopyUtils.copy(is, os);  // both streams are closed
-            // create the string from the byte[]
-            String content = new String(os.toByteArray());
+            byte[] bytes = os.toByteArray();
+            // get the encoding for the string
+            String encoding = getEncoding();
+            // create the string from the byte[] using encoding if necessary
+            String content = (encoding == null) ? new String(bytes) : new String(bytes, encoding);
             // done
             return content;
         }
@@ -142,9 +218,9 @@ public abstract class AbstractContentReaderImpl implements ContentReader
     /**
      * Inner <code>InputStream</code> that executes the callback when the
      * input stream is closed.  It delegates to the input stream given
-     * by {@link AbstractContentReaderImpl#getDirectInputStream()}.
+     * by {@link AbstractContentReader#getDirectInputStream()}.
      * <p>
-     * The callback is made to {@link AbstractContentReaderImpl#listeners}.
+     * The callback is made to {@link AbstractContentReader#listeners}.
      * 
      * @author Derek Hulley
      */
@@ -165,7 +241,7 @@ public abstract class AbstractContentReaderImpl implements ContentReader
         {
             delegate.close();
             // call the listeners
-            for (ContentStreamListener listener : AbstractContentReaderImpl.this.listeners)
+            for (ContentStreamListener listener : AbstractContentReader.this.listeners)
             {
                 listener.contentStreamClosed();
             }

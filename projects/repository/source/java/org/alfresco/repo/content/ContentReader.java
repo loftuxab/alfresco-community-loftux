@@ -20,7 +20,7 @@ import java.io.OutputStream;
  * 
  * @author Derek Hulley
  */
-public interface ContentReader
+public interface ContentReader extends Content
 {
     /**
      * Use this method to register any interest in the 
@@ -35,13 +35,13 @@ public interface ContentReader
     public void addListener(ContentStreamListener listener);
     
     /**
-     * @return Returns a URL identifying the specific location of the content.
-     *      The URL must identify, within the context of the originating content
-     *      store, the exact location of the content.
+     * Convenience method to get another reader onto the underlying content.
+     * 
+     * @return Returns a reader onto the underlying content
      * @throws ContentIOException
      */
-    public String getContentUrl() throws ContentIOException;
-    
+    public ContentReader getReader() throws ContentIOException;
+
     /**
      * Provides low-level access to the underlying content.
      * <p>
@@ -54,9 +54,23 @@ public interface ContentReader
     public InputStream getContentInputStream() throws ContentIOException;
     
     /**
+     * Convenience method to find out if the input stream has been closed.
+     * Once closed, the input stream cannot be reused.  This method could
+     * be used to wait for a particular read operation to complete, for example.
+     * 
+     * @return Return true if the content input stream has been used and closed
+     *      otherwise false.
+     */
+    public boolean isClosed();
+    
+    /**
      * Gets content from the repository.
      * <p>
      * All resources will be closed automatically.
+     * <p>
+     * Care must be taken that the bytes read from the stream are properly
+     * decoded according to the {@link Content#getEncoding() encoding}
+     * property.
      * 
      * @param os the stream to which to write the content
      * @throws ContentIOException
@@ -78,7 +92,11 @@ public interface ContentReader
     public void getContent(File file) throws ContentIOException;
 
     /**
-     * Gets content from the repository direct to <code>String</code>
+     * Gets content from the repository direct to <code>String</code>.
+     * <p>
+     * If the {@link Content#getEncoding() encoding } is known then it will be used
+     * otherwise the default system <tt>byte[]</tt> to <tt>String</tt> conversion
+     * will be used.
      * <p>
      * All resources will be closed automatically.
      * <p>

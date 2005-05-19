@@ -22,11 +22,11 @@ import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
 
 /**
- * @see org.alfresco.repo.content.RoutingContentServiceImpl
+ * @see org.alfresco.repo.content.RoutingContentService
  * 
  * @author Derek Hulley
  */
-public class RoutingContentServiceImplTest extends BaseSpringTest
+public class RoutingContentServiceTest extends BaseSpringTest
 {
     private static final String SOME_CONTENT = "ABC";
     
@@ -35,7 +35,7 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
     private NodeRef rootNodeRef;
     private NodeRef contentNodeRef;
     
-    public RoutingContentServiceImplTest()
+    public RoutingContentServiceTest()
     {
     }
     
@@ -61,7 +61,7 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
         contentNodeRef = assocRef.getChildRef();
         Map<QName, Serializable> properties = nodeService.getProperties(contentNodeRef);
         properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+        properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
         nodeService.addAspect(contentNodeRef, DictionaryBootstrap.ASPECT_CONTENT, properties);
     }
     
@@ -79,6 +79,34 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
         assertNotNull(getUserTransaction());
         assertFalse(getUserTransaction() == getUserTransaction());  // ensure txn instances aren't shared 
     }
+    
+    /**
+     * Checks that the URL, mimetype and encoding are automatically set on the readers
+     * and writers
+     */
+    public void testAutoSettingOfProperties() throws Exception
+    {
+        // get a writer onto the node
+        ContentWriter writer = contentService.getUpdatingWriter(contentNodeRef);
+        assertNotNull("Writer should not be null", writer);
+        assertNotNull("Content URL should not be null", writer.getContentUrl());
+        assertNotNull("Content mimetype should not be null", writer.getMimetype());
+        assertNotNull("Content encoding should not be null", writer.getEncoding());
+        
+        // write some content
+        writer.putContent(SOME_CONTENT);
+        
+        // get the reader
+        ContentReader reader = contentService.getReader(contentNodeRef);
+        assertNotNull("Reader should not be null", reader);
+        assertNotNull("Content URL should not be null", reader.getContentUrl());
+        assertNotNull("Content mimetype should not be null", reader.getMimetype());
+        assertNotNull("Content encoding should not be null", reader.getEncoding());
+
+        // check the content - the encoding will come into effect here
+        String contentCheck = reader.getContentString();
+        assertEquals("Content incorrect", SOME_CONTENT, contentCheck);
+    }
 	
 	/**
 	 * Tests simple writes that don't automatically update the node content URL
@@ -86,7 +114,7 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
 	public void testSimpleWrite() throws Exception
 	{
 		// get a writer to an arbitrary node
-		ContentWriter writer = contentService.getWriter(contentNodeRef);
+		ContentWriter writer = contentService.getWriter(contentNodeRef);   // no updating of URL
 		assertNotNull("Writer should not be null", writer);
 		
 		// put some content
@@ -321,7 +349,14 @@ public class RoutingContentServiceImplTest extends BaseSpringTest
             {
                 txn.begin();    // not testing transactions - this is not a safe pattern
                 // put the content
-                os.write(content.getBytes());
+                if (writer.getEncoding() == null)
+                {
+                    os.write(content.getBytes());
+                }
+                else
+                {
+                    os.write(content.getBytes(writer.getEncoding()));
+                }
                 synchronized (writer)
                 {
                     isWaiting = true;
