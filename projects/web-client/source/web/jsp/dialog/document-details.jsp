@@ -4,8 +4,8 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="16kb" %>
 <%@ page isELIgnored="false" %>
-
 <%@ page import="org.alfresco.web.PanelGenerator" %>
 
 <r:page>
@@ -92,16 +92,20 @@
                               <br/>
                               <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" 
                                        progressive="true"><br/>
-                                 <table border="0" cellpadding="2" cellspacing="0">
+                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tr><td style="border-bottom: 1px solid black;">General</td></tr>
                                     <tr>
                                        <td>
-                                       <r:propertySheetGrid value="#{BrowseBean.document}" var="generalProps">
-                                          <r:property value="name" columns="2" />
-                                          <r:property value="createddate" columns="2" />
-                                          <r:property value="modifieddate" columns="2" />
+                                       <r:propertySheetGrid id="general-props" value="#{BrowseBean.document}" var="generalProps" 
+                                                            columns="1" mode="view" labelWidth="70">
+                                          <r:property name="name" displayLabel="File Name" />
+                                          <r:property name="createddate" displayLabel="Created" />
+                                          <r:property name="modifieddate" displayLabel="Modified" />
                                        </r:propertySheetGrid>
                                        </td>
+                                    </tr>
+                                    <tr>
+                                       <td><h:messages styleClass="errorMessage" /></td>
                                     </tr>
                                  </table>
                               </a:panel>
@@ -110,6 +114,17 @@
                                        progressive="true" expanded="false"><br/>
                                  Workflow options
                               </a:panel>
+                              <br/>
+                              <a:panel label="Categories" id="categories-panel" border="greyround" bgcolor="#eaeaea" 
+                                       progressive="true" expanded="false"><br/>
+                                 Categories
+                              </a:panel>
+                              <br/>
+                              <a:panel label="Version History" id="version-history-panel" border="greyround" bgcolor="#eaeaea" 
+                                       progressive="true" expanded="false"><br/>
+                                 Version History
+                              </a:panel>
+                              <br/>
                            </td>
                            
                            <td valign="top">

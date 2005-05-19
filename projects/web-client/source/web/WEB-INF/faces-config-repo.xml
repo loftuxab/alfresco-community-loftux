@@ -32,6 +32,12 @@
          <renderer-type>org.alfresco.faces.NodeDescendantsLinkRenderer</renderer-type>
          <renderer-class>org.alfresco.web.ui.repo.renderer.NodeDescendantsLinkRenderer</renderer-class>
       </renderer>
+      
+      <renderer>
+         <component-family>org.alfresco.faces.Property</component-family>
+         <renderer-type>org.alfresco.faces.PropertyRenderer</renderer-type>
+         <renderer-class>org.alfresco.web.ui.repo.renderer.property.PropertyRenderer</renderer-class>
+      </renderer>
    </render-kit>
       
 </faces-config>

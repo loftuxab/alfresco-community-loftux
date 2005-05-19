@@ -1,7 +1,9 @@
 package org.alfresco.web.bean.repository;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +31,7 @@ public class Node implements Serializable
    private String id;
    private Set aspects = null;
    private Map<String, Object> properties = new HashMap<String, Object>(7, 1.0f);
+   private List<String> propertyNames = null;
    
    private boolean propsRetrieved = false;
    private NodeService nodeService;
@@ -79,6 +82,35 @@ public class Node implements Serializable
       }
       
       return properties;
+   }
+   
+   /**
+    * @return A list of the property names currently held by this node
+    */
+   public List<String> getPropertyNames()
+   {
+      if (this.propertyNames == null)
+      {
+         // make sure the properties are available
+         this.getProperties();
+         // retrieve the list of property names
+         this.propertyNames = new ArrayList(this.properties.size());
+         for (String propName : this.properties.keySet())
+         {
+            this.propertyNames.add(propName);
+         }
+      }
+      
+      return this.propertyNames;
+   }
+   
+   /**
+    * @param propertyName Property to test existence of
+    * @return true if property exists, false otherwise
+    */
+   public boolean hasProperty(String propertyName)
+   {
+      return getProperties().containsKey(propertyName);
    }
 
    /**

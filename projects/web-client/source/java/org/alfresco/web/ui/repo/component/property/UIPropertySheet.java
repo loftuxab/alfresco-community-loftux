@@ -1,7 +1,6 @@
 package org.alfresco.web.ui.repo.component.property;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -10,34 +9,32 @@ import javax.faces.component.UIPanel;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
-import jsftest.repository.DataDictionary;
-import jsftest.repository.NodeRef;
-import jsftest.repository.NodeService;
-import jsftest.repository.DataDictionary.MetaData;
-import jsftest.repository.DataDictionary.Property;
-
-import org.apache.log4j.Logger;
-import org.springframework.web.jsf.FacesContextUtils;
-
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
 import org.alfresco.config.element.PropertiesConfigElement;
+import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.web.bean.repository.Node;
-import org.alfresco.web.bean.repository.Repository;
+import org.apache.log4j.Logger;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
- * Component that represents the properties of an object
+ * Component that represents the properties of a Node
  * 
  * @author gavinc
  */
 public class UIPropertySheet extends UIPanel implements NamingContainer
 {
+   public static final String VIEW_MODE = "view";
+   public static final String EDIT_MODE = "edit";
+   
    private static Logger logger = Logger.getLogger(UIPropertySheet.class);
    private static String DEFAULT_VAR_NAME = "node";
    
    private String variable;
    private NodeRef nodeRef;
    private Node node;
+   private Boolean readOnly;
+   private String mode;
    
    /**
     * Default constructor
@@ -76,36 +73,32 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       
       if (howManyKids == 0)
       {
-         DataDictionary dd = new DataDictionary();
-         MetaData metaData = dd.getMetaData(this.node.getTypeName());
-            
+         // get the property names the current node has
+         List<String> props = node.getPropertyNames();
+         
          if (externalConfig != null && externalConfig.booleanValue())
          {
             // configure the component using the config service
             if (logger.isDebugEnabled())
                logger.debug("Configuring property sheet using ConfigService");
-            
-            //ConfigService configSvc = ConfigServiceFactory.getConfigService();
+
             ConfigService configSvc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("configService");
             Config configProps = configSvc.getConfig(this.node);
             PropertiesConfigElement propsToDisplay = (PropertiesConfigElement)configProps.getConfigElement("properties");
-            List propNames = propsToDisplay.getProperties();
+            List propsToRender = propsToDisplay.getProperties();
             
             if (logger.isDebugEnabled())
-            {
-               logger.debug("ConfigElement: " + propsToDisplay);
-               logger.debug("Properties to render: " + propNames);
-            }
+               logger.debug("Properties to render: " + propsToRender);
             
-            createComponents(context, metaData, propNames);
+            createPropertyComponents(context, props, propsToRender);
          }
          else
          {
             // show all the properties for the current node
             if (logger.isDebugEnabled())
-               logger.debug("Configuring property sheet using meta data");   
+               logger.debug("Configuring property sheet using node's properties");   
             
-            createComponents(context, metaData);
+            createPropertyComponents(context, props, null);
          }
       }
       
@@ -130,6 +123,8 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       this.nodeRef = (NodeRef)values[1];
       this.node = (Node)values[2];
       this.variable = (String)values[3];
+      this.readOnly = (Boolean)values[4];
+      this.mode = (String)values[5];
    }
    
    /**
@@ -137,12 +132,14 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[4];
+      Object values[] = new Object[6];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.nodeRef;
       values[2] = this.node;
       values[3] = this.variable;
+      values[4] = this.readOnly;
+      values[5] = this.mode;
       return (values);
    }
    
@@ -200,51 +197,98 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
    }
    
    /**
-    * Creates components to represent all the properties in the given meta data object
-    * 
-    * @param context
-    * @param metaData
-    * @throws IOException
+    * @return Returns whether the property sheet is read only
     */
-   private void createComponents(FacesContext context, MetaData metaData)
-   	throws IOException
+   public boolean isReadOnly()
    {
-      Iterator iter = metaData.getProperties().iterator();
-      while (iter.hasNext())
+      if (this.readOnly == null)
       {
-         Property property = (Property)iter.next(); 
-         
-         // generate the label
-         PropertyHelper.generateLabel(context, property.getDisplayName(), this);
-         
-         // generate the input control
-         PropertyHelper.generateControl(context, property, this.variable, this);
+         ValueBinding vb = getValueBinding("readOnly");
+         if (vb != null)
+         {
+            this.readOnly = (Boolean)vb.getValue(getFacesContext());
+         }
       }
+      
+      if (this.readOnly == null)
+      {
+         this.readOnly = Boolean.FALSE;
+      }
+      
+      return this.readOnly; 
    }
-   
+
    /**
-    * Creates components to represent the given properties in the given meta data object
+    * @param readOnly Sets the read only flag for the property sheet
+    */
+   public void setReadOnly(boolean readOnly)
+   {
+      this.readOnly = Boolean.valueOf(readOnly);
+   }
+
+   /**
+    * @return Returns the mode
+    */
+   public String getMode()
+   {
+      if (this.mode == null)
+      {
+         ValueBinding vb = getValueBinding("mode");
+         if (vb != null)
+         {
+            this.mode = (String)vb.getValue(getFacesContext());
+         }
+      }
+      
+      if (this.mode == null)
+      {
+         mode = EDIT_MODE;
+      }
+      
+      return mode;
+   }
+
+   /**
+    * @param mode Sets the mode
+    */
+   public void setMode(String mode)
+   {
+      this.mode = mode;
+   }
+
+   /**
+    * Creates all the property components required to display the properties held by the node, 
+    * but only those specified in the includeProps list
     * 
-    * @param context
-    * @param metaData
-    * @param propNames
+    * @param context JSF context
+    * @param properties List of property names held by node
+    * @param includeProps List of properties to exclude from the render 
     * @throws IOException
     */
-   private void createComponents(FacesContext context, MetaData metaData, List propNames)
+   private void createPropertyComponents(FacesContext context, List<String> properties, List includeProps)
       throws IOException
    {
-      Iterator iter = metaData.getProperties().iterator();
-      while (iter.hasNext())
+      for (String propertyName : properties)
       {
-         Property property = (Property)iter.next();
-         
-         if (propNames.contains(property.getName()))
+         if (includeProps == null || includeProps.contains(propertyName))
          {
-            // generate the label
-            PropertyHelper.generateLabel(context, property.getDisplayName(), this);
+            // create the property component
+            UIProperty property = (UIProperty)context.getApplication().createComponent("org.alfresco.faces.Property");
+            property.setId(context.getViewRoot().createUniqueId());
+            property.setName(propertyName);
             
-            // generate the input control
-            PropertyHelper.generateControl(context, property, this.variable, this);
+            // if this property sheet is set as read only, set all properties to read only
+            if (isReadOnly())
+            {
+               property.setReadOnly(true);
+            }
+            
+            this.getChildren().add(property);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Created property component " + property + "(" + 
+                      property.getClientId(context) + 
+                      ") and added it to property sheet " + this);
          }
       }
    }

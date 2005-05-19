@@ -24,13 +24,13 @@
       </attribute>
       
       <attribute>
-         <name>binding</name>
+         <name>rendered</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       
       <attribute>
-         <name>rendered</name>
+         <name>readOnly</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -43,6 +43,30 @@
       
       <attribute>
          <name>columns</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>mode</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>labelWidth</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>cellpadding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>cellspacing</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -66,13 +90,31 @@
       </attribute>
       
       <attribute>
-         <name>value</name>
+         <name>name</name>
          <required>true</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       
       <attribute>
-         <name>columns</name>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>displayLabel</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>readOnly</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>mode</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>

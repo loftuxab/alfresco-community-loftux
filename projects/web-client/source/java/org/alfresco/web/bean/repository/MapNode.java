@@ -1,17 +1,11 @@
 package org.alfresco.web.bean.repository;
 
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.util.Conversion;
 
 /**
  * Lighweight client side representation of a node held in the repository, which

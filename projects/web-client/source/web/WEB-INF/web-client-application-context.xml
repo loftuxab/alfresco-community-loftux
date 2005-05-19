@@ -18,4 +18,11 @@
       </constructor-arg>
    </bean>
    
+   <!-- NOTE: This references a bean in the repository Spring configuration -->
+   <bean id="dataDictionary" class="org.alfresco.web.bean.repository.DataDictionary">
+      <constructor-arg>
+         <ref bean="dictionaryService"/>
+      </constructor-arg>
+   </bean>
+   
 </beans>

@@ -15,6 +15,11 @@ public class PropertySheetGridTag extends BaseComponentTag
    private String var;
    private String columns;
    private String externalConfig;
+   private String readOnly;
+   private String mode;
+   private String labelWidth;
+   private String cellpadding;
+   private String cellspacing;
    
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
@@ -32,32 +37,6 @@ public class PropertySheetGridTag extends BaseComponentTag
       return "javax.faces.Grid";
    }
    
-   /**
-    * @see javax.faces.webapp.UIComponentTag#setProperties(javax.faces.component.UIComponent)
-    */
-   protected void setProperties(UIComponent component)
-   {
-      super.setProperties(component);
-      
-      setStringProperty(component, "value", this.value);
-      setStringStaticProperty(component, "var", this.var);
-      setIntProperty(component, "columns", this.columns);
-      setBooleanProperty(component, "externalConfig", this.externalConfig);
-   }
-
-   /**
-    * @see javax.faces.webapp.UIComponentTag#release()
-    */
-   public void release()
-   {
-      this.value = null;
-      this.var = null;
-      this.columns = null;
-      this.externalConfig = null;
-      
-      super.release();
-   }
-
    /**
     * @param value The value to set.
     */
@@ -88,5 +67,81 @@ public class PropertySheetGridTag extends BaseComponentTag
    public void setExternalConfig(String externalConfig)
    {
       this.externalConfig = externalConfig;
-   }   
+   }
+
+   /**
+    * @param mode The mode, either "edit" or "view"
+    */
+   public void setMode(String mode)
+   {
+      this.mode = mode;
+   }
+
+   /**
+    * @param readOnly The readOnly to set.
+    */
+   public void setReadOnly(String readOnly)
+   {
+      this.readOnly = readOnly;
+   }
+   
+   /**
+    * @param labelWidth Sets the label column width
+    */
+   public void setLabelWidth(String labelWidth)
+   {
+      this.labelWidth = labelWidth;
+   }
+   
+   /**
+    * @param cellpadding Sets the cellpadding for the grid
+    */
+   public void setCellpadding(String cellpadding)
+   {
+      this.cellpadding = cellpadding;
+   }
+
+   /**
+    * @param cellspacing Sets the cellspacing for the grid
+    */
+   public void setCellspacing(String cellspacing)
+   {
+      this.cellspacing = cellspacing;
+   }
+
+   /**
+    * @see javax.faces.webapp.UIComponentTag#setProperties(javax.faces.component.UIComponent)
+    */
+   protected void setProperties(UIComponent component)
+   {
+      super.setProperties(component);
+      
+      setStringProperty(component, "value", this.value);
+      setStringProperty(component, "mode", this.mode);
+      setStringStaticProperty(component, "var", this.var);
+      setIntProperty(component, "columns", this.columns);
+      setIntStaticProperty(component, "labelWidth", this.labelWidth);
+      setBooleanProperty(component, "externalConfig", this.externalConfig);
+      setBooleanProperty(component, "readOnly", this.readOnly);
+      setStringStaticProperty(component, "cellpadding", this.cellpadding);
+      setStringStaticProperty(component, "cellspacing", this.cellspacing);
+   }
+
+   /**
+    * @see javax.faces.webapp.UIComponentTag#release()
+    */
+   public void release()
+   {
+      this.value = null;
+      this.var = null;
+      this.columns = null;
+      this.externalConfig = null;
+      this.readOnly = null;
+      this.mode = null;
+      this.labelWidth = null;
+      this.cellpadding = null;
+      this.cellspacing = null;
+      
+      super.release();
+   }
 }
