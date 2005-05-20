@@ -154,7 +154,7 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
-                                       <h:selectBooleanCheckbox id="keepCheckedOut" />&nbsp;
+                                       <h:selectBooleanCheckbox value="#{CheckinCheckoutBean.keepCheckedOut}" />
                                        <span style="vertical-align:20%">Check in changes and keep file checked out</span>
                                     </td>
                                  </tr>

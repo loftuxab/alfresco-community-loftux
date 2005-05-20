@@ -127,8 +127,8 @@
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>
-                                       <%-- TODO: real downloadable file link here --%>
+                                    <td style="padding:4px">
+                                       <%-- TODO: real downloadable file link here (large bolder font?) --%>
                                        <b><h:outputText value="#{CheckinCheckoutBean.workingDocument.name}" /></b>
                                     </td>
                                  </tr>

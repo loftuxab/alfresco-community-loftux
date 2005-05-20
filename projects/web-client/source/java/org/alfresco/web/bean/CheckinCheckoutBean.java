@@ -7,15 +7,18 @@ import java.io.File;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.version.operations.VersionOperationsService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -109,6 +112,22 @@ public class CheckinCheckoutBean
    public void setWorkingDocument(Node workingDocument)
    {
       this.workingDocument = workingDocument;
+   }
+   
+   /**
+    * @param keepCheckedOut   The keepCheckedOut to set.
+    */
+   public void setKeepCheckedOut(boolean keepCheckedOut)
+   {
+      this.keepCheckedOut = keepCheckedOut;
+   }
+   
+   /**
+    * @return Returns the keepCheckedOut.
+    */
+   public boolean getKeepCheckedOut()
+   {
+      return this.keepCheckedOut;
    }
    
    /**
@@ -208,10 +227,15 @@ public class CheckinCheckoutBean
             // checkout the node content to create a working copy
             // TODO: impl checkout to a arbituary parent Space 
             NodeRef workingCopyRef = this.versionOperationsService.checkout(node.getNodeRef());
-            Node workingCopy = new Node(workingCopyRef, this.nodeService);
+            
+            // modify the name to include an additional string
+            // save the original name so we can set it back later
+            String originalName = RepoUtils.getNameForNode(this.nodeService, workingCopyRef);
+            this.nodeService.setProperty(workingCopyRef, QNAME_NAME, originalName + WORKING_COPY);
+            this.nodeService.setProperty(workingCopyRef, QNAME_ORIGINALNAME, originalName);
             
             // set the working copy Node instance
-            setWorkingDocument(workingCopy);
+            setWorkingDocument(new Node(workingCopyRef, this.nodeService));
             
             // TODO: need to get the content URL to the content service
             //       see Gavs work in Add Content wizard
@@ -308,18 +332,23 @@ public class CheckinCheckoutBean
          try
          {
             if (logger.isDebugEnabled())
-               logger.debug("Trying to unlock content node Id: " + node.getId());
+               logger.debug("Trying to checkin content node Id: " + node.getId());
             
             // checkin the node content
-            // TODO: get this boolean from form input
-            boolean keepCheckedOut = false;
+            Serializable nameProp = this.nodeService.getProperty(node.getNodeRef(), QNAME_ORIGINALNAME);
+            
             // TODO: where does this come from?
             String contentURL = null;
-            this.versionOperationsService.checkin(
+            // TODO: what props should we add here? - e.g. version history text
+            Map<String, Serializable> props = Collections.<String, Serializable>emptyMap();
+            NodeRef originalDoc = this.versionOperationsService.checkin(
                   node.getNodeRef(),
-                  Collections.<String, Serializable>emptyMap(),   // TODO: do we need to add stuff here?
+                  props,
                   contentURL, 
-                  keepCheckedOut);
+                  this.keepCheckedOut);      // set from input form
+            
+            // restore original name after copy
+            this.nodeService.setProperty(originalDoc, QNAME_NAME, nameProp);
             
             // clear action context
             setDocument(null);
@@ -334,7 +363,7 @@ public class CheckinCheckoutBean
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to checkout Content Node due to system error: " + err.getMessage());
+            Utils.addErrorMessage("Unable to check-in Content Node due to system error: " + err.getMessage());
          }
       }
       else
@@ -366,6 +395,7 @@ public class CheckinCheckoutBean
       
       this.file = null;
       this.fileName = null;
+      this.keepCheckedOut = false;
       
       // remove the file upload bean from the session
       FacesContext ctx = FacesContext.getCurrentInstance();
@@ -378,15 +408,21 @@ public class CheckinCheckoutBean
    
    private static Logger logger = Logger.getLogger(CheckinCheckoutBean.class);
    
+   private static final String WORKING_COPY = " (working copy)";
+   
+   private static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
+   private static final QName QNAME_ORIGINALNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "originalName");
+   
    /** The current document */
    private Node document;
    
    /** The working copy of the document we are checking out */
    private Node workingDocument;
    
+   /** transient form and upload properties */
    private File file;
-   
    private String fileName;
+   private boolean keepCheckedOut = false;
    
    /** The BrowseBean to be used by the bean */
    private BrowseBean browseBean;
