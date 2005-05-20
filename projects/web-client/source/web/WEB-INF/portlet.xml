@@ -11,11 +11,6 @@
            <name>default-view</name>
            <value>/jsp/browse/browse.jsp</value>
         </init-param>
-        
-        <init-param>
-           <name>error-page</name>
-           <value>/jsp/error.jsp</value>
-        </init-param>
 
         <supports>
             <mime-type>text/html</mime-type>

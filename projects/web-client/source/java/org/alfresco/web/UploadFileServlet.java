@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
+import org.alfresco.web.util.Utils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -70,8 +71,14 @@ public class UploadFileServlet extends HttpServlet
                String filename = item.getName();
                if (filename != null && filename.length() != 0)
                {
+                  // workaround a bug in IE where the full path is returned
+                  int idx = filename.lastIndexOf(File.separator); 
+                  if (idx != -1)
+                  {
+                     filename = filename.substring(idx + File.separator.length());
+                  }
+                  
                   File tempFile = File.createTempFile("alfresco", ".upload");
-                  tempFile.deleteOnExit();
                   item.write(tempFile);
                   bean.setFile(tempFile);
                   bean.setFileName(filename);
@@ -96,28 +103,8 @@ public class UploadFileServlet extends HttpServlet
       }
       catch (Throwable error)
       {
-         // ******************************************************************
-         // TODO: configure the error page and re-throw error if not specified
-         //       we also need to calculate the return page so we don't rely
-         //       on the browser history - we may also want to do a forward
-         //       instead of a redirect!!
-         // ******************************************************************
-         
-         // get the error bean from the session and set the error that occurred.
-         HttpSession session = request.getSession();
-         ErrorBean errorBean = (ErrorBean)session.getAttribute(ErrorBean.ERROR_BEAN_NAME);
-         if (errorBean == null)
-         {
-            errorBean = new ErrorBean();
-            session.setAttribute(ErrorBean.ERROR_BEAN_NAME, errorBean);
-         }
-         errorBean.setLastError(error);
-         errorBean.setReturnPage(returnPage);
-
-         if (logger.isDebugEnabled())
-            logger.debug("An error has occurred, redirecting to error page: /jsp/error.jsp");
-         
-         response.sendRedirect(request.getContextPath() + "/jsp/error.jsp");
+         Utils.handleServletError(getServletContext(), (HttpServletRequest)request,
+               (HttpServletResponse)response, error, logger, returnPage);
       }
    }
 }

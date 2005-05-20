@@ -14,9 +14,9 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.UnavailableException;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
+import org.alfresco.web.util.Utils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
@@ -34,18 +34,6 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
    private static final String ERROR_OCCURRED = "error-occurred";
    
    private static Logger logger = Logger.getLogger(AlfrescoFacesPortlet.class);
-   
-   private String errorPage;
-
-   /**
-    * @see org.apache.myfaces.portlet.MyFacesGenericPortlet#init()
-    */
-   public void init() throws PortletException, UnavailableException
-   {
-      this.errorPage = getPortletConfig().getInitParameter(ERROR_PAGE_PARAM);
-      
-      super.init();
-   }
 
    /**
     * Called by the portlet container to allow the portlet to process an action request.
@@ -81,8 +69,14 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
                String filename = item.getName();
                if(item.isFormField() == false)
                {
+                  // workaround a bug in IE where the full path is returned
+                  int idx = filename.lastIndexOf(File.separator);
+                  if (idx != -1)
+                  {
+                     filename = filename.substring(idx + File.separator.length());
+                  }
+                  
                   File tempFile = File.createTempFile("alfresco", ".upload");
-                  tempFile.deleteOnExit();
                   item.write(tempFile);
                   bean.setFile(tempFile);
                   bean.setFileName(filename);
@@ -106,7 +100,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
       }
       catch (Throwable e)
       {
-         if (this.errorPage != null)
+         if (Utils.getErrorPage(getPortletContext()) != null)
          {
             handleError(request, response, e);
          }
@@ -155,15 +149,18 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
    {
       if (request.getParameter(ERROR_OCCURRED) != null)
       {
+         String errorPage = Utils.getErrorPage(getPortletContext());
+         
          if (logger.isDebugEnabled())
-            logger.debug("An error has occurred, redirecting to error page: " + this.errorPage);
+            logger.debug("An error has occurred, redirecting to error page: " + errorPage);
          
          response.setContentType("text/html");
-         PortletRequestDispatcher dispatcher = getPortletContext().getRequestDispatcher(this.errorPage);
+         PortletRequestDispatcher dispatcher = getPortletContext().getRequestDispatcher(errorPage);
          dispatcher.include(request, response);
       }
       else
       {
+         // TODO: Add error handling around here so errors in getter's get caught!
          super.facesRender(request, response);
       }
    }

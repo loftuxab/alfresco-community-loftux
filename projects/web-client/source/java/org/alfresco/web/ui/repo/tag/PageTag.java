@@ -6,7 +6,7 @@ import java.io.Writer;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.alfresco.web.ContextListener;
+import org.alfresco.web.util.Utils;
 
 /**
  * A non-JSF tag library that adds the HTML begin and end tags if running in servlet mode
@@ -38,7 +38,7 @@ public class PageTag extends TagSupport
     */
    public int doStartTag() throws JspException
    {
-      if (ContextListener.inPortletServer() == false)
+      if (Utils.inPortalServer(pageContext.getServletContext()) == false)
       {
          try
          {
@@ -67,7 +67,7 @@ public class PageTag extends TagSupport
 
    public int doEndTag() throws JspException
    {
-      if (ContextListener.inPortletServer() == false)
+      if (Utils.inPortalServer(pageContext.getServletContext()) == false)
       {
          try
          {

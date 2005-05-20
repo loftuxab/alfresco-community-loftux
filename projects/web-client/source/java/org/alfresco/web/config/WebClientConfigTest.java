@@ -165,6 +165,8 @@ public class WebClientConfigTest extends BaseTest
       String mode = serverConfig.getMode();
       logger.info("mode = " + mode);
       assertTrue("server mode should be 'servlet'", mode.equals("servlet"));
+      logger.info("is portlet mode = " + serverConfig.isPortletMode());
+      assertFalse("inPortletMode should return 'false'", serverConfig.isPortletMode());
       
       String errorPage = serverConfig.getErrorPage();
       logger.info("error page = " + errorPage);

@@ -12,6 +12,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.util.Utils;
 
 /**
  * ServletContextListener implementation that initialises the application.
@@ -22,14 +23,7 @@ import org.alfresco.web.bean.repository.Repository;
  */
 public class ContextListener implements ServletContextListener, HttpSessionListener
 {
-   private static boolean inPortlet = true;
-   private static final String SERVER_TYPE = "org.alfresco.SERVER_TYPE";
    private static Logger logger = Logger.getLogger(ContextListener.class);
-   
-   public static boolean inPortletServer()
-   {
-      return inPortlet;
-   }
    
    /**
     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
@@ -44,17 +38,12 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       {
          // create the store
          nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, Repository.REPOSITORY_STORE);
+         
+         // TODO: make sure the root company space exists, if not create it.
       }
       
-      // determine what type of server we are using, servlet or portlet, default to portlet
-      String serverType = event.getServletContext().getInitParameter(SERVER_TYPE);
-      if (serverType != null && serverType.equalsIgnoreCase("servlet"))
-      {
-         inPortlet = false;
-         
-         if (logger.isDebugEnabled())
-            logger.debug("Running in servlet mode");
-      }
+      if (logger.isDebugEnabled())
+         logger.debug("Server is running in portal server: " + Utils.inPortalServer(event.getServletContext()));
    }
 
    /**

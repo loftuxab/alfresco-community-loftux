@@ -73,5 +73,20 @@ public class ServerConfigElement extends ConfigElementAdapter
    public void setErrorPage(String errorPage)
    {
       this.errorPage = errorPage;
-   }   
+   }
+   
+   /**
+    * @return Returns true if we are configured to run in a portal server
+    */
+   public boolean isPortletMode()
+   {
+      boolean inPortlet = true;
+      
+      if (this.mode != null && this.mode.equalsIgnoreCase("servlet"))
+      {
+         inPortlet = false;
+      }
+      
+      return inPortlet;
+   }
 }
