@@ -19,8 +19,6 @@ public class NodeTypeEvaluator implements Evaluator
    {
       boolean result = false;
       
-      // TODO: Also deal with NodeRef object's being passed in
-      
       if (obj instanceof Node)
       {
          String type = (String)((Node)obj).getTypeName();

@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.alfresco.config.evaluator.Evaluator;
+import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.web.bean.repository.Node;
 
 /**
@@ -22,14 +25,15 @@ public class AspectEvaluator implements Evaluator
    {
       boolean result = false;
       
-      // TODO: Also deal with NodeRef object's being passed in
-      
       if (obj instanceof Node)
       {
          Set aspects = ((Node)obj).getAspects();
          if (aspects != null)
          {
-            result = aspects.contains(condition);
+            // TODO: for now presume the namespace is our default one
+            QName spaceQName = QName.createQName(NamespaceService.ALFRESCO_URI, condition);
+            ClassRef spaceAspect = new ClassRef(spaceQName);
+            result = aspects.contains(spaceAspect);
          }
       }
       

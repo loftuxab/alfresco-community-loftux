@@ -1,40 +1,29 @@
 <alfresco-config>
    
    <plug-ins>
-      <evaluators>
-         <evaluator id="type-name" class="jsftest.repository.TypeNameEvaluator"/>
-         <evaluator id="aspect" class="org.alfresco.web.config.AspectEvaluator"/>
-      </evaluators>
+      <element-readers>
+         <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
+         <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
+      </element-readers>
    </plug-ins>
-      
-   <!-- define a global config section -->
+
    <config>
-      <properties>
-         <property name="name"/>
-      </properties>
+      <property-sheet>
+         <show-property name="name" />
+      </property-sheet>
+      <server>
+         <mode>servlet</mode>
+         <error-page>/jsp/error.jsp</error-page>
+      </server>
    </config>
    
-   <config evaluator="type-name" condition="base">
-      <properties>
-         <property name="description"/>
-         <property name="created"/>
-         <property name="modified"/>
-      </properties>
-   </config>
-   
-   <config evaluator="type-name" condition="SOP">
-      <properties>
-         <property name="description"/>
-         <property name="modified"/>
-         <property name="effective"/>
-         <property name="approved"/>
-      </properties>
-   </config>
-   
-   <config evaluator="aspect" condition="versionable">
-      <properties>
-         <property name="latestversion"/>
-      </properties>
+   <config evaluator="string-compare" condition="space-aspect">
+      <property-sheet>
+         <show-property name="createddate" readOnly="true" />
+         <show-property name="modifieddate" readOnly="true" />
+         <show-property name="description" displayLabel="Description" readOnly="false" />
+         <show-property name="icon" />
+      </property-sheet>
    </config>
    
    <config evaluator="object-type" condition="org.alfresco.web.ui.common.component.data.UIRichList">

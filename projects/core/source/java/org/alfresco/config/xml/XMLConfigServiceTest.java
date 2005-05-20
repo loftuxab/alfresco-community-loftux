@@ -6,8 +6,6 @@ import java.util.List;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
-import org.alfresco.config.ConfigService;
-import org.alfresco.config.element.PropertiesConfigElement;
 import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.source.FileConfigSource;
 import org.alfresco.config.source.HTTPConfigSource;
@@ -40,7 +38,7 @@ public class XMLConfigServiceTest extends BaseTest
     {
         // setup the config service
         String configFile = getResourcesDir() + "config.xml";
-        ConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
         svc.init();
 
         // try and get the global item
@@ -71,6 +69,26 @@ public class XMLConfigServiceTest extends BaseTest
         assertEquals("The override item should now be true", "true", overrideItem.getValue());
         logger.info("overrideItem = " + overrideItem.getValue());
     }
+    
+    /**
+     * Tests the config service's ability to reset
+     */
+    public void testReset()
+    {
+       // setup the config service
+        String configFile = getResourcesDir() + "config.xml";
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
+        svc.init();
+
+        // try and get the global item
+        Config unitTest = svc.getConfig("Unit Test");
+        assertNotNull("unitTest should not be null", unitTest);
+        
+        // reset the config service then try to retrieve some config again
+        svc.reset();
+        unitTest = svc.getConfig("Unit Test");
+        assertNotNull("unitTest should not be null", unitTest);
+    }
 
     /**
      * Tests the use of the class path source config
@@ -80,7 +98,7 @@ public class XMLConfigServiceTest extends BaseTest
     public void xtestClasspathSource()
     {
         String configFile = "org/alfresco/config-classpath.xml"; 
-        ConfigService svc = new XMLConfigService(new ClassPathConfigSource(configFile));
+        XMLConfigService svc = new XMLConfigService(new ClassPathConfigSource(configFile));
         svc.init();
         
         Config config = svc.getGlobalConfig();
@@ -96,7 +114,7 @@ public class XMLConfigServiceTest extends BaseTest
     {
         List<String> configFile = new ArrayList<String>(1);
         configFile.add("http://localhost:8080/web-client/config-http.xml");
-        ConfigService svc = new XMLConfigService(new HTTPConfigSource(configFile));
+        XMLConfigService svc = new XMLConfigService(new HTTPConfigSource(configFile));
         svc.init();
         
         Config config = svc.getGlobalConfig();
@@ -113,7 +131,7 @@ public class XMLConfigServiceTest extends BaseTest
         List<String> configFiles = new ArrayList<String>(2);
         configFiles.add(getResourcesDir() + "config.xml");
         configFiles.add(getResourcesDir() + "config-multi.xml");
-        ConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.init();
 
         // try and get the global config section
@@ -159,7 +177,7 @@ public class XMLConfigServiceTest extends BaseTest
         List<String> configFiles = new ArrayList<String>(2);
         configFiles.add(getResourcesDir() + "config.xml");
         configFiles.add(getResourcesDir() + "config-areas.xml");
-        ConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.init();
 
         // try and get an section defined in an area (without restricting the
@@ -197,74 +215,7 @@ public class XMLConfigServiceTest extends BaseTest
 
     public void xtestMerging()
     {
-        // TODO: Add tests to make sure merging works (move tests from elsewhere
-        // to here)
+        // TODO: Add tests to make sure merging works 
         // include tests including and excluding globals and areas
-    }
-
-    /**
-     * Tests the config service by retrieving properties configuration using the
-     * generic interfaces
-     */
-    public void testGenericConfigElement()
-    {
-        // setup the config service
-        String configFiles = getResourcesDir() + "config-properties.xml";
-        ConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
-        svc.init();
-
-        // get the base properties configuration
-        Config configProps = svc.getConfig("base");
-        ConfigElement propsToDisplay = configProps.getConfigElement("properties");
-        assertNotNull("properties config should not be null", propsToDisplay);
-
-        // get all the property names using the ConfigElement interface methods
-        List<ConfigElement> kids = propsToDisplay.getChildren();
-        List<String> propNames = new ArrayList<String>();
-        for (ConfigElement propElement : propsToDisplay.getChildren())
-        {
-            String value = propElement.getValue();
-            assertNull("property value should be null", value);
-            String propName = propElement.getAttribute("name");
-            propNames.add(propName);
-        }
-
-        logger.info("propNames = " + propNames);
-        assertEquals("There should be 4 properties", propNames.size() == 4, true);
-
-        logger.info("has attribute id: " + propsToDisplay.hasAttribute("id"));
-        assertEquals("The id attribute should not be present", propsToDisplay.hasAttribute("id"), false);
-    }
-
-    /**
-     * Tests the config service by retrieving properties configuration using the
-     * Properties specific config objects
-     */
-    public void testGetProperties()
-    {
-        // setup the config service
-        String configFiles = getResourcesDir() + "config-properties.xml";
-        ConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
-        svc.init();
-
-        // get the SOP properties configuration
-        Config configProps = svc.getConfig("SOP");
-        PropertiesConfigElement propsToDisplay = (PropertiesConfigElement) configProps.getConfigElement("properties");
-        assertNotNull("properties config should not be null", propsToDisplay);
-
-        // get all the property names using the PropertiesConfigElement
-        // implementation
-        List<String> propNames = propsToDisplay.getProperties();
-        
-        // make sure the generic interfaces are also returning the correct data
-        List<ConfigElement> kids = propsToDisplay.getChildren();
-        assertNotNull("kids should not be null", kids);
-        assertTrue("There should be more than one child", kids.size() > 1);
-
-        logger.info("propNames = " + propNames);
-        assertEquals("There should be 5 properties", propNames.size() == 5, true);
-
-        logger.info("has attribute id: " + propsToDisplay.hasAttribute("id"));
-        assertEquals("The id attribute should not be present", propsToDisplay.hasAttribute("id"), false);
     }
 }

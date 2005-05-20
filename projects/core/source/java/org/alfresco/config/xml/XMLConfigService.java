@@ -12,7 +12,6 @@ import org.alfresco.config.ConfigSectionImpl;
 import org.alfresco.config.ConfigSource;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
 import org.alfresco.config.xml.elementreader.GenericElementReader;
-import org.alfresco.config.xml.elementreader.PropertiesElementReader;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -53,12 +52,23 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 
         // initialise the element readers map with built-in readers
         this.elementReaders = new HashMap<String, ConfigElementReader>();
-        addConfigElementReader("properties", PropertiesElementReader.class.getName());
 
         parse();
 
         if (logger.isDebugEnabled())
             logger.debug("Completed initialisation");
+    }
+    
+    /**
+     * @see org.alfresco.config.BaseConfigService#destroy()
+     */
+    public void destroy()
+    {
+       this.elementReaders.clear();
+       this.elementReaders = null;
+       this.currentArea = null;
+       
+       super.destroy();
     }
 
     /**

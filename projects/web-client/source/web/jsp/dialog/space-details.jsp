@@ -56,9 +56,9 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/>Space Name</div>
-                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
-                              <div class="mainSubText">Use this page to view the details about the content.</div>
+                              <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
+                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.actionSpace.name}" />'</div>
+                              <div class="mainSubText">Use this page to view the details about the space.</div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=110 style="padding-left:2px">
@@ -85,42 +85,24 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <a:panel label="Preview" id="preview-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true" expanded="false"><br/>
-                                 <a:actionLink value="Download link" padding="4" id="link1" />
-                              </a:panel>
-                              <br/>
                               <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" 
                                        progressive="true"><br/>
-                                 <table border="0" cellpadding="0" cellspacing="0">
-                                    <tr><td style="border-bottom: 1px solid black;padding-bottom:2px;">General</td></tr>
-                                    <tr>
-                                       <td style="padding-top:6px;">
-                                       <r:propertySheetGrid id="general-props" value="#{BrowseBean.document}" var="generalProps" 
-                                                            columns="1" mode="view" labelStyleClass="propertiesLabel">
-                                          <r:property name="name" displayLabel="File Name" />
-                                       </r:propertySheetGrid>
-                                       </td>
-                                    </tr>
-                                    <tr>
-                                       <td><h:messages styleClass="errorMessage" /></td>
-                                    </tr>
-                                 </table>
+                                 <r:propertySheetGrid id="space-props" value="#{BrowseBean.actionSpace}" var="spaceProps" 
+                                                      columns="1" mode="view" labelStyleClass="propertiesLabel" 
+                                                      externalConfig="true" />
+                                 <h:messages styleClass="errorMessage" />
                               </a:panel>
                               <br/>
-                              <a:panel label="Workflow" id="workflow-panel" border="greyround" bgcolor="#eaeaea" 
+                              <a:panel label="Preferences" id="preferences-panel" border="greyround" bgcolor="#eaeaea" 
                                        progressive="true" expanded="false"><br/>
-                                 Workflow options
                               </a:panel>
                               <br/>
-                              <a:panel label="Categories" id="categories-panel" border="greyround" bgcolor="#eaeaea" 
+                              <a:panel label="Rules" id="rules-panel" border="greyround" bgcolor="#eaeaea" 
                                        progressive="true" expanded="false"><br/>
-                                 Categories
                               </a:panel>
                               <br/>
-                              <a:panel label="Version History" id="version-history-panel" border="greyround" bgcolor="#eaeaea" 
+                              <a:panel label="Space Members" id="members-panel" border="greyround" bgcolor="#eaeaea" 
                                        progressive="true" expanded="false"><br/>
-                                 Version History
                               </a:panel>
                               <br/>
                            </td>

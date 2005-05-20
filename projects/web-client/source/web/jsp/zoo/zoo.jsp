@@ -14,10 +14,12 @@
       
       <h:commandButton id="show-components-zoo" value="Component Zoo" action="showRichListZoo" />
       <br/><br/>
+      <%--
       <h:commandButton id="show-property-zoo" value="Property Zoo" action="showPropertyZoo" />
       <br/><br/>
       <h:commandButton id="show-auto-property-zoo" value="Auto Property Zoo" action="showAutoPropertyZoo" />
       <br/><br/>
+      --%>
       <h:commandButton id="show-image-picker" value="Image Picker Zoo" action="showImagePickerZoo" />
       <br/><br/>
       <h:commandButton id="show-user-list" value="UserList Test Pages" action="showUserlist" />

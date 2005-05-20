@@ -180,6 +180,10 @@
          <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>showSpaceDetails</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>checkoutFile</from-outcome>
          <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
       </navigation-case>

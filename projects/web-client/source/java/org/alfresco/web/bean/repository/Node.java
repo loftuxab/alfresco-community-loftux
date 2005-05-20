@@ -46,7 +46,7 @@ public class Node implements Serializable
    {
       if (nodeRef == null)
       {
-         throw new IllegalArgumentException("NodeRef must be specified for creation of a Node.");
+         throw new IllegalArgumentException("NodeRef must be supplied for creation of a Node.");
       }
       
       if (nodeService == null)
@@ -57,6 +57,11 @@ public class Node implements Serializable
       this.nodeRef = nodeRef;
       this.id = nodeRef.getId();
       this.nodeService = nodeService;
+      
+      if (this.id == null || this.id.length() == 0)
+      {
+         throw new IllegalArgumentException("The NodeRef id must not be null to create a Node.");
+      }
    }
 
    /**

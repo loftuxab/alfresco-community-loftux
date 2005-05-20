@@ -11,9 +11,10 @@ import javax.faces.el.ValueBinding;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
-import org.alfresco.config.element.PropertiesConfigElement;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.config.PropertySheetConfigElement;
+import org.alfresco.web.config.PropertySheetConfigElement.PropertyConfig;
 import org.apache.log4j.Logger;
 import org.springframework.web.jsf.FacesContextUtils;
 
@@ -82,15 +83,17 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
             if (logger.isDebugEnabled())
                logger.debug("Configuring property sheet using ConfigService");
 
-            ConfigService configSvc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("configService");
+            ConfigService configSvc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+                  context).getBean("configService");
             Config configProps = configSvc.getConfig(this.node);
-            PropertiesConfigElement propsToDisplay = (PropertiesConfigElement)configProps.getConfigElement("properties");
-            List propsToRender = propsToDisplay.getProperties();
+            PropertySheetConfigElement propsToDisplay = (PropertySheetConfigElement)configProps.
+               getConfigElement("property-sheet");
+            List<PropertyConfig> propsToRender = propsToDisplay.getPropertiesToShow();
             
             if (logger.isDebugEnabled())
-               logger.debug("Properties to render: " + propsToRender);
+               logger.debug("Properties to render: " + propsToDisplay.getPropertyNamesToShow());
             
-            createPropertyComponents(context, props, propsToRender);
+            createPropertyComponentsFromConfig(context, propsToRender);
          }
          else
          {
@@ -98,7 +101,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
             if (logger.isDebugEnabled())
                logger.debug("Configuring property sheet using node's properties");   
             
-            createPropertyComponents(context, props, null);
+            createPropertyComponentsFromNode(context, props);
          }
       }
       
@@ -257,39 +260,71 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
    }
 
    /**
-    * Creates all the property components required to display the properties held by the node, 
-    * but only those specified in the includeProps list
+    * Creates all the property components required to display the properties held by the node.
     * 
     * @param context JSF context
-    * @param properties List of property names held by node
-    * @param includeProps List of properties to exclude from the render 
+    * @param properties List of property names held by node 
     * @throws IOException
     */
-   private void createPropertyComponents(FacesContext context, List<String> properties, List includeProps)
+   private void createPropertyComponentsFromNode(FacesContext context, List<String> properties)
       throws IOException
    {
       for (String propertyName : properties)
       {
-         if (includeProps == null || includeProps.contains(propertyName))
+         // create the property component
+         UIProperty propComp = (UIProperty)context.getApplication().createComponent("org.alfresco.faces.Property");
+         propComp.setId(context.getViewRoot().createUniqueId());
+         propComp.setName(propertyName);
+         
+         // if this property sheet is set as read only, set all properties to read only
+         if (isReadOnly())
          {
-            // create the property component
-            UIProperty property = (UIProperty)context.getApplication().createComponent("org.alfresco.faces.Property");
-            property.setId(context.getViewRoot().createUniqueId());
-            property.setName(propertyName);
-            
-            // if this property sheet is set as read only, set all properties to read only
-            if (isReadOnly())
-            {
-               property.setReadOnly(true);
-            }
-            
-            this.getChildren().add(property);
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Created property component " + property + "(" + 
-                      property.getClientId(context) + 
-                      ") and added it to property sheet " + this);
+            propComp.setReadOnly(true);
          }
+         
+         // NOTE: we don't know what the display label is so don't set it
+         
+         this.getChildren().add(propComp);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Created property component " + propComp + "(" + 
+                   propComp.getClientId(context) + 
+                   ") and added it to property sheet " + this);
+      }
+   }
+   
+   /**
+    * Creates all the property components required to display the properties specified
+    * in an external config file.
+    * 
+    * @param context JSF context
+    * @param properties List of properties to render (driven from configuration) 
+    * @throws IOException
+    */
+   private void createPropertyComponentsFromConfig(FacesContext context, List<PropertyConfig> properties)
+      throws IOException
+   {
+      for (PropertyConfig property : properties)
+      {
+         // create the property component
+         UIProperty propComp = (UIProperty)context.getApplication().createComponent("org.alfresco.faces.Property");
+         propComp.setId(context.getViewRoot().createUniqueId());
+         propComp.setName(property.getName());
+         propComp.setDisplayLabel(property.getDisplayLabel());
+         
+         // if this property sheet is set as read only or the config says the property
+         // should be read only set it as such
+         if (isReadOnly() || property.isReadOnly())
+         {
+            propComp.setReadOnly(true);
+         }
+         
+         this.getChildren().add(propComp);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Created property component " + propComp + "(" + 
+                   propComp.getClientId(context) + 
+                   ") and added it to property sheet " + this);
       }
    }
 }

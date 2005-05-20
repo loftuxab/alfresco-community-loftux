@@ -3,13 +3,12 @@
    <plug-ins>
       <evaluators>
          <evaluator id="node-type" class="org.alfresco.web.config.NodeTypeEvaluator" />
-         <evaluator id="aspect" class="org.alfresco.web.config.AspectEvaluator" />
+         <evaluator id="aspect-name" class="org.alfresco.web.config.AspectEvaluator" />
       </evaluators>
-      <!--
       <element-readers>
          <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
+         <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
       </element-readers>
-      -->
    </plug-ins>
    
    <config>
@@ -19,12 +18,16 @@
       </server>
    </config>
    
-   <config evaluator="node-type" condition="file">
-      <properties>
-         <property name="name" />
-         <property name="createddate" />
-         <property name="modifieddate" />
-      </properties>
+   <config evaluator="node-type" condition="folder">
+      <property-sheet>
+         <show-property name="name" displayLabel="Name" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="space">
+      <property-sheet>
+         <show-property name="description" displayLabel="Description" />
+      </property-sheet>
    </config>
    
    <!--

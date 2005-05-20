@@ -54,7 +54,7 @@ public abstract class BaseConfigService implements ConfigService
     }
 
     /**
-     * @see org.alfresco.config.ConfigService#init()
+     * Initialises the config service
      */
     public void init()
     {
@@ -69,7 +69,7 @@ public abstract class BaseConfigService implements ConfigService
     }
 
     /**
-     * @see org.alfresco.config.ConfigService#destroy()
+     * Cleans up all the resources used by the config service
      */
     public void destroy()
     {
@@ -80,6 +80,18 @@ public abstract class BaseConfigService implements ConfigService
         this.sections = null;
         this.sectionsByArea = null;
         this.evaluators = null;
+    }
+    
+    /**
+     * Resets the config service
+     */
+    public void reset()
+    {
+       if (logger.isDebugEnabled())
+         logger.debug("Resetting config service");
+       
+       destroy();
+       init();
     }
 
     /**
@@ -334,6 +346,12 @@ public abstract class BaseConfigService implements ConfigService
      */
     protected void processSection(ConfigSection section, Object object, ConfigImpl results)
     {
+        // TODO: Extract this processing out to a ConfigLookupAlgorithm class
+        //       so that we can provide overriden lookup behaviour i.e. no merging,
+        //       inheritance lookup. 
+        //       Also move the combining into the default algorithm rather than in ConfigImpl.addConfigElement()
+       
+       
         String evaluatorName = section.getEvaluator();
         Evaluator evaluator = getEvaluator(evaluatorName);
 
@@ -344,17 +362,16 @@ public abstract class BaseConfigService implements ConfigService
         }
 
         // if the config section applies to the given object exract all the
-        // config
-        // elements inside and add them to the Config object
+        // config elements inside and add them to the Config object
         if (evaluator.applies(object, section.getCondition()))
         {
             if (logger.isDebugEnabled())
                 logger.debug(section + " matches");
 
-            List sectionConfigElements = section.getConfigElements();
+            List<ConfigElement> sectionConfigElements = section.getConfigElements();
             for (int x = 0; x < sectionConfigElements.size(); x++)
             {
-                results.addConfigElement((ConfigElement) sectionConfigElements.get(x));
+                results.addConfigElement(sectionConfigElements.get(x));
             }
         }
     }

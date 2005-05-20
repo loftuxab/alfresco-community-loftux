@@ -6,17 +6,7 @@ package org.alfresco.config;
  * @author gavinc
  */
 public interface ConfigService
-{
-   /**
-    * Initialisation hook for configuration service implementations
-    */
-   public void init();
-   
-   /**
-    * Destruction hook for configuration service implementations
-    */
-   public void destroy();
-   
+{  
    /**
     * Retrieves the configuration for the given object
     * 

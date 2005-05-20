@@ -77,7 +77,9 @@
                                  <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" actionListener="#{BrowseBean.setupSpaceAction}" id="link3" />
                                  <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" id="link4" />
                                  <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
-                                    <a:actionLink value="Change Details" image="/images/icons/Change_details.gif" id="link5" />
+                                    <a:actionLink value="Change Details" image="/images/icons/Change_details.gif" id="link5" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
+                                       <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param2" />
+                                    </a:actionLink>
                                     <a:actionLink value="Cut" image="/images/icons/cut.gif" id="link6" />
                                     <a:actionLink value="Copy" image="/images/icons/copy.gif" id="link7" />
                                     <a:actionLink value="Paste" image="/images/icons/paste.gif" id="link8" />
