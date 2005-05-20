@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.lock.LockService;
+import org.alfresco.repo.lock.LockStatus;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -106,6 +109,49 @@ public final class RepoUtils
        return buf.toString();
    }
    
+   /**
+    * Return whether a Node is current Locked
+    * 
+    * @param nodeService      The NodeService to use
+    * @param lockService      The LockService to use
+    * @param ref              NodeRef to test
+    * 
+    * @return whether a Node is current Locked
+    */
+   public static Boolean isNodeLocked(NodeService nodeService, LockService lockService, NodeRef ref)
+   {
+      Boolean locked = Boolean.FALSE;
+      if (nodeService.hasAspect(ref, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK))
+      {
+         // TODO: replace username with real user name ref here!
+         LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);
+         if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
+         {
+            locked = Boolean.TRUE;
+         }
+      }
+      
+      return locked;
+   }
+   
+   /**
+    * Return whether a Node is a Working Copy
+    * 
+    * @param nodeService      The NodeService to use
+    * @param ref              NodeRef to test
+    * 
+    * @return whether a Node is a Working Copy
+    */
+   public static Boolean isWorkingCopy(NodeService nodeService, NodeRef ref)
+   {
+      return (nodeService.hasAspect(ref, DictionaryBootstrap.ASPECT_WORKING_COPY)) ? Boolean.TRUE : Boolean.FALSE;
+   }
+   
    
    private static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
+   
+   // TODO: TEMP! Replace this once we have "users" in the system!
+   private static final String USERNAME = "admin";
+   
+   public static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
 }

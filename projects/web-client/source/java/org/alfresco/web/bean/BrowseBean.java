@@ -29,6 +29,7 @@ import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.value.ValueConverter;
+import org.alfresco.repo.version.operations.VersionOperationsService;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -279,7 +280,7 @@ public class BrowseBean implements IContextListener
     */
    public void contextUpdated()
    {
-      s_logger.info("*****contextUpdated() listener called");
+      logger.info("*****contextUpdated() listener called");
       invalidateComponents();
    }
    
@@ -317,8 +318,8 @@ public class BrowseBean implements IContextListener
          // in-case another view mode appears
          setBrowsePageSize(10);
       }
-      if (s_logger.isDebugEnabled())
-         s_logger.debug("Browse view page size set to: " + getBrowsePageSize());
+      if (logger.isDebugEnabled())
+         logger.debug("Browse view page size set to: " + getBrowsePageSize());
       
       // push the view mode into the lists
       setBrowseViewMode(viewMode);
@@ -370,20 +371,21 @@ public class BrowseBean implements IContextListener
             else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
             {
                // special properties to be used by the value binding components on the page
-               node.put("locked", isNodeLocked(nodeRef));
+               node.put("locked", RepoUtils.isNodeLocked(nodeService, lockService, nodeRef));
+               node.put("workingCopy", RepoUtils.isWorkingCopy(nodeService, nodeRef));
                
                this.contentNodes.add(node);
             }
             else
             {
-               if (s_logger.isDebugEnabled())
-                  s_logger.debug("Found neither a Space or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
+               if (logger.isDebugEnabled())
+                  logger.debug("Found neither a Space or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
             }
          }
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {parentNodeId}) );
+         Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {parentNodeId}) );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
       }
@@ -401,11 +403,11 @@ public class BrowseBean implements IContextListener
       String query = buildSearchQuery(searchText, searchMode);
       try
       {
-         if (s_logger.isDebugEnabled())
-            s_logger.debug("Searching using path: " + query);
+         if (logger.isDebugEnabled())
+            logger.debug("Searching using path: " + query);
          ResultSet results = this.searchService.query(Repository.getStoreRef(), "lucene", query, null, null);
-         if (s_logger.isDebugEnabled())
-            s_logger.debug("Search results returned: " + results.length());
+         if (logger.isDebugEnabled())
+            logger.debug("Search results returned: " + results.length());
          
          // create a list of items from the results
          this.containerNodes = new ArrayList<Node>(results.length());
@@ -425,48 +427,26 @@ public class BrowseBean implements IContextListener
                else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
                {
                   // special properties to be used by the value binding components on the page
-                  node.put("locked", isNodeLocked(ref));
+                  node.put("locked", RepoUtils.isNodeLocked(nodeService, lockService, ref));
+                  node.put("workingCopy", RepoUtils.isWorkingCopy(nodeService, ref));
                   
                   this.contentNodes.add(node);
                }
                else
                {
-                  if (s_logger.isDebugEnabled())
-                     s_logger.debug("Found neither a Space or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
+                  if (logger.isDebugEnabled())
+                     logger.debug("Found neither a Space or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
                }
             }
          }
       }
       catch (Exception err)
       {
-         s_logger.info("Search failed for: " + query);
+         logger.info("Search failed for: " + query);
          Utils.addErrorMessage( MessageFormat.format(ERROR_SEARCH, new Object[] {err.getMessage()}) );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
       }
-   }
-
-   /**
-    * Return whether a Node is current Locked
-    * 
-    * @param ref NodeRef
-    * 
-    * @return whether a Node is current Locked
-    */
-   private Boolean isNodeLocked(NodeRef ref)
-   {
-      Boolean locked = Boolean.FALSE;
-      if (nodeService.hasAspect(ref, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK))
-      {
-         // TODO: replace username with real user name ref here!
-         LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);
-         if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
-         {
-            locked = Boolean.TRUE;
-         }
-      }
-      
-      return locked;
    }
 
    /**
@@ -555,7 +535,7 @@ public class BrowseBean implements IContextListener
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
          }
       }
    }
@@ -573,8 +553,8 @@ public class BrowseBean implements IContextListener
          throw new IllegalStateException("NodeRef returned from UINodeDescendants.NodeSelectedEvent cannot be null!");
       }
       
-      if (s_logger.isDebugEnabled())
-         s_logger.debug("*Selected noderef Id: " + nodeRef.getId());
+      if (logger.isDebugEnabled())
+         logger.debug("*Selected noderef Id: " + nodeRef.getId());
       
       try
       {
@@ -583,11 +563,11 @@ public class BrowseBean implements IContextListener
          List<IBreadcrumbHandler> location = this.navigator.getLocation();
          ChildAssocRef parentAssocRef = nodeService.getPrimaryParent(nodeRef);
          
-         if (s_logger.isDebugEnabled())
+         if (logger.isDebugEnabled())
          {
-            s_logger.debug("Selected item getPrimaryParent().getChildRef() noderef Id:  " + parentAssocRef.getChildRef().getId());
-            s_logger.debug("Selected item getPrimaryParent().getParentRef() noderef Id: " + parentAssocRef.getParentRef().getId());
-            s_logger.debug("Current value getNavigator().getCurrentNodeId() noderef Id: " + getNavigator().getCurrentNodeId());
+            logger.debug("Selected item getPrimaryParent().getChildRef() noderef Id:  " + parentAssocRef.getChildRef().getId());
+            logger.debug("Selected item getPrimaryParent().getParentRef() noderef Id: " + parentAssocRef.getParentRef().getId());
+            logger.debug("Current value getNavigator().getCurrentNodeId() noderef Id: " + getNavigator().getCurrentNodeId());
          }
          
          if (nodeEvent.IsParent == false)
@@ -607,7 +587,7 @@ public class BrowseBean implements IContextListener
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
+         Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
       }
    }
    
@@ -625,8 +605,8 @@ public class BrowseBean implements IContextListener
       String id = params.get("id");
       if (id != null && id.length() != 0)
       {
-         if (s_logger.isDebugEnabled())
-            s_logger.debug("Setup for action, setting current space to: " + id);
+         if (logger.isDebugEnabled())
+            logger.debug("Setup for action, setting current space to: " + id);
          
          try
          {
@@ -639,7 +619,7 @@ public class BrowseBean implements IContextListener
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
          }
       }
       else
@@ -651,9 +631,9 @@ public class BrowseBean implements IContextListener
    }
    
    /**
-    * Action event called by all Browse actions that need to setup a Content Document context
-    * before an action page/wizard is called. The context will be a Node in setDocument() which
-    * can be retrieved on the action page from BrowseBean.getDocument().
+    * Action event called by all actions that need to setup a Content Document context on the 
+    * BrowseBean before an action page/wizard is called. The context will be a Node in
+    * setDocument() which can be retrieved on the action page from BrowseBean.getDocument().
     * 
     * @param event   ActionEvent
     */
@@ -664,8 +644,8 @@ public class BrowseBean implements IContextListener
       String id = params.get("id");
       if (id != null && id.length() != 0)
       {
-         if (s_logger.isDebugEnabled())
-            s_logger.debug("Setup for action, setting current document to: " + id);
+         if (logger.isDebugEnabled())
+            logger.debug("Setup for action, setting current document to: " + id);
          
          try
          {
@@ -678,7 +658,7 @@ public class BrowseBean implements IContextListener
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
          }
       }
       else
@@ -701,8 +681,8 @@ public class BrowseBean implements IContextListener
       {
          try
          {
-            if (s_logger.isDebugEnabled())
-               s_logger.debug("Trying to delete space Id: " + node.getId());
+            if (logger.isDebugEnabled())
+               logger.debug("Trying to delete space Id: " + node.getId());
             
             this.nodeService.deleteNode(node.getNodeRef());
             
@@ -747,131 +727,7 @@ public class BrowseBean implements IContextListener
       }
       else
       {
-         s_logger.warn("WARNING: deleteSpaceOK called without a current Space!");
-      }
-      
-      return outcome;
-   }
-   
-   /**
-    * Action called upon completion of the Check Out file page
-    */
-   public String checkoutFile()
-   {
-      String outcome = null;
-      
-      Node node = getDocument();
-      if (node != null)
-      {
-         try
-         {
-            if (s_logger.isDebugEnabled())
-               s_logger.debug("Trying to lock content node Id: " + node.getId());
-            
-            // lock the node, adding the Lock aspect if required
-            if (node.hasAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK) == false)
-            {
-               this.nodeService.addAspect(node.getNodeRef(), DictionaryBootstrap.ASPECT_CLASS_REF_LOCK, Collections.<QName, Serializable>emptyMap());
-            }
-            this.lockService.lock(node.getNodeRef(), USERNAME, LockType.READ_ONLY_LOCK);
-            
-            // TODO: checkout the node content etc.
-            
-            // show the page that display the checkout link
-            //
-            // TODO: setup appropriate context for this - should we move checkout into a separate bean?
-            //
-            outcome = "checkoutFileLink";
-         }
-         catch (Throwable err)
-         {
-            Utils.addErrorMessage("Unable to checkout Content Node due to system error: " + err.getMessage());
-         }
-      }
-      else
-      {
-         s_logger.warn("WARNING: checkoutFileOK called without a current Document!");
-      }
-      
-      return outcome;
-   }
-   
-   /**
-    * Action called upon completion of the Check Out file Link download page
-    */
-   public String checkoutFileOK()
-   {
-      String outcome = null;
-      
-      Node node = getDocument();
-      if (node != null)
-      {
-         // TODO: checkout the node content etc.
-         
-         // clear action context
-         setDocument(null);
-         
-         // refresh the UI, setting the outcome will show the browse view
-         invalidateComponents();
-         
-         outcome = "browse";
-      }
-      else
-      {
-         s_logger.warn("WARNING: checkoutFileOK called without a current Document!");
-      }
-      
-      return outcome;
-   }
-   
-   /**
-    * Action to undo the checkout of a document and return to the browse screen.
-    */
-   public String undoCheckout()
-   {
-      // TODO: implement undo checkout
-      return "browse";
-   }
-   
-   /**
-    * Action called upon completion of the Check In file page
-    */
-   public String checkinFileOK()
-   {
-      String outcome = null;
-      
-      Node node = getDocument();
-      if (node != null)
-      {
-         try
-         {
-            if (s_logger.isDebugEnabled())
-               s_logger.debug("Trying to unlock content node Id: " + node.getId());
-            
-            // lock the node, adding the Lock aspect if required
-            if (node.hasAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK) == true)
-            {
-               this.lockService.unlock(node.getNodeRef(), USERNAME);
-            }
-            
-            // TODO: checkin the node content etc.
-            
-            // clear action context
-            setDocument(null);
-            
-            // refresh the UI, setting the outcome will show the browse view
-            invalidateComponents();
-            
-            outcome = "browse";
-         }
-         catch (Throwable err)
-         {
-            Utils.addErrorMessage("Unable to checkout Content Node due to system error: " + err.getMessage());
-         }
-      }
-      else
-      {
-         s_logger.warn("WARNING: checkinFileOK called without a current Document!");
+         logger.warn("WARNING: deleteSpaceOK called without a current Space!");
       }
       
       return outcome;
@@ -905,8 +761,8 @@ public class BrowseBean implements IContextListener
     */
    private void invalidateComponents()
    {
-      if (s_logger.isDebugEnabled())
-         s_logger.debug("Invalidating UI List Components...");
+      if (logger.isDebugEnabled())
+         logger.debug("Invalidating UI List Components...");
       
       // clear the value for the list components - will cause re-bind to it's data and refresh
       if (this.contentRichList != null)
@@ -997,15 +853,11 @@ public class BrowseBean implements IContextListener
    // ------------------------------------------------------------------------------
    // Private data
    
-   // TODO: TEMP! Replace this once we have "users" in the system!
-   private static final String USERNAME = "admin";
-   
-   private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
    private static final String ERROR_SEARCH  = "Search failed during to a system error: {0}";
    
    public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
    
-   private static Logger s_logger = Logger.getLogger(BrowseBean.class);
+   private static Logger logger = Logger.getLogger(BrowseBean.class);
    
    //private static final String SEARCH_ALL               = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
    //private static final String SEARCH_FILE_NAME         = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";

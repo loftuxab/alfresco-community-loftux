@@ -9,6 +9,7 @@
 
 <%@ page import="org.alfresco.web.PanelGenerator" %>
 <%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
+<%@ page import="org.alfresco.web.AlfrescoFacesPortlet" %>
 
 <r:page>
 
@@ -130,7 +131,7 @@
                                  <h:form id="add-content-upload-end">
                                  <tr><td class="paddingRow"></td></tr>
                                  <%
-                                 AddContentWizard wiz = (AddContentWizard)session.getAttribute("javax.portlet.p.AlfrescoClientInstance.AlfrescoClientWindow?AddContentWizard");
+                                 AddContentWizard wiz = (AddContentWizard)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "AddContentWizard");
                                  if (wiz == null)
                                  {
                                  	wiz = (AddContentWizard)session.getAttribute("AddContentWizard");

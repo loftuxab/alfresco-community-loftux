@@ -148,7 +148,7 @@
                                  <tr>
                                     <td colspan="2">
                                        <h:selectBooleanCheckbox value="#{NewSpaceWizard.saveAsTemplate}"/>&nbsp;
-                                       Save as template
+                                       <span style="vertical-align:20%">Save as template</span>
                                     </td>
                                  </tr>
                                  <tr>

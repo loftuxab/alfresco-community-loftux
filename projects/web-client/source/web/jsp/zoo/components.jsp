@@ -375,7 +375,7 @@
       <a:inputDatePicker id="date1" value="#{TestList.rows[0].created}" startYear="1996" yearCount="10"/>
       <br>
       Date Picker with CSS style applied:<br>
-      <a:inputDatePicker id="date2" startYear="2000" yearCount="5" styleClass="userInputForm" />
+      <a:inputDatePicker id="date2" startYear="2000" yearCount="5" styleClass="inputField" />
       
       <p>
       

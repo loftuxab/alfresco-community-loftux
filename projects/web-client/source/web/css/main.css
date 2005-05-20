@@ -258,10 +258,10 @@ a.headbarLink
    padding: 4px;
 }
 
-.userInputForm
+input,textarea
 {
    font-family: Tahoma, Arial, Helvetica, sans-serif;
-   font-size: 10px;
+   font-size: 11px;
 }
 
 .dialogControls

@@ -7,6 +7,8 @@
 <%@ page isELIgnored="false" %>
 
 <%@ page import="org.alfresco.web.PanelGenerator" %>
+<%@ page import="org.alfresco.web.AlfrescoFacesPortlet" %>
+<%@ page import="org.alfresco.web.bean.CheckinCheckoutBean" %>
 
 <r:page>
 
@@ -19,7 +21,7 @@
    <f:loadBundle basename="messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="checkin-file">
+   <h:form id="checkin-file1">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -58,7 +60,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Check In '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainTitle">Check In '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Current status is 'draft'.</div>
                               <div class="mainSubText">Use this page to check in your working copy for other team members to work with.</div>
@@ -95,17 +97,65 @@
                                           <f:selectItem itemValue="current" itemLabel="Use copy in current space" />
                                           <f:selectItem itemValue="other" itemLabel="Locate copy on my computer" />
                                        </h:selectOneRadio>
-                                       <br>
-                                       TODO: Add upload component.
                                     </td>
                                  </tr>
+                                 
+                                 </h:form>
+                                 
+                                 <r:uploadForm>
+                                 <tr>
+                                    <td>
+                                       Location:<input style="margin-left:12px;" type="file" size="50" name="file"/>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td class="mainSubText">Click upload</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <input style="margin-left:12px;" type="submit" value="Upload" />
+                                    </td>
+                                 </tr>
+                                 </r:uploadForm>
+                                 
+                                 <h:form id="checkin-file2">
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <%
+                                 CheckinCheckoutBean bean = (CheckinCheckoutBean)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "CheckinCheckoutBean");
+                                 if (bean == null)
+                                 {
+                                 	bean = (CheckinCheckoutBean)session.getAttribute("CheckinCheckoutBean");
+                                 }
+                                 if (bean != null && bean.getFileName() != null) {
+                                 %>
+                                    <tr>
+                                       <td>
+                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                          The file "<%=bean.getFileName()%>" was uploaded successfully.
+                                       </td>
+                                    </tr>
+                                 <% } %>
+                                 
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td class="wizardSectionHeading">Check In options</td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       TODO: Add check in options.
+                                       Version Notes
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <h:inputTextarea id="notes" rows="2" cols="50"/>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>
+                                       <h:selectBooleanCheckbox id="keepCheckedOut" />&nbsp;
+                                       <span style="vertical-align:20%">Check in changes and keep file checked out</span>
                                     </td>
                                  </tr>
                               </table>
@@ -117,13 +167,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Check In" action="#{BrowseBean.checkinFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="Check In" action="#{CheckinCheckoutBean.checkinFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
+                                       <h:commandButton value="Cancel" action="#{CheckinCheckoutBean.cancel}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>

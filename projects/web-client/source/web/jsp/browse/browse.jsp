@@ -371,19 +371,21 @@
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
-                           <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction">
-                              <f:param name="id" value="#{r.id}" />
-                           </a:actionLink>
                            <a:booleanEvaluator value="#{r.locked == false}">
-                              <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{BrowseBean.setupContentAction}" action="checkoutFile">
+                              <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
+                           </a:booleanEvaluator>
+                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
+                           <a:booleanEvaluator value="#{r.locked == false && r.workingCopy == false}">
+                              <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                              <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </a:booleanEvaluator>
-                           <a:booleanEvaluator value="#{r.locked == true}">
-                              <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{BrowseBean.setupContentAction}" action="checkinFile">
+                           <a:booleanEvaluator value="#{r.workingCopy == true}">
+                              <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkinFile">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </a:booleanEvaluator>

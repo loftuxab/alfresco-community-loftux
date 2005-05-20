@@ -47,7 +47,7 @@ public class UploadFileServlet extends HttpServlet
          }
 
          if (logger.isDebugEnabled())
-            logger.debug("Uploading file...");
+            logger.debug("Uploading servlet servicing...");
          
          HttpSession session = request.getSession();
          ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
@@ -58,7 +58,6 @@ public class UploadFileServlet extends HttpServlet
          while(iter.hasNext())
          {
             FileItem item = iter.next();
-            String filename = item.getName();
             if(item.isFormField())
             {
                if (item.getFieldName().equalsIgnoreCase("return-page"))
@@ -68,13 +67,19 @@ public class UploadFileServlet extends HttpServlet
             }
             else
             {
-               File tempFile = File.createTempFile("alfresco", ".upload");
-               tempFile.deleteOnExit();
-               item.write(tempFile);
-               bean.setFile(tempFile);
-               bean.setFileName(filename);
-               bean.setFilePath(tempFile.getAbsolutePath());
-               session.setAttribute(FileUploadBean.FILE_UPLOAD_BEAN_NAME, bean);
+               String filename = item.getName();
+               if (filename != null && filename.length() != 0)
+               {
+                  File tempFile = File.createTempFile("alfresco", ".upload");
+                  tempFile.deleteOnExit();
+                  item.write(tempFile);
+                  bean.setFile(tempFile);
+                  bean.setFileName(filename);
+                  bean.setFilePath(tempFile.getAbsolutePath());
+                  session.setAttribute(FileUploadBean.FILE_UPLOAD_BEAN_NAME, bean);
+                  if (logger.isDebugEnabled())
+                     logger.debug("Temp file: " + tempFile.getAbsolutePath() + " created from upload filename: " + filename);
+               }
             }
          }
          
@@ -85,7 +90,7 @@ public class UploadFileServlet extends HttpServlet
 
          // finally redirect
          if (logger.isDebugEnabled())
-            logger.debug("Upload complete, redirecting to: " + returnPage);
+            logger.debug("Upload servicing complete, redirecting to: " + returnPage);
 
          response.sendRedirect(returnPage);
       }

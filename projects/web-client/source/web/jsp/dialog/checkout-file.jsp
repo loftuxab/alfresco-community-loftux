@@ -58,7 +58,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Check Out '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainTitle">Check Out '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Use this page to enter information about the checkout.</div>
@@ -88,8 +88,8 @@
                               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
                                     <td valign=top style="padding-top:2px"><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
-                                    <td>A copy of the file '<h:outputText value="#{BrowseBean.document.name}" />' will be made for you to work with.<br>
-                                        When you have completed your changes you need to check the file in to allow other to view your changes.
+                                    <td>A copy of the file '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' will be made for you to work with.<br>
+                                        When you have completed your changes you need to check-in the file to allow others to view the changes.
                                     </td>
                                  </tr>
                               </table>
@@ -101,7 +101,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Check Out" action="#{BrowseBean.checkoutFile}" styleClass="dialogControls" />
+                                       <h:commandButton value="Check Out" action="#{CheckinCheckoutBean.checkoutFile}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>

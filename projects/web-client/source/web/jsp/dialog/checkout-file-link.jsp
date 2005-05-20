@@ -58,7 +58,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Check Out of '<h:outputText value="#{BrowseBean.document.name}" />' Complete</div>
+                              <div class="mainTitle">Check Out of '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' Complete</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Use this page to edit the checked out file or undo the check out.</div>
@@ -88,7 +88,7 @@
                               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
                                     <td valign=top style="padding-top:2px"><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
-                                    <td>A copy of the file '<h:outputText value="#{BrowseBean.document.name}" />' is now checked out to you for editing.<br>
+                                    <td>A copy of the file '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' is now checked out to you for editing.<br>
                                         To edit the file follow the instructions below then click OK.<br>
                                         To undo the checkout click Undo Checkout.
                                     </td>
@@ -102,19 +102,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="OK" action="#{BrowseBean.checkoutFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="OK" action="#{CheckinCheckoutBean.checkoutFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Undo Checkout" action="#{BrowseBean.undoCheckout}" styleClass="dialogControls" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="dialogButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Close" action="browse" styleClass="dialogControls" />
+                                       <h:commandButton value="Undo Checkout" action="#{CheckinCheckoutBean.undoCheckout}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>
@@ -134,7 +128,8 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       ===TODO: FILE LINK HERE===
+                                       <%-- TODO: real downloadable file link here --%>
+                                       <b><h:outputText value="#{CheckinCheckoutBean.workingDocument.name}" /></b>
                                     </td>
                                  </tr>
                                  <tr>

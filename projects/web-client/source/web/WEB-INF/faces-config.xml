@@ -93,6 +93,27 @@
    
    <managed-bean>
       <description>
+         The bean that backs up the Checkin and Checkout pages.
+      </description>
+      <managed-bean-name>CheckinCheckoutBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.CheckinCheckoutBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>versionOperationsService</property-name>
+         <value>#{versionOperationsService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that holds navigation state.
       </description>
       <managed-bean-name>NavigationBean</managed-bean-name>
@@ -116,16 +137,16 @@
       <managed-bean-class>org.alfresco.web.bean.BrowseBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
          <property-name>nodeService</property-name>
          <value>#{indexingNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>searchService</property-name>
          <value>#{searcherComponent}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>navigator</property-name>
-         <value>#{NavigationBean}</value>
       </managed-property>
       <managed-property>
          <property-name>lockService</property-name>

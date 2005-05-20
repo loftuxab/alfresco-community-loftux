@@ -188,7 +188,7 @@ public class UISimpleSearch extends UICommand
       
       // close button
       out.write("<tr><td><table width=100%><tr><td>" +
-                "<input type='button' value='Close' class='userInputForm' onclick=\"document.getElementById('_search').style.display='none';\">" + 
+                "<input type='button' value='Close' class='dialogControls' onclick=\"document.getElementById('_search').style.display='none';\">" + 
                 "</td><td align=right>");
       out.write(searchImage);
       out.write("</td></tr></table></td></tr>");
@@ -200,7 +200,7 @@ public class UISimpleSearch extends UICommand
       out.write(getClientId(context));
       // TODO: style and class from component properties!
       out.write("' onkeypress=\"return _noenter(event)\"");
-      out.write(" class='userInputForm' type='text' maxlength='255' style='width:90px;padding-top:3px' value=\"");
+      out.write(" type='text' maxlength='255' style='width:90px;padding-top:3px' value=\"");
       // output previous search text stored in this component!
       out.write(getLastSearch());
       out.write("\">");
