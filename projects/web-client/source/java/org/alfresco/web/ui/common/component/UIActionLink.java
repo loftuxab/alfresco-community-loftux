@@ -50,6 +50,7 @@ public class UIActionLink extends UICommand
       this.image = (String)values[2];
       this.showLink = (Boolean)values[3];
       this.params = (Map)values[4];
+      this.href = (String)values[5];
    }
    
    /**
@@ -57,13 +58,14 @@ public class UIActionLink extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[5];
+      Object values[] = new Object[6];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.padding;
       values[2] = this.image;
       values[3] = this.showLink;
       values[4] = this.params;
+      values[5] = this.href;
       return (values);
    }
 
@@ -180,6 +182,29 @@ public class UIActionLink extends UICommand
       this.image = image;
    }
    
+   /**
+    * @return Returns the href.
+    */
+   public String getHref()
+   {
+      ValueBinding vb = getValueBinding("href");
+      if (vb != null)
+      {
+         this.href = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.href;
+   }
+   
+   /**
+    * @param href The href to set.
+    */
+   public void setHref(String href)
+   {
+      this.href = href;
+   }
+   
+   
    
    // ------------------------------------------------------------------------------
    // Private data
@@ -192,6 +217,8 @@ public class UIActionLink extends UICommand
    
    /** If an image is specified, it is shown in additon to the value text */
    private String image = null;
+   
+   private String href = null;
    
    /** Map of child param name/values pairs */
    private Map<String, String> params = new HashMap<String, String>(3, 1.0f);

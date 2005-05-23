@@ -141,10 +141,7 @@ public class ActionLinkTag extends HtmlComponentTag
    {
       this.href = href;
    }
-
-
-   /** the href */
-   private String href;
+   
 
    /** the padding in pixels */
    private String padding;
@@ -166,4 +163,7 @@ public class ActionLinkTag extends HtmlComponentTag
 
    /** the showLink boolean */
    private String showLink;
+   
+   /** the href link */
+   private String href;
 }

@@ -94,6 +94,10 @@ public class ActionLinkRenderer extends BaseRenderer
       StringBuilder buf = new StringBuilder(256);
       
       Map attrs = link.getAttributes();
+      if (attrs.get("absolute") != null)
+      {
+         logger.debug("Absolute: " + attrs.get("absolute"));
+      }
       if (attrs.get("href") == null)
       {
          buf.append("<a href='#' onclick=\"");
