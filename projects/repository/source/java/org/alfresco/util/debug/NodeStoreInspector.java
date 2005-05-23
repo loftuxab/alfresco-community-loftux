@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -62,18 +63,26 @@ public class NodeStoreInspector
     {
         StringBuilder builder = new StringBuilder();
         
-        // ClassRef nodeType = nodeService.getType(rootNode);
-        builder.
-            append(getIndent(iIndent)).
-            append("node: ").
-            append(nodeRef.getId()).
-            append("\n");
-          //  append(" (").
-          //  append(nodeType.toString()).
-          //  append(")\n");
-        
 		try
 		{
+	        ClassRef nodeType = nodeService.getType(nodeRef);
+	        builder.
+	            append(getIndent(iIndent)).
+	            append("node: ").
+	            append(nodeRef.getId()).
+	            append(" (").
+	            append(nodeType.getQName().getLocalName());
+			
+			Collection<ClassRef> aspects = nodeService.getAspects(nodeRef);
+			for (ClassRef aspect : aspects) 
+			{
+				builder.
+					append(", ").
+					append(aspect.getQName().getLocalName());
+			}
+			
+	        builder.append(")\n");        
+		
 	        Map<QName, Serializable> props = nodeService.getProperties(nodeRef);
 	        for (QName name : props.keySet())
 	        {
