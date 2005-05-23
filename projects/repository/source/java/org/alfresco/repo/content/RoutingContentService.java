@@ -73,6 +73,11 @@ public class RoutingContentService implements ContentService
 
     public ContentWriter getWriter(NodeRef nodeRef)
     {
+        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT))
+        {
+           throw new AspectMissingException(DictionaryBootstrap.ASPECT_CONTENT, nodeRef);
+        }
+        
         CodeMonkey.todo("Choose the store to write to at runtime");  // TODO
         ContentWriter writer = store.getWriter(nodeRef);
 
@@ -91,16 +96,21 @@ public class RoutingContentService implements ContentService
         return writer;
     }
 
-	/**
-	 * Add a listener to the plain writer
-	 * 
-	 * @see #getWriter(NodeRef)
-	 */
+	 /**
+	  * Add a listener to the plain writer
+	  * 
+	  * @see #getWriter(NodeRef)
+	  */
     public ContentWriter getUpdatingWriter(NodeRef nodeRef)
     {
-		// get the plain writer
-		ContentWriter writer = getWriter(nodeRef);
-		// get URL that is going to be written to
+        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT))
+        {
+           throw new AspectMissingException(DictionaryBootstrap.ASPECT_CONTENT, nodeRef);
+        }
+        
+		  // get the plain writer
+		  ContentWriter writer = getWriter(nodeRef);
+		  // get URL that is going to be written to
         String contentUrl = writer.getContentUrl();
         // need a listener to update the node when the stream closes
         WriteStreamListener listener = new WriteStreamListener(nodeRef, contentUrl);
