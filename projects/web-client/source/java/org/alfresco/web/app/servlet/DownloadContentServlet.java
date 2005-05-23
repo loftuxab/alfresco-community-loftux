@@ -4,6 +4,9 @@
 package org.alfresco.web.app.servlet;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -14,10 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.alfresco.web.config.MimeTypeConfigElement;
 import org.alfresco.web.config.MimeTypesElementReader;
 import org.apache.log4j.Logger;
@@ -25,6 +31,14 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
+ * Servlet responsible for streaming node content from the repo directly to the reponse stream.
+ * The appropriate mimetype is calculated based on filename extension.
+ * <p>
+ * The URL to the servlet should be generated thus:
+ * <pre>/web-client/download/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
+ * the store protocol, followed by the store ID, followed by the content Node Id
+ * the last part is used for mimetype calculation and browser default filename
+ * 
  * @author Kevin Roast
  */
 public class DownloadContentServlet extends HttpServlet
@@ -43,10 +57,10 @@ public class DownloadContentServlet extends HttpServlet
          // TODO: add compression here?
          //       see http://servlets.com/jservlet2/examples/ch06/ViewResourceCompress.java for example
          
-         // /web-client/download/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
          // The URL contains multiple parts
+         // /web-client/download/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
          // the protocol, followed by the store, followed by the Id
-         // the last part is only used for mimetype and for browser use
+         // the last part is only used for mimetype and browser use
          String uri = req.getRequestURI();
          if (logger.isDebugEnabled())
             logger.debug("Processing URL: " + uri);
@@ -55,8 +69,8 @@ public class DownloadContentServlet extends HttpServlet
          {
             throw new IllegalArgumentException("Download URL did not contain all required args: " + uri); 
          }
-         t.nextToken();    // skip
-         t.nextToken();    // skip
+         t.nextToken();    // skip web app name
+         t.nextToken();    // skip servlet name
          StoreRef storeRef = new StoreRef(t.nextToken(), t.nextToken());
          String id = t.nextToken();
          String filename = t.nextToken();
@@ -64,11 +78,20 @@ public class DownloadContentServlet extends HttpServlet
          if (logger.isDebugEnabled())
             logger.debug("Found NodeRef: " + nodeRef.toString());
          
+         // set header based on filename - will force a Save As from the browse if it doesn't recognise it
+         // this is better than the default response of the browse trying to display the contents!
+         // TODO: make this configurable - and check it does not prevent streaming of large files
+         res.setHeader("Content-Disposition", "attachment;filename=" + URLDecoder.decode(filename));
+         
+         // useful debug output!
+         //logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
+         
          // base the mimetype from the file extension
          ConfigService configService = (ConfigService)context.getBean("configService");
          MimeTypeConfigElement config = (MimeTypeConfigElement)configService.getGlobalConfig()
                .getConfigElement(MimeTypesElementReader.ELEMENT_MIMETYPES);
          
+         // fall back if mimetype not found
          String mimetype = "text/plain";
          int extIndex = filename.lastIndexOf('.');
          if (extIndex != -1)
@@ -82,6 +105,8 @@ public class DownloadContentServlet extends HttpServlet
          res.setContentType(mimetype);
          
          // get the content and stream directly to the response output stream
+         // assuming the repo is capable of streaming in chunks, this should allow large files
+         // to be streamed directly to the browser response stream.
          ContentService contentService = (ContentService)context.getBean("contentService");
          ContentReader reader = contentService.getReader(nodeRef);
          reader.getContent( res.getOutputStream() );
@@ -90,13 +115,25 @@ public class DownloadContentServlet extends HttpServlet
       }
       catch (Throwable err)
       {
-         throw new RuntimeException("Error during download content servlet processing: " + err.getMessage(), err);
+         throw new AlfrescoRuntimeException("Error during download content servlet processing: " + err.getMessage(), err);
       }
       finally
       {
          out.close();
       }
    }
-      
+   
+   public final static String generateURL(NodeRef ref, String name)
+   {
+      return MessageFormat.format(DOWNLOAD_URL, new Object[] {
+            ref.getStoreRef().getProtocol(),
+            ref.getStoreRef().getIdentifier(),
+            ref.getId(),
+            URLEncoder.encode(name) } );
+   }
+   
+   
    private static Logger logger = Logger.getLogger(DownloadContentServlet.class);
+   
+   private static final String DOWNLOAD_URL = "/download/{0}/{1}/{2}/{3}";
 }

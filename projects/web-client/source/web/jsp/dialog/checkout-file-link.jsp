@@ -87,7 +87,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
                               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
-                                    <td valign=top style="padding-top:2px"><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
+                                    <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
                                     <td>A copy of the file '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' is now checked out to you for editing.<br>
                                         To edit the file follow the instructions below then click OK.<br>
                                         To undo the checkout click Undo Checkout.

@@ -32,6 +32,7 @@ import org.alfresco.repo.value.ValueConverter;
 import org.alfresco.repo.version.operations.VersionOperationsService;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -375,6 +376,7 @@ public class BrowseBean implements IContextListener
                // special properties to be used by the value binding components on the page
                node.put("locked", RepoUtils.isNodeLocked(nodeService, lockService, nodeRef));
                node.put("workingCopy", RepoUtils.isWorkingCopy(nodeService, nodeRef));
+               node.put("url", DownloadContentServlet.generateURL(nodeRef, node.getName()));
                
                this.contentNodes.add(node);
             }
@@ -418,8 +420,8 @@ public class BrowseBean implements IContextListener
          {
             for (ResultSetRow row: results)
             {
-               NodeRef ref = row.getNodeRef();
-               MapNode node = new MapNode(ref, this.nodeService);
+               NodeRef nodeRef = row.getNodeRef();
+               MapNode node = new MapNode(nodeRef, this.nodeService);
                
                // look for Space or File nodes
                if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
@@ -429,8 +431,9 @@ public class BrowseBean implements IContextListener
                else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
                {
                   // special properties to be used by the value binding components on the page
-                  node.put("locked", RepoUtils.isNodeLocked(nodeService, lockService, ref));
-                  node.put("workingCopy", RepoUtils.isWorkingCopy(nodeService, ref));
+                  node.put("locked", RepoUtils.isNodeLocked(nodeService, lockService, nodeRef));
+                  node.put("workingCopy", RepoUtils.isWorkingCopy(nodeService, nodeRef));
+                  node.put("url", DownloadContentServlet.generateURL(nodeRef, node.getName()));
                   
                   this.contentNodes.add(node);
                }

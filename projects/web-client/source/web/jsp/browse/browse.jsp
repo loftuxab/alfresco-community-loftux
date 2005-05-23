@@ -371,8 +371,11 @@
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
-                           <a:booleanEvaluator value="#{r.locked == false}">
+                           <a:actionLink value="#{msg.view}" href="#{r.url}" image="/images/icons/View_small.gif" showLink="false" styleClass="inlineAction" />
+                           <a:booleanEvaluator value="#{r.workingCopy == true}"><%-- TODO: && userid == currentuser --%>
                               <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
+                           </a:booleanEvaluator>
+                           <a:booleanEvaluator value="#{r.locked == false}">
                               <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
                            </a:booleanEvaluator>
                            <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />

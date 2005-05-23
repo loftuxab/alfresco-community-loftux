@@ -361,6 +361,15 @@ public class AddContentWizard
          // add the properties to the node
          nodeService.setProperties(fileNodeRef, properties);
          
+         // apply the content aspect if it's not already applied
+         if (nodeService.hasAspect(fileNodeRef, DictionaryBootstrap.ASPECT_CONTENT) == false)
+         {
+            Map<QName, Serializable> props = new HashMap<QName, Serializable>(3, 1.0f);
+            props.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+            props.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+            nodeService.addAspect(fileNodeRef, DictionaryBootstrap.ASPECT_CONTENT, props);
+         }
+         
          // get a writer for the content and put the file
          ContentWriter writer = contentService.getUpdatingWriter(fileNodeRef);
          writer.putContent(this.file);

@@ -40,6 +40,7 @@ public class ActionLinkTag extends HtmlComponentTag
       setBooleanProperty(component, "showLink", this.showLink);
       setStringProperty(component, "verticalAlign", this.verticalAlign);
       setIntProperty(component, "padding", this.padding);
+      setStringProperty(component, "href", this.href);
       setStringProperty(component, "value", this.value);
       
       // TODO: Add image width/height properties
@@ -58,6 +59,7 @@ public class ActionLinkTag extends HtmlComponentTag
       this.showLink = null;
       this.verticalAlign = null;
       this.padding = null;
+      this.href = null;
    }
    
    /**
@@ -129,7 +131,20 @@ public class ActionLinkTag extends HtmlComponentTag
    {
       this.padding = padding;
    }
+   
+   /**
+    * Set the href to use instead of a JSF action
+    *
+    * @param href     the href
+    */
+   public void setHref(String href)
+   {
+      this.href = href;
+   }
 
+
+   /** the href */
+   private String href;
 
    /** the padding in pixels */
    private String padding;

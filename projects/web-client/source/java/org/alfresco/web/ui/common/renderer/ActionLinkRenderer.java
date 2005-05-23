@@ -93,12 +93,29 @@ public class ActionLinkRenderer extends BaseRenderer
    {
       StringBuilder buf = new StringBuilder(256);
       
-      buf.append("<a href='#' onclick=\"");
-      // generate JavaScript to set a hidden form field and submit
-      // a form which request attributes that we can decode
-      buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
-      buf.append('"');
       Map attrs = link.getAttributes();
+      if (attrs.get("href") == null)
+      {
+         buf.append("<a href='#' onclick=\"");
+         // generate JavaScript to set a hidden form field and submit
+         // a form which request attributes that we can decode
+         buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
+         buf.append('"');
+      }
+      else
+      {
+         String href = (String)attrs.get("href");
+         if (href.startsWith("http") == false)
+         {
+            href = context.getExternalContext().getRequestContextPath() + href;
+         }
+         buf.append("<a href=\"")
+            .append(href)
+            .append('"');
+         
+         // TODO: support 'target' attribute?
+      }
+      
       if (attrs.get("style") != null)
       {
          buf.append(" style=\"")
@@ -201,7 +218,8 @@ public class ActionLinkRenderer extends BaseRenderer
       }
       
       // render text link cell for the menu
-      buf.append("><a href='#' onclick=\"");
+      buf.append(">");
+      buf.append("<a href='#' onclick=\"");
       buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
       buf.append('"');
       Map attrs = link.getAttributes();

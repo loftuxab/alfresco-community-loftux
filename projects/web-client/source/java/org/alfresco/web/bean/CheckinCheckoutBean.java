@@ -23,6 +23,7 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.version.operations.VersionOperationsService;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -252,23 +253,10 @@ public class CheckinCheckoutBean
             setWorkingDocument(workingCopy);
             
             // create content URL to the content download servlet with ID and expected filename
-            // e.g. /servlet/download/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
             // the myfile part will be ignored by the servlet but gives the browser a hint
-            String url = MessageFormat.format(DOWNLOAD_URL, new Object[] {
-                  workingCopyRef.getStoreRef().getProtocol(),
-                  workingCopyRef.getStoreRef().getIdentifier(),
-                  workingCopyRef.getId(),
-                  URLEncoder.encode(workingCopy.getName()) } );
+            String url = DownloadContentServlet.generateURL(workingCopyRef, workingCopy.getName());
             
             workingCopy.getProperties().put("url", url);
-            /*
-            HttpServletRequest req = (HttpServletRequest)pageContext.getRequest(); 
-            out.write(req.getContextPath());
-            out.write("/uploadFileServlet'>\n");
-            out.write("<input type='hidden' name='return-page' value='");
-            out.write(req.getContextPath() + "/faces" + req.getServletPath());
-            out.write("'>\n");
-             */
             
             // show the page that display the checkout link
             outcome = "checkoutFileLink";
@@ -436,8 +424,6 @@ public class CheckinCheckoutBean
    // Private data
    
    private static Logger logger = Logger.getLogger(CheckinCheckoutBean.class);
-   
-   private static final String DOWNLOAD_URL = "/download/{0}/{1}/{2}/{3}";
    
    private static final String WORKING_COPY = " (working copy)";
    
