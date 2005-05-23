@@ -146,6 +146,9 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		return workingCopy;
 	}
 	
+	/**
+	 * Test checkIn
+	 */
 	public void testCheckIn()
 	{
 		NodeRef workingCopy = checkout();
@@ -184,8 +187,19 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		
 	}
 	
+	/**
+	 * Test cancel checkOut
+	 */
 	public void testCancelCheckOut()
 	{
+		NodeRef workingCopy = checkout();
+		assertNotNull(workingCopy);
+		
+		NodeRef origNodeRef = this.versionOperationsService.cancelCheckout(workingCopy);
+		assertEquals(this.nodeRef, origNodeRef);
+		
+		System.out.println(
+				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 	}
 
 }
