@@ -1,1 +1,0 @@
-Just a check that new files remain added with the SVN SWITCH
