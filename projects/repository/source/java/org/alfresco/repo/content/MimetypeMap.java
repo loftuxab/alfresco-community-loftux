@@ -11,6 +11,8 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides a bidirectional mapping between well-known mimetypes and
@@ -28,6 +30,8 @@ public class MimetypeMap
     private static final String ATTR_DISPLAY = "display";
     private static final String ELEMENT_EXTENSION = "extension";
     private static final String ATTR_DEFAULT = "default";
+    
+    private static final Log logger = LogFactory.getLog(MimetypeMap.class);
     
     private ConfigService configService;
     
@@ -59,34 +63,66 @@ public class MimetypeMap
         Config config = configService.getConfig(CONFIG_CONDITION, CONFIG_AREA);
         ConfigElement mimetypesElement = config.getConfigElement(ELEMENT_MIMETYPES);
         List<ConfigElement> mimetypes = mimetypesElement.getChildren();
+        int count = 0;
         for (ConfigElement mimetypeElement : mimetypes)
         {
+            count++;
+            // add to list of mimetypes
             String mimetype = mimetypeElement.getAttribute(ATTR_MIMETYPE);
-            String mimetypeDisplay = mimetypeElement.getAttribute(ATTR_DISPLAY);
+            if (mimetype == null || mimetype.length() == 0)
+            {
+                logger.warn("Ignoring empty mimetype " + count);
+                continue;
+            }
             if (this.mimetypes.contains(mimetype))
             {
                 throw new AlfrescoRuntimeException("Duplicate mimetype definition: " + mimetype);
             }
-            // add to list of mimetypes
             this.mimetypes.add(mimetype);
             // add to map of mimetype displays
-            this.displaysByMimetype.put(mimetype, mimetypeDisplay);
-            List<ConfigElement> extensions = mimetypeElement.getChildren();
-            for (ConfigElement extension : extensions)
+            String mimetypeDisplay = mimetypeElement.getAttribute(ATTR_DISPLAY);
+            if (mimetypeDisplay != null && mimetypeDisplay.length() > 0)
             {
-                String extensionValue = extension.getValue();
-                String extensionDisplay = extension.getAttribute(ATTR_DISPLAY);
-                String isDefaultStr = extension.getAttribute(ATTR_DEFAULT);
-                boolean isDefault = Boolean.parseBoolean(isDefaultStr);
+                this.displaysByMimetype.put(mimetype, mimetypeDisplay);
+            }
+            
+            // get all the extensions
+            boolean isFirst = true;
+            List<ConfigElement> extensions = mimetypeElement.getChildren();
+            for (ConfigElement extensionElement : extensions)
+            {
                 // add to map of mimetypes by extension
-                this.mimetypesByExtension.put(extensionValue, mimetype);
-                // add to map of extension displays
-                this.displaysByExtension.put(extensionValue, extensionDisplay);
-                // add to map of extensions by mimetype
-                if (isDefault)
+                String extension = extensionElement.getValue();
+                if (extension == null || extension.length() == 0)
                 {
-                    this.extensionsByMimetype.put(mimetype, extensionValue);
+                    logger.warn("Ignoring empty extension for mimetype: " + mimetype);
+                    continue;
                 }
+                this.mimetypesByExtension.put(extension, mimetype);
+                // add to map of extension displays
+                String extensionDisplay = extensionElement.getAttribute(ATTR_DISPLAY);
+                if (extensionDisplay != null && extensionDisplay.length() > 0)
+                {
+                    this.displaysByExtension.put(extension, extensionDisplay);
+                }
+                else if (mimetypeDisplay != null && mimetypeDisplay.length() > 0)
+                {
+                    // no display defined for the extension - use the mimetype's display
+                    this.displaysByExtension.put(extension, mimetypeDisplay);
+                }
+                // add to map of extensions by mimetype if it is the default or first extension
+                String isDefaultStr = extensionElement.getAttribute(ATTR_DEFAULT);
+                boolean isDefault = Boolean.parseBoolean(isDefaultStr);
+                if (isDefault || isFirst)
+                {
+                    this.extensionsByMimetype.put(mimetype, extension);
+                }
+                isFirst = false;
+            }
+            // check that there were extensions defined
+            if (extensions.size() == 0)
+            {
+                logger.warn("No extensions defined for mimetype: " + mimetype);
             }
         }
         

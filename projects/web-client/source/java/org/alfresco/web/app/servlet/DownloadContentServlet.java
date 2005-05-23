@@ -15,17 +15,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.node.NodeService;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.util.debug.NodeStoreInspector;
-import org.alfresco.web.config.MimeTypeConfigElement;
-import org.alfresco.web.config.MimeTypesElementReader;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -87,16 +82,14 @@ public class DownloadContentServlet extends HttpServlet
          //logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
          
          // base the mimetype from the file extension
-         ConfigService configService = (ConfigService)context.getBean("configService");
-         MimeTypeConfigElement config = (MimeTypeConfigElement)configService.getGlobalConfig()
-               .getConfigElement(MimeTypesElementReader.ELEMENT_MIMETYPES);
+         MimetypeMap mimetypeMap = (MimetypeMap)context.getBean("mimetypeMap");
          
          // fall back if mimetype not found
          String mimetype = "text/plain";
          int extIndex = filename.lastIndexOf('.');
          if (extIndex != -1)
          {
-            String mt = config.getMimeType(filename.substring(extIndex + 1));
+            String mt = mimetypeMap.getMimetypesByExtension().get(extIndex);
             if (mt != null)
             {
                mimetype = mt;

@@ -3,9 +3,11 @@
  */
 package org.alfresco.repo.version.lightweight;
 
+import org.alfresco.repo.content.ContentIOException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
+import org.alfresco.repo.content.NoTransformerException;
 import org.alfresco.repo.ref.NodeRef;
 ;
 
@@ -69,7 +71,14 @@ public class ContentServiceImpl implements ContentService
      */
     public ContentWriter getTempWriter()
     {
-        //return versionContentStore.getWriter();
 		return this.contentService.getTempWriter();
+    }
+
+    /**
+     * Delegates to the underlying content service.
+     */
+    public void transform(ContentReader reader, ContentWriter writer) throws NoTransformerException, ContentIOException
+    {
+        this.contentService.transform(reader, writer);
     }        
 }

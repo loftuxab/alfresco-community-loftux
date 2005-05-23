@@ -1,6 +1,7 @@
 package org.alfresco.repo.content;
 
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.util.AspectMissingException;
 
 /**
  * Provides methods for accessing and transforming content.
@@ -31,8 +32,10 @@ public interface ContentService
      * @param nodeRef a reference to a node with the <b>content</b> aspect
      * @return Returns a reader for the content associated with the node,
      *      or null if no content has been written for the node
+     * @throws AspectMissingException if the node does not have the <b>content</b>
+     *      aspect
      */
-    public ContentReader getReader(NodeRef nodeRef);
+    public ContentReader getReader(NodeRef nodeRef) throws AspectMissingException;
 
 	/**
 	 * Gets a writer for the content associated with the given node.
@@ -79,6 +82,6 @@ public interface ContentService
      *      given source and target mimetypes of the reader and writer
      * @throws ContentIOException if the transformation fails
      */
-//    public void transform(ContentReader reader, ContentWriter writer)
-//            throws NoTransformerException, ContentIOException;
+    public void transform(ContentReader reader, ContentWriter writer)
+            throws NoTransformerException, ContentIOException;
 }

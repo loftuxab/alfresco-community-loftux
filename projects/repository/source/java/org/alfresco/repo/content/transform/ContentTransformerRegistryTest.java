@@ -16,9 +16,9 @@ import org.alfresco.util.BaseSpringTest;
  */
 public class ContentTransformerRegistryTest extends BaseSpringTest
 {
-    private static final String A = "A";
-    private static final String B = "B";
-    private static final String C = "C";
+    private static final String A = "text/plain";
+    private static final String B = "text/xml";
+    private static final String C = "text/sgml";
     
     private ContentTransformerRegistry registry;
     private ContentTransformerRegistry dummyRegistry;

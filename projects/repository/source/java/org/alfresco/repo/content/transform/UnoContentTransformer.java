@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.joott.uno.DocumentConverter;
-import net.sf.joott.uno.DocumentConverterFactory;
 import net.sf.joott.uno.DocumentFormat;
 import net.sf.joott.uno.UnoConnection;
 
@@ -32,7 +31,7 @@ public class UnoContentTransformer implements ContentTransformer
     
     /** map of <tt>DocumentFormat</tt> instances keyed by mimetype */
     private static Map<String, DocumentFormat> formatsByMimetype;
-
+    
     static
     {
         // Build the map of known Uno document formats and store by mimetype 
@@ -57,6 +56,7 @@ public class UnoContentTransformer implements ContentTransformer
     }
     
     private UnoConnection connection;
+    private boolean isConnected;
     
     /**
      * Constructs the default transformer that will attempt to connect to the
@@ -95,9 +95,19 @@ public class UnoContentTransformer implements ContentTransformer
     /**
      * @param unoConnectionUrl the URL of the Uno server
      */
-    private void init(String unoConnectionUrl)
+    private synchronized void init(String unoConnectionUrl)
     {
         connection = new UnoConnection(unoConnectionUrl);
+        // attempt to make an connection
+        try
+        {
+            connection.connect();
+            isConnected = true;
+        }
+        catch (ConnectException e)
+        {
+            isConnected = false;
+        }
     }
     
     /**
@@ -105,16 +115,7 @@ public class UnoContentTransformer implements ContentTransformer
      */
     public boolean isConnected()
     {
-        try
-        {
-            DocumentConverterFactory.getConnection();
-            return true;
-        }
-        catch (ConnectException e)
-        {
-            // connection failed
-            return false;
-        }
+        return isConnected;
     }
 
     /**
@@ -192,7 +193,7 @@ public class UnoContentTransformer implements ContentTransformer
         // perform the conversion using the Uno server
         try
         {
-            DocumentConverter converter = DocumentConverterFactory.getConverter();
+            DocumentConverter converter = new DocumentConverter(connection);
             converter.convert(tempFromFile, tempToFile, targetFormat);
             // conversion success
         }

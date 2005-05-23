@@ -1,6 +1,9 @@
 package org.alfresco.repo.content;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.filestore.FileContentStore;
+import org.alfresco.repo.content.transform.ContentTransformer;
+import org.alfresco.repo.content.transform.ContentTransformerRegistry;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
@@ -16,6 +19,8 @@ import org.alfresco.util.debug.CodeMonkey;
 public class RoutingContentService implements ContentService
 {
     private NodeService nodeService;
+    /** a registry of all available content transformers */
+    private ContentTransformerRegistry transformerRegistry;
     /** TEMPORARY until we have a map to choose from at runtime */
     private ContentStore store;
     
@@ -25,10 +30,13 @@ public class RoutingContentService implements ContentService
      *      content writes
      * @param storeRoot temporary measure to set a working store root
      */
-    public RoutingContentService(NodeService nodeService, String storeRoot)
+    public RoutingContentService(NodeService nodeService,
+            ContentTransformerRegistry transformerRegistry,
+            String storeRoot)
     {
         CodeMonkey.todo("The store root should be set on the store directly and via a config file");  // TODO
         this.nodeService = nodeService;
+        this.transformerRegistry = transformerRegistry;
         this.store = new FileContentStore(storeRoot);
     }
 
@@ -167,8 +175,28 @@ public class RoutingContentService implements ContentService
      * @see org.alfresco.repo.content.transform.ContentTransformerRegistry
      * @see org.alfresco.repo.content.transform.ContentTransformer
      */
-    public void transform(ContentReader reader, ContentWriter writer) throws NoTransformerException, ContentIOException
+    public void transform(ContentReader reader, ContentWriter writer)
+            throws NoTransformerException, ContentIOException
     {
-        throw new UnsupportedOperationException();
+        // check that source and target mimetypes are available
+        String sourceMimetype = reader.getMimetype();
+        if (sourceMimetype == null)
+        {
+            throw new AlfrescoRuntimeException("The content reader mimetype must be set: " + reader);
+        }
+        String targetMimetype = writer.getMimetype();
+        if (targetMimetype == null)
+        {
+            throw new AlfrescoRuntimeException("The content writer mimetype must be set: " + writer);
+        }
+        // look for a transformer
+        ContentTransformer transformer = transformerRegistry.getTransformer(sourceMimetype, targetMimetype);
+        if (transformer == null)
+        {
+            throw new NoTransformerException(sourceMimetype, targetMimetype);
+        }
+        // we have a transformer, so do it
+        transformer.transform(reader, writer);
+        // done
     }
 }

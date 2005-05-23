@@ -235,6 +235,9 @@
                <ref bean="indexingNodeService" />
             </constructor-arg>
             <constructor-arg>
+               <ref bean="contentTransformerRegistry" />
+            </constructor-arg>
+            <constructor-arg>
                <value>c:/contentstore</value>
             </constructor-arg>
          </bean>

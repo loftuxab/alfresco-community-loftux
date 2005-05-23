@@ -7,6 +7,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.util.debug.CodeMonkey;
 import org.apache.commons.logging.Log;
@@ -68,6 +69,16 @@ public class ContentTransformerRegistry
      */
     public ContentTransformer getTransformer(String sourceMimetype, String targetMimetype)
     {
+        // check that the mimetypes are valid
+        if (!mimetypeMap.getMimetypes().contains(sourceMimetype))
+        {
+            throw new AlfrescoRuntimeException("Unknown source mimetype: " + sourceMimetype);
+        }
+        if (!mimetypeMap.getMimetypes().contains(targetMimetype))
+        {
+            throw new AlfrescoRuntimeException("Unknown target mimetype: " + targetMimetype);
+        }
+        
         TransformationKey key = new TransformationKey(sourceMimetype, targetMimetype);
         transformationCacheReadLock.lock();
         try
