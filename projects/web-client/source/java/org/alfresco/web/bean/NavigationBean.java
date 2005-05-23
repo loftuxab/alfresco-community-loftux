@@ -21,6 +21,7 @@ import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.Searcher;
+import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;

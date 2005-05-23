@@ -1,4 +1,4 @@
-package org.alfresco.web;
+package org.alfresco.web.app;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -12,7 +12,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.util.Utils;
 
 /**
  * ServletContextListener implementation that initialises the application.
@@ -43,7 +42,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       }
       
       if (logger.isDebugEnabled())
-         logger.debug("Server is running in portal server: " + Utils.inPortalServer(event.getServletContext()));
+         logger.debug("Server is running in portal server: " + Application.inPortalServer(event.getServletContext()));
    }
 
    /**

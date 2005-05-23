@@ -1,4 +1,4 @@
-package org.alfresco.web;
+package org.alfresco.web.app.servlet;
 
 import java.io.IOException;
 
@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.ErrorBean;
-import org.alfresco.web.util.Utils;
 import org.apache.log4j.Logger;
 
 /**
@@ -38,7 +38,7 @@ public class AlfrescoFacesServlet extends FacesServlet
       {
          // TODO: determine the return page
          
-         Utils.handleServletError(getServletConfig().getServletContext(), (HttpServletRequest)request,
+         Application.handleServletError(getServletConfig().getServletContext(), (HttpServletRequest)request,
                (HttpServletResponse)response, error, logger, null);
       }
    }

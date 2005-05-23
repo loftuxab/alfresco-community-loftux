@@ -1,4 +1,4 @@
-package org.alfresco.web;
+package org.alfresco.web.app.portlet;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,9 +14,9 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.UnavailableException;
 
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
-import org.alfresco.web.util.Utils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
@@ -100,7 +100,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
       }
       catch (Throwable e)
       {
-         if (Utils.getErrorPage(getPortletContext()) != null)
+         if (Application.getErrorPage(getPortletContext()) != null)
          {
             handleError(request, response, e);
          }
@@ -149,7 +149,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
    {
       if (request.getParameter(ERROR_OCCURRED) != null)
       {
-         String errorPage = Utils.getErrorPage(getPortletContext());
+         String errorPage = Application.getErrorPage(getPortletContext());
          
          if (logger.isDebugEnabled())
             logger.debug("An error has occurred, redirecting to error page: " + errorPage);

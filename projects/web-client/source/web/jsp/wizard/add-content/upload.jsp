@@ -7,7 +7,7 @@
 
 <%@ page isELIgnored="false" %>
 
-<%@ page import="org.alfresco.web.PanelGenerator" %>
+<%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 <%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
 <%@ page import="org.alfresco.web.AlfrescoFacesPortlet" %>
 

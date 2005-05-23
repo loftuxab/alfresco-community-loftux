@@ -60,7 +60,7 @@
       </a:menu>
       <p>
       Menu with image, styles and actions with icons:<br>
-      <a:menu id="menu2" styleClass="header" itemSpacing="2" label="More..." image="/images/arrow_expanded.gif" tooltip="Click Me"
+      <a:menu id="menu2" styleClass="header" itemSpacing="2" label="More..." image="/images/icons/arrow_expanded.gif" tooltip="Click Me"
             menuStyle="background-color:#eeeeee;border-top:thin solid #FFFFFF; border-left:thin solid #FFFFFF; border-right:thin solid #444444; border-bottom:thin solid #444444;">
          <a:actionLink value="Menu Action Link" image="/images/icons/BlueArrow.gif" />
          <a:actionLink value="Click Me" image="/images/icons/link_small.gif" action="success" actionListener="#{TestList.clickActionLink}" styleClass="header" />

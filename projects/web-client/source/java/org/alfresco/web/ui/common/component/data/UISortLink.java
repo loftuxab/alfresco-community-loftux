@@ -269,9 +269,9 @@ public class UISortLink extends UICommand
    
    private static Logger s_logger = Logger.getLogger(IDataContainer.class);
    
-   private final static String IMAGE_SORTUP     = "/images/sort_up.gif";
-   private final static String IMAGE_SORTDOWN   = "/images/sort_down.gif";
-   private final static String IMAGE_SORTNONE   = "/images/sort_flat.gif";
+   private final static String IMAGE_SORTUP     = "/images/icons/sort_up.gif";
+   private final static String IMAGE_SORTDOWN   = "/images/icons/sort_down.gif";
+   private final static String IMAGE_SORTNONE   = "/images/icons/sort_flat.gif";
    
    /** sorting mode */
    private String mode = IDataContainer.SORT_CASEINSENSITIVE;

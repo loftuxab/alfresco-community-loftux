@@ -30,6 +30,8 @@ import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.value.ValueConverter;
 import org.alfresco.repo.version.operations.VersionOperationsService;
+import org.alfresco.web.app.context.IContextListener;
+import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -276,7 +278,7 @@ public class BrowseBean implements IContextListener
    // IContextListener implementation 
    
    /**
-    * @see org.alfresco.web.bean.IContextListener#contextUpdated()
+    * @see org.alfresco.web.app.context.IContextListener#contextUpdated()
     */
    public void contextUpdated()
    {

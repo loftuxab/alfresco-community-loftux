@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.alfresco.web.util.Utils;
+import org.alfresco.web.app.Application;
 import org.apache.log4j.Logger;
 
 /**
@@ -32,7 +32,7 @@ public class UploadFormTag extends TagSupport
          
          out.write("<form name='upload-form' method='post' enctype='multipart/form-data' action='");
          
-         if (Utils.inPortalServer(pageContext.getServletContext()))
+         if (Application.inPortalServer(pageContext.getServletContext()))
          {
             RenderResponse renderResp  = (RenderResponse)pageContext.getRequest().
                                    getAttribute("javax.portlet.response");

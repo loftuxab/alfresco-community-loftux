@@ -6,7 +6,7 @@
 
 <%@ page isELIgnored="false" %>
 
-<%@ page import="org.alfresco.web.PanelGenerator" %>
+<%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
    
@@ -56,7 +56,7 @@
                            <%-- actions for browse mode --%>
                            <a:panel id="browse-actions" rendered="#{NavigationBean.searchText == null}">
                               <td width=30>
-                                 <img src="<%=request.getContextPath()%>/images/ball_big.gif" width=26 height=27>
+                                 <img src="<%=request.getContextPath()%>/images/icons/ball_big.gif" width=26 height=27>
                               </td>
                               <td>
                                  <%-- Summary --%>
@@ -76,7 +76,7 @@
                                  </a:actionLink>
                                  <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" actionListener="#{BrowseBean.setupSpaceAction}" id="link3" />
                                  <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" id="link4" />
-                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
+                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
                                     <a:actionLink value="Change Details" image="/images/icons/Change_details.gif" id="link5" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param2" />
                                     </a:actionLink>
@@ -258,7 +258,7 @@
                            <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
-                           <a:menu id="actionsMenu1" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                           <a:menu id="actionsMenu1" itemSpacing="4" image="/images/icons/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
@@ -389,7 +389,7 @@
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </a:booleanEvaluator>
-                           <a:menu id="actionsMenu2" itemSpacing="4" image="/images/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                           <a:menu id="actionsMenu2" itemSpacing="4" image="/images/icons/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />
                               <a:actionLink value="Action 001" image="/images/icons/Change_details.gif" />

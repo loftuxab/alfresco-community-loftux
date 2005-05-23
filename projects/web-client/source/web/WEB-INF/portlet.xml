@@ -5,7 +5,7 @@
         <description>Alfresco Client Portlet</description>
         <portlet-name>AlfrescoClient</portlet-name>
         <display-name>Alfresco Portlet</display-name>
-        <portlet-class>org.alfresco.web.AlfrescoFacesPortlet</portlet-class>
+        <portlet-class>org.alfresco.web.app.portlet.AlfrescoFacesPortlet</portlet-class>
         
         <init-param>
            <name>default-view</name>

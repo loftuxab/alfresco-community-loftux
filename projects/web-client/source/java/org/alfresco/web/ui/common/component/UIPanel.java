@@ -13,7 +13,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.el.ValueBinding;
 
-import org.alfresco.web.PanelGenerator;
+import org.alfresco.web.ui.common.PanelGenerator;
 import org.alfresco.web.ui.common.Utils;
 
 /**
@@ -339,8 +339,8 @@ public class UIPanel extends SelfRenderingComponent
    // ------------------------------------------------------------------------------
    // Constants 
    
-   private final static String EXPANDED_IMG  = "/images/arrow_expanded.gif";
-   private final static String COLLAPSED_IMG = "/images/arrow_collapsed.gif";
+   private final static String EXPANDED_IMG  = "/images/icons/arrow_expanded.gif";
+   private final static String COLLAPSED_IMG = "/images/icons/arrow_collapsed.gif";
    
    
    // ------------------------------------------------------------------------------

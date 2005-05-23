@@ -10,8 +10,8 @@ import javax.portlet.RenderResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.ErrorBean;
-import org.alfresco.web.util.Utils;
 
 /**
  * A non-JSF tag library that displays the currently stored system error
@@ -169,7 +169,7 @@ public class SystemErrorTag extends TagSupport
          // output a link to return to the application
          out.write("\n<div style='padding-top:16px;'><a href='");
       
-         if (Utils.inPortalServer(pageContext.getServletContext()))
+         if (Application.inPortalServer(pageContext.getServletContext()))
          {
             RenderResponse renderResp  = (RenderResponse)pageContext.getRequest().
                                    getAttribute("javax.portlet.response");

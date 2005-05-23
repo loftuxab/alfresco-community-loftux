@@ -69,24 +69,24 @@
    </listener>
    
    <listener>
-      <listener-class>org.alfresco.web.ContextListener</listener-class>
+      <listener-class>org.alfresco.web.app.ContextListener</listener-class>
    </listener>
    
    <!-- Faces Servlet -->
    <servlet>
       <servlet-name>Faces Servlet</servlet-name>
-      <servlet-class>org.alfresco.web.AlfrescoFacesServlet</servlet-class>
+      <servlet-class>org.alfresco.web.app.servlet.AlfrescoFacesServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
    </servlet>
    
    <servlet>
       <servlet-name>uploadFile</servlet-name>
-      <servlet-class>org.alfresco.web.UploadFileServlet</servlet-class>
+      <servlet-class>org.alfresco.web.app.servlet.UploadFileServlet</servlet-class>
    </servlet>
    
    <servlet>
       <servlet-name>downloadContent</servlet-name>
-      <servlet-class>org.alfresco.web.DownloadContentServlet</servlet-class>
+      <servlet-class>org.alfresco.web.app.servlet.DownloadContentServlet</servlet-class>
    </servlet>
   
    <servlet-mapping>

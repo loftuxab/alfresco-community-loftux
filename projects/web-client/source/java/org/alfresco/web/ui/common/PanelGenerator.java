@@ -1,7 +1,7 @@
 /*
  * Created on Jan 18, 2005
  */
-package org.alfresco.web;
+package org.alfresco.web.ui.common;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -44,23 +44,23 @@ public final class PanelGenerator
    {
       out.write("<table cellspacing=0 cellpadding=0 border=0 width=100%><tr><td width=7><img src='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_01.gif' width=7 height=7 alt=''></td>");
       
       out.write("<td background='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_02.gif'><img src='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_02.gif' width=7 height=7 alt=''></td>");
       
       out.write("<td width=7><img src='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_03");
       if (dialog)
@@ -71,11 +71,11 @@ public final class PanelGenerator
       
       out.write("<tr><td background='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_04.gif'><img src='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_04.gif' width=7 height=7 alt=''></td><td bgcolor='");
       out.write(bgColor);
@@ -87,33 +87,33 @@ public final class PanelGenerator
    {
       out.write("</td><td background='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_06.gif'><img src='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_06.gif' width=7 height=7 alt=''></td></tr>");
       
       out.write("<tr><td width=7><img src='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_07.gif' width=7 height=7 alt=''></td>");
       
       out.write("<td background='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_08.gif'><img src='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_08.gif' width=7 height=7 alt=''></td>");
       
       out.write("<td width=7><img src='");
       out.write(contextPath);
-      out.write("/images/");
+      out.write("/images/parts/");
       out.write(panel);
       out.write("_09.gif' width=7 height=7 alt=''></td></tr></table>");
    }

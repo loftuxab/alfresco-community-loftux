@@ -1,7 +1,7 @@
 /*
  * Created on 22-May-2005
  */
-package org.alfresco.web;
+package org.alfresco.web.app.servlet;
 
 import java.io.IOException;
 import java.util.StringTokenizer;

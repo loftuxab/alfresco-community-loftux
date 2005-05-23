@@ -1,4 +1,4 @@
-package org.alfresco.web;
+package org.alfresco.web.app.servlet;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
-import org.alfresco.web.util.Utils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -103,7 +103,7 @@ public class UploadFileServlet extends HttpServlet
       }
       catch (Throwable error)
       {
-         Utils.handleServletError(getServletContext(), (HttpServletRequest)request,
+         Application.handleServletError(getServletContext(), (HttpServletRequest)request,
                (HttpServletResponse)response, error, logger, returnPage);
       }
    }
