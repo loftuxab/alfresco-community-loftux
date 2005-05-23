@@ -19,8 +19,10 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -79,7 +81,7 @@ public class DownloadContentServlet extends HttpServlet
          res.setHeader("Content-Disposition", "attachment;filename=\"" + URLDecoder.decode(filename) + '"');
          
          // useful debug output!
-         //logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
+         logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
          
          // base the mimetype from the file extension
          MimetypeMap mimetypeMap = (MimetypeMap)context.getBean("mimetypeMap");

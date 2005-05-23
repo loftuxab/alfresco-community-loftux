@@ -14,7 +14,10 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.UserTransaction;
 
+import org.alfresco.repo.content.ContentService;
+import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.InvalidNodeRefException;
@@ -29,6 +32,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.log4j.Logger;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast
@@ -87,6 +91,22 @@ public class CheckinCheckoutBean
    }
    
    /**
+    * @return Returns the ContentService.
+    */
+   public ContentService getContentService()
+   {
+      return this.contentService;
+   }
+
+   /**
+    * @param contentService   The ContentService to set.
+    */
+   public void setContentService(ContentService contentService)
+   {
+      this.contentService = contentService;
+   }
+   
+   /**
     * @return The document node being used for the current operation
     */
    public Node getDocument()
@@ -132,6 +152,29 @@ public class CheckinCheckoutBean
    public boolean getKeepCheckedOut()
    {
       return this.keepCheckedOut;
+   }
+   
+   /**
+    * @return Returns the copy location. Either the current or other space.
+    */
+   public String getCopyLocation()
+   {
+      if (this.fileName != null)
+      {
+         return this.COPYLOCATION_OTHER;
+      }
+      else
+      {
+         return this.copyLocation;
+      }
+   }
+   
+   /**
+    * @param copyLocation The copy location. Either the current or other space.
+    */
+   public void setCopyLocation(String copyLocation)
+   {
+      this.copyLocation = copyLocation;
    }
    
    /**
@@ -220,11 +263,17 @@ public class CheckinCheckoutBean
    {
       String outcome = null;
       
+      UserTransaction tx = null;
+      
       Node node = getDocument();
       if (node != null)
       {
          try
          {
+            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+                  FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx.begin();
+            
             if (logger.isDebugEnabled())
                logger.debug("Trying to checkout content node Id: " + node.getId());
             
@@ -258,11 +307,16 @@ public class CheckinCheckoutBean
             
             workingCopy.getProperties().put("url", url);
             
+            // commit the transaction
+            tx.commit();
+            
             // show the page that display the checkout link
             outcome = "checkoutFileLink";
          }
          catch (Throwable err)
          {
+            // rollback the transaction
+            try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
             Utils.addErrorMessage("Unable to checkout Content Node due to system error: " + err.getMessage());
          }
       }
@@ -284,9 +338,8 @@ public class CheckinCheckoutBean
       Node node = getWorkingDocument();
       if (node != null)
       {
-         // TODO: clean up etc.
-         
-         // clear action context
+         // clean up and clear action context
+         clearUpload();
          setDocument(null);
          setWorkingDocument(null);
          
@@ -318,6 +371,8 @@ public class CheckinCheckoutBean
             // try to cancel checkout of the working copy
             this.versionOperationsService.cancelCheckout(node.getNodeRef());
             
+            clearUpload();
+            
             // refresh the UI, and setting the outcome will show the browse view
             UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
             
@@ -325,7 +380,7 @@ public class CheckinCheckoutBean
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to cancel checkout of Content Node due to system error: " + err.getMessage());
+            Utils.addErrorMessage("Unable to cancel checkout of Content Node due to system error: " + err.getMessage(), err);
          }
       }
       else
@@ -343,34 +398,62 @@ public class CheckinCheckoutBean
    {
       String outcome = null;
       
+      UserTransaction tx = null;
+      
+      // NOTE: for checkin the document _is_ the working document!
       Node node = getDocument();
       if (node != null)
       {
          try
          {
+            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+                  FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx.begin();
+            
             if (logger.isDebugEnabled())
                logger.debug("Trying to checkin content node Id: " + node.getId());
             
             // checkin the node content
             Serializable nameProp = this.nodeService.getProperty(node.getNodeRef(), QNAME_ORIGINALNAME);
             
-            // TODO: where does this come from?
-            String contentURL = null;
+            // we can either checkin the content from the current working copy node
+            // which would have been previously updated by the user
+            String contentUrl;
+            if (getCopyLocation().equals(COPYLOCATION_CURRENT))
+            {
+               contentUrl = (String)node.getProperties().get("contentUrl");
+            }
+            // or specify a specific file as the content instead
+            else
+            {
+               // add the content to a repo temp writer location
+               // we can then retrieve the URL to the content to to be set on the node during checkin
+               ContentWriter tempWriter = this.contentService.getTempWriter();
+               tempWriter.putContent(this.file);
+               contentUrl = tempWriter.getContentUrl();
+            }
+            
+            if (contentUrl == null || contentUrl.length() == 0)
+            {
+               throw new IllegalStateException("Content URL is empty for specified working copy content node!");
+            }
+            
             // TODO: what props should we add here? - e.g. version history text
             Map<String, Serializable> props = Collections.<String, Serializable>emptyMap();
             NodeRef originalDoc = this.versionOperationsService.checkin(
                   node.getNodeRef(),
                   props,
-                  contentURL, 
+                  contentUrl, 
                   this.keepCheckedOut);      // set from input form
             
-            // restore original name after copy
+            // restore original name after checkin copy opp
             this.nodeService.setProperty(originalDoc, QNAME_NAME, nameProp);
+            
+            // commit the transaction
+            tx.commit();
             
             // clear action context
             setDocument(null);
-            setWorkingDocument(null);
-            
             clearUpload();
             
             // refresh the UI, setting the outcome will show the browse view
@@ -380,7 +463,9 @@ public class CheckinCheckoutBean
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to check-in Content Node due to system error: " + err.getMessage());
+            // rollback the transaction
+            try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+            Utils.addErrorMessage("Unable to check-in Content Node due to system error: " + err.getMessage(), err);
          }
       }
       else
@@ -402,6 +487,9 @@ public class CheckinCheckoutBean
       return "browse";
    }
    
+   /**
+    * Clear form state and upload file bean
+    */
    private void clearUpload()
    {
       // delete the temporary file we uploaded earlier
@@ -413,6 +501,7 @@ public class CheckinCheckoutBean
       this.file = null;
       this.fileName = null;
       this.keepCheckedOut = false;
+      this.copyLocation = COPYLOCATION_CURRENT;
       
       // remove the file upload bean from the session
       FacesContext ctx = FacesContext.getCurrentInstance();
@@ -427,6 +516,11 @@ public class CheckinCheckoutBean
    
    private static final String WORKING_COPY = " (working copy)";
    
+   /** constants for copy location selection */
+   private static final String COPYLOCATION_CURRENT = "current";
+   private static final String COPYLOCATION_OTHER   = "other";
+   
+   /** well known QName values */
    private static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
    private static final QName QNAME_ORIGINALNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "originalName");
    
@@ -440,6 +534,7 @@ public class CheckinCheckoutBean
    private File file;
    private String fileName;
    private boolean keepCheckedOut = false;
+   private String copyLocation = COPYLOCATION_CURRENT;
    
    /** The BrowseBean to be used by the bean */
    private BrowseBean browseBean;
@@ -449,4 +544,7 @@ public class CheckinCheckoutBean
    
    /** The VersionOperationsService to be used by the bean */
    private VersionOperationsService versionOperationsService;
+   
+   /** The ContentService to be used by the bean */
+   private ContentService contentService;
 }

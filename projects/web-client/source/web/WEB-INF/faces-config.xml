@@ -110,6 +110,10 @@
          <property-name>versionOperationsService</property-name>
          <value>#{versionOperationsService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>contentService</property-name>
+         <value>#{contentService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

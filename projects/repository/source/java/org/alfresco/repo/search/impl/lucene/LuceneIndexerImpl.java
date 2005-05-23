@@ -1039,15 +1039,18 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         isAtomic &= atomic;
         Serializable value = properties.get(propertyQName);
-        // convert value to String
-        for (String strValue : ValueConverter.getCollection(String.class, value))
+        if (value != null)
         {
-            // String strValue = ValueConverter.convert(String.class, value);
-            // TODO: Need to add with the correct language based analyser
-            if (index && atomic)
-            {
-                doc.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
-            }
+           // convert value to String
+           for (String strValue : ValueConverter.getCollection(String.class, value))
+           {
+              // String strValue = ValueConverter.convert(String.class, value);
+              // TODO: Need to add with the correct language based analyser
+              if (index && atomic)
+              {
+                 doc.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
+              }
+           }
         }
         return isAtomic;
     }
@@ -1265,24 +1268,26 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     }
 
                     Serializable value = properties.get(propertyQName);
-                    // convert value to String
-                    for (String strValue : ValueConverter.getCollection(String.class, value))
+                    if (value != null)
                     {
-
-                        // TODO: Need converter here
-                        // Conversion should be done in the anlyser as we may
-                        // take
-                        // advantage of tokenisation
-
-                        // Need to add with the correct language based analyser
-                        if (index && !atomic)
-                        {
-                            String fieldName = "@" + propertyQName;
-                            document.removeFields(fieldName);
-                            document.add(new Field(fieldName, strValue, store, index, tokenise));
-                        }
+                       // convert value to String
+                       for (String strValue : ValueConverter.getCollection(String.class, value))
+                       {
+                          
+                          // TODO: Need converter here
+                          // Conversion should be done in the anlyser as we may
+                          // take
+                          // advantage of tokenisation
+                          
+                          // Need to add with the correct language based analyser
+                          if (index && !atomic)
+                          {
+                             String fieldName = "@" + propertyQName;
+                             document.removeFields(fieldName);
+                             document.add(new Field(fieldName, strValue, store, index, tokenise));
+                          }
+                       }
                     }
-
                 }
 
                 document.removeField("FTSSTATUS");

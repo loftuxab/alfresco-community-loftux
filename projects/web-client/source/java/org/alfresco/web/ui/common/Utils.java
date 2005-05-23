@@ -11,6 +11,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 
+import org.apache.log4j.Logger;
 import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
 
 import org.alfresco.web.data.IDataContainer;
@@ -422,8 +423,26 @@ public final class Utils
     */
    public static void addErrorMessage(String msg)
    {
+      addErrorMessage(msg, null);
+   }
+   
+   /**
+    * Adds a global error message and logs exception details
+    * 
+    * @param msg     The error message
+    * @param err     The exceptio
+    */
+   public static void addErrorMessage(String msg, Throwable err)
+   {
       FacesContext context = FacesContext.getCurrentInstance( );
       FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg);
       context.addMessage(null, facesMsg);
+      if (err != null && logger.isDebugEnabled())
+      {
+         err.printStackTrace();
+      }
    }
+   
+   
+   private static Logger logger = Logger.getLogger(Utils.class);
 }

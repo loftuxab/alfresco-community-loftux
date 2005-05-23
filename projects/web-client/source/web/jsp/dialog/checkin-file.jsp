@@ -93,16 +93,13 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:selectOneRadio value="current" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="Use copy in current space" />
-                                          <f:selectItem itemValue="other" itemLabel="Locate copy on my computer" />
-                                       </h:selectOneRadio>
+                                       To check-in a file from your computer, first upload the content to the server.
                                     </td>
                                  </tr>
-                                 
                                  </h:form>
                                  
                                  <r:uploadForm>
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
                                        Location:<input style="margin-left:12px;" type="file" size="50" name="file"/>
@@ -117,10 +114,6 @@
                                        <input style="margin-left:12px;" type="submit" value="Upload" />
                                     </td>
                                  </tr>
-                                 </r:uploadForm>
-                                 
-                                 <h:form id="checkin-file2">
-                                 <tr><td class="paddingRow"></td></tr>
                                  <%
                                  CheckinCheckoutBean bean = (CheckinCheckoutBean)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "CheckinCheckoutBean");
                                  if (bean == null)
@@ -136,7 +129,17 @@
                                        </td>
                                     </tr>
                                  <% } %>
+                                 </r:uploadForm>
                                  
+                                 <h:form id="checkin-file2">
+                                 <tr>
+                                    <td>
+                                       <h:selectOneRadio value="#{CheckinCheckoutBean.copyLocation}" layout="pageDirection">
+                                          <f:selectItem itemValue="current" itemDisabled="#{CheckinCheckoutBean.fileName != null}" itemLabel="Use copy in current space" />
+                                          <f:selectItem itemValue="other" itemLabel="Use copy uploaded from my computer" />
+                                       </h:selectOneRadio>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td class="wizardSectionHeading">Check In options</td>
