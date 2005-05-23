@@ -26,6 +26,7 @@
                      includes="${webinf.lib.includes}" 
                      excludes="${webinf.lib.excludes}" />
          <zipfileset dir="${common.lib.dir}/eclipse" includes="*.jar" prefix="WEB-INF\lib" />
+         <zipfileset dir="${common.lib.dir}/openoffice" includes="*.jar" prefix="WEB-INF\lib" />
          <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="WEB-INF\lib" />
          <zipfileset dir="${common.dir}/projects/core/build/dist" prefix="WEB-INF\lib"
                      includes="core.jar" />
