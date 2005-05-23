@@ -85,13 +85,11 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <a:panel label="Preview" id="preview-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true" expanded="false"><br/>
-                                 <a:actionLink value="Download link" padding="4" id="link1" />
+                              <a:panel label="Preview" id="preview-panel" border="greyround" bgcolor="#eaeaea" progressive="true"><br/>
+                                 <a:actionLink value="#{BrowseBean.document.name}" href="#{BrowseBean.document.properties.url}" />
                               </a:panel>
                               <br/>
-                              <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true"><br/>
+                              <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" progressive="true"><br/>
                                  <table border="0" cellpadding="0" cellspacing="0">
                                     <tr><td style="border-bottom: 1px solid black;padding-bottom:2px;">General</td></tr>
                                     <tr>
@@ -108,18 +106,15 @@
                                  </table>
                               </a:panel>
                               <br/>
-                              <a:panel label="Workflow" id="workflow-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true" expanded="false"><br/>
+                              <a:panel label="Workflow" id="workflow-panel" border="greyround" bgcolor="#eaeaea" progressive="true" expanded="false"><br/>
                                  Workflow options
                               </a:panel>
                               <br/>
-                              <a:panel label="Categories" id="categories-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true" expanded="false"><br/>
+                              <a:panel label="Categories" id="categories-panel" border="greyround" bgcolor="#eaeaea" progressive="true" expanded="false"><br/>
                                  Categories
                               </a:panel>
                               <br/>
-                              <a:panel label="Version History" id="version-history-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true" expanded="false"><br/>
+                              <a:panel label="Version History" id="version-history-panel" border="greyround" bgcolor="#eaeaea" progressive="true" expanded="false"><br/>
                                  Version History
                               </a:panel>
                               <br/>

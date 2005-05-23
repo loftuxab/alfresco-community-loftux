@@ -216,6 +216,10 @@
          <from-outcome>checkinFile</from-outcome>
          <to-view-id>/jsp/dialog/checkin-file.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>updateFile</from-outcome>
+         <to-view-id>/jsp/dialog/update-file.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>

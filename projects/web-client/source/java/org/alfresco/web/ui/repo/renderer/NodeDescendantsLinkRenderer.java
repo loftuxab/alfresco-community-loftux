@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.springframework.web.jsf.FacesContextUtils;
 
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -96,12 +97,15 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          for (int index=0; index<maximum; index++)
          {
             ChildAssocRef ref = childRefs.get(index);
-            out.write(renderDescendant(context, control, ref, false));
-            
-            // output separator if appropriate
-            if (index < maximum - 1)
+            if (service.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_SPACE))
             {
-               out.write( separator );
+               out.write(renderDescendant(context, control, ref, false));
+               
+               // output separator if appropriate
+               if (index < maximum - 1)
+               {
+                  out.write( separator );
+               }
             }
          }
          

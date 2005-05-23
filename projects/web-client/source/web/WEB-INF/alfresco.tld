@@ -571,6 +571,12 @@
       </attribute>
       
       <attribute>
+         <name>tooltip</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
          <name>image</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>

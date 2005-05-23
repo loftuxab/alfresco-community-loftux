@@ -400,9 +400,9 @@ public class CheckinCheckoutBean
       
       UserTransaction tx = null;
       
-      // NOTE: for checkin the document _is_ the working document!
+      // NOTE: for checkin the document node _is_ the working document!
       Node node = getDocument();
-      if (node != null)
+      if (node != null && (getCopyLocation().equals(COPYLOCATION_CURRENT) || this.getFileName() != null))
       {
          try
          {
@@ -413,8 +413,13 @@ public class CheckinCheckoutBean
             if (logger.isDebugEnabled())
                logger.debug("Trying to checkin content node Id: " + node.getId());
             
-            // checkin the node content
-            Serializable nameProp = this.nodeService.getProperty(node.getNodeRef(), QNAME_ORIGINALNAME);
+            // get the original name and the working copy name
+            String origNameProp = (String)node.getProperties().get("originalName");
+            String nameProp = node.getName();
+            
+            // switch the name back to the original name before checkin
+            // otherwise the working copy name will get set on the original doc!
+            this.nodeService.setProperty(node.getNodeRef(), QNAME_NAME, origNameProp);
             
             // we can either checkin the content from the current working copy node
             // which would have been previously updated by the user
@@ -446,8 +451,11 @@ public class CheckinCheckoutBean
                   contentUrl, 
                   this.keepCheckedOut);      // set from input form
             
-            // restore original name after checkin copy opp
-            this.nodeService.setProperty(originalDoc, QNAME_NAME, nameProp);
+            // restore working copy name after checkin copy opp
+            if (this.keepCheckedOut == true)
+            {
+               this.nodeService.setProperty(node.getNodeRef(), QNAME_NAME, nameProp);
+            }
             
             // commit the transaction
             tx.commit();
@@ -471,6 +479,59 @@ public class CheckinCheckoutBean
       else
       {
          logger.warn("WARNING: checkinFileOK called without a current Document!");
+      }
+      
+      return outcome;
+   }
+   
+   /**
+    * Action called upon completion of the Update File page
+    */
+   public String updateFileOK()
+   {
+      String outcome = null;
+      
+      UserTransaction tx = null;
+      
+      // NOTE: for update the document node _is_ the working document!
+      Node node = getDocument();
+      if (node != null && this.getFileName() != null)
+      {
+         try
+         {
+            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+                  FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx.begin();
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Trying to update content node Id: " + node.getId());
+            
+            // get an updating writer that we can use to modify the content on the current node
+            ContentWriter writer = this.contentService.getUpdatingWriter(node.getNodeRef());
+            writer.putContent(this.file);
+            
+            // commit the transaction
+            tx.commit();
+            
+            // clear action context
+            setDocument(null);
+            clearUpload();
+            
+            // refresh the UI, setting the outcome will show the browse view
+            UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
+            
+            outcome = "browse";
+         }
+         catch (Throwable err)
+         {
+            // rollback the transaction
+            try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+            Utils.addErrorMessage("Unable to update Content Node due to system error: " + err.getMessage(), err);
+         }
+      }
+      else
+      {
+         logger.warn("WARNING: updateFileOK called without a current Document!");
       }
       
       return outcome;

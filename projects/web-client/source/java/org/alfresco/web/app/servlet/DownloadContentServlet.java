@@ -81,7 +81,7 @@ public class DownloadContentServlet extends HttpServlet
          res.setHeader("Content-Disposition", "attachment;filename=\"" + URLDecoder.decode(filename) + '"');
          
          // useful debug output!
-         logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
+         //logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
          
          // base the mimetype from the file extension
          MimetypeMap mimetypeMap = (MimetypeMap)context.getBean("mimetypeMap");
@@ -105,8 +105,6 @@ public class DownloadContentServlet extends HttpServlet
          ContentService contentService = (ContentService)context.getBean("contentService");
          ContentReader reader = contentService.getReader(nodeRef);
          reader.getContent( res.getOutputStream() );
-         
-         // TODO: redirect (form parameter? could use form params instead of URL!)
       }
       catch (Throwable err)
       {

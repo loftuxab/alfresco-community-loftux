@@ -658,6 +658,10 @@ public class BrowseBean implements IContextListener
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             Node node = new Node(ref, this.nodeService);
             
+            // store the URL to for downloading the content
+            String name = node.getName();
+            node.getProperties().put("url", DownloadContentServlet.generateURL(ref, name));
+            
             // remember the document
             setDocument(node);
          }

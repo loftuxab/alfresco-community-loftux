@@ -51,6 +51,7 @@ public class UIActionLink extends UICommand
       this.showLink = (Boolean)values[3];
       this.params = (Map)values[4];
       this.href = (String)values[5];
+      this.tooltip = (String)values[6];
    }
    
    /**
@@ -58,7 +59,7 @@ public class UIActionLink extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[6];
+      Object values[] = new Object[7];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.padding;
@@ -66,6 +67,7 @@ public class UIActionLink extends UICommand
       values[3] = this.showLink;
       values[4] = this.params;
       values[5] = this.href;
+      values[6] = this.tooltip;
       return (values);
    }
 
@@ -81,6 +83,10 @@ public class UIActionLink extends UICommand
     */
    public Map<String, String> getParameterMap()
    {
+      if (this.params == null)
+      {
+         this.params = new HashMap<String, String>(3, 1.0f);
+      }
       return this.params;
    }
    
@@ -204,6 +210,31 @@ public class UIActionLink extends UICommand
       this.href = href;
    }
    
+   /**
+    * Get the tooltip title text
+    *
+    * @return the tooltip
+    */
+   public String getTooltip()
+   {
+      ValueBinding vb = getValueBinding("tooltip");
+      if (vb != null)
+      {
+         this.tooltip = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.tooltip;
+   }
+
+   /**
+    * Set the tooltip title text
+    *
+    * @param tooltip     the tooltip
+    */
+   public void setTooltip(String tooltip)
+   {
+      this.tooltip = tooltip;
+   }
    
    
    // ------------------------------------------------------------------------------
@@ -218,8 +249,12 @@ public class UIActionLink extends UICommand
    /** If an image is specified, it is shown in additon to the value text */
    private String image = null;
    
+   /** static href to use instead of an action/actionlistener */
    private String href = null;
    
+   /** tooltip title text to display on the action link */
+   private String tooltip = null;
+   
    /** Map of child param name/values pairs */
-   private Map<String, String> params = new HashMap<String, String>(3, 1.0f);
+   private Map<String, String> params = null;
 }

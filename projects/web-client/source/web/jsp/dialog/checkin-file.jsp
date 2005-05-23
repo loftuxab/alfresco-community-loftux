@@ -93,7 +93,7 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       To check-in a file from your computer, first upload the content to the server.
+                                       To check-in a file from your computer, first upload the content to the repository.
                                     </td>
                                  </tr>
                                  </h:form>
@@ -102,7 +102,7 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
-                                       Location:<input style="margin-left:12px;" type="file" size="50" name="file"/>
+                                       Location:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

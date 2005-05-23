@@ -94,10 +94,6 @@ public class ActionLinkRenderer extends BaseRenderer
       StringBuilder buf = new StringBuilder(256);
       
       Map attrs = link.getAttributes();
-      if (attrs.get("absolute") != null)
-      {
-         logger.debug("Absolute: " + attrs.get("absolute"));
-      }
       if (attrs.get("href") == null)
       {
          buf.append("<a href='#' onclick=\"");
@@ -130,6 +126,12 @@ public class ActionLinkRenderer extends BaseRenderer
       {
          buf.append(" class=")
             .append(attrs.get("styleClass"));
+      }
+      if (attrs.get("tooltip") != null)
+      {
+         buf.append(" title=\"")
+            .append(Utils.encode((String)attrs.get("tooltip")))
+            .append('"');
       }
       buf.append('>');
       
@@ -220,13 +222,31 @@ public class ActionLinkRenderer extends BaseRenderer
             .append(padding)
             .append("px\"");
       }
+      buf.append(">");
+      
+      Map attrs = link.getAttributes();
       
       // render text link cell for the menu
-      buf.append(">");
-      buf.append("<a href='#' onclick=\"");
-      buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
-      buf.append('"');
-      Map attrs = link.getAttributes();
+      if (attrs.get("href") == null)
+      {
+         buf.append("<a href='#' onclick=\"");
+         buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
+         buf.append('"');
+      }
+      else
+      {
+         String href = (String)attrs.get("href");
+         if (href.startsWith("http") == false)
+         {
+            href = context.getExternalContext().getRequestContextPath() + href;
+         }
+         buf.append("<a href=\"")
+            .append(href)
+            .append('"');
+         
+         // TODO: support 'target' attribute?
+      }
+      
       if (attrs.get("style") != null)
       {
          buf.append(" style=\"")
