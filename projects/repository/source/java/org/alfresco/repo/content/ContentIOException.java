@@ -1,5 +1,7 @@
 package org.alfresco.repo.content;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 
 /**
  * Wraps a general <code>Exceptions</code> that occurred while reading or writing
@@ -9,7 +11,7 @@ package org.alfresco.repo.content;
  * 
  * @author Derek Hulley
  */
-public class ContentIOException extends RuntimeException
+public class ContentIOException extends AlfrescoRuntimeException
 {
     private static final long serialVersionUID = 3258130249983276087L;
     

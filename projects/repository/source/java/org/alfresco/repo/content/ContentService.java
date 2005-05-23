@@ -1,6 +1,5 @@
 package org.alfresco.repo.content;
 
-import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.ref.NodeRef;
 
 /**
@@ -66,5 +65,20 @@ public interface ContentService
      */
     public ContentWriter getTempWriter();
     
-//    public ContentTransformer getTransformer(String sourceMimetype, String targetMimetype);
+    /**
+     * Transforms the content from the reader and writes the content
+     * back out to the writer.
+     * <p>
+     * The mimetypes used for the transformation must be set both on
+     * the {@link Content#getMimetype() reader} and on the
+     * {@link Content#getMimetype() writer}.
+     * 
+     * @param reader the source content location and mimetype
+     * @param writer the target content location and mimetype
+     * @throws NoTransformerException if no transformer exists for the
+     *      given source and target mimetypes of the reader and writer
+     * @throws ContentIOException if the transformation fails
+     */
+//    public void transform(ContentReader reader, ContentWriter writer)
+//            throws NoTransformerException, ContentIOException;
 }

@@ -152,4 +152,13 @@ public class RoutingContentService implements ContentService
         }
     }
 
+
+    /**
+     * @see org.alfresco.repo.content.transform.ContentTransformerRegistry
+     * @see org.alfresco.repo.content.transform.ContentTransformer
+     */
+    public void transform(ContentReader reader, ContentWriter writer) throws NoTransformerException, ContentIOException
+    {
+        throw new UnsupportedOperationException();
+    }
 }

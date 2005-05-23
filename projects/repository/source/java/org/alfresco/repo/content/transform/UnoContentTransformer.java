@@ -9,6 +9,7 @@ import java.util.Map;
 import net.sf.joott.uno.DocumentConverter;
 import net.sf.joott.uno.DocumentConverterFactory;
 import net.sf.joott.uno.DocumentFormat;
+import net.sf.joott.uno.UnoConnection;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentIOException;
@@ -53,6 +54,50 @@ public class UnoContentTransformer implements ContentTransformer
 //        formatsByMimetype.put(DocumentFormat.XML_IMPRESS.getMimeType(), DocumentFormat.XML_IMPRESS);
         formatsByMimetype.put(DocumentFormat.XML_WRITER.getMimeType(), DocumentFormat.XML_WRITER);
 //        formatsByMimetype.put(DocumentFormat.XML_WRITER_WEB.getMimeType(), DocumentFormat.XML_WRITER_WEB);
+    }
+    
+    private UnoConnection connection;
+    
+    /**
+     * Constructs the default transformer that will attempt to connect to the
+     * Uno server using the default connect string.
+     * 
+     * @see UnoConnection#DEFAULT_CONNECTION_STRING
+     */
+    public UnoContentTransformer()
+    {
+        init(UnoConnection.DEFAULT_CONNECTION_STRING);
+    }
+    
+//    /**
+//     * Construct a transformer that will fetch its configuration from the given
+//     * service.
+//     * 
+//     * @param configService a service containing the required configuration
+//     */
+//    public UnoContentTransformer(ConfigService configService)
+//    {
+//        // get the connection string from the service
+//        init
+//    }
+    
+    /**
+     * Constructs a transformer that uses the given url to establish
+     * a connection.
+     * 
+     * @param unoConnectionUrl the Uno server connection URL
+     */
+    public UnoContentTransformer(String unoConnectionUrl)
+    {
+        init(unoConnectionUrl);
+    }
+    
+    /**
+     * @param unoConnectionUrl the URL of the Uno server
+     */
+    private void init(String unoConnectionUrl)
+    {
+        connection = new UnoConnection(unoConnectionUrl);
     }
     
     /**
