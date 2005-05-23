@@ -83,6 +83,11 @@
       <servlet-name>uploadFile</servlet-name>
       <servlet-class>org.alfresco.web.UploadFileServlet</servlet-class>
    </servlet>
+   
+   <servlet>
+      <servlet-name>downloadContent</servlet-name>
+      <servlet-class>org.alfresco.web.DownloadContentServlet</servlet-class>
+   </servlet>
   
    <servlet-mapping>
       <servlet-name>Faces Servlet</servlet-name>
@@ -92,6 +97,11 @@
    <servlet-mapping>
       <servlet-name>uploadFile</servlet-name>
       <url-pattern>/uploadFileServlet</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+      <servlet-name>downloadContent</servlet-name>
+      <url-pattern>/download/*</url-pattern>
    </servlet-mapping>
     
    <session-config>

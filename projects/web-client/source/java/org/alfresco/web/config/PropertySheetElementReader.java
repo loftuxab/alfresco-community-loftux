@@ -30,7 +30,7 @@ public class PropertySheetElementReader implements ConfigElementReader
       if (element != null)
       {
          String name = element.getName();
-         if (name.equalsIgnoreCase(ELEMENT_PROPERTY_SHEET) == false)
+         if (name.equals(ELEMENT_PROPERTY_SHEET) == false)
          {
             throw new ConfigException("PropertySheetElementReader can only parse " +
                   ELEMENT_PROPERTY_SHEET + "elements, " + "the element passed was '" + 

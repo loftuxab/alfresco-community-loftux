@@ -5,6 +5,7 @@ package org.alfresco.web.bean;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
@@ -230,18 +232,44 @@ public class CheckinCheckoutBean
             
             // modify the name to include an additional string
             // save the original name so we can set it back later
-            String originalName = RepoUtils.getNameForNode(this.nodeService, workingCopyRef);
-            this.nodeService.setProperty(workingCopyRef, QNAME_NAME, originalName + WORKING_COPY);
+            String originalName = node.getName();
+            String workingCopyName;
+            int extIndex = originalName.lastIndexOf('.');
+            if (extIndex != -1)
+            {
+               workingCopyName = originalName.substring(0, extIndex) + WORKING_COPY + originalName.substring(extIndex);  
+            }
+            else
+            {
+               workingCopyName = originalName + WORKING_COPY;
+            }
+            this.nodeService.setProperty(workingCopyRef, QNAME_NAME, workingCopyName);
             this.nodeService.setProperty(workingCopyRef, QNAME_ORIGINALNAME, originalName);
             
             // set the working copy Node instance
-            setWorkingDocument(new Node(workingCopyRef, this.nodeService));
+            Node workingCopy = new Node(workingCopyRef, this.nodeService);
+            setWorkingDocument(workingCopy);
             
-            // TODO: need to get the content URL to the content service
-            //       see Gavs work in Add Content wizard
+            // create content URL to the content download servlet with ID and expected filename
+            // e.g. /servlet/download/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
+            // the myfile part will be ignored by the servlet but gives the browser a hint
+            String url = MessageFormat.format(DOWNLOAD_URL, new Object[] {
+                  workingCopyRef.getStoreRef().getProtocol(),
+                  workingCopyRef.getStoreRef().getIdentifier(),
+                  workingCopyRef.getId(),
+                  URLEncoder.encode(workingCopy.getName()) } );
             
-            // TODO: show the page that display the checkout link
+            workingCopy.getProperties().put("url", url);
+            /*
+            HttpServletRequest req = (HttpServletRequest)pageContext.getRequest(); 
+            out.write(req.getContextPath());
+            out.write("/uploadFileServlet'>\n");
+            out.write("<input type='hidden' name='return-page' value='");
+            out.write(req.getContextPath() + "/faces" + req.getServletPath());
+            out.write("'>\n");
+             */
             
+            // show the page that display the checkout link
             outcome = "checkoutFileLink";
          }
          catch (Throwable err)
@@ -407,6 +435,8 @@ public class CheckinCheckoutBean
    // Private data
    
    private static Logger logger = Logger.getLogger(CheckinCheckoutBean.class);
+   
+   private static final String DOWNLOAD_URL = "/download/{0}/{1}/{2}/{3}";
    
    private static final String WORKING_COPY = " (working copy)";
    

@@ -28,7 +28,7 @@ public class ServerElementReader implements ConfigElementReader
       if (element != null)
       {
          String name = element.getName();
-         if (name.equalsIgnoreCase(ELEMENT_SERVER) == false)
+         if (name.equals(ELEMENT_SERVER) == false)
          {
             throw new ConfigException("ServerElementReader can only parse " +
                   ELEMENT_SERVER + "elements, " + "the element passed was '" + 
