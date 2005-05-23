@@ -3,6 +3,7 @@ package org.alfresco.repo.version.common.versionlabel;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.version.Version;
@@ -30,7 +31,8 @@ public class SerialVersionLabelPolicyTest extends TestCase
         HashMap<String, Serializable> versionProp1 = new HashMap<String, Serializable>();
         versionProp1.put(Version.PROP_VERSION_TYPE, VersionType.MINOR);
         
-        String initialVersion = policy.getVersionLabelValue(
+        String initialVersion = policy.calculateVersionLabel(
+				DictionaryBootstrap.TYPE_BASE,
                 null,
                 0,
                 versionProp1);
@@ -40,7 +42,8 @@ public class SerialVersionLabelPolicyTest extends TestCase
         versionProp2.put(Version.PROP_VERSION_LABEL, "1.0");
         Version version1 = new VersionImpl(versionProp2, dummyNodeRef);
         
-        String verisonLabel1 = policy.getVersionLabelValue(
+        String verisonLabel1 = policy.calculateVersionLabel(
+				DictionaryBootstrap.TYPE_BASE,                
                 version1,
                 1,
                 versionProp1);
@@ -53,7 +56,8 @@ public class SerialVersionLabelPolicyTest extends TestCase
         HashMap<String, Serializable> versionProp4 = new HashMap<String, Serializable>();
         versionProp4.put(Version.PROP_VERSION_TYPE, VersionType.MAJOR);
         
-        String verisonLabel2 = policy.getVersionLabelValue(
+        String verisonLabel2 = policy.calculateVersionLabel(
+				DictionaryBootstrap.TYPE_BASE,
                 version2,
                 1,
                 versionProp4);

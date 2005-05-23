@@ -11,7 +11,7 @@ import org.alfresco.repo.version.VersionHistory;
  * 
  * @author Roy Wetherall
  */
-public class VersionServiceImplTest extends BaseImplTest
+public class VersionServiceImplTest extends VersionStoreBaseTest
 {
 	/**
      * Tests the creation of the initial version of a versionable node
@@ -35,7 +35,7 @@ public class VersionServiceImplTest extends BaseImplTest
         createVersion(versionableNode);
     }
     
-    // TODO test versioning a non versionable node ie: no veriosn apsect
+    // TODO test versioning a non versionable node ie: no version apsect
     
     // TODO test versioning numberious times with branchs implies by different workspaces
     
@@ -47,7 +47,8 @@ public class VersionServiceImplTest extends BaseImplTest
         NodeRef versionableNode = createNewVersionableNode();
         
         // Snap shot data
-        int expectedVersionNumber = peekNextVersionNumber(); 
+        int expectedVersionNumber = peekNextVersionNumber();
+		String expectedVersionLabel = peekNextVersionLabel(versionableNode, expectedVersionNumber, versionProperties);
         long beforeVersionTime = System.currentTimeMillis();
         
         // Version the node and its children
@@ -57,20 +58,21 @@ public class VersionServiceImplTest extends BaseImplTest
                 true);
         
         // Check the returned versions are correct
-        CheckVersionCollection(expectedVersionNumber, beforeVersionTime, versions);
+        CheckVersionCollection(expectedVersionNumber, expectedVersionLabel, beforeVersionTime, versions);
         
         // TODO check the version history is correct
-    }
+    }	
     
     /**
      * Test versioning many nodes in one go
      */
     public void testVersioningManyNodes()
     {
-        createNewVersionableNode();
+        NodeRef versionableNode = createNewVersionableNode();
         
         // Snap shot data
         int expectedVersionNumber = peekNextVersionNumber(); 
+		String expectedVersionLabel = peekNextVersionLabel(versionableNode, expectedVersionNumber, versionProperties);        
         long beforeVersionTime = System.currentTimeMillis();
         
         // Version the list of nodes created
@@ -79,7 +81,7 @@ public class VersionServiceImplTest extends BaseImplTest
                 this.versionProperties);
         
         // Check the returned versions are correct
-        CheckVersionCollection(expectedVersionNumber, beforeVersionTime, versions);     
+        CheckVersionCollection(expectedVersionNumber, expectedVersionLabel, beforeVersionTime, versions);     
 
         // TODO check the version histories
     }
@@ -91,7 +93,7 @@ public class VersionServiceImplTest extends BaseImplTest
      * @param beforeVersionTime      the time before the versions where created
      * @param versions               the collection of version objects
      */
-    private void CheckVersionCollection(int expectedVersionNumber, long beforeVersionTime, Collection<Version> versions)
+    private void CheckVersionCollection(int expectedVersionNumber, String expectedVersionLabel, long beforeVersionTime, Collection<Version> versions)
     {
         for (Version version : versions)
         {
@@ -104,7 +106,7 @@ public class VersionServiceImplTest extends BaseImplTest
             assertNotNull("The versionable node ref that relates to the frozen node id can not be found.", origionaNodeRef);
             
             // Check the new version
-            checkNewVersion(beforeVersionTime, expectedVersionNumber, version, origionaNodeRef);
+            checkNewVersion(beforeVersionTime, expectedVersionNumber, expectedVersionLabel, version, origionaNodeRef);
         }
     }
     

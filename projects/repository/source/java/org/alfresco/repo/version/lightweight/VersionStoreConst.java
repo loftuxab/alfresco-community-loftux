@@ -6,6 +6,7 @@ package org.alfresco.repo.version.lightweight;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.version.Version;
+import org.alfresco.repo.version.VersionService;
 
 /**
  * interface conating the constants used by the light weight 
@@ -13,13 +14,24 @@ import org.alfresco.repo.version.Version;
  * 
  * @author Roy Wetherall
  */
-public interface Const
+public interface VersionStoreConst
 {
     /**
      * Namespace
      */
     public static final String NAMESPACE_URI = "http://www.alfresco.com/lightWeightVersionStore/1.0";
     
+	 /**
+     * The store protocol
+     */
+    public static final String STORE_PROTOCOL = VersionService.VERSION_STORE_PROTOCOL;
+    
+    /**
+     * The store id
+     */
+    public static final String STORE_ID = "lightWeightVersionStore";
+   
+	
     /**
      * Version history type
      */

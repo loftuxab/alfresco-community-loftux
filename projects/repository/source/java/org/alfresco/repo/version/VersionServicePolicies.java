@@ -3,7 +3,12 @@
  */
 package org.alfresco.repo.version;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl.CopyDetails;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.ref.NodeRef;
 
@@ -47,6 +52,20 @@ public interface VersionServicePolicies
 		 * 
 		 * @param versionableNode
 		 */
-		public void onCreateVersion(NodeRef versionableNode);
+		public void onCreateVersion(
+				NodeRef versionableNode, 
+				Map<String, Serializable>additionalVersionProperties,
+				CopyDetails frozenState);
+	}
+	
+	public interface CalculateVersionLabelPolicy extends ClassPolicy
+	{
+		static final String NAMESPACE = NamespaceService.ALFRESCO_URI;
+		
+		public String calculateVersionLabel(
+				ClassRef classRef,
+				Version preceedingVersion,
+				int versionNumber,
+				Map<String, Serializable>verisonProperties);
 	}
 }

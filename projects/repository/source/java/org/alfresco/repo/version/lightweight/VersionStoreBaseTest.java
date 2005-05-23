@@ -15,9 +15,10 @@ import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.version.Version;
 import org.alfresco.repo.version.VersionService;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
+import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
 import org.alfresco.util.BaseSpringTest;
 
-public class BaseImplTest extends BaseSpringTest 
+public class VersionStoreBaseTest extends BaseSpringTest 
 {
 	/*
      * Services used by the tests
@@ -178,19 +179,29 @@ public class BaseImplTest extends BaseSpringTest
     protected Version createVersion(NodeRef versionableNode, Map<String, Serializable> versionProperties)
     {
         // Get the next version number
-        // TODO this check of the version number presumes the default version label policy
         int nextVersion = peekNextVersionNumber(); 
-        
+        String nextVersionLabel = peekNextVersionLabel(versionableNode, nextVersion, versionProperties);
+		
         // Snap-shot the date-time
         long beforeVersionTime = System.currentTimeMillis();
         
         // Now lets create a new version for this node
         Version newVersion = lightWeightVersionStoreVersionService.createVersion(versionableNode, this.versionProperties);
-        checkNewVersion(beforeVersionTime, nextVersion, newVersion, versionableNode);
+        checkNewVersion(beforeVersionTime, nextVersion, nextVersionLabel, newVersion, versionableNode);
         
         // Return the new version
         return newVersion;
     }
+	
+	/**
+	 * Gets the next version label
+	 */
+	protected String peekNextVersionLabel(NodeRef nodeRef, int versionNumber, Map<String, Serializable> versionProperties)
+	{
+		Version version = this.lightWeightVersionStoreVersionService.getCurrentVersion(nodeRef);		
+		SerialVersionLabelPolicy policy = new SerialVersionLabelPolicy();
+		return policy.calculateVersionLabel(DictionaryBootstrap.TYPE_BASE, version, versionNumber, versionProperties);
+	}
     
     /**
      * Checkd the validity of a new version
@@ -200,15 +211,19 @@ public class BaseImplTest extends BaseSpringTest
      * @param newVersion            the new version
      * @param versionableNode       the versioned node
      */
-    protected void checkNewVersion(long beforeVersionTime, int expectedVersionNumber, Version newVersion, NodeRef versionableNode)
+    protected void checkNewVersion(long beforeVersionTime, int expectedVersionNumber, String expectedVersionLabel, Version newVersion, NodeRef versionableNode)
     {
         assertNotNull(newVersion);
         
-        // Check the version label
+        // Check the version label and version number
         assertEquals(
                 "The expected version number was not used.",
                 Integer.toString(expectedVersionNumber), 
-                newVersion.getVersionLabel());
+                newVersion.getVersionProperty(Version.PROP_VERSION_NUMBER));
+		assertEquals(
+				"The expected version label was not used.",
+				expectedVersionLabel,
+				newVersion.getVersionLabel());
         
         // Check the created date
         long afterVersionTime = System.currentTimeMillis();

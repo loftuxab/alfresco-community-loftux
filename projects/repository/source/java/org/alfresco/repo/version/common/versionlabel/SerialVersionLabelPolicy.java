@@ -6,8 +6,8 @@ package org.alfresco.repo.version.common.versionlabel;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionLabelPolicy;
 import org.alfresco.repo.version.VersionType;
 
 /**
@@ -15,7 +15,7 @@ import org.alfresco.repo.version.VersionType;
  * 
  * @author Roy Wetherall
  */
-public class SerialVersionLabelPolicy implements VersionLabelPolicy
+public class SerialVersionLabelPolicy 
 {
     // TODO need to add support for branches into this labeling policy
     
@@ -27,7 +27,8 @@ public class SerialVersionLabelPolicy implements VersionLabelPolicy
      * @param versionProperties  the version property values
      * @return                   the version label
      */
-    public String getVersionLabelValue(
+    public String calculateVersionLabel(
+			ClassRef classRef,
             Version preceedingVersion, 
             int versionNumber, 
             Map<String, Serializable> versionProperties)

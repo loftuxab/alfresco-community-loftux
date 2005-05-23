@@ -120,5 +120,15 @@ public interface VersionService
      *                  thrown if the version aspect is missing
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef)
-        throws AspectMissingException;       
+        throws AspectMissingException;     
+	
+	/**
+	 * Gets the version object for the current version of the node reference
+	 * passed.
+	 * <p>
+	 * Returns null if the node is not versionable or has not been versioned.
+	 * @param nodeRef   the node reference
+	 * @return			the version object for the current version
+	 */
+	public Version getCurrentVersion(NodeRef nodeRef);
 }

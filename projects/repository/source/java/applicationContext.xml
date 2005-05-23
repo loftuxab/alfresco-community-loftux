@@ -402,9 +402,9 @@
 			 <property name="contentService">
 				<ref bean="contentService" />
 			 </property>			 	
-			 <property name="versionContentStore">
+			 <!--<property name="versionContentStore">
 				<ref bean="lightWeightVersionStoreContentStore"/>
-			 </property>
+			 </property>-->
 			 <property name="versionCounterDaoService">
 				<ref bean="versionCounterDaoService"/>
 			 </property>
@@ -434,7 +434,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.version.lightweight.NodeServiceImpl" init-method="initialise">
+         <bean class="org.alfresco.repo.version.lightweight.NodeServiceImpl">
 			 <property name="nodeService">
 				<!-- TODO This should point to the general node service -->	
 				<ref bean="dbNodeService" />
@@ -466,12 +466,9 @@
       </property>
       <property name="target">
          <bean class="org.alfresco.repo.version.lightweight.ContentServiceImpl">
-			 <property name="dbNodeService">
-				<ref bean="dbNodeService" />
+			 <property name="contentService">
+				<ref bean="contentService" />
 			</property>	
-			<property name="versionContentStore">
-				<ref bean="lightWeightVersionStoreContentStore"/>
-			</property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -481,7 +478,7 @@
       </property>
    </bean>
    
-   <bean id='lightWeightVersionStoreContentStore' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+  <!-- <bean id='lightWeightVersionStoreContentStore' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.repo.content.ContentStore</value>
       </property>
@@ -500,7 +497,7 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
-   </bean>
+   </bean>-->
       
    
    <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>

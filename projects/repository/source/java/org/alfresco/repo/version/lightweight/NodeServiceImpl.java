@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.AssociationExistsException;
 import org.alfresco.repo.node.InvalidAspectException;
@@ -27,19 +28,80 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.repo.ref.qname.RegexQNamePattern;
+import org.alfresco.repo.search.Searcher;
 
 /**
  * The light weight version store node service implementation.
  * 
  * @author Roy Wetherall
  */
-public class NodeServiceImpl extends BaseImpl implements NodeService 
+public class NodeServiceImpl implements NodeService, VersionStoreConst 
 {
     /**
      * Error messages
      */
     private final static String MSG_UNSUPPORTED = 
         "This operation is not supported by a version store implementation of the node service.";
+	
+	/**
+     * The common node service
+     */
+    protected NodeService nodeService ;
+    
+    /**
+     * The db node service, used as the version store implementation
+     */
+    protected NodeService dbNodeService;
+
+    /**
+     * The repository searcher
+     */
+    private Searcher searcher;
+    
+    /**
+     * The dictionary service
+     */
+    protected DictionaryService dicitionaryService;
+	
+	/**
+     * Sets the general node service
+     * 
+     * @param nodeService   the node service
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+    
+    /**
+     * Sets the db node service, used as the version store implementation
+     * 
+     * @param nodeService  the node service
+     */
+    public void setDbNodeService(NodeService nodeService)
+    {
+        this.dbNodeService = nodeService;
+    }
+
+    /**
+     * Sets the searcher
+     * 
+     * @param searcher  the searcher
+     */
+    public void setSearcher(Searcher searcher)
+    {
+        this.searcher = searcher; 
+    }
+    
+    /**
+     * Sets the dictionary service
+     * 
+     * @param dictionaryService  the dictionary service
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dicitionaryService = dictionaryService;
+    }
 	
     /**
      * Delegates to the <code>NodeService</code> used as the version store implementation
@@ -143,7 +205,7 @@ public class NodeServiceImpl extends BaseImpl implements NodeService
      */
     public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
-		return (ClassRef)this.dbNodeService.getProperty(nodeRef, BaseImpl.PROP_QNAME_FROZEN_NODE_TYPE);
+		return (ClassRef)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_NODE_TYPE);
     }
     
     /**

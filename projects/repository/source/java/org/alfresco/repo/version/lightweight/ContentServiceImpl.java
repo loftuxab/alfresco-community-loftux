@@ -5,11 +5,8 @@ package org.alfresco.repo.version.lightweight;
 
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.util.AspectMissingException;
 ;
 
 /**
@@ -17,54 +14,36 @@ import org.alfresco.util.AspectMissingException;
  * 
  * @author Roy Wetherall
  */
-public class ContentServiceImpl extends BaseImpl implements ContentService 
+public class ContentServiceImpl implements ContentService 
 {
     /**
      * Error messages
      */
     private final static String MSG_UNSUPPORTED = 
         "This operation is not supported by a version store implementation of the content service.";   
-    
-    /**
-     * The version content store
-     */
-    private ContentStore versionContentStore;
-    
-    /**
-     * Sets the version content store
-     * 
-     * @param versionContentStore  the version content store
-     */
-    public void setVersionContentStore(ContentStore versionContentStore)
-    {
-        this.versionContentStore = versionContentStore;
-    }
-    
+    	
+	/**
+	 * The content service
+	 */
+	protected ContentService contentService;
+
+	/**
+	 * Set the content service
+	 * 
+	 * @param contentService  the content service
+	 */
+	public void setContentService(ContentService contentService) 
+	{
+		this.contentService = contentService;
+	}
+	
     /**
      * @see org.alfresco.repo.content.ContentService#getReader(org.alfresco.repo.ref.NodeRef)
      */
     public ContentReader getReader(NodeRef nodeRef)
     {
-        ContentReader reader = null;
-        
-        // Check that the content aspect is present
-        if (dbNodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT) == false)
-        {
-            throw new AspectMissingException(DictionaryBootstrap.ASPECT_CONTENT, nodeRef);
-        }
-        
-        // Get the content URL
-        String contentUrl = (String) this.dbNodeService.getProperty(
-                nodeRef,
-                DictionaryBootstrap.PROP_QNAME_CONTENT_URL);
-        
-        // check that the URL is available
-        if (contentUrl != null)
-        {
-            reader = versionContentStore.getReader(contentUrl);
-        }
-        
-        return reader;
+		// Delegate the call to the content service
+		return this.contentService.getReader(nodeRef);
     }
 
 	/**
@@ -90,6 +69,7 @@ public class ContentServiceImpl extends BaseImpl implements ContentService
      */
     public ContentWriter getTempWriter()
     {
-        return versionContentStore.getWriter();
+        //return versionContentStore.getWriter();
+		return this.contentService.getTempWriter();
     }        
 }

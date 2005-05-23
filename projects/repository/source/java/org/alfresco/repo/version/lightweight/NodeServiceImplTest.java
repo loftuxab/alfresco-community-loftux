@@ -23,7 +23,7 @@ import org.alfresco.repo.version.Version;
 /**
  * @author Roy Wetherall
  */
-public class NodeServiceImplTest extends BaseImplTest 
+public class NodeServiceImplTest extends VersionStoreBaseTest 
 {
 	/**
 	 * Light weight version store node service

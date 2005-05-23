@@ -24,7 +24,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.impl.lucene.analysis.DateAnalyser;
 import org.alfresco.repo.search.impl.lucene.analysis.IntegerAnalyser;
 import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.lightweight.Const;
+import org.alfresco.repo.version.lightweight.VersionStoreConst;
 import org.alfresco.util.debug.CodeMonkey;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
@@ -556,57 +556,57 @@ public class DictionaryBootstrap
         // Light Weight Version Store Model Defintions
         
         // -------------------- versionedAttribute type --------------------
-        M2Type versionedAttributeType = metaModelDAO.createType(Const.TYPE_QNAME_VERSIONED_PROPERTY);
+        M2Type versionedAttributeType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSIONED_PROPERTY);
         versionedAttributeType.setSuperClass(baseType);
         
         // Create assocQName property
-        M2Property assocQNameProperty = versionedAttributeType.createProperty(Const.PROP_QNAME);
+        M2Property assocQNameProperty = versionedAttributeType.createProperty(VersionStoreConst.PROP_QNAME);
         assocQNameProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         assocQNameProperty.setMandatory(true);
         assocQNameProperty.setMultiValued(false);
         
         // Create value property
-        M2Property valueProperty = versionedAttributeType.createProperty(Const.PROP_VALUE);
+        M2Property valueProperty = versionedAttributeType.createProperty(VersionStoreConst.PROP_VALUE);
         valueProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.ANY));
         valueProperty.setMandatory(true);
         valueProperty.setMultiValued(false);        
         
         // -------------------- versionedChildAssoc type --------------------
-        M2Type versionedChildAssocType = metaModelDAO.createType(Const.TYPE_QNAME_VERSIONED_CHILD_ASSOC);
+        M2Type versionedChildAssocType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSIONED_CHILD_ASSOC);
         versionedChildAssocType.setSuperClass(referenceType);
         
         // Create frozen is primary property
         M2Property frozenIsPrimary = versionedChildAssocType.createProperty(
-                Const.PROP_IS_PRIMARY);
+                VersionStoreConst.PROP_IS_PRIMARY);
         frozenIsPrimary.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.BOOLEAN));
         frozenIsPrimary.setMandatory(true);
         frozenIsPrimary.setMultiValued(false);
         
         // Create qname property
-        M2Property qname2 = versionedChildAssocType.createProperty(Const.PROP_ASSOC_QNAME);
+        M2Property qname2 = versionedChildAssocType.createProperty(VersionStoreConst.PROP_ASSOC_QNAME);
         qname2.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         qname2.setMandatory(true);
         qname2.setMultiValued(false);
                 
         // Create frozen nth sibling property
         M2Property frozenNthSibling = versionedChildAssocType.createProperty(
-                Const.PROP_NTH_SIBLING);
+                VersionStoreConst.PROP_NTH_SIBLING);
         frozenNthSibling.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.INT));
         frozenNthSibling.setMandatory(true);
         frozenNthSibling.setMultiValued(false);
         
         // -------------------- versionedChildAssoc type --------------------
-        M2Type versionedAssocType = metaModelDAO.createType(Const.TYPE_QNAME_VERSIONED_ASSOC);
+        M2Type versionedAssocType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSIONED_ASSOC);
         versionedAssocType.setSuperClass(referenceType);
         
         // Create qname property
-        M2Property qname3 = versionedAssocType.createProperty(Const.PROP_ASSOC_QNAME);
+        M2Property qname3 = versionedAssocType.createProperty(VersionStoreConst.PROP_ASSOC_QNAME);
         qname3.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
         qname3.setMandatory(true);
         qname3.setMultiValued(false);
         
         // -------------------- version type --------------------
-        M2Type versionType = metaModelDAO.createType(Const.TYPE_QNAME_VERSION);
+        M2Type versionType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSION);
         versionType.setSuperClass(containerType);
         
         // Create verison number property
@@ -666,41 +666,41 @@ public class DictionaryBootstrap
         frozenAspects.setMultiValued(true);
         
         // Child assoc to versioned attribute details
-        M2ChildAssociation versionedAttributesChildAssoc = versionType.createChildAssociation(Const.CHILD_VERSIONED_ATTRIBUTES);
+        M2ChildAssociation versionedAttributesChildAssoc = versionType.createChildAssociation(VersionStoreConst.CHILD_VERSIONED_ATTRIBUTES);
         // TODO the details of this
         
         // Child assoc to versioned child assoc details
-        M2ChildAssociation versionedChildAssocsChildAssoc = versionType.createChildAssociation(Const.CHILD_VERSIONED_CHILD_ASSOCS);
+        M2ChildAssociation versionedChildAssocsChildAssoc = versionType.createChildAssociation(VersionStoreConst.CHILD_VERSIONED_CHILD_ASSOCS);
         // TODO the details of this
         
         // Add the successor association
         M2Association successorAssoc = versionType.createAssociation(
-                Const.ASSOC_SUCCESSOR.getLocalName());
+                VersionStoreConst.ASSOC_SUCCESSOR.getLocalName());
         successorAssoc.getRequiredToClasses().add(versionType);
         successorAssoc.setMandatory(false);
         successorAssoc.setMultiValued(true);
               
         // -------------------- versionHistoryType type --------------------
-        M2Type versionHistoryType = metaModelDAO.createType(Const.TYPE_QNAME_VERSION_HISTORY);
+        M2Type versionHistoryType = metaModelDAO.createType(VersionStoreConst.TYPE_QNAME_VERSION_HISTORY);
         versionHistoryType.setSuperClass(containerType);
         
         // Create versioned node id property
         M2Property nodeIdProperty = versionHistoryType.createProperty(
-                Const.PROP_VERSIONED_NODE_ID);
+                VersionStoreConst.PROP_VERSIONED_NODE_ID);
         nodeIdProperty.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
         nodeIdProperty.setMandatory(true);
         nodeIdProperty.setMultiValued(false);
         
         // Add the child assoc
         M2ChildAssociation versionChildAssoc = versionHistoryType.createChildAssociation(
-                Const.CHILD_VERSIONS);
+                VersionStoreConst.CHILD_VERSIONS);
         versionChildAssoc.getRequiredToClasses().add(versionType);
         versionChildAssoc.setMandatory(true);
         versionChildAssoc.setMultiValued(true);
         
         // Add the root version association
         M2Association rootVersionAssoc = versionHistoryType.createAssociation(
-                Const.ASSOC_ROOT_VERSION.getLocalName());
+                VersionStoreConst.ASSOC_ROOT_VERSION.getLocalName());
         rootVersionAssoc.getRequiredToClasses().add(versionType);
         rootVersionAssoc.setMandatory(true);
         rootVersionAssoc.setMultiValued(false);               

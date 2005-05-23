@@ -14,7 +14,7 @@ import org.alfresco.repo.version.Version;
  * 
  * @author Roy Wetherall
  */
-public class ContentServiceImplTest extends BaseImplTest
+public class ContentServiceImplTest extends VersionStoreBaseTest
 {
     /**
      * Error message

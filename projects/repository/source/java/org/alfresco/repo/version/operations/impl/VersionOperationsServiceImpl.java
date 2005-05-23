@@ -213,7 +213,14 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 			throw new AspectMissingException(DictionaryBootstrap.ASPECT_WORKING_COPY, workingCopyNodeRef);
 		}
 		
-		// TODO sort out the content ... 
+		if (contentUrl != null)
+		{
+			// Set the content url value onto the working copy
+			this.nodeService.setProperty(
+					workingCopyNodeRef, 
+					DictionaryBootstrap.PROP_QNAME_CONTENT_URL, 
+					contentUrl);
+		}
 		
 		// Check that the working node still has the copy aspect applied
 		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_COPY) == true)
@@ -321,5 +328,4 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		
 		return nodeRef;
 	}
-
 }
