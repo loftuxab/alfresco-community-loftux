@@ -9,7 +9,7 @@
 
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 <%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
-<%@ page import="org.alfresco.web.AlfrescoFacesPortlet" %>
+<%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
 
 <r:page>
 

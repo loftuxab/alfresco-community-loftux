@@ -7,7 +7,7 @@
 <%@ page isELIgnored="false" %>
 
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
-<%@ page import="org.alfresco.web.AlfrescoFacesPortlet" %>
+<%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
 <%@ page import="org.alfresco.web.bean.CheckinCheckoutBean" %>
 
 <r:page>
