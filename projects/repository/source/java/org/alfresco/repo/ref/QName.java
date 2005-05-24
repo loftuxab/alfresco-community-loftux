@@ -90,7 +90,15 @@ public final class QName implements QNamePattern, Serializable
     public static QName createQName(String qname, NamespacePrefixResolver prefixResolver)
         throws InvalidQNameException, NamespaceException
     {
-        throw new UnsupportedOperationException();
+        int colonIndex = qname.indexOf(':');
+        if(colonIndex > -1)
+        {
+            return createQName(qname.substring(0, colonIndex), qname.substring(colonIndex+1), prefixResolver);
+        }
+        else
+        {
+            throw new InvalidQNameException("QName '" + qname + "' must be a prefix and local name");
+        }
     }
 
 

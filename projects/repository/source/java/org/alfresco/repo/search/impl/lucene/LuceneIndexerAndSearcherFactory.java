@@ -87,6 +87,8 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private LuceneIndexLock luceneIndexLock;
     
     private FullTextSearchIndexer luceneFullTextSearchIndexer;
+    
+    private String indexRootLocation;
 
     /**
      * Private constructor for the singleton TODO: FIt in with IOC
@@ -137,6 +139,11 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     public void setLuceneFullTextSearchIndexer(FullTextSearchIndexer luceneFullTextSearchIndexer)
     {
         this.luceneFullTextSearchIndexer = luceneFullTextSearchIndexer;
+    }
+    
+    public void setIndexRootLocation(String indexRootLocation)
+    {
+        this.indexRootLocation = indexRootLocation;
     }
     
 
@@ -278,6 +285,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setLuceneFullTextSearchIndexer(luceneFullTextSearchIndexer);
+        indexer.setIndexRootLocation(indexRootLocation);
         return indexer;
     }
 
@@ -311,6 +319,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         searcher.setLuceneIndexLock(luceneIndexLock);
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
+        searcher.setIndexRootLocation(indexRootLocation);
         return searcher;
     }
 

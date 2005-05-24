@@ -453,6 +453,7 @@ public class LuceneTest extends TestCase
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
+        
 
         indexer.clearIndex();
 
@@ -469,7 +470,8 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-
+        searcher.setNameSpaceService(new MockNameService("namespace"));
+        
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"value-2\"", null, null);
 
         assertEquals(1, results.length());
@@ -477,6 +479,22 @@ public class LuceneTest extends TestCase
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-1:\"value-1\"", null, null);
+        assertEquals(2, results.length());
+        assertEquals(n2.getId(), results.getNodeRef(0).getId());
+        assertEquals(n1.getId(), results.getNodeRef(1).getId());
+        assertEquals(1.0f, results.getScore(0));
+        assertEquals(1.0f, results.getScore(1));
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@namespace\\:property\\-1:\"value-1\"", null, null);
+        assertEquals(2, results.length());
+        assertEquals(n2.getId(), results.getNodeRef(0).getId());
+        assertEquals(n1.getId(), results.getNodeRef(1).getId());
+        assertEquals(1.0f, results.getScore(0));
+        assertEquals(1.0f, results.getScore(1));
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:\"value-1\"", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
         assertEquals(n1.getId(), results.getNodeRef(1).getId());

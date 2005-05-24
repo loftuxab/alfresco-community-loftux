@@ -30,10 +30,10 @@ import org.apache.lucene.store.FSDirectory;
  * <p>
  * The default file structure is
  * <ol>
- * <li><b>/lucene-indexes/"protocol"/"name"/</b> for the main index
- * <li><b>/lucene-indexes/"protocol"/"name"/deltas/"id"</b> for transactional
+ * <li><b>"base"/"protocol"/"name"/</b> for the main index
+ * <li><b>"base"/"protocol"/"name"/deltas/"id"</b> for transactional
  * updates
- * <li><b>/lucene-indexes/"protocol"/"name"/undo/"id"</b> undo information
+ * <li><b>"base"/"protocol"/"name"/undo/"id"</b> undo information
  * </ol>
  * 
  * <p>
@@ -113,6 +113,8 @@ public abstract class LuceneBase implements Lockable
 
     private LuceneIndexLock luceneIndexLock;
 
+    private String indexRootLocation = File.separator + "lucene-indexes";
+
     /**
      * Initiase the configuration elements of the lucene store indexers and
      * searchers.
@@ -162,7 +164,7 @@ public abstract class LuceneBase implements Lockable
      */
     private String getBasePath()
     {
-        String basePath = File.separator + "lucene-indexes" + File.separator + store.getProtocol() + File.separator + store.getIdentifier() + File.separator;
+        String basePath = indexRootLocation + File.separator + store.getProtocol() + File.separator + store.getIdentifier() + File.separator;
         return basePath;
     }
 
@@ -673,6 +675,12 @@ public abstract class LuceneBase implements Lockable
     {
         return dictionaryService;
     }
+
+    public void setIndexRootLocation(String indexRootLocation)
+    {
+        this.indexRootLocation = indexRootLocation;
+    }
+    
     
 
 }

@@ -157,6 +157,29 @@ public class LuceneQueryParser extends QueryParser
                 }
                 return booleanQuery;
             }
+            else if (field.startsWith("@"))
+            {
+                // Check for any prefixes and expand to the full uri
+                if(field.charAt(1) != '{')
+                {
+                    int colonPosition = field.indexOf(':');
+                    if(colonPosition == -1)
+                    {
+                        // use the default namespace
+                        return super.getFieldQuery("@{"+nameSpaceService.getNamespaceURI("")+"}"+field.substring(1), queryText);
+                    }
+                    else
+                    {
+                        // find the prefix
+                        return super.getFieldQuery("@{"+nameSpaceService.getNamespaceURI(field.substring(1, colonPosition))+"}"+field.substring(colonPosition+1), queryText);
+                    }
+                }
+                else
+                {
+                    // Already in expanded form
+                    return super.getFieldQuery(field, queryText);
+                }
+            }
             else
             {
                 return super.getFieldQuery(field, queryText);

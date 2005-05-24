@@ -344,6 +344,9 @@
         <property name="luceneFullTextSearchIndexer">
             <ref bean="LuceneFullTextSearchIndexer"/>
         </property>
+        <property name="indexRootLocation">
+            <value>w:/lucene-indexes</value>
+        </property>
     </bean>
     
     <!-- Support for locking lucene indexes for deletion and update -->

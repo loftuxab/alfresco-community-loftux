@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Session;
-import org.jaxen.JaxenException;
-
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
@@ -30,6 +27,8 @@ import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.Conversion;
 import org.alfresco.util.debug.CodeMonkey;
+import org.hibernate.Session;
+
 import com.vladium.utils.timing.ITimer;
 import com.vladium.utils.timing.TimerFactory;
 
