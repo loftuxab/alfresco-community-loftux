@@ -14,7 +14,7 @@
    
    <config>
       <server>
-         <mode>portlet</mode>
+         <mode>servlet</mode>
          <error-page>/jsp/error.jsp</error-page>
       </server>
    </config>

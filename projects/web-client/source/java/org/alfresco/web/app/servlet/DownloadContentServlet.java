@@ -76,7 +76,7 @@ public class DownloadContentServlet extends HttpServlet
          // set header based on filename - will force a Save As from the browse if it doesn't recognise it
          // this is better than the default response of the browse trying to display the contents!
          // TODO: make this configurable - and check it does not prevent streaming of large files
-         res.setHeader("Content-Disposition", "attachment;filename=" + URLDecoder.decode(filename));
+         res.setHeader("Content-Disposition", "attachment;filename=\"" + URLDecoder.decode(filename) + '"');
          
          // useful debug output!
          //logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
