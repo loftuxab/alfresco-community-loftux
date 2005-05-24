@@ -8,8 +8,8 @@ import java.util.Map;
 
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl.CopyDetails;
 import org.alfresco.repo.policy.ClassPolicy;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.NodeRef;
 
 /**
@@ -20,7 +20,7 @@ import org.alfresco.repo.ref.NodeRef;
 public interface VersionServicePolicies
 {
 	/**
-	 * 
+	 * Before create version policy interface.
 	 */
 	public interface BeforeCreateVersionPolicy extends ClassPolicy
 	{
@@ -39,7 +39,7 @@ public interface VersionServicePolicies
 	}
 	
 	/**
-	 * 
+	 * On create version policy interface
 	 */
 	public interface OnCreateVersionPolicy extends ClassPolicy
 	{
@@ -48,16 +48,16 @@ public interface VersionServicePolicies
 		 */
 		static final String NAMESPACE = NamespaceService.ALFRESCO_URI;
 		
-		/**
-		 * 
-		 * @param versionableNode
-		 */
 		public void onCreateVersion(
+				ClassRef classRef,
 				NodeRef versionableNode, 
-				Map<String, Serializable>additionalVersionProperties,
-				CopyDetails frozenState);
+				Map<String, Serializable> versionProperties,
+				PolicyScope nodeDetails);
 	}
 	
+	/**
+	 * Calculate version lable policy interface
+	 */
 	public interface CalculateVersionLabelPolicy extends ClassPolicy
 	{
 		static final String NAMESPACE = NamespaceService.ALFRESCO_URI;

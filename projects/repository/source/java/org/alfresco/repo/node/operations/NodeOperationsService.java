@@ -76,10 +76,6 @@ public interface NodeOperationsService
             QName destinationAssocTypeQName, 
             QName destinationQName);
     
-    // TODO
-    // copyPropertiesOnly ??
-    // copy with a set of node references specified ??
-    
     /**
      * Copies the state of one node on top of another.
      * <p>
@@ -107,10 +103,5 @@ public interface NodeOperationsService
      * @param sourceNodeRef    the destination node reference
      * @param destinationNodeRef         the source node reference
      */
-    public void copy(NodeRef sourceNodeRef, NodeRef destinationNodeRef);
-    
-    // TODO
-    // update with includeChildren == true ?? not sure what this would mean ??
-    // update with a set of nodes provided ??
-    
+    public void copy(NodeRef sourceNodeRef, NodeRef destinationNodeRef);        
 }

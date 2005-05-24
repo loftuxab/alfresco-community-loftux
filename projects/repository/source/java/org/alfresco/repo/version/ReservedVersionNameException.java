@@ -18,7 +18,7 @@ public class ReservedVersionNameException extends RuntimeException
     /**
      * Error message
      */
-    private static final String MESSAGE = "The version property name '{0}' clashes with a reserved verison property name.";
+    private static final String MESSAGE = "The version property name {0} clashes with a reserved verison property name.";
     
     /**
      * Constructor

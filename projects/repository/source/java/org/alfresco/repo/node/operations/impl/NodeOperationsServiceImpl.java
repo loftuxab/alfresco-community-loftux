@@ -24,12 +24,12 @@ import org.alfresco.repo.node.operations.NodeOperationsServicePolicies;
 import org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyPolicy;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
-import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Node operations service implmentation.
@@ -121,7 +121,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 			destinationQName != null)
         {       
 			ClassRef sourceClassRef = this.nodeService.getType(sourceNodeRef);
-			CopyDetails copyDetails = getCopyDetails(sourceNodeRef);			
+			PolicyScope copyDetails = getCopyDetails(sourceNodeRef);			
 			
             if (sourceNodeRef.getStoreRef().equals(destinationParent.getStoreRef()) == true)
             {
@@ -141,8 +141,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
             }
             else
             {
-				// TODO
-				CodeMonkey.todo("We need to create a new node in the other store with the same id as the source.");
+				// TODO We need to create a new node in the other store with the same id as the source
 
                 // Error - since at the moment we do not support cross store copying
 				throw new UnsupportedOperationException("Copying nodes across stores is not currently supported.");
@@ -168,16 +167,15 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param sourceNodeRef		the source node reference
 	 * @return					the copy details
 	 */
-	private CopyDetails getCopyDetails(NodeRef sourceNodeRef)
+	private PolicyScope getCopyDetails(NodeRef sourceNodeRef)
 	{
 		ClassRef sourceClassRef = this.nodeService.getType(sourceNodeRef);		
-		CopyDetails copyDetails = new CopyDetails(sourceClassRef);
+		PolicyScope copyDetails = new PolicyScope(sourceClassRef);
 		
 		// Invoke the onCopy behaviour
 		invokeOnCopy(sourceClassRef, sourceNodeRef, copyDetails);
 		
-		// TODO 
-		CodeMonkey.todo("What do we do aboout props and assocs that are on the node node but not part of the type definition?");
+		// TODO What do we do aboout props and assocs that are on the node node but not part of the type definition?
 		
 		// Get the source aspects
 		Set<ClassRef> sourceAspects = this.nodeService.getAspects(sourceNodeRef);
@@ -197,7 +195,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param sourceNodeRef		source node reference
 	 * @param copyDetails		the copy details
 	 */
-	private void invokeOnCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	private void invokeOnCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		Collection<NodeOperationsServicePolicies.OnCopyPolicy> policies = this.onCopyDelegate.getList(sourceClassRef);
 		if (policies.isEmpty() == true)
@@ -220,7 +218,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param sourceNodeRef		the source node reference
 	 * @param copyDetails		details of the state being copied
 	 */
-    private void defaultOnCopy(ClassRef classRef, NodeRef sourceNodeRef, CopyDetails copyDetails) 
+    private void defaultOnCopy(ClassRef classRef, NodeRef sourceNodeRef, PolicyScope copyDetails) 
 	{
 		ClassDefinition classDefinition = this.dictionaryService.getClass(classRef);	
 		if (classDefinition != null)
@@ -264,7 +262,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param destinationNodeRef	the destintaion node reference
 	 * @param copyDetails			the copy details
 	 */
-	private void copyProperties(NodeRef destinationNodeRef, CopyDetails copyDetails)
+	private void copyProperties(NodeRef destinationNodeRef, PolicyScope copyDetails)
 	{
 		Map<QName, Serializable> props = copyDetails.getProperties();
 		if (props != null)
@@ -282,7 +280,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param destinationNodeRef	the destination node reference
 	 * @param copyDetails			the copy details
 	 */
-	private void copyAspects(NodeRef destinationNodeRef, CopyDetails copyDetails)
+	private void copyAspects(NodeRef destinationNodeRef, PolicyScope copyDetails)
 	{
 		Set<ClassRef> apects = copyDetails.getAspects();
 		for (ClassRef aspect : apects) 
@@ -321,7 +319,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param copyDetails			the copy details
 	 * @param copyChildren			indicates whether the primary children are copied or not
 	 */
-	private void copyAssociations(NodeRef destinationNodeRef, CopyDetails copyDetails, boolean copyChildren)
+	private void copyAssociations(NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
 	{
 		ClassRef classRef = this.nodeService.getType(destinationNodeRef);
 		copyChildAssociations(classRef, destinationNodeRef, copyDetails, copyChildren);
@@ -348,15 +346,14 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param destinationNodeRef	the destination node reference
 	 * @param copyDetails			the copy details 
 	 */
-	private void copyTargetAssociations(ClassRef classRef, NodeRef destinationNodeRef, CopyDetails copyDetails) 
+	private void copyTargetAssociations(ClassRef classRef, NodeRef destinationNodeRef, PolicyScope copyDetails) 
 	{
 		Map<QName, NodeAssocRef> nodeAssocRefs = copyDetails.getAssociations(classRef);
 		if (nodeAssocRefs != null)
 		{
 			for (Map.Entry<QName, NodeAssocRef> entry : nodeAssocRefs.entrySet()) 
 			{
-				// TODO need to use the nth value when adding the child node
-				CodeMonkey.todo("Currently the order of child associations is not preserved during copy");
+				// TODO Currently the order of child associations is not preserved during copy
 				
 				// Add the association
 				NodeRef targetRef = entry.getValue().getTargetRef();
@@ -377,15 +374,14 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param copyDetails			the copy details
 	 * @param copyChildren			indicates whether to copy the primary children
 	 */
-	private void copyChildAssociations(ClassRef classRef, NodeRef destinationNodeRef, CopyDetails copyDetails, boolean copyChildren)
+	private void copyChildAssociations(ClassRef classRef, NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
 	{
 		Map<QName, ChildAssocRef> childAssocs = copyDetails.getChildAssociations(classRef);
 		if (childAssocs != null)
 		{
 			for (Map.Entry<QName, ChildAssocRef> entry : childAssocs.entrySet()) 
 			{
-				// TODO need to use the nth value when adding the child node
-				CodeMonkey.todo("Currently the order of child associations is not preserved during copy");
+				// TODO Currently the order of child associations is not preserved during copy
 				
 				if (copyChildren == true)
 				{
@@ -450,7 +446,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 		}
 		
 		// Get the copy details
-		CopyDetails copyDetails = getCopyDetails(sourceNodeRef);
+		PolicyScope copyDetails = getCopyDetails(sourceNodeRef);
 		
 		// Copy over the top of the destination node
 		copyProperties(destinationNodeRef, copyDetails);
@@ -468,407 +464,9 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param sourceNodeRef		the source node reference
 	 * @param copyDetails	    the copy details
 	 */
-	public void copyAspectOnCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	public void copyAspectOnCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Do nothing.  This will ensure that copy aspect on the source node does not get copied onto
 		// the destination node.
-	}
-	
-	/**
-	 * Aspect copy details class.  Contains the details of an aspect that should be copied.
-	 * 
-	 * @author Roy Wetherall
-	 */
-	private class AspectCopyDetails
-	{
-		/**
-		 * The properties that should be copied
-		 */
-		protected Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-		
-		/**
-		 * The child associations that should be copied
-		 */
-		protected Map<QName, ChildAssocRef> childAssocs = new HashMap<QName, ChildAssocRef>();
-		
-		/**
-		 * The target associations that should be copied
-		 */
-		protected Map<QName, NodeAssocRef> targetAssocs = new HashMap<QName, NodeAssocRef>();
-		
-		/**
-		 * The class ref of the aspect
-		 */
-		protected ClassRef classRef;
-	
-		/**
-		 * Constructor
-		 * 
-		 * @param classRef  the class ref
-		 */
-		public AspectCopyDetails(ClassRef classRef)
-		{
-			this.classRef = classRef;
-		}
-		
-		/**
-		 * Add a property to the list of those to be copied
-		 * 
-		 * @param qName		the qualified name of the property
-		 * @param value		the value of the property
-		 */
-		protected void addProperty(QName qName, Serializable value) 
-		{
-			this.properties.put(qName, value);			
-		}
-		
-		/**
-		 * Remove a property from the list of thiose to be copied
-		 * 
-		 * @param qName		the qualified name of the property
-		 */
-		protected void removeProperty(QName qName) 
-		{
-			this.properties.remove(qName);			
-		}
-		
-		/**
-		 * Gets the map of properties to be copied
-		 * 
-		 * @return  map of property names and values
-		 */
-		public Map<QName, Serializable> getProperties() 
-		{
-			return properties;
-		}
-		
-		/**
-		 * Add a child association to copy
-		 * 
-		 * @param qname			the qualified name of the association
-		 * @param childAssocRef the child association reference
-		 */
-		protected void addChildAssociation(QName qname, ChildAssocRef childAssocRef) 
-		{
-			this.childAssocs.put(qname, childAssocRef);
-		}
-		
-		/**
-		 * Remove a child association from the list to copy
-		 * 
-		 * @param qname  the qualified name of the association
-		 */
-		protected void removeChildAssociation(QName qname) 
-		{
-			this.childAssocs.remove(qname);
-		}
-		
-		/**
-		 * Gets the child associations to be copied
-		 * 
-		 * @return  map containing the child associations to be copied
-		 */
-		public Map<QName, ChildAssocRef> getChildAssociations() 
-		{
-			return this.childAssocs;
-		}
-		
-		/**
-		 * Adds an association to be copied
-		 * 
-		 * @param qname			the qualified name of the association
-		 * @param nodeAssocRef	the association reference
-		 */
-		protected void addAssociation(QName qname, NodeAssocRef nodeAssocRef)
-		{
-			this.targetAssocs.put(qname, nodeAssocRef);
-		}
-		
-		/**
-		 * Remove an association from the list to be copied
-		 * 
-		 * @param qname  the qualified name of the association
-		 */
-		protected void removeAssociation(QName qname) 
-		{
-			this.targetAssocs.remove(qname);
-		}
-		
-		/**
-		 * Gets the map of associations to be copied
-		 * 
-		 * @return  a map conatining the associations to be copied
-		 */
-		public Map<QName, NodeAssocRef> getAssociations() 
-		{
-			return this.targetAssocs;
-		}		
-	}
-	
-	/**
-	 * Copy details class.  Contains the details of the node to be copied.
-	 * 
-	 * @author Roy Wetherall
-	 */
-	public class CopyDetails extends AspectCopyDetails
-	{
-		/**
-		 * The aspects to be copied
-		 */
-		protected Map<ClassRef, AspectCopyDetails> aspectCopyDetails = new HashMap<ClassRef, AspectCopyDetails>();
-		
-		/**
-		 * Constructor
-		 * 
-		 * @param classRef  the class reference
-		 */
-		public CopyDetails(ClassRef classRef)
-		{
-			super(classRef);
-		}
-		
-		/**
-		 * Adda property to be copied
-		 * 
-		 * @param classRef  the class reference
-		 * @param qName		the qualified name of the property
-		 * @param value		the value of the property
-		 */
-		public void addProperty(ClassRef classRef, QName qName, Serializable value) 
-		{
-			if (classRef.equals(this.classRef) == true)
-			{
-				addProperty(qName, value);
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails == null)
-				{
-					// Add the aspect
-					aspectDetails = addAspect(classRef);
-				}
-				aspectDetails.addProperty(qName, value);
-			}
-		}
-		
-		/**
-		 * Removes a property from the list to be copied
-		 * 
-		 * @param classRef	the class reference
-		 * @param qName		the qualified name
-		 */
-		public void removeProperty(ClassRef classRef, QName qName) 
-		{
-			if (classRef.equals(this.classRef) == true)
-			{
-				removeProperty(qName);
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails != null)
-				{
-					aspectDetails.removeProperty(qName);
-				}				
-			}
-		}
-		
-		/**
-		 * Get the properties that to be copied for the class/aspect specified.
-		 * 
-		 * @param classRef  the class ref
-		 * @return			the properties that should be copied
-		 */
-		public Map<QName, Serializable> getProperties(ClassRef classRef)
-		{
-			Map<QName, Serializable> result = null;
-			if (classRef.equals(this.classRef) == true)
-			{
-				result = getProperties();
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails != null)
-				{
-					result = aspectDetails.getProperties();
-				}
-			}
-			
-			return result;
-		}
-		
-		/**
-		 * 
-		 * @param classRef
-		 * @param qname
-		 * @param childAssocRef
-		 */
-		public void addChildAssociation(ClassRef classRef, QName qname, ChildAssocRef childAssocRef) 
-		{
-			if (classRef.equals(this.classRef) == true)
-			{
-				addChildAssociation(qname, childAssocRef);
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails == null)
-				{
-					// Add the aspect
-					aspectDetails = addAspect(classRef);
-				}
-				aspectDetails.addChildAssociation(qname, childAssocRef);
-			}
-		}
-		
-		/**
-		 * 
-		 * @param classRef
-		 * @param qname
-		 */
-		public void removeChildAssociation(ClassRef classRef, QName qname) 
-		{
-			if (classRef.equals(this.classRef) == true)
-			{
-				removeChildAssociation(qname);
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails != null)
-				{
-					aspectDetails.removeChildAssociation(qname);
-				}				
-			}
-		}
-		
-		/**
-		 * 
-		 * @param classRef
-		 * @return
-		 */
-		public Map<QName, ChildAssocRef> getChildAssociations(ClassRef classRef) 
-		{
-			Map<QName, ChildAssocRef> result = null;
-			if (classRef.equals(this.classRef) == true)
-			{
-				result = getChildAssociations();
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails != null)
-				{
-					result = aspectDetails.getChildAssociations();
-				}
-			}
-			
-			return result;
-		}
-		
-		/**
-		 * 
-		 * @param classRef
-		 * @param qname
-		 * @param nodeAssocRef
-		 */
-		public void addAssociation(ClassRef classRef, QName qname, NodeAssocRef nodeAssocRef)
-		{
-			if (classRef.equals(this.classRef) == true)
-			{
-				addAssociation(qname, nodeAssocRef);
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails == null)
-				{
-					// Add the aspect
-					aspectDetails = addAspect(classRef);
-				}
-				aspectDetails.addAssociation(qname, nodeAssocRef);
-			}
-		}
-		
-		/**
-		 * 
-		 * @param classRef
-		 * @param qname
-		 */
-		public void removeAssociation(ClassRef classRef, QName qname) 
-		{
-			if (classRef.equals(this.classRef) == true)
-			{
-				removeAssociation(qname);
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails != null)
-				{
-					aspectDetails.removeAssociation(qname);
-				}				
-			}
-		}
-		
-		/**
-		 * 
-		 * @param classRef
-		 * @return
-		 */
-		public Map<QName, NodeAssocRef> getAssociations(ClassRef classRef) 
-		{
-			Map<QName, NodeAssocRef> result = null;
-			if (classRef.equals(this.classRef) == true)
-			{
-				result = getAssociations();
-			}
-			else
-			{
-				AspectCopyDetails aspectDetails = this.aspectCopyDetails.get(classRef);
-				if (aspectDetails != null)
-				{
-					result = aspectDetails.getAssociations();
-				}
-			}
-			
-			return result;
-		}
-		
-		/**
-		 * Add an aspect to be copied
-		 * 
-		 * @param aspect	the aspect class reference
-		 * @return			the apsect copy details (returned as a helper)
-		 */
-		public AspectCopyDetails addAspect(ClassRef aspect) 
-		{
-			AspectCopyDetails result = new AspectCopyDetails(aspect);
-			this.aspectCopyDetails.put(aspect, result);
-			return result;
-		}
-		
-		/**
-		 * Removes an aspect from the list to be copied
-		 * 
-		 * @param aspect	the aspect class reference
-		 */
-		public void removeAspect(ClassRef aspect) 
-		{
-			this.aspectCopyDetails.remove(aspect);
-		}
-		
-		/**
-		 * Gets a list of the aspects to be copied
-		 * 
-		 * @return  a list of aspect to copy
-		 */
-		public Set<ClassRef> getAspects()
-		{
-			return this.aspectCopyDetails.keySet();
-		}
-			
-	}
+	}	
 }

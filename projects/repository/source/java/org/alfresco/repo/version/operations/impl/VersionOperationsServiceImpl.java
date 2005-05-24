@@ -13,8 +13,8 @@ import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.lock.LockType;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
-import org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl.CopyDetails;
 import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -129,13 +129,13 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	/**
 	 * onCopy policy behaviour
 	 * 
-	 * @see org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyPolicy#onCopy(ClassRef, NodeRef, CopyDetails)
+	 * @see org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyPolicy#onCopy(ClassRef, NodeRef, PolicyScope)
 	 * 
 	 * @param sourceClassRef  the source class reference
 	 * @param sourceNodeRef	  the source node reference
 	 * @param copyDetails	  the copy details
 	 */
-	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Do nothing to ensure that the working copy aspect does not appear on the copy
 	}

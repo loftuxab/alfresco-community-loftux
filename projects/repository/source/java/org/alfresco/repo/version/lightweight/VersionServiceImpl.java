@@ -12,17 +12,16 @@ import java.util.Set;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.dictionary.ClassRef;
-import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.ref.qname.RegexQNamePattern;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.version.ReservedVersionNameException;
 import org.alfresco.repo.version.Version;
@@ -65,12 +64,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     /**
      * The repository searcher
      */
-    private Searcher searcher;
-    
-    /**
-     * The dictionary service
-     */
-    protected DictionaryService dicitionaryService;
+    private Searcher searcher;       
 	
     /**
      * The generic content service
@@ -100,16 +94,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     public void setSearcher(Searcher searcher)
     {
         this.searcher = searcher; 
-    }
-    
-    /**
-     * Sets the dictionary service
-     * 
-     * @param dictionaryService  the dictionary service
-     */
-    public void setDictionaryService(DictionaryService dictionaryService)
-    {
-        this.dicitionaryService = dictionaryService;
     }
 	
     /**
@@ -300,19 +284,20 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      */
     private Version createVersion(
             NodeRef nodeRef, 
-            Map<String, Serializable> versionProperties, 
+            Map<String, Serializable> origVersionProperties, 
             int versionNumber)
             throws ReservedVersionNameException, AspectMissingException
     {
 
+		// Copy the version properties (to prevent unexpected side effects to the caller)
+		Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
+		versionProperties.putAll(origVersionProperties);
+		
         // Check for the version aspect
         checkForVersionAspect(nodeRef);
         
         // Call the policy behaviour
 		invokeBeforeCreateVersion(nodeRef);		
-        
-        // TODO we need some way of 'locking' the current node to ensure no modifications (or other versions) 
-        //      can take place untill the versioning process is complete
         
         // Check that the supplied additional version properties do not clash with the reserved ones
         VersionUtil.checkVersionPropertyNames(versionProperties.keySet());
@@ -355,16 +340,29 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             }
         }
         
-        // Create the new version node (child of the version history)
+		// Add the standard version properties
+		addStandardVersionProperties(versionProperties, nodeRef, currentVersionRef, versionNumber);
+		
+		// Create the node details
+		ClassRef classRef = this.nodeService.getType(nodeRef);
+		PolicyScope nodeDetails = new PolicyScope(classRef);
+		
+		// Get the node details by calling the onVersionCreate policy behaviour
+		invokeOnCreateVersion(nodeRef, versionProperties, nodeDetails);
+		
+		// TODO What do we do about ad-hoc properties and assocs ?
+		
+		// Create the new version node (child of the version history)
         NodeRef newVersionRef = createNewVersion(
                 nodeRef, 
                 versionHistoryRef,
-                currentVersionRef, 
+                //currentVersionRef, 
                 versionProperties, 
-                versionNumber);
+                nodeDetails);
+                //versionNumber);
         
         // 'Freeze' the current nodes state in the new version node
-        freezeNodeState(nodeRef, newVersionRef);
+        //freezeNodeState(nodeRef, newVersionRef);
         
         if (currentVersionRef == null)
         {
@@ -438,6 +436,38 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		
 		return version;
 	}
+	
+	private void addStandardVersionProperties(Map<String, Serializable> versionProperties, NodeRef nodeRef, NodeRef preceedingNodeRef, int versionNumber)
+	{
+		// Set the version number for the new version
+		versionProperties.put(Version.PROP_VERSION_NUMBER, Integer.toString(versionNumber));
+        
+        // Set the created date
+		versionProperties.put(Version.PROP_CREATED_DATE, new Date());
+		
+		// Set the versionable node id
+		versionProperties.put(Version.PROP_FROZEN_NODE_ID, nodeRef.getId());
+		
+		// Set the versionable node store protocol
+		versionProperties.put(Version.PROP_FROZEN_NODE_STORE_PROTOCOL, nodeRef.getStoreRef().getProtocol());
+		
+		// Set the versionable node store id
+		versionProperties.put(Version.PROP_FROZEN_NODE_STORE_ID, nodeRef.getStoreRef().getIdentifier());
+        
+        // Store the current node type
+        ClassRef nodeType = this.nodeService.getType(nodeRef);
+		versionProperties.put(Version.PROP_FROZEN_NODE_TYPE, nodeType);
+        
+        // Store the current aspects
+        Set<ClassRef> aspects = this.nodeService.getAspects(nodeRef);
+		versionProperties.put(Version.PROP_FROZEN_ASPECTS, (Serializable)aspects);
+        
+        // Calculate the version label
+		ClassRef classRef = this.nodeService.getType(nodeRef);
+		Version preceedingVersion = getVersion(preceedingNodeRef);
+        String versionLabel = invokeCalculateVersionLabel(classRef, preceedingVersion, versionNumber, versionProperties);
+		versionProperties.put(Version.PROP_VERSION_LABEL, versionLabel);
+	}	
     
     /**
      * Creates a new version node, setting the properties both calculated and specified.
@@ -453,43 +483,12 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     private NodeRef createNewVersion(
 			NodeRef versionableNodeRef, 
 			NodeRef versionHistoryRef, 
-			NodeRef preceedingNodeRef, 
-			Map<String, Serializable> 
-			versionProperties, 
-			int versionNumber)
+			Map<String, Serializable> versionProperties,
+			PolicyScope nodeDetails)
     {
-        HashMap<QName, Serializable> props = new HashMap<QName, Serializable>(15, 1.0f);
+        HashMap<QName, Serializable> props = new HashMap<QName, Serializable>(15, 1.0f);        
         
-        // Set the version number for the new version
-        props.put(PROP_QNAME_VERSION_NUMBER, Integer.toString(versionNumber));
-        
-        // Set the created date
-        props.put(PROP_QNAME_VERSION_CREATED_DATE, new Date());
-		
-		// Set the versionable node id
-		props.put(PROP_QNAME_FROZEN_NODE_ID, versionableNodeRef.getId());
-		
-		// Set the versionable node store protocol
-		props.put(PROP_QNAME_FROZEN_NODE_STORE_PROTOCOL, versionableNodeRef.getStoreRef().getProtocol());
-		
-		// Set the versionable node store id
-		props.put(PROP_QNAME_FROZEN_NODE_STORE_ID, versionableNodeRef.getStoreRef().getIdentifier());
-        
-        // Store the current node type
-        ClassRef nodeType = this.nodeService.getType(versionableNodeRef);
-        props.put(PROP_QNAME_FROZEN_NODE_TYPE, nodeType);
-        
-        // Store the current aspects
-        Set<ClassRef> aspects = this.nodeService.getAspects(versionableNodeRef);
-		props.put(PROP_QNAME_FROZEN_ASPECTS, (Serializable)aspects);
-        
-        // Calculate the version label
-		ClassRef classRef = this.nodeService.getType(versionableNodeRef);
-		Version preceedingVersion = getVersion(preceedingNodeRef);
-        String versionLabel = invokeCalculateVersionLabel(classRef, preceedingVersion, versionNumber, versionProperties);
-        props.put(PROP_QNAME_VERSION_LABEL, versionLabel);
-        
-        // Set the property values
+		// Set the property values
         for (String key : versionProperties.keySet())
         {
             // Apply the namespace to the verison property
@@ -508,78 +507,43 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
                 CHILD_QNAME_VERSIONS,
                 CLASS_REF_VERSION.getQName(),
                 props);
-        return childAssocRef.getChildRef();
+        NodeRef versionNodeRef = childAssocRef.getChildRef();
+		
+		// Freeze the various parts of the node
+		freezeProperties(versionNodeRef, nodeDetails.getProperties());
+		freezeChildAssociations(versionNodeRef, nodeDetails.getChildAssociations());
+		freezeAssociations(versionNodeRef, nodeDetails.getAssociations());
+		freezeAspects(nodeDetails, versionNodeRef, nodeDetails.getAspects());
+		
+		// Return the created node reference
+		return versionNodeRef;
     }
     
-    /**
-     * Takes the current state of the node and 'freezes' it on the version node.
-     * 
-     * @param nodeRef     the node reference
-     * @param versionRef  the version node reference
-     */
-    private void freezeNodeState(NodeRef nodeRef, NodeRef versionRef)
-    {
-        // Copy the current values of the node onto the version node, thus taking a snap shot of the values
-        Map<QName, Serializable> nodeProperties = this.nodeService.getProperties(nodeRef);
-        if (nodeProperties != null)
-        {
-            // Copy the property values from the node onto the version node
-            for (QName propertyName : nodeProperties.keySet())
-            {                               
-                // Get the property values
-                HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
-                properties.put(PROP_QNAME_QNAME, propertyName);
-                properties.put(PROP_QNAME_VALUE, nodeProperties.get(propertyName));
-                
-                // Create the node storing the frozen attribute details
-                this.dbNodeService.createNode(
-                        versionRef, 
-                        null,
-                        CHILD_QNAME_VERSIONED_ATTRIBUTES,
-                        CLASS_REF_VERSIONED_PROPERTY.getQName(),
-                        properties);                
-            }
-        }                  
-        
-        // TODO the following behaviour is default and should overrideable (ie: can choose when to ignore, version or 
-        //      reference children) how do we do this?       
-        
-        // Get the children of the versioned node
-        Collection<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
-        for (ChildAssocRef childAssocRef : childAssocRefs)
-        {
-            HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
-            
-            // Set the qname, isPrimary and nthSibling properties
-            properties.put(PROP_QNAME_ASSOC_QNAME, childAssocRef.getQName());
-            properties.put(PROP_QNAME_IS_PRIMARY, Boolean.valueOf(childAssocRef.isPrimary()));
-            properties.put(PROP_QNAME_NTH_SIBLING, Integer.valueOf(childAssocRef.getNthSibling()));
-            
-            // Need to determine whether the child is versioned or not
-            NodeRef versionHistoryRef = getVersionHistoryNodeRef(childAssocRef.getChildRef());
-            if (versionHistoryRef == null)
-            {
-                // Set the reference property to point to the child node
-                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, childAssocRef.getChildRef());
-            }
-            else
-            {
-                // Set the reference property to point to the version history
-                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, versionHistoryRef);
-            }
-            
-            // Create child version reference
-            ChildAssocRef newRef = this.dbNodeService.createNode(
-                    versionRef,
-                    null,
-                    CHILD_QNAME_VERSIONED_CHILD_ASSOCS, 
-                    CLASS_REF_VERSIONED_CHILD_ASSOC.getQName(),
-                    properties);
-        }
-        
-        // Version the target assocs
-        List<NodeAssocRef> targetAssocs = this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
-        for (NodeAssocRef targetAssoc : targetAssocs)
+	/**
+	 * 
+	 * @param nodeDetails
+	 * @param versionNodeRef
+	 * @param aspects
+	 */
+    private void freezeAspects(PolicyScope nodeDetails, NodeRef versionNodeRef, Set<ClassRef> aspects) 
+	{
+		for (ClassRef aspect : aspects) 
+		{
+			// Freeze the details of the aspect
+			freezeProperties(versionNodeRef, nodeDetails.getProperties(aspect));
+			freezeChildAssociations(versionNodeRef, nodeDetails.getChildAssociations(aspect));
+			freezeAssociations(versionNodeRef, nodeDetails.getAssociations(aspect));
+		}
+	}
+
+	/**
+	 * 
+	 * @param versionNodeRef
+	 * @param associations
+	 */
+	private void freezeAssociations(NodeRef versionNodeRef, Map<QName, NodeAssocRef> associations) 
+	{
+		for (NodeAssocRef targetAssoc : associations.values())
         {
             HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
             
@@ -601,13 +565,176 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             
             // Create child version reference
             ChildAssocRef newRef = this.dbNodeService.createNode(
-                    versionRef,
+                    versionNodeRef,
                     null, 
                     CHILD_QNAME_VERSIONED_ASSOCS, 
                     CLASS_REF_VERSIONED_ASSOC.getQName(),
                     properties);
         }
-    }    		
+	}
+
+	/**
+	 * 
+	 * @param versionNodeRef
+	 * @param childAssociations
+	 */
+	private void freezeChildAssociations(NodeRef versionNodeRef, Map<QName, ChildAssocRef> childAssociations) 
+	{
+		for (Map.Entry<QName, ChildAssocRef> entry : childAssociations.entrySet()) 
+		{
+			ChildAssocRef childAssocRef = entry.getValue();
+			HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+            
+            // Set the qname, isPrimary and nthSibling properties
+            properties.put(PROP_QNAME_ASSOC_QNAME, childAssocRef.getQName());
+            properties.put(PROP_QNAME_IS_PRIMARY, Boolean.valueOf(childAssocRef.isPrimary()));
+            properties.put(PROP_QNAME_NTH_SIBLING, Integer.valueOf(childAssocRef.getNthSibling()));
+            
+            // Need to determine whether the child is versioned or not
+            NodeRef versionHistoryRef = getVersionHistoryNodeRef(childAssocRef.getChildRef());
+            if (versionHistoryRef == null)
+            {
+                // Set the reference property to point to the child node
+                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, childAssocRef.getChildRef());
+            }
+            else
+            {
+                // Set the reference property to point to the version history
+                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, versionHistoryRef);
+            }
+            
+            // Create child version reference
+            ChildAssocRef newRef = this.dbNodeService.createNode(
+                    versionNodeRef,
+                    null,
+                    CHILD_QNAME_VERSIONED_CHILD_ASSOCS, 
+                    CLASS_REF_VERSIONED_CHILD_ASSOC.getQName(),
+                    properties);
+		}
+	}
+
+	/**
+	 * 
+	 * @param versionNodeRef
+	 * @param properties
+	 */
+	private void freezeProperties(NodeRef versionNodeRef, Map<QName, Serializable> properties) 
+	{
+		// Copy the property values from the node onto the version node
+        for (Map.Entry<QName, Serializable> entry : properties.entrySet())
+        {                               
+            // Get the property values
+            HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
+			props.put(PROP_QNAME_QNAME, entry.getKey());
+			props.put(PROP_QNAME_VALUE, entry.getValue());
+            
+            // Create the node storing the frozen attribute details
+            this.dbNodeService.createNode(
+                    versionNodeRef, 
+                    null,
+                    CHILD_QNAME_VERSIONED_ATTRIBUTES,
+                    CLASS_REF_VERSIONED_PROPERTY.getQName(),
+                    props);                
+        }
+	}
+
+	/**
+     * Takes the current state of the node and 'freezes' it on the version node.
+     * 
+     * @param nodeRef     the node reference
+     * @param versionRef  the version node reference
+     */
+//    private void freezeNodeState(NodeRef nodeRef, NodeRef versionRef)
+//    {
+//        // Copy the current values of the node onto the version node, thus taking a snap shot of the values
+//        Map<QName, Serializable> nodeProperties = this.nodeService.getProperties(nodeRef);
+//        if (nodeProperties != null)
+//        {
+//            // Copy the property values from the node onto the version node
+//            for (QName propertyName : nodeProperties.keySet())
+//            {                               
+//                // Get the property values
+//                HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+//                properties.put(PROP_QNAME_QNAME, propertyName);
+//                properties.put(PROP_QNAME_VALUE, nodeProperties.get(propertyName));
+//                
+//                // Create the node storing the frozen attribute details
+//                this.dbNodeService.createNode(
+//                        versionRef, 
+//                        null,
+//                        CHILD_QNAME_VERSIONED_ATTRIBUTES,
+//                        CLASS_REF_VERSIONED_PROPERTY.getQName(),
+//                        properties);                
+//            }
+//        }                  
+//        
+//        // TODO the following behaviour is default and should overrideable (ie: can choose when to ignore, version or 
+//        //      reference children) how do we do this?       
+//        
+//        // Get the children of the versioned node
+//        Collection<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
+//        for (ChildAssocRef childAssocRef : childAssocRefs)
+//        {
+//            HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+//            
+//            // Set the qname, isPrimary and nthSibling properties
+//            properties.put(PROP_QNAME_ASSOC_QNAME, childAssocRef.getQName());
+//            properties.put(PROP_QNAME_IS_PRIMARY, Boolean.valueOf(childAssocRef.isPrimary()));
+//            properties.put(PROP_QNAME_NTH_SIBLING, Integer.valueOf(childAssocRef.getNthSibling()));
+//            
+//            // Need to determine whether the child is versioned or not
+//            NodeRef versionHistoryRef = getVersionHistoryNodeRef(childAssocRef.getChildRef());
+//            if (versionHistoryRef == null)
+//            {
+//                // Set the reference property to point to the child node
+//                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, childAssocRef.getChildRef());
+//            }
+//            else
+//            {
+//                // Set the reference property to point to the version history
+//                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, versionHistoryRef);
+//            }
+//            
+//            // Create child version reference
+//            ChildAssocRef newRef = this.dbNodeService.createNode(
+//                    versionRef,
+//                    null,
+//                    CHILD_QNAME_VERSIONED_CHILD_ASSOCS, 
+//                    CLASS_REF_VERSIONED_CHILD_ASSOC.getQName(),
+//                    properties);
+//        }
+//        
+//        // Version the target assocs
+//        List<NodeAssocRef> targetAssocs = this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+//        for (NodeAssocRef targetAssoc : targetAssocs)
+//        {
+//            HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+//            
+//            // Set the qname of the association
+//            properties.put(PROP_QNAME_ASSOC_QNAME, targetAssoc.getQName());
+//            
+//            // Need to determine whether the target is versioned or not
+//            NodeRef versionHistoryRef = getVersionHistoryNodeRef(targetAssoc.getTargetRef());
+//            if (versionHistoryRef == null)
+//            {
+//                // Set the reference property to point to the child node
+//                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, targetAssoc.getTargetRef());
+//            }
+//            else
+//            {
+//                // Set the reference property to point to the version history
+//                properties.put(DictionaryBootstrap.PROP_QNAME_REFERENCE, versionHistoryRef);
+//            }
+//            
+//            // Create child version reference
+//            ChildAssocRef newRef = this.dbNodeService.createNode(
+//                    versionRef,
+//                    null, 
+//                    CHILD_QNAME_VERSIONED_ASSOCS, 
+//                    CLASS_REF_VERSIONED_ASSOC.getQName(),
+//                    properties);
+//        }
+//    }    		
 	
 	/**
 	 * Gets the version stores root node

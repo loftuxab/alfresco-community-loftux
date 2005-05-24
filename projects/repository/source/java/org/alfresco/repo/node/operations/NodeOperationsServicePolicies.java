@@ -5,8 +5,8 @@ package org.alfresco.repo.node.operations;
 
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl.CopyDetails;
 import org.alfresco.repo.policy.ClassPolicy;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.NodeRef;
 
 /**
@@ -30,6 +30,6 @@ public interface NodeOperationsServicePolicies
 		public void onCopy(
 				ClassRef classRef,
 				NodeRef sourceNodeRef,
-				CopyDetails copyDetails);
+				PolicyScope copyDetails);
 	}
 }

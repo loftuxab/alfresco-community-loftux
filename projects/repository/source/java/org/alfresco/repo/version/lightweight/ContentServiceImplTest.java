@@ -10,7 +10,7 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.version.Version;
 
 /**
- * Unit test for ContentServiceImpl
+ * Tests for retrieving frozen content from a verioned node
  * 
  * @author Roy Wetherall
  */
@@ -30,7 +30,7 @@ public class ContentServiceImplTest extends VersionStoreBaseTest
     /**
      * The version content store
      */
-    private ContentService versionContentService;    
+    private ContentService contentService;    
     
     /**
      * Called during the transaction setup
@@ -40,7 +40,7 @@ public class ContentServiceImplTest extends VersionStoreBaseTest
         super.onSetUpInTransaction();
         
         // Get the instance of the required content service
-        this.versionContentService = (ContentService)this.applicationContext.getBean("lightWeightVersionStoreContentService");
+        this.contentService = (ContentService)this.applicationContext.getBean("contentService");
     }
     
     /**
@@ -55,7 +55,7 @@ public class ContentServiceImplTest extends VersionStoreBaseTest
         Version version = createVersion(versionableNode, this.versionProperties);
         
         // Get the content reader for the frozen node
-        ContentReader contentReader = this.versionContentService.getReader(version.getNodeRef());
+        ContentReader contentReader = this.contentService.getReader(version.getNodeRef());
         assertNotNull(contentReader);
         assertEquals(TEST_CONTENT, contentReader.getContentString());
         
@@ -66,7 +66,7 @@ public class ContentServiceImplTest extends VersionStoreBaseTest
         Version version2 = createVersion(versionableNode, this.versionProperties);
         
         // Get the content reader for the new verisoned content
-        ContentReader contentReader2 = this.versionContentService.getReader(version2.getNodeRef());
+        ContentReader contentReader2 = this.contentService.getReader(version2.getNodeRef());
         assertNotNull(contentReader2);
         assertEquals(UPDATED_CONTENT, contentReader2.getContentString());
     }
@@ -85,15 +85,12 @@ public class ContentServiceImplTest extends VersionStoreBaseTest
         // Get writer is not supported by the version content service
         try
         {
-            this.versionContentService.getUpdatingWriter(version.getNodeRef());
+            this.contentService.getUpdatingWriter(version.getNodeRef());
             fail("This operation is not supported.");
         }
-        catch (UnsupportedOperationException exception)
+        catch (Exception exception)
         {
-            if (exception.getMessage() != MSG_ERR)
-            {
-                fail("Unexpected exception raised during method excution: " + exception.getMessage());
-            }
+            // An exception should be raised
         }
     }
 }

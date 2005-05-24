@@ -3,8 +3,10 @@
  */
 package org.alfresco.repo.lock.impl;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.repo.dictionary.ClassRef;
@@ -17,8 +19,8 @@ import org.alfresco.repo.lock.NodeLockedException;
 import org.alfresco.repo.lock.UnableToAquireLockException;
 import org.alfresco.repo.lock.UnableToReleaseLockException;
 import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl.CopyDetails;
 import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -92,6 +94,12 @@ public class LockServiceImpl implements LockService
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
 				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
 				new JavaBehaviour(this, "onCopy"));
+		
+		// Register the onCreateVersion behavior for the version aspect
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
+				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				new JavaBehaviour(this, "onCreateVersion"));
     }
     
     /**
@@ -350,9 +358,30 @@ public class LockServiceImpl implements LockService
 	 * @param sourceNodeRef	  the source node reference
 	 * @param copyDetails	  the copy details
 	 */
-	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, CopyDetails copyDetails)
+	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Add the lock aspect, but do not copy any of the properties
 		copyDetails.addAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK);
+	}
+	
+	/**
+	 * OnCreateVersion behaviour for the lock aspect
+	 * <p>
+	 * Ensures that the property valies of the lock aspect are not
+	 * 'frozen' in the version store.
+	 * 
+	 * @param classRef				the class reference
+	 * @param versionableNode		the versionable node reference
+	 * @param versionProperties		the version properties
+	 * @param nodeDetails			the details of the node to be versioned
+	 */
+	public void onCreateVersion(
+			ClassRef classRef,
+			NodeRef versionableNode, 
+			Map<String, Serializable> versionProperties,
+			PolicyScope nodeDetails)
+	{
+		// Add the lock aspect, but do not version the property values
+		nodeDetails.addAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK);
 	}
 }

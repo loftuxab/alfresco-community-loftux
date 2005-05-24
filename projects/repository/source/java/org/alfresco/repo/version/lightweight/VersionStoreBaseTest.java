@@ -7,7 +7,13 @@ import java.util.Map;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.metamodel.M2Association;
+import org.alfresco.repo.dictionary.metamodel.M2ChildAssociation;
+import org.alfresco.repo.dictionary.metamodel.M2Property;
+import org.alfresco.repo.dictionary.metamodel.M2Type;
+import org.alfresco.repo.dictionary.metamodel.MetaModelDAO;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -27,6 +33,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
     protected VersionService lightWeightVersionStoreVersionService;
     protected VersionCounterDaoService versionCounterDaoService;
     protected ContentService contentService;
+	protected MetaModelDAO metaModelDAO;
 	
     /*
      * Data used by tests
@@ -44,21 +51,35 @@ public class VersionStoreBaseTest extends BaseSpringTest
     /*
      * Proprety names and values
      */
-    protected final static QName PROP_1 = QName.createQName("{test}prop1");
-	protected final static QName PROP_2 = QName.createQName("{test}prop2");
-	protected final static QName PROP_3 = QName.createQName("{test}prop3");
-	protected final static String VERSION_PROP_1 = "versionProp1";
-	protected final static String VERSION_PROP_2 = "versionProp2";
-	protected final static String VERSION_PROP_3 = "versionProp3";
-	protected final static String VALUE_1 = "value1";
-	protected final static String VALUE_2 = "value2";
-	protected final static String VALUE_3 = "value3";
+	protected static final QName TEST_TYPE_QNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "testType");
+	protected static final QName PROP_1 = QName.createQName(NamespaceService.ALFRESCO_URI, "prop1");
+	protected static final QName PROP_2 = QName.createQName(NamespaceService.ALFRESCO_URI, "prop2");
+	protected static final QName PROP_3 = QName.createQName(NamespaceService.ALFRESCO_URI, "prop3");
+	protected static final String VERSION_PROP_1 = "versionProp1";
+	protected static final String VERSION_PROP_2 = "versionProp2";
+	protected static final String VERSION_PROP_3 = "versionProp3";
+	protected static final String VALUE_1 = "value1";
+	protected static final String VALUE_2 = "value2";
+	protected static final String VALUE_3 = "value3";
+	protected static final QName TEST_CHILD_ASSOC_1 = QName.createQName(NamespaceService.ALFRESCO_URI, "childAssoc1");
+	protected static final QName TEST_CHILD_ASSOC_2 = QName.createQName(NamespaceService.ALFRESCO_URI, "childAssoc2");
+	protected static final QName TEST_ASSOC = QName.createQName(NamespaceService.ALFRESCO_URI, "assoc");	
     
     /**
      * Test content
      */
-    protected static final String TEST_CONTENT = "This is the versioned test content.";  
+    protected static final String TEST_CONTENT = "This is the versioned test content.";	
     
+	/**
+	 * Sets the meta model dao
+	 * 
+	 * @param metaModelDao  the meta model dao
+	 */
+	public void setMetaModelDAO(MetaModelDAO metaModelDAO) 
+	{
+		this.metaModelDAO = metaModelDAO;
+	}
+	
     /**
      * Called during the transaction setup
      */
@@ -70,6 +91,9 @@ public class VersionStoreBaseTest extends BaseSpringTest
         this.versionCounterDaoService = (VersionCounterDaoService)applicationContext.getBean("versionCounterDaoService");
         this.contentService = (ContentService)applicationContext.getBean("contentService");
         
+		// Create the test model
+		createTestModel();
+		
         // Create a bag of properties for later use
         this.versionProperties = new HashMap<String, Serializable>();
         versionProperties.put(VERSION_PROP_1, VALUE_1);
@@ -78,9 +102,9 @@ public class VersionStoreBaseTest extends BaseSpringTest
         
         // Create the node properties
         this.nodeProperties = new HashMap<QName, Serializable>();
-        this.nodeProperties.put(VersionServiceImplTest.PROP_1, VersionServiceImplTest.VALUE_1);
-        this.nodeProperties.put(VersionServiceImplTest.PROP_2, VersionServiceImplTest.VALUE_2);
-        this.nodeProperties.put(VersionServiceImplTest.PROP_3, VersionServiceImplTest.VALUE_3);
+        this.nodeProperties.put(PROP_1, VALUE_1);
+        this.nodeProperties.put(PROP_2, VALUE_2);
+        this.nodeProperties.put(PROP_3, VALUE_3);
         
         // Create a workspace that contains the 'live' nodes
         this.testStoreRef = this.dbNodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
@@ -88,6 +112,46 @@ public class VersionStoreBaseTest extends BaseSpringTest
         // Get a reference to the root node
         this.rootNodeRef = this.dbNodeService.getRootNode(this.testStoreRef);
     }
+	
+	/**
+	 * Creates the test model used by the tests
+	 */
+	private void createTestModel()
+	{
+		M2Type testType = this.metaModelDAO.createType(TEST_TYPE_QNAME);
+		testType.setSuperClass(this.metaModelDAO.getClass(DictionaryBootstrap.TYPE_QNAME_CONTAINER));
+		
+		M2Property prop1 = testType.createProperty(PROP_1.getLocalName());
+		prop1.setMandatory(true);
+		prop1.setMultiValued(false);
+		
+		M2Property prop2 = testType.createProperty(PROP_2.getLocalName());
+		prop2.setMandatory(false);
+		prop2.setMandatory(false);
+
+		M2Property prop3 = testType.createProperty(PROP_3.getLocalName());
+		prop3.setMandatory(false);
+		prop3.setMandatory(false);
+		
+		M2ChildAssociation childAssoc = testType.createChildAssociation(TEST_CHILD_ASSOC_1.getLocalName());
+		childAssoc.setMandatory(false);
+		
+		M2ChildAssociation childAssoc2 = testType.createChildAssociation(TEST_CHILD_ASSOC_2.getLocalName());
+		childAssoc2.setMandatory(false);
+		
+		M2Association assoc = testType.createAssociation(TEST_ASSOC.getLocalName());
+		assoc.setMandatory(false);
+//		
+//		M2Aspect testAspect = this.metaModelDAO.createAspect(TEST_ASPECT_QNAME);
+//		
+//		M2Property prop3 = testAspect.createProperty(PROP3_MANDATORY);
+//		prop3.setMandatory(true);
+//		prop3.setMultiValued(false);
+//		
+//		M2Property prop4 = testAspect.createProperty(PROP4_OPTIONAL);
+//		prop4.setMandatory(false);
+//		prop4.setMultiValued(false);					
+	}
     
     /**
      * Creates a new versionable node
@@ -107,7 +171,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 rootNodeRef, 
                 null, 
                 QName.createQName("{test}MyVersionableNode"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(nodeRef, aspectRef, new HashMap<QName, Serializable>());
         
@@ -127,8 +191,9 @@ public class VersionStoreBaseTest extends BaseSpringTest
         NodeRef child1 = this.dbNodeService.createNode(
                 nodeRef,
                 null,
-                QName.createQName("{test}ChildNode1"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                //QName.createQName("{test}ChildNode1"),
+                TEST_CHILD_ASSOC_1,
+				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(child1, aspectRef, new HashMap<QName, Serializable>());
         assertNotNull(child1);
@@ -136,8 +201,9 @@ public class VersionStoreBaseTest extends BaseSpringTest
         NodeRef child2 = this.dbNodeService.createNode(
                 nodeRef,
                 null,
-                QName.createQName("{test}ChildNode2"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                //QName.createQName("{test}ChildNode2"),
+                TEST_CHILD_ASSOC_2,
+				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
         this.dbNodeService.addAspect(child2, aspectRef, new HashMap<QName, Serializable>());
         assertNotNull(child2);
@@ -148,10 +214,10 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 rootNodeRef,
                 null,
                 QName.createQName("{test}MyAssocNode"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
         assertNotNull(assocNode);
-        this.dbNodeService.createAssociation(nodeRef, assocNode, QName.createQName("{test}MyAssociation"));
+        this.dbNodeService.createAssociation(nodeRef, assocNode, TEST_ASSOC);
         
         return nodeRef;
     }

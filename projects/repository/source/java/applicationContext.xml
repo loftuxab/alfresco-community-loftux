@@ -461,50 +461,7 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
-   </bean>
-   
-   <bean id='lightWeightVersionStoreContentService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.repo.content.ContentService</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="org.alfresco.repo.version.lightweight.ContentServiceImpl">
-			 <property name="contentService">
-				<ref bean="contentService" />
-			</property>	
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean>
-   
-  <!-- <bean id='lightWeightVersionStoreContentStore' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.repo.content.ContentStore</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="org.alfresco.repo.content.filestore.FileContentStore">
-			 <constructor-arg>
-				<value>c:\VersionedContent</value>
-             </constructor-arg>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean>-->
-      
+   </bean>      
    
    <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
       <property name='proxyInterfaces'>

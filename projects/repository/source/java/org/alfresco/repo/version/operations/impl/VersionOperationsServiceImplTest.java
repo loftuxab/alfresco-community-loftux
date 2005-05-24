@@ -168,13 +168,14 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		NodeRef workingCopy3 = checkout();
 		Map<String, Serializable> versionProperties3 = new HashMap<String, Serializable>();
 		versionProperties3.put(Version.PROP_VERSION_TYPE, VersionType.MAJOR);
-		NodeRef origNodeRef = this.versionOperationsService.checkin(workingCopy3, versionProperties3, contentUrl);
+		NodeRef origNodeRef = this.versionOperationsService.checkin(workingCopy3, versionProperties3, contentUrl, true);
 		assertNotNull(origNodeRef);
 		ContentReader contentReader = this.contentService.getReader(origNodeRef);
 		assertNotNull(contentReader);
 		assertEquals(CONTENT_2, contentReader.getContentString());
 		System.out.println(
 				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		this.versionOperationsService.cancelCheckout(workingCopy3);
 		
 		// Test keep checked out flag
 		NodeRef workingCopy2 = checkout();		
