@@ -731,12 +731,52 @@ public class BrowseBean implements IContextListener
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to delete Space due to system error: " + err.getMessage());
+            Utils.addErrorMessage("Unable to delete Space due to system error: " + err.getMessage(), err);
          }
       }
       else
       {
          logger.warn("WARNING: deleteSpaceOK called without a current Space!");
+      }
+      
+      return outcome;
+   }
+   
+   /**
+    * Handler called upon the completion of the Delete File page
+    * 
+    * @return outcome
+    */
+   public String deleteFileOK()
+   {
+      String outcome = null;
+      
+      Node node = getDocument();
+      if (node != null)
+      {
+         try
+         {
+            if (logger.isDebugEnabled())
+               logger.debug("Trying to delete content node Id: " + node.getId());
+            
+            this.nodeService.deleteNode(node.getNodeRef());
+            
+            // clear action context
+            setDocument(null);
+            
+            invalidateComponents();
+            
+            // setting the outcome will show the browse view again
+            outcome = "browse";
+         }
+         catch (Throwable err)
+         {
+            Utils.addErrorMessage("Unable to delete File due to system error: " + err.getMessage(), err);
+         }
+      }
+      else
+      {
+         logger.warn("WARNING: deleteFileOK called without a current Document!");
       }
       
       return outcome;

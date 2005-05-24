@@ -151,7 +151,7 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:inputTextarea id="notes" rows="2" cols="50"/>
+                                       <h:inputTextarea value="#{CheckinCheckoutBean.versionNotes}" rows="2" cols="50" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

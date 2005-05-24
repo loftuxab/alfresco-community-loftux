@@ -387,7 +387,7 @@
                            <a:menu id="actionsMenu2" itemSpacing="4" image="/images/icons/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
                               <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" />
                               <a:booleanEvaluator value="#{r.locked == false && r.workingCopy == false}">
-                                 <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif">
+                                 <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" actionListener="#{BrowseBean.setupContentAction}" action="deleteFile">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>

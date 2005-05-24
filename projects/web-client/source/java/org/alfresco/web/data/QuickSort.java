@@ -113,6 +113,8 @@ public final class QuickSort extends Sort
       List keys = this.keys;
       Object pivotValue = keys.get((upper + lower + 1) >> 1) ;
       
+      int size = keys.size();
+      
       while (lower <= upper)
       {
          if (this.bForward == true)

@@ -197,6 +197,10 @@
          <to-view-id>/jsp/dialog/delete-space.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>deleteFile</from-outcome>
+         <to-view-id>/jsp/dialog/delete-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>addContent</from-outcome>
          <to-view-id>/jsp/wizard/add-content/upload.jsp</to-view-id>
       </navigation-case>

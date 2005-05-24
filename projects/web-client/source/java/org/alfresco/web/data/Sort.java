@@ -272,6 +272,7 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null && obj2 == null) return 0;
          if (obj1 == null) return -1;
          if (obj2 == null) return 1;
          return (obj1.toString()).compareTo(obj2.toString());
@@ -285,6 +286,9 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null && obj2 == null) return 0;
+         if (obj1 == null) return -1;
+         if (obj2 == null) return 1;
          return ((CollationKey)obj1).compareTo((CollationKey)obj2);
       }
    }
@@ -296,6 +300,7 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null && obj2 == null) return 0;
          if (obj1 == null) return -1;
          if (obj2 == null) return 1;
          return ((Integer)obj1).compareTo((Integer)obj2);
@@ -309,6 +314,7 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null && obj2 == null) return 0;
          if (obj1 == null) return -1;
          if (obj2 == null) return 1;
          return ((Float)obj1).compareTo((Float)obj2);
@@ -322,6 +328,7 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null && obj2 == null) return 0;
          if (obj1 == null) return -1;
          if (obj2 == null) return 1;
          return ((Long)obj1).compareTo((Long)obj2);
@@ -335,6 +342,7 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null && obj2 == null) return 0;
          if (obj1 == null) return -1;
          if (obj2 == null) return 1;
          return ((Boolean)obj1).equals((Boolean)obj2) ? -1 : 1;
@@ -348,6 +356,7 @@ public abstract class Sort
        */
       public int compare(final Object obj1, final Object obj2)
       {
+         if (obj1 == null && obj2 == null) return 0;
          if (obj1 == null) return -1;
          if (obj2 == null) return 1;
          return ((Date)obj1).compareTo((Date)obj2);

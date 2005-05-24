@@ -19,7 +19,7 @@
    <f:loadBundle basename="messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="delete-space">
+   <h:form id="delete-file">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -58,8 +58,8 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle"><h:outputText value="#{msg.delete_space}" /> '<h:outputText value="#{BrowseBean.actionSpace.name}" />'</div>
-                              <div class="mainSubText"><h:outputText value="#{msg.delete_space_info}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.delete_file}" /> '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.delete_file_info}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -87,8 +87,8 @@
                               <table cellpadding="2" cellspacing="2" border="0">
                                  <tr>
                                     <td class="mainSubTitle">
-                                       <h:outputFormat value="#{msg.delete_space_confirm}">
-                                          <f:param value="#{BrowseBean.actionSpace.name}"/>
+                                       <h:outputFormat value="#{msg.delete_file_confirm}">
+                                          <f:param value="#{BrowseBean.document.name}"/>
                                        </h:outputFormat>
                                     </td>
                                  </tr>
@@ -108,7 +108,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Delete" action="#{BrowseBean.deleteSpaceOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="Delete" action="#{BrowseBean.deleteFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>

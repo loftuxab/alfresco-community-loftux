@@ -24,6 +24,7 @@ import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.version.Version;
 import org.alfresco.repo.version.operations.VersionOperationsService;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
@@ -152,6 +153,22 @@ public class CheckinCheckoutBean
    public boolean getKeepCheckedOut()
    {
       return this.keepCheckedOut;
+   }
+   
+   /**
+    * @return Returns the version history notes.
+    */
+   public String getVersionNotes()
+   {
+      return this.versionNotes;
+   }
+
+   /**
+    * @param versionNotes  The version history notes to set.
+    */
+   public void setVersionNotes(String versionNotes)
+   {
+      this.versionNotes = versionNotes;
    }
    
    /**
@@ -444,12 +461,13 @@ public class CheckinCheckoutBean
             }
             
             // TODO: what props should we add here? - e.g. version history text
-            Map<String, Serializable> props = Collections.<String, Serializable>emptyMap();
+            Map<String, Serializable> props = new HashMap<String, Serializable>(1, 1.0f);
+            props.put(Version.PROP_DESCRIPTION, this.versionNotes);
             NodeRef originalDoc = this.versionOperationsService.checkin(
                   node.getNodeRef(),
                   props,
                   contentUrl, 
-                  this.keepCheckedOut);      // set from input form
+                  this.keepCheckedOut);
             
             // restore working copy name after checkin copy opp
             if (this.keepCheckedOut == true)
@@ -563,6 +581,7 @@ public class CheckinCheckoutBean
       this.fileName = null;
       this.keepCheckedOut = false;
       this.copyLocation = COPYLOCATION_CURRENT;
+      this.versionNotes = "";
       
       // remove the file upload bean from the session
       FacesContext ctx = FacesContext.getCurrentInstance();
@@ -596,6 +615,7 @@ public class CheckinCheckoutBean
    private String fileName;
    private boolean keepCheckedOut = false;
    private String copyLocation = COPYLOCATION_CURRENT;
+   private String versionNotes = "";
    
    /** The BrowseBean to be used by the bean */
    private BrowseBean browseBean;
