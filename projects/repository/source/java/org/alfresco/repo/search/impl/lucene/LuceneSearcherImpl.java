@@ -9,9 +9,11 @@ import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.Path;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.EmptyResultSet;
 import org.alfresco.repo.search.QueryParameter;
+import org.alfresco.repo.search.QueryParameterDefinition;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.SearcherException;
 import org.apache.lucene.queryParser.ParseException;
@@ -55,7 +57,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      * Searcher implementation
      */
 
-    public ResultSet query(StoreRef store, String language, String queryString, Path[] queryOptions, QueryParameter[] queryParameters) throws SearcherException
+    public ResultSet query(StoreRef store, String language, String queryString, Path[] queryOptions, QueryParameterDefinition[] queryParameterDefinitions) throws SearcherException
     {
         if (indexExists())
         {
@@ -152,7 +154,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         return getSearcher(storeRef, null);
     }
 
-    public void setNameSpaceService(NamespaceService nameSpaceService)
+    public void setNamespaceService(NamespaceService nameSpaceService)
     {
         this.nameSpaceService = nameSpaceService;
     }
@@ -172,6 +174,26 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         this.dictionaryService = dictionaryService;
     }
     
+    public ResultSet query(StoreRef store, String language, String query)
+    {
+        return query(store, language, query, null, null);
+    }
+
+    public ResultSet query(StoreRef store, String language, String query, QueryParameterDefinition[] queryParameterDefintions)
+    {
+        return query(store, language, query, null, queryParameterDefintions);
+    }
+
+    public ResultSet query(StoreRef store, String language, String query, Path[] attributePaths)
+    {
+        return query(store, language, query, attributePaths, null);
+    }
+
+    public ResultSet query(StoreRef store, QName queryId, QueryParameter[] queryParameters)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
     
     
     

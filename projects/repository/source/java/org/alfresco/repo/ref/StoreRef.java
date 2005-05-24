@@ -2,6 +2,8 @@ package org.alfresco.repo.ref;
 
 import java.io.Serializable;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 /**
  * Reference to a node store
  * 
@@ -41,6 +43,17 @@ public final class StoreRef implements EntityRef, Serializable
 
         this.protocol = protocol;
         this.identifier = identifier;
+    }
+
+    public StoreRef(String string)
+    {
+        int dividerPatternPosition = string.indexOf(":////");
+        if(dividerPatternPosition == -1)
+        {
+            throw new AlfrescoRuntimeException("Invalid store ref: does not contain ////:");
+        }
+        this.protocol = string.substring(0, dividerPatternPosition);
+        this.identifier = string.substring(dividerPatternPosition+3);
     }
 
     public String toString()

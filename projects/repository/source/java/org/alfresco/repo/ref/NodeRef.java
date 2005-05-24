@@ -2,6 +2,8 @@ package org.alfresco.repo.ref;
 
 import java.io.Serializable;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 /**
  * Reference to a node
  * 
@@ -41,6 +43,17 @@ public class NodeRef implements EntityRef, Serializable
 
         this.storeRef = storeRef;
         this.id = id;
+    }
+
+    public NodeRef(String nodeRef)
+    {
+        int lastForwardSlash = nodeRef.lastIndexOf('/');
+        if(lastForwardSlash == -1)
+        {
+            throw new AlfrescoRuntimeException("Invalid node ref - does not contain forward slash");
+        }
+         this.storeRef = new StoreRef(nodeRef.substring(0, lastForwardSlash));
+         this.id = nodeRef.substring(lastForwardSlash+1);
     }
 
     public String toString()

@@ -13,6 +13,7 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.NodeService;
@@ -89,6 +90,8 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private FullTextSearchIndexer luceneFullTextSearchIndexer;
     
     private String indexRootLocation;
+    
+    private ContentService contentService;
 
     /**
      * Private constructor for the singleton TODO: FIt in with IOC
@@ -286,6 +289,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setLuceneFullTextSearchIndexer(luceneFullTextSearchIndexer);
         indexer.setIndexRootLocation(indexRootLocation);
+        indexer.setContentService(contentService);
         return indexer;
     }
 
@@ -300,7 +304,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
             deltaId = getTransactionId(getTransaction());
         }
         LuceneSearcher searcher = getSearcher(storeRef, deltaId);
-        searcher.setNameSpaceService(nameSpaceService);
+        searcher.setNamespaceService(nameSpaceService);
         return searcher;
     }
 
@@ -315,7 +319,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private LuceneSearcher getSearcher(StoreRef storeRef, String deltaId) throws SearcherException
     {
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, deltaId);
-        searcher.setNameSpaceService(nameSpaceService);
+        searcher.setNamespaceService(nameSpaceService);
         searcher.setLuceneIndexLock(luceneIndexLock);
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
@@ -680,4 +684,10 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         }
         
     }
+
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+    
 }

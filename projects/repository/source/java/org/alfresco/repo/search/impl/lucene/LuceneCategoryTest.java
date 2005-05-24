@@ -324,7 +324,7 @@ public class LuceneCategoryTest extends TestCase
         
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setNameSpaceService(new MockNameService(""));
+        searcher.setNamespaceService(new MockNameService(""));
         ResultSet results;
         
         

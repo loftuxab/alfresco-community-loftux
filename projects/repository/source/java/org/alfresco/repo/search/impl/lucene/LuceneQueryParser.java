@@ -7,7 +7,6 @@
  */
 package org.alfresco.repo.search.impl.lucene;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.alfresco.repo.dictionary.ClassDefinition;
@@ -15,9 +14,6 @@ import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.search.impl.lucene.query.PathQuery;
-import org.alfresco.repo.search.impl.lucene.query.RelativeStructuredFieldPosition;
-import org.alfresco.repo.search.impl.lucene.query.StructuredFieldPosition;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.CharStream;

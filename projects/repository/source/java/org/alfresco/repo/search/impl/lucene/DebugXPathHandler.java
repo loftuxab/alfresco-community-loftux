@@ -252,7 +252,7 @@ public class DebugXPathHandler implements XPathHandler
         XPathReader reader = new XPathReader();
         reader.setXPathHandler(new DebugXPathHandler());
         reader
-                .parse("/ns:one[@woof='dog']/two/./../two[functionTest(@a, @b, 'dfghdfg')]/three/*/four//*/five/six[@exists1 and @exists2]");
+                .parse("/ns:one[@woof='dog']/two/./../two[functionTest(@a, @b, $woof:woof)]/three/*/four//*/five/six[@exists1 and @exists2]");
     }
 
 }

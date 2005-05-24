@@ -450,10 +450,9 @@ public class LuceneXPathHandler implements XPathHandler
         query = new PathQuery(dictionaryService);
     }
 
-    public void variableReference(String arg0, String arg1) throws SAXPathException
+    public void variableReference(String uri, String localName) throws SAXPathException
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+       
     }
 
     public void setNameSpaceService(NamespaceService nameSpaceService)

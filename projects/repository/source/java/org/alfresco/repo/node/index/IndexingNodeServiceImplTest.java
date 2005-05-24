@@ -2,6 +2,7 @@ package org.alfresco.repo.node.index;
 
 import java.util.Map;
 
+import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.BaseNodeServiceTest;
@@ -34,6 +35,12 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
     protected NodeService getNodeService()
     {
         return (NodeService) applicationContext.getBean("indexingNodeService");
+    }
+    
+    @Override
+    protected ContentService getContentService()
+    {
+        return (ContentService) applicationContext.getBean("contentService");
     }
 
     protected void onSetUpInTransaction() throws Exception

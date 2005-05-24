@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.value.ValueConverter;
 import org.jaxen.DefaultNavigator;
@@ -192,7 +193,7 @@ public class DocumentNavigator extends DefaultNavigator
     @Override
     public XPath parseXPath(String o) throws SAXPathException
     {
-        return new NodeServiceXPath(o, nodeService, namespaceService);
+        return new NodeServiceXPath(o, nodeService, namespaceService, null);
     }
 
     // Basic navigation support
@@ -251,6 +252,9 @@ public class DocumentNavigator extends DefaultNavigator
         return new ChildAssocRef(null, null, nodeService.getRootNode(((ChildAssocRef)o).getChildRef().getStoreRef()));
     }
 
-    
+    public Object getNode(NodeRef nodeRef)
+    {
+        return nodeService.getPrimaryParent(nodeRef);
+    }
     
 }

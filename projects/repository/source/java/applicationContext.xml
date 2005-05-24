@@ -347,6 +347,9 @@
         <property name="indexRootLocation">
             <value>w:/lucene-indexes</value>
         </property>
+        <property name="contentService">
+            <ref bean="contentService"/>
+        </property>
     </bean>
     
     <!-- Support for locking lucene indexes for deletion and update -->
