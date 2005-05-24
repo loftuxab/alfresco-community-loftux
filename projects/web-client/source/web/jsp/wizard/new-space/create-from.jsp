@@ -57,9 +57,9 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
                            </td>
                            <td>
-                              <h:outputText value="#{NewSpaceWizard.currentSpaceName}" styleClass="mainSubTitle"/><br/>
-                              <div class="mainTitle">New Space</div>
-                              <div class="mainSubText">Use this wizard to create a new space.</div>
+                              <h:outputText value="Space: #{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
+                              <h:outputText value="#{NewSpaceWizard.wizardTitle}" styleClass="mainTitle"/><br/>
+                              <h:outputText value="#{NewSpaceWizard.wizardDescription}" styleClass="mainSubText"/>
                            </td>
                         </tr>
                      </table>
@@ -98,10 +98,10 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle">Step 1 - Starting Space</td>
+                                    <td class="mainSubTitle"><h:outputText value="#{NewSpaceWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr>
-                                    <td class="mainSubText">Choose how you want to create your space.</td>
+                                    <td class="mainSubText"><h:outputText value="#{NewSpaceWizard.stepDescription}" /></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
@@ -118,7 +118,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>To continue click Next.</td>
+                                    <td><h:outputText value="#{NewSpaceWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -134,21 +134,14 @@
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" 
-                                                        disabled="#{NewSpaceWizard.finishDisabled}" styleClass="wizardButton" />
+                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
+                                                        disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Minimise To Shelf" action="#{NewSpaceWizard.minimise}" 
-                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

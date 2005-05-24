@@ -57,7 +57,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value="#{NewSpaceDialog.currentSpaceName}" /></div>
+                              <h:outputText value="Space: #{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
                               <div class="mainTitle">Create Space</div>
                               <div class="mainSubText">Use this dialog to create a new space.</div>
                            </td>
@@ -147,12 +147,6 @@
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Cancel" action="#{NewSpaceDialog.cancel}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Minimise to Shelf" action="#{NewSpaceDialog.minimise}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

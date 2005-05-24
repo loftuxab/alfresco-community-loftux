@@ -57,9 +57,9 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/other_file.gif" />
                            </td>
                            <td>
-                              <h:outputText value="#{AddContentWizard.currentSpaceName}" styleClass="mainSubTitle"/><br/>
-                              <div class="mainTitle">Add Content</div>
-                              <div class="mainSubText">You have entered the information required to add the content to this space.</div>
+                              <h:outputText value="Space: #{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
+                              <h:outputText value="#{AddContentWizard.wizardTitle}" styleClass="mainTitle"/><br/>
+                              <h:outputText value="#{AddContentWizard.wizardDescription}" styleClass="mainSubText"/>
                            </td>
                         </tr>
                      </table>
@@ -96,21 +96,18 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle">Step 2 - Summary</td>
+                                    <td class="mainSubTitle"><h:outputText value="#{AddContentWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr>
-                                    <td class="mainSubText">You are about to add the following content:</td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td><h:outputText value="#{AddContentWizard.summary}" escape="false"/></td>
+                                    <td class="mainSubText"><h:outputText value="#{AddContentWizard.stepDescription}" /></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="details-hints">
-                                       To add the content to this space click Finish.<br/>
-                                       To review or change your selections click Back.
-                                    </td>
+                                    <td><h:outputText value="#{AddContentWizard.summary}" escape="false" /></td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td><h:outputText value="#{AddContentWizard.stepInstructions}" escape="false" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -121,8 +118,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton"
-                                                        disabled="#{AddContentWizard.finishDisabled}" />
+                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -134,13 +130,6 @@
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Cancel" action="#{AddContentWizard.cancel}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Minimise To Shelf" action="#{AddContentWizard.minimise}" 
-                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

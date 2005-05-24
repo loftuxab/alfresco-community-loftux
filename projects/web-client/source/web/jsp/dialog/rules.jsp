@@ -9,7 +9,7 @@
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
-
+   
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
@@ -18,8 +18,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
-   <h:form id="myform">
+   <h:form id="document-details">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -54,25 +53,31 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="26">
-                              <%-- REPLACE ME: icon here --%>
+                              <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
-                              <%-- Summary --%>
-                              <%-- REPLACE ME: summary here --%>
+                              <div class="mainSubTitle"/>Space: <h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
+                              <div class="mainTitle">Content Rules</div>
+                              <div class="mainSubText">This view shows you all the rules to be applied to content in this space.</div>
                            </td>
-                           <td bgcolor="#495F69" width="1"></td>
-                           <td width="100" style="padding-left:2px">
+                           <td bgcolor="#495F69" width=1></td>
+                           <td width=110 style="padding-left:2px">
                               <%-- Current object actions --%>
-                              <%-- REPLACE ME: object actions --%>
+                              <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
+                              <a:actionLink value="#{msg.create_rule}" image="/images/icons/space_small.gif" padding="4" action="createRule" actionListener="#{NewRuleWizard.startWizard}" />
                            </td>
-                           <td bgcolor="#495F69" width="1"></td>
-                           <td width="100">
-                              <%-- Details View settings --%>
-                              <%-- REPLACE ME: views --%>
+                           <td bgcolor="#495F69" width=1></td>
+                           <td width=110 style="padding-left:2px">
+                              <%-- Filters --%>
+                              <h:outputText style="padding-left:26px;padding-bottom:4px;" styleClass="mainSubTitle" value="#{msg.filter_contents}" /><br/>
+                              <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
+                                    value="local" selectedImage="/images/icons/Details.gif">
+                                 <a:listItem value="local" label="Local" />
+                                 <a:listItem value="inherited" label="Inherited" />
+                              </a:modeList>
                            </td>
                         </tr>
                      </table>
-                     
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_6.gif)" width="4"></td>
                </tr>
@@ -85,41 +90,52 @@
                </tr>
                
                <%-- Toolbar --%>
+               <%-- NOTE: removed toolbar until multi-select implemented
                <tr style="padding-top:4px">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
                   <td>
-                     <table cellspacing="0" cellpadding="4">
+                     <table cellspacing=0 cellpadding=4>
                         <tr>
                            <td>
-                              <%-- Toolbar actions --%>
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "bluetoolbar", "#E9F0F4"); %>
-                                 <%-- REPLACE ME: toolbar actions --%>
+                                 <table cellspacing=0 cellpadding=0><tr>
+                                    <td><a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
+                                    <td><a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
+                                    <td><a:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
+                                    <td><a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" /></td>
+                                 </tr></table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
                            </td>
                         </tr>
                      </table>
                   </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>
+               --%>
                
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td height="300">
-                     
-                     <%-- Details inner components --%>
-                     <%-- REPLACE ME: details components --%>
-                     
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
+                     <table cellspacing="0" cellpadding="3" border="0" width="100%">
+                        <tr>
+                           <td width="100%" valign="top">
+                              <br/>A List of current rules
+                           </td>
+                           
+                           <td valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <table cellpadding="1" cellspacing="1" border="0">
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                           </td>
+                        </tr>
+                     </table>
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

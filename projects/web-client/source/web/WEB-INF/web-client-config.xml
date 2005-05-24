@@ -14,7 +14,7 @@
    
    <config>
       <server>
-         <mode>portlet</mode>
+         <mode>servlet</mode>
          <error-page>/jsp/error.jsp</error-page>
       </server>
    </config>
@@ -30,18 +30,5 @@
          <show-property name="description" displayLabel="Description" />
       </property-sheet>
    </config>
-   
-   <!--
-   <config evaluator="string-compare" condition="wizard:new-space">
-      <wizard>
-         <steps>
-            <step id="1">
-               <page>/jsp/wizard/new-space/create-from.jsp</page>
-               <title>Choose how you want to create your space.</title>
-            </step>
-         </steps>
-      </wizard>
-   </config>
-   -->
    
 </alfresco-config>

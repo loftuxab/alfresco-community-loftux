@@ -7,7 +7,6 @@
 <%@ page buffer="50kb" %>
 
 <%@ page isELIgnored="false" %>
-
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
@@ -72,11 +71,11 @@
                               <td width=110 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
-                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link1" />
+                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{NewSpaceDialog.startWizard}" id="link1" />
                                  <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link2" >
                                     <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                  </a:actionLink>
-                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" actionListener="#{BrowseBean.setupSpaceAction}" id="link3" />
+                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" actionListener="#{AddContentWizard.startWizard}" id="link3" />
                                  <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" id="link4" />
                                  <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
                                     <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" id="link5" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
@@ -85,7 +84,8 @@
                                     <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" id="link6" />
                                     <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" id="link7" />
                                     <a:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" id="link8" />
-                                    <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link9" />
+                                    <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{NewSpaceWizard.startWizard}" id="link9" />
+                                    <a:actionLink value="#{msg.manage_rules}" image="/images/icons/space_small.gif" action="manageRules" id="link10" />
                                  </a:menu>
                               </td>
                            </a:panel>

@@ -1,7 +1,6 @@
 package org.alfresco.web.bean.wizard;
 
 import java.io.Serializable;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -10,30 +9,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
-import org.apache.log4j.Logger;
-
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
-import org.alfresco.repo.node.InvalidNodeRefException;
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
-import org.alfresco.repo.search.Searcher;
 import org.alfresco.util.Conversion;
-import org.alfresco.web.bean.NavigationBean;
-import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
-import org.alfresco.web.ui.common.component.UIModeList;
+import org.apache.log4j.Logger;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -41,209 +31,34 @@ import org.springframework.web.jsf.FacesContextUtils;
  * 
  * @author gavinc
  */
-public class NewSpaceWizard
+public class NewSpaceWizard extends AbstractWizardBean
 {
    private static Logger logger = Logger.getLogger(NewSpaceWizard.class);
-   private static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
+   
+   // TODO: retrieve these from the config service
+   private static final String WIZARD_TITLE = "New Space Wizard";
+   private static final String WIZARD_DESC = "Use this wizard to create a new space.";
+   private static final String STEP1_TITLE = "Step One - Starting Space";
+   private static final String STEP1_DESCRIPTION = "Choose how you want to create your space.";
+   private static final String STEP2_TITLE = "Step Two - Space Options";
+   private static final String STEP2_DESCRIPTION = "Select space options.";
+   private static final String STEP3_TITLE = "Step Three - Space Details";
+   private static final String STEP3_DESCRIPTION = "Enter information about the space.";
+   private static final String FINISH_INSTRUCTION = "To close this wizard and create your space click Finish.";
    
    // new space wizard specific properties
-   private String createFrom = "scratch";
-   private String spaceType = "container";
+   private String createFrom;
+   private String spaceType;
    private String existingSpaceId;
    private String templateSpaceId;
-   private String copyPolicy = "structure";
+   private String copyPolicy;
    private String name;
    private String description;
-   private String icon = "space-icon-default";
+   private String icon;
    private String templateName;
-   private boolean saveAsTemplate = false;
+   private boolean saveAsTemplate;
    private List spaces;
    private List templates;
-   
-   // common wizard properties
-   private int currentStep = 1;
-   private boolean finishDisabled = true;
-   private String currentSpaceName;
-   private NodeService nodeService;
-   private Searcher searchService;
-   private NavigationBean navigator;
-
-   /**
-    * @return Returns the nodeService.
-    */
-   public NodeService getNodeService()
-   {
-      return this.nodeService;
-   }
-
-   /**
-    * @param nodeService The nodeService to set.
-    */
-   public void setNodeService(NodeService nodeService)
-   {
-      this.nodeService = nodeService;
-   }
-   
-   /**
-    * @return Returns the searchService.
-    */
-   public Searcher getSearchService()
-   {
-      return searchService;
-   }
-
-   /**
-    * @param searchService The searchService to set.
-    */
-   public void setSearchService(Searcher searchService)
-   {
-      this.searchService = searchService;
-   }
-   
-   /**
-    * @return Returns the navigation bean instance.
-    */
-   public NavigationBean getNavigator()
-   {
-      return navigator;
-   }
-   
-   /**
-    * @param navigator The NavigationBean to set.
-    */
-   public void setNavigator(NavigationBean navigator)
-   {
-      this.navigator = navigator;
-   }
-   
-   /**
-    * @return Returns the currentStep.
-    */
-   public int getCurrentStep()
-   {
-      return currentStep;
-   }
-
-   /**
-    * @param currentStep The currentStep to set.
-    */
-   public void setCurrentStep(int currentStep)
-   {
-      this.currentStep = currentStep;
-   }
-   
-   /**
-    * @return Returns the currentSpaceName.
-    */
-   public String getCurrentSpaceName()
-   {
-      // NOTE: We do this ourself rather than using the browse bean as when the 
-      //       wizard potentially gets restored from the shelf the current node
-      //       may have changed from when the wizard was launched. That means we
-      //       should also store the current id too!
-      
-      if (this.currentSpaceName == null)
-      {
-         String spaceName = "Alfresco Home";
-         String currentNodeId = this.navigator.getCurrentNodeId();
-         if (currentNodeId != null)
-         {
-            try
-            {
-               NodeRef ref = new NodeRef(Repository.getStoreRef(), currentNodeId);
-               spaceName = RepoUtils.getNameForNode(this.nodeService, ref);
-            }
-            catch (InvalidNodeRefException refErr)
-            {
-               Utils.addErrorMessage(MessageFormat.format(ERROR_NODEREF, new Object[] {currentNodeId}));
-            }
-         }
-         
-         this.currentSpaceName = spaceName;
-      }
-      
-      return this.currentSpaceName;
-   }
-
-   /**
-    * @param currentSpaceName The currentSpaceName to set.
-    */
-   public void setCurrentSpaceName(String currentSpaceName)
-   {
-      this.currentSpaceName = currentSpaceName;
-   }
-   
-   /**
-    * @return Returns the finishDisabled.
-    */
-   public boolean isFinishDisabled()
-   {
-      return finishDisabled;
-   }
-
-   /**
-    * @param finishDisabled The finishDisabled to set.
-    */
-   public void setFinishDisabled(boolean finishDisabled)
-   {
-      this.finishDisabled = finishDisabled;
-   }
-
-   /**
-    * Deals with the next button being pressed
-    * 
-    * @return
-    */
-   public String next()
-   {
-      this.currentStep++;
-      
-      // determine whether the finish button should be enabled
-      evaluateFinishButtonState();
-      
-      // determine which page to go to next
-      String nextPage = determinePageForStep(this.currentStep);
-      
-      // navigate
-      navigate(nextPage);
-      
-      if (logger.isDebugEnabled())
-      {
-         logger.debug("Navigating to next page: " + nextPage);
-         logger.debug("currentStep: " + this.currentStep);
-      }
-      
-      // return null to prevent the naviagtion handler looking up the next page
-      return null;
-   }
-   
-   /**
-    * Deals with the back button being pressed
-    * 
-    * @return
-    */
-   public String back()
-   {       
-      this.currentStep--;
-      
-      // determine whether the finish button should be enabled
-      evaluateFinishButtonState();
-      
-      // determine which page to go to next
-      String previousPage = determinePageForStep(this.currentStep);
-      
-      // navigate
-      navigate(previousPage);
-      
-      if (logger.isDebugEnabled())
-      {
-         logger.debug("Navigating to previous page: " + previousPage);
-         logger.debug("currentStep: " + this.currentStep);
-      }
-      
-      // return null to prevent the naviagtion handler looking up the next page
-      return null;
-   }
    
    /**
     * Deals with the finish button being pressed
@@ -252,8 +67,7 @@ public class NewSpaceWizard
     */
    public String finish()
    {
-      if (logger.isDebugEnabled())
-         logger.debug(getSummary());
+      String outcome = FINISH_OUTCOME;
       
       // *******************************************************************************
       // TODO: The user may have selected to create the space from an existing space
@@ -267,7 +81,8 @@ public class NewSpaceWizard
       {
          // create error and send wizard back to details page
          Utils.addErrorMessage("You must supply a name for the space");
-         navigate(determinePageForStep(3));
+         outcome = determineOutcomeForStep(3);
+         this.currentStep = 3;
       }
       else
       {
@@ -295,6 +110,9 @@ public class NewSpaceWizard
                       null,
                       QName.createQName(NamespaceService.ALFRESCO_URI, this.name),
                       DictionaryBootstrap.TYPE_QNAME_FOLDER);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Created folder node with name: " + this.name);
             
             NodeRef nodeRef = assocRef.getChildRef();
             
@@ -326,6 +144,9 @@ public class NewSpaceWizard
             // add the space aspect to the folder
             this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
 
+            if (logger.isDebugEnabled())
+               logger.debug("Created space aspect with properties: " + properties);
+            
             // commit the transaction
             tx.commit();
          }
@@ -335,46 +156,158 @@ public class NewSpaceWizard
             try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
             throw new RuntimeException(e);
          }
-        
-         // reset the state
-         reset();
-         
-         // navigate
-         navigate("/jsp/browse/browse.jsp");
       }
       
-      return null;
+      return outcome;
    }
    
    /**
-    * Deals with the cancel button being pressed
-    * 
-    * @return
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getWizardDescription()
     */
-   public String cancel()
+   public String getWizardDescription()
    {
-      // reset the state
-      reset();
-      
-      // navigate
-      navigate("/jsp/browse/browse.jsp");
-      
-      return null;
+      return WIZARD_DESC;
+   }
+
+   /**
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getWizardTitle()
+    */
+   public String getWizardTitle()
+   {
+      return WIZARD_TITLE;
    }
    
    /**
-    * Deals with the minimise button being pressed
-    * 
-    * @return
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getStepDescription()
     */
-   public String minimise()
+   public String getStepDescription()
    {
-      // navigate
-      navigate("/jsp/browse/browse.jsp");
+      String stepDesc = null;
       
-      return null;
+      switch (this.currentStep)
+      {
+         case 1:
+         {
+            stepDesc = STEP1_DESCRIPTION;
+            break;
+         }
+         case 2:
+         {
+            stepDesc = STEP2_DESCRIPTION;
+            break;
+         }
+         case 3:
+         {
+            stepDesc = STEP3_DESCRIPTION;
+            break;
+         }
+         case 4:
+         {
+            stepDesc = SUMMARY_DESCRIPTION;
+            break;
+         }
+         default:
+         {
+            stepDesc = "";
+         }
+      }
+      
+      return stepDesc;
+   }
+
+   /**
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getStepTitle()
+    */
+   public String getStepTitle()
+   {
+      String stepTitle = null;
+      
+      switch (this.currentStep)
+      {
+         case 1:
+         {
+            stepTitle = STEP1_TITLE;
+            break;
+         }
+         case 2:
+         {
+            stepTitle = STEP2_TITLE;
+            break;
+         }
+         case 3:
+         {
+            stepTitle = STEP3_TITLE;
+            break;
+         }
+         case 4:
+         {
+            stepTitle = SUMMARY_TITLE;
+            break;
+         }
+         default:
+         {
+            stepTitle = "";
+         }
+      }
+      
+      return stepTitle;
    }
    
+   /**
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getStepInstructions()
+    */
+   public String getStepInstructions()
+   {
+      String stepInstruction = null;
+      
+      switch (this.currentStep)
+      {
+         case 4:
+         {
+            stepInstruction = FINISH_INSTRUCTION;
+            break;
+         }
+         default:
+         {
+            stepInstruction = DEFAULT_INSTRUCTION;
+         }
+      }
+      
+      return stepInstruction;
+   }
+   
+   /**
+    * Initialises the wizard
+    */
+   public void init()
+   {
+      super.init();
+      
+      // clear the cached query results
+      if (this.spaces != null)
+      {
+         this.spaces.clear();
+         this.spaces = null;
+      }
+      if (this.templates != null)
+      {
+         this.templates.clear();
+         this.templates = null;
+      }
+      
+      // reset all variables
+      this.createFrom = "scratch";
+      this.spaceType = "container";
+      this.icon = "space-icon-default";
+      this.copyPolicy = "structure";
+      this.existingSpaceId = null;
+      this.templateSpaceId = null;
+      this.name = null;
+      this.description = null;
+      this.templateName = null;
+      this.saveAsTemplate = false;
+   }
+
    /**
     * @return Returns the summary data for the wizard.
     */
@@ -391,7 +324,7 @@ public class NewSpaceWizard
       
       return builder.toString();
    }
-
+   
    /**
     * @return Returns a list of template spaces currently in the system
     */
@@ -577,109 +510,55 @@ public class NewSpaceWizard
    {
       this.templateSpaceId = templateSpaceId;
    }
-
-   /**
-    * Called when the step is changed by the left panel
-    * 
-    * @param event The event representing the step change
-    */
-   public void stepChanged(ActionEvent event)
-   {
-      UIModeList viewList = (UIModeList)event.getComponent();
-      int step = Integer.parseInt(viewList.getValue().toString());
-      
-      String page = determinePageForStep(step);
-      navigate(page);
-      
-      if (logger.isDebugEnabled())
-         logger.debug("Navigating directly to: " + page);
-   }
    
    /**
-    * Sets the page to navigate to
-    * 
-    * @param page Page to navigate to
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#determineOutcomeForStep(int)
     */
-   private void navigate(String page)
+   protected String determineOutcomeForStep(int step)
    {
-      FacesContext ctx = FacesContext.getCurrentInstance();
-      UIViewRoot newRoot = ctx.getApplication().getViewHandler().createView(ctx, page);
-      ctx.setViewRoot(newRoot);
-      ctx.renderResponse();
-   }
-   
-   /**
-    * Returns the page to be navigated to for the given step
-    * 
-    * @param step
-    * @return
-    */
-   private String determinePageForStep(int step)
-   {
-      // TODO: in the wizard framework make this abstract and represent step
-      //       0 as the page the wizard was launched from and step -1 as the
-      //       cancel page
+      String outcome = null;
       
-      String page = null;
-      String dir = "/jsp/wizard/new-space/";
-      
-      switch (step)
+      switch(step)
       {
          case 1:
          {
-            page = dir + "create-from.jsp";
+            outcome = "create-from";
             break;
          }
          case 2:
          {
             if (createFrom.equalsIgnoreCase("scratch"))
             {
-               page = dir + "from-scratch.jsp";
+               outcome = "from-scratch";
             }
             else if (createFrom.equalsIgnoreCase("existing"))
             {
-               page = dir + "from-existing.jsp";
+               outcome = "from-existing";
             }
             else if (createFrom.equalsIgnoreCase("template"))
             {
-               page = dir + "from-template.jsp";
+               outcome = "from-template";
             }
             
             break;
          }
          case 3:
          {
-            page = dir + "details.jsp";
+            outcome = "details";
             break;
          }
          case 4:
          {
-            page = dir + "summary.jsp";
+            outcome = "summary";
             break;
          }
          default:
          {
-            page = "/jsp/browse/browse.jsp";
+            outcome = CANCEL_OUTCOME;
          }
       }
       
-      return page;
-   }
-   
-   /**
-    * Determines whether the finish button should be enabled and sets
-    * the finishDisabled flag appropriately
-    */
-   private void evaluateFinishButtonState()
-   {
-      if (this.createFrom.equals("scratch") && this.currentStep > 2)
-      {
-         this.finishDisabled = false;
-      }
-      else
-      {
-         this.finishDisabled = true;
-      }
+      return outcome;
    }
    
    /**
@@ -736,38 +615,5 @@ public class NewSpaceWizard
       }
       
       return items;
-   }
-   
-   /**
-    * Resets the state of the wizard
-    */
-   private void reset()
-   {
-      // clear the cached query results
-      if (this.spaces != null)
-      {
-         this.spaces.clear();
-         this.spaces = null;
-      }
-      if (this.templates != null)
-      {
-         this.templates.clear();
-         this.templates = null;
-      }
-      
-      // reset all variables
-      this.currentStep = 1;
-      this.createFrom = "scratch";
-      this.spaceType = "container";
-      this.currentSpaceName = null;
-      this.existingSpaceId = null;
-      this.templateSpaceId = null;
-      this.copyPolicy = "structure";
-      this.name = null;
-      this.description = null;
-      this.icon = "icon1";
-      this.templateName = null;
-      this.saveAsTemplate = false;
-      this.finishDisabled = true;
    }
 }

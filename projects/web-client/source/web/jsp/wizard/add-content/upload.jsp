@@ -59,9 +59,9 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/other_file.gif" />
                            </td>
                            <td>
-                              <h:outputText value="#{AddContentWizard.currentSpaceName}" styleClass="mainSubTitle"/><br/>
-                              <div class="mainTitle">Add Content</div>
-                              <div class="mainSubText">Use this wizard to add a document to a space.</div>
+                              <h:outputText value="Space: #{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
+                              <h:outputText value="#{AddContentWizard.wizardTitle}" styleClass="mainTitle"/><br/>
+                              <h:outputText value="#{AddContentWizard.wizardDescription}" styleClass="mainSubText"/>
                            </td>
                         </tr>
                      </table>
@@ -100,10 +100,10 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0">
                                  <tr>
-                                    <td class="mainSubTitle">Step 1 - Upload Document</td>
+                                    <td class="mainSubTitle"><h:outputText value="#{AddContentWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr>
-                                    <td class="mainSubText">Locate and upload your document to the repository.</td>
+                                    <td class="mainSubText"><h:outputText value="#{AddContentWizard.stepDescription}" /></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
@@ -147,7 +147,7 @@
                                  <% } %>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>To continue click Next.</td>
+                                    <td><h:outputText value="#{AddContentWizard.stepInstructions}" escape="false" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -162,26 +162,13 @@
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{AddContentWizard.back}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" 
-                                                        disabled="#{AddContentWizard.finishDisabled}"/>
+                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Cancel" action="#{AddContentWizard.cancel}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Minimise To Shelf" action="#{AddContentWizard.minimise}" 
-                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

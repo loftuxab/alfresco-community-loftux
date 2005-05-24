@@ -93,6 +93,31 @@
    
    <managed-bean>
       <description>
+         The bean that backs up the New Rule Wizard
+      </description>
+      <managed-bean-name>NewRuleWizard</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.wizard.NewRuleWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>rulesService</property-name>
+         <value>#{RulesService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the Checkin and Checkout pages.
       </description>
       <managed-bean-name>CheckinCheckoutBean</managed-bean-name>
@@ -156,6 +181,13 @@
          <property-name>lockService</property-name>
          <value>#{lockService}</value>
       </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>Temporary holder for a RulesService</description>
+      <managed-bean-name>RulesService</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.repository.RulesService</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
    
    
@@ -224,6 +256,10 @@
          <from-outcome>updateFile</from-outcome>
          <to-view-id>/jsp/dialog/update-file.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>manageRules</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
@@ -234,12 +270,173 @@
       </navigation-case>
    </navigation-rule>
    
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/rules.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>createRule</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rule for the new space dialog -->
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/new-space.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
    <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click, finish on dialog) -->
    <navigation-rule>
       <from-view-id>/jsp/*</from-view-id>
       <navigation-case>
          <from-outcome>browse</from-outcome>
          <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rule to cancel and finish from any wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/*</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the advanced space wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-space/*</from-view-id>
+      <navigation-case>
+         <from-outcome>create-from</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/create-from.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>from-scratch</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/from-scratch.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>from-existing</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/from-existing.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>from-template</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/from-template.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>details</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the add content wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/add-content/*</from-view-id>
+      <navigation-case>
+         <from-outcome>upload</from-outcome>
+         <to-view-id>/jsp/wizard/add-content/upload.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/add-content/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the new rule wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-rule/*</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>details</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>condition</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>in-category</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition-in-category.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>contains-text</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition-contains-text.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>action</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>simple-workflow</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-simple-workflow.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>link-category</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-link-category.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>add-features</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-add-features.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>copy</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-copy.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>move</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-move.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>email</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-email.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>check-in</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-check-in.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>check-out</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-check-out.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-rule/condition.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>no-condition</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-rule/action.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>no-condition</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
       

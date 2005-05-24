@@ -4,8 +4,8 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
-
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
@@ -18,8 +18,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
-   <h:form id="new-space-from-template">
+   <h:form id="new-rule-check-in">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -58,8 +57,8 @@
                            </td>
                            <td>
                               <h:outputText value="Space: #{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
-                              <h:outputText value="#{NewSpaceWizard.wizardTitle}" styleClass="mainTitle"/><br/>
-                              <h:outputText value="#{NewSpaceWizard.wizardDescription}" styleClass="mainSubText"/>
+                              <h:outputText value="#{NewRuleWizard.wizardTitle}" styleClass="mainTitle"/><br/>
+                              <h:outputText value="#{NewRuleWizard.wizardDescription}" styleClass="mainSubText"/>
                            </td>
                         </tr>
                      </table>
@@ -84,12 +83,14 @@
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
-                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                    value="2" actionListener="#{NewSpaceWizard.stepChanged}">
-                                 <a:listItem value="1" label="1. Starting Space" />
-                                 <a:listItem value="2" label="2. Space Options" />
-                                 <a:listItem value="3" label="3. Space Details" />
-                                 <a:listItem value="4" label="4. Summary" />
+                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
+                                          value="5">
+                                 <a:listItem value="1" label="1. Details" />
+                                 <a:listItem value="2" label="2. Condition" />
+                                 <a:listItem value="3" label="3. Condition Settings" />
+                                 <a:listItem value="4" label="4. Action" />
+                                 <a:listItem value="5" label="5. Action Settings" />
+                                 <a:listItem value="6" label="6. Summary" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -98,45 +99,18 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{NewSpaceWizard.stepTitle}" /></td>
+                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
-                                 <tr>
-                                    <td class="mainSubText"><h:outputText value="#{NewSpaceWizard.stepDescription}" /></td>
-                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 
+
+                                 <tr><td>Check in settings defined here</td></tr>
+
+
+
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="wizardSectionHeading">Template Space</td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td>Select the template you want to use.</td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <h:selectOneMenu value="#{NewSpaceWizard.templateSpaceId}">
-                                          <f:selectItems value="#{NewSpaceWizard.templateSpaces}" />
-                                       </h:selectOneMenu>
-                                    </td>
-                                 </tr>
-                                 <tr><td class="details-separator" /></tr>
-                                 <tr>
-                                    <td>Copy existing space</td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <h:selectOneRadio value="#{NewSpaceWizard.copyPolicy}" layout="pageDirection">
-                                          <f:selectItem itemValue="structure" itemLabel="Structure" />
-                                          <f:selectItem itemValue="contents" itemLabel="Structure and contents" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
-                                 <tr><td class="details-separator" /></tr>
-                                 <tr>
-                                    <td>Note: Any content rules for spaces will also be copied.</td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td>><h:outputText value="#{NewSpaceWizard.stepInstructions}" /></td>
+                                    <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -147,24 +121,23 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="Back" action="#{NewRuleWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
-                                                        disabled="true" />
+                                       <h:commandButton value="Finish" action="#{NewRuleWizard.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
-                                 <tr><td class="button-group-separator"></td></tr>
+                                 <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="Cancel" action="#{NewRuleWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
@@ -172,6 +145,16 @@
                            </td>
                         </tr>
                      </table>
+                  </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
+               </tr>
+               
+               <%-- Error Messages --%>
+               <tr valign="top">
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
+                  <td>
+                     <%-- messages tag to show messages not handled by other specific message tags --%>
+                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

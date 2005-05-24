@@ -4,7 +4,7 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
-<%@ page buffer="16kb" %>
+<%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
@@ -56,7 +56,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/>Space Name</div>
+                              <h:outputText value="#{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
                               <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText">Use this page to view the details about the content.</div>
                            </td>
