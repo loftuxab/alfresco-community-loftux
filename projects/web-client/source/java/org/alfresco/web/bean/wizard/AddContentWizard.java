@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.NamespaceService;
@@ -142,7 +143,7 @@ public class AddContentWizard extends AbstractWizardBean
          {
             // rollback the transaction
             try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-            throw new RuntimeException(e);
+            throw new AlfrescoRuntimeException("Failed to add content", e);
          }
       }
       

@@ -57,7 +57,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
                            </td>
                            <td>
-                              <h:outputText value="Space: #{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
+                              <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
                               <div class="mainTitle">Create Space</div>
                               <div class="mainSubText">Use this dialog to create a new space.</div>
                            </td>

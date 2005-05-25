@@ -74,6 +74,7 @@ public class LoginBean
    {
       // TODO: This must go to the repository via a service to authenticate
       //       for now only accept admin/admin as username/password
+      //       We must also store the returned User object in the session
       
       if (m_name.equals("admin") && m_password.equals("admin"))
       {

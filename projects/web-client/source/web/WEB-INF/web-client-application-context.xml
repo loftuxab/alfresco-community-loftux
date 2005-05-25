@@ -25,4 +25,11 @@
       </constructor-arg>
    </bean>
    
+   <!-- bean to represent the currently logged in user, this will eventually be retrieved from the repo -->
+   <bean id="currentUser" class="org.alfresco.web.bean.repository.User">
+      <constructor-arg>
+         <value>admin</value>
+      </constructor-arg>
+   </bean>
+   
 </beans>

@@ -59,9 +59,9 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/other_file.gif" />
                            </td>
                            <td>
-                              <h:outputText value="Space: #{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
-                              <h:outputText value="#{AddContentWizard.wizardTitle}" styleClass="mainTitle"/><br/>
-                              <h:outputText value="#{AddContentWizard.wizardDescription}" styleClass="mainSubText"/>
+                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
+                              <div class="mainTitle"><h:outputText value="#{AddContentWizard.wizardTitle}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{AddContentWizard.wizardDescription}" /></div>
                            </td>
                         </tr>
                      </table>

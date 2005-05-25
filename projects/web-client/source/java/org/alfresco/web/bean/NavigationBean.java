@@ -15,13 +15,16 @@ import javax.faces.event.ActionEvent;
 
 import org.apache.log4j.Logger;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.Searcher;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
@@ -36,9 +39,10 @@ public class NavigationBean
    {
       // TODO: remove this test code - to kick off the breadcrumb path and root node Id
       List<IBreadcrumbHandler> elements = new ArrayList(1);
-      elements.add(new NavigationBreadcrumbHandler("My Home"));
+      elements.add(new NavigationBreadcrumbHandler(Application.COMPANY_SPACE_NAME));
       setLocation(elements);
-      setCurrentNodeId(null);
+      setCurrentNodeId(Application.getCurrentUser(
+            FacesContext.getCurrentInstance()).getHomeSpaceId());
    }
    
    
@@ -146,42 +150,12 @@ public class NavigationBean
    {
       s_logger.debug("Setting current node id to: " + currentNodeId);
       
-      if (currentNodeId != null)
+      if (currentNodeId == null)
       {
-         try
-         {
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), currentNodeId);
-            
-            Map<QName, Serializable> props = this.nodeService.getProperties(new NodeRef(Repository.getStoreRef(), currentNodeId));
-            
-            // setup some properties
-            this.nodeProperties.clear();
-            this.nodeProperties.put("id", currentNodeId);
-            String name = RepoUtils.getNameForNode(this.nodeService, ref);
-            this.nodeProperties.put("name", name);
-            String desc = RepoUtils.getQNameProperty(props, "description", true);
-            this.nodeProperties.put("description", desc);
-            
-            this.currentNodeId = currentNodeId;
-         }
-         catch (InvalidNodeRefException err)
-         {
-            // TODO: how to handle this?
-            s_logger.error("Unable to locate node Id: " + currentNodeId);
-         }
+         throw new AlfrescoRuntimeException("Can not set the current node id to null");
       }
-      else
-      {
-         // TODO: replace this with correct root node handling!
-         // setup some properties
-         this.nodeProperties.clear();
-         this.nodeProperties.put("id", currentNodeId);
-         this.nodeProperties.put("name", "Linton's Home");
-         this.nodeProperties.put("description", "Text description of Linton's Home from Space property");
          
-         this.currentNodeId = currentNodeId;
-      }
-      
+      this.currentNodeId = currentNodeId;
       this.searchText = null;
       
       UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
@@ -190,8 +164,12 @@ public class NavigationBean
    /**
     * @return Returns the Map of properties for the current Node. 
     */
-   public Map<String, String> getNodeProperties()
+   public Map<String, Object> getNodeProperties()
    {
+      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
+      Node node = new Node(nodeRef, this.nodeService);
+      this.nodeProperties = node.getProperties();
+      
       return this.nodeProperties;
    }
    
@@ -266,9 +244,10 @@ public class NavigationBean
       {
          // TODO: replace this temp code one we have home folders etc.!
          // TEMP!
-         setCurrentNodeId(null);
-         setLocation( (List)breadcrumb.getValue() );
          FacesContext fc = FacesContext.getCurrentInstance();
+         setCurrentNodeId(Application.getCurrentUser(fc).getHomeSpaceId());
+         setLocation( (List)breadcrumb.getValue() );
+         
          if (fc.getViewRoot().getViewId().equals(BrowseBean.BROWSE_VIEW_ID))
          {
             return null;
@@ -304,7 +283,7 @@ public class NavigationBean
    private int searchMode;
    
    /** bag of displayable properties for the current node */
-   private Map<String, String> nodeProperties = new HashMap<String, String>(7, 1.0f);
+   private Map<String, Object> nodeProperties = null;
    
    /** expanded state of the Shelf panel wrapper component */
    private boolean shelfExpanded = true;

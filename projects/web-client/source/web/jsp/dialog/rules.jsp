@@ -56,7 +56,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/>Space: <h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
+                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
                               <div class="mainTitle">Content Rules</div>
                               <div class="mainSubText">This view shows you all the rules to be applied to content in this space.</div>
                            </td>

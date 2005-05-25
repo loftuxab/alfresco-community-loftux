@@ -13,6 +13,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -154,7 +155,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          {
             // rollback the transaction
             try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-            throw new RuntimeException(e);
+            throw new AlfrescoRuntimeException("Failed to create new space", e);
          }
       }
       
