@@ -145,7 +145,8 @@ public class ActionLinkRenderer extends BaseRenderer
             buf.append("<table cellspacing=0 cellpadding=0 style=\"cursor:hand\"><tr><td width=16>");
          }
          
-         buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue()));
+         // TODO: allow configuring of alignment attribute
+         buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue(), "absmiddle"));
          
          if (link.getShowLink() == true)
          {

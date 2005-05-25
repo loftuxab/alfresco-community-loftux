@@ -297,6 +297,22 @@ public final class Utils
     */
    public static String buildImageTag(FacesContext context, String image, String alt)
    {
+      return buildImageTag(context, image, alt, null);
+   }
+   
+   /**
+    * Build a context path safe image tag for the supplied image path.
+    * Image path should be supplied with a leading slash '/'.
+    * 
+    * @param context       FacesContext
+    * @param image         The local image path from the web folder with leading slash '/'
+    * @param alt           Optional alt/title text
+    * @param align         Optional alignment value
+    * 
+    * @return Populated <code>img</code> tag
+    */
+   public static String buildImageTag(FacesContext context, String image, String alt, String align)
+   {
       StringBuilder buf = new StringBuilder(128);
       
       buf.append("<img src='")
@@ -312,6 +328,11 @@ public final class Utils
             .append("\" title=\"")
             .append(alt)
             .append('"');
+      }
+      if (align != null)
+      {
+         buf.append(" align=")
+            .append(align);
       }
       
       buf.append('>');

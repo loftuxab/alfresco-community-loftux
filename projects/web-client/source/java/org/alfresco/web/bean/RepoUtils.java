@@ -4,7 +4,11 @@
 package org.alfresco.web.bean;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.Map;
+
+import javax.faces.context.FacesContext;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
@@ -135,6 +139,53 @@ public final class RepoUtils
       return locked;
    }
    
+   /**
+    * Return the image path to the filetype icon for the specified node
+    * 
+    * @param node       Node to build filetype icon path for
+    * 
+    * @return the image path for the specified node type or the default icon if not found
+    */
+   public static String getFileTypeImage(Node node)
+   {
+      String image = DEFAULT_FILE_IMAGE;
+      
+      String name = node.getName();
+      int extIndex = name.lastIndexOf('.');
+      if (extIndex != -1 && name.length() > extIndex + 1)
+      {
+         String ext = name.substring(extIndex + 1).toLowerCase();
+         
+         // found file extension
+         synchronized (s_fileExtensionMap)
+         {
+            image = s_fileExtensionMap.get(ext);
+            if (image == null)
+            {
+               // not found create for first time
+               image = IMAGE_PREFIX + ext + IMAGE_POSTFIX;
+               
+               // TODO: add support for Large filetype icons also!
+               
+               // does this image exist on the web-server?
+               if (FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(image) != null)
+               {
+                  // found the image for this extension - save it for later
+                  s_fileExtensionMap.put(ext, image);
+               }
+               else
+               {
+                  // not found, save the default image for this extension instead
+                  image = DEFAULT_FILE_IMAGE;
+                  s_fileExtensionMap.put(ext, image);
+               }
+            }
+         }
+      }
+      
+      return image;
+   }
+   
    
    public static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
    
@@ -142,4 +193,9 @@ public final class RepoUtils
    private static final String USERNAME = "admin";
    
    public static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
+   
+   private final static String IMAGE_PREFIX = "/images/filetypes/";
+   private final static String IMAGE_POSTFIX = ".gif";
+   private final static String DEFAULT_FILE_IMAGE = IMAGE_PREFIX + "_default" + IMAGE_POSTFIX;
+   private final static Map<String, String> s_fileExtensionMap = new HashMap<String, String>(89, 1.0f);
 }

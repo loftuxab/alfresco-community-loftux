@@ -119,8 +119,6 @@ public class UISortLink extends UICommand
       String value = (String)requestMap.get(fieldId);
       if (value != null && value.equals(getClientId(context)))
       {
-         if (s_logger.isDebugEnabled())
-            s_logger.debug("Caught sort click using field: " + fieldId + "; for sort link Id: " + getClientId(context));
          // we were clicked - queue an event to represent the click
          // cannot handle the event here as other components etc. have not had
          // a chance to decode() - we queue an event to be processed later

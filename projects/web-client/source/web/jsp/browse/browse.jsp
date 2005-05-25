@@ -297,7 +297,7 @@
                               <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file.gif" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileTypeImage}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
                               <f:param name="id" value="#{r.id}" />
@@ -319,7 +319,7 @@
                         <%-- Primary column for list view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file.gif" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileTypeImage}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="title">
                               <f:param name="id" value="#{r.id}" />

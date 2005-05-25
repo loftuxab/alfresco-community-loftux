@@ -359,7 +359,7 @@ public class BrowseBean implements IContextListener
             NodeRef nodeRef = ref.getChildRef();
             
             // create our Node representation
-            MapNode node = new MapNode(ref.getChildRef(), this.nodeService);
+            MapNode node = new MapNode(nodeRef, this.nodeService);
             
             // look for Space or File nodes
             if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
@@ -368,10 +368,7 @@ public class BrowseBean implements IContextListener
             }
             else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
             {
-               // special properties to be used by the value binding components on the page
-               node.put("locked", RepoUtils.isNodeLocked(node, lockService, nodeRef));
-               node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_WORKING_COPY));
-               node.put("url", DownloadContentServlet.generateURL(nodeRef, node.getName()));
+               setupDataBindingProperties(node);
                
                this.contentNodes.add(node);
             }
@@ -425,10 +422,7 @@ public class BrowseBean implements IContextListener
                }
                else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
                {
-                  // special properties to be used by the value binding components on the page
-                  node.put("locked", RepoUtils.isNodeLocked(node, lockService, nodeRef));
-                  node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_WORKING_COPY));
-                  node.put("url", DownloadContentServlet.generateURL(nodeRef, node.getName()));
+                  setupDataBindingProperties(node);
                   
                   this.contentNodes.add(node);
                }
@@ -447,6 +441,22 @@ public class BrowseBean implements IContextListener
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
       }
+   }
+   
+   /**
+    * Setup the additional properties required at data-binding time.
+    * These are properties used by components on the page when iterating over the nodes.
+    * Information such as whether the node is locked, a working copy, download URL etc. 
+    * 
+    * @param node       MapNode to add the properties too
+    */
+   private void setupDataBindingProperties(MapNode node)
+   {
+      // special properties to be used by the value binding components on the page
+      node.put("locked", RepoUtils.isNodeLocked(node, this.lockService, node.getNodeRef()));
+      node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_WORKING_COPY));
+      node.put("url", DownloadContentServlet.generateURL(node.getNodeRef(), node.getName()));
+      node.put("fileTypeImage", RepoUtils.getFileTypeImage(node));
    }
 
    /**
