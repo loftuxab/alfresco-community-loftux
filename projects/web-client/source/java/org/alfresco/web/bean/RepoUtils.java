@@ -15,6 +15,7 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.value.ValueConverter;
+import org.alfresco.web.bean.repository.Node;
 
 /**
  * @author Kevin Roast
@@ -112,16 +113,16 @@ public final class RepoUtils
    /**
     * Return whether a Node is current Locked
     * 
-    * @param nodeService      The NodeService to use
+    * @param node             The Node wrapper to test against
     * @param lockService      The LockService to use
     * @param ref              NodeRef to test
     * 
     * @return whether a Node is current Locked
     */
-   public static Boolean isNodeLocked(NodeService nodeService, LockService lockService, NodeRef ref)
+   public static Boolean isNodeLocked(Node node, LockService lockService, NodeRef ref)
    {
       Boolean locked = Boolean.FALSE;
-      if (nodeService.hasAspect(ref, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK))
+      if (node.hasAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK))
       {
          // TODO: replace username with real user name ref here!
          LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);
@@ -132,19 +133,6 @@ public final class RepoUtils
       }
       
       return locked;
-   }
-   
-   /**
-    * Return whether a Node is a Working Copy
-    * 
-    * @param nodeService      The NodeService to use
-    * @param ref              NodeRef to test
-    * 
-    * @return whether a Node is a Working Copy
-    */
-   public static Boolean isWorkingCopy(NodeService nodeService, NodeRef ref)
-   {
-      return (nodeService.hasAspect(ref, DictionaryBootstrap.ASPECT_WORKING_COPY)) ? Boolean.TRUE : Boolean.FALSE;
    }
    
    

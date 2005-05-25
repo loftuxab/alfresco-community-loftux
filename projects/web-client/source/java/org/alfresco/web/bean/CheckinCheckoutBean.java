@@ -237,7 +237,7 @@ public class CheckinCheckoutBean
    /**
     * Action event called by all actions that need to setup a Content Document context on the 
     * CheckinCheckoutBean before an action page/wizard is called. The context will be a Node in
-    * setDocument() which can be retrieved on the action page from BrowseBean.getDocument().
+    * setDocument() which can be retrieved on action pages via getDocument().
     * 
     * @param event   ActionEvent
     */
@@ -375,7 +375,7 @@ public class CheckinCheckoutBean
    }
    
    /**
-    * Action to undo the checkout of a document and return to the browse screen.
+    * Action to undo the checkout of a document just checked out from the checkout screen.
     */
    public String undoCheckout()
    {
@@ -388,6 +388,55 @@ public class CheckinCheckoutBean
          {
             // try to cancel checkout of the working copy
             this.versionOperationsService.cancelCheckout(node.getNodeRef());
+            
+            clearUpload();
+            
+            outcome = "browse";
+         }
+         catch (Throwable err)
+         {
+            Utils.addErrorMessage("Unable to cancel checkout of Content Node due to system error: " + err.getMessage(), err);
+         }
+      }
+      else
+      {
+         logger.warn("WARNING: undoCheckout called without a current WorkingDocument!");
+      }
+      
+      return outcome;
+   }
+   
+   /**
+    * Action to undo the checkout of a locked document. This document may either by the original copy
+    * or the working copy node. Therefore calculate which it is, if the working copy is found then
+    * we simply cancel checkout on that document. If the original copy is found then we need to find
+    * the appropriate working copy and perform the action on that node.
+    */
+   public String undoCheckoutFile()
+   {
+      String outcome = null;
+      
+      Node node = getDocument();
+      if (node != null)
+      {
+         try
+         {
+            // TODO: find the working copy for this document and cancel the checkout on it
+            if (node.hasAspect(DictionaryBootstrap.ASPECT_WORKING_COPY))
+            {
+               this.versionOperationsService.cancelCheckout(node.getNodeRef());
+            }
+            else if (node.hasAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK))
+            {
+               // TODO: is this possible? as currently only the workingcopy aspect has the copyReference
+               //       attribute - this means we cannot find out where the copy is to cancel it!
+               //       can we construct a search? (errgh)
+               throw new RuntimeException("NOT IMPLEMENTED");
+            }
+            else
+            {
+               throw new IllegalStateException("Node supplied for undo checkout has neither Working Copy or Locked aspect!");
+            }
             
             clearUpload();
             

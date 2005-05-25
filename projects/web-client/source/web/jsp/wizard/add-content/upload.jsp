@@ -157,12 +157,12 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{AddContentWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="Next" action="#{AddContentWizard.next}" styleClass="wizardButton" disabled="#{CheckinCheckoutBean.fileName == null}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" disabled="#{CheckinCheckoutBean.fileName == null}" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>

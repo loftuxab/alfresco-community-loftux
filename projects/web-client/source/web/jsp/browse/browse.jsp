@@ -327,14 +327,6 @@
                            <h:graphicImage url="/images/icons/locked.gif" width="15" height="12" rendered="#{r.locked == true}" />
                         </a:column>
                         
-                        <%-- Description column for all view modes --%>
-                        <a:column style="text-align:left">
-                           <f:facet name="header">
-                              <a:sortLink label="Description" value="description" styleClass="header"/>
-                           </f:facet>
-                           <h:outputText value="#{r.description}" />
-                        </a:column>
-                        
                         <%-- Created Date column for details view mode --%>
                         <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
                            <f:facet name="header">
@@ -388,6 +380,11 @@
                               <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" />
                               <a:booleanEvaluator value="#{r.locked == false && r.workingCopy == false}">
                                  <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" actionListener="#{BrowseBean.setupContentAction}" action="deleteFile">
+                                    <f:param name="id" value="#{r.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
+                              <a:booleanEvaluator value="#{r.workingCopy == true}"> <%-- TODO: add "|| r.locked == true" later if possible to do --%>
+                                 <a:actionLink value="#{msg.undocheckout}" image="/images/icons/UndoCheckOut_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>

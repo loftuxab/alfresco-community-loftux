@@ -369,8 +369,8 @@ public class BrowseBean implements IContextListener
             else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
             {
                // special properties to be used by the value binding components on the page
-               node.put("locked", RepoUtils.isNodeLocked(nodeService, lockService, nodeRef));
-               node.put("workingCopy", RepoUtils.isWorkingCopy(nodeService, nodeRef));
+               node.put("locked", RepoUtils.isNodeLocked(node, lockService, nodeRef));
+               node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_WORKING_COPY));
                node.put("url", DownloadContentServlet.generateURL(nodeRef, node.getName()));
                
                this.contentNodes.add(node);
@@ -426,8 +426,8 @@ public class BrowseBean implements IContextListener
                else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
                {
                   // special properties to be used by the value binding components on the page
-                  node.put("locked", RepoUtils.isNodeLocked(nodeService, lockService, nodeRef));
-                  node.put("workingCopy", RepoUtils.isWorkingCopy(nodeService, nodeRef));
+                  node.put("locked", RepoUtils.isNodeLocked(node, lockService, nodeRef));
+                  node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_WORKING_COPY));
                   node.put("url", DownloadContentServlet.generateURL(nodeRef, node.getName()));
                   
                   this.contentNodes.add(node);
