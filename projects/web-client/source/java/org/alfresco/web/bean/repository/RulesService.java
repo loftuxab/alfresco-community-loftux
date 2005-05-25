@@ -29,8 +29,8 @@ public class RulesService
       ArrayList<RuleAction> ruleActions = new ArrayList<RuleAction>(8);
       ruleActions.add(new RuleAction("simple-workflow", "Add simple workflow to content",
                         "This will add a simple workflow to the matched content. This " +
-                        "will allow the content to be moved to a different space for " +
-                        "its next step in a workflow.  You can also give a space for " +
+                        "will allow the content to be moved to a different location for " +
+                        "its next step in a workflow.  You can also give a location for " +
                         "it to be moved to if you want a reject step"));
       ruleActions.add(new RuleAction("link-category", "Link content to category",
                         "This will apply a category to the matched content."));
@@ -38,10 +38,10 @@ public class RulesService
                         "This will add a feature to the matched content."));
       ruleActions.add(new RuleAction("copy", "Create a copy of content in a given format at " +
                         "a specific location",
-                        "This will copy the matched content to another location with a" +
+                        "This will copy the matched content to another location with a " +
                         "specific format."));
-      ruleActions.add(new RuleAction("move", "Move content to a specific space",
-                        "This will move the matched content to another space."));
+      ruleActions.add(new RuleAction("move", "Move content to a specific location",
+                        "This will move the matched content to another location."));
       ruleActions.add(new RuleAction("email", "Send an email to specified users",
                         "This will send an email to a list of users when the content matches."));
       ruleActions.add(new RuleAction("check-in", "Check in content",
@@ -59,9 +59,9 @@ public class RulesService
    {
       ArrayList<RuleCondition> ruleConditions = new ArrayList<RuleCondition>(3);
       ruleConditions.add(new RuleCondition("no-condition", "All Content", 
-                           "This condition will match any item of content added to the space. " +
-                           "Use this when you wish to apply an action to everything when it is " +
-                           "added to the space."));
+                           "This condition will match any item of content added to this location. " +
+                           "Use this when you wish to apply an action to everything " +
+                           "added to this location."));
       ruleConditions.add(new RuleCondition("in-category", "Content in a specific category", 
                            "The rule is applied to all content that has a specific category"));
       ruleConditions.add(new RuleCondition("contains-text", "Content which contains " +

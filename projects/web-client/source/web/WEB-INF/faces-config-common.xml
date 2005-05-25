@@ -78,7 +78,21 @@
       <component-type>org.alfresco.faces.StringEqualsEvaluator</component-type>
       <component-class>org.alfresco.web.ui.common.component.evaluator.StringEqualsEvaluator</component-class>
    </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.DynamicDescription</component-type>
+      <component-class>org.alfresco.web.ui.common.component.description.UIDynamicDescription</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.Description</component-type>
+      <component-class>org.alfresco.web.ui.common.component.description.UIDescription</component-class>
+   </component>
 
+   <component>
+      <component-type>org.alfresco.faces.Descriptions</component-type>
+      <component-class>org.alfresco.web.ui.common.component.description.UIDescriptions</component-class>
+   </component>
 
    <!-- ==================== CONVERTERS ==================== -->
    <converter>

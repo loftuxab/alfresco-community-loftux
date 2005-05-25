@@ -22,6 +22,8 @@
       --%>
       <h:commandButton id="show-image-picker" value="Image Picker Zoo" action="showImagePickerZoo" />
       <br/><br/>
+      <h:commandButton id="dyna-desc" value="Dynamic Description Zoo" action="showDynaDescZoo" />
+      <br/><br/>
       <h:commandButton id="show-user-list" value="UserList Test Pages" action="showUserlist" />
       
       <p/><p/>

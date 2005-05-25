@@ -105,16 +105,21 @@
                                  <tr>
                                     <td>Action:</td>
                                     <td>
-                                       <h:selectOneMenu value="#{NewRuleWizard.action}">
+                                       <h:selectOneMenu value="#{NewRuleWizard.action}"
+                                          onchange="javascript:itemSelected(this);">
                                           <f:selectItems value="#{NewRuleWizard.actions}" />
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>Description:</td>
+                                    <td valign="top">Description:</td>
                                     <td>
-                                       &lt;description of action goes here&gt;
+                                       <div style="width: 300px">
+                                          <a:dynamicDescription selected="#{NewRuleWizard.action}">
+                                             <a:descriptions value="#{NewRuleWizard.actionDescriptions}" />
+                                          </a:dynamicDescription>
+                                       </div>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

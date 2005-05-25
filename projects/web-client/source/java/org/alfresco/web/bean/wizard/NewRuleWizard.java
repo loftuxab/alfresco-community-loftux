@@ -1,14 +1,16 @@
 package org.alfresco.web.bean.wizard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.model.SelectItem;
 
 import org.alfresco.web.bean.repository.RulesService;
-import org.alfresco.web.bean.repository.RulesService.RuleType;
 import org.alfresco.web.bean.repository.RulesService.RuleAction;
 import org.alfresco.web.bean.repository.RulesService.RuleCondition;
+import org.alfresco.web.bean.repository.RulesService.RuleType;
 import org.apache.log4j.Logger;
 
 /**
@@ -40,6 +42,8 @@ public class NewRuleWizard extends AbstractWizardBean
    private List<SelectItem> types;
    private List<SelectItem> conditions;
    private List<SelectItem> actions;
+   private Map<String, String> conditionDescriptions;
+   private Map<String, String> actionDescriptions;
    
    /**
     * Deals with the finish button being pressed
@@ -220,8 +224,8 @@ public class NewRuleWizard extends AbstractWizardBean
       this.name = null;
       this.description = null;
       this.type = "inbound";
-      this.action = null;
-      this.condition = null;
+      this.action = "simple-workflow";
+      this.condition = "no-condition";
       
       if (this.actions != null)
       {
@@ -233,6 +237,18 @@ public class NewRuleWizard extends AbstractWizardBean
       {
          this.conditions.clear();
          this.conditions = null;
+      }
+      
+      if (this.conditionDescriptions != null)
+      {
+         this.conditionDescriptions.clear();
+         this.conditionDescriptions = null;
+      }
+      
+      if (this.actionDescriptions != null)
+      {
+         this.actionDescriptions.clear();
+         this.actionDescriptions = null;
       }
    }
    
@@ -347,13 +363,33 @@ public class NewRuleWizard extends AbstractWizardBean
       {
          List<RuleAction> ruleActions = rulesService.getRuleActions();
          this.actions = new ArrayList<SelectItem>();
+         this.actionDescriptions = new HashMap<String, String>();
          for (RuleAction ruleAction : ruleActions)
          {
             this.actions.add(new SelectItem(ruleAction.getId(), ruleAction.getName()));
+            this.actionDescriptions.put(ruleAction.getId(), ruleAction.getDescription());
          }
       }
       
       return this.actions;
+   }
+   
+   /**
+    * @return Returns a map of all the action descriptions 
+    */
+   public Map<String, String> getActionDescriptions()
+   {
+      if (this.actionDescriptions == null)
+      {
+         List<RuleAction> ruleActions = rulesService.getRuleActions();
+         this.actionDescriptions = new HashMap<String, String>();
+         for (RuleAction ruleAction : ruleActions)
+         {
+            this.actionDescriptions.put(ruleAction.getId(), ruleAction.getDescription());
+         }
+      }
+      
+      return this.actionDescriptions;
    }
 
    /**
@@ -372,6 +408,24 @@ public class NewRuleWizard extends AbstractWizardBean
       }
       
       return this.conditions;
+   }
+   
+   /**
+    * @return Returns a map of all the condition descriptions 
+    */
+   public Map<String, String> getConditionDescriptions()
+   {
+      if (this.conditionDescriptions == null)
+      {
+         List<RuleCondition> ruleConditions = rulesService.getRuleConditions();
+         this.conditionDescriptions = new HashMap<String, String>();
+         for (RuleCondition ruleCondition : ruleConditions)
+         {
+            this.conditionDescriptions.put(ruleCondition.getId(), ruleCondition.getDescription());
+         }
+      }
+      
+      return this.conditionDescriptions;
    }
 
    /**

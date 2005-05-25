@@ -66,6 +66,10 @@
          <to-view-id>/jsp/zoo/image-picker.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>showDynaDescZoo</from-outcome>
+         <to-view-id>/jsp/zoo/dynamic-description.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>showWebClient</from-outcome>
          <to-view-id>/jsp/browse/browse.jsp</to-view-id>
       </navigation-case>

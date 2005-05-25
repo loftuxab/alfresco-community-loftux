@@ -1106,4 +1106,98 @@
       </attribute>
    </tag>
 
+   <tag>
+      <name>dynamicDescription</name>
+      <tagclass>org.alfresco.web.ui.common.tag.description.DynamicDescriptionTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <description>
+         Displays a description that dynamically changes when another input
+         control on the page changes state
+      </description>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>selected</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>functionName</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
+   
+   <tag>
+      <name>description</name>
+      <tagclass>org.alfresco.web.ui.common.tag.description.DescriptionTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <description>Represents a description option</description>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>controlValue</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>text</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>      
+   </tag>
+   
+   <tag>
+      <name>descriptions</name>
+      <tagclass>org.alfresco.web.ui.common.tag.description.DescriptionsTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <description>Represents description options held in a Map object</description>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+   </tag>
+   
 </taglib>

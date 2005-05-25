@@ -19,10 +19,10 @@ public class DummyBean
    public DummyBean()
    {
       this.properties = new Properties();
-      this.properties.put("one", "");
-      this.properties.put("two", "");
-      this.properties.put("three", "");
-      this.properties.put("four", "");
+      this.properties.put("one", "This is 1");
+      this.properties.put("two", "This is 2");
+      this.properties.put("three", "This is 3");
+      this.properties.put("four", "This is 4");
    }
    
    public Properties getProperties()

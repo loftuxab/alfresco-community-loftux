@@ -12,17 +12,6 @@
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
-   
-<script language='JavaScript'>
-   var m_currentDescription = 'desc-container';
-         
-   function itemSelected(radioButton)
-   {
-      document.getElementById(m_currentDescription).style.display = 'none';  
-      m_currentDescription = 'desc-' + radioButton.value;
-      document.getElementById(m_currentDescription).style.display = 'inline';
-   }
-</script>
 
 <f:view>
    
@@ -146,15 +135,14 @@
                                                 <h:graphicImage id="info-icon" url="/images/icons/info_icon.gif" />
                                              </td>
                                              <td valign='top' align='left'>
-                                                <span id='desc-container' style='display: inline'>
-                                                A place for keeping and organising documents and other spaces.
-                                                </span>
-                                                <span id='desc-discussion' style='display: none'>
-                                                A place for discussing the subject of this Space.
-                                                </span>
-                                                <span id='desc-wiki' style='display: none'>
-                                                A place to store Wiki pages.
-                                                </span>
+                                                <a:dynamicDescription selected="#{NewSpaceWizard.spaceType}">
+                                                   <a:description controlValue="container" 
+                                                      text="A place for keeping and organising documents and other spaces." />
+                                                   <a:description controlValue="discussion" 
+                                                      text="A place for discussing the subject of this space." />
+                                                   <a:description controlValue="wiki" 
+                                                      text="A place to store wiki pages." />
+                                                </a:dynamicDescription>
                                              </td>
                                           </tr>
                                        </table>
