@@ -4,6 +4,7 @@
 package org.alfresco.repo.rule;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +26,16 @@ public class Rule implements Serializable
 	 * The rule type
 	 */
 	private RuleType ruleType;
+
+	/**
+	 * The title
+	 */
+	private String title;
+
+	/**
+	 * The description
+	 */
+	private String description;
 	
 	/**
 	 * Constructor
@@ -33,6 +44,13 @@ public class Rule implements Serializable
 	 */
 	public Rule(RuleType ruleType)
 	{
+		if (ruleType == null)
+		{
+			// Error since the passed rule type is null
+			throw new RuleServiceException("A rule must have a rule type specified.");
+		}
+		
+		// Set the rule type
 		this.ruleType = ruleType;
 	}
 	
@@ -43,7 +61,7 @@ public class Rule implements Serializable
 	 */
 	public RuleType getRuleType()
 	{
-		throw new UnsupportedOperationException();
+		return this.ruleType;
 	}
 	
 	/**
@@ -53,7 +71,7 @@ public class Rule implements Serializable
 	 */
 	public String getTitle()
 	{
-		throw new UnsupportedOperationException();
+		return this.title;
 	}
 	
 	/**
@@ -63,7 +81,7 @@ public class Rule implements Serializable
 	 */
 	public void setTitle(String title)
 	{
-		throw new UnsupportedOperationException();
+		this.title = title;
 	}
 	
 	/**
@@ -73,7 +91,7 @@ public class Rule implements Serializable
 	 */
 	public String getDescription()
 	{
-		throw new UnsupportedOperationException();
+		return this.description;
 	}
 	
 	/**
@@ -83,92 +101,69 @@ public class Rule implements Serializable
 	 */
 	public void setDescription(String description)
 	{
-		throw new UnsupportedOperationException();
+		this.description = description;
 	}
 	
 	/**
-	 * Get the condition for the rule
 	 * 
-	 * @return  the rule condition
+	 * @param ruleCondition
+	 * @param parameterValues
+	 * @return
 	 */
-	public RuleCondition getRuleCondition()
+	public RuleItemInstance<RuleCondition> addRuleCondition(
+			RuleCondition ruleCondition, 
+			Map<String, Serializable> parameterValues) 
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	/**
-	 * Set the condition for the rule
 	 * 
-	 * @param ruleCondition  the rule condition
+	 * @return
 	 */
-	public void setRuleCondition(RuleCondition ruleCondition)
+	public List<RuleItemInstance<RuleCondition>> getRuleConditions()
+	{
+		throw new UnsupportedOperationException();
+	}		
+	
+	/**
+	 * 
+	 * @param ruleItemInstance
+	 */
+	public void removeRuleCondition(RuleItemInstance<RuleCondition> ruleItemInstance)
+	{
+		throw new UnsupportedOperationException();
+	}	
+	
+	/**
+	 * 
+	 * @param ruleAction
+	 * @param parameterValues
+	 * @return
+	 */
+	public RuleItemInstance<RuleAction> addRuleAction(
+			RuleAction ruleAction,
+			Map<String, Serializable> parameterValues)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	/**
-	 * Get the condition parameter values
-	 * <p>
-	 * Returns a map containing the name of the parameter and the 
-	 * value.
 	 * 
-	 * @return	the parameter values of the condition
+	 * @return
 	 */
-	public Map<String, Serializable> getRuleConditionParameterValues()
+	public List<RuleItemInstance<RuleAction>> getRuleActions()
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	/**
-	 * Set the condition parameter values
 	 * 
-	 * @param parameterValues  the condition parameter values
+	 * @param ruleItemInstance
 	 */
-	public void setRuleConditionParameterValues(Map<String, Serializable> parameterValues) 
+	public void removeRuleAction(RuleItemInstance<RuleAction> ruleItemInstance)
 	{
 		throw new UnsupportedOperationException();
 	}
-	
-	/**
-	 * Get the action for the rule
-	 * 
-	 * @return  the rule action 
-	 */
-	public RuleAction getRuleAction()
-	{
-		throw new UnsupportedOperationException();	
-	}
-	
-	/**
-	 * Set the action for the rule.
-	 * 
-	 * @param ruleAction	the rule action 
-	 */
-	public void setRuleAction(RuleAction ruleAction)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * Get the action parameter values.
-	 * <p>
-	 * Returns a map containing the parameter name and value.
-	 * 
-	 * @return	the action parameter values
-	 */
-	public Map<String, Serializable> getRuleActionParameterValues()
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * Set the action parameter values.
-	 * 
-	 * @param parameterValues	the action parameter values
-	 */
-	public void setRuleActionParameterValues(Map<String, Serializable> parameterValues) 
-	{
-		throw new UnsupportedOperationException();
-	}
-	
 }
+
