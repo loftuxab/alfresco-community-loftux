@@ -37,7 +37,7 @@ public class NavigationBean
 {
    public NavigationBean()
    {
-      // TODO: remove this test code - to kick off the breadcrumb path and root node Id
+      // kick off the breadcrumb path and our root node Id
       List<IBreadcrumbHandler> elements = new ArrayList(1);
       elements.add(new NavigationBreadcrumbHandler(Application.COMPANY_SPACE_NAME));
       setLocation(elements);
@@ -242,8 +242,7 @@ public class NavigationBean
        */
       public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
-         // TODO: replace this temp code one we have home folders etc.!
-         // TEMP!
+         // set the current node to the user home folder node ID
          FacesContext fc = FacesContext.getCurrentInstance();
          setCurrentNodeId(Application.getCurrentUser(fc).getHomeSpaceId());
          setLocation( (List)breadcrumb.getValue() );

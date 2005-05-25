@@ -3,7 +3,6 @@
  */
 package org.alfresco.web.bean;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,12 +13,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
-import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
-import org.alfresco.repo.lock.LockStatus;
-import org.alfresco.repo.lock.LockType;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -28,8 +24,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.Searcher;
-import org.alfresco.repo.value.ValueConverter;
-import org.alfresco.repo.version.operations.VersionOperationsService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
@@ -283,7 +278,7 @@ public class BrowseBean implements IContextListener
     */
    public void contextUpdated()
    {
-      logger.info("*****contextUpdated() listener called");
+      logger.debug("*****contextUpdated() listener called");
       invalidateComponents();
    }
    
@@ -466,25 +461,37 @@ public class BrowseBean implements IContextListener
    {
       String query;
       
-      // search against the "name" attribute
+      // the QName for the well known "name" attribute
       String nameAttr = RepoUtils.escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "name"));
+      
+      // match against the "name" attribute
+      String nameAttrQuery = " +@" + nameAttr + ":\"" + text + "*\"";
+      
+      // match against content text
+      String contentQuery = " TEXT:\"" + text + "\"";
+      
+      // match against FILE type
+      String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"";
+      
+      // match against FOLDER type
+      String folderTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"";
       
       switch (mode)
       {
          case UISimpleSearch.SEARCH_ALL:
-            query = "+@" + nameAttr + ":\"" + text + "*\"";
+            query = "(" + nameAttrQuery + ") OR " + contentQuery;
             break;
          
          case UISimpleSearch.SEARCH_FILE_NAMES:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\""   + " +@" + nameAttr + ":\"" + text + "*\"";
+            query = fileTypeQuery + nameAttrQuery;
             break;
          
          case UISimpleSearch.SEARCH_FILE_NAMES_CONTENTS:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\""   + " +@" + nameAttr + ":\"" + text + "*\"";
+            query = "(" + fileTypeQuery + nameAttrQuery + ") OR " + contentQuery;
             break;
          
          case UISimpleSearch.SEARCH_SPACE_NAMES:
-            query = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +@" + nameAttr + ":\"" + text + "*\"";
+            query = folderTypeQuery + nameAttrQuery;
             break;
          
          default:
@@ -632,6 +639,7 @@ public class BrowseBean implements IContextListener
          setActionSpace(null);
       }
       
+      // clear the UI state in preparation for finishing the next action
       invalidateComponents();
    }
    
@@ -674,6 +682,9 @@ public class BrowseBean implements IContextListener
       {
          setDocument(null);
       }
+      
+      // clear the UI state in preparation for finishing the next action
+      invalidateComponents();
    }
    
    /**
@@ -717,7 +728,7 @@ public class BrowseBean implements IContextListener
                      else
                      {
                         // TODO: shouldn't do this - but for now the user home dir is the root!
-                        navigator.setCurrentNodeId(null);
+                        navigator.setCurrentNodeId(Application.getCurrentUser(FacesContext.getCurrentInstance()).getHomeSpaceId());
                      }
                   }
                }
@@ -763,8 +774,6 @@ public class BrowseBean implements IContextListener
             
             // clear action context
             setDocument(null);
-            
-            invalidateComponents();
             
             // setting the outcome will show the browse view again
             outcome = "browse";
@@ -907,11 +916,6 @@ public class BrowseBean implements IContextListener
    public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
    
    private static Logger logger = Logger.getLogger(BrowseBean.class);
-   
-   //private static final String SEARCH_ALL               = "+PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   //private static final String SEARCH_FILE_NAME         = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   //private static final String SEARCH_FILE_NAME_CONTENT = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
-   //private static final String SEARCH_FOLDER_NAME       = "+TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"" + " +PATH:\"//" + NamespaceService.ALFRESCO_PREFIX + ":*\" +QNAME:{0}*";
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;

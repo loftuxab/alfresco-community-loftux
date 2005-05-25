@@ -259,6 +259,10 @@ public class CheckinCheckoutBean
             
             // remember the document
             setDocument(node);
+            
+            // refresh the UI, calling this method now is fine as it basically makes sure certain
+            // beans clear the state - so when we finish here other beans will have been reset
+            UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
          }
          catch (InvalidNodeRefException refErr)
          {
@@ -311,7 +315,7 @@ public class CheckinCheckoutBean
             {
                workingCopyName = originalName + WORKING_COPY;
             }
-            this.nodeService.setProperty(workingCopyRef, QNAME_NAME, workingCopyName);
+            this.nodeService.setProperty(workingCopyRef, RepoUtils.QNAME_NAME, workingCopyName);
             this.nodeService.setProperty(workingCopyRef, QNAME_ORIGINALNAME, originalName);
             
             // set the working copy Node instance
@@ -360,9 +364,6 @@ public class CheckinCheckoutBean
          setDocument(null);
          setWorkingDocument(null);
          
-         // refresh the UI, and setting the outcome will show the browse view
-         UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
-         
          outcome = "browse";
       }
       else
@@ -389,9 +390,6 @@ public class CheckinCheckoutBean
             this.versionOperationsService.cancelCheckout(node.getNodeRef());
             
             clearUpload();
-            
-            // refresh the UI, and setting the outcome will show the browse view
-            UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
             
             outcome = "browse";
          }
@@ -436,7 +434,7 @@ public class CheckinCheckoutBean
             
             // switch the name back to the original name before checkin
             // otherwise the working copy name will get set on the original doc!
-            this.nodeService.setProperty(node.getNodeRef(), QNAME_NAME, origNameProp);
+            this.nodeService.setProperty(node.getNodeRef(), RepoUtils.QNAME_NAME, origNameProp);
             
             // we can either checkin the content from the current working copy node
             // which would have been previously updated by the user
@@ -472,7 +470,7 @@ public class CheckinCheckoutBean
             // restore working copy name after checkin copy opp
             if (this.keepCheckedOut == true)
             {
-               this.nodeService.setProperty(node.getNodeRef(), QNAME_NAME, nameProp);
+               this.nodeService.setProperty(node.getNodeRef(), RepoUtils.QNAME_NAME, nameProp);
             }
             
             // commit the transaction
@@ -481,9 +479,6 @@ public class CheckinCheckoutBean
             // clear action context
             setDocument(null);
             clearUpload();
-            
-            // refresh the UI, setting the outcome will show the browse view
-            UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
             
             outcome = "browse";
          }
@@ -534,9 +529,6 @@ public class CheckinCheckoutBean
             // clear action context
             setDocument(null);
             clearUpload();
-            
-            // refresh the UI, setting the outcome will show the browse view
-            UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
             
             outcome = "browse";
          }
@@ -601,7 +593,6 @@ public class CheckinCheckoutBean
    private static final String COPYLOCATION_OTHER   = "other";
    
    /** well known QName values */
-   private static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
    private static final QName QNAME_ORIGINALNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "originalName");
    
    /** The current document */

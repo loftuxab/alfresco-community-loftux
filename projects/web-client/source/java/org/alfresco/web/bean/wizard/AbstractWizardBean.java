@@ -1,9 +1,11 @@
 package org.alfresco.web.bean.wizard;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.search.Searcher;
+import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.NavigationBean;
 import org.apache.log4j.Logger;
 
@@ -74,6 +76,10 @@ public abstract class AbstractWizardBean
     */
    public void startWizard(ActionEvent event)
    {
+      // refresh the UI, calling this method now is fine as it basically makes sure certain
+      // beans clear the state - so when we finish the wizard other beans will have been reset
+      UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
+      
       // initialise the wizard in case we are launching 
       // after it was navigated away from
       init();
