@@ -8,9 +8,14 @@
 package org.alfresco.repo.search;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
@@ -32,7 +37,7 @@ public class CannedQueryDefImpl implements CannedQueryDef
 
     private String language;
 
-    private List<QueryParameterDefinition> queryParameterDefs;
+    private Map<QName, QueryParameterDefinition> queryParameterDefs = new HashMap<QName, QueryParameterDefinition>();
 
     String query;
 
@@ -44,7 +49,10 @@ public class CannedQueryDefImpl implements CannedQueryDef
         this.qName = qName;
         this.language = language;
         this.query = query;
-        this.queryParameterDefs = queryParameterDefs;
+        for(QueryParameterDefinition paramDef : queryParameterDefs)
+        {
+            this.queryParameterDefs.put(paramDef.getQName(), paramDef);
+        }
         this.container = container;
     }
 
@@ -58,9 +66,9 @@ public class CannedQueryDefImpl implements CannedQueryDef
         return language;
     }
 
-    public List<QueryParameterDefinition> getQueryParameterDefs()
+    public Collection<QueryParameterDefinition> getQueryParameterDefs()
     {
-        return queryParameterDefs;
+        return Collections.unmodifiableCollection(queryParameterDefs.values());
     }
 
     public String getQuery()
@@ -73,7 +81,7 @@ public class CannedQueryDefImpl implements CannedQueryDef
         return container.getNamespacePrefixResolver();
     }
 
-    public static CannedQueryDefImpl createCannedQuery(Element element, DictionaryService dictionaryService, QueryCollection container)
+    public static CannedQueryDefImpl createCannedQuery(Element element, DictionaryService dictionaryService, QueryCollection container, NamespacePrefixResolver nspr)
     {
         if (element.getQName().getName().equals(ELEMENT_QNAME.getName()))
         {
@@ -104,7 +112,7 @@ public class CannedQueryDefImpl implements CannedQueryDef
             for(Iterator it = list.iterator(); it.hasNext(); /**/)
             {
                 Element defElement = (Element) it.next();
-                NamedQueryParameterDefinition nqpd = QueryParameterDefImpl.createParameterDefinition(defElement, dictionaryService);
+                NamedQueryParameterDefinition nqpd = QueryParameterDefImpl.createParameterDefinition(defElement, dictionaryService, nspr);
                 queryParameterDefs.add(nqpd.getQueryParameterDefinition());
             }
             
@@ -113,7 +121,12 @@ public class CannedQueryDefImpl implements CannedQueryDef
             {
                 Element refElement = (Element) it.next();
                 NamedQueryParameterDefinition nqpd = QueryParameterRefImpl.createParameterReference(refElement, dictionaryService, container);
-                queryParameterDefs.add(nqpd.getQueryParameterDefinition());
+                QueryParameterDefinition  resolved = nqpd.getQueryParameterDefinition();
+                if(resolved == null)
+                {
+                    throw new AlfrescoRuntimeException("Unable to find refernce parameter : "+nqpd.getQName());
+                }
+                queryParameterDefs.add(resolved);
             }
             
             return new CannedQueryDefImpl(qName, language, query, queryParameterDefs, container);
@@ -128,6 +141,11 @@ public class CannedQueryDefImpl implements CannedQueryDef
     public static org.dom4j.QName getElementQName()
     {
         return ELEMENT_QNAME;
+    }
+
+    public Map<QName, QueryParameterDefinition> getQueryParameterMap()
+    {
+        return Collections.unmodifiableMap(queryParameterDefs);
     }
 
 }

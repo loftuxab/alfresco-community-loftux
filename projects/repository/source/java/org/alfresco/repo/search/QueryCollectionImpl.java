@@ -121,7 +121,7 @@ public class QueryCollectionImpl implements QueryCollection
             for(Iterator it = list.iterator(); it.hasNext(); /**/)
             {
                 Element defElement = (Element) it.next();
-                QueryParameterDefinition paramDef = QueryParameterDefImpl.createParameterDefinition(defElement, dictionaryService);
+                QueryParameterDefinition paramDef = QueryParameterDefImpl.createParameterDefinition(defElement, dictionaryService, nspr);
                 parameters.put(paramDef.getQName(), paramDef);
             }
             
@@ -131,7 +131,7 @@ public class QueryCollectionImpl implements QueryCollection
             for(Iterator it = list.iterator(); it.hasNext(); /**/)
             {
                 Element defElement = (Element) it.next();
-                CannedQueryDefImpl queryDef = CannedQueryDefImpl.createCannedQuery(defElement, dictionaryService, collection);
+                CannedQueryDefImpl queryDef = CannedQueryDefImpl.createCannedQuery(defElement, dictionaryService, collection, nspr);
                 collection.addQueryDefinition(queryDef);
             }
             

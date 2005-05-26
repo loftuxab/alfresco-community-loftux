@@ -45,7 +45,7 @@ public class QueryParameterRefImpl implements NamedQueryParameterDefinition
             Element qNameElement = element.element(DEF_QNAME.getName());
             if(qNameElement != null)
             {
-               qName = QName.createQName(qNameElement.getText());
+               qName = QName.createQName(qNameElement.getText(), container.getNamespacePrefixResolver());
             }
             
             return new QueryParameterRefImpl(qName, container);

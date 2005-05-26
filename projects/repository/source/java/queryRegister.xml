@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE query-register PUBLIC '-//ALFRESCO//DTD QUERY//EN' 'queryRegister.dtd'>
+<!--<!DOCTYPE query-register PUBLIC '-//ALFRESCO//DTD QUERY//EN' 'queryRegister.dtd'>-->
 <query-register>
     <name>test-query-register</name>
     <namespaces>
@@ -32,4 +32,36 @@
         </parameter-definition>
         <query>+QNAME:$alf:query-parameter-name</query>
     </query-definition>
+    
+    
+    <query-definition>
+        <qname>alf:test1</qname>
+        <language>lucene</language>
+        <query>TEXT:fox</query>
+    </query-definition>
+    
+    <query-definition>
+        <qname>alf:test2</qname>
+        <language>lucene</language>
+        <parameter-definition>
+            <qname>alf:banana</qname>
+            <type>alf:string</type>
+            <default-value>fox</default-value>
+        </parameter-definition>
+        <query>TEXT:${alf:banana}</query>
+    </query-definition>
+    
+    <query-definition>
+        <qname>alf:test3</qname>
+        <language>lucene</language>
+        <parameter-definition>
+            <qname>alf:banana</qname>
+            <type>alf:string</type>
+            <default-value>fox</default-value>
+        </parameter-definition>
+        <query>PATH:"${alf:banana}"</query>
+    </query-definition>
+    
+    
+    
 </query-register>

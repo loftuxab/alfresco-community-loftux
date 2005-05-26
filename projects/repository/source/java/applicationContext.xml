@@ -356,6 +356,9 @@
         <property name="contentService">
             <ref bean="contentService"/>
         </property>
+        <property name="queryRegister">
+            <ref bean="queryRegisterComponent"/>
+        </property>
     </bean>
     
     <!-- Support for locking lucene indexes for deletion and update -->
@@ -675,6 +678,22 @@
       <property name="triggers">
          <list>
             <ref local="ftsIndexerTrigger"/>
+         </list>
+      </property>
+   </bean>
+   
+   <!-- Query Register Component -->
+   
+   <bean id="queryRegisterComponent" class="org.alfresco.repo.search.QueryRegisterComponentImpl">
+      <property name="dictionaryService">
+         <ref bean="dictionaryService" />
+      </property>
+      <property name="namespaceService">
+          <ref bean="namespaceService"/>
+      </property>
+      <property name="collections">
+         <list>
+            <value>queryRegister.xml</value>
          </list>
       </property>
    </bean>

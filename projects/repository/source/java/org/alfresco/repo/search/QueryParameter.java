@@ -3,6 +3,10 @@
  */
 package org.alfresco.repo.search;
 
+import java.io.Serializable;
+
+import org.alfresco.repo.ref.QName;
+
 /**
  * Encapsulates a query parameter
  * 
@@ -11,8 +15,28 @@ package org.alfresco.repo.search;
  */
 public class QueryParameter
 {
-    private String name;
+    private QName qName;
 
-    private String value;
+    private Serializable value;
 
+    public QueryParameter(QName qName, Serializable value)
+    {
+        this.qName = qName;
+        this.value = value;
+    }
+
+    public QName getQName()
+    {
+        return qName;
+    }
+    
+
+    public Serializable getValue()
+    {
+        return value;
+    }
+    
+    
+    
+    
 }

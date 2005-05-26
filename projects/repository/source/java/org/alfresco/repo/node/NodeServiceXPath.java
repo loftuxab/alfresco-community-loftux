@@ -96,6 +96,8 @@ public class NodeServiceXPath extends BaseXPath
             String attributeValue = StringFunction.evaluate(attributeName, nav);
             String patternValue = StringFunction.evaluate(pattern, nav);
 
+            // TODO:  Ignore the pattern for now
+            // Should do a type pattern test
             NodeRef nodeRef = new NodeRef(attributeValue);
             
             DocumentNavigator dNav = (DocumentNavigator)nav;

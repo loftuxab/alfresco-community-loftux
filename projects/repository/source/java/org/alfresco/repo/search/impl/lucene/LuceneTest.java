@@ -3,7 +3,6 @@ package org.alfresco.repo.search.impl.lucene;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -30,10 +29,15 @@ import org.alfresco.repo.dictionary.metamodel.MetaModelDAO;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NamespaceException;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.repo.search.QueryParameter;
+import org.alfresco.repo.search.QueryParameterDefImpl;
+import org.alfresco.repo.search.QueryParameterDefinition;
+import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
@@ -111,6 +115,10 @@ public class LuceneTest extends TestCase
 
                                                 private ContentService contentService;
 
+                                                private QueryRegisterComponent queryRegisterComponent;
+
+                                                private NamespacePrefixResolver namespacePrefixResolver;
+
     public LuceneTest()
     {
         super();
@@ -125,6 +133,8 @@ public class LuceneTest extends TestCase
         metaModelDAO = (MetaModelDAO) ctx.getBean("metaModelDAO");
         luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
         contentService = (ContentService) ctx.getBean("contentService");
+        queryRegisterComponent = (QueryRegisterComponent) ctx.getBean("queryRegisterComponent");
+        namespacePrefixResolver = (NamespacePrefixResolver) ctx.getBean("namespaceService");
 
         assertEquals(true, ctx.isSingleton("luceneIndexLock"));
         assertEquals(true, ctx.isSingleton("LuceneFullTextSearchIndexer"));
@@ -210,15 +220,15 @@ public class LuceneTest extends TestCase
         n14 = nodeService.createNode(n13, null, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_QNAME_CONTENT, contentProperties).getChildRef();
 
         Map<QName, Serializable> properties = nodeService.getProperties(n14);
-        //properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "application/msword");
+        properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+        //properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "application/msword");
         properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
         nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_CONTENT, properties);
         
         ContentWriter writer = contentService.getUpdatingWriter(n14);
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("test.doc");
-        writer.putContent(is);
-        
+        //InputStream is = this.getClass().getClassLoader().getResourceAsStream("test.doc");
+        //writer.putContent(is);
+        writer.putContent("The quick brown fox jumped over the lazy dog");
         
         nodeService.addChild(rootNodeRef, n8, QName.createQName("{namespace}eight-0"));
         nodeService.addChild(n1, n8, QName.createQName("{namespace}eight-1"));
@@ -659,6 +669,7 @@ public class LuceneTest extends TestCase
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
         searcher.setNamespaceService(new MockNameService("namespace"));
+        searcher.setQueryRegister(queryRegisterComponent);
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -908,6 +919,42 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         results.close();
       
+        // FTS test
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TEXT:\"fox\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+        
+        QName queryQName = QName.createQName("alf:test1", namespacePrefixResolver);
+        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, null );
+        assertEquals(1, results.length());
+        results.close();
+        
+        // Parameters
+        
+        queryQName = QName.createQName("alf:test2", namespacePrefixResolver);
+        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, null );
+        assertEquals(1, results.length());
+        results.close();
+        
+        queryQName = QName.createQName("alf:test2", namespacePrefixResolver);
+        QueryParameter qp = new QueryParameter(QName.createQName("alf:banana", namespacePrefixResolver), "woof");
+        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, new QueryParameter[]{qp} );
+        assertEquals(0, results.length());
+        results.close();
+        
+        queryQName = QName.createQName("alf:test3", namespacePrefixResolver);
+        qp = new QueryParameter(QName.createQName("alf:banana", namespacePrefixResolver), "/one/five//*");
+        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, new QueryParameter[]{qp} );
+        assertEquals(9, results.length());
+        results.close();
+        
+        // TODO: should not have a null property type definition
+        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:lemur", namespacePrefixResolver), (PropertyTypeDefinition)null, true, "fox");        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TEXT:\"${alf:lemur}\"", null, new QueryParameterDefinition[]{paramDef});
+        assertEquals(1, results.length());
+        results.close();
+    
     }
 
     public void testPathSearch() throws InterruptedException

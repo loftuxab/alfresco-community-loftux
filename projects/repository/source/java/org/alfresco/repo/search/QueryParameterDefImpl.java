@@ -12,6 +12,7 @@ import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.QName;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
@@ -77,7 +78,7 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
         return propertyTypeDefintion;
     }
 
-    public static QueryParameterDefinition createParameterDefinition(Element element, DictionaryService dictionaryService)
+    public static QueryParameterDefinition createParameterDefinition(Element element, DictionaryService dictionaryService,  NamespacePrefixResolver nspr)
     {
 
         if (element.getQName().getName().equals(ELEMENT_QNAME.getName()))
@@ -86,21 +87,21 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
             Element qNameElement = element.element(DEF_QNAME.getName());
             if (qNameElement != null)
             {
-                qName = QName.createQName(qNameElement.getText());
+                qName = QName.createQName(qNameElement.getText(), nspr);
             }
 
             PropertyDefinition propDef = null;
             Element propDefElement = element.element(PROPERTY_QNAME.getName());
             if (propDefElement != null)
             {
-                propDef = dictionaryService.getProperty(QName.createQName(propDefElement.getText()));
+                propDef = dictionaryService.getProperty(QName.createQName(propDefElement.getText(), nspr));
             }
 
             PropertyTypeDefinition typeDef = null;
             Element typeDefElement = element.element(PROPERTY_TYPE_QNAME.getName());
             if (typeDefElement != null)
             {
-                typeDef = dictionaryService.getPropertyType(new DictionaryRef(QName.createQName(typeDefElement.getText())));
+                typeDef = dictionaryService.getPropertyType(new DictionaryRef(QName.createQName(typeDefElement.getText(), nspr)));
             }
 
             boolean hasDefault = false;

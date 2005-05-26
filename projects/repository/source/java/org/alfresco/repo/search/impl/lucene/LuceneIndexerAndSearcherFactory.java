@@ -19,6 +19,7 @@ import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.IndexerException;
+import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.SearcherException;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
@@ -92,6 +93,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private String indexRootLocation;
     
     private ContentService contentService;
+    private QueryRegisterComponent queryRegister;
 
     /**
      * Private constructor for the singleton TODO: FIt in with IOC
@@ -147,6 +149,11 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     public void setIndexRootLocation(String indexRootLocation)
     {
         this.indexRootLocation = indexRootLocation;
+    }
+
+    public void setQueryRegister(QueryRegisterComponent queryRegister)
+    {
+        this.queryRegister = queryRegister;
     }
     
 
@@ -304,7 +311,6 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
             deltaId = getTransactionId(getTransaction());
         }
         LuceneSearcher searcher = getSearcher(storeRef, deltaId);
-        searcher.setNamespaceService(nameSpaceService);
         return searcher;
     }
 
@@ -324,6 +330,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
         searcher.setIndexRootLocation(indexRootLocation);
+        searcher.setQueryRegister(queryRegister);
         return searcher;
     }
 
