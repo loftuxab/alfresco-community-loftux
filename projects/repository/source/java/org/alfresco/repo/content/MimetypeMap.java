@@ -1,7 +1,6 @@
 package org.alfresco.repo.content;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +21,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MimetypeMap
 {
+    public static final String MIMETYPE_TEXT_PLAIN = "text/plain";
+    public static final String MIMETYPE_XML = "text/xml";
+    public static final String MIMETYPE_HTML = "text/html";
+    public static final String MIMETYPE_PDF = "application/pdf";
+    public static final String MIMETYPE_WORD = "application/msword";
+    public static final String MIMETYPE_EXCEL = "application/vnd.excel";
+    
     private static final String CONFIG_AREA = "mimetype-map";
     private static final String CONFIG_CONDITION = "Mimetype Map";
     private static final String ELEMENT_MIMETYPES = "mimetypes";
@@ -35,7 +41,7 @@ public class MimetypeMap
     
     private ConfigService configService;
     
-    private Collection<String> mimetypes;
+    private List<String> mimetypes;
     private Map<String, String> extensionsByMimetype;
     private Map<String, String> mimetypesByExtension;
     private Map<String, String> displaysByMimetype;
@@ -127,11 +133,26 @@ public class MimetypeMap
         }
         
         // make the collections read-only
-        this.mimetypes = Collections.unmodifiableCollection(this.mimetypes);
+        this.mimetypes = Collections.unmodifiableList(this.mimetypes);
         this.extensionsByMimetype = Collections.unmodifiableMap(this.extensionsByMimetype);
         this.mimetypesByExtension = Collections.unmodifiableMap(this.mimetypesByExtension);
         this.displaysByMimetype = Collections.unmodifiableMap(this.displaysByMimetype);
         this.displaysByExtension = Collections.unmodifiableMap(this.displaysByExtension);
+    }
+    
+    /**
+     * @param mimetype a valid mimetype
+     * @return Returns the default extension for the mimetype
+     * @throws AlfrescoRuntimeException if the mimetype doesn't exist
+     */
+    public String getExtension(String mimetype)
+    {
+        String extension = extensionsByMimetype.get(mimetype);
+        if (extension == null)
+        {
+            throw new AlfrescoRuntimeException("No extension available for mimetype: " + mimetype);
+        }
+        return extension;
     }
 
     public Map<String, String> getDisplaysByExtension()
@@ -149,7 +170,7 @@ public class MimetypeMap
         return extensionsByMimetype;
     }
 
-    public Collection<String> getMimetypes()
+    public List<String> getMimetypes()
     {
         return mimetypes;
     }

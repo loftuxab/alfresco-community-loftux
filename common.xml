@@ -96,12 +96,16 @@
             <fileset dir="${common.dir}/projects">
                <include name="**/build/dist/*.jar" />
             </fileset>
+            <dirset dir="${common.dir}/projects">
+               <include name="**/source/test-resources" />
+            </dirset>
          </classpath>
          <formatter type="plain"/>
          <batchtest fork="yes" todir="${test.results.dir}">
             <fileset dir="${src.java.dir}">
                <include name="**/*Test.java" />
                <exclude name="**/Base*Test.java" />
+               <exclude name="**/Abstract*Test.java" />
             </fileset>
         </batchtest>
       </junit>

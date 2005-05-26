@@ -1,9 +1,6 @@
 package org.alfresco.repo.content.transform;
 
 import java.io.File;
-import java.io.OutputStream;
-
-import junit.framework.TestCase;
 
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentWriter;
@@ -15,7 +12,7 @@ import org.alfresco.util.TempFileProvider;
  * 
  * @author Derek Hulley
  */
-public class StringExtractingContentTransformerTest extends TestCase
+public class StringExtractingContentTransformerTest extends AbstractContentTransformerTest
 {
     private static final String SOME_CONTENT = "azAz10!£$%^&*()\t\r\n";
     
@@ -23,7 +20,8 @@ public class StringExtractingContentTransformerTest extends TestCase
     /** the final destination of transformations */
     private ContentWriter targetWriter;
     
-    public void setUp() throws Exception
+    @Override
+    public void onSetUpInTransaction() throws Exception
     {
         transformer = new StringExtractingContentTransformer();
         targetWriter = new FileContentWriter(getTempFile());
@@ -31,6 +29,11 @@ public class StringExtractingContentTransformerTest extends TestCase
         targetWriter.setEncoding("UTF-8");
     }
     
+    protected ContentTransformer getTransformer(String sourceMimetype, String targetMimetype)
+    {
+        return transformer;
+    }
+
     public void testSetUp() throws Exception
     {
         assertNotNull(transformer);
@@ -94,32 +97,5 @@ public class StringExtractingContentTransformerTest extends TestCase
         ContentReader checkReader = targetWriter.getReader();
         String checkContent = checkReader.getContentString();
         assertEquals("Content check failed", SOME_CONTENT, checkContent);
-    }
-    
-    public void testBindaryToTextConversion() throws Exception
-    {
-        ContentWriter sourceWriter = new FileContentWriter(getTempFile());
-        sourceWriter.setMimetype("image/tiff");
-        sourceWriter.setEncoding(null);
-        // put content directly to stream, but keep a string as a check
-        byte[] bytes = new byte[] {1, 34, 120, 97, 19, -45, -68, 23};
-        String content = new String(bytes, targetWriter.getEncoding());   // encoding must be correct
-        OutputStream os = sourceWriter.getContentOutputStream();
-        os.write(bytes);
-        os.close();
-
-        // get the reader
-        ContentReader reader = sourceWriter.getReader();
-        // check reliability
-        double reliability = transformer.getReliability(reader.getMimetype(), targetWriter.getMimetype());
-        assertEquals("Reliability incorrect", 0.1, reliability);
-        
-        // transform
-        transformer.transform(reader, targetWriter);
-        
-        // get a reader onto the transformed content and check
-        ContentReader checkReader = targetWriter.getReader();
-        String checkContent = checkReader.getContentString();
-        assertEquals("Content check failed", content, checkContent);
     }
 }

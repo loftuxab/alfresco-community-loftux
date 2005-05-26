@@ -213,8 +213,14 @@
    <bean id="contentTransformerRegistry" class="org.alfresco.repo.content.transform.ContentTransformerRegistry" >
       <constructor-arg>
          <list>
-            <bean class="org.alfresco.repo.content.transform.UnoContentTransformer" />
+            <bean class="org.alfresco.repo.content.transform.UnoContentTransformer">
+               <constructor-arg>
+                  <ref bean="mimetypeMap" />
+               </constructor-arg>
+            </bean>
             <bean class="org.alfresco.repo.content.transform.StringExtractingContentTransformer" />
+            <bean class="org.alfresco.repo.content.transform.BinaryPassThroughContentTransformer" />
+            <bean class="org.alfresco.repo.content.transform.PdfBoxContentTransformer" />
          </list>
       </constructor-arg>
       <constructor-arg>
@@ -642,38 +648,35 @@
    <!-- Scheduled jobs -->
    <!--                -->
    
-    <bean id="ftsIndexerJob" 
-        class="org.springframework.scheduling.quartz.JobDetailBean">
-        <property name="jobClass">
-            <value>org.alfresco.repo.search.impl.lucene.fts.FTSIndexerJob</value>
-        </property>
-        <property name="jobDataAsMap">
-            <map>
-                <entry key="bean">
-                    <ref bean="LuceneFullTextSearchIndexer"/>
-                </entry>
-            </map>
-        </property>
-    </bean>
-   
    <bean id="ftsIndexerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
-        <property name="jobDetail">
-            <ref local="ftsIndexerJob"/>
-        </property>
-        <property name="startDelay">
-            <value>10000</value>
-        </property>
-        <property name="repeatInterval">
-            <value>10000</value>
-        </property>
+      <property name="jobDetail">
+         <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+            <property name="jobClass">
+               <value>org.alfresco.repo.search.impl.lucene.fts.FTSIndexerJob</value>
+            </property>
+            <property name="jobDataAsMap">
+               <map>
+                  <entry key="bean">
+                     <ref bean="LuceneFullTextSearchIndexer"/>
+                  </entry>
+               </map>
+            </property>
+         </bean>
+      </property>
+      <property name="startDelay">
+         <value>10000</value>
+      </property>
+      <property name="repeatInterval">
+         <value>10000</value>
+      </property>
    </bean>
    
    <bean id="scedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-    <property name="triggers">
-        <list>
+      <property name="triggers">
+         <list>
             <ref local="ftsIndexerTrigger"/>
-        </list>
-    </property>
+         </list>
+      </property>
    </bean>
 
 </beans>

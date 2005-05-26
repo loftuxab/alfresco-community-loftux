@@ -58,6 +58,25 @@ public class ContentTransformerRegistry
     }
     
     /**
+     * Resets the transformation cache.  This allows a fresh analysis of the best
+     * conversions based on actual average performance of the transformers.
+     */
+    public void resetCache()
+    {
+        // get a write lock on the cache
+        transformationCacheWriteLock.lock();
+        try
+        {
+            transformationCache.clear();
+            // done
+        }
+        finally
+        {
+            transformationCacheWriteLock.unlock();
+        }
+    }
+    
+    /**
      * Gets the best transformer possible.
      * <p>
      * The result is cached for quicker access next time.
@@ -141,7 +160,13 @@ public class ContentTransformerRegistry
     }
     
     /**
-     * Loops through the content transformers and picks the one with the highest reliability
+     * Loops through the content transformers and picks the one with the highest reliability.
+     * <p>
+     * Where there are several transformers that are equally reliable, the fastest will be 
+     * returned.  A good example of this would be for a <pre>text/plain --> text/plain</pre>
+     * conversion.  A transformer that merely passed the stream across without any actuall
+     * interpretation of the data will be much faster than a transformer that had to open
+     * an application and then save the file back to disk.
      * 
      * @return Returns best transformer for the translation - null if
      *      all score 0.0 on reliability
@@ -149,23 +174,31 @@ public class ContentTransformerRegistry
     private ContentTransformer findDirectTransformer(String sourceMimetype, String targetMimetype)
     {
         double maxReliability = 0.0;
+        long leastTime = 100000L;   // 100 seconds - longer than anyone would think of waiting 
         ContentTransformer bestTransformer = null;
         // loop through transformers
         for (ContentTransformer transformer : this.transformers)
         {
             double reliability = transformer.getReliability(sourceMimetype, targetMimetype);
-            if (reliability == 1.0)
+            long time = transformer.getTransformationTime();
+            if (reliability <= 0.0)
             {
-                // we have a perfect match
-                bestTransformer = transformer;
-                break;
+                // it is unusable
+                continue;
             }
-            else if (reliability <= maxReliability)
+            if (reliability < maxReliability)
             {
                 // it is not the best one to use
                 continue;
             }
+            else if (reliability == maxReliability && time >= leastTime)
+            {
+                // it is as good as the best so far, but it takes longer
+                continue;
+            }
             bestTransformer = transformer;
+            maxReliability = reliability;
+            leastTime = time;
         }
         // done
         return bestTransformer;

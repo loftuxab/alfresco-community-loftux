@@ -12,7 +12,8 @@ import org.alfresco.repo.content.ContentWriter;
 public interface ContentTransformer
 {
     /**
-     * Provides a score of transforming content from a specific mimetype to another.
+     * Provides the approximate accuracy with which this transformer can
+     * transform from one mimetype to another.
      * <p>
      * This method is used to determine, up front, which of a set of
      * transformers will be used to perform a specific transformation.
@@ -24,6 +25,17 @@ public interface ContentTransformer
      *      the transformation can be performed perfectly.
      */
     public double getReliability(String sourceMimetype, String targetMimetype);
+    
+    /**
+     * Provides an estimate, usually a worst case guess, of how long a transformation
+     * will take.
+     * <p>
+     * This method is used to determine, up front, which of a set of
+     * equally reliant transformers will be used for a specific transformation.
+     * 
+     * @return Returns the approximate number of milliseconds per transformation
+     */
+    public long getTransformationTime();
     
     /**
      * Transforms the content provided by the reader and source mimetype

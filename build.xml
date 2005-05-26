@@ -1,5 +1,7 @@
 <project name="alfresco" default="build-all">
 
+   <!-- Checking the SVN SWITCH -->
+
    <property name="common.dir" value="${basedir}" />
    <import file="${common.dir}/common-init.xml" />
 

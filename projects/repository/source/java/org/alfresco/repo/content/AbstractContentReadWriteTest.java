@@ -102,19 +102,6 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         assertEquals("Encoding incorrect", writer.getEncoding(), readerFromReader.getEncoding());
     }
 	
-	/**
-	 * Ensures that the URLs generated are always unique, even for the same node reference
-	 */
-	public void testRepeatedWriteUrls() throws Exception
-	{
-		String url1 = getWriter().getContentUrl();
-		String url2 = getWriter().getContentUrl();
-		String url3 = getWriter().getContentUrl();
-		
-		assertNotSame("URLs were duplicated", url1, url2);
-		assertNotSame("URLs were duplicated", url1, url3);
-	}
-    
     /**
      * The simplest test.  Write a string and read it again, checking that we receive the same values.
      * If the resource accessed by {@link #getReader()} and {@link #getWriter()} is not the same, then

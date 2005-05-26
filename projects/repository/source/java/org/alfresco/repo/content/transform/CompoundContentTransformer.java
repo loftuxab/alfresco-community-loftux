@@ -28,11 +28,12 @@ public class CompoundContentTransformer implements ContentTransformer
     /** a sequence of transformers to apply */
     private LinkedList<Transformation> chain;
     /** the combined reliability of all the transformations in the chain */
-    private double reliability = 1.0;
+    private double reliability;
     
     public CompoundContentTransformer()
     {
         chain = new LinkedList<Transformation>();
+        reliability = 1.0;
     }
     
     /**
@@ -53,18 +54,18 @@ public class CompoundContentTransformer implements ContentTransformer
                 targetMimetype);
         // add to the chain
         chain.add(transformation);
-        // update our reliability 
+        // recalculate combined reliability
         double transformerReliability = transformer.getReliability(sourceMimetype, targetMimetype);
         if (transformerReliability <= 0.0 || transformerReliability > 1.0)
         {
             throw new AlfrescoRuntimeException(
-                    "Reliability of transformer must be between 0.0 and 1.0 \n" +
+                    "Reliability of transformer must be between 0.0 and 1.0: \n" +
                     "   transformer: " + transformer + "\n" +
                     "   source: " + sourceMimetype + "\n" +
                     "   target: " + targetMimetype + "\n" +
                     "   reliability: " + transformerReliability);
         }
-        this.reliability = this.reliability * transformerReliability;
+        this.reliability *= transformerReliability;
     }
     
     /**
@@ -92,6 +93,21 @@ public class CompoundContentTransformer implements ContentTransformer
             return 0.0;
         }
         return reliability;
+    }
+
+    /**
+     * @return Returns 0 if there are no transformers in the chain otherwise
+     *      returns the sum of all the individual transformation times
+     */
+    public long getTransformationTime()
+    {
+        long transformationTime = 0L;
+        for (Transformation transformation : chain)
+        {
+            ContentTransformer transformer = transformation.transformer;
+            transformationTime += transformer.getTransformationTime();
+        }
+        return transformationTime;
     }
 
     /**
