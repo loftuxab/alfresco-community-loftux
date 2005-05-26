@@ -44,6 +44,11 @@ public class NewRuleWizard extends AbstractWizardBean
    private List<SelectItem> actions;
    private Map<String, String> conditionDescriptions;
    private Map<String, String> actionDescriptions;
+   private Map<String, String> conditionProperties;
+   private Map<String, String> actionProperties;
+   
+   // condition and action specific lists - TEMP, picker components will be used
+   private List<SelectItem> categories;
    
    /**
     * Deals with the finish button being pressed
@@ -54,6 +59,12 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (logger.isDebugEnabled())
          logger.debug("Finish called");
+      
+      if (logger.isDebugEnabled())
+      {
+         logger.debug("condition properties: " + this.conditionProperties);
+         logger.debug("action properties: " + this.actionProperties);
+      }
       
       return FINISH_OUTCOME;
    }
@@ -250,6 +261,9 @@ public class NewRuleWizard extends AbstractWizardBean
          this.actionDescriptions.clear();
          this.actionDescriptions = null;
       }
+      
+      this.conditionProperties = new HashMap<String, String>(1);
+      this.actionProperties = new HashMap<String, String>(3);
    }
    
    /**
@@ -446,6 +460,36 @@ public class NewRuleWizard extends AbstractWizardBean
       return this.types;
    }
 
+   /**
+    * @return Gets the condition settings 
+    */
+   public Map<String, String> getConditionProperties()
+   {
+      return this.conditionProperties;
+   }
+   
+   /**
+    * @return Gets the action settings
+    */
+   public Map<String, String> getActionProperties()
+   {
+      return this.actionProperties;
+   }
+   
+   // TEMP - find out from Andy how you get hold of categories - if you can!
+   public List<SelectItem> getCategories()
+   {
+      if (this.categories == null)
+      {
+         this.categories = new ArrayList<SelectItem>();
+         this.categories.add(new SelectItem("category1", "Caegory 1"));
+         this.categories.add(new SelectItem("category2", "Caegory 2"));
+         this.categories.add(new SelectItem("category3", "Caegory 3"));
+      }
+      
+      return this.categories;
+   }
+   
    /**
     * @see org.alfresco.web.bean.wizard.AbstractWizardBean#determineOutcomeForStep(int)
     */

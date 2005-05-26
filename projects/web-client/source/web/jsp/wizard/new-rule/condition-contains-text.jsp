@@ -99,18 +99,36 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
+                                    <td class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 
-
-                                 <tr><td>Contains text settings defined here</td></tr>
-
-
-
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
+                                    <td class="mainSubText">
+                                       Enter the text pattern required, including any wildcards.  
+                                       The file name includes the file type extension when matching.
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>
+                                       File name pattern:&nbsp;
+                                       <h:inputText id="pattern" value="#{NewRuleWizard.conditionProperties.pattern}" 
+                                                    size="40" />
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr><td>Hints:</td></tr>
+                                 <tr>
+                                    <td>
+                                       Use zz* to match any name that begins with zz; 
+                                       use *.txt to match any text file; 
+                                       use *zz* to match any file name that contains zz 
+                                       anywhere including the beginning or end.
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>

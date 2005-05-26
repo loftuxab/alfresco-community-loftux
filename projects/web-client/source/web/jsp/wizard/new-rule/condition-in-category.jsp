@@ -99,18 +99,23 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
+                                    <td class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 
-
-                                 <tr><td>In category settings defined here</td></tr>
-
-
-
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
+                                    <td class="mainSubText">Choose the required category:</td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>
+                                       <h:selectOneMenu value="#{NewRuleWizard.conditionProperties.category}">
+                                          <f:selectItems value="#{NewRuleWizard.categories}" />
+                                       </h:selectOneMenu>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
