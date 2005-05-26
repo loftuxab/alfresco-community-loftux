@@ -37,6 +37,7 @@ public class ListItemTag extends BaseComponentTag
       setStringProperty(component, "label", this.label);
       setStringProperty(component, "image", this.image);
       setStringProperty(component, "value", this.value);
+      setBooleanProperty(component, "disabled", this.disabled);
    }
    
    /**
@@ -49,6 +50,7 @@ public class ListItemTag extends BaseComponentTag
       this.label = null;
       this.image = null;
       this.value = null;
+      this.disabled = null;
    }
    
    /**
@@ -91,6 +93,15 @@ public class ListItemTag extends BaseComponentTag
       this.value = value;
    }
    
+   /**
+    * Set the disabled flag
+    * 
+    * @param disabled true to set this item as disabled
+    */
+   public void setDisabled(String disabled)
+   {
+      this.disabled = disabled;
+   }
 
    /** the tooltip */
    private String tooltip;
@@ -103,4 +114,7 @@ public class ListItemTag extends BaseComponentTag
 
    /** the value to be selected initially */
    private String value;
+   
+   /** the disabled flag */
+   private String disabled;
 }

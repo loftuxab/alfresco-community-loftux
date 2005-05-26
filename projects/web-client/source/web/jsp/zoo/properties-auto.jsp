@@ -3,6 +3,8 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="32kb" %>
+
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
 <f:view>

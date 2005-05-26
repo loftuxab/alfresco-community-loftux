@@ -84,7 +84,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
-                                          value="3">
+                                          value="3" disabled="true">
                                  <a:listItem value="1" label="1. Details" />
                                  <a:listItem value="2" label="2. Condition" />
                                  <a:listItem value="3" label="3. Condition Settings" />
@@ -151,16 +151,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

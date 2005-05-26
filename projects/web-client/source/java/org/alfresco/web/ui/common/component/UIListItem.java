@@ -27,9 +27,10 @@ public class UIListItem extends SelfRenderingComponent
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[2];
+      Object values[] = new Object[3];
       values[0] = super.saveState(context);
       values[1] = this.value;
+      values[2] = this.disabled;
       return ((Object) (values));
    }
 
@@ -41,6 +42,7 @@ public class UIListItem extends SelfRenderingComponent
       Object values[] = (Object[])state;
       super.restoreState(context, values[0]);
       this.value = values[1];
+      this.disabled = (Boolean)values[2];
    }
    
    
@@ -75,10 +77,46 @@ public class UIListItem extends SelfRenderingComponent
       this.value = value;
    }
    
+   /**
+    * Returns the disabled flag
+    * 
+    * @return true if the mode list is disabled
+    */
+   public boolean isDisabled()
+   {
+      ValueBinding vb = getValueBinding("disabled");
+      if (vb != null)
+      {
+         this.disabled = (Boolean)vb.getValue(getFacesContext());
+      }
+      
+      if (this.disabled != null)
+      {
+         return this.disabled.booleanValue();
+      }
+      else
+      {
+         // return the default
+         return false;
+      }
+   }
+
+   /**
+    * Sets whether the mode list is disabled
+    * 
+    * @param disabled   the disabled flag
+    */
+   public void setDisabled(boolean disabled)
+   {
+      this.disabled = disabled;
+   }
    
    // ------------------------------------------------------------------------------
    // Private data
    
    /** the component value */
    private Object value = null;
+   
+   /** disabled flag */
+   private Boolean disabled = null;
 }

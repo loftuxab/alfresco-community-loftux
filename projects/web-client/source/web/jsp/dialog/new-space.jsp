@@ -4,8 +4,8 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
-
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
@@ -76,12 +76,15 @@
                </tr>
                
                <%-- Details --%>
-               <tr valign=top>
+               <tr valign=top>                  
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
+                              
+                              <a:errors message="#{msg.error_create_space_dialog}" styleClass="errorMessage" />
+                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
@@ -154,16 +157,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

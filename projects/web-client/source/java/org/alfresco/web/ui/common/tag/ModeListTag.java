@@ -50,6 +50,7 @@ public class ModeListTag extends HtmlComponentTag
       setIntProperty(component, "iconColumnWidth", this.iconColumnWidth);
       setIntProperty(component, "width", this.width);
       setBooleanProperty(component, "horizontal", this.horizontal);
+      setBooleanProperty(component, "disabled", this.disabled);
       setStringProperty(component, "label", this.label);
       setStringProperty(component, "value", this.value);
    }
@@ -79,6 +80,7 @@ public class ModeListTag extends HtmlComponentTag
       this.action = null;
       this.actionListener = null;
       this.value = null;
+      this.disabled = null;
    }
 
    /**
@@ -271,6 +273,15 @@ public class ModeListTag extends HtmlComponentTag
       this.selectedImage = selectedImage;
    }
 
+   /**
+    * Set the disabled flag
+    * 
+    * @param disabled true to disable all children
+    */
+   public void setDisabled(String disabled)
+   {
+      this.disabled = disabled;
+   }
 
    /** the selectedImage */
    private String selectedImage;
@@ -328,4 +339,7 @@ public class ModeListTag extends HtmlComponentTag
 
    /** the value */
    private String value;
+   
+   /** the disabled flag */
+   private String disabled;
 }

@@ -5,7 +5,6 @@
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <%@ page buffer="50kb" %>
-
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 

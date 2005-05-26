@@ -2,6 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="32kb" %>
+
 <r:page>
 
 <f:view>

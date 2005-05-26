@@ -926,6 +926,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>disabled</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    </tag>
    
    <tag>
@@ -988,6 +994,12 @@
       <attribute>
          <name>value</name>
          <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>disabled</name>
+         <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
@@ -1197,7 +1209,50 @@
          <required>true</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+   </tag>
+   
+   <tag>
+      <name>errors</name>
+      <tagclass>org.alfresco.web.ui.common.tag.ErrorsTag</tagclass>
+      <bodycontent>JSP</bodycontent>
       
+      <description>Displays global errors within a gradient panel</description>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>message</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>styleClass</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>style</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>tooltip</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    </tag>
    
 </taglib>

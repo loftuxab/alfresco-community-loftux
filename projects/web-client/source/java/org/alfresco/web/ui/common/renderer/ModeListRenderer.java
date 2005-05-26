@@ -188,13 +188,19 @@ public class ModeListRenderer extends BaseRenderer
             }
             
             // output item link
-            // TODO: add "disabled" flag! to render a non-clickable icon (+styles?)
             out.write("<td>");
-            out.write("<a href='#' onclick=\"");
-            // generate javascript to submit the value of the child component
-            String value = list.getClientId(context) + NamingContainer.SEPARATOR_CHAR + (String)child.getAttributes().get("value");
-            out.write(Utils.generateFormSubmit(context, list, getHiddenFieldName(context, list), value));
-            out.write('"');
+            if (!list.isDisabled() && !item.isDisabled())
+            {
+               out.write("<a href='#' onclick=\"");
+               // generate javascript to submit the value of the child component
+               String value = list.getClientId(context) + NamingContainer.SEPARATOR_CHAR + (String)child.getAttributes().get("value");
+               out.write(Utils.generateFormSubmit(context, list, getHiddenFieldName(context, list), value));
+               out.write('"');
+            }
+            else
+            {
+               out.write("<span");
+            }
             
             // render style for the item link
             if (item.getValue().equals(list.getValue()))
@@ -211,6 +217,14 @@ public class ModeListRenderer extends BaseRenderer
             outputAttribute(out, child.getAttributes().get("tooltip"), "title");
             out.write('>');
             out.write(Utils.encode((String)child.getAttributes().get("label")));
+            if (!list.isDisabled() && !item.isDisabled())
+            {
+               out.write("</a>");
+            }
+            else
+            {
+               out.write("</span>");
+            }
             out.write("</td></tr></table></td>");
             
             if (list.isHorizontal() == false)

@@ -2,6 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 
+<%@ page buffer="32kb" %>
+
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
 <f:view>

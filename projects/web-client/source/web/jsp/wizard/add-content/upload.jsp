@@ -5,8 +5,8 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
-
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 <%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
 <%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
@@ -87,7 +87,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                    value="1" actionListener="#{AddContentWizard.stepChanged}">
+                                          value="1" disabled="true">
                                  <a:listItem value="1" label="1. Upload Document" />
                                  <a:listItem value="2" label="2. Summary" />
                               </a:modeList>
@@ -97,6 +97,9 @@
                            </h:form>
                         
                            <td width="100%" valign="top">
+                              
+                              <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
+                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0">
                                  <tr>
@@ -157,12 +160,12 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{AddContentWizard.next}" styleClass="wizardButton" disabled="#{CheckinCheckoutBean.fileName == null}" />
+                                       <h:commandButton value="Next" action="#{AddContentWizard.next}" styleClass="wizardButton" disabled="#{AddContentWizard.fileName == null}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" disabled="#{CheckinCheckoutBean.fileName == null}" />
+                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" disabled="#{AddContentWizard.fileName == null}" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
@@ -176,16 +179,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

@@ -4,8 +4,8 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
-
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
@@ -85,7 +85,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                    value="2" actionListener="#{NewSpaceWizard.stepChanged}">
+                                    value="2" disabled="true">
                                  <a:listItem value="1" label="1. Starting Space" />
                                  <a:listItem value="2" label="2. Space Options" />
                                  <a:listItem value="3" label="3. Space Details" />
@@ -136,7 +136,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>><h:outputText value="#{NewSpaceWizard.stepInstructions}" /></td>
+                                    <td><h:outputText value="#{NewSpaceWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>

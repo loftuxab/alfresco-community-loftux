@@ -51,6 +51,7 @@ public class UIModeList extends UICommand
       super.restoreState(context, values[0]);
       this.iconColumnWidth = (Integer)values[1];
       this.horizontal = (Boolean)values[2];
+      this.disabled = (Boolean)values[3];
    }
    
    /**
@@ -58,11 +59,12 @@ public class UIModeList extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[3];
+      Object values[] = new Object[4];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.iconColumnWidth;
       values[2] = this.horizontal;
+      values[3] = this.disabled;
       return (values);
    }
    
@@ -153,6 +155,39 @@ public class UIModeList extends UICommand
       this.iconColumnWidth = Integer.valueOf(iconColumnWidth);
    }
 
+   /**
+    * Returns the disabled flag
+    * 
+    * @return true if the mode list is disabled
+    */
+   public boolean isDisabled()
+   {
+      ValueBinding vb = getValueBinding("disabled");
+      if (vb != null)
+      {
+         this.disabled = (Boolean)vb.getValue(getFacesContext());
+      }
+      
+      if (this.disabled != null)
+      {
+         return this.disabled.booleanValue();
+      }
+      else
+      {
+         // return the default
+         return false;
+      }
+   }
+
+   /**
+    * Sets whether the mode list is disabled
+    * 
+    * @param disabled   the disabled flag
+    */
+   public void setDisabled(boolean disabled)
+   {
+      this.disabled = disabled;
+   }
    
    // ------------------------------------------------------------------------------
    // Private data 
@@ -163,6 +198,8 @@ public class UIModeList extends UICommand
    /** true for horizontal rendering, false otherwise */
    private Boolean horizontal = null;
    
+   /** disabled flag */
+   private Boolean disabled = null;
    
    // ------------------------------------------------------------------------------
    // Inner classes

@@ -81,7 +81,7 @@ public class NewSpaceWizard extends AbstractWizardBean
       if (this.name == null || this.name.length() == 0)
       {
          // create error and send wizard back to details page
-         Utils.addErrorMessage("You must supply a name for the space");
+         Utils.addErrorMessage("You must supply a name for the space.");
          outcome = determineOutcomeForStep(3);
          this.currentStep = 3;
       }

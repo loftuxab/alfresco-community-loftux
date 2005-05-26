@@ -61,7 +61,7 @@ public class AddContentWizard extends AbstractWizardBean
       if (this.fileName == null || this.fileName.length() == 0)
       {
          // create error and send wizard back to upload page
-         Utils.addErrorMessage("You must upload a file before you can complete the wizard");
+         Utils.addErrorMessage("You must upload a file before you can complete the wizard.");
          outcome = determineOutcomeForStep(1);
          this.currentStep = 1;
       }

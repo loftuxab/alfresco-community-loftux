@@ -4,6 +4,7 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="64kb" %>
 <%@ page isELIgnored="false" %>
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>

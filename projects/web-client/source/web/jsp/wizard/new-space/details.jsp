@@ -4,14 +4,30 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
+<%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
-
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
+
+<script language="JavaScript1.2">
+   function checkButtonState(inputField)
+   {
+      if (inputField.value.length == 0)
+      {
+         document.getElementById("new-space-details:next-button").disabled = true;
+         document.getElementById("new-space-details:finish-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("new-space-details:next-button").disabled = false;
+         document.getElementById("new-space-details:finish-button").disabled = false;
+      }
+   }
+</script>
 
 <f:view>
    
@@ -85,7 +101,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                    value="3" actionListener="#{NewSpaceWizard.stepChanged}">
+                                    value="3" disabled="true">
                                  <a:listItem value="1" label="1. Starting Space" />
                                  <a:listItem value="2" label="2. Space Options" />
                                  <a:listItem value="3" label="3. Space Details" />
@@ -93,8 +109,10 @@
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
-                           
                            <td width="100%" valign="top">
+                              
+                              <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
+                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
@@ -110,7 +128,8 @@
                                  <tr>
                                     <td>Name:</td>
                                     <td>
-                                       <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" />&nbsp;*
+                                       <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" 
+                                                    onkeyup="javascript:checkButtonState(this);" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
@@ -168,7 +187,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton id="next-button" value="Next" action="#{NewSpaceWizard.next}" 
+                                                        styleClass="wizardButton" disabled="#{NewSpaceWizard.name == null}" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -178,7 +198,8 @@
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton id="finish-button" value="Finish" action="#{NewSpaceWizard.finish}" 
+                                                        styleClass="wizardButton" disabled="#{NewSpaceWizard.name == null}"/>
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
@@ -192,16 +213,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

@@ -13,6 +13,14 @@
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
+<script language="JavaScript1.2">
+   function checkButtonState(inputField)
+   {
+      var disabled = (inputField.value.length == 0);
+      document.getElementById("new-rule-details:next-button").disabled = disabled;
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -84,7 +92,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
-                                          value="1">
+                                          value="1" disabled="true">
                                  <a:listItem value="1" label="1. Details" />
                                  <a:listItem value="2" label="2. Condition" />
                                  <a:listItem value="3" label="3. Condition Settings" />
@@ -96,6 +104,9 @@
                            </td>
                            
                            <td width="100%" valign="top">
+                              
+                              <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
+                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
@@ -113,7 +124,8 @@
                                  <tr>
                                     <td>Name:</td>
                                     <td>
-                                       <h:inputText id="name" value="#{NewRuleWizard.name}" size="35" />&nbsp;*
+                                       <h:inputText id="name" value="#{NewRuleWizard.name}" size="35" 
+                                                    onkeyup="javascript:checkButtonState(this);" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
@@ -135,7 +147,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton id="next-button" value="Next" action="#{NewRuleWizard.next}" 
+                                                        styleClass="wizardButton" disabled="#{NewRuleWizard.name == null}" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -155,16 +168,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>
