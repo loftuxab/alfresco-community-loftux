@@ -22,6 +22,7 @@ import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
+import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.version.Version;
@@ -172,6 +173,22 @@ public class CheckinCheckoutBean
    }
    
    /**
+    * @return Returns the selected Space Id.
+    */
+   public String getSelectedSpaceId()
+   {
+      return this.selectedSpaceId;
+   }
+   
+   /**
+    * @param selectedSpaceId  The selected Space Id to set.
+    */
+   public void setSelectedSpaceId(String selectedSpaceId)
+   {
+      this.selectedSpaceId = selectedSpaceId;
+   }
+   
+   /**
     * @return Returns the copy location. Either the current or other space.
     */
    public String getCopyLocation()
@@ -299,8 +316,26 @@ public class CheckinCheckoutBean
                logger.debug("Trying to checkout content node Id: " + node.getId());
             
             // checkout the node content to create a working copy
-            // TODO: impl checkout to a arbituary parent Space 
-            NodeRef workingCopyRef = this.versionOperationsService.checkout(node.getNodeRef());
+            if (logger.isDebugEnabled())
+            {
+               logger.debug("Checkout copy location: " + getCopyLocation());
+               logger.debug("Selected Space Id: " + this.selectedSpaceId);
+            }
+            NodeRef workingCopyRef;
+            if (getCopyLocation().equals(COPYLOCATION_OTHER) && this.selectedSpaceId != null)
+            {
+               // checkout to a arbituary parent Space 
+               NodeRef destRef = new NodeRef(Repository.getStoreRef(), this.selectedSpaceId);
+               
+               // TODO: The destination assoc type qname should come from the child assoc ref.
+               ChildAssocRef childAssocRef = this.nodeService.getPrimaryParent(destRef);
+               workingCopyRef = this.versionOperationsService.checkout(node.getNodeRef(),
+                     destRef, null, childAssocRef.getQName());
+            }
+            else
+            {
+               workingCopyRef = this.versionOperationsService.checkout(node.getNodeRef());
+            }
             
             // modify the name to include an additional string
             // save the original name so we can set it back later
@@ -623,6 +658,7 @@ public class CheckinCheckoutBean
       this.keepCheckedOut = false;
       this.copyLocation = COPYLOCATION_CURRENT;
       this.versionNotes = "";
+      this.selectedSpaceId = null;
       
       // remove the file upload bean from the session
       FacesContext ctx = FacesContext.getCurrentInstance();
@@ -656,6 +692,7 @@ public class CheckinCheckoutBean
    private boolean keepCheckedOut = false;
    private String copyLocation = COPYLOCATION_CURRENT;
    private String versionNotes = "";
+   private String selectedSpaceId = null;
    
    /** The BrowseBean to be used by the bean */
    private BrowseBean browseBean;
@@ -667,5 +704,5 @@ public class CheckinCheckoutBean
    private VersionOperationsService versionOperationsService;
    
    /** The ContentService to be used by the bean */
-   private ContentService contentService;
+   private ContentService contentService;   
 }

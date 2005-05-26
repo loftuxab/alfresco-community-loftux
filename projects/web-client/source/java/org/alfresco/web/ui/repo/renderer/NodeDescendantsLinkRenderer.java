@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.springframework.web.jsf.FacesContextUtils;
@@ -82,41 +84,56 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          
          // use Spring JSF integration to get the node service bean
          NodeService service = getNodeService(context);
-         List<ChildAssocRef> childRefs = service.getChildAssocs(parentRef);
-         
-         // TODO: need a comparator to sort node refs (based on childref qname)
-         //       as currently the list is returned in a random order per request
-         
-         // walk each child ref and output a descendant link control for each item
-         String separator = (String)component.getAttributes().get("separator");
-         if (separator == null)
+         UserTransaction tx = null;
+         try
          {
-            separator = DEFAULT_SEPARATOR;
-         }
-         int maximum = childRefs.size() > control.getMaxChildren() ? control.getMaxChildren() : childRefs.size();
-         for (int index=0; index<maximum; index++)
-         {
-            ChildAssocRef ref = childRefs.get(index);
-            if (service.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_SPACE))
-            {
-               out.write(renderDescendant(context, control, ref, false));
+            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+                  FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx.begin();
                
-               // output separator if appropriate
-               if (index < maximum - 1)
+            List<ChildAssocRef> childRefs = service.getChildAssocs(parentRef);
+            
+            // TODO: need a comparator to sort node refs (based on childref qname)
+            //       as currently the list is returned in a random order per request
+            
+            // walk each child ref and output a descendant link control for each item
+            String separator = (String)component.getAttributes().get("separator");
+            if (separator == null)
+            {
+               separator = DEFAULT_SEPARATOR;
+            }
+            int maximum = childRefs.size() > control.getMaxChildren() ? control.getMaxChildren() : childRefs.size();
+            for (int index=0; index<maximum; index++)
+            {
+               ChildAssocRef ref = childRefs.get(index);
+               if (service.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_SPACE))
                {
-                  out.write( separator );
+                  out.write(renderDescendant(context, control, ref, false));
+                  
+                  // output separator if appropriate
+                  if (index < maximum - 1)
+                  {
+                     out.write( separator );
+                  }
                }
             }
+            
+            // do we need to render ellipses to indicate more items than the maximum
+            if (control.getShowEllipses() == true && childRefs.size() > control.getMaxChildren())
+            {
+               out.write( separator );
+               // TODO: is this the correct way to get the information we need?
+               //       e.g. primary parent may not be the correct path? how do we make sure we find
+               //       the correct parent and more importantly the correct Display Name value!
+               out.write( renderDescendant(context, control, service.getPrimaryParent(parentRef), true) );
+            }
+            
+            tx.commit();
          }
-         
-         // do we need to render ellipses to indicate more items than the maximum
-         if (control.getShowEllipses() == true && childRefs.size() > control.getMaxChildren())
+         catch (Throwable err)
          {
-            out.write( separator );
-            // TODO: is this the correct way to get the information we need?
-            //       e.g. primary parent may not be the correct path? how do we make sure we find
-            //       the correct parent and more importantly the correct Display Name value!
-            out.write( renderDescendant(context, control, service.getPrimaryParent(parentRef), true) );
+            try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+            throw new RuntimeException(err);
          }
       }
    }
@@ -160,6 +177,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
       if (ellipses == false)
       {
          // label is the name of the child node assoc
+         // TODO: get the NAME attribute here!
          buf.append(Utils.encode(childRef.getQName().getLocalName()));
       }
       else

@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
@@ -41,6 +42,7 @@ import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.alfresco.web.ui.repo.component.UISimpleSearch;
 import org.apache.log4j.Logger;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast
@@ -334,8 +336,13 @@ public class BrowseBean implements IContextListener
     */
    private void queryBrowseNodes(String parentNodeId)
    {
+      UserTransaction tx = null;
       try
       {
+         tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+         tx.begin();
+         
          NodeRef parentRef;
          if (parentNodeId == null)
          {
@@ -378,12 +385,23 @@ public class BrowseBean implements IContextListener
                   logger.debug("Found neither a Space or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
             }
          }
+         
+         // commit the transaction
+         tx.commit();
       }
       catch (InvalidNodeRefException refErr)
       {
          Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {parentNodeId}) );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+      }
+      catch (Exception err)
+      {
+         Utils.addErrorMessage( MessageFormat.format(ERROR_GENERIC, err.getMessage()), err );
+         this.containerNodes = Collections.<Node>emptyList();
+         this.contentNodes = Collections.<Node>emptyList();
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
    }
    
@@ -397,8 +415,14 @@ public class BrowseBean implements IContextListener
    {
       // get the searcher object and perform the search of the root node
       String query = buildSearchQuery(searchText, searchMode);
+      
+      UserTransaction tx = null;
       try
       {
+         tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+         tx.begin();
+         
          if (logger.isDebugEnabled())
             logger.debug("Searching using path: " + query);
          ResultSet results = this.searchService.query(Repository.getStoreRef(), "lucene", query, null, null);
@@ -433,6 +457,9 @@ public class BrowseBean implements IContextListener
                }
             }
          }
+         
+         // commit the transaction
+         tx.commit();
       }
       catch (Exception err)
       {
@@ -440,6 +467,7 @@ public class BrowseBean implements IContextListener
          Utils.addErrorMessage( MessageFormat.format(ERROR_SEARCH, new Object[] {err.getMessage()}) );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
    }
    
@@ -922,6 +950,7 @@ public class BrowseBean implements IContextListener
    // Private data
    
    private static final String ERROR_SEARCH  = "Search failed during to a system error: {0}";
+   private static final String ERROR_GENERIC = "A system error occured during the operation: {0}";
    
    public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
    

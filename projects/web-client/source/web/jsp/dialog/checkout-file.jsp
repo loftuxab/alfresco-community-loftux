@@ -124,10 +124,16 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:selectOneRadio value="current" layout="pageDirection">
+                                       <h:selectOneRadio value="#{CheckinCheckoutBean.copyLocation}" layout="pageDirection">
                                           <f:selectItem itemValue="current" itemLabel="In the current space" />
-                                          <f:selectItem itemValue="other" itemLabel="Space:" />
+                                          <f:selectItem itemValue="other" itemLabel="In the space selected:" />
                                        </h:selectOneRadio>
+                                       <%-- Space selector to allow user to pick a Space --%>
+                                       <table border=0><tr><td>
+                                          <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
+                                          <r:spaceSelector label="Select a Space..." value="#{CheckinCheckoutBean.selectedSpaceId}" />
+                                          <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                                       </td></tr></table>
                                     </td>
                                  </tr>
                               </table>
