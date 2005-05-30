@@ -8,12 +8,37 @@
          </td>
          <td><img src="<%=request.getContextPath()%>/images/parts/headbar_end.gif" width=4 height=33></td>
       </tr>
-      <tr>
+      <tr width=185>
          <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
-         <td height=425 valign=top>
+         <td valign=top>
             
-            <%-- TODO: Shelf components --%>
-            <img src="<%=request.getContextPath()%>/images/test/shelf.png" style="padding-top:4px">
+            <%-- Shelf component --%>
+            <r:shelf id="shelf" groupPanel="ballongrey" groupBgcolor="#eeeeee" selectedGroupPanel="bluetoolbar" selectedGroupBgcolor="#e9f0f4"
+                  innerGroupPanel="white" innerGroupBgcolor="#ffffff">
+               <r:shelfGroup label="My Clipboard" id="shelf-group-1">
+                  <r:shelfItem id="shelf-item-1-1">
+                     
+                  </r:shelfItem>
+               </r:shelfGroup>
+               
+               <r:shelfGroup label="Shortcuts" id="shelf-group-2" expanded="true">
+                  <r:shelfItem id="shelf-item-2-1">
+                     
+                  </r:shelfItem>
+               </r:shelfGroup>
+               
+               <r:shelfGroup label="Drop Zone" id="shelf-group-3">
+                  <r:shelfItem id="shelf-item-3-1">
+                     
+                  </r:shelfItem>
+               </r:shelfGroup>
+               
+               <r:shelfGroup label="Actions in Progress" id="shelf-group-4">
+                  <r:shelfItem id="shelf-item-4-1">
+                     
+                  </r:shelfItem>
+               </r:shelfGroup>
+            </r:shelf>
             
          </td>
          <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>

@@ -28,6 +28,21 @@
       <component-type>org.alfresco.faces.SimpleSearch</component-type>
       <component-class>org.alfresco.web.ui.repo.component.UISimpleSearch</component-class>
    </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.Shelf</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.shelf.UIShelf</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.ShelfGroup</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.shelf.UIShelfGroup</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.ShelfItem</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.shelf.UIShelfItem</component-class>
+   </component>
 
    
    <!-- ==================== RENDERERS ==================== -->
