@@ -211,17 +211,22 @@ public class Node implements Serializable
       return this.path;
    }
    
-//   /**
-//    * Used to save the properties edited by the user
-//    * 
-//    * @return The outcome string
-//    */
-//   public String persist()
-//   {
-//      logger.debug("Updating properties for: " + this + "; properties = " + this.properties);
-//      
-//      // TODO: Use whatever service to persist the Node back to the repository
-//      
-//      return "success";
-//   }   
+   /**
+    * Resets the state of the node to force re-retrieval of the data
+    */
+   public void reset()
+   {
+      this.name = null;
+      this.type = null;
+      this.path = null;
+      this.properties = new HashMap<String, Object>(7, 1.0f);
+      this.propsRetrieved = false;
+      this.aspects = null;
+
+      if (this.propertyNames != null)
+      {
+         this.propertyNames.clear();
+      }
+      this.propertyNames = null;
+   }
 }

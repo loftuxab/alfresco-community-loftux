@@ -3,6 +3,7 @@
  */
 package org.alfresco.web.ui.common;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.faces.application.FacesMessage;
@@ -10,6 +11,7 @@ import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
+import javax.faces.context.ResponseWriter;
 
 import org.apache.log4j.Logger;
 import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
@@ -98,6 +100,28 @@ public final class Utils
       else
       {
          return sb.toString();
+      }
+   }
+   
+   /**
+    * Helper to output an attribute to the output stream
+    * 
+    * @param out        ResponseWriter
+    * @param attr       attribute value object (cannot be null)
+    * @param mapping    mapping to output as e.g. style="..."
+    * 
+    * @throws IOException
+    */
+   public static void outputAttribute(ResponseWriter out, Object attr, String mapping)
+      throws IOException
+   {
+      if (attr != null)
+      {
+         out.write(' ');
+         out.write(mapping);
+         out.write("=\"");
+         out.write(attr.toString());
+         out.write('"');
       }
    }
    

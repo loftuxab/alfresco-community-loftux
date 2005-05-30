@@ -72,6 +72,31 @@
    
    <managed-bean>
       <description>
+         The bean that backs up the Edit Space Dialog
+      </description>
+      <managed-bean-name>EditSpaceDialog</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.wizard.NewSpaceWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the Add Content Wizard
       </description>
       <managed-bean-name>AddContentWizard</managed-bean-name>
@@ -271,6 +296,26 @@
       <navigation-case>
          <from-outcome>checkoutFileLink</from-outcome>
          <to-view-id>/jsp/dialog/checkout-file-link.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/space-details.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>editSpaceProperties</from-outcome>
+         <to-view-id>/jsp/dialog/edit-space.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-space.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

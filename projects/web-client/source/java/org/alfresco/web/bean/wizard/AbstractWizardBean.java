@@ -6,6 +6,7 @@ import javax.faces.event.ActionEvent;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.NavigationBean;
 import org.apache.log4j.Logger;
 
@@ -26,9 +27,11 @@ public abstract class AbstractWizardBean
    
    // common wizard properties
    protected int currentStep = 1;
+   protected boolean editMode = false;
    protected NodeService nodeService;
    protected Searcher searchService;
    protected NavigationBean navigator;
+   protected BrowseBean browseBean;
    
    /**
     * @return Returns the wizard description
@@ -86,6 +89,28 @@ public abstract class AbstractWizardBean
       
       if (logger.isDebugEnabled())
          logger.debug("Started wizard : " + getWizardTitle());
+   }
+   
+   /**
+    * Action listener called when the wizard is being launched for 
+    * editing an existing node.
+    */
+   public void startWizardForEdit(ActionEvent event)
+   {
+      // refresh the UI, calling this method now is fine as it basically makes sure certain
+      // beans clear the state - so when we finish the wizard other beans will have been reset
+      UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
+      
+      // set the wizard in edit mode
+      this.editMode = true;
+      
+      // populate the wizard's default values with the current value
+      // from the node being edited
+      init();
+      populate();
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Started wizard : " + getWizardTitle() + " for editing");
    }
  
    /**
@@ -152,6 +177,15 @@ public abstract class AbstractWizardBean
    {
       this.currentStep = 1;
    }
+   
+   /**
+    * Populates the wizard's values with the current values
+    * of the node about to be edited
+    */
+   public void populate()
+   {
+      // subclasses will override this method to setup accordingly
+   }
 
    /**
     * @return Returns the nodeService.
@@ -200,4 +234,20 @@ public abstract class AbstractWizardBean
    {
       this.navigator = navigator;
    }
+
+   /**
+    * @return The BrowseBean
+    */
+   public BrowseBean getBrowseBean()
+   {
+      return this.browseBean;
+   }
+
+   /**
+    * @param browseBean The BrowseBean to set.
+    */
+   public void setBrowseBean(BrowseBean browseBean)
+   {
+      this.browseBean = browseBean;
+   }  
 }

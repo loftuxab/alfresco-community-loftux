@@ -7,11 +7,12 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.faces.component.NamingContainer;
-import javax.faces.component.UIComponent;
+import javax.faces.component.UICommand;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.el.ValueBinding;
+import javax.faces.event.ActionEvent;
 
 import org.alfresco.web.ui.common.PanelGenerator;
 import org.alfresco.web.ui.common.Utils;
@@ -19,10 +20,18 @@ import org.alfresco.web.ui.common.Utils;
 /**
  * @author kevinr
  */
-public class UIPanel extends SelfRenderingComponent
+public class UIPanel extends UICommand
 {
    // ------------------------------------------------------------------------------
    // Component Impl 
+   
+   /**
+    * Default constructor
+    */
+   public UIPanel()
+   {
+      setRendererType(null);
+   }
    
    /**
     * @see javax.faces.component.UIComponent#getFamily()
@@ -60,13 +69,35 @@ public class UIPanel extends SelfRenderingComponent
                bgcolor);
       }
       
-      // output textual label
+      // determine if we have a link on the header
+      boolean linkPresent = false;
+      String linkLabel = getLinkLabel();
+      String linkIcon = getLinkIcon();
+      if (linkLabel != null || linkIcon != null)
+      {
+         linkPresent = true;
+      }
+      
+      // determine whether we have any adornment
+      boolean adornments = false;
       String label = getLabel();
+      if (label != null || isProgressive() == true || linkPresent == true)
+      {
+         adornments = true;
+      }
+         
+      if (adornments)
+      {
+         // start the containing table if we have any adornments
+         out.write("<table border='0' cellspacing='0' cellpadding='0' width='100%'><tr><td>");
+      }
+      
+      // output textual label
       if (label != null)
       {
          out.write("<span");
-         outputAttribute(out, getAttributes().get("style"), "style");
-         outputAttribute(out, getAttributes().get("styleClass"), "class");
+         Utils.outputAttribute(out, getAttributes().get("style"), "style");
+         Utils.outputAttribute(out, getAttributes().get("styleClass"), "class");
          out.write('>');
          
          out.write(Utils.encode(label));
@@ -94,11 +125,42 @@ public class UIPanel extends SelfRenderingComponent
          
          out.write("</a>");
       }
-      
-      // start panel contents on new line if we added any adornments
-      if (label != null || isProgressive() == true)
+
+      if (adornments)
       {
-         out.write("<br>");
+         out.write("</td>");
+      }
+      
+      if (linkPresent)
+      {
+         out.write("<td align='right'>");
+         
+         out.write("<a href=\"#\" onclick=\"");
+         out.write(Utils.generateFormSubmit(context, this, getHiddenFieldName(), 
+               getClientId(context) + NamingContainer.SEPARATOR_CHAR + LINK_CLICKED));
+         out.write("\"");
+         Utils.outputAttribute(out, getLinkStyleClass(), "class");
+         Utils.outputAttribute(out, getLinkTooltip(), "title");
+         out.write(">");
+         
+         if (getLinkIcon() != null)
+         {
+            out.write(Utils.buildImageTag(context, getLinkIcon(), getLinkTooltip(), "absmiddle"));
+         }
+         
+         if (getLinkLabel() != null)
+         {
+            out.write("<span style='padding-left: 6px;'>");
+            out.write(getLinkLabel());
+            out.write("</span>");
+         }
+         
+         out.write("</a></td>");
+      }
+      
+      if (adornments)
+      {
+         out.write("</tr></table>");
       }
    }
 
@@ -136,9 +198,20 @@ public class UIPanel extends SelfRenderingComponent
       // we encoded the value to start with our Id
       if (value != null && value.startsWith(getClientId(context) + NamingContainer.SEPARATOR_CHAR))
       {
-         // we were clicked
-         // strip out the boolean value from the field contents
-         setExpanded( Boolean.valueOf( value.substring(getClientId(context).length() + 1) ).booleanValue() );
+         // we were clicked, strip out the value
+         String strippedValue = value.substring(getClientId(context).length() + 1);
+         
+         if (strippedValue.equals(LINK_CLICKED))
+         {
+            // the action link was clicked, so queue the action event
+            ActionEvent event = new ActionEvent(this);
+            queueEvent(event);
+         }
+         else
+         {
+            // the expand/collapse icon was clicked, so toggle the state 
+            setExpanded( Boolean.valueOf(strippedValue).booleanValue() );
+         }
          
          //
          // TODO: See http://forums.java.sun.com/thread.jspa?threadID=524925&start=15&tstart=0
@@ -168,6 +241,10 @@ public class UIPanel extends SelfRenderingComponent
       this.border = (String)values[3];
       this.bgcolor = (String)values[4];
       this.label = (String)values[5];
+      this.linkLabel = (String)values[6];
+      this.linkIcon = (String)values[7];
+      this.linkStyleClass = (String)values[8];
+      this.linkTooltip = (String)values[9];
    }
    
    /**
@@ -175,7 +252,7 @@ public class UIPanel extends SelfRenderingComponent
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[6];
+      Object values[] = new Object[10];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = (isExpanded() ? Boolean.TRUE : Boolean.FALSE);
@@ -183,6 +260,10 @@ public class UIPanel extends SelfRenderingComponent
       values[3] = this.border;
       values[4] = this.bgcolor;
       values[5] = this.label;
+      values[6] = this.linkLabel;
+      values[7] = this.linkIcon;
+      values[8] = this.linkStyleClass;
+      values[9] = this.linkTooltip;
       return values;
    }
    
@@ -254,6 +335,94 @@ public class UIPanel extends SelfRenderingComponent
    public void setLabel(String label)
    {
       this.label = label;
+   }
+   
+   /**
+    * @return Returns the icon to use for the link
+    */
+   public String getLinkIcon()
+   {
+      ValueBinding vb = getValueBinding("linkIcon");
+      if (vb != null)
+      {
+         this.linkIcon = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.linkIcon;
+   }
+
+   /**
+    * @param linkIcon Sets the link icon
+    */
+   public void setLinkIcon(String linkIcon)
+   {
+      this.linkIcon = linkIcon;
+   }
+
+   /**
+    * @return Returns the label to use for the link
+    */
+   public String getLinkLabel()
+   {
+      ValueBinding vb = getValueBinding("linkLabel");
+      if (vb != null)
+      {
+         this.linkLabel = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.linkLabel;
+   }
+
+   /**
+    * @param linkLabel Sets the link label
+    */
+   public void setLinkLabel(String linkLabel)
+   {
+      this.linkLabel = linkLabel;
+   }
+
+   /**
+    * @return Returns the link style class
+    */
+   public String getLinkStyleClass()
+   {
+      ValueBinding vb = getValueBinding("linkStyleClass");
+      if (vb != null)
+      {
+         this.linkStyleClass = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.linkStyleClass;
+   }
+
+   /**
+    * @param linkStyleClass Sets the link style class
+    */
+   public void setLinkStyleClass(String linkStyleClass)
+   {
+      this.linkStyleClass = linkStyleClass;
+   }
+
+   /**
+    * @return Returns the tooltip for the link
+    */
+   public String getLinkTooltip()
+   {
+      ValueBinding vb = getValueBinding("linkTooltip");
+      if (vb != null)
+      {
+         this.linkTooltip = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.linkTooltip;
+   }
+
+   /**
+    * @param linkTooltip Sets the link tooltip
+    */
+   public void setLinkTooltip(String linkTooltip)
+   {
+      this.linkTooltip = linkTooltip;
    }
 
    /**
@@ -341,7 +510,7 @@ public class UIPanel extends SelfRenderingComponent
    
    private final static String EXPANDED_IMG  = "/images/icons/arrow_expanded.gif";
    private final static String COLLAPSED_IMG = "/images/icons/arrow_collapsed.gif";
-   
+   private final static String LINK_CLICKED = "link-clicked";
    
    // ------------------------------------------------------------------------------
    // Private members 
@@ -351,6 +520,10 @@ public class UIPanel extends SelfRenderingComponent
    private String bgcolor = null;
    private Boolean progressive = null;
    private String label = null;
+   private String linkLabel = null;
+   private String linkIcon = null;
+   private String linkTooltip = null;
+   private String linkStyleClass = null;
    
    // component state
    private Boolean expanded = Boolean.TRUE;

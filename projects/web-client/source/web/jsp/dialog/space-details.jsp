@@ -86,7 +86,9 @@
                         <tr>
                            <td width="100%" valign="top">
                               <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true"><br/>
+                                       progressive="true" action="editSpaceProperties" linkTooltip="Modify"
+                                       actionListener="#{EditSpaceDialog.startWizardForEdit}"
+                                       linkIcon="/images/icons/Change_details.gif">
                                  <r:propertySheetGrid id="space-props" value="#{BrowseBean.actionSpace}" var="spaceProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
