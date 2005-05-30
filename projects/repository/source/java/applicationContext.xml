@@ -682,6 +682,26 @@
       </property>
    </bean>
    
+   <!--                -->
+   <!-- Rules Service -->
+   <!--                -->
+   
+   <bean id="RuleService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.repo.rule.RuleService</value>
+      </property>
+      <property name="transactionManager"><ref bean="transactionManager"/></property>
+      <property name="target">
+         <bean class="org.alfresco.repo.rule.impl.RuleServiceImpl">
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
    <!-- Query Register Component -->
    
    <bean id="queryRegisterComponent" class="org.alfresco.repo.search.QueryRegisterComponentImpl">

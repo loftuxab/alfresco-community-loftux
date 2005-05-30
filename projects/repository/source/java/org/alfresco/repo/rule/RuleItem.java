@@ -1,36 +1,26 @@
 package org.alfresco.repo.rule;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.Map;
 
-public interface RuleItem 
+/**
+ * 
+ * @author Roy Wetherall
+ */
+public interface RuleItem
 {
 	/**
-	 * Get the name of the rule item.
-	 * <p>
-	 * The name is unique and is used to identify the rule item.
+	 * Get the parameter values
 	 * 
-	 * @return	the name of the rule action
+	 * @return	get the parameter values
 	 */
-	public String getName();
+	public Map<String, Serializable> getParameterValues();
 	
 	/**
-	 * The title of the rule item.
+	 * Sets the parameter values
 	 * 
-	 * @return	the title of the rule item
+	 * @param parameterValues	the parameter values
 	 */
-	public String getTitle();
-	
-	/**
-	 * The description of the rule item.
-	 * 
-	 * @return	the description of the rule item
-	 */
-	public String getDescription();
-	
-	/**
-	 * A list containing the parmameter defintions for this rule item.
-	 * 
-	 * @return	a list of parameter definitions
-	 */
-	public List<ParameterDefinition> getParameterDefinitions();
+	public void setParameterValues(
+            Map<String, Serializable> parameterValues);
 }

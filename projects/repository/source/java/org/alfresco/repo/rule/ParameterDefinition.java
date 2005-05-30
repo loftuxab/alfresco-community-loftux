@@ -31,6 +31,6 @@ public interface ParameterDefinition
 	 * 
 	 * @return	the parameter display label
 	 */
-	public String getDisplayName();
+	public String getDisplayLabel();
 	
 }

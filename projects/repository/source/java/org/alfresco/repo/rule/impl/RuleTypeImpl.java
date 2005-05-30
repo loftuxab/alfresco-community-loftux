@@ -6,16 +6,29 @@ package org.alfresco.repo.rule.impl;
 import org.alfresco.repo.rule.RuleType;
 
 /**
+ * Rule type implementation class.
+ * 
  * @author Roy Wetherall
  */
 public class RuleTypeImpl implements RuleType
 {
     /**
+     * The name of the rule type
+     */
+    private String name;
+    
+    /**
+     * The display label
+     */
+    private String displayLabel;
+    
+    /**
      * 
      */
-    public RuleTypeImpl()
+    public RuleTypeImpl(String name, String displayLabel)
     {
-        super();
+        this.name = name;
+        this.displayLabel = displayLabel;
     }
 
     /**
@@ -23,7 +36,7 @@ public class RuleTypeImpl implements RuleType
      */
     public String getName()
     {
-        throw new UnsupportedOperationException();
+        return this.name;
     }
 
     /**
@@ -31,7 +44,7 @@ public class RuleTypeImpl implements RuleType
      */
     public String getDisplayLabel()
     {
-        throw new UnsupportedOperationException();
+        return this.displayLabel;
     }
 
 }

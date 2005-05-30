@@ -4,8 +4,12 @@
 package org.alfresco.repo.rule;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.alfresco.repo.rule.impl.RuleActionImpl;
+import org.alfresco.repo.rule.impl.RuleConditionImpl;
 
 /**
  * Rule implementation class.
@@ -36,7 +40,17 @@ public class Rule implements Serializable
 	 * The description
 	 */
 	private String description;
-	
+    
+    /**
+     * List of rule conditions
+     */
+    private List<RuleCondition> ruleConditions = new ArrayList<RuleCondition>();
+    
+    /**
+     * List of rule actions
+     */
+    private List<RuleAction> ruleActions = new ArrayList<RuleAction>();
+    
 	/**
 	 * Constructor
 	 * 
@@ -105,65 +119,77 @@ public class Rule implements Serializable
 	}
 	
 	/**
-	 * 
-	 * @param ruleCondition
-	 * @param parameterValues
-	 * @return
+	 * Get a list of rule conditions.
+     * 
+	 * @return     the list of rule conditions
 	 */
-	public RuleItemInstance<RuleCondition> addRuleCondition(
-			RuleCondition ruleCondition, 
-			Map<String, Serializable> parameterValues) 
+	public List<RuleCondition> getRuleConditions()
 	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public List<RuleItemInstance<RuleCondition>> getRuleConditions()
-	{
-		throw new UnsupportedOperationException();
-	}		
-	
-	/**
-	 * 
-	 * @param ruleItemInstance
-	 */
-	public void removeRuleCondition(RuleItemInstance<RuleCondition> ruleItemInstance)
-	{
-		throw new UnsupportedOperationException();
+		return this.ruleConditions;
 	}	
+    
+    /**
+     */
+    public RuleCondition addRuleCondition(
+            RuleConditionDefinition ruleConditionDefinition,
+            Map<String, Serializable> parameterValues)
+    {
+        // TODO for now we only support a single rule condition
+        if (this.ruleConditions.size() > 0)
+        {
+            throw new RuleServiceException("Currently only one condition per rule is supported.");
+        }
+        
+        // Create the rule action and add to the list
+        RuleCondition ruleCondition = new RuleConditionImpl(ruleConditionDefinition, parameterValues);
+        this.ruleConditions.add(ruleCondition);
+        return ruleCondition;
+    }
+        
+    /**
+     * 
+     */
+    public void removeRuleCondition(RuleCondition ruleCondition)
+    {
+        // Remove the rule action from the list
+        this.ruleConditions.remove(ruleCondition);
+    }
+    
+    /**
+     * Get a list of rule actions.
+     * 
+     * @return      the list of rule actions
+     */
+    public List<RuleAction> getRuleActions()
+    {
+        return this.ruleActions;
+    }
 	
 	/**
-	 * 
-	 * @param ruleAction
-	 * @param parameterValues
-	 * @return
 	 */
-	public RuleItemInstance<RuleAction> addRuleAction(
-			RuleAction ruleAction,
+	public RuleAction addRuleAction(
+			RuleActionDefinition ruleActionDefinition,
 			Map<String, Serializable> parameterValues)
 	{
-		throw new UnsupportedOperationException();
+        // TODO for now we only support a single rule action
+        if (this.ruleActions.size() > 0)
+        {
+            throw new RuleServiceException("Currently only one action per rule is supported.");
+        }
+        
+        // Create the rule action and add to the list
+		RuleAction ruleAction = new RuleActionImpl(ruleActionDefinition, parameterValues);
+        this.ruleActions.add(ruleAction);
+        return ruleAction;
 	}
-	
+		
 	/**
 	 * 
-	 * @return
 	 */
-	public List<RuleItemInstance<RuleAction>> getRuleActions()
+	public void removeRuleAction(RuleAction ruleAction)
 	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * 
-	 * @param ruleItemInstance
-	 */
-	public void removeRuleAction(RuleItemInstance<RuleAction> ruleItemInstance)
-	{
-		throw new UnsupportedOperationException();
+		// Remove the rule action from the list
+        this.ruleActions.remove(ruleAction);
 	}
 }
 

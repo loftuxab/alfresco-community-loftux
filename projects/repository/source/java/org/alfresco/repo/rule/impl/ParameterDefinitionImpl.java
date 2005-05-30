@@ -3,27 +3,60 @@
  */
 package org.alfresco.repo.rule.impl;
 
+import java.io.Serializable;
+
 import org.alfresco.repo.rule.ParameterDefinition;
 
 /**
+ * Parameter definition implementation class.
+ * 
  * @author Roy Wetherall
  */
-public class ParameterDefinitionImpl implements ParameterDefinition
+public class ParameterDefinitionImpl implements ParameterDefinition, Serializable
 {
     /**
-     * 
+     * Serial version UID
      */
-    public ParameterDefinitionImpl()
-    {
-        super();
-    }
+    private static final long serialVersionUID = 3976741384558751799L;
 
+    /**
+     * The name of the parameter
+     */
+    private String name;
+    
+    /**
+     * The type of the parameter
+     */
+    private Class type;
+    
+    /**
+     * The display label
+     */
+    private String displayLabel;
+
+    /**
+     * Constructor
+     * 
+     * @param name          the name of the parameter
+     * @param type          the type of the parameter
+     * @param displayLabel  the display label
+     */
+    public ParameterDefinitionImpl(
+            String name, 
+            Class type, 
+            String displayLabel)
+    {
+        this.name = name;
+        this.type = type;
+        this.displayLabel = displayLabel;
+    }
+    
     /**
      * @see org.alfresco.repo.rule.ParameterDefinition#getName()
      */
     public String getName()
     {
-        throw new UnsupportedOperationException();
+        return this.name;
     }
 
     /**
@@ -31,15 +64,15 @@ public class ParameterDefinitionImpl implements ParameterDefinition
      */
     public Class getType()
     {
-        throw new UnsupportedOperationException();
+        return this.type;
     }
 
     /**
-     * @see org.alfresco.repo.rule.ParameterDefinition#getDisplayName()
+     * @see org.alfresco.repo.rule.ParameterDefinition#getDisplayLabel()
      */
-    public String getDisplayName()
+    public String getDisplayLabel()
     {
-        throw new UnsupportedOperationException();
+        return this.displayLabel;
     }
 
 }

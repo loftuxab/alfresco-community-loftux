@@ -28,14 +28,14 @@ public interface RuleService
 	 * 
 	 * @return	a list of condition definitions
 	 */
-	public List<RuleCondition> getConditionDefintions();
+	public List<RuleConditionDefinition> getConditionDefinitions();
 	
 	/**
 	 * Get the action definitions currently defined in the repository.
 	 * 
 	 * @return	a list of action definitions
 	 */
-	public List<RuleAction> getActionDefinitions();
+	public List<RuleActionDefinition> getActionDefinitions();
 	
 	/**
 	 * Makes a specified node Actionable.
