@@ -691,11 +691,7 @@
       <property name="namespaceService">
           <ref bean="namespaceService"/>
       </property>
-      <property name="collections">
-         <list>
-            <value>queryRegister.xml</value>
-         </list>
-      </property>
+      <!-- Query collections should be loaded on demand using this component - once loaded thay are available for use -->
    </bean>
 
 </beans>

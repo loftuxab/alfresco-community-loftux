@@ -59,8 +59,7 @@ public class LuceneTest extends TestCase
 
     DictionaryService dictionaryService;
 
-    LuceneIndexLock luceneIndexLock; // = (LuceneIndexLock)
-                                        // ctx.getBean("luceneIndexLock");
+    LuceneIndexLock luceneIndexLock;
 
     private NodeRef rootNodeRef;
 
@@ -98,26 +97,25 @@ public class LuceneTest extends TestCase
 
     private ClassRef testTypeRef;
 
-    private FullTextSearchIndexer luceneFTS; // = (FullTextSearchIndexer)
-                                                // ctx.getBean("LuceneFullTextSearchIndexer");
+    private FullTextSearchIndexer luceneFTS;
 
     private QName testSuperType;
 
-                                                private M2Type testTypeSuperType;
+    private M2Type testTypeSuperType;
 
-                                                private QName testAspect;
+    private QName testAspect;
 
-                                                private ClassRef testAspectRef;
+    private ClassRef testAspectRef;
 
-                                                private QName testSuperAspect;
+    private QName testSuperAspect;
 
-                                                private M2Aspect testAspectSuperAspect;
+    private M2Aspect testAspectSuperAspect;
 
-                                                private ContentService contentService;
+    private ContentService contentService;
 
-                                                private QueryRegisterComponent queryRegisterComponent;
+    private QueryRegisterComponent queryRegisterComponent;
 
-                                                private NamespacePrefixResolver namespacePrefixResolver;
+    private NamespacePrefixResolver namespacePrefixResolver;
 
     public LuceneTest()
     {
@@ -135,6 +133,8 @@ public class LuceneTest extends TestCase
         contentService = (ContentService) ctx.getBean("contentService");
         queryRegisterComponent = (QueryRegisterComponent) ctx.getBean("queryRegisterComponent");
         namespacePrefixResolver = (NamespacePrefixResolver) ctx.getBean("namespaceService");
+        
+        queryRegisterComponent.loadQueryCollection("testQueryRegister.xml");
 
         assertEquals(true, ctx.isSingleton("luceneIndexLock"));
         assertEquals(true, ctx.isSingleton("LuceneFullTextSearchIndexer"));
@@ -149,9 +149,9 @@ public class LuceneTest extends TestCase
         n2 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}two"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "value-1");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "value-2");
-        
+
         n3 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}three"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        
+
         ObjectOutputStream oos;
         try
         {
@@ -159,7 +159,7 @@ public class LuceneTest extends TestCase
             oos = new ObjectOutputStream(baos);
             oos.writeObject(n3);
             oos.close();
-            
+
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
             Object o = ois.readObject();
             ois.close();
@@ -174,10 +174,7 @@ public class LuceneTest extends TestCase
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-       
-        
-        
-        
+
         Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
         testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"), "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
         testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic"),
@@ -198,16 +195,16 @@ public class LuceneTest extends TestCase
         Map<QName, Serializable> contentProperties = new HashMap<QName, Serializable>();
         contentProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "encoding"), "woof");
         contentProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype"), "woof");
-        
+
         n4 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}four"), testTypeRef.getQName(), testProperties).getChildRef();
-        
+
         nodeService.getProperties(n1);
         nodeService.getProperties(n2);
         nodeService.getProperties(n3);
         nodeService.getProperties(n4);
-        
+
         n3 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}three"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-       
+
         n5 = nodeService.createNode(n1, null, QName.createQName("{namespace}five"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         n6 = nodeService.createNode(n1, null, QName.createQName("{namespace}six"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         n7 = nodeService.createNode(n2, null, QName.createQName("{namespace}seven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
@@ -221,15 +218,17 @@ public class LuceneTest extends TestCase
 
         Map<QName, Serializable> properties = nodeService.getProperties(n14);
         properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        //properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "application/msword");
+        // properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE,
+        // "application/msword");
         properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
         nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_CONTENT, properties);
-        
+
         ContentWriter writer = contentService.getUpdatingWriter(n14);
-        //InputStream is = this.getClass().getClassLoader().getResourceAsStream("test.doc");
-        //writer.putContent(is);
+        // InputStream is =
+        // this.getClass().getClassLoader().getResourceAsStream("test.doc");
+        // writer.putContent(is);
         writer.putContent("The quick brown fox jumped over the lazy dog");
-        
+
         nodeService.addChild(rootNodeRef, n8, QName.createQName("{namespace}eight-0"));
         nodeService.addChild(n1, n8, QName.createQName("{namespace}eight-1"));
         nodeService.addChild(n2, n13, QName.createQName("{namespace}link"));
@@ -249,17 +248,16 @@ public class LuceneTest extends TestCase
 
         testSuperType = QName.createQName(NamespaceService.ALFRESCO_URI, "testSuperType");
         testTypeSuperType = metaModelDAO.createType(testSuperType);
-       
-        
+
         testAspect = QName.createQName(NamespaceService.ALFRESCO_URI, "testAspect");
         testAspectRef = new ClassRef(testAspect);
-        
+
         testSuperAspect = QName.createQName(NamespaceService.ALFRESCO_URI, "testSuperAspect");
         testAspectSuperAspect = metaModelDAO.createAspect(testSuperAspect);
-        
-        M2Aspect testAspectAspect =  metaModelDAO.createAspect(testAspect);
+
+        M2Aspect testAspectAspect = metaModelDAO.createAspect(testAspect);
         testAspectAspect.setSuperClass(testAspectSuperAspect);
-        
+
         M2Type testTypeType = metaModelDAO.createType(testType);
         testTypeType.setSuperClass(testTypeSuperType);
         testTypeType.getDefaultAspects().add(testAspectAspect);
@@ -290,7 +288,7 @@ public class LuceneTest extends TestCase
         int_ista.setStoredInIndex(true);
         int_ista.setTokenisedInIndex(true);
 
-        M2Property long_ista = testTypeType.createProperty("long-ista");        
+        M2Property long_ista = testTypeType.createProperty("long-ista");
         long_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.LONG));
         long_ista.setMandatory(true);
         long_ista.setMultiValued(false);
@@ -380,14 +378,14 @@ public class LuceneTest extends TestCase
         noderef_ista.setStoredInIndex(true);
         noderef_ista.setTokenisedInIndex(true);
 
-//        M2Property path_ista = testTypeType.createProperty("path-ista");
-//        path_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.PATH));
-//        path_ista.setMandatory(true);
-//        path_ista.setMultiValued(false);
-//        path_ista.setIndexed(true);
-//        path_ista.setIndexedAtomically(true);
-//        path_ista.setStoredInIndex(true);
-//        path_ista.setTokenisedInIndex(true);
+        // M2Property path_ista = testTypeType.createProperty("path-ista");
+        // path_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.PATH));
+        // path_ista.setMandatory(true);
+        // path_ista.setMultiValued(false);
+        // path_ista.setIndexed(true);
+        // path_ista.setIndexedAtomically(true);
+        // path_ista.setStoredInIndex(true);
+        // path_ista.setTokenisedInIndex(true);
     }
 
     public LuceneTest(String arg0)
@@ -482,7 +480,6 @@ public class LuceneTest extends TestCase
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
-        
 
         indexer.clearIndex();
 
@@ -500,7 +497,7 @@ public class LuceneTest extends TestCase
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
         searcher.setNamespaceService(new MockNameService("namespace"));
-        
+
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"value-2\"", null, null);
 
         assertEquals(1, results.length());
@@ -514,7 +511,7 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(0));
         assertEquals(1.0f, results.getScore(1));
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@namespace\\:property\\-1:\"value-1\"", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
@@ -522,7 +519,7 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(0));
         assertEquals(1.0f, results.getScore(1));
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:\"value-1\"", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
@@ -829,132 +826,135 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen//.//.\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         // Type search tests
-        
+
         QName qname = QName.createQName(NamespaceService.ALFRESCO_URI, "int-ista");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(qname) + ":\"01\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"01\"", null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
-        
+
         qname = QName.createQName(NamespaceService.ALFRESCO_URI, "long-ista");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(qname) + ":\"2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"2\"", null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
-        
+
         qname = QName.createQName(NamespaceService.ALFRESCO_URI, "float-ista");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(qname) + ":\"3.4\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"3.4\"", null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "double-ista")) + ":\"5.6\"", null, null);
+
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "double-ista")) + ":\"5.6\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         Date date = new Date();
         String sDate = CachingDateFormat.getDateFormat().format(date);
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "date-ista")) + ":\""+sDate+"\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "date-ista")) + ":\"" + sDate + "\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "datetime-ista")) + ":\""+sDate+"\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "datetime-ista")) + ":\"" + sDate + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "boolean-ista")) + ":\"true\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "boolean-ista")) + ":\"true\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "qname-ista")) + ":\"{wibble}wobble\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "qname-ista")) + ":\"{wibble}wobble\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "guid-ista")) + ":\"My-GUID\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "guid-ista")) + ":\"My-GUID\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "category-ista")) + ":\"CategoryId\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "category-ista")) + ":\"CategoryId\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "noderef-ista")) + ":\""+n1+"\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "noderef-ista")) + ":\"" + n1 + "\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "path-ista")) + ":\""+nodeService.getPath(n3)+"\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "path-ista")) + ":\""
+                + nodeService.getPath(n3) + "\"", null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(QName.createQName(NamespaceService.ALFRESCO_URI, "path-ista")));
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\""+testType.toString()+"\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\"" + testType.toString() + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\""+testSuperType.toString()+"\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\"" + testSuperType.toString() + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\""+testAspect.toString()+"\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testAspect.toString() + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\""+testSuperAspect.toString()+"\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testSuperAspect.toString() + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-      
+
         // FTS test
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TEXT:\"fox\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         QName queryQName = QName.createQName("alf:test1", namespacePrefixResolver);
-        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, null );
+        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         // Parameters
-        
+
         queryQName = QName.createQName("alf:test2", namespacePrefixResolver);
-        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, null );
+        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         queryQName = QName.createQName("alf:test2", namespacePrefixResolver);
         QueryParameter qp = new QueryParameter(QName.createQName("alf:banana", namespacePrefixResolver), "woof");
-        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, new QueryParameter[]{qp} );
+        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, new QueryParameter[] { qp });
         assertEquals(0, results.length());
         results.close();
-        
+
         queryQName = QName.createQName("alf:test3", namespacePrefixResolver);
         qp = new QueryParameter(QName.createQName("alf:banana", namespacePrefixResolver), "/one/five//*");
-        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, new QueryParameter[]{qp} );
+        results = searcher.query(rootNodeRef.getStoreRef(), queryQName, new QueryParameter[] { qp });
         assertEquals(9, results.length());
         results.close();
-        
+
         // TODO: should not have a null property type definition
-        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:lemur", namespacePrefixResolver), (PropertyTypeDefinition)null, true, "fox");        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TEXT:\"${alf:lemur}\"", null, new QueryParameterDefinition[]{paramDef});
+        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:lemur", namespacePrefixResolver), (PropertyTypeDefinition) null, true, "fox");
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TEXT:\"${alf:lemur}\"", null, new QueryParameterDefinition[] { paramDef });
         assertEquals(1, results.length());
         results.close();
-    
+
+        paramDef = new QueryParameterDefImpl(QName.createQName("alf:intvalue", namespacePrefixResolver), (PropertyTypeDefinition) null, true, "1");
+        qname = QName.createQName(NamespaceService.ALFRESCO_URI, "int-ista");
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"${alf:intvalue}\"", null, new QueryParameterDefinition[] { paramDef });
+        assertEquals(1, results.length());
+        assertNotNull(results.getRow(0).getValue(qname));
+        results.close();
+
     }
 
     public void testPathSearch() throws InterruptedException
@@ -1029,6 +1029,11 @@ public class LuceneTest extends TestCase
         assertEquals(25, results.length());
         results.close();
         luceneFTS.resume();
+        
+        QueryParameterDefinition paramDef = new QueryParameterDefImpl(QName.createQName("alf:query", namespacePrefixResolver), (PropertyTypeDefinition) null, true, "//./*");
+        results = searcher.query(rootNodeRef.getStoreRef(), "xpath", "${alf:query}", null, new QueryParameterDefinition[] { paramDef });
+        assertEquals(25, results.length());
+        results.close();
     }
 
     public void testMissingIndex() throws InterruptedException
@@ -1948,7 +1953,7 @@ public class LuceneTest extends TestCase
         {
             map.put(NamespaceService.DEFAULT_PREFIX, defaultUri);
         }
-        
+
         public Collection<String> getURIs()
         {
             return map.values();

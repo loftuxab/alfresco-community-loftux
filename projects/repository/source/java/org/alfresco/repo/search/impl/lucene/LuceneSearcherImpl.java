@@ -75,27 +75,28 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
     {
         if (indexExists())
         {
+            String parameterisedQueryString;
+            if (queryParameterDefinitions != null)
+            {
+                Map<QName, QueryParameterDefinition> map = new HashMap<QName, QueryParameterDefinition>();
+                if (queryParameterDefinitions != null)
+                {
+                    for (QueryParameterDefinition qpd : queryParameterDefinitions)
+                    {
+                        map.put(qpd.getQName(), qpd);
+                    }
+                }
+                parameterisedQueryString = parameterise(queryString, map, null, nameSpaceService);
+            }
+            else
+            {
+                parameterisedQueryString = queryString;
+            }
+            
             if (language.equalsIgnoreCase(LUCENE))
             {
                 try
                 {
-                    String parameterisedQueryString;
-                    if (queryParameterDefinitions != null)
-                    {
-                        Map<QName, QueryParameterDefinition> map = new HashMap<QName, QueryParameterDefinition>();
-                        if(queryParameterDefinitions != null)
-                        {
-                            for(QueryParameterDefinition qpd : queryParameterDefinitions)
-                            {
-                                map.put(qpd.getQName(), qpd);
-                            }
-                        }
-                        parameterisedQueryString = parameterise(queryString, map, null, nameSpaceService);
-                    }
-                    else
-                    {
-                        parameterisedQueryString = queryString;
-                    }
 
                     Query query = LuceneQueryParser.parse(parameterisedQueryString, DEFAULT_FIELD, new LuceneAnalyser(dictionaryService), nameSpaceService, dictionaryService);
                     Searcher searcher = getSearcher();
@@ -121,13 +122,14 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     LuceneXPathHandler handler = new LuceneXPathHandler();
                     handler.setNameSpaceService(nameSpaceService);
                     handler.setDictionaryService(dictionaryService);
+                    // TODO: Handler should have the query parameters to use in building its lucene query
+                    // At the moment xpath style parameters in the PATH expression are not supported.
                     reader.setXPathHandler(handler);
-                    reader.parse(queryString);
+                    reader.parse(parameterisedQueryString);
                     Query query = handler.getQuery();
                     Searcher searcher = getSearcher();
                     Hits hits = searcher.search(query);
                     return new LuceneResultSet(store, hits, searcher, nodeService);
-
                 }
                 catch (SAXPathException e)
                 {
