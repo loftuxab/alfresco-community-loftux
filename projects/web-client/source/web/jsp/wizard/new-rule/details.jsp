@@ -122,9 +122,9 @@
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Name:</td>
+                                    <td>Title:</td>
                                     <td>
-                                       <h:inputText id="name" value="#{NewRuleWizard.name}" size="35" 
+                                       <h:inputText id="title" value="#{NewRuleWizard.title}" size="35" 
                                                     onkeyup="javascript:checkButtonState(this);" />&nbsp;*
                                     </td>
                                  </tr>
@@ -148,7 +148,7 @@
                                  <tr>
                                     <td align="center">
                                        <h:commandButton id="next-button" value="Next" action="#{NewRuleWizard.next}" 
-                                                        styleClass="wizardButton" disabled="#{NewRuleWizard.name == null}" />
+                                                        styleClass="wizardButton" disabled="#{NewRuleWizard.title == null}" />
                                     </td>
                                  </tr>
                                  <tr>

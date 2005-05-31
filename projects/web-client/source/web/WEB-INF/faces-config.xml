@@ -136,8 +136,8 @@
          <value>#{NavigationBean}</value>
       </managed-property>
       <managed-property>
-         <property-name>rulesService</property-name>
-         <value>#{RulesService}</value>
+         <property-name>ruleService</property-name>
+         <value>#{RuleService}</value>
       </managed-property>
    </managed-bean>
    
@@ -207,14 +207,6 @@
          <value>#{lockService}</value>
       </managed-property>
    </managed-bean>
-   
-   <managed-bean>
-      <description>Temporary holder for a RulesService</description>
-      <managed-bean-name>RulesService</managed-bean-name>
-      <managed-bean-class>org.alfresco.web.bean.repository.RulesService</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-   </managed-bean>
-   
    
    <!-- ==================== NAVIGATION ==================== -->
    <!-- navigation rules describe the navigation cases between views using the -->

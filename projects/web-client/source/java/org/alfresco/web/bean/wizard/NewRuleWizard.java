@@ -7,10 +7,10 @@ import java.util.Map;
 
 import javax.faces.model.SelectItem;
 
-import org.alfresco.web.bean.repository.RulesService;
-import org.alfresco.web.bean.repository.RulesService.RuleAction;
-import org.alfresco.web.bean.repository.RulesService.RuleCondition;
-import org.alfresco.web.bean.repository.RulesService.RuleType;
+import org.alfresco.repo.rule.RuleActionDefinition;
+import org.alfresco.repo.rule.RuleConditionDefinition;
+import org.alfresco.repo.rule.RuleService;
+import org.alfresco.repo.rule.RuleType;
 import org.apache.log4j.Logger;
 
 /**
@@ -33,12 +33,12 @@ public class NewRuleWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To create the rule click Finish.";
    
    // new rule wizard specific properties
-   private String name;
+   private String title;
    private String description;
    private String type;
    private String condition;
    private String action;
-   private RulesService rulesService;
+   private RuleService ruleService;
    private List<SelectItem> types;
    private List<SelectItem> conditions;
    private List<SelectItem> actions;
@@ -232,7 +232,7 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       super.init();
       
-      this.name = null;
+      this.title = null;
       this.description = null;
       this.type = "inbound";
       this.action = "simple-workflow";
@@ -272,7 +272,7 @@ public class NewRuleWizard extends AbstractWizardBean
    public String getSummary()
    {
       StringBuilder builder = new StringBuilder();
-      builder.append("Name: ").append(this.name).append("<br/>");
+      builder.append("Name: ").append(this.title).append("<br/>");
       builder.append("Description: ").append(this.description).append("<br/>");
       builder.append("Condition: ").append(this.condition).append("<br/>");
       builder.append("Action: ").append(this.action).append("<br/>");
@@ -297,19 +297,19 @@ public class NewRuleWizard extends AbstractWizardBean
    } 
 
    /**
-    * @return Returns the name.
+    * @return Returns the title.
     */
-   public String getName()
+   public String getTitle()
    {
-      return name;
+      return title;
    }
    
    /**
-    * @param name The name to set.
+    * @param title The title to set.
     */
-   public void setName(String name)
+   public void setTitle(String title)
    {
-      this.name = name;
+      this.title = title;
    }
 
    /**
@@ -361,11 +361,11 @@ public class NewRuleWizard extends AbstractWizardBean
    }
 
    /**
-    * @param rulesService Sets the rule service to use
+    * @param ruleService Sets the rule service to use
     */
-   public void setRulesService(RulesService rulesService)
+   public void setRuleService(RuleService ruleService)
    {
-      this.rulesService = rulesService;
+      this.ruleService = ruleService;
    }
 
    /**
@@ -375,13 +375,11 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.actions == null)
       {
-         List<RuleAction> ruleActions = rulesService.getRuleActions();
+         List<RuleActionDefinition> ruleActions = this.ruleService.getActionDefinitions();
          this.actions = new ArrayList<SelectItem>();
-         this.actionDescriptions = new HashMap<String, String>();
-         for (RuleAction ruleAction : ruleActions)
+         for (RuleActionDefinition ruleActionDef : ruleActions)
          {
-            this.actions.add(new SelectItem(ruleAction.getId(), ruleAction.getName()));
-            this.actionDescriptions.put(ruleAction.getId(), ruleAction.getDescription());
+            this.actions.add(new SelectItem(ruleActionDef.getName(), ruleActionDef.getTitle()));
          }
       }
       
@@ -395,11 +393,11 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.actionDescriptions == null)
       {
-         List<RuleAction> ruleActions = rulesService.getRuleActions();
+         List<RuleActionDefinition> ruleActions = this.ruleService.getActionDefinitions();
          this.actionDescriptions = new HashMap<String, String>();
-         for (RuleAction ruleAction : ruleActions)
+         for (RuleActionDefinition ruleActionDef : ruleActions)
          {
-            this.actionDescriptions.put(ruleAction.getId(), ruleAction.getDescription());
+            this.actionDescriptions.put(ruleActionDef.getName(), ruleActionDef.getDescription());
          }
       }
       
@@ -413,11 +411,12 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.conditions == null)
       {
-         List<RuleCondition> ruleConditions = rulesService.getRuleConditions();
+         List<RuleConditionDefinition> ruleConditions = this.ruleService.getConditionDefinitions();
          this.conditions = new ArrayList<SelectItem>();
-         for (RuleCondition ruleCondition : ruleConditions)
+         for (RuleConditionDefinition ruleConditionDef : ruleConditions)
          {
-            this.conditions.add(new SelectItem(ruleCondition.getId(), ruleCondition.getName()));
+            this.conditions.add(new SelectItem(ruleConditionDef.getName(), 
+                  ruleConditionDef.getTitle()));
          }
       }
       
@@ -431,11 +430,12 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.conditionDescriptions == null)
       {
-         List<RuleCondition> ruleConditions = rulesService.getRuleConditions();
+         List<RuleConditionDefinition> ruleConditions = this.ruleService.getConditionDefinitions();
          this.conditionDescriptions = new HashMap<String, String>();
-         for (RuleCondition ruleCondition : ruleConditions)
+         for (RuleConditionDefinition ruleConditionDef : ruleConditions)
          {
-            this.conditionDescriptions.put(ruleCondition.getId(), ruleCondition.getDescription());
+            this.conditionDescriptions.put(ruleConditionDef.getName(), 
+                  ruleConditionDef.getDescription());
          }
       }
       
@@ -449,11 +449,11 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.types == null)
       {
-         List<RuleType> ruleTypes = rulesService.getRuleTypes();
+         List<RuleType> ruleTypes = this.ruleService.getRuleTypes();
          this.types = new ArrayList<SelectItem>();
          for (RuleType ruleType : ruleTypes)
          {
-            this.types.add(new SelectItem(ruleType.getId(), ruleType.getName()));
+            this.types.add(new SelectItem(ruleType.getName(), ruleType.getDisplayLabel()));
          }
       }
       
@@ -482,9 +482,9 @@ public class NewRuleWizard extends AbstractWizardBean
       if (this.categories == null)
       {
          this.categories = new ArrayList<SelectItem>();
-         this.categories.add(new SelectItem("category1", "Caegory 1"));
-         this.categories.add(new SelectItem("category2", "Caegory 2"));
-         this.categories.add(new SelectItem("category3", "Caegory 3"));
+         this.categories.add(new SelectItem("category1", "Category 1"));
+         this.categories.add(new SelectItem("category2", "Category 2"));
+         this.categories.add(new SelectItem("category3", "Category 3"));
       }
       
       return this.categories;
