@@ -1,7 +1,8 @@
 package org.alfresco.repo.node;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreatePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeDeletePolicy;
@@ -11,10 +12,13 @@ import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePolicy;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.repo.ref.qname.RegexQNamePattern;
+import org.alfresco.repo.search.QueryParameterDefinition;
+import org.jaxen.JaxenException;
 
 /**
  * Provides common functionality for {@link org.alfresco.repo.node.NodeService}
@@ -160,4 +164,60 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     {
         return getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
     }
+
+    public List<ChildAssocRef> selectNodes(NodeRef contextNode, String xPath, QueryParameterDefinition[] paramDefs, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws XPathException
+    {
+        try
+        {
+           NodeServiceXPath xpath = new NodeServiceXPath(xPath, this, namespacePrefixResolver, paramDefs, followAllParentLinks);
+           for(String prefix: namespacePrefixResolver.getPrefixes())
+           {
+              xpath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
+           }
+           List list = xpath.selectNodes(getPrimaryParent(contextNode));
+           List<ChildAssocRef> answer = new ArrayList<ChildAssocRef>(list.size());
+           for(Object o: list)
+           {
+               if(!(o instanceof ChildAssocRef))
+               {
+                   throw new XPathException("Xpath expression must only select nodes");
+               }
+               answer.add((ChildAssocRef)o);
+           }
+           return answer;
+        }
+        catch(JaxenException e)
+        {
+            throw new XPathException("Error executing xpath", e);
+        }
+    }
+
+    public List<Serializable> selectProperties(NodeRef contextNode, String xPath, QueryParameterDefinition[] paramDefs, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks)
+    {
+        try
+        {
+           NodeServiceXPath xpath = new NodeServiceXPath(xPath, this, namespacePrefixResolver, paramDefs, followAllParentLinks);
+           for(String prefix: namespacePrefixResolver.getPrefixes())
+           {
+              xpath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
+           }
+           List list = xpath.selectNodes(getPrimaryParent(contextNode));
+           List<Serializable> answer = new ArrayList<Serializable>(list.size());
+           for(Object o: list)
+           {
+               if(!(o instanceof DocumentNavigator.Property))
+               {
+                   throw new XPathException("Xpath expression must only select nodes");
+               }
+               answer.add(((DocumentNavigator.Property)o).value);
+           }
+           return answer;
+        }
+        catch(JaxenException e)
+        {
+            throw new XPathException("Error executing xpath", e);
+        }
+    }
+    
+    
 }

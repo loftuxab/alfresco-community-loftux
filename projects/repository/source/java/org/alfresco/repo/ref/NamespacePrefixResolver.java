@@ -33,4 +33,11 @@ public interface NamespacePrefixResolver
     public Collection<String> getPrefixes(String namespaceURI)
         throws NamespaceException;
     
+    /**
+     * Gets all registered Prefixes
+     * 
+     * @return collection of all registered namespace prefixes
+     */
+    Collection<String> getPrefixes();
+    
 }

@@ -21,6 +21,7 @@ import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.PropertyException;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.EntityRef;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
@@ -28,6 +29,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.repo.ref.qname.RegexQNamePattern;
+import org.alfresco.repo.search.QueryParameterDefinition;
 import org.alfresco.repo.search.Searcher;
 
 /**
@@ -468,4 +470,18 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }
+
+    public List<ChildAssocRef> selectNodes(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
+    public List<Serializable> selectProperties(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+    
+    
 }

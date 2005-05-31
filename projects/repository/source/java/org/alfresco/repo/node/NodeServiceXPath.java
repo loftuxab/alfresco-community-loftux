@@ -7,11 +7,11 @@
  */
 package org.alfresco.repo.node;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.search.QueryParameterDefinition;
 import org.jaxen.BaseXPath;
@@ -31,10 +31,11 @@ public class NodeServiceXPath extends BaseXPath
      * 
      */
     private static final long serialVersionUID = 3834032441789592882L;
+    private boolean followAllParentLinks;
 
-    public NodeServiceXPath(String arg0, NodeService nodeService, NamespaceService namespaceService, QueryParameterDefinition[] paramDefs) throws JaxenException
+    public NodeServiceXPath(String arg0, NodeService nodeService, NamespacePrefixResolver nspr, QueryParameterDefinition[] paramDefs, boolean followAllParentLinks) throws JaxenException
     {
-        super(arg0, new DocumentNavigator(nodeService, namespaceService));
+        super(arg0, new DocumentNavigator(nodeService, nspr, followAllParentLinks));
         // Add support for parameters
         if (paramDefs != null)
         {
@@ -93,15 +94,22 @@ public class NodeServiceXPath extends BaseXPath
 
         public Object evaluate(Object attributeName, Object pattern, Navigator nav)
         {
+            List<Object> answer = new ArrayList<Object>();
             String attributeValue = StringFunction.evaluate(attributeName, nav);
             String patternValue = StringFunction.evaluate(pattern, nav);
 
             // TODO:  Ignore the pattern for now
             // Should do a type pattern test
-            NodeRef nodeRef = new NodeRef(attributeValue);
+            if((attributeValue != null) && (attributeValue.length() > 0))
+            {
+               NodeRef nodeRef = new NodeRef(attributeValue);
+               DocumentNavigator dNav = (DocumentNavigator)nav;
+               answer.add(dNav.getNode(nodeRef));
+               
+            }
+            return answer;
             
-            DocumentNavigator dNav = (DocumentNavigator)nav;
-            return dNav.getNode(nodeRef);
         }
     }
+
 }

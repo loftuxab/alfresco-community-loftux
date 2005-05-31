@@ -44,7 +44,7 @@ public class QueryRegisterComponentTest extends TestCase
         QueryRegisterComponentImpl qr = new QueryRegisterComponentImpl();
         qr.setNamespaceService(namespaceService);
         qr.setDictionaryService(dictionaryService);
-        qr.loadQueryCollection("queryRegister.xml");
+        qr.loadQueryCollection("testQueryRegister.xml");
         
         assertNotNull(qr.getQueryDefinition(QName.createQName("alf", "query1", namespaceService)));
         assertEquals("lucene", qr.getQueryDefinition(QName.createQName("alf", "query1", namespaceService)).getLanguage());

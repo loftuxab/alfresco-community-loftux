@@ -13,8 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.value.ValueConverter;
@@ -39,7 +39,7 @@ public class DocumentNavigator extends DefaultNavigator
 
     private NodeService nodeService; 
     
-    private NamespaceService namespaceService;
+    private NamespacePrefixResolver nspr;
     
     // Support classes to encapsulate stuff more akin to xml
     
@@ -60,11 +60,14 @@ public class DocumentNavigator extends DefaultNavigator
      */
     private static final long serialVersionUID = 3618984485740165427L;
 
-    public DocumentNavigator(NodeService nodeService, NamespaceService namespaceService)
+    private boolean followAllParentLinks;
+
+    public DocumentNavigator(NodeService nodeService, NamespacePrefixResolver nspr, boolean followAllParentLinks)
     {
         super();
         this.nodeService = nodeService;
-        this.namespaceService = namespaceService;
+        this.nspr = nspr;
+        this.followAllParentLinks = followAllParentLinks;
     }
 
     @Override
@@ -193,7 +196,7 @@ public class DocumentNavigator extends DefaultNavigator
     @Override
     public XPath parseXPath(String o) throws SAXPathException
     {
-        return new NodeServiceXPath(o, nodeService, namespaceService, null);
+        return new NodeServiceXPath(o, nodeService, nspr, null, followAllParentLinks);
     }
 
     // Basic navigation support
@@ -224,9 +227,9 @@ public class DocumentNavigator extends DefaultNavigator
     {
         // Iterator of Namespace
         ArrayList<Namespace> namespaces = new ArrayList<Namespace>();
-        for(String prefix :namespaceService.getPrefixes())
+        for(String prefix : nspr.getPrefixes())
         {
-            String uri = namespaceService.getNamespaceURI(prefix);
+            String uri = nspr.getNamespaceURI(prefix);
             Namespace ns = new Namespace();
             ns.prefix = prefix;
             ns.uri = uri;
@@ -242,7 +245,17 @@ public class DocumentNavigator extends DefaultNavigator
         ChildAssocRef contextRef = (ChildAssocRef)o;
         if(contextRef.getParentRef() != null)
         {
-           parents.add(nodeService.getPrimaryParent(contextRef.getParentRef()));
+            if(followAllParentLinks)
+            {
+                for(ChildAssocRef car: nodeService.getParentAssocs(contextRef.getChildRef()))
+                {
+                   parents.add(nodeService.getPrimaryParent(car.getParentRef()));
+                }
+            }
+            else
+            {
+               parents.add(nodeService.getPrimaryParent(contextRef.getParentRef()));
+            }
         }
         return parents.iterator();
     }

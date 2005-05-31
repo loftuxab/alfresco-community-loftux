@@ -1,6 +1,7 @@
 package org.alfresco.repo.ref;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import junit.framework.TestCase;
 
@@ -240,6 +241,14 @@ public class QNameTest extends TestCase
         public Collection<String> getPrefixes(String namespaceURI)
         {
             throw new NamespaceException("URI " + namespaceURI + " not registered");
+        }
+
+        public Collection<String> getPrefixes()
+        {
+            HashSet<String> prefixes = new HashSet<String>();
+            prefixes.add(NamespaceService.DEFAULT_PREFIX);
+            prefixes.add(NamespaceService.ALFRESCO_PREFIX);
+            return prefixes;
         }
         
     }

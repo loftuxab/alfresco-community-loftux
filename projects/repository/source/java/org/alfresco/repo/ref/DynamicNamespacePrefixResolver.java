@@ -10,6 +10,8 @@ package org.alfresco.repo.ref;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A delegating namespace prefix resolver which allows local over rides from the
@@ -95,4 +97,17 @@ public class DynamicNamespacePrefixResolver implements NamespacePrefixResolver
         }
         return prefixes;
     }
+
+    public Collection<String> getPrefixes()
+    {
+       Set<String> prefixes = new HashSet<String>();
+       if(delegate != null)
+       {
+          prefixes.addAll(delegate.getPrefixes());
+       }
+       prefixes.addAll(map.keySet());
+       return prefixes;
+    }
+    
+    
 }

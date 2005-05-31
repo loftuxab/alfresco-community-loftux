@@ -9,12 +9,14 @@ import java.util.Set;
 import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.EntityRef;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
+import org.alfresco.repo.search.QueryParameterDefinition;
 
 /**
  * Interface for public and internal <b>node</b> and <b>store</b> operations.
@@ -379,4 +381,29 @@ public interface NodeService
      * @throws InvalidNodeRefException if the node could not be found
      */
     public Collection<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException;
+    
+    /**
+     * Select nodes using an xpath expression.
+     * 
+     * @param contextNode - the context node for relative expressions etc
+     * @param XPath - the xpath string to evaluate
+     * @param parameters - parameters to bind in to the xpath expression
+     * @param namespacePrefixResolver - prefix to namespace mappings
+     * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
+     * @return a list of all the child assoc relationships to the selected nodes
+     */
+    public List<ChildAssocRef> selectNodes(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks);
+
+    /**
+     * Select properties using an xpath expression 
+     * 
+     * @param contextNode - the context node for relative expressions etc
+     * @param XPath - the xpath string to evaluate
+     * @param parameters - parameters to bind in to the xpath expression
+     * @param namespacePrefixResolver - prefix to namespace mappings
+     * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
+     * @return a list of property values 
+     * TODO: Should be returning a property object 
+     */
+    public List<Serializable> selectProperties(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks);
 }
