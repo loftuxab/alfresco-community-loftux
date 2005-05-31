@@ -36,10 +36,10 @@ public class AlfrescoFacesServlet extends FacesServlet
       }
       catch (Throwable error)
       {
-         // TODO: determine the return page
+         String returnPage = ((HttpServletRequest)request).getRequestURI();
          
          Application.handleServletError(getServletConfig().getServletContext(), (HttpServletRequest)request,
-               (HttpServletResponse)response, error, logger, null);
+               (HttpServletResponse)response, error, logger, returnPage);
       }
    }
    
