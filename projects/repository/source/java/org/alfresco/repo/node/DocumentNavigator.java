@@ -47,6 +47,7 @@ public class DocumentNavigator extends DefaultNavigator
     {
         QName qname;
         Serializable value;
+        NodeRef parent;
     }
     
     public class Namespace
@@ -204,13 +205,15 @@ public class DocumentNavigator extends DefaultNavigator
     public Iterator getAttributeAxisIterator(Object o) throws UnsupportedAxisException
     {
         ArrayList<Property> properties = new ArrayList<Property>();
-        Map<QName, Serializable> map = nodeService.getProperties(((ChildAssocRef)o).getChildRef());       
+        NodeRef nodeRef = ((ChildAssocRef)o).getChildRef();
+        Map<QName, Serializable> map = nodeService.getProperties(nodeRef);       
         for(QName qName : map.keySet())
         {
             // Do not support multi value attributes - return the first
             Property property = new Property();
             property.qname = qName;
             property.value = map.get(qName);
+            property.parent = nodeRef;
             properties.add(property);
         }
         return properties.iterator();
@@ -268,6 +271,16 @@ public class DocumentNavigator extends DefaultNavigator
     public Object getNode(NodeRef nodeRef)
     {
         return nodeService.getPrimaryParent(nodeRef);
+    }
+
+    public Boolean like(NodeRef childRef, QName qname, String sqlLikePattern)
+    {
+       return nodeService.like(childRef, qname, sqlLikePattern);
+    }
+    
+    public Boolean contains(NodeRef childRef, QName qname, String sqlLikePattern)
+    {
+       return nodeService.contains(childRef, qname, sqlLikePattern);
     }
     
 }

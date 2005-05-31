@@ -11,9 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
+import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.QueryParameterDefinition;
+import org.alfresco.repo.search.SearcherComponent;
 import org.jaxen.BaseXPath;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -77,6 +80,8 @@ public class NodeServiceXPath extends BaseXPath
         SimpleFunctionContext sfc = (SimpleFunctionContext) this.getFunctionContext();
         // TODO:Register extra functions here
         sfc.registerFunction(null, "deref", new Deref());
+        sfc.registerFunction(null, "like", new Like());
+        sfc.registerFunction(null, "contains", new Contains());
     }
 
     static class Deref implements Function
@@ -111,5 +116,92 @@ public class NodeServiceXPath extends BaseXPath
             
         }
     }
+    
+    static class Like implements Function
+    {
+   
+        public Object call(Context context, List args) throws FunctionCallException
+        {
+            if (args.size() == 2)
+            {
+                return evaluate(context.getNodeSet(), args.get(0), args.get(1), context.getNavigator());
+            }
 
+            throw new FunctionCallException("like() requires two arguments.");
+        }
+
+        public Object evaluate(List nodes, Object obj, Object pattern, Navigator nav)
+        {
+            Object attribute = null;
+            if(obj instanceof List)
+            {
+                List list = (List) obj;
+                if (list.isEmpty())
+                {
+                   return false;
+                }
+                // do not recurse: only first list should unwrap
+                attribute = list.get(0);
+            }
+            if((attribute == null) || !nav.isAttribute(attribute))
+            {
+                return false;
+            }
+            if(nodes.size() != 1)
+            {
+                return false;
+            }
+            if(!nav.isElement(nodes.get(0)))
+            {
+                return false;
+            }
+            ChildAssocRef car = (ChildAssocRef)nodes.get(0);
+            String patternValue = StringFunction.evaluate(pattern, nav);
+            QName qname = QName.createQName(nav.getAttributeNamespaceUri(attribute), nav.getAttributeName(attribute));
+            DocumentNavigator dNav = (DocumentNavigator)nav;
+            
+            return dNav.like(car.getChildRef(), qname, patternValue); 
+            
+        }
+    }
+    
+    static class Contains implements Function
+    {
+   
+        public Object call(Context context, List args) throws FunctionCallException
+        {
+            if (args.size() == 1)
+            {
+                return evaluate(context.getNodeSet(), args.get(0), context.getNavigator());
+            }
+
+            throw new FunctionCallException("contains() requires one argument.");
+        }
+
+        public Object evaluate(List nodes, Object pattern, Navigator nav)
+        {
+            if(nodes.size() != 1)
+            {
+                return false;
+            }
+            QName qname = null;
+            NodeRef nodeRef = null;
+            if(nav.isElement(nodes.get(0)))
+            {
+                qname = null; // should use all attributes and full text index
+                nodeRef = ((ChildAssocRef)nodes.get(0)).getChildRef();
+            }
+            else if(nav.isAttribute(nodes.get(0)))
+            {   
+                qname = QName.createQName(nav.getAttributeNamespaceUri(nodes.get(0)), nav.getAttributeName(nodes.get(0)));
+                nodeRef = ((DocumentNavigator.Property)nodes.get(0)).parent;
+            }
+            
+            String patternValue = StringFunction.evaluate(pattern, nav);
+            DocumentNavigator dNav = (DocumentNavigator)nav;
+            
+            return dNav.contains(nodeRef, qname, patternValue); 
+            
+        }
+    }
 }

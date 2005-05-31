@@ -482,6 +482,18 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }
+
+    public boolean contains(NodeRef nodeRef, QName property, String sqlLikePattern)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean like(NodeRef nodeRef, QName property, String sqlLikePattern)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
     
     
 }

@@ -406,4 +406,8 @@ public interface NodeService
      * TODO: Should be returning a property object 
      */
     public List<Serializable> selectProperties(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks);
+
+    public boolean like(NodeRef nodeRef, QName property, String sqlLikePattern);
+    
+    public boolean contains(NodeRef nodeRef, QName property, String googleLikePattern);
 }

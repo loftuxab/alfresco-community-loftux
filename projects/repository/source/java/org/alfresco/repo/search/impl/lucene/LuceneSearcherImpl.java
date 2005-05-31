@@ -28,7 +28,6 @@ import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.SearcherException;
 import org.alfresco.repo.value.ValueConverter;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;

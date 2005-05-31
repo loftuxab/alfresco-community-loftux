@@ -1,5 +1,7 @@
 package org.alfresco.repo.node.index;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.content.ContentService;
@@ -8,6 +10,7 @@ import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
@@ -67,6 +70,53 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
         rootNodeRef = myRootNode;
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"" + NamespaceService.ALFRESCO_TEST_PREFIX + ":root_p_n1\"", null, null);
         assertEquals(1, results.length());
-
+    }
+    
+    public void testLikeAndContains() throws Exception
+    {
+        rootNodeRef = myRootNode;
+        
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        
+        List<ChildAssocRef> answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, '*monkey')", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, '%monkey')", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, 'monk*')", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, 'monk%')", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, 'monk\\%')", null, namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('monkey')", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        List<Serializable> result =  nodeService.selectProperties(rootNodeRef, "//@*[contains('monkey')", null, namespacePrefixResolver, false);
+        assertEquals(1, result.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('mon?ey')", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        result =  nodeService.selectProperties(rootNodeRef, "//@*[contains('mon?ey')", null, namespacePrefixResolver, false);
+        assertEquals(1, result.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('m*y')", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        result =  nodeService.selectProperties(rootNodeRef, "//@*[contains('mon*')", null, namespacePrefixResolver, false);
+        assertEquals(1, result.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('*nkey')", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        result =  nodeService.selectProperties(rootNodeRef, "//@*[contains('?onkey')", null, namespacePrefixResolver, false);
+        assertEquals(1, result.size());
     }
 }

@@ -26,33 +26,39 @@ import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.repo.search.Indexer;
 import org.alfresco.repo.search.IndexerComponent;
+import org.alfresco.repo.search.ResultSet;
+import org.alfresco.repo.search.Searcher;
+import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 
 /**
  * A lightweight <code>NodeService</code> that delegates the work to a
  * <i>proper</i> <code>NodeService</code>, but also ensures that the
- * required calls are made to the {@link org.alfresco.repo.search.Indexer indexer}.
+ * required calls are made to the
+ * {@link org.alfresco.repo.search.Indexer indexer}.
  * <p>
  * The use of a delegate to perform all the <b>node</b> manipulation means that
- * implementations of the stores can be swapped in and out but still get indexed.
+ * implementations of the stores can be swapped in and out but still get
+ * indexed.
  * 
  * @author Derek Hulley
  */
 public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
 {
     private NodeService nodeServiceDelegate;
+
     private Indexer indexer;
 
-    public IndexingNodeServiceImpl(
-			PolicyComponent policyComponent,
-			NodeService nodeServiceDelegate, 
-			Indexer indexer)
+    private Searcher searcher;
+
+    public IndexingNodeServiceImpl(PolicyComponent policyComponent, NodeService nodeServiceDelegate, Indexer indexer, Searcher searcher)
     {
-		super(policyComponent);
-		
+        super(policyComponent);
+
         this.nodeServiceDelegate = nodeServiceDelegate;
         this.indexer = indexer;
+        this.searcher = searcher;
     }
-    
+
     /**
      * Delegates to the assigned {@link #storeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
@@ -86,7 +92,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     {
         return nodeServiceDelegate.exists(nodeRef);
     }
-    
+
     /**
      * Direct delegation to assigned {@link #storeServiceDelegate}
      */
@@ -98,10 +104,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * @see #createNode(NodeRef, QName, String, Map<QName,Serializable>)
      */
-    public ChildAssocRef createNode(NodeRef parentRef,
-            QName assocTypeQName,
-            QName assocQName,
-            QName nodeTypeQName) throws InvalidNodeRefException
+    public ChildAssocRef createNode(NodeRef parentRef, QName assocTypeQName, QName assocQName, QName nodeTypeQName) throws InvalidNodeRefException
     {
         return this.createNode(parentRef, null, assocQName, nodeTypeQName, null);
     }
@@ -112,19 +115,11 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @see IndexerComponent#createNode(ChildAssocRef)
      */
-    public ChildAssocRef createNode(NodeRef parentRef,
-            QName assocTypeQName,
-            QName assocQName,
-            QName nodeTypeQName,
-            Map<QName, Serializable> properties) throws InvalidNodeRefException
+    public ChildAssocRef createNode(NodeRef parentRef, QName assocTypeQName, QName assocQName, QName nodeTypeQName, Map<QName, Serializable> properties)
+            throws InvalidNodeRefException
     {
         // call delegate
-        ChildAssocRef assocRef = nodeServiceDelegate.createNode(
-                parentRef,
-                null,
-                assocQName,
-                nodeTypeQName,
-                properties);
+        ChildAssocRef assocRef = nodeServiceDelegate.createNode(parentRef, null, assocQName, nodeTypeQName, properties);
         // update index
         indexer.createNode(assocRef);
         // done
@@ -138,18 +133,14 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     {
         return nodeServiceDelegate.getType(nodeRef);
     }
-    
+
     /**
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
      * @see IndexerComponent#updateNode(NodeRef)
      */
-    public void addAspect(
-            NodeRef nodeRef,
-            ClassRef aspectRef,
-            Map<QName, Serializable> aspectProperties)
-            throws InvalidNodeRefException, InvalidAspectException, PropertyException
+    public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
         // call delegate
         nodeServiceDelegate.addAspect(nodeRef, aspectRef, aspectProperties);
@@ -163,10 +154,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @see IndexerComponent#updateNode(NodeRef)
      */
-    public void removeAspect(
-            NodeRef nodeRef,
-            ClassRef aspectRef)
-            throws InvalidNodeRefException, InvalidAspectException
+    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
         // call delegate
         nodeServiceDelegate.removeAspect(nodeRef, aspectRef);
@@ -199,8 +187,9 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     public void deleteNode(NodeRef nodeRef) throws InvalidNodeRefException
     {
         // TODO: The NodeService should just return the element refs deleted
-        
-        // get the first primary assoc to this node - it is the last path element
+
+        // get the first primary assoc to this node - it is the last path
+        // element
         Path path = getPath(nodeRef);
         Path.ChildAssocElement element = (Path.ChildAssocElement) path.last();
         ChildAssocRef assoc = element.getRef();
@@ -404,4 +393,65 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     {
         return nodeServiceDelegate.getProperty(nodeRef, qname);
     }
+
+    public boolean contains(NodeRef nodeRef, QName property, String googleLikePattern)
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(googleLikePattern).append(") ");
+        if (property != null)
+        {
+            buffer.append("@").append(LuceneQueryParser.escape(property.toString())).append(":(").append(googleLikePattern).append(")");
+        }
+        else
+        {
+            for (QName key : nodeServiceDelegate.getProperties(nodeRef).keySet())
+            {
+                buffer.append("@").append(LuceneQueryParser.escape(key.toString())).append(":(").append(googleLikePattern).append(")");
+            }
+        }
+        buffer.append(")");
+
+        ResultSet resultSet = searcher.query(nodeRef.getStoreRef(), "lucene", buffer.toString());
+        boolean answer = resultSet.length() > 0;
+        return answer;
+    }
+
+    public boolean like(NodeRef nodeRef, QName property, String sqlLikePattern)
+    {
+        // Need to turn the SQL like patter into lucene line
+        // Need to replace unescaped % with * (? and ? will match and \ is used
+        // for escape so the rest is OK)
+
+        StringBuffer patternBuffer = new StringBuffer();
+        char previous = ' ';
+        char current = ' ';
+        for (int i = 0; i < sqlLikePattern.length(); i++)
+        {
+            previous = current;
+            current = sqlLikePattern.charAt(i);
+            if ((current == '%') && (previous != '\\'))
+            {
+                patternBuffer.append("*");
+            }
+            else
+            {
+                patternBuffer.append(current);
+            }
+        }
+
+        String pattern = patternBuffer.toString();
+
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(pattern).append(") ");
+        if (property != null)
+        {
+            buffer.append("@").append(LuceneQueryParser.escape(property.toString())).append(":(").append(pattern).append(")");
+        }
+        buffer.append(")");
+
+        ResultSet resultSet = searcher.query(nodeRef.getStoreRef(), "lucene", buffer.toString());
+        boolean answer = resultSet.length() > 0;
+        return answer;
+    }
+
 }

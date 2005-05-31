@@ -218,6 +218,16 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             throw new XPathException("Error executing xpath", e);
         }
     }
+
+    public boolean contains(NodeRef nodeRef, QName property, String googleLikePattern)
+    {
+        return false;
+    }
+
+    public boolean like(NodeRef nodeRef, QName property, String sqlLikePattern)
+    {
+        return false;
+    }
     
     
 }

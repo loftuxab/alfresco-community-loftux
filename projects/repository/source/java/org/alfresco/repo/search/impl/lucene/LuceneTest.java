@@ -1784,19 +1784,7 @@ public class LuceneTest extends TestCase
 
     private String escapeQName(QName qName)
     {
-        StringBuffer buffer = new StringBuffer();
-        String string = qName.toString();
-        for (int i = 0; i < string.length(); i++)
-        {
-            char c = string.charAt(i);
-            if ((c == '{') || (c == '}') || (c == '-') || (c == ':'))
-            {
-                buffer.append('\\');
-            }
-
-            buffer.append(c);
-        }
-        return buffer.toString();
+        return LuceneQueryParser.escape(qName.toString());
     }
 
     public void testForKev() throws InterruptedException

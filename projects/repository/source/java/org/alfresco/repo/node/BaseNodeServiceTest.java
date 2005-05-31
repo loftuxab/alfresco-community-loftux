@@ -953,7 +953,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         List<Serializable> attributes = nodeService.selectProperties(rootNodeRef, "//@alftest:animal", null, namespacePrefixResolver, false);
         System.out.println(attributes);
         assertEquals(1, attributes.size());
-        
     }
     
     
