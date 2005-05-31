@@ -98,8 +98,15 @@ public abstract class BaseComponentTag extends UIComponentTag
    {
       if (value != null)
       {
-         ValueBinding vb = getFacesContext().getApplication().createValueBinding(value);
-         component.setValueBinding(name, vb);
+         if (isValueReference(value))
+         {
+            ValueBinding vb = getFacesContext().getApplication().createValueBinding(value);
+            component.setValueBinding(name, vb);
+         }
+         else
+         {
+            throw new IllegalArgumentException("Property: '" + name + "' must be a value binding expression.");
+         }
       }
    }
    

@@ -4,6 +4,7 @@
 package org.alfresco.web.ui.common;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.faces.application.FacesMessage;
@@ -122,6 +123,41 @@ public final class Utils
          out.write("=\"");
          out.write(attr.toString());
          out.write('"');
+      }
+   }
+   
+   /**
+    * Helper to recursively render a component and it's child components
+    * 
+    * @param context    FacesContext
+    * @param component  UIComponent
+    * 
+    * @throws IOException
+    */
+   public static void encodeRecursive(FacesContext context, UIComponent component)
+      throws IOException
+   {
+      if (component.isRendered() == true)
+      {
+         component.encodeBegin(context);
+         
+         // follow the spec for components that render their children
+         if (component.getRendersChildren() == true)
+         {
+            component.encodeChildren(context);
+         }
+         else
+         {
+            if (component.getChildCount() != 0)
+            {
+               for (Iterator i=component.getChildren().iterator(); i.hasNext(); /**/)
+               {
+                  encodeRecursive(context, (UIComponent)i.next());
+               }
+            }
+         }
+         
+         component.encodeEnd(context);
       }
    }
    
@@ -261,10 +297,10 @@ public final class Utils
    {
       StringBuilder buf = new StringBuilder(200);
       
-      buf.append("<img src='")
+      buf.append("<img src=\"")
          .append(context.getExternalContext().getRequestContextPath())
          .append(image)
-         .append("' width=")
+         .append("\" width=")
          .append(width)
          .append(" height=")
          .append(height)
@@ -339,10 +375,10 @@ public final class Utils
    {
       StringBuilder buf = new StringBuilder(128);
       
-      buf.append("<img src='")
+      buf.append("<img src=\"")
          .append(context.getExternalContext().getRequestContextPath())
          .append(image)
-         .append("' border='0'");
+         .append("\" border=0");
       
       if (alt != null)
       {

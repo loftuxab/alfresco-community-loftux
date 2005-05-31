@@ -7,6 +7,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
 import org.alfresco.web.ui.repo.component.property.UIProperty;
 import org.apache.log4j.Logger;
@@ -71,10 +72,10 @@ public class PropertyRenderer extends BaseRenderer
          // close the <td> 
          out.write(">");
          // encode the label
-         encodeRecursive(context, label);
+         Utils.encodeRecursive(context, label);
          // encode the control
          context.getResponseWriter().write("</td><td>");
-         encodeRecursive(context, control);
+         Utils.encodeRecursive(context, control);
          
          // NOTE: we'll allow the property sheet's grid renderer close off the last <td>
       }

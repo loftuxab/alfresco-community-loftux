@@ -44,41 +44,6 @@ public abstract class BaseRenderer extends Renderer
    }
    
    /**
-    * Helper to recursively render a component and it's child components
-    * 
-    * @param context    FacesContext
-    * @param component  UIComponent
-    * 
-    * @throws IOException
-    */
-   protected static void encodeRecursive(FacesContext context, UIComponent component)
-      throws IOException
-   {
-      if (component.isRendered() == true)
-      {
-         component.encodeBegin(context);
-         
-         // follow the spec for components that render their children
-         if (component.getRendersChildren() == true)
-         {
-            component.encodeChildren(context);
-         }
-         else
-         {
-            if (component.getChildCount() != 0)
-            {
-               for (Iterator i=component.getChildren().iterator(); i.hasNext(); /**/)
-               {
-                  encodeRecursive(context, (UIComponent)i.next());
-               }
-            }
-         }
-         
-         component.encodeEnd(context);
-      }
-   }
-   
-   /**
     * Ensures that the given context and component are not null. This method
     * should be called by all renderer methods that are given these parameters.
     * 

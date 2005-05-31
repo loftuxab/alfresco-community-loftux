@@ -80,8 +80,12 @@
                                     <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" id="link5" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param2" />
                                     </a:actionLink>
-                                    <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" id="link6" />
-                                    <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" id="link7" />
+                                    <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" id="link6" actionListener="#{ClipboardBean.cutNode}">
+                                       <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param3" />
+                                    </a:actionLink>
+                                    <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" id="link7" actionListener="#{ClipboardBean.copyNode}">
+                                       <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param4" />
+                                    </a:actionLink>
                                     <a:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" id="link8" />
                                     <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{NewSpaceWizard.startWizard}" id="link9" />
                                     <a:actionLink value="#{msg.manage_rules}" image="/images/icons/space_small.gif" action="manageRules" id="link10" />
@@ -254,8 +258,12 @@
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
-                           <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
-                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.cutNode}">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
+                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.copyNode}">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
                            <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
@@ -361,9 +369,13 @@
                               <a:actionLink value="#{msg.update}" image="/images/icons/file.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
-                              <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.cutNode}">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
                            </a:booleanEvaluator>
-                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" />
+                           <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.copyNode}">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
                            <a:booleanEvaluator value="#{r.locked == false && r.workingCopy == false}">
                               <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
                                  <f:param name="id" value="#{r.id}" />

@@ -14,7 +14,7 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
 /**
- * @author kevinr
+ * @author Kevin Roast
  */
 public class UIModeList extends UICommand
 {
@@ -189,6 +189,7 @@ public class UIModeList extends UICommand
       this.disabled = disabled;
    }
    
+   
    // ------------------------------------------------------------------------------
    // Private data 
 
@@ -200,6 +201,7 @@ public class UIModeList extends UICommand
    
    /** disabled flag */
    private Boolean disabled = null;
+   
    
    // ------------------------------------------------------------------------------
    // Inner classes

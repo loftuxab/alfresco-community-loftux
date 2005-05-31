@@ -207,9 +207,7 @@ public class UIShelf extends SelfRenderingComponent
                   }
                   
                   // allow child components to render themselves
-                  group.encodeBegin(context);
-                  group.encodeChildren(context);
-                  group.encodeEnd(context);
+                  Utils.encodeRecursive(context, group);
                   
                   if (innerGroupPanel != null)
                   {

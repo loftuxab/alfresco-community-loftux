@@ -347,7 +347,7 @@
       
       <attribute>
          <name>id</name>
-         <required>false</required>
+         <required>true</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       
@@ -407,7 +407,7 @@
       
       <attribute>
          <name>id</name>
-         <required>false</required>
+         <required>true</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       
@@ -486,6 +486,36 @@
       <attribute>
          <name>tooltip</name>
          <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
+   
+   <tag>
+      <name>clipboardShelfItem</name>
+      <tagclass>org.alfresco.web.ui.repo.tag.shelf.ClipboardShelfItemTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>binding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>collections</name>
+         <required>true</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>

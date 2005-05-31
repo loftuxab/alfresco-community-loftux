@@ -11,6 +11,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.el.ValueBinding;
 
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 
 /**
@@ -65,9 +66,6 @@ public class UIShelfGroup extends SelfRenderingComponent
       }
       
       ResponseWriter out = context.getResponseWriter();
-      
-      // TODO: allow config of spacing between ShelfGroup components
-      out.write("<table border=0 cellspacing=4 cellpadding=0>");
    }
    
    /**
@@ -83,14 +81,19 @@ public class UIShelfGroup extends SelfRenderingComponent
       ResponseWriter out = context.getResponseWriter();
       
       // output each shelf group in turn
+      out.write("<table cellspacing=1 cellpadding=0 border=0 width=100%>");
       for (Iterator i=this.getChildren().iterator(); i.hasNext(); /**/)
       {
          UIComponent child = (UIComponent)i.next();
          if (child instanceof UIShelfItem)
          {
-            // TODO: render children
+            // render child items
+            out.write("<tr><td>");
+            Utils.encodeRecursive(context, child);
+            out.write("</tr></td>");
          }
       }
+      out.write("</table>");
    }
    
    /**
@@ -104,8 +107,6 @@ public class UIShelfGroup extends SelfRenderingComponent
       }
       
       ResponseWriter out = context.getResponseWriter();
-      
-      out.write("</table>");
    }
 
    /**

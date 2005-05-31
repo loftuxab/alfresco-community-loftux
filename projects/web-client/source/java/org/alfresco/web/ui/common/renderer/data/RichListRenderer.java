@@ -13,6 +13,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.data.UIColumn;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
@@ -234,7 +235,7 @@ public class RichListRenderer extends BaseRenderer
                if (column.getChildCount() != 0)
                {
                   // allow child controls inside the columns to render themselves
-                  encodeRecursive(context, column);
+                  Utils.encodeRecursive(context, column);
                }
                
                out.write("</td>");
@@ -258,7 +259,7 @@ public class RichListRenderer extends BaseRenderer
             UIComponent child = (UIComponent)i.next();
             if (child instanceof UIColumn == false)
             {
-               encodeRecursive(context, child);
+               Utils.encodeRecursive(context, child);
             }
          }
          out.write("</td></tr>");
@@ -407,7 +408,7 @@ public class RichListRenderer extends BaseRenderer
             if (column.getChildCount() != 0)
             {
                // allow child controls inside the columns to render themselves
-               encodeRecursive(context, column);
+               Utils.encodeRecursive(context, column);
             }
             out.write("</td>");
             
@@ -422,7 +423,7 @@ public class RichListRenderer extends BaseRenderer
                if (actionsColumn.getChildCount() != 0)
                {
                   // allow child controls inside the columns to render themselves
-                  encodeRecursive(context, actionsColumn);
+                  Utils.encodeRecursive(context, actionsColumn);
                }
                out.write("</td>");
             }
@@ -449,7 +450,7 @@ public class RichListRenderer extends BaseRenderer
                if (column.getChildCount() != 0)
                {
                   // allow child controls inside the columns to render themselves
-                  encodeRecursive(context, column);
+                  Utils.encodeRecursive(context, column);
                }
                out.write("</td><td></td></tr>");
                
@@ -478,7 +479,7 @@ public class RichListRenderer extends BaseRenderer
             UIComponent child = (UIComponent)i.next();
             if (child instanceof UIColumn == false)
             {
-               encodeRecursive(context, child);
+               Utils.encodeRecursive(context, child);
             }
          }
          out.write("</td></tr>");
@@ -590,7 +591,7 @@ public class RichListRenderer extends BaseRenderer
                if (column.getChildCount() != 0)
                {
                   // allow child controls inside the columns to render themselves
-                  encodeRecursive(context, column);
+                  Utils.encodeRecursive(context, column);
                }
                out.write("</td></tr>");
             }
@@ -612,7 +613,7 @@ public class RichListRenderer extends BaseRenderer
                if (column.getChildCount() != 0)
                {
                   // allow child controls inside the columns to render themselves
-                  encodeRecursive(context, column);
+                  Utils.encodeRecursive(context, column);
                }
                out.write("</td></tr>");
                
@@ -652,7 +653,7 @@ public class RichListRenderer extends BaseRenderer
             UIComponent child = (UIComponent)i.next();
             if (child instanceof UIColumn == false)
             {
-               encodeRecursive(context, child);
+               Utils.encodeRecursive(context, child);
             }
          }
          out.write("</td></tr>");

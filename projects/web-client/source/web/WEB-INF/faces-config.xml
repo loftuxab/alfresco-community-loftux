@@ -208,6 +208,24 @@
       </managed-property>
    </managed-bean>
    
+   <managed-bean>
+      <description>
+         The bean that holds users ClipboardBean state.
+      </description>
+      <managed-bean-name>ClipboardBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.clipboard.ClipboardBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeOperationsService</property-name>
+         <value>#{nodeOperationsService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   
    <!-- ==================== NAVIGATION ==================== -->
    <!-- navigation rules describe the navigation cases between views using the -->
    <!-- outcomes from action methods or the outcome from a default action impl -->

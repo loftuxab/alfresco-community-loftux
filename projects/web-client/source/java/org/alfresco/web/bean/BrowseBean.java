@@ -280,7 +280,7 @@ public class BrowseBean implements IContextListener
     */
    public void contextUpdated()
    {
-      logger.debug("*****contextUpdated() listener called");
+      logger.debug("contextUpdated() listener called");
       invalidateComponents();
    }
    
