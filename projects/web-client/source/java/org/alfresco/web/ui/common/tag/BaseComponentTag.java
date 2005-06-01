@@ -204,5 +204,5 @@ public abstract class BaseComponentTag extends UIComponentTag
       }
    }
    
-   private final static Class ACTION_CLASS_ARGS[] = {javax.faces.event.ActionEvent.class};
+   protected final static Class ACTION_CLASS_ARGS[] = {javax.faces.event.ActionEvent.class};
 }

@@ -530,6 +530,12 @@
          <required>true</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>pasteActionListener</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    </tag>
    
 </taglib>

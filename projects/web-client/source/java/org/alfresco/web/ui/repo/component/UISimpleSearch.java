@@ -78,7 +78,7 @@ public class UISimpleSearch extends UICommand
    public void decode(FacesContext context)
    {
       Map requestMap = context.getExternalContext().getRequestParameterMap();
-      String fieldId = getHiddenFieldName(context, this);
+      String fieldId = Utils.getActionHiddenFieldName(context, this);
       String value = (String)requestMap.get(fieldId);
       // we are clicked if the hidden field contained our client id
       if (value != null && value.equals(this.getClientId(context)))
@@ -149,7 +149,7 @@ public class UISimpleSearch extends UICommand
             "else {" +
             "   return true; } }");
       out.write("function _searchSubmit() {");
-      out.write(Utils.generateFormSubmit(context, this, getHiddenFieldName(context, this), getClientId(context)));
+      out.write(Utils.generateFormSubmit(context, this, Utils.getActionHiddenFieldName(context, this), getClientId(context)));
       out.write("}");
       out.write("</script>");
       
@@ -256,21 +256,6 @@ public class UISimpleSearch extends UICommand
    public int getSearchMode()
    {
       return this.searchOption;
-   }
-   
-   
-   // ------------------------------------------------------------------------------
-   // Private helpers
-   
-   /**
-    * Get the hidden field name for this actionlink.
-    * Build a shared field name from the parent form name and the string "act".
-    * 
-    * @return hidden field name shared by all action links within the Form.
-    */
-   private static String getHiddenFieldName(FacesContext context, UIComponent component)
-   {
-      return Utils.getParentForm(context, component).getClientId(context) + NamingContainer.SEPARATOR_CHAR + "act";
    }
    
    

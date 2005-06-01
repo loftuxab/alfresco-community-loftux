@@ -10,17 +10,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
+import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
+import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
+import org.alfresco.web.ui.repo.component.shelf.UIClipboardShelfItem;
 import org.apache.log4j.Logger;
 
 /**
@@ -61,6 +69,22 @@ public class ClipboardBean
    public void setNodeOperationsService(NodeOperationsService nodeOperationsService)
    {
       this.nodeOperationsService = nodeOperationsService;
+   }
+   
+   /**
+    * @return Returns the navigation bean instance.
+    */
+   public NavigationBean getNavigator()
+   {
+      return this.navigator;
+   }
+   
+   /**
+    * @param navigator The NavigationBean to set.
+    */
+   public void setNavigator(NavigationBean navigator)
+   {
+      this.navigator = navigator;
    }
    
    /**
@@ -112,6 +136,51 @@ public class ClipboardBean
    }
    
    /**
+    * Action handler called to paste one or all items from the clipboard
+    */
+   public void pasteItem(ActionEvent event)
+   {
+      UIClipboardShelfItem.ClipboardEvent clipEvent = (UIClipboardShelfItem.ClipboardEvent)event;
+      int index = clipEvent.Index;
+      if (index == -1)
+      {
+         // paste all
+      }
+      else
+      {
+         // paste an individual item
+         if (index >= this.items.size())
+         {
+            throw new IllegalStateException("Clipboard attempting paste a non existent item index: " + index);
+         }
+         
+         ClipboardItem item = this.items.get(index);
+         NodeRef parentRef = new NodeRef(Repository.getStoreRef(), this.navigator.getCurrentNodeId());
+         try
+         {
+            // call the node ops service to initiate the copy
+            // TODO: what should the assoc QName be?
+            // TODO: can we use primary parent here?
+            //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
+            //       It's naff backend design if we need to pass childassocref around everywhere...!
+            ChildAssocRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
+            NodeRef copyRef = this.nodeOperationsService.copy(item.Node.getNodeRef(), parentRef, null, assocRef.getQName());
+            // TODO: a temp fix for the fact that the NAME attribute is not copied as DD not here yet
+            this.nodeService.setProperty(copyRef, RepoUtils.QNAME_NAME, item.Node.getName());
+            
+            // refresh UI on success
+            UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
+            
+            // TODO: after a paste all - remove items from the clipboard...? or not. ask linton
+         }
+         catch (Exception err)
+         {
+            Utils.addErrorMessage("Unable to paste item due to system error: " + err.getMessage(), err);
+         }
+      }
+   }
+   
+   /**
     * Add a clipboard node for an operation to the clipboard
     * 
     * @param id      ID of the node for the operation
@@ -159,6 +228,9 @@ public class ClipboardBean
    
    /** The NodeOperationsService to be used by the bean */
    private NodeOperationsService nodeOperationsService;
+   
+   /** The NavigationBean reference */
+   private NavigationBean navigator;
    
    /** Current state of the clipboard items */
    private List<ClipboardItem> items = new ArrayList<ClipboardItem>(4);

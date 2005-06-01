@@ -216,6 +216,10 @@
       <managed-bean-class>org.alfresco.web.bean.clipboard.ClipboardBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
          <property-name>nodeService</property-name>
          <value>#{indexingNodeService}</value>
       </managed-property>

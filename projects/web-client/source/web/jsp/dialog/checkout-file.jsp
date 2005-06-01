@@ -61,7 +61,7 @@
                               <div class="mainTitle">Check Out '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText">Use this page to enter information about the checkout.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.checkoutfile_description}" /></div>
                            </td>
                         </tr>
                      </table>

@@ -63,7 +63,7 @@
                               <div class="mainTitle">Update '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Current status is 'draft'.</div>
-                              <div class="mainSubText">Use this page to update a document on the repository with content from your computer.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.updatefile_description}" /></div>
                            </td>
                         </tr>
                      </table>

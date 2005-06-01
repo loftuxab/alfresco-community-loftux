@@ -31,7 +31,7 @@ public class ActionLinkRenderer extends BaseRenderer
    public void decode(FacesContext context, UIComponent component)
    {
       Map requestMap = context.getExternalContext().getRequestParameterMap();
-      String fieldId = getHiddenFieldName(context, component);
+      String fieldId = Utils.getActionHiddenFieldName(context, component);
       String value = (String)requestMap.get(fieldId);
       // we are clicked if the hidden field contained our client id
       if (value != null && value.equals(component.getClientId(context)))
@@ -99,7 +99,7 @@ public class ActionLinkRenderer extends BaseRenderer
          buf.append("<a href='#' onclick=\"");
          // generate JavaScript to set a hidden form field and submit
          // a form which request attributes that we can decode
-         buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
+         buf.append(Utils.generateFormSubmit(context, link, Utils.getActionHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
          buf.append('"');
       }
       else
@@ -231,7 +231,7 @@ public class ActionLinkRenderer extends BaseRenderer
       if (attrs.get("href") == null)
       {
          buf.append("<a href='#' onclick=\"");
-         buf.append(Utils.generateFormSubmit(context, link, getHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
+         buf.append(Utils.generateFormSubmit(context, link, Utils.getActionHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
          buf.append('"');
       }
       else
@@ -271,17 +271,6 @@ public class ActionLinkRenderer extends BaseRenderer
    
    // ------------------------------------------------------------------------------
    // Private helpers
-
-   /**
-    * Get the hidden field name for this actionlink.
-    * Build a shared field name from the parent form name and the string "act".
-    * 
-    * @return hidden field name shared by all action links within the Form.
-    */
-   private static String getHiddenFieldName(FacesContext context, UIComponent component)
-   {
-      return Utils.getParentForm(context, component).getClientId(context) + NamingContainer.SEPARATOR_CHAR + "act";
-   }
    
    /**
     * Return true if the action link is present within a UIMenu component container

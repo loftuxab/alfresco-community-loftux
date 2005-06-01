@@ -19,8 +19,8 @@
             <%--                 This is because they are wrapped in a Panel component --%>
             <r:shelf id="shelf" groupPanel="ballongrey" groupBgcolor="#eeeeee" selectedGroupPanel="bluetoolbar" selectedGroupBgcolor="#e9f0f4"
                   innerGroupPanel="white" innerGroupBgcolor="#ffffff">
-               <r:shelfGroup label="My Clipboard" id="shelf-group-1" expanded="true">
-                  <r:clipboardShelfItem id="clipboard-shelf-item" collections="#{ClipboardBean.items}" />
+               <r:shelfGroup label="Clipboard" id="shelf-group-1" expanded="true">
+                  <r:clipboardShelfItem id="clipboard-shelf-item" collections="#{ClipboardBean.items}" pasteActionListener="#{ClipboardBean.pasteItem}" />
                </r:shelfGroup>
                
                <r:shelfGroup label="Shortcuts" id="shelf-group-2">

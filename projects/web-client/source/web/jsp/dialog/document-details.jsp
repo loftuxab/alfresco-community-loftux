@@ -58,7 +58,7 @@
                            <td>
                               <h:outputText value="#{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
                               <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
-                              <div class="mainSubText">Use this page to view the details about the content.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=110 style="padding-left:2px">

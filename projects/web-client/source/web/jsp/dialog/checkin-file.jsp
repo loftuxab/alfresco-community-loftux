@@ -63,7 +63,7 @@
                               <div class="mainTitle">Check In '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
                               <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText">Current status is 'draft'.</div>
-                              <div class="mainSubText">Use this page to check in your working copy for other team members to work with.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.checkinfile_description}" /></div>
                            </td>
                         </tr>
                      </table>

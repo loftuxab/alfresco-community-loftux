@@ -105,6 +105,36 @@ public final class Utils
    }
    
    /**
+    * Crop a label within a SPAN element, using ellipses '...' at the end of label and
+    * and encode the result for HTML output. A SPAN will only be generated if the label
+    * is beyond 32 characters in length.
+    * 
+    * @param text    to crop and encode
+    * 
+    * @return encoded and cropped resulting label HTML
+    */
+   public static String cropEncode(String text)
+   {
+      if (text.length() > CROP_CHARS_LENGTH)
+      {
+         String label = text.substring(0, CROP_CHARS_LENGTH - 3) + "...";
+         StringBuilder buf = new StringBuilder(32 + 32 + text.length());
+         buf.append("<span title=\"")
+            .append(Utils.encode(text))
+            .append("\">")
+            .append(Utils.encode(label))
+            .append("</span>");
+         return buf.toString();
+      }
+      else
+      {
+         return Utils.encode(text);
+      }
+   }
+   
+   private final static int CROP_CHARS_LENGTH = 32;
+   
+   /**
     * Helper to output an attribute to the output stream
     * 
     * @param out        ResponseWriter
@@ -124,6 +154,22 @@ public final class Utils
          out.write(attr.toString());
          out.write('"');
       }
+   }
+   
+   /**
+    * Get the hidden field name for any action component.
+    * 
+    * All components that wish to simply encode a form value with their client ID can reuse the same
+    * hidden field within the parent form. NOTE: components which use this method must only encode
+    * their client ID as the value and nothing else!
+    * 
+    * Build a shared field name from the parent form name and the string "act".
+    * 
+    * @return hidden field name shared by all action components within the Form.
+    */
+   public static String getActionHiddenFieldName(FacesContext context, UIComponent component)
+   {
+      return Utils.getParentForm(context, component).getClientId(context) + NamingContainer.SEPARATOR_CHAR + "act";
    }
    
    /**

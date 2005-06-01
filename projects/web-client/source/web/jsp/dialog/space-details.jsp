@@ -58,7 +58,7 @@
                            <td>
                               <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
                               <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.actionSpace.name}" />'</div>
-                              <div class="mainSubText">Use this page to view the details about the space.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.spacedetails_description}" /></div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=110 style="padding-left:2px">
