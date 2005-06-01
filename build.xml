@@ -62,6 +62,7 @@
          <fileset dir="." includes="**/project-build.xml" />
       </subant>
       <antcall target="deploy-tomcat" />
+      <antcall target="start-tomcat" />
    </target>
 
    <target name="incremental-tomcat" depends="common-init">
@@ -69,12 +70,25 @@
          <fileset dir="." includes="**/project-build.xml" />
       </subant>
       <antcall target="deploy-tomcat" />
+      <antcall target="start-tomcat" />
    </target>
 
    <target name="deploy-exploded-web-client-tomcat" depends="common-init">
       <copy todir="${tomcat.home}/webapps/web-client" verbose="true">
          <fileset dir="projects/web-client/source/web" excludes="WEB-INF/**" />
       </copy>
+   </target>
+
+   <target name="start-tomcat" depends="common-init" description="Starts the Tomcat server">
+      <exec dir="${tomcat.home}/bin" executable="cmd.exe" spawn="true">
+         <arg line="/k startup.bat" />
+      </exec>
+   </target>
+
+   <target name="start-jboss" depends="common-init" description="Starts the JBoss server">
+      <exec dir="${jboss.home}/bin" executable="cmd.exe" spawn="true">
+         <arg line="/k start run.bat" />
+      </exec>
    </target>
 
 </project>
