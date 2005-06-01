@@ -251,7 +251,7 @@ public class UIClipboardShelfItem extends UIShelfItem
    {
       FacesContext context = getFacesContext(); 
       
-      StringBuilder buf = new StringBuilder(64);
+      StringBuilder buf = new StringBuilder(256);
       
       buf.append("<a href='#' onclick=\"");
       // generate JavaScript to set a hidden form field and submit

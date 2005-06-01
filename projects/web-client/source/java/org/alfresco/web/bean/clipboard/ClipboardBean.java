@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
@@ -30,6 +31,7 @@ import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.repo.component.shelf.UIClipboardShelfItem;
 import org.apache.log4j.Logger;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast
@@ -141,42 +143,81 @@ public class ClipboardBean
    public void pasteItem(ActionEvent event)
    {
       UIClipboardShelfItem.ClipboardEvent clipEvent = (UIClipboardShelfItem.ClipboardEvent)event;
+      
       int index = clipEvent.Index;
-      if (index == -1)
+      if (index >= this.items.size())
       {
-         // paste all
+         throw new IllegalStateException("Clipboard attempting paste a non existent item index: " + index);
+      }
+      
+      UserTransaction tx = null;
+      try
+      {
+         tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+         tx.begin();
+         
+         if (index == -1)
+         {
+            // paste all
+            for (int i=0; i<this.items.size(); i++)
+            {
+               performClipboardOperation(this.items.get(i));
+            }
+            // TODO: after a paste all - remove items from the clipboard...? or not. ask linton
+         }
+         else
+         {
+            // single paste operation
+            performClipboardOperation(this.items.get(index));
+         }
+         
+         // commit the transaction
+         tx.commit();
+         
+         // refresh UI on success
+         UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
+      }
+      catch (Exception err)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+         Utils.addErrorMessage("Unable to paste item due to system error: " + err.getMessage(), err);
+      }
+   }
+
+   /**
+    * Perform the operation for the specified clipboard item
+    * 
+    * @param item
+    */
+   private void performClipboardOperation(ClipboardItem item)
+   {
+      NodeRef parentRef = new NodeRef(Repository.getStoreRef(), this.navigator.getCurrentNodeId());
+      
+      if (item.Mode == ClipboardStatus.COPY)
+      {
+         if (logger.isDebugEnabled())
+            logger.debug("Trying to copy node ID: " + item.Node.getId() + " into node ID: " + parentRef.getId());
+         
+         // call the node ops service to initiate the copy
+         // TODO: what should the assoc QName be?
+         // TODO: should we use primary parent here?
+         //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
+         //       It's naff backend design if we need to pass childassocref around everywhere...!
+         ChildAssocRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
+         boolean copyChildren = (item.Node.hasAspect(DictionaryBootstrap.ASPECT_SPACE));
+         NodeRef copyRef = this.nodeOperationsService.copy(item.Node.getNodeRef(), parentRef, null, assocRef.getQName(), copyChildren);
+         
+         // TODO: a temp fix for the fact that the NAME attribute is not copied as DD not here yet
+         this.nodeService.setProperty(copyRef, RepoUtils.QNAME_NAME, item.Node.getName());
       }
       else
       {
-         // paste an individual item
-         if (index >= this.items.size())
-         {
-            throw new IllegalStateException("Clipboard attempting paste a non existent item index: " + index);
-         }
+         if (logger.isDebugEnabled())
+            logger.debug("Trying to move node ID: " + item.Node.getId() + " into node ID: " + parentRef.getId());
          
-         ClipboardItem item = this.items.get(index);
-         NodeRef parentRef = new NodeRef(Repository.getStoreRef(), this.navigator.getCurrentNodeId());
-         try
-         {
-            // call the node ops service to initiate the copy
-            // TODO: what should the assoc QName be?
-            // TODO: can we use primary parent here?
-            //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
-            //       It's naff backend design if we need to pass childassocref around everywhere...!
-            ChildAssocRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
-            NodeRef copyRef = this.nodeOperationsService.copy(item.Node.getNodeRef(), parentRef, null, assocRef.getQName());
-            // TODO: a temp fix for the fact that the NAME attribute is not copied as DD not here yet
-            this.nodeService.setProperty(copyRef, RepoUtils.QNAME_NAME, item.Node.getName());
-            
-            // refresh UI on success
-            UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
-            
-            // TODO: after a paste all - remove items from the clipboard...? or not. ask linton
-         }
-         catch (Exception err)
-         {
-            Utils.addErrorMessage("Unable to paste item due to system error: " + err.getMessage(), err);
-         }
+         // TODO: implement when Move service is available!
       }
    }
    
@@ -221,7 +262,7 @@ public class ClipboardBean
    // ------------------------------------------------------------------------------
    // Private data
    
-   private static Logger s_logger = Logger.getLogger(ClipboardBean.class);
+   private static Logger logger = Logger.getLogger(ClipboardBean.class);
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
