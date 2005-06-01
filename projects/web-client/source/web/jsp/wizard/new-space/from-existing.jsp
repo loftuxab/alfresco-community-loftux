@@ -109,13 +109,10 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>Select existing space to use.</td>
-                                 </tr>
-                                 <tr>
                                     <td>
-                                       <h:selectOneMenu value="#{NewSpaceWizard.existingSpaceId}">
-                                          <f:selectItems value="#{NewSpaceWizard.spaces}" />
-                                       </h:selectOneMenu>
+                                       <r:spaceSelector label="Click here to select an existing space..." 
+                                                        value="#{NewSpaceWizard.existingSpaceId}" 
+                                                        style="border: 1px dashed #cccccc; padding: 6px;" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow" /></tr>

@@ -37,6 +37,8 @@ public class SpaceSelectorTag extends HtmlComponentTag
       
       setStringBindingProperty(component, "value", this.value);
       setStringProperty(component, "label", this.label);
+      setStringProperty(component, "nodeStyle", this.nodeStyle);
+      setStringProperty(component, "nodeStyleClass", this.nodeStyleClass);
       setIntProperty(component, "spacing", this.spacing);
    }
    
@@ -82,6 +84,25 @@ public class SpaceSelectorTag extends HtmlComponentTag
       this.spacing = spacing;
    }
 
+   /**
+    * Set the node style
+    * 
+    * @param nodeStyle  the node style
+    */
+   public void setNodeStyle(String nodeStyle)
+   {
+      this.nodeStyle = nodeStyle;
+   }
+
+   /**
+    * Set the node style class
+    * 
+    * @param nodeStyleClass   the node style class
+    */
+   public void setNodeStyleClass(String nodeStyleClass)
+   {
+      this.nodeStyleClass = nodeStyleClass;
+   }
 
    /** the value */
    private String value;
@@ -91,4 +112,10 @@ public class SpaceSelectorTag extends HtmlComponentTag
 
    /** the spacing */
    private String spacing;
+   
+   /** the node style */
+   private String nodeStyle;
+   
+   /** the node style class */
+   private String nodeStyleClass;
 }

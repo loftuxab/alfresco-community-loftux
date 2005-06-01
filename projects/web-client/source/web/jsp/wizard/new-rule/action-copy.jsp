@@ -101,13 +101,24 @@
                                  <tr>
                                     <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>Required&nbsp;format:</td>
+                                    <td width="100%">
+                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.format}">
+                                          <f:selectItems value="#{NewRuleWizard.formats}" />
+                                       </h:selectOneMenu>
+                                    </td>
+                                 </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 
-
-                                 <tr><td>Copy settings defined here</td></tr>
-
-
-
+                                 <tr>
+                                    <td>Destination:</td>
+                                    <td>
+                                       <r:spaceSelector label="Click here to select the destination" 
+                                                        value="#{NewRuleWizard.actionProperties.destinationLocation}" 
+                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>

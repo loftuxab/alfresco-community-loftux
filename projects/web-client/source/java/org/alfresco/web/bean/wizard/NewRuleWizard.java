@@ -5,13 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.rule.RuleActionDefinition;
 import org.alfresco.repo.rule.RuleConditionDefinition;
 import org.alfresco.repo.rule.RuleService;
 import org.alfresco.repo.rule.RuleType;
 import org.apache.log4j.Logger;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -47,6 +50,7 @@ public class NewRuleWizard extends AbstractWizardBean
    private Map<String, String> conditionProperties;
    private Map<String, String> actionProperties;
    
+   private List<SelectItem> formats;
    // condition and action specific lists - TEMP, picker components will be used
    private List<SelectItem> categories;
    
@@ -488,6 +492,23 @@ public class NewRuleWizard extends AbstractWizardBean
       }
       
       return this.categories;
+   }
+   
+   public List<SelectItem> getFormats()
+   {
+      if (this.formats == null)
+      {
+         this.formats = new ArrayList<SelectItem>();
+         // TODO: Configure the list, for now just list the ones we know we support
+         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_HTML, "HTML"));
+         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_XML, "XML"));
+         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_TEXT_PLAIN, "Plain Text"));
+         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_PDF, "PDF"));
+         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_WORD, "Microsoft Word"));
+         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_EXCEL, "Microsoft Excel"));
+      }
+      
+      return this.formats;
    }
    
    /**

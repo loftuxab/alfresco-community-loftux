@@ -197,11 +197,8 @@ public class UISpaceSelector extends UIInput
                label = (String)getNodeService(context).getProperty(nodeRef, RepoUtils.QNAME_NAME);
             }
             
-            // field value is whether we are picking and the current or parent Id value
-            String fieldValue = encodeFieldValues(MODE_PERFORM_SELECTION, valueId);
-            buf.append("<a href='#' onclick=\"");
-            buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue));
-            buf.append('"');
+            // output surrounding span for style purposes
+            buf.append("<span");
             if (attrs.get("style") != null)
             {
                buf.append(" style=\"")
@@ -213,9 +210,27 @@ public class UISpaceSelector extends UIInput
                buf.append(" class=")
                   .append(attrs.get("styleClass"));
             }
+            buf.append(">");
+            
+            // field value is whether we are picking and the current or parent Id value
+            String fieldValue = encodeFieldValues(MODE_PERFORM_SELECTION, valueId);
+            buf.append("<a href='#' onclick=\"");
+            buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue));
+            buf.append('"');
+            if (attrs.get("nodeStyle") != null)
+            {
+               buf.append(" style=\"")
+                  .append(attrs.get("nodeStyle"))
+                  .append('"');
+            }
+            if (attrs.get("nodeStyleClass") != null)
+            {
+               buf.append(" class=")
+                  .append(attrs.get("nodeStyleClass"));
+            }
             buf.append(">")
                .append(label)
-               .append("</a>");
+               .append("</a></span>");
             
             break;
          }
@@ -232,7 +247,19 @@ public class UISpaceSelector extends UIInput
                      FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
                tx.begin();
                
-               buf.append("<table border=0 cellspacing=1 cellpadding=1>");
+               buf.append("<table border=0 cellspacing=1 cellpadding=1");
+               if (attrs.get("style") != null)
+               {
+                  buf.append(" style=\"")
+                     .append(attrs.get("style"))
+                     .append('"');
+               }
+               if (attrs.get("styleClass") != null)
+               {
+                  buf.append(" class=")
+                     .append(attrs.get("styleClass"));
+               }
+               buf.append(">");
                
                // render "Go Up" link
                if (this.navigationId != null)
@@ -407,16 +434,16 @@ public class UISpaceSelector extends UIInput
       buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue));
       buf.append('"');
       Map attrs = this.getAttributes();
-      if (attrs.get("style") != null)
+      if (attrs.get("nodeStyle") != null)
       {
          buf.append(" style=\"")
-            .append(attrs.get("style"))
+            .append(attrs.get("nodeStyle"))
             .append('"');
       }
-      if (attrs.get("styleClass") != null)
+      if (attrs.get("nodeStyleClass") != null)
       {
          buf.append(" class=")
-            .append(attrs.get("styleClass"));
+            .append(attrs.get("nodeStyleClass"));
       }
       buf.append('>');
       
