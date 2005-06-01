@@ -3,10 +3,12 @@ package org.alfresco.repo.content.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.repo.content.ContentIOException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.content.filestore.FileContentReader;
+import org.alfresco.repo.content.filestore.FileContentWriter;
+import org.alfresco.util.TempFileProvider;
 
 /**
  * @see org.alfresco.repo.content.transform.ContentTransformerRegistry
@@ -25,6 +27,9 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
     /** a fake registry with fake transformers */
     private ContentTransformerRegistry dummyRegistry;
     
+    private ContentReader reader;
+    private ContentWriter writer;
+    
     /**
      * Allows dependency injection
      */
@@ -36,6 +41,11 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
     @Override
     public void onSetUpInTransaction() throws Exception
     {
+        reader = new FileContentReader(TempFileProvider.createTempFile(getName(), ".txt"));
+        reader.setMimetype(A);
+        writer = new FileContentWriter(TempFileProvider.createTempFile(getName(), ".txt"));
+        writer.setMimetype(D);
+        
         byte[] bytes = new byte[256];
         for (int i = 0; i < 256; i++)
         {
@@ -53,7 +63,7 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         // create some dummy transformers for speed tests - execute the fast one to give it poor average
         ContentTransformer slowTransformer = new DummyTransformer(A, D, 1.0, 20L);
         ContentTransformer fastTransformer = new DummyTransformer(A, D, 1.0, 10L);
-        fastTransformer.transform(null, null);
+        fastTransformer.transform(reader, writer);  // force a non-zero average time
         transformers.add(slowTransformer);
         transformers.add(fastTransformer);
         // create the dummyRegistry
@@ -114,8 +124,8 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         assertEquals("Incorrect reliability", 0.0, transformer.getReliability(D, A));
         assertEquals("Incorrect transformation time", 0L, transformer.getTransformationTime());
         // now execute the dummy transformer - it will start a meaningful but slow average
-        transformer.transform(null, null);
-        transformer.transform(null, null);
+        transformer.transform(reader, writer);
+        transformer.transform(reader, writer);
         assertEquals("Incorrent transformation time", 20L, transformer.getTransformationTime());
         
         // reset the registry cache
@@ -179,7 +189,7 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         /**
          * Just notches up some average times
          */
-        public void transform(ContentReader reader, ContentWriter writer) throws ContentIOException
+        public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
         {
             // just update the transformation time
             super.recordTime(transformationTime);

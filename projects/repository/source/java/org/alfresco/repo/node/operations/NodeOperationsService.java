@@ -27,8 +27,8 @@ public interface NodeOperationsService
      * reference the origional node.     
      * <p>
      * The aspects applied to source node will also be applied to destination node 
-     * and all the property value will be duplicated accordinly.  This is with the
-     * exception of the apects that have been marked as having 'Non-Transferable State'.
+     * and all the property value will be duplicated accordingly.  This is with the
+     * exception of the aspects that have been marked as having 'Non-Transferable State'.
      * In this case the aspect will be applied to the copy, but the properties will take
      * on the default values.
      * <p>

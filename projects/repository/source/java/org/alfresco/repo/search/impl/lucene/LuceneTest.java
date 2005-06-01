@@ -42,7 +42,7 @@ import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
-import org.alfresco.repo.value.CachingDateFormat;
+import org.alfresco.util.CachingDateFormat;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

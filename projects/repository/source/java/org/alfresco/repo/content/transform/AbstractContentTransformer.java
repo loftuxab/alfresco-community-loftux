@@ -2,8 +2,11 @@ package org.alfresco.repo.content.transform;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.Content;
+import org.alfresco.repo.content.ContentIOException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentWriter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides basic services for {@link org.alfresco.repo.content.transform.ContentTransformer}
@@ -13,6 +16,8 @@ import org.alfresco.repo.content.ContentWriter;
  */
 public abstract class AbstractContentTransformer implements ContentTransformer
 {
+    private static final Log logger = LogFactory.getLog(AbstractContentTransformer.class);
+    
     private double averageTime = 0.0;
     private long count = 0L;
     
@@ -70,6 +75,60 @@ public abstract class AbstractContentTransformer implements ContentTransformer
                     "   writer: " + writer);
         }
         // it all checks out OK
+    }
+
+    /**
+     * Method to be implemented by subclasses wishing to make use of the common infrastructural code
+     * provided by this class.
+     * 
+     * @param reader the source of the content to transform
+     * @param writer the target to which to write the transformed content
+     * @throws Exception exceptions will be handled by this class - subclasses can throw anything
+     */
+    protected abstract void transformInternal(ContentReader reader, ContentWriter writer) throws Exception;
+    
+    /**
+     * Performs the following:
+     * <ul>
+     *   <li>Times the transformation</li>
+     *   <li>Ensures that the transformation is allowed</li>
+     *   <li>Calls the subclass implementation of {@link #transformInternal(ContentReader, ContentWriter)}</li>
+     *   <li>Transforms any exceptions generated</li>
+     *   <li>Logs a successful transformation</li>
+     * </ul>
+     * Subclass need only be concerned with performing the transformation.
+     */
+    public final void transform(ContentReader reader, ContentWriter writer) throws ContentIOException
+    {
+        // begin timing
+        long before = System.currentTimeMillis();
+        
+        // check the reliability
+        checkReliability(reader, writer);
+        
+        try
+        {
+            transformInternal(reader, writer);
+        }
+        catch (Throwable e)
+        {
+            throw new ContentIOException("Content conversion failed: \n" +
+                    "   reader: " + reader + "\n" +
+                    "   writer: " + writer,
+                    e);
+        }
+        
+        // record time
+        long after = System.currentTimeMillis();
+        recordTime(after - before);
+        
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Completed transformation: \n" +
+                    "   reader: " + reader + "\n" +
+                    "   writer: " + writer);
+        }
     }
 
     /**

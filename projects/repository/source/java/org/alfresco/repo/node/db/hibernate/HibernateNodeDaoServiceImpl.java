@@ -178,7 +178,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         
         // enforce the cascade
         getHibernateTemplate().flush();
-        getHibernateTemplate().clear();
     }
 
     public ChildAssoc getPrimaryParentAssoc(Node node)

@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Makes use of the OpenOffice Uno interfaces to convert the content.
  * <p>
- * The 
+ * The conversions are slow but reliable.
  * 
  * @author Derek Hulley
  */
@@ -54,7 +54,7 @@ public class UnoContentTransformer extends AbstractContentTransformer
                 new DocumentFormatWrapper(DocumentFormat.PDF_WRITER, 1.0));
         formatsByConversion.put(
                 new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_EXCEL, MimetypeMap.MIMETYPE_TEXT_PLAIN),
-                new DocumentFormatWrapper(DocumentFormat.TEXT_CALC, 1.0));
+                new DocumentFormatWrapper(DocumentFormat.TEXT_CALC, 0.8));  // only first sheet extracted
         formatsByConversion.put(
                 new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_EXCEL, MimetypeMap.MIMETYPE_PDF),
                 new DocumentFormatWrapper(DocumentFormat.PDF_CALC, 1.0));
@@ -187,18 +187,10 @@ public class UnoContentTransformer extends AbstractContentTransformer
         }
     }
 
-    /**
-     * Uses the standard 
-     */
-    public void transform(ContentReader reader, ContentWriter writer) throws ContentIOException
+    public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
     {
-        // begin timing
-        long before = System.currentTimeMillis();
-        
         String sourceMimetype = getMimetype(reader);
         String targetMimetype = getMimetype(writer);
-        // check the reliability - takes care of the check limiting the target mimetype to plain text
-        checkReliability(reader, writer);
 
         // create temporary files to convert from and to
         File tempFromFile = TempFileProvider.createTempFile("UnoContentTransformer",
@@ -234,20 +226,6 @@ public class UnoContentTransformer extends AbstractContentTransformer
         
         // upload the temp output to the writer given us
         writer.putContent(tempToFile);
-        
-        // record time
-        long after = System.currentTimeMillis();
-        recordTime(after - before);
-        
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Uno server conversion succeeded: \n" +
-                    "   reader: " + reader + "\n" +
-                    "   writer: " + writer + "\n" +
-                    "   from file: " + tempFromFile + "\n" +
-                    "   to file: " + tempToFile);
-        }
     }
     
     /**

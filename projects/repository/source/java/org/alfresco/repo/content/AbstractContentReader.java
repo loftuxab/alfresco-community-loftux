@@ -115,7 +115,8 @@ public abstract class AbstractContentReader extends AbstractContent implements C
      * their implementations.
      * 
      * @return Returns a stream from which content can be read
-     * @throws ContentIOException
+     * @throws ContentIOException if the stream could not be opened or the underlying content
+     *      has disappeared
      */
     protected abstract InputStream getDirectInputStream() throws ContentIOException;
 

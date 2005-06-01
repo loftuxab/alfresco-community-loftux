@@ -1,6 +1,5 @@
 package org.alfresco.repo.content.transform;
 
-import org.alfresco.repo.content.ContentIOException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentWriter;
 import org.apache.commons.logging.Log;
@@ -46,29 +45,9 @@ public class BinaryPassThroughContentTransformer extends AbstractContentTransfor
     /**
      * Performs a direct stream provided the preconditions are met
      */
-    public void transform(ContentReader reader, ContentWriter writer) throws ContentIOException
+    public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
     {
-        // begin timing
-        long before = System.currentTimeMillis();
-        
-        String sourceMimetype = getMimetype(reader);
-        String targetMimetype = getMimetype(writer);
-        // check the reliability - takes care of the check limiting the target mimetype to plain text
-        checkReliability(reader, writer);
-        
         // just stream it
         writer.putContent(reader.getContentInputStream());
-        
-        // record time
-        long after = System.currentTimeMillis();
-        recordTime(after - before);
-        
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Completed transformation: \n" +
-                    "   reader: " + reader + "\n" +
-                    "   writer: " + writer);
-        }
     }
 }

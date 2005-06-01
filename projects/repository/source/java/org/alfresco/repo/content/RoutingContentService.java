@@ -8,6 +8,7 @@ import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.util.AspectMissingException;
+import org.alfresco.util.TempFileProvider;
 import org.alfresco.util.debug.CodeMonkey;
 
 /**
@@ -23,21 +24,24 @@ public class RoutingContentService implements ContentService
     private ContentTransformerRegistry transformerRegistry;
     /** TEMPORARY until we have a map to choose from at runtime */
     private ContentStore store;
+    /** the store for all temporarily created content */
+    private ContentStore tempStore;
     
     /**
      * 
      * @param nodeService the node service that will be used to update nodes after
      *      content writes
-     * @param storeRoot temporary measure to set a working store root
+     * @param store temporary measure to set a working store
      */
     public RoutingContentService(NodeService nodeService,
             ContentTransformerRegistry transformerRegistry,
-            String storeRoot)
+            ContentStore store)
     {
         CodeMonkey.todo("The store root should be set on the store directly and via a config file");  // TODO
         this.nodeService = nodeService;
         this.transformerRegistry = transformerRegistry;
-        this.store = new FileContentStore(storeRoot);
+        this.store = store;
+        this.tempStore = new FileContentStore(TempFileProvider.getTempDir().getAbsolutePath());
     }
 
     public ContentReader getReader(NodeRef nodeRef)
@@ -87,7 +91,7 @@ public class RoutingContentService implements ContentService
         }
         
         CodeMonkey.todo("Choose the store to write to at runtime");  // TODO
-        ContentWriter writer = store.getWriter(nodeRef);
+        ContentWriter writer = store.getWriter();
 
         // get the content mimetype
         String mimetype = (String) nodeService.getProperty(
@@ -133,7 +137,36 @@ public class RoutingContentService implements ContentService
      */
     public ContentWriter getTempWriter()
     {
-        return store.getWriter();
+        return tempStore.getWriter();
+    }
+
+    /**
+     * @see org.alfresco.repo.content.transform.ContentTransformerRegistry
+     * @see org.alfresco.repo.content.transform.ContentTransformer
+     */
+    public void transform(ContentReader reader, ContentWriter writer)
+            throws NoTransformerException, ContentIOException
+    {
+        // check that source and target mimetypes are available
+        String sourceMimetype = reader.getMimetype();
+        if (sourceMimetype == null)
+        {
+            throw new AlfrescoRuntimeException("The content reader mimetype must be set: " + reader);
+        }
+        String targetMimetype = writer.getMimetype();
+        if (targetMimetype == null)
+        {
+            throw new AlfrescoRuntimeException("The content writer mimetype must be set: " + writer);
+        }
+        // look for a transformer
+        ContentTransformer transformer = transformerRegistry.getTransformer(sourceMimetype, targetMimetype);
+        if (transformer == null)
+        {
+            throw new NoTransformerException(sourceMimetype, targetMimetype);
+        }
+        // we have a transformer, so do it
+        transformer.transform(reader, writer);
+        // done
     }
 
     /**
@@ -168,35 +201,5 @@ public class RoutingContentService implements ContentService
                     DictionaryBootstrap.PROP_QNAME_CONTENT_URL,
                     contentUrl);
         }
-    }
-
-
-    /**
-     * @see org.alfresco.repo.content.transform.ContentTransformerRegistry
-     * @see org.alfresco.repo.content.transform.ContentTransformer
-     */
-    public void transform(ContentReader reader, ContentWriter writer)
-            throws NoTransformerException, ContentIOException
-    {
-        // check that source and target mimetypes are available
-        String sourceMimetype = reader.getMimetype();
-        if (sourceMimetype == null)
-        {
-            throw new AlfrescoRuntimeException("The content reader mimetype must be set: " + reader);
-        }
-        String targetMimetype = writer.getMimetype();
-        if (targetMimetype == null)
-        {
-            throw new AlfrescoRuntimeException("The content writer mimetype must be set: " + writer);
-        }
-        // look for a transformer
-        ContentTransformer transformer = transformerRegistry.getTransformer(sourceMimetype, targetMimetype);
-        if (transformer == null)
-        {
-            throw new NoTransformerException(sourceMimetype, targetMimetype);
-        }
-        // we have a transformer, so do it
-        transformer.transform(reader, writer);
-        // done
     }
 }

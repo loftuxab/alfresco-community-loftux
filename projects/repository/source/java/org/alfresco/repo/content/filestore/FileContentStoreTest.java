@@ -6,8 +6,7 @@ import org.alfresco.repo.content.AbstractContentReadWriteTest;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.util.TempFileProvider;
 
 /**
  * Tests read and write functionality for the store.
@@ -18,6 +17,7 @@ import org.alfresco.repo.ref.StoreRef;
  */
 public class FileContentStoreTest extends AbstractContentReadWriteTest
 {
+    private ContentStore store;
     private ContentReader reader;
     private ContentWriter writer;
     
@@ -26,17 +26,14 @@ public class FileContentStoreTest extends AbstractContentReadWriteTest
     {
         super.setUp();
         
-        // create a writer to a temp file and then use the URL that the writer
-        // has for the URL of the reader
-        File tempFile = File.createTempFile(getName(), ".tmp");
-        File tempDir = tempFile.getParentFile();
-        assertTrue(tempDir.isDirectory());
-        ContentStore store = new FileContentStore(tempDir.getAbsolutePath());
+        // create a store that uses a subdirectory of the temp directory
+        File tempDir = TempFileProvider.getTempDir();
+        store = new FileContentStore(
+                tempDir.getAbsolutePath() +
+                File.separatorChar +
+                getName());
         
-        StoreRef storeRef = new StoreRef(getName(), "test");
-        NodeRef nodeRef = new NodeRef(storeRef, "GUID-12345");
-
-        writer = store.getWriter(nodeRef);
+        writer = store.getWriter();
         String contentUrl = writer.getContentUrl();
         reader = store.getReader(contentUrl);
     }
@@ -46,6 +43,12 @@ public class FileContentStoreTest extends AbstractContentReadWriteTest
         super.testSetUp();
         assertNotNull(reader);
         assertNotNull(writer);
+    }
+    
+    @Override
+    protected ContentStore getStore()
+    {
+        return store;
     }
 
     @Override

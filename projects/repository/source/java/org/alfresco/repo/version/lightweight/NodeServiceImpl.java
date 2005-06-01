@@ -202,6 +202,14 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     }
     
     /**
+     * @throws UnsupportedOperationException always
+     */
+    public ChildAssocRef moveNode(NodeRef nodeToMoveRef, NodeRef newParentRef, QName assocTypeQName, QName assocQName) throws InvalidNodeRefException
+    {
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
+    /**
      * Type translation for version store
      */
     public QName getType(NodeRef nodeRef) throws InvalidNodeRefException

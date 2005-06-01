@@ -1,10 +1,3 @@
-/*
- * Created on 28-Apr-2005
- * 
- * TODO Comment this class
- * 
- * 
- */
 package org.alfresco.repo.value;
 
 import java.math.BigDecimal;
@@ -14,6 +7,8 @@ import java.util.Date;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
+
+import org.alfresco.util.CachingDateFormat;
 
 public class ValueConverterTest extends TestCase
 {

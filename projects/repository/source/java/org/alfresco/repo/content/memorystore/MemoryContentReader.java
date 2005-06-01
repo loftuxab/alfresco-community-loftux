@@ -26,6 +26,10 @@ public class MemoryContentReader extends AbstractContentReader
     public MemoryContentReader(String contentUrl, byte[] content)
     {
         super(contentUrl);
+        if (content == null)
+        {
+            throw new IllegalArgumentException("byte[] may not be null");
+        }
         this.content = content;
     }
 
@@ -34,7 +38,16 @@ public class MemoryContentReader extends AbstractContentReader
     {
         return new MemoryContentReader(this.getContentUrl(), this.content);
     }
-    
+ 
+    /**
+     * @return Return true always as memory is always available
+     */
+    public boolean exists()
+    {
+        // the content always exists
+        return true;
+    }
+
     /**
      * @return Returns a <tt>ByteArrayInputStream</tt> directly onto the
      *      underlying {@link #content}.

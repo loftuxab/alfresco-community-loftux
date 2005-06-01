@@ -1,10 +1,3 @@
-/*
- * Created on Mar 16, 2005
- * 
- * TODO Comment this class
- * 
- * 
- */
 package org.alfresco.repo.search.impl.lucene.analysis;
 
 import java.io.IOException;
@@ -13,16 +6,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.alfresco.repo.value.CachingDateFormat;
+import org.alfresco.util.CachingDateFormat;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.WhitespaceTokenizer;
 
 /**
  * @author andyh
- * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
  */
 public class DateTokenFilter extends Tokenizer
 {
@@ -33,12 +23,6 @@ public class DateTokenFilter extends Tokenizer
         super(in);
         baseTokeniser = new WhitespaceTokenizer(in);
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.lucene.analysis.TokenStream#next()
-     */
 
     public Token next() throws IOException
     {

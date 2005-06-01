@@ -1,7 +1,6 @@
 package org.alfresco.repo.node;
 
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -11,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
@@ -391,7 +389,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         
         QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
-        Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+        Date now = new Date();
         properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
         
         QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
@@ -652,6 +650,30 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // get the parent node's children
         Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
         assertEquals("Incorrect number of children", 2, childAssocRefs.size());
+    }
+    
+    public void testMoveNode() throws Exception
+    {
+        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n5_p_n7"));
+        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n6_p_n8"));
+        NodeRef n5Ref = n5pn7Ref.getParentRef();
+        NodeRef n6Ref = n6pn8Ref.getParentRef();
+        NodeRef n8Ref = n6pn8Ref.getChildRef();
+        // move n8 to n5
+        ChildAssocRef assocRef = nodeService.moveNode(
+                n8Ref,
+                n5Ref,
+                null,
+                QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n5_p_n8"));
+        // check that n6 is no longer the parent
+        List<ChildAssocRef> n6ChildRefs = nodeService.getChildAssocs(
+                n6Ref,
+                QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n6_p_n8"));
+        assertEquals("Primary child assoc is still present", 0, n6ChildRefs.size());
+        // check that n5 is the parent
+        ChildAssocRef checkRef = nodeService.getPrimaryParent(n8Ref);
+        assertEquals("Primary assoc incorrent", assocRef, checkRef);
     }
     
     /**
@@ -952,108 +974,123 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals(1, attributes.size());
     }
     
-    
-    public void xtestAddPerformance() throws Exception
+    public void testLikeAndContains() throws Exception
     {
-        timer.start();
-        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
-        directories.put(rootNodeRef, QName.createQName("{ } "));
-        createLevels(directories, 1);    
-        setComplete();
+        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
         
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        
+        List<ChildAssocRef> answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, 'monkey')", null, namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('monkey')", null, namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
     }
     
-    public void xtestAddPerformance2() throws Exception
-    {
-        timer.stop();
-        System.out.println("Created in "+timer.getDuration());
-        timer.reset();
-        timer.start();
-        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
-        directories.put(rootNodeRef, QName.createQName("{ } "));
-        createLevels(directories, 2);
-        setComplete();
-    }
-    
-    public void xtestAddPerformance3() throws Exception
-    {
-        timer.stop();
-        System.out.println("Created in "+timer.getDuration());
-        timer.reset();
-        timer.start();
-        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
-        directories.put(rootNodeRef, QName.createQName("{ } "));
-        createLevels(directories, 3);
-        timer.stop();
-        setComplete();
-        System.out.println("Created in "+timer.getDuration());
-    }
-    
-    public void xtestAddPerformance4() throws Exception
-    {
-        timer.stop();
-        System.out.println("Created in "+timer.getDuration());
-        timer.reset();
-    }
-    
-    
-
-    private void createLevels( Map<NodeRef, QName> map, int levels)
-    {
-        for(NodeRef ref: map.keySet())
-        {
-            QName qname = map.get(ref);
-            Map<NodeRef, QName> directories = createLevel(ref, qname.getLocalName(), "file", "directory");
-            if(levels > 0)
-            {
-                createLevels(directories, levels-1);
-            }
-        }
-    }
-    
-    private Map<NodeRef, QName> createLevel(NodeRef container, String root, String filePrefix, String directoryPrefix)
-    {
-        String ns = NamespaceService.ALFRESCO_TEST_URI;
-        QName qname = null;
-        ChildAssocRef assoc = null;
-        Map<NodeRef, QName> ret = new HashMap<NodeRef, QName>(10);
-
-        for (int i = 0; i < 10; i++)
-        {
-            qname = QName.createQName(ns, root +"_ "+ directoryPrefix + "_" + i);
-            assoc = nodeService.createNode(container,
-                    null,
-                    qname,
-                    DictionaryBootstrap.TYPE_QNAME_CONTAINER);
-            NodeRef ref = assoc.getChildRef();
-            ret.put(ref, qname);
-        }
-
-        for (int i = 10; i < 100; i++)
-        {
-            qname = QName.createQName(ns, root + filePrefix + "_" + i);
-            assoc = nodeService.createNode(container,
-                    null,
-                    qname,
-                    DictionaryBootstrap.TYPE_QNAME_CONTAINER);
-            Map<QName, Serializable> properties = nodeService.getProperties(assoc.getChildRef());
-            //properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "application/msword");
-            properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-            properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
-            nodeService.addAspect(assoc.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
-            ContentWriter writer = contentService.getUpdatingWriter(assoc.getChildRef());
-            writer.putContent("I need to make a 50K document somehow. So I will type and type and type until I have something like it …. But then word is so overblown it will probably be that big already!/n"+
-                    "/n" +
-                    "Well hat is 25k and it contains nothing./n"+
-                    "Good work all round there./n"+
-                    "/n"+
-                   "So does this make much difference?/n/n");
-            //InputStream is = this.getClass().getClassLoader().getResourceAsStream("text50.txt");
-            //writer.putContent(is);
-            NodeRef ref = assoc.getChildRef();
-        }
-
-        return ret;
-    }
-
+//  Must move to suite of performance tests
+//  and must be actual tests, i.e. with asserts, etc.
+//    public void xtestAddPerformance() throws Exception
+//    {
+//        timer.start();
+//        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
+//        directories.put(rootNodeRef, QName.createQName("{ } "));
+//        createLevels(directories, 1);    
+//        setComplete();
+//        
+//    }
+//    
+//    public void xtestAddPerformance2() throws Exception
+//    {
+//        timer.stop();
+//        System.out.println("Created in "+timer.getDuration());
+//        timer.reset();
+//        timer.start();
+//        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
+//        directories.put(rootNodeRef, QName.createQName("{ } "));
+//        createLevels(directories, 2);
+//        setComplete();
+//    }
+//    
+//    public void xtestAddPerformance3() throws Exception
+//    {
+//        timer.stop();
+//        System.out.println("Created in "+timer.getDuration());
+//        timer.reset();
+//        timer.start();
+//        Map<NodeRef, QName> directories = new HashMap<NodeRef, QName>();
+//        directories.put(rootNodeRef, QName.createQName("{ } "));
+//        createLevels(directories, 3);
+//        timer.stop();
+//        setComplete();
+//        System.out.println("Created in "+timer.getDuration());
+//    }
+//    
+//    public void xtestAddPerformance4() throws Exception
+//    {
+//        timer.stop();
+//        System.out.println("Created in "+timer.getDuration());
+//        timer.reset();
+//    }
+//    
+//    
+//
+//    private void createLevels( Map<NodeRef, QName> map, int levels)
+//    {
+//        for(NodeRef ref: map.keySet())
+//        {
+//            QName qname = map.get(ref);
+//            Map<NodeRef, QName> directories = createLevel(ref, qname.getLocalName(), "file", "directory");
+//            if(levels > 0)
+//            {
+//                createLevels(directories, levels-1);
+//            }
+//        }
+//    }
+//    
+//    private Map<NodeRef, QName> createLevel(NodeRef container, String root, String filePrefix, String directoryPrefix)
+//    {
+//        String ns = NamespaceService.ALFRESCO_TEST_URI;
+//        QName qname = null;
+//        ChildAssocRef assoc = null;
+//        Map<NodeRef, QName> ret = new HashMap<NodeRef, QName>(10);
+//
+//        for (int i = 0; i < 10; i++)
+//        {
+//            qname = QName.createQName(ns, root +"_ "+ directoryPrefix + "_" + i);
+//            assoc = nodeService.createNode(container,
+//                    null,
+//                    qname,
+//                    DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+//            NodeRef ref = assoc.getChildRef();
+//            ret.put(ref, qname);
+//        }
+//
+//        for (int i = 10; i < 100; i++)
+//        {
+//            qname = QName.createQName(ns, root + filePrefix + "_" + i);
+//            assoc = nodeService.createNode(container,
+//                    null,
+//                    qname,
+//                    DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+//            Map<QName, Serializable> properties = nodeService.getProperties(assoc.getChildRef());
+//            //properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "application/msword");
+//            properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+//            properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
+//            nodeService.addAspect(assoc.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
+//            ContentWriter writer = contentService.getUpdatingWriter(assoc.getChildRef());
+//            writer.putContent("I need to make a 50K document somehow. So I will type and type and type until I have something like it …. But then word is so overblown it will probably be that big already!/n"+
+//                    "/n" +
+//                    "Well hat is 25k and it contains nothing./n"+
+//                    "Good work all round there./n"+
+//                    "/n"+
+//                   "So does this make much difference?/n/n");
+//            //InputStream is = this.getClass().getClassLoader().getResourceAsStream("text50.txt");
+//            //writer.putContent(is);
+//            NodeRef ref = assoc.getChildRef();
+//        }
+//
+//        return ret;
+//    }
 }

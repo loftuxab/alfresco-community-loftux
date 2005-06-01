@@ -1,7 +1,6 @@
 package org.alfresco.repo.content;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
+import java.util.List;
 
 /**
  * Provides low-level retrieval of content
@@ -21,19 +20,17 @@ import org.alfresco.repo.ref.StoreRef;
  */
 public interface ContentStore
 {
-    public static final StoreRef TEMP_STOREREF = new StoreRef("tempstore", "files");
-    public static final NodeRef TEMP_NODEREF = new NodeRef(TEMP_STOREREF, "tempfile");
-
     /**
      * Get the accessor with which to read from the content
      * at the given URL.  The reader is <b>stateful</b> and
      * can <b>only be used once</b>.
      * 
      * @param contentUrl the store-specific URL where the content is located
-     * @return Returns a read-only content accessor or null if no content
-     *      is present at the URL given
+     * @return Returns a read-only content accessor for the given URL.  There may
+     *      be no content at the given URL, but the reader must still be returned.
+     * @throws ContentIOException
      */
-    public ContentReader getReader(String contentUrl);
+    public ContentReader getReader(String contentUrl) throws ContentIOException;
     
     /**
      * Get an accessor with which to write content to an anonymous location
@@ -45,28 +42,36 @@ public interface ContentStore
      * location twice.
      *  
      * @return Returns a write-only content accessor
+     * @throws ContentIOException
      *
      * @see #getWriter(NodeRef)
      * @see ContentWriter#addListener(ContentStreamListener)
      * @see ContentWriter#getContentUrl()
      */
-    public ContentWriter getWriter();
+    public ContentWriter getWriter() throws ContentIOException;
 
     /**
-     * Get the accessor with which to write content associated with
-     * the given <code>NodeRef</code>.    The writer is <b>stateful</b>
-     * and can <b>only be used once</b>.
-     * <p>
-     * Every call to this method will return a writer onto a <b>new</b>
-     * content URL.  It is never possible to write the same physical
-     * location twice. 
+     * Get a list of all content in the store
      * 
-     * @param nodeRef the key against which the content is stored
-     * @return Returns a write-only content accessor
-     * 
-     * @see #getWriter()
-     * @see ContentWriter#addListener(ContentStreamListener)
-     * @see ContentWriter#getContentUrl()
+     * @return Returns a complete list of the URLs of all available content
+     *      in the store
+     * @throws ContentIOException
      */
-	public ContentWriter getWriter(NodeRef nodeRef);
+    public List<String> listUrls() throws ContentIOException;
+    
+    /**
+     * Deletes the content at the given URL.
+     * <p>
+     * A delete cannot be forced since it is much better to have the
+     * file remain longer than desired rather than deleted prematurely.
+     * The store implementation may choose to safeguard files for certain
+     * minimum period, in which case all files younger than a certain
+     * age will not be deleted.
+     * 
+     * @param contentUrl the URL of the content to delete
+     * @return Return true if the content was deleted (either by this or
+     *      another operation), otherwise false
+     * @throws ContentIOException
+     */
+    public boolean delete(String contentUrl) throws ContentIOException;
 }

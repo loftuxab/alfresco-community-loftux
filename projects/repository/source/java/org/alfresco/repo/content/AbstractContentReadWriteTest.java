@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -30,6 +31,18 @@ public abstract class AbstractContentReadWriteTest extends TestCase
     public void setUp() throws Exception
     {
     }
+    
+    /**
+     * Fetch the store to be used during a test.  This method is invoked once per test - it is
+     * therefore safe to use <code>setUp</code> to initialise resources.
+     * 
+     * @return Returns the store that creates the readers and writers.  The result may be null,
+     *      in which case the tests that work directly against the store will be bypassed.
+     * 
+     * @see #getReader()()
+     * @see #getWriter()
+     */
+    protected abstract ContentStore getStore();
     
     /**
      * Fetch a reader to be used during a test.  This method is invoked once per test - it is
@@ -270,5 +283,112 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         String check = new String(buffer, 0, count);
         
         assertEquals("Write out of and read into files failed", content, check);
+    }
+    
+    /**
+     * Tests deletion of content.
+     * <p>
+     * Only applies when {@link #getStore()} returns a value.
+     */
+    public void testDelete() throws Exception
+    {
+        ContentStore store = getStore();
+        if (store == null)
+        {
+            // allowed - in which case the test is useless
+            return;
+        }
+        ContentWriter writer = getWriter();
+        
+        String content = "ABC";
+        String contentUrl = writer.getContentUrl();
+
+        // write some bytes, but don't close the stream
+        OutputStream os = writer.getContentOutputStream();
+        os.write(content.getBytes());
+        os.flush();                  // make sure that the bytes get persisted
+        
+        // with the stream open, attempt to delete the content
+        boolean deleted = store.delete(contentUrl);
+        assertFalse("No exception thrown when attempting to delete content with open write stream", deleted);
+        
+        // close the stream
+        os.close();
+        
+        // get a reader
+        ContentReader reader = store.getReader(contentUrl);
+        assertNotNull(reader);
+        ContentReader readerCheck = writer.getReader();
+        assertNotNull(readerCheck);
+        assertEquals("Store and write provided readers onto different URLs",
+                writer.getContentUrl(), reader.getContentUrl());
+        
+        // open the stream onto the content
+        InputStream is = reader.getContentInputStream();
+        
+        // attempt to delete the content
+        deleted = store.delete(contentUrl);
+        assertFalse("Content deletion failed to detect active reader", deleted);
+
+        // close the reader stream
+        is.close();
+        
+        // get a fresh reader
+        reader = store.getReader(contentUrl);
+        assertNotNull(reader);
+        assertTrue("Content should exist", reader.exists());
+        // delete the content
+        store.delete(contentUrl);
+        
+        // attempt to read from the reader
+        try
+        {
+            is = reader.getContentInputStream();
+            fail("Reader failed to detect underlying content deletion");
+        }
+        catch (ContentIOException e)
+        {
+            // expected
+        }
+        
+        // get another fresh reader
+        reader = store.getReader(contentUrl);
+        assertNotNull("Reader must be returned even when underlying content is missing",
+                reader);
+        assertFalse("Content should not exist", reader.exists());
+        try
+        {
+            is = reader.getContentInputStream();
+            fail("Reader opened stream onto missing content");
+        }
+        catch (ContentIOException e)
+        {
+            // expected
+        }
+    }
+    
+    /**
+     * Tests retrieval of all content URLs
+     * <p>
+     * Only applies when {@link #getStore()} returns a value.
+     */
+    public void testListUrls() throws Exception
+    {
+        ContentStore store = getStore();
+        if (store == null)
+        {
+            return;         // test is meaningless
+        }
+        ContentWriter writer = getWriter();
+        
+        List<String> contentUrls = store.listUrls();
+        String contentUrl = writer.getContentUrl();
+        assertFalse("Writer URL should be unique", contentUrls.contains(contentUrl));
+        
+        // write some data
+        writer.putContent("The quick brown fox...");
+        
+        contentUrls = store.listUrls();
+        assertTrue("Newly written content does not appear as a URL", contentUrls.contains(contentUrl));
     }
 }

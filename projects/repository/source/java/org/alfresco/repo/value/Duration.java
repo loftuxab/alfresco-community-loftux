@@ -1,10 +1,3 @@
-/*
- * Created on 27-Apr-2005
- * 
- * TODO Comment this class
- * 
- * 
- */
 package org.alfresco.repo.value;
 
 import java.io.IOException;
@@ -18,7 +11,7 @@ import java.text.ParsePosition;
 import java.util.Calendar;
 import java.util.Date;
 
-
+import org.alfresco.util.CachingDateFormat;
 
 /**
  * This data type represent duration/interval/period as defined by the XMLSchema type

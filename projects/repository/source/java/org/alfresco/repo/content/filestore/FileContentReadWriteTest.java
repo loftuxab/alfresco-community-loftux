@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.alfresco.repo.content.AbstractContentReadWriteTest;
 import org.alfresco.repo.content.ContentReader;
+import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.ContentWriter;
 
 /**
@@ -31,6 +32,12 @@ public class FileContentReadWriteTest extends AbstractContentReadWriteTest
         file.deleteOnExit();
     }
 
+    @Override
+    protected ContentStore getStore()
+    {
+        return null;
+    }
+    
     @Override
     protected ContentReader getReader()
     {

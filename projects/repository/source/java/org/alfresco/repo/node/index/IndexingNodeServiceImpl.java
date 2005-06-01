@@ -24,7 +24,6 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.repo.search.Indexer;
-import org.alfresco.repo.search.IndexerComponent;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
@@ -62,7 +61,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #storeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#createNode(ChildAssocRef)
+     * @see Indexer#createNode(ChildAssocRef)
      */
     public StoreRef createStore(String protocol, String identifier) throws StoreExistsException
     {
@@ -112,7 +111,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#createNode(ChildAssocRef)
+     * @see Indexer#createNode(ChildAssocRef)
      */
     public ChildAssocRef createNode(NodeRef parentRef, QName assocTypeQName, QName assocQName, QName nodeTypeQName, Map<QName, Serializable> properties)
             throws InvalidNodeRefException
@@ -121,6 +120,35 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         ChildAssocRef assocRef = nodeServiceDelegate.createNode(parentRef, null, assocQName, nodeTypeQName, properties);
         // update index
         indexer.createNode(assocRef);
+        // done
+        return assocRef;
+    }
+    
+    /**
+     * Delegates to the assigned {@link #nodeServiceDelegate} before using the
+     * {@link #indexer} to update the search index.
+     * 
+     * @see Indexer#deleteChildRelationship(ChildAssocRef)
+     * @see Indexer#createChildRelationship(ChildAssocRef)
+     */
+    public ChildAssocRef moveNode(
+            NodeRef nodeToMoveRef,
+            NodeRef newParentRef,
+            QName assocTypeQName,
+            QName assocQName)
+            throws InvalidNodeRefException
+    {
+        // get the old primary parent assoc
+        ChildAssocRef oldAssocRef = nodeServiceDelegate.getPrimaryParent(nodeToMoveRef);
+        // call delegate
+        ChildAssocRef assocRef = nodeServiceDelegate.moveNode(
+                nodeToMoveRef,
+                newParentRef,
+                assocTypeQName,
+                assocQName);
+        // update index
+        indexer.deleteChildRelationship(oldAssocRef);
+        indexer.createChildRelationship(assocRef);
         // done
         return assocRef;
     }
@@ -137,7 +165,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#updateNode(NodeRef)
+     * @see Indexer#updateNode(NodeRef)
      */
     public void addAspect(NodeRef nodeRef, QName aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
@@ -151,7 +179,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#updateNode(NodeRef)
+     * @see Indexer#updateNode(NodeRef)
      */
     public void removeAspect(NodeRef nodeRef, QName aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
@@ -181,7 +209,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#deleteNode(ChildAssocRef)
+     * @see Indexer#deleteNode(ChildAssocRef)
      */
     public void deleteNode(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -203,7 +231,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#createChildRelationship(ChildAssocRef)
+     * @see Indexer#createChildRelationship(ChildAssocRef)
      */
     public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
     {
@@ -219,8 +247,8 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#deleteChildRelationship(ChildAssocRef)
-     * @see IndexerComponent#deleteNode(ChildAssocRef)
+     * @see Indexer#deleteChildRelationship(ChildAssocRef)
+     * @see Indexer#deleteNode(ChildAssocRef)
      */
     public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
     {
@@ -250,8 +278,8 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#deleteChildRelationship(ChildAssocRef)
-     * @see IndexerComponent#deleteNode(ChildAssocRef)
+     * @see Indexer#deleteChildRelationship(ChildAssocRef)
+     * @see Indexer#deleteNode(ChildAssocRef)
      */
     public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
     {
@@ -281,7 +309,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#updateNode(NodeRef)
+     * @see Indexer#updateNode(NodeRef)
      */
     public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
@@ -295,7 +323,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * Delegates to the assigned {@link #nodeServiceDelegate} before using the
      * {@link #indexer} to update the search index.
      * 
-     * @see IndexerComponent#updateNode(NodeRef)
+     * @see Indexer#updateNode(NodeRef)
      */
     public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException
     {

@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.alfresco.repo.value.CachingDateFormat;
+import org.alfresco.util.CachingDateFormat;
 
 
 public class M2XML

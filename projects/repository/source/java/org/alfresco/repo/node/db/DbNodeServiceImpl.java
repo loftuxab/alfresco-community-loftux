@@ -82,6 +82,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 
     /**
      * Performs a null- and type-safe check before returning the <b>container</b> node
+     * 
      * @param nodeRef a reference to a container node
      * @return Returns an instance of a container node (never null)
      * @throws InvalidNodeRefException if the node referenced doesn't exist
@@ -100,6 +101,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     
     /**
      * Performs a null- and type-safe check before returning the <b>real</b> node
+     * 
      * @param nodeRef a reference to a real node
      * @return Returns an instance of a real node (never null)
      * @throws InvalidNodeRefException if the node referenced doesn't exist
@@ -259,6 +261,43 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		// done
 		return childAssocRef;
     }
+    
+    /**
+     * Drops the old primary association and creates a new one
+     */
+    public ChildAssocRef moveNode(
+            NodeRef nodeToMoveRef,
+            NodeRef newParentRef,
+            QName assocTypeQName,
+            QName assocQName)
+            throws InvalidNodeRefException
+    {
+        CodeMonkey.todo("Check that the child association is allowed"); // TODO
+        
+        // check the node references
+        Node nodeToMove = getNodeNotNull(nodeToMoveRef);
+        ContainerNode newParentNode = getContainerNodeNotNull(newParentRef);
+        // get the primary parent assoc
+        ChildAssoc oldAssoc = nodeDaoService.getPrimaryParentAssoc(nodeToMove);
+        // get the old parent
+        ContainerNode oldParentNode = oldAssoc.getParent();
+        
+        // Invoke policy behaviour
+        invokeBeforeUpdate(oldParentNode.getNodeRef());    // old parent will be updated
+        invokeBeforeUpdate(newParentRef);                  // new parent ditto
+        
+        // remove the child assoc from the old parent
+        nodeDaoService.deleteChildAssoc(oldAssoc);
+        // create a new assoc
+        ChildAssoc newAssoc = nodeDaoService.newChildAssoc(newParentNode, nodeToMove, true, assocQName);
+
+        // invoke policy behaviour
+        invokeOnUpdate(oldParentNode.getNodeRef());
+        invokeOnUpdate(newParentRef);
+        
+        // done
+        return newAssoc.getChildAssocRef();
+    }
 
     public QName getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -403,7 +442,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         List<AspectDefinition> defaultAspects = nodeTypeDef.getDefaultAspects();
         if (defaultAspects.contains(aspectDef))
         {
-            throw new InvalidAspectException("The aspect is a default for the node's type and cannot be removed: " + aspectRef, aspectRef);
+            throw new InvalidAspectException(
+                    "The aspect is a default for the node's type and cannot be removed: " + aspectRef,
+                    aspectRef);
         }
         
         // remove the aspect, if present
@@ -415,7 +456,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             Map<QName,PropertyDefinition> propertyDefs = aspectDef.getProperties();
             for (QName propertyName : propertyDefs.keySet())
             {
-                nodeProperties.remove(propertyName);
+                nodeProperties.remove(propertyName.toString());
             }
         }
 		

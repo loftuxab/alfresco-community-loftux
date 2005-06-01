@@ -1,11 +1,4 @@
-/*
- * Created on 27-Apr-2005
- * 
- * TODO Comment this class
- * 
- * 
- */
-package org.alfresco.repo.value;
+package org.alfresco.util;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -15,18 +8,16 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Provides <b>thread safe</b> means of obtaining a cached, non-lenient date
- * formatter.
- * 
- * @author derekh
+ * Provides <b>thread safe</b> means of obtaining a cached date formatter.
+ * <p>
+ * The cached string-date mappings are stored in a <tt>WeakHashMap</tt>.
  * 
  * @see java.text.DateFormat#setLenient(boolean)
+ * 
+ * @author Derek Hulley
  */
 public class CachingDateFormat extends SimpleDateFormat
 {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3258415049197565235L;
 
     public static final String FORMAT_FULL_GENERIC = "yyyy-MM-dd'T'HH:mm:ss";

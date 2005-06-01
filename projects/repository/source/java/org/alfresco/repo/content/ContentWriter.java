@@ -39,9 +39,8 @@ public interface ContentWriter extends Content
      * method will return null if the content has not yet been written by the
      * writer or if the output stream is still open.
      * 
-     * @return Returns a reader onto newly written content or null if the content
-     *      has not yet been written or the new content stream has not yet been
-     *      closed.
+     * @return Returns a reader onto the underlying content that this writer
+     *      will or has written to
      * @throws ContentIOException
      */
     public ContentReader getReader() throws ContentIOException;

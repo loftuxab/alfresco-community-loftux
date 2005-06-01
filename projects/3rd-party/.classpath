@@ -48,5 +48,6 @@
 	<classpathentry kind="lib" path="lib/bcel.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-run.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-2.5.1.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

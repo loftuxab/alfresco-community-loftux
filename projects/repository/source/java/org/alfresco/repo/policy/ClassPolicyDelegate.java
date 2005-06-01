@@ -9,7 +9,6 @@ import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 
-
 /**
  * Delegate for a Class-level Policy.  Provides access to Policy Interface
  * implementations which invoke the appropriate bound behaviours.

@@ -41,6 +41,13 @@ public interface ContentReader extends Content
      * @throws ContentIOException
      */
     public ContentReader getReader() throws ContentIOException;
+    
+    /**
+     * Check if the {@link Content#getContentUrl() underlying content} is present.
+     * 
+     * @return Returns true if there is content at the URL refered to by this reader
+     */
+    public boolean exists();
 
     /**
      * Provides low-level access to the underlying content.

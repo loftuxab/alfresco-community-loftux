@@ -30,7 +30,11 @@ public class FileContentReader extends AbstractContentReader
     public FileContentReader(File file)
     {
         super(FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
-        
+
+        if (file == null)
+        {
+            throw new IllegalArgumentException("File may not be null");
+        }
         this.file = file;
     }
     
@@ -48,6 +52,14 @@ public class FileContentReader extends AbstractContentReader
         return new FileContentReader(this.file);
     }
     
+    /**
+     * @see File#exists()
+     */
+    public boolean exists()
+    {
+        return file.exists();
+    }
+
     @Override
     protected InputStream getDirectInputStream() throws ContentIOException
     {

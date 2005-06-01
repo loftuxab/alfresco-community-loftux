@@ -224,13 +224,20 @@
             <bean class="org.alfresco.repo.content.transform.StringExtractingContentTransformer" />
             <bean class="org.alfresco.repo.content.transform.BinaryPassThroughContentTransformer" />
             <bean class="org.alfresco.repo.content.transform.PdfBoxContentTransformer" />
+            <bean class="org.alfresco.repo.content.transform.PoiHssfContentTransformer" />
          </list>
       </constructor-arg>
       <constructor-arg>
          <ref bean="mimetypeMap" />
       </constructor-arg>
    </bean>
-      
+   
+   <bean id="fileContentStore" class="org.alfresco.repo.content.filestore.FileContentStore">
+      <constructor-arg>
+         <value>w:/contentstore</value>
+      </constructor-arg>
+   </bean>
+   
    <bean id="contentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.repo.content.ContentService</value>
@@ -247,7 +254,7 @@
                <ref bean="contentTransformerRegistry" />
             </constructor-arg>
             <constructor-arg>
-               <value>c:/contentstore</value>
+               <ref bean="fileContentStore" />
             </constructor-arg>
          </bean>
       </property>
@@ -677,10 +684,62 @@
       </property>
    </bean>
    
-   <bean id="scedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+   <bean id="tempFileCleanerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+      <property name="jobDetail">
+         <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+            <property name="jobClass">
+               <value>org.alfresco.util.TempFileProvider$TempFileCleanerJob</value>
+            </property>
+            <property name="jobDataAsMap">
+               <map>
+                  <entry key="protectHours">
+                     <value>24</value>
+                  </entry>
+               </map>
+            </property>
+         </bean>
+      </property>
+      <property name="startDelay">
+         <value>60000</value>                     <!-- start after a minute -->
+      </property>
+      <property name="repeatInterval">
+         <value>3600000</value>                    <!-- repeat every hour -->
+      </property>
+   </bean>
+
+   <bean id="fileContentStoreCleanerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+      <property name="jobDetail">
+         <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+            <property name="jobClass">
+               <value>org.alfresco.repo.content.ContentStoreCleanupJob</value>
+            </property>
+            <property name="jobDataAsMap">
+               <map>
+                  <entry key="contentStore">
+                     <ref bean="fileContentStore" />
+                  </entry>
+                  <entry key="searcher">
+                     <ref bean="searcherComponent" />
+                  </entry>
+               </map>
+            </property>
+         </bean>
+      </property>
+      <property name="startDelay">
+         <value>10000</value>                     <!-- start after an hour -->
+      </property>
+      <property name="repeatInterval">
+         <value>10000</value>                      <!-- repeat every 24 hour -->
+      </property>
+   </bean>
+
+   <!-- passing a list to the SchedulerFactoryBean only instantiates the first one -->   
+   <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
       <property name="triggers">
          <list>
             <ref local="ftsIndexerTrigger"/>
+            <ref local="tempFileCleanerTrigger"/>
+            <ref local="fileContentStoreCleanerTrigger"/>
          </list>
       </property>
    </bean>

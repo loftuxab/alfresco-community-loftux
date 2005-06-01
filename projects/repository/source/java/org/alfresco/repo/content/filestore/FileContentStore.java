@@ -2,17 +2,18 @@ package org.alfresco.repo.content.filestore;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.alfresco.repo.content.ContentIOException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.util.GUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides a store of node content directly to the file system.
@@ -61,30 +62,52 @@ public class FileContentStore implements ContentStore
     }
     
     /**
-     * Generates a new and unique file for the given node reference.
+     * Generates a new and unique file based on the current date.
      * 
-     * @param nodeRef the node for which to generate a unique filename
-     * @return Returns a new and unique file instance for the node
+     * @return Returns a new and unique file
      * @throws IOException if the file or parent directories couldn't be created
      */
-    private File getNewStorageFile(NodeRef nodeRef) throws IOException
+    private File getNewStorageFile() throws IOException
     {
-        StoreRef storeRef = nodeRef.getStoreRef();
+        Calendar calendar = new GregorianCalendar();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
         // create the directory
-        String subDir = storeRef.getProtocol() + File.separatorChar +
-                storeRef.getIdentifier() + File.separatorChar +
-                nodeRef.getId(); 
-        File dir = new File(rootDirectory, subDir);
+        StringBuilder sb = new StringBuilder(20);
+        sb.append(year).append(File.separatorChar)
+          .append(month).append(File.separatorChar)
+          .append(day);
+        File dir = new File(rootDirectory, sb.toString());
         if (!dir.exists())
         {
             dir.mkdirs();
         }
+        
         // create the file
-        long time = System.currentTimeMillis();
-        String localFileName = "" + time + "-" + GUID.generate() + ".bin";
+        String localFileName = GUID.generate() + ".bin";
         File file = new File(dir, localFileName);
         // done
         return file;
+    }
+    
+    /**
+     * Used to ensure that the URLs passed into the store conform to the
+     * {@link FileContentStore#STORE_PROTOCOL correct protocol}.
+     * 
+     * @param contentUrl a URL of the content to check
+     * @throws RuntimeException if the URL is not correct
+     */
+    private void checkUrl(String contentUrl) throws RuntimeException
+    {
+        String urlStartCheck = FileContentStore.STORE_PROTOCOL + rootDirectory;
+        if (!contentUrl.startsWith(urlStartCheck))
+        {
+            throw new RuntimeException(
+                    "This store is reserved for URLs starting with " +
+                    urlStartCheck + ": \n" +
+                    "   store: " + this);
+        }
     }
     
     /**
@@ -93,13 +116,7 @@ public class FileContentStore implements ContentStore
      */
     public ContentReader getReader(String contentUrl)
     {
-        if (!contentUrl.startsWith(FileContentStore.STORE_PROTOCOL))
-        {
-            throw new RuntimeException(
-                    "This store is reserved for URLs starting with " +
-                    FileContentStore.STORE_PROTOCOL + ": \n" +
-                    "   store: " + this);
-        }
+        checkUrl(contentUrl);
         try
         {
             File file = new File(contentUrl.substring(6));
@@ -120,35 +137,92 @@ public class FileContentStore implements ContentStore
     }
     
     /**
-     * @see #getWriter(NodeRef)
-     * @see ContentStore#TEMP_NODEREF
+     * @return Returns a writer onto a location based on the date
      */
     public ContentWriter getWriter()
     {
-        return getWriter(ContentStore.TEMP_NODEREF);
-    }
-
-    /**
-     * Generates a unique filename based on the given node reference.
-     */
-    public ContentWriter getWriter(NodeRef nodeRef)
-    {
         try
         {
-            File file = getNewStorageFile(nodeRef);
+            File file = getNewStorageFile();
             ContentWriter writer = new FileContentWriter(file);
             // done
             if (logger.isDebugEnabled())
             {
-                logger.debug("Created content writer for node reference: \n" +
-                        "   node: " + nodeRef + "\n" +
+                logger.debug("Created content writer: \n" +
                         "   writer: " + writer);
             }
             return writer;
         }
         catch (IOException e)
         {
-            throw new ContentIOException("Failed to get writer for node: " + nodeRef, e);
+            throw new ContentIOException("Failed to get writer", e);
+        }
+    }
+
+    public List<String> listUrls()
+    {
+        // recursively get all files within the root
+        List<String> contentUrls = new ArrayList<String>(1000);
+        listUrls(rootDirectory, contentUrls);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Listed all content URLS: \n" +
+                    "   store: " + this + "\n" +
+                    "   count: " + contentUrls.size());
+        }
+        return contentUrls;
+    }
+    
+    /**
+     * @param directory the current directory to get the files from
+     * @param contentUrls the list of current content URLs to add to
+     * @return Returns a list of all files within the given directory and all subdirectories
+     */
+    private void listUrls(File directory, List<String> contentUrls)
+    {
+        File[] files = directory.listFiles();
+        for (File file : files)
+        {
+            if (file.isDirectory())
+            {
+                // we have a subdirectory - recurse
+                listUrls(file, contentUrls);
+            }
+            else
+            {
+                // found a file - create and add the URL
+                String contentUrl = (FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
+                contentUrls.add(contentUrl);
+            }
+        }
+    }
+
+    /**
+     * Deletes the content at the URL provided it is <b>older than 24 hours</b>.
+     */
+    public boolean delete(String contentUrl) throws ContentIOException
+    {
+        checkUrl(contentUrl);
+        // check if the file exists
+        try
+        {
+            File file = new File(contentUrl.substring(6));
+            if (file.exists() &&
+                    file.lastModified() < (System.currentTimeMillis() - 86400000))  // modified more than 24 hours ago 
+            {
+                return file.delete();
+            }
+            else
+            {
+                return true;
+            }
+        }
+        catch (Throwable e)
+        {
+            throw new ContentIOException("Failed to delete content: \n" +
+                    "   store: " + this + "\n" +
+                    "   URL: " + contentUrl);
         }
     }
 }

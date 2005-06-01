@@ -88,6 +88,29 @@ public interface NodeService
             throws InvalidNodeRefException, InvalidNodeTypeException, PropertyException;
     
     /**
+     * Moves the primary location of the given node.
+     * <p>
+     * This involves changing the node's primary parent and possibly the name of the
+     * association referencing it.
+     *  
+     * @param nodeToMoveRef the node to move
+     * @param newParentRef the new parent of the moved node
+     * @param assocTypeQName the type of the association to create.  This is used
+     *      for verification against the data dictionary.
+     * @param assocQName the qualified name of the new child association
+     * @return Returns a reference to the newly created child association
+     * @throws InvalidNodeRefException if either the parent node or move node reference is invalid
+     * 
+     * @see #getPrimaryParent(NodeRef)
+     */
+    public ChildAssocRef moveNode(
+            NodeRef nodeToMoveRef,
+            NodeRef newParentRef,
+            QName assocTypeQName,
+            QName assocQName)
+            throws InvalidNodeRefException;
+    
+    /**
      * @param nodeRef
      * @return Returns the type name
      * @throws InvalidNodeRefException if the node could not be found

@@ -21,6 +21,7 @@ import java.util.Map;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.util.CachingDateFormat;
 
 /**
  * Support for generic conversion between types.
