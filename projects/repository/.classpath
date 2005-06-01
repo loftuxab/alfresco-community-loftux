@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="source/java"/>
 	<classpathentry kind="src" path="source/test-resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="src" path="/Core"/>
+	<classpathentry kind="src" path="/Core"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

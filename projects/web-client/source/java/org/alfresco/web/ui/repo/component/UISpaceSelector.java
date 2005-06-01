@@ -4,27 +4,21 @@
 package org.alfresco.web.ui.repo.component;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
-import javax.faces.component.ValueHolder;
 import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
 import javax.faces.el.ValueBinding;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
-import javax.faces.event.ValueChangeEvent;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -32,7 +26,6 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
-import org.jaxen.function.SumFunction;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -287,7 +280,7 @@ public class UISpaceSelector extends UIInput
                   for (int index=0; index<childRefs.size(); index++)
                   {
                      ChildAssocRef childRef = childRefs.get(index);
-                     if (service.hasAspect(childRef.getChildRef(), DictionaryBootstrap.ASPECT_SPACE))
+                     if (service.hasAspect(childRef.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_SPACE))
                      {
                         // render each space found
                         String childId = childRef.getChildRef().getId();

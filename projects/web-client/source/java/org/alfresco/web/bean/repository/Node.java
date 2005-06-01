@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -26,7 +25,7 @@ public class Node implements Serializable
    
    private NodeRef nodeRef;
    private String name;
-   private ClassRef type;
+   private QName type;
    private String path;
    private String id;
    private Set aspects = null;
@@ -129,7 +128,7 @@ public class Node implements Serializable
    /**
     * @return Returns the type.
     */
-   public ClassRef getType()
+   public QName getType()
    {
       if (this.type == null)
       {
@@ -144,7 +143,7 @@ public class Node implements Serializable
     */
    public String getTypeName()
    {
-      return getType().getQName().getLocalName();
+      return getType().getLocalName();
    }
    
    /**
@@ -184,7 +183,7 @@ public class Node implements Serializable
     * @param aspect The aspect to test for
     * @return true if the node has the aspect false otherwise
     */
-   public boolean hasAspect(ClassRef aspect)
+   public boolean hasAspect(QName aspect)
    {
       Set aspects = getAspects();
       return aspects.contains(aspect);

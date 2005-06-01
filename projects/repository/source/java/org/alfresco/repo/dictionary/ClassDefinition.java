@@ -1,6 +1,6 @@
 package org.alfresco.repo.dictionary;
 
-import java.util.List;
+import java.util.Map;
 
 import org.alfresco.repo.ref.QName;
 
@@ -11,60 +11,58 @@ import org.alfresco.repo.ref.QName;
  */
 public interface ClassDefinition
 {
-    /**
-     * @return  the class reference
-     */
-    public ClassRef getReference();
 
     /**
      * @return the qualified name of the class
      */
-    public QName getQName();
+    public QName getName();
+    
+    /**
+     * @return the human-readable class title 
+     */
+    public String getTitle();
+    
+    /**
+     * @return the human-readable class description 
+     */
+    public String getDescription();
     
     /**
      * @return  the super class (or null, if this is the root)
      */
-    public ClassDefinition getSuperClass();
+    public QName getParentName();
     
     /**
-     * @return Returns true => aspect, false => type
+     * @return true => aspect, false => type
      */
     public boolean isAspect();
 
     /**
-     * @return Returns the properties of the class, including inherited properties
+     * @return the properties of the class, including inherited properties
      */
-    public List<PropertyDefinition> getProperties();
+    public Map<QName, PropertyDefinition> getProperties();
     
     /**
-     * @param name the simple name of the property, i.e. not the qualified name
-     * @return Returns the property definition, or null if not found
+     * Fetch all associations for which this is a source type, including child associations.
      * 
-     * @see PropertyRef#getPropertyName()
+     * @return the associations including inherited ones
+     * @see ChildAssociationDefinition
      */
-    public PropertyDefinition getProperty(String name);
+    public Map<QName, AssociationDefinition> getAssociations();
+    
+    /**
+     * Fetch only child associations for which this is a source type.
+     *
+     * @return all child associations applicable to this type, including those
+     *         inherited from super types
+     */
+    public Map<QName, ChildAssociationDefinition> getChildAssociations();
 
     /**
-     * Fetch all associations applicable to this type, including child associations.
+     * Fetch all associations for which this is a target type, including child associations.
      * 
-     * @return Returns the associations including inherited ones
-     * 
-     * @see ChildAssociationDefinition
+     * @return the associations including inherited ones
      */
-    public List<AssociationDefinition> getAssociations();
+    // TODO: public Map<QName, AssociationDefinition> getTargetAssociations();
     
-    /**
-     * @param name the simple name of the association, i.e. not the qualified name
-     * @return Returns the association definition, or null if not found.
-     * 
-     * @see AssociationRef#getAssociationName()
-     * @see ChildAssociationDefinition
-     */
-    public AssociationDefinition getAssociation(String name);
-    
-    /**
-     * @return Returns all child associations applicable to this type, including those
-     *      inherited from super types
-     */
-    public List<ChildAssociationDefinition> getChildAssociations();
 }

@@ -1,6 +1,7 @@
 package org.alfresco.repo.node;
 
-import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.ref.QName;
+
 
 /**
  * Thrown when a reference to an <b>aspect</b> is incorrect.
@@ -11,14 +12,14 @@ public class InvalidAspectException extends RuntimeException
 {
     private static final long serialVersionUID = 3257290240330051893L;
 
-    private ClassRef aspectRef;
+    private QName aspectRef;
     
-    public InvalidAspectException(ClassRef aspectRef)
+    public InvalidAspectException(QName aspectRef)
     {
         this(null, aspectRef);
     }
 
-    public InvalidAspectException(String msg, ClassRef aspectRef)
+    public InvalidAspectException(String msg, QName aspectRef)
     {
         super(msg);
         this.aspectRef = aspectRef;
@@ -29,7 +30,7 @@ public class InvalidAspectException extends RuntimeException
      * 
      * @see org.alfresco.repo.dictionary.ClassDefinition#getProperties()
      */
-    public ClassRef getAspectRef()
+    public QName getAspectRef()
     {
         return aspectRef;
     }

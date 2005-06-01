@@ -1,0 +1,133 @@
+<model name="alf:versionmodel" xmlns="http://www.alfresco.org/dictionary/0.1">
+
+   <description>Alfresco Version Store Model</description>
+   <author>Alfresco</author>
+   <published>2005-05-30</published>
+   <version>0.1</version>
+   
+   <imports>
+      <import uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
+      <import uri="http://www.alfresco.org/1.0" prefix="alf"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/lightweightversionstore/1.0" prefix="ver"/>
+   </namespaces>
+
+   <types>
+      
+      <type name="ver:versionedProperty">
+         <parent>alf:base</parent>
+         
+         <properties>
+            <property name="ver:qname">
+               <type>d:text</type>
+            </property>
+            <property name="ver:value">
+               <type>d:any</type>
+            </property>
+         </properties>
+      </type>
+
+      <type name="ver:versionedAssoc">
+         <parent>alf:reference</parent>
+         
+         <properties>
+            <property name="ver:assocQName">
+               <type>d:qname</type>
+            </property>
+         </properties>
+      </type>
+      
+      <type name="ver:versionedChildAssoc">
+         <parent>ver:versionedAssoc</parent>
+         
+         <properties>
+            <property name="ver:isPrimary">
+               <type>d:boolean</type>
+            </property>
+            <property name="ver:nthSibling">
+               <type>d:int</type>
+            </property>
+         </properties>
+      </type>
+
+      <type name="ver:version">
+         <parent>alf:container</parent>
+         
+         <properties>
+            <property name="ver:versionNumber">
+               <type>d:int</type>
+            </property>
+            <property name="ver:versionLabel">
+               <type>d:text</type>
+            </property>
+            <property name="ver:createdDate">
+               <type>d:datetime</type>
+            </property>
+            <property name="ver:modifiedDate">
+               <type>d:datetime</type>
+            </property>
+            <property name="ver:frozenNodeId">
+               <type>d:guid</type>
+            </property>
+            <property name="ver:frozenNodeStoreId">
+               <type>d:guid</type>
+            </property>
+            <property name="ver:frozenNodeStoreProtocol">
+               <type>d:text</type>
+            </property>
+            <property name="ver:frozenNodeType">
+               <type>d:text</type>
+            </property>
+            <property name="ver:frozenAspects">
+               <type>d:qname</type>
+               <multiple>true</multiple>
+            </property>
+         </properties>
+         
+         <associations>
+            <child-association name="ver:versionedAttributes">
+               <!-- TODO -->
+               <target>
+                  <class>alf:base</class>
+               </target>
+            </child-association>
+            <child-association name="ver:versionedChildAssocs">
+               <!-- TODO -->
+               <target>
+                  <class>alf:base</class>
+               </target>
+            </child-association>
+            <association name="ver:successor">
+               <target>
+                  <class>ver:version</class>
+               </target>
+            </association>
+         </associations>
+      </type>
+      
+      <type name="ver:versionHistory">
+         <properties>
+            <property name="ver:versionedNodeId">
+               <type>d:guid</type>
+            </property>
+         </properties>
+       
+         <associations>
+            <child-association name="ver:version">
+               <target>
+                  <class>ver:version</class>
+               </target>
+            </child-association>
+            <association name="ver:rootVersion">
+               <target>
+                  <class>ver:version</class>
+               </target>
+            </association>
+         </associations>  
+      </type>
+      
+   </types>
+   
+</model>

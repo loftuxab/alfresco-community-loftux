@@ -7,8 +7,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.ClassRef;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.lock.LockType;
 import org.alfresco.repo.lock.NodeLockedException;
@@ -63,9 +62,6 @@ public class LockBehaviourImplTest extends BaseSpringTest
         this.lockService = (LockService)applicationContext.getBean("lockService");
 		this.versionService = (VersionService)applicationContext.getBean("lightWeightVersionStoreVersionService");
         
-        // Get the lock aspect class ref
-        ClassRef lockAspect = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_LOCK);
-        
         // Create the node properties
         HashMap<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
         nodeProperties.put(QName.createQName("{test}property1"), "value1");
@@ -83,7 +79,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
                 QName.createQName("{}ParentNode"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.nodeRef, lockAspect, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK, new HashMap<QName, Serializable>());
         assertNotNull(this.nodeRef);
         
         // Create a node with no lockAspect
@@ -204,7 +200,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 	public void testVersionServiceLockBehaviour()
 	{
 		// Add the version aspect to the node
-		this.nodeService.addAspect(this.nodeRef, new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION), null);
+		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION, null);
 		
 		try
 		{
@@ -279,7 +275,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		Map<QName, Serializable> propMap = new HashMap<QName, Serializable>();
 		propMap.put(QName.createQName("{test}prop2"), "value2");
 		this.nodeService.setProperties(this.nodeRef, propMap);
-		this.nodeService.removeAspect(this.nodeRef, new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION));
+		this.nodeService.removeAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION);
 		// TODO there are various other calls that could be more vigirously checked
 		
 		// Lock the node as the 'bad' user

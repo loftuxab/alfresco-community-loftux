@@ -7,7 +7,6 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.DictionaryRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
@@ -99,12 +98,8 @@ public class LuceneAnalyser extends Analyzer
         else if (fieldName.startsWith("@"))
         {
             QName propertyQName = QName.createQName(fieldName.substring(1));
-            PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
-            PropertyTypeDefinition propertyType = dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.TEXT));
-            if(propertyDefinition != null)
-            {
-               propertyType = propertyDefinition.getPropertyType();
-            }
+            PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
+            PropertyTypeDefinition propertyType = (propertyDef == null) ? dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT) : propertyDef.getPropertyType();
             String analyserClassName = propertyType.getAnalyserClassName();
             try
             {
@@ -113,15 +108,15 @@ public class LuceneAnalyser extends Analyzer
             }
             catch (ClassNotFoundException e)
             {
-                throw new RuntimeException("Unable to load analyser for type "+propertyDefinition.getQName() + " of type "+propertyType.getName()+ " using "+analyserClassName);
+                throw new RuntimeException("Unable to load analyser for property " + fieldName.substring(1) + " of type " + propertyType.getName() + " using " + analyserClassName);
             }
             catch (InstantiationException e)
             {
-                throw new RuntimeException("Unable to load analyser for type "+propertyDefinition.getQName() + " of type "+propertyType.getName()+ " using "+analyserClassName);   
+                throw new RuntimeException("Unable to load analyser for property " + fieldName.substring(1) + " of type " + propertyType.getName() + " using " + analyserClassName);
             }
             catch (IllegalAccessException e)
             {
-                throw new RuntimeException("Unable to load analyser for type "+propertyDefinition.getQName() + " of type "+propertyType.getName()+ " using "+analyserClassName);
+                throw new RuntimeException("Unable to load analyser for property " + fieldName.substring(1) + " of type " + propertyType.getName() + " using " + analyserClassName);
             }
         }
         else

@@ -13,13 +13,11 @@ import java.util.Set;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
-import org.alfresco.repo.dictionary.DictionaryRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
@@ -190,7 +188,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         ret.put(qname, assoc);
         NodeRef n6 = assoc.getChildRef();
         nodeService.addAspect(n6,
-                DictionaryBootstrap.ASPECT_ROOT,
+                DictionaryBootstrap.ASPECT_QNAME_ROOT,
                 Collections.<QName, Serializable>emptyMap());
 
         qname = QName.createQName(ns, "n4_n6");
@@ -252,7 +250,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // get the root node
         NodeRef storeRootNode = nodeService.getRootNode(storeRef);
         // make sure that it has the root aspect
-        boolean isRoot = nodeService.hasAspect(storeRootNode, DictionaryBootstrap.ASPECT_ROOT);
+        boolean isRoot = nodeService.hasAspect(storeRootNode, DictionaryBootstrap.ASPECT_QNAME_ROOT);
         assertTrue("Root node of store does not have root aspect", isRoot);
     }
     
@@ -285,28 +283,27 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 QName.createQName("pathA"), DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
         // get the type
-        ClassRef type = nodeService.getType(nodeRef);
-        assertEquals("Type mismatch", DictionaryBootstrap.TYPE_CONTAINER, type);
+        QName type = nodeService.getType(nodeRef);
+        assertEquals("Type mismatch", DictionaryBootstrap.TYPE_QNAME_CONTAINER, type);
     }
     
     /**
      * Fills the given property map with some values according to the property definitions on the given class
      */
-    protected void fillProperties(ClassRef classRef, Map<QName, Serializable> properties)
+    protected void fillProperties(QName classRef, Map<QName, Serializable> properties)
     {
         ClassDefinition classDef = dictionaryService.getClass(classRef);
         if (classDef == null)
         {
             throw new RuntimeException("No such class: " + classRef);
         }
-        List<PropertyDefinition> propertyDefs = classDef.getProperties();
+        Map<QName,PropertyDefinition> propertyDefs = classDef.getProperties();
         // make up a property value for each property
-        for (PropertyDefinition propertyDef : propertyDefs)
+        for (QName propertyName : propertyDefs.keySet())
         {
-            QName qname = propertyDef.getQName();
             Serializable value = new Long(System.currentTimeMillis());
             // add it
-            properties.put(qname, value);
+            properties.put(propertyName, value);
         }
     }
     
@@ -327,7 +324,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(20);
         try
         {
-            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT, properties);
+            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
             fail("Failed to detect inadequate properties for aspect");
         }
         catch (PropertyException e)
@@ -335,11 +332,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             // expected
         }
         // get the properties required for the aspect
-        fillProperties(DictionaryBootstrap.ASPECT_CONTENT, properties);
+        fillProperties(DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
         // get the node properties before
         Map<QName, Serializable> propertiesBefore = nodeService.getProperties(nodeRef);
         // add the aspect
-        nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT, properties);
+        nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
         // get the properties after and check
         Map<QName, Serializable> propertiesAfter = nodeService.getProperties(nodeRef);
         assertEquals("Aspect properties not added",
@@ -359,18 +356,18 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
         
         // check that we know that the aspect is present
-        Set<ClassRef> aspects = nodeService.getAspects(nodeRef);
+        Set<QName> aspects = nodeService.getAspects(nodeRef);
         assertEquals("Incorrect number of aspects", 1, aspects.size());
         assertTrue("Content aspect not present",
-                aspects.contains(DictionaryBootstrap.ASPECT_CONTENT));
+                aspects.contains(DictionaryBootstrap.ASPECT_QNAME_CONTENT));
         
         // check that hasAspect works
-        boolean hasAspect = nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT);
+        boolean hasAspect = nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT);
         assertTrue("Aspect not confirmed to be on node", hasAspect);
         
         // remove the aspect
-        nodeService.removeAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT);
-        hasAspect = nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT);
+        nodeService.removeAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT);
+        hasAspect = nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT);
         assertFalse("Aspect not removed from node", hasAspect);
         
         // check that the associated properties were removed
@@ -410,9 +407,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         properties.put(propSpaceType, "container");
         
         // try and add the aspect to the folder node
-        nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
+        nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_SPACE, properties);
         
-        Set<ClassRef> aspects = nodeService.getAspects(nodeRef);
+        Set<QName> aspects = nodeService.getAspects(nodeRef);
         assertEquals("There should only be 1 aspect applied", 1, aspects.size());
     }
 
@@ -449,7 +446,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         // fill properties
-        fillProperties(DictionaryBootstrap.ASPECT_CONTENT, properties);
+        fillProperties(DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
         
         // create node for real
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
@@ -460,12 +457,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         NodeRef nodeRef = assocRef.getChildRef();
         // check that the content aspect is present
         assertTrue("Content aspect not present",
-                nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT));
+                nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
         
         // attempt to remove the aspect
         try
         {
-            nodeService.removeAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT);
+            nodeService.removeAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT);
             fail("Failed to prevent removal of type-required aspect");
         }
         catch (InvalidAspectException e)
@@ -665,7 +662,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     private NodeAssocRef createAssociation() throws Exception
     {
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-        fillProperties(DictionaryBootstrap.TYPE_REFERENCE, properties);
+        fillProperties(DictionaryBootstrap.TYPE_QNAME_REFERENCE, properties);
         
         ChildAssocRef childAssocRef = nodeService.createNode(rootNodeRef,
                 null,
@@ -896,7 +893,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals(1, list.size());
         //System.out.println(list);
         
-        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:test", namespacePrefixResolver), dictionaryService.getPropertyType(new DictionaryRef(PropertyTypeDefinition.TEXT)), true, "monkey");
+        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:test", namespacePrefixResolver), dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT), true, "monkey");
         xpath = new NodeServiceXPath("//.[@alftest:animal=$alf:test]", nodeService, namespacePrefixResolver, new QueryParameterDefinition[]{paramDef}, false);
         xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
         xpath.addNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
@@ -1043,7 +1040,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             //properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "application/msword");
             properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
             properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
-            nodeService.addAspect(assoc.getChildRef(), DictionaryBootstrap.ASPECT_CONTENT, properties);
+            nodeService.addAspect(assoc.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
             ContentWriter writer = contentService.getUpdatingWriter(assoc.getChildRef());
             writer.putContent("I need to make a 50K document somehow. So I will type and type and type until I have something like it …. But then word is so overblown it will probably be that big already!/n"+
                     "/n" +

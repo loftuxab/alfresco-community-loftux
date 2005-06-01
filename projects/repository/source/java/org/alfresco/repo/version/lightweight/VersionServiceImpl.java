@@ -11,9 +11,8 @@ import java.util.Set;
 
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentStore;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyScope;
@@ -146,7 +145,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		// Regiseter the serial version label behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "calculateVersionLabel"),
-				DictionaryBootstrap.TYPE_BASE,
+				DictionaryBootstrap.TYPE_QNAME_BASE,
 				new JavaBehaviour(new SerialVersionLabelPolicy(), "calculateVersionLabel"));
 	}
     
@@ -316,7 +315,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
                     getRootNode(), 
                     null, 
                     CHILD_QNAME_VERSION_HISTORIES,
-                    CLASS_REF_VERSION_HISTORY.getQName(),
+                    TYPE_QNAME_VERSION_HISTORY,
                     props);
             versionHistoryRef = childAssocRef.getChildRef();            
         }
@@ -344,7 +343,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		addStandardVersionProperties(versionProperties, nodeRef, currentVersionRef, versionNumber);
 		
 		// Create the node details
-		ClassRef classRef = this.nodeService.getType(nodeRef);
+		QName classRef = this.nodeService.getType(nodeRef);
 		PolicyScope nodeDetails = new PolicyScope(classRef);
 		
 		// Get the node details by calling the onVersionCreate policy behaviour
@@ -424,7 +423,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	{
 		Version version = null;
 		
-		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_VERSION) == true)
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION) == true)
 		{
 			VersionHistory versionHistory = getVersionHistory(nodeRef);
 			if (versionHistory != null)
@@ -455,15 +454,15 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		versionProperties.put(Version.PROP_FROZEN_NODE_STORE_ID, nodeRef.getStoreRef().getIdentifier());
         
         // Store the current node type
-        ClassRef nodeType = this.nodeService.getType(nodeRef);
+        QName nodeType = this.nodeService.getType(nodeRef);
 		versionProperties.put(Version.PROP_FROZEN_NODE_TYPE, nodeType);
         
         // Store the current aspects
-        Set<ClassRef> aspects = this.nodeService.getAspects(nodeRef);
+        Set<QName> aspects = this.nodeService.getAspects(nodeRef);
 		versionProperties.put(Version.PROP_FROZEN_ASPECTS, (Serializable)aspects);
         
         // Calculate the version label
-		ClassRef classRef = this.nodeService.getType(nodeRef);
+		QName classRef = this.nodeService.getType(nodeRef);
 		Version preceedingVersion = getVersion(preceedingNodeRef);
         String versionLabel = invokeCalculateVersionLabel(classRef, preceedingVersion, versionNumber, versionProperties);
 		versionProperties.put(Version.PROP_VERSION_LABEL, versionLabel);
@@ -505,7 +504,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
                 versionHistoryRef, 
                 null,
                 CHILD_QNAME_VERSIONS,
-                CLASS_REF_VERSION.getQName(),
+                TYPE_QNAME_VERSION,
                 props);
         NodeRef versionNodeRef = childAssocRef.getChildRef();
 		
@@ -525,9 +524,9 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	 * @param versionNodeRef
 	 * @param aspects
 	 */
-    private void freezeAspects(PolicyScope nodeDetails, NodeRef versionNodeRef, Set<ClassRef> aspects) 
+    private void freezeAspects(PolicyScope nodeDetails, NodeRef versionNodeRef, Set<QName> aspects) 
 	{
-		for (ClassRef aspect : aspects) 
+		for (QName aspect : aspects) 
 		{
 			// Freeze the details of the aspect
 			freezeProperties(versionNodeRef, nodeDetails.getProperties(aspect));
@@ -568,7 +567,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
                     versionNodeRef,
                     null, 
                     CHILD_QNAME_VERSIONED_ASSOCS, 
-                    CLASS_REF_VERSIONED_ASSOC.getQName(),
+                    TYPE_QNAME_VERSIONED_ASSOC,
                     properties);
         }
 	}
@@ -608,7 +607,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
                     versionNodeRef,
                     null,
                     CHILD_QNAME_VERSIONED_CHILD_ASSOCS, 
-                    CLASS_REF_VERSIONED_CHILD_ASSOC.getQName(),
+                    TYPE_QNAME_VERSIONED_CHILD_ASSOC,
                     properties);
 		}
 	}
@@ -633,7 +632,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
                     versionNodeRef, 
                     null,
                     CHILD_QNAME_VERSIONED_ATTRIBUTES,
-                    CLASS_REF_VERSIONED_PROPERTY.getQName(),
+                    TYPE_QNAME_VERSIONED_PROPERTY,
                     props);                
         }
 	}
@@ -911,7 +910,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     private void checkForVersionAspect(NodeRef nodeRef)
        throws AspectMissingException
     {
-        ClassRef aspectRef = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION);
+        QName aspectRef = DictionaryBootstrap.ASPECT_QNAME_VERSION;
         
         if (this.nodeService.hasAspect(nodeRef, aspectRef) == false)
         {

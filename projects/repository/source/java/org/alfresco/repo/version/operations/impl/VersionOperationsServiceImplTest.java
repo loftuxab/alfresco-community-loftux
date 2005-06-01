@@ -10,7 +10,7 @@ import java.util.Map;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -82,13 +82,13 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		Map<QName, Serializable>contentProperties = new HashMap<QName, Serializable>();
 		contentProperties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
 		contentProperties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_CONTENT, contentProperties);
+		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);
 		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.nodeRef);
 		contentWriter.putContent(CONTENT_1);	
 		
 		// Add the lock and version aspects to the created node
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_VERSION, null);
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK, null);		
+		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION, null);
+		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK, null);		
 	}
 	
 	/**
@@ -126,8 +126,8 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		assertNotNull(workingCopy);
 		
 		// Ensure that the working copy and copy aspect has been applied
-		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_WORKING_COPY));	
-		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_COPY));
+		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));	
+		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_QNAME_COPY));
 		
 		// Ensure that the content has been copied correctly
 		ContentReader contentReader = this.contentService.getReader(this.nodeRef);

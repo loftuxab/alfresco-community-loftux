@@ -1,8 +1,8 @@
 package org.alfresco.repo.policy;
 
 import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.ref.QName;
 
 
 /**
@@ -11,13 +11,13 @@ import org.alfresco.repo.dictionary.DictionaryService;
  * @author David Caruana
  *
  */
-public class ClassBehaviourBinding implements BehaviourBinding
+/*package*/ class ClassBehaviourBinding implements BehaviourBinding
 {
     // The dictionary service
     private DictionaryService dictionary;
     
     // The class reference
-    private ClassRef classRef; 
+    private QName classRef; 
 
 
     /**
@@ -26,7 +26,7 @@ public class ClassBehaviourBinding implements BehaviourBinding
      * @param dictionary  the dictionary service
      * @param classRef  the reference of the Class
      */
-    /*package*/ ClassBehaviourBinding(DictionaryService dictionary, ClassRef classRef)
+    /*package*/ ClassBehaviourBinding(DictionaryService dictionary, QName classRef)
     {
         this.dictionary = dictionary;
         this.classRef = classRef;
@@ -39,10 +39,10 @@ public class ClassBehaviourBinding implements BehaviourBinding
     {
         BehaviourBinding generalisedBinding = null;
         ClassDefinition classDefinition = dictionary.getClass(classRef);
-        ClassDefinition superClassDefinition = classDefinition.getSuperClass();
-        if (superClassDefinition != null)
+        QName parentClassName = classDefinition.getParentName();
+        if (parentClassName != null)
         {
-            generalisedBinding = new ClassBehaviourBinding(dictionary, superClassDefinition.getReference());
+            generalisedBinding = new ClassBehaviourBinding(dictionary, parentClassName);
         }
         return generalisedBinding;
     }
@@ -52,7 +52,7 @@ public class ClassBehaviourBinding implements BehaviourBinding
      * 
      * @return  the class reference
      */
-    public ClassRef getClassRef()
+    public QName getClassRef()
     {
         return classRef;
     }
@@ -78,6 +78,5 @@ public class ClassBehaviourBinding implements BehaviourBinding
     {
         return "ClassBinding[class=" + classRef + "]";
     }
-    
     
 }

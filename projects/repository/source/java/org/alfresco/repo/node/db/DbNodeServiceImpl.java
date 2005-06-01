@@ -13,11 +13,10 @@ import java.util.Stack;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.TypeDefinition;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.ContainerNode;
 import org.alfresco.repo.domain.Node;
@@ -44,8 +43,6 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.util.debug.CodeMonkey;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * Node service using database persistence layer to fulfill functionality
@@ -176,7 +173,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node rootNode = store.getRootNode();
         // assign the root aspect - this is expected of all roots, even store roots
         addAspect(rootNode.getNodeRef(),
-                DictionaryBootstrap.ASPECT_ROOT,
+                DictionaryBootstrap.ASPECT_QNAME_ROOT,
                 Collections.<QName, Serializable>emptyMap());
         // done
         StoreRef storeRef = store.getStoreRef();
@@ -232,10 +229,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocQName);
         
         // get the mandatory aspects for the node type
-        TypeDefinition nodeTypeDef = dictionaryService.getType(new ClassRef(nodeTypeQName));
+        TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeQName);
         if (nodeTypeDef == null)
         {
-            throw new InvalidNodeTypeException(new ClassRef(nodeTypeQName));
+            throw new InvalidNodeTypeException(nodeTypeQName);
         }
         List<AspectDefinition> defaultAspectDefs = nodeTypeDef.getDefaultAspects();
         // check that property requirements are met
@@ -245,7 +242,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Set<QName> nodeAspects = node.getAspects();
         for (AspectDefinition defaultAspectDef : defaultAspectDefs)
         {
-            nodeAspects.add(defaultAspectDef.getQName());
+            nodeAspects.add(defaultAspectDef.getName());
         }
         
         // set the properties - it is a new node so only set properties if there are any
@@ -263,11 +260,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		return childAssocRef;
     }
 
-    public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
+    public QName getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
-        ClassRef classRef = new ClassRef(node.getTypeQName());
-        return  classRef;
+        return node.getTypeQName();
     }
     
     /**
@@ -289,34 +285,35 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             Map<QName, Serializable> properties)
             throws PropertyException
     {
-        // get properties applicable to the class/aspect itself
-        List<PropertyDefinition> propertyDefs = classDef.getProperties(); 
+        Map<QName,PropertyDefinition> allPropertyDefs = new HashMap<QName,PropertyDefinition>();
+
+        // add class properties
+        allPropertyDefs.putAll(classDef.getProperties()); 
         
-        // get properties of the additional aspects
+        // add additional aspect properties
         if (aspectDefs != null)
         {
             for (AspectDefinition aspectDef : aspectDefs)
             {
-                List<PropertyDefinition> aspectProperties = aspectDef.getProperties();
-                propertyDefs.addAll(aspectProperties);
+                Map<QName,PropertyDefinition> aspectProperties = aspectDef.getProperties();
+                allPropertyDefs.putAll(aspectProperties);
             }
         }
         
         // check that each required property is present
-        for (PropertyDefinition propertyDef : propertyDefs)
+        for (PropertyDefinition propertyDef : allPropertyDefs.values())
         {
             // ignore optional properties
             if (!propertyDef.isMandatory())
             {
                 continue;
             }
-            QName qname = propertyDef.getQName();
+            QName qname = propertyDef.getName();
             // is it present?
-            if (properties.containsKey(qname) == false)
+            if (properties == null || properties.containsKey(qname) == false)
             {
                 // not present
-                throw new PropertyException("Mandatory property value not supplied: " + qname,
-                        propertyDef.getReference());
+                throw new PropertyException("Mandatory property value not supplied: " + qname, qname);
             }
             // property has a value
         }
@@ -334,8 +331,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         List<AspectDefinition> aspectDefs = new ArrayList<AspectDefinition>(aspectQNames.size());
         for (QName qname : aspectQNames)
         {
-            ClassRef aspectRef = new ClassRef(qname);
-            AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
+            AspectDefinition aspectDef = dictionaryService.getAspect(qname);
             aspectDefs.add(aspectDef);
         }
         // done
@@ -348,7 +344,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      */
     public void addAspect(
             NodeRef nodeRef,
-            ClassRef aspectRef,
+            QName aspectRef,
             Map<QName, Serializable> aspectProperties)
             throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
@@ -366,7 +362,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         Node node = getNodeNotNull(nodeRef);
         // physically attach the aspect to the node
-        node.getAspects().add(aspectRef.getQName());
+        node.getAspects().add(aspectRef);
         
 		if (aspectProperties != null)
 		{
@@ -383,7 +379,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * @see Node#getAspects()
      */
-    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef)
+    public void removeAspect(NodeRef nodeRef, QName aspectRef)
             throws InvalidNodeRefException, InvalidAspectException
     {
 		// Invoke policy behaviours
@@ -395,13 +391,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             throw new InvalidAspectException(aspectRef);
         }
-        QName aspectQName = aspectDef.getQName();
         // get the node
         Node node = getNodeNotNull(nodeRef);
         
         // check that the aspect may be removed
-        ClassRef nodeTypeRef = new ClassRef(node.getTypeQName());
-        TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeRef);
+        TypeDefinition nodeTypeDef = dictionaryService.getType(node.getTypeQName());
         if (nodeTypeDef == null)
         {
             throw new InvalidNodeRefException("The node type is no longer valid: " + nodeRef, nodeRef);
@@ -413,15 +407,15 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
         
         // remove the aspect, if present
-        boolean removed = node.getAspects().remove(aspectQName);
+        boolean removed = node.getAspects().remove(aspectRef);
         // if the aspect was present, remove the associated properties
         if (removed)
         {
             Map<String, Serializable> nodeProperties = node.getProperties();
-            List<PropertyDefinition> propertyDefs = aspectDef.getProperties();
-            for (PropertyDefinition propertyDef : propertyDefs)
+            Map<QName,PropertyDefinition> propertyDefs = aspectDef.getProperties();
+            for (QName propertyName : propertyDefs.keySet())
             {
-                nodeProperties.remove(propertyDef.getQName().toString());
+                nodeProperties.remove(propertyName);
             }
         }
 		
@@ -434,14 +428,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @see Node#getAspects()
      */
-    public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    public boolean hasAspect(NodeRef nodeRef, QName aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
         Node node = getNodeNotNull(nodeRef);
         Set<QName> aspectQNames = node.getAspects();
-        
-        QName aspectQName = aspectRef.getQName();
-        
-        boolean hasAspect = aspectQNames.contains(aspectQName);
+        boolean hasAspect = aspectQNames.contains(aspectRef);
         // done
         return hasAspect;
     }
@@ -449,19 +440,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * Transforms the results from {@link Node#getAspects()} into an unmodifiable set
      */
-    public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
+    public Set<QName> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
         Set<QName> aspectQNames = node.getAspects();
-        Set<ClassRef> aspectRefs = new HashSet<ClassRef>(aspectQNames.size());
-        // transform to an a list of ClassRef instances
-        for (QName qname : aspectQNames)
-        {
-            ClassRef aspectRef = new ClassRef(qname);
-            aspectRefs.add(aspectRef);
-        }
-        // done
-        return Collections.unmodifiableSet(aspectRefs);
+        return Collections.unmodifiableSet(aspectQNames);
     }
 
     public void deleteNode(NodeRef nodeRef)
@@ -640,7 +623,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 
         // check that the properties fulfill all the requirements of the node type
         // and any additional aspects
-        ClassRef nodeClassRef = getType(nodeRef);
+        QName nodeClassRef = getType(nodeRef);
         ClassDefinition nodeClassDef = dictionaryService.getClass(nodeClassRef);
         List<AspectDefinition> nodeAspectDefs = getNodeAspects(node);
         checkProperties(nodeClassDef, nodeAspectDefs, properties);  // confirms that properties are valid
@@ -899,14 +882,14 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // does the node have parents
         boolean hasParents = parentAssocs.size() > 0;
         // does the current node have a root aspect?
-        boolean isRoot = hasAspect(currentNodeRef, DictionaryBootstrap.ASPECT_ROOT);
+        boolean isRoot = hasAspect(currentNodeRef, DictionaryBootstrap.ASPECT_QNAME_ROOT);
         
         // look for a root.  If we only want the primary root, then ignore all but the
         // top-level root.
         if (isRoot && !(primaryOnly && hasParents))  // exclude primary search with parents present
         {
             // create a one-sided assoc ref for the root node and prepend to the stack
-            ChildAssocRef assocRef = new ChildAssocRef(null, getType(currentNodeRef).getQName(), getRootNode(currentNode.getNodeRef().getStoreRef()));
+            ChildAssocRef assocRef = new ChildAssocRef(null, getType(currentNodeRef), getRootNode(currentNode.getNodeRef().getStoreRef()));
             // create a path to save and add the 'root' assoc
             Path pathToSave = new Path();
             Path.ChildAssocElement first = null;

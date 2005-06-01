@@ -3,11 +3,11 @@
  */
 package org.alfresco.repo.node.operations;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 
 /**
  * @author Roy Wetherall
@@ -28,7 +28,7 @@ public interface NodeOperationsServicePolicies
 		 * 
 		 */
 		public void onCopy(
-				ClassRef classRef,
+				QName classRef,
 				NodeRef sourceNodeRef,
 				PolicyScope copyDetails);
 	}

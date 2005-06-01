@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
+import org.alfresco.repo.ref.QName;
 
 /**
  * Lighweight client side representation of the repository data dictionary. 
@@ -18,7 +19,7 @@ import org.alfresco.repo.dictionary.PropertyDefinition;
 public class DataDictionary
 {
    private DictionaryService dictionaryService;
-   private Map<ClassRef, ClassDefinition> types = new HashMap<ClassRef, ClassDefinition>(6, 1.0f);
+   private Map<QName, ClassDefinition> types = new HashMap<QName, ClassDefinition>(6, 1.0f);
 
    /**
     * Constructor
@@ -34,7 +35,7 @@ public class DataDictionary
     * @param type The ClassRef of the type to retrive data for
     * @return The class definition for the requested type
     */
-   public ClassDefinition getType(ClassRef type)
+   public ClassDefinition getType(QName type)
    {
       ClassDefinition classDef = types.get(type);
       
@@ -66,7 +67,8 @@ public class DataDictionary
       
       if (classDef != null)
       {
-         propDef = classDef.getProperty(property);
+         Map<QName, PropertyDefinition> properties = classDef.getProperties();
+         propDef = properties.get(QName.createQName(NamespaceService.ALFRESCO_URI, property));
       }
       
       return propDef;

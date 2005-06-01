@@ -6,16 +6,15 @@ package org.alfresco.repo.version.operations.impl;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.lock.LockType;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -122,7 +121,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		// Register copy behaviour for the working copy aspect
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
-				DictionaryBootstrap.ASPECT_WORKING_COPY,
+				DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY,
 				new JavaBehaviour(this, "onCopy"));
 	}
 	
@@ -135,7 +134,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	 * @param sourceNodeRef	  the source node reference
 	 * @param copyDetails	  the copy details
 	 */
-	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Do nothing to ensure that the working copy aspect does not appear on the copy
 	}
@@ -152,15 +151,15 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		// TODO should this be done here ??
 		
 		// Apply the lock aspect if required
-		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK) == false)
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK) == false)
 		{
-			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_LOCK, null);
+			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK, null);
 		}
 		
 		// Apply the version aspect if required
-		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_VERSION) == false)
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION) == false)
 		{
-			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CLASS_REF_VERSION, null);
+			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION, null);
 		}
 		
 		// Make the working copy
@@ -171,7 +170,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 				destinationAssocQName);
 		
 		// Apply the working copy aspect to the working copy
-		this.nodeService.addAspect(workingCopy, DictionaryBootstrap.ASPECT_WORKING_COPY, null);
+		this.nodeService.addAspect(workingCopy, DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY, null);
 		
 		// Get the current user reference to use as the lock owner
 		// TODO Need to be able to get the current user reference.
@@ -207,10 +206,10 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		NodeRef nodeRef = null;
 		
 		// Check that we have been handed a working copy
-		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_WORKING_COPY) == false)
+		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY) == false)
 		{
 			// Error since we have not been passed a working copy
-			throw new AspectMissingException(DictionaryBootstrap.ASPECT_WORKING_COPY, workingCopyNodeRef);
+			throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY, workingCopyNodeRef);
 		}
 		
 		if (contentUrl != null)
@@ -223,7 +222,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		}
 		
 		// Check that the working node still has the copy aspect applied
-		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_COPY) == true)
+		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY) == true)
 		{
 			// Try and get the origional node reference
 			nodeRef = (NodeRef)this.nodeService.getProperty(workingCopyNodeRef, DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE);
@@ -260,7 +259,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		else
 		{
 			// Error since the copy aspect is missing
-			throw new AspectMissingException(DictionaryBootstrap.ASPECT_COPY, workingCopyNodeRef);
+			throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_COPY, workingCopyNodeRef);
 		}
 		
 		return nodeRef;
@@ -295,14 +294,14 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		NodeRef nodeRef = null;
 		
 		// Check that we have been handed a working copy
-		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_WORKING_COPY) == false)
+		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY) == false)
 		{
 			// Error since we have not been passed a working copy
-			throw new AspectMissingException(DictionaryBootstrap.ASPECT_WORKING_COPY, workingCopyNodeRef);
+			throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY, workingCopyNodeRef);
 		}
 		
 		// Ensure that the node has the copy aspect
-		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_COPY) == true)
+		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY) == true)
 		{
 			// Get the origional node
 			nodeRef = (NodeRef)this.nodeService.getProperty(workingCopyNodeRef, DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE);
@@ -323,7 +322,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		else
 		{
 			// Error since the copy aspect is missing
-			throw new AspectMissingException(DictionaryBootstrap.ASPECT_COPY, workingCopyNodeRef);
+			throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_COPY, workingCopyNodeRef);
 		}
 		
 		return nodeRef;

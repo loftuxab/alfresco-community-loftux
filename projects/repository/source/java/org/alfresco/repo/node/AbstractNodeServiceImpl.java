@@ -3,7 +3,6 @@ package org.alfresco.repo.node;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreatePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeDeletePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreatePolicy;
@@ -86,7 +85,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
 			QName assocQName, 
 			QName nodeTypeQName)
 	{
-		NodeServicePolicies.BeforeCreatePolicy policy = this.beforeCreateDelegate.get(new ClassRef(nodeTypeQName));
+		NodeServicePolicies.BeforeCreatePolicy policy = this.beforeCreateDelegate.get(nodeTypeQName);
 		policy.beforeCreate(parentRef, assocTypeQName, assocQName, nodeTypeQName);
 	}
 	
@@ -138,9 +137,8 @@ public abstract class AbstractNodeServiceImpl implements NodeService
 	 */
 	protected void invokeOnDelete(QName typeQName, NodeRef nodeRef)
 	{
-		ClassRef classRef = new ClassRef(typeQName);
-		NodeServicePolicies.OnDeletePolicy policy = this.onDeleteDelegate.get(classRef);
-		policy.onDelete(classRef, nodeRef);		
+		NodeServicePolicies.OnDeletePolicy policy = this.onDeleteDelegate.get(typeQName);
+		policy.onDelete(typeQName, nodeRef);		
 	}
     
     /**

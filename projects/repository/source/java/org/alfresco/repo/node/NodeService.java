@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.EntityRef;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
@@ -90,12 +89,12 @@ public interface NodeService
     
     /**
      * @param nodeRef
-     * @return Returns a class reference to the node type
+     * @return Returns the type name
      * @throws InvalidNodeRefException if the node could not be found
      * 
      * @see org.alfresco.repo.dictionary.DictionaryService
      */
-    public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException;
+    public QName getType(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * Applies an aspect to the given node.  After this method has been called,
@@ -110,11 +109,11 @@ public interface NodeService
      * @throws PropertyException if one of the aspect's required
      *      properties have not been provided
      *
-     * @see org.alfresco.repo.dictionary.DictionaryService#getAspect(ClassRef)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAspect(QName)
      * @see org.alfresco.repo.dictionary.ClassDefinition#getProperties()
      */
     public void addAspect(NodeRef nodeRef,
-            ClassRef aspectRef,
+            QName aspectRef,
             Map<QName, Serializable> aspectProperties)
             throws InvalidNodeRefException, InvalidAspectException, PropertyException;
     
@@ -127,7 +126,7 @@ public interface NodeService
      * @throws InvalidAspectException if the the aspect is unknown or if the
      *      aspect is mandatory for the <b>class</b> of the <b>node</b>
      */
-    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef)
+    public void removeAspect(NodeRef nodeRef, QName aspectRef)
             throws InvalidNodeRefException, InvalidAspectException;
     
     /**
@@ -141,7 +140,7 @@ public interface NodeService
      * @throws InvalidNodeRefException if the node could not be found
      * @throws InvalidAspectException if the aspect reference is invalid
      */
-    public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef)
+    public boolean hasAspect(NodeRef nodeRef, QName aspectRef)
             throws InvalidNodeRefException, InvalidAspectException;
     
     /**
@@ -150,7 +149,7 @@ public interface NodeService
      *      aspects
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException;
+    public Set<QName> getAspects(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
      * Deletes the given node.

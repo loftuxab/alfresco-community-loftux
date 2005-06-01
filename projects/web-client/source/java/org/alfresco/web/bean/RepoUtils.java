@@ -11,7 +11,7 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.lock.LockStatus;
 import org.alfresco.repo.node.NodeService;
@@ -126,7 +126,7 @@ public final class RepoUtils
    public static Boolean isNodeLocked(Node node, LockService lockService, NodeRef ref)
    {
       Boolean locked = Boolean.FALSE;
-      if (node.hasAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK))
+      if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCK))
       {
          // TODO: replace username with real user name ref here!
          LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);

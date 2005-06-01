@@ -5,8 +5,6 @@ package org.alfresco.web.bean.clipboard;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -14,14 +12,12 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.RepoUtils;
@@ -206,7 +202,7 @@ public class ClipboardBean
          //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
          //       It's naff backend design if we need to pass childassocref around everywhere...!
          ChildAssocRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
-         boolean copyChildren = (item.Node.hasAspect(DictionaryBootstrap.ASPECT_SPACE));
+         boolean copyChildren = (item.Node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE));
          NodeRef copyRef = this.nodeOperationsService.copy(item.Node.getNodeRef(), parentRef, null, assocRef.getQName(), copyChildren);
          
          // TODO: a temp fix for the fact that the NAME attribute is not copied as DD not here yet

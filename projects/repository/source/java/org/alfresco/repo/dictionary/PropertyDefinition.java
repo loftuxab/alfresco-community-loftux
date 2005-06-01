@@ -10,19 +10,27 @@ import org.alfresco.repo.ref.QName;
 public interface PropertyDefinition
 {
     /**
-     * @return  the qualified name of the property
+     * @return the qualified name of the property
      */
-    public QName getQName();
+    public QName getName();
 
     /**
-     * @return  the property reference
-     */   
-    public PropertyRef getReference();
-
+     * @return the human-readable class title 
+     */
+    public String getTitle();
+    
     /**
-     * TODO: Replace this with public PropertyTypeDefinition getPropertyType();
-     * 
-     * @return  the qualified name of the property type
+     * @return the human-readable class description 
+     */
+    public String getDescription();
+    
+    /**
+     * @return the default value 
+     */
+    public String getDefaultValue();
+    
+    /**
+     * @return the qualified name of the property type
      */
     public PropertyTypeDefinition getPropertyType();
 
@@ -59,13 +67,13 @@ public interface PropertyDefinition
     /**
      * @return true => tokenised when it is indexed (the stored value will not be tokenised)
      */
-    
     public boolean isTokenisedInIndex();
     
     /**
+     * All non atomic properties will be indexed at the same time.
+     *
      * @return true => The attribute must be indexed in the commit of the transaction. 
      * false => the indexing will be done in the background and may be out of date.
-     * All non atomic properties will be indexed at the same time.
      */
     public boolean isIndexedAtomically();
     

@@ -15,7 +15,7 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -75,7 +75,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          Node node = new Node(ref.getChildRef(), nodeService);
          
          // look for Space aspect
-         if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE) &&
+         if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE) &&
              node.getName().equals(qname.getLocalName()))
          {
             companySpaceFound = true;
@@ -123,7 +123,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             properties.put(propDescription, "The root company space");
             
             // add the space aspect to the folder
-            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
+            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_SPACE, properties);
             
             // commit the transaction
             tx.commit();

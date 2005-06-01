@@ -26,6 +26,10 @@
 
       <mkdir dir="${classes.dir}" />
       <mkdir dir="${dist.dir}" />
+
+      <!-- load the JIBX target -->
+      <taskdef name="bind" classname="org.jibx.binding.ant.CompileTask"
+               classpath="${common.lib.dir}/jibx/jibx-bind.jar;${common.lib.dir}/bcel.jar;${common.lib.dir}/xpp3.jar"/>
    </target>
 
    <target name="dump-properties" depends="common-init">
@@ -205,3 +209,4 @@
    </target>
 
 </project>
+

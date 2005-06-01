@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.QName;
@@ -23,14 +22,14 @@ public class PolicyScope extends AspectDetails
 	/**
 	 * The aspects
 	 */
-	protected Map<ClassRef, AspectDetails> aspectCopyDetails = new HashMap<ClassRef, AspectDetails>();
+	protected Map<QName, AspectDetails> aspectCopyDetails = new HashMap<QName, AspectDetails>();
 	
 	/**
 	 * Constructor
 	 * 
 	 * @param classRef  the class reference
 	 */
-	public PolicyScope(ClassRef classRef)
+	public PolicyScope(QName classRef)
 	{
 		super(classRef);
 	}
@@ -42,7 +41,7 @@ public class PolicyScope extends AspectDetails
 	 * @param qName		the qualified name of the property
 	 * @param value		the value of the property
 	 */
-	public void addProperty(ClassRef classRef, QName qName, Serializable value) 
+	public void addProperty(QName classRef, QName qName, Serializable value) 
 	{
 		if (classRef.equals(this.classRef) == true)
 		{
@@ -66,7 +65,7 @@ public class PolicyScope extends AspectDetails
 	 * @param classRef	the class reference
 	 * @param qName		the qualified name
 	 */
-	public void removeProperty(ClassRef classRef, QName qName) 
+	public void removeProperty(QName classRef, QName qName) 
 	{
 		if (classRef.equals(this.classRef) == true)
 		{
@@ -88,7 +87,7 @@ public class PolicyScope extends AspectDetails
 	 * @param classRef  the class ref
 	 * @return			the properties that should be copied
 	 */
-	public Map<QName, Serializable> getProperties(ClassRef classRef)
+	public Map<QName, Serializable> getProperties(QName classRef)
 	{
 		Map<QName, Serializable> result = null;
 		if (classRef.equals(this.classRef) == true)
@@ -114,7 +113,7 @@ public class PolicyScope extends AspectDetails
 	 * @param qname
 	 * @param childAssocRef
 	 */
-	public void addChildAssociation(ClassRef classRef, QName qname, ChildAssocRef childAssocRef) 
+	public void addChildAssociation(QName classRef, QName qname, ChildAssocRef childAssocRef) 
 	{
 		if (classRef.equals(this.classRef) == true)
 		{
@@ -138,7 +137,7 @@ public class PolicyScope extends AspectDetails
 	 * @param classRef
 	 * @param qname
 	 */
-	public void removeChildAssociation(ClassRef classRef, QName qname) 
+	public void removeChildAssociation(QName classRef, QName qname) 
 	{
 		if (classRef.equals(this.classRef) == true)
 		{
@@ -160,7 +159,7 @@ public class PolicyScope extends AspectDetails
 	 * @param classRef
 	 * @return
 	 */
-	public Map<QName, ChildAssocRef> getChildAssociations(ClassRef classRef) 
+	public Map<QName, ChildAssocRef> getChildAssociations(QName classRef) 
 	{
 		Map<QName, ChildAssocRef> result = null;
 		if (classRef.equals(this.classRef) == true)
@@ -186,7 +185,7 @@ public class PolicyScope extends AspectDetails
 	 * @param qname
 	 * @param nodeAssocRef
 	 */
-	public void addAssociation(ClassRef classRef, QName qname, NodeAssocRef nodeAssocRef)
+	public void addAssociation(QName classRef, QName qname, NodeAssocRef nodeAssocRef)
 	{
 		if (classRef.equals(this.classRef) == true)
 		{
@@ -210,7 +209,7 @@ public class PolicyScope extends AspectDetails
 	 * @param classRef
 	 * @param qname
 	 */
-	public void removeAssociation(ClassRef classRef, QName qname) 
+	public void removeAssociation(QName classRef, QName qname) 
 	{
 		if (classRef.equals(this.classRef) == true)
 		{
@@ -232,7 +231,7 @@ public class PolicyScope extends AspectDetails
 	 * @param classRef
 	 * @return
 	 */
-	public Map<QName, NodeAssocRef> getAssociations(ClassRef classRef) 
+	public Map<QName, NodeAssocRef> getAssociations(QName classRef) 
 	{
 		Map<QName, NodeAssocRef> result = null;
 		if (classRef.equals(this.classRef) == true)
@@ -257,7 +256,7 @@ public class PolicyScope extends AspectDetails
 	 * @param aspect	the aspect class reference
 	 * @return			the apsect copy details (returned as a helper)
 	 */
-	public AspectDetails addAspect(ClassRef aspect) 
+	public AspectDetails addAspect(QName aspect) 
 	{
 		AspectDetails result = new AspectDetails(aspect);
 		this.aspectCopyDetails.put(aspect, result);
@@ -269,7 +268,7 @@ public class PolicyScope extends AspectDetails
 	 * 
 	 * @param aspect	the aspect class reference
 	 */
-	public void removeAspect(ClassRef aspect) 
+	public void removeAspect(QName aspect) 
 	{
 		this.aspectCopyDetails.remove(aspect);
 	}
@@ -279,7 +278,7 @@ public class PolicyScope extends AspectDetails
 	 * 
 	 * @return  a list of aspect to copy
 	 */
-	public Set<ClassRef> getAspects()
+	public Set<QName> getAspects()
 	{
 		return this.aspectCopyDetails.keySet();
 	}		
@@ -312,14 +311,14 @@ public class PolicyScope extends AspectDetails
 	/**
 	 * The class ref of the aspect
 	 */
-	protected ClassRef classRef;
+	protected QName classRef;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param classRef  the class ref
 	 */
-	public AspectDetails(ClassRef classRef)
+	public AspectDetails(QName classRef)
 	{
 		this.classRef = classRef;
 	}

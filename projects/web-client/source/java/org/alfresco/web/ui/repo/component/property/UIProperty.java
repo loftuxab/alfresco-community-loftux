@@ -110,7 +110,7 @@ public class UIProperty extends UIPanel implements NamingContainer
             if (displayLabel == null)
             {
                // TODO: We need to retrieve the proper display label when it is available!
-               displayLabel = propDef.getQName().getLocalName();
+               displayLabel = propDef.getName().getLocalName();
             }
             
             // generate the label and type specific control
@@ -265,7 +265,7 @@ public class UIProperty extends UIPanel implements NamingContainer
       UIOutput control = null;
       ValueBinding vb = context.getApplication().
                         createValueBinding("#{" + varName + "." + 
-                        propDef.getQName().getLocalName() + "}");
+                        propDef.getName().getLocalName() + "}");
       
       UIPropertySheet propSheet = (UIPropertySheet)this.getParent();
       if (propSheet.getMode().equalsIgnoreCase(UIPropertySheet.VIEW_MODE))

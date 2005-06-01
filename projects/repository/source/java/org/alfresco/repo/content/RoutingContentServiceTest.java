@@ -12,7 +12,7 @@ import javax.transaction.UserTransaction;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -29,7 +29,7 @@ import org.alfresco.util.GUID;
 public class RoutingContentServiceTest extends BaseSpringTest
 {
     private static final String SOME_CONTENT = "ABC";
-    
+        
     private ContentService contentService;
     private NodeService nodeService;
     private NodeRef rootNodeRef;
@@ -62,7 +62,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         Map<QName, Serializable> properties = nodeService.getProperties(contentNodeRef);
         properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
         properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
-        nodeService.addAspect(contentNodeRef, DictionaryBootstrap.ASPECT_CONTENT, properties);
+        nodeService.addAspect(contentNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
     }
     
     private UserTransaction getUserTransaction()

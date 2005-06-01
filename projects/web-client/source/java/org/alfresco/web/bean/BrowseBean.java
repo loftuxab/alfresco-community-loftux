@@ -15,7 +15,7 @@ import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
@@ -369,11 +369,11 @@ public class BrowseBean implements IContextListener
             MapNode node = new MapNode(nodeRef, this.nodeService);
             
             // look for Space or File nodes
-            if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
+            if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE))
             {
                this.containerNodes.add(node);
             }
-            else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
+            else if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FILE))
             {
                setupDataBindingProperties(node);
                
@@ -440,11 +440,11 @@ public class BrowseBean implements IContextListener
                MapNode node = new MapNode(nodeRef, this.nodeService);
                
                // look for Space or File nodes
-               if (node.hasAspect(DictionaryBootstrap.ASPECT_SPACE))
+               if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE))
                {
                   this.containerNodes.add(node);
                }
-               else if (node.getType().equals(DictionaryBootstrap.TYPE_FILE))
+               else if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FILE))
                {
                   setupDataBindingProperties(node);
                   
@@ -482,7 +482,7 @@ public class BrowseBean implements IContextListener
    {
       // special properties to be used by the value binding components on the page
       node.put("locked", RepoUtils.isNodeLocked(node, this.lockService, node.getNodeRef()));
-      node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_WORKING_COPY));
+      node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));
       node.put("url", DownloadContentServlet.generateURL(node.getNodeRef(), node.getName()));
       node.put("fileTypeImage", RepoUtils.getFileTypeImage(node));
    }

@@ -3,12 +3,11 @@ package org.alfresco.repo.policy;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.alfresco.repo.dictionary.ClassRef;
+import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.alfresco.repo.ref.QName;
 
 
 /**
@@ -59,8 +58,13 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      * @param classRef  the class reference
      * @return  the policy
      */
-    public P get(ClassRef classRef)
+    public P get(QName classRef)
     {
+        ClassDefinition classDefinition = dictionary.getClass(classRef);
+        if (classDefinition == null)
+        {
+            throw new IllegalArgumentException("Class " + classRef + " has not been defined in the data dictionary");
+        }
         return factory.create(new ClassBehaviourBinding(dictionary, classRef));
     }
 
@@ -71,8 +75,13 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      * @param classRef  the class reference
      * @return  the collection of policies
      */
-    public Collection<P> getList(ClassRef classRef)
+    public Collection<P> getList(QName classRef)
     {
+        ClassDefinition classDefinition = dictionary.getClass(classRef);
+        if (classDefinition == null)
+        {
+            throw new IllegalArgumentException("Class " + classRef + " has not been defined in the data dictionary");
+        }
         return factory.createList(new ClassBehaviourBinding(dictionary, classRef));
     }
 
@@ -104,12 +113,12 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
 		Collection<P> result = new ArrayList<P>();
 		
 		// Get the behaviour for the node's type
-		ClassRef classRef = nodeService.getType(nodeRef);
+		QName classRef = nodeService.getType(nodeRef);
 		result.addAll(getList(classRef));
 		
 		// Get the behaviour for all the aspect types
-		Collection<ClassRef> aspects = nodeService.getAspects(nodeRef);
-		for (ClassRef aspect : aspects) 
+		Collection<QName> aspects = nodeService.getAspects(nodeRef);
+		for (QName aspect : aspects) 
 		{
 			result.addAll(getList(aspect));
 		}

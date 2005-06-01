@@ -11,9 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.AssociationExistsException;
 import org.alfresco.repo.node.InvalidAspectException;
 import org.alfresco.repo.node.InvalidNodeRefException;
@@ -205,15 +204,15 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     /**
      * Type translation for version store
      */
-    public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
+    public QName getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
-		return (ClassRef)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_NODE_TYPE);
+		return (QName)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_NODE_TYPE);
     }
     
     /**
      * @throws UnsupportedOperationException always
      */
-    public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
+    public void addAspect(NodeRef nodeRef, QName aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
@@ -222,16 +221,16 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     /**
      * Translation for version store
      */
-    public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    public boolean hasAspect(NodeRef nodeRef, QName aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
-        Set<ClassRef> aspects = (Set<ClassRef>)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_ASPECTS);
+        Set<QName> aspects = (Set<QName>)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_ASPECTS);
         return aspects.contains(aspectRef);
     }
 
     /**
      * @throws UnsupportedOperationException always
      */
-    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    public void removeAspect(NodeRef nodeRef, QName aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
@@ -240,9 +239,9 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     /**
      * Translation for version store
      */
-    public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
+    public Set<QName> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        return (Set<ClassRef>)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_ASPECTS);
+        return (Set<QName>)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_ASPECTS);
     }
 
     /**
@@ -351,8 +350,8 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
             if (qnamePattern.isMatch(qName) == true)
             {
                 // Check to see if the versioned node is a version history
-                ClassRef classRef = this.dbNodeService.getType(referencedNode);
-                if (CLASS_REF_VERSION_HISTORY.equals(classRef) == true)
+                QName classRef = this.dbNodeService.getType(referencedNode);
+                if (TYPE_QNAME_VERSION_HISTORY.equals(classRef) == true)
                 {
                     // Return a reference to the node in the correct workspace
                     String childRefId = (String)this.dbNodeService.getProperty(referencedNode, PROP_QNAME_VERSIONED_NODE_ID);
@@ -428,8 +427,8 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
             if (qnamePattern.isMatch(qName) == true)
             {
                 // Check to see if the versioned node is a version history
-                ClassRef classRef = this.dbNodeService.getType(referencedNode);
-                if (CLASS_REF_VERSION_HISTORY.equals(classRef) == true)
+                QName classRef = this.dbNodeService.getType(referencedNode);
+                if (TYPE_QNAME_VERSION_HISTORY.equals(classRef) == true)
                 {
                     // Return a reference to the node in the correct workspace
                     String childRefId = (String)this.dbNodeService.getProperty(referencedNode, PROP_QNAME_VERSIONED_NODE_ID);

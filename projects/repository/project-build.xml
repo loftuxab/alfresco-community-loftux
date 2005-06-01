@@ -3,8 +3,18 @@
    <path id="common.path" path="${basedir}/../.." />
    <property name="common.dir" refid="common.path" />
    <import file="${common.dir}/common.xml" />
-   
+
    <!-- we only build a JAR file in this project -->
    <target name="package" depends="package-jar" />
-   
+
+   <target name="compile-java" depends="common.compile-java">
+      <antcall target="compile-jibx" />
+   </target>
+
+   <target name="compile-jibx" depends="init">
+      <bind verbose="false" load="true" binding="${jibx.binding.file}">
+         <classpathset dir="${classes.dir}"/>
+      </bind>
+   </target>
+
 </project>

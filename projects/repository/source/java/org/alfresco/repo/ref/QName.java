@@ -26,6 +26,7 @@ public final class QName implements QNamePattern, Serializable
     private int hashCode;
     private String prefix;
 
+    private static final char NAMESPACE_PREFIX = ':';
     private static final char NAMESPACE_BEGIN = '{';
     private static final char NAMESPACE_END = '}';
     private static final char[] INVALID_CHARS = { '/', '.' };
@@ -76,6 +77,10 @@ public final class QName implements QNamePattern, Serializable
         
         // Calculate namespace URI and create QName
         String uri = prefixResolver.getNamespaceURI(prefix);
+        if (uri == null)
+        {
+            throw new NamespaceException("Namespace prefix " + prefix + " is not mapped to a namespace URI");
+        }
         return new QName(uri, localName, prefix);
     }
 
@@ -90,15 +95,17 @@ public final class QName implements QNamePattern, Serializable
     public static QName createQName(String qname, NamespacePrefixResolver prefixResolver)
         throws InvalidQNameException, NamespaceException
     {
-        int colonIndex = qname.indexOf(':');
-        if(colonIndex > -1)
+        QName name = null;
+        if (qname != null)
         {
-            return createQName(qname.substring(0, colonIndex), qname.substring(colonIndex+1), prefixResolver);
+            int colonIndex = qname.indexOf(NAMESPACE_PREFIX);
+            if(colonIndex == -1)
+            {
+                throw new InvalidQNameException("QName '" + qname + "' must be a prefix and local name");
+            }
+            name = createQName(qname.substring(0, colonIndex), qname.substring(colonIndex+1), prefixResolver);
         }
-        else
-        {
-            throw new InvalidQNameException("QName '" + qname + "' must be a prefix and local name");
-        }
+        return name;
     }
 
 
@@ -273,4 +280,17 @@ public final class QName implements QNamePattern, Serializable
         return NAMESPACE_BEGIN + namespaceURI + NAMESPACE_END + localName;
     }
 
+    
+    /**
+     * Render string representation of QName using format:
+     * 
+     * <code>prefix:name</code>
+     * 
+     * @return the string representation
+     */
+    public String toPrefixString()
+    {
+        return (prefix == null) ? "" : prefix + NAMESPACE_PREFIX + localName;
+    }
+    
 }

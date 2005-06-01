@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -65,20 +64,20 @@ public class NodeStoreInspector
         
 		try
 		{
-	        ClassRef nodeType = nodeService.getType(nodeRef);
+	        QName nodeType = nodeService.getType(nodeRef);
 	        builder.
 	            append(getIndent(iIndent)).
 	            append("node: ").
 	            append(nodeRef.getId()).
 	            append(" (").
-	            append(nodeType.getQName().getLocalName());
+	            append(nodeType.getLocalName());
 			
-			Collection<ClassRef> aspects = nodeService.getAspects(nodeRef);
-			for (ClassRef aspect : aspects) 
+			Collection<QName> aspects = nodeService.getAspects(nodeRef);
+			for (QName aspect : aspects) 
 			{
 				builder.
 					append(", ").
-					append(aspect.getQName().getLocalName());
+					append(aspect.getLocalName());
 			}
 			
 	        builder.append(")\n");        

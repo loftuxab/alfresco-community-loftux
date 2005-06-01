@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.ref.QName;
@@ -98,9 +97,9 @@ public class PolicyComponentImpl implements PolicyComponent
 
 
     /* (non-Javadoc)
-     * @see org.alfresco.repo.policy.PolicyComponent#bindClassBehaviour(org.alfresco.repo.ref.QName, org.alfresco.repo.dictionary.ClassRef, org.alfresco.repo.policy.Behaviour)
+     * @see org.alfresco.repo.policy.PolicyComponent#bindClassBehaviour(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, org.alfresco.repo.policy.Behaviour)
      */
-    public BehaviourDefinition<ClassBehaviourBinding> bindClassBehaviour(QName policy, ClassRef classRef, Behaviour behaviour)
+    public BehaviourDefinition<ClassBehaviourBinding> bindClassBehaviour(QName policy, QName classRef, Behaviour behaviour)
     {
         // Validate arguments
         ParameterCheck.mandatory("Policy", policy);

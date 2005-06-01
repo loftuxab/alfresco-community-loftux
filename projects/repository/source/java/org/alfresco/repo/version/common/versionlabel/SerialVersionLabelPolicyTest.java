@@ -3,7 +3,7 @@ package org.alfresco.repo.version.common.versionlabel;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.version.Version;
@@ -32,7 +32,7 @@ public class SerialVersionLabelPolicyTest extends TestCase
         versionProp1.put(Version.PROP_VERSION_TYPE, VersionType.MINOR);
         
         String initialVersion = policy.calculateVersionLabel(
-				DictionaryBootstrap.TYPE_BASE,
+				DictionaryBootstrap.TYPE_QNAME_BASE,
                 null,
                 0,
                 versionProp1);
@@ -43,7 +43,7 @@ public class SerialVersionLabelPolicyTest extends TestCase
         Version version1 = new VersionImpl(versionProp2, dummyNodeRef);
         
         String verisonLabel1 = policy.calculateVersionLabel(
-				DictionaryBootstrap.TYPE_BASE,                
+				DictionaryBootstrap.TYPE_QNAME_BASE,                
                 version1,
                 1,
                 versionProp1);
@@ -57,7 +57,7 @@ public class SerialVersionLabelPolicyTest extends TestCase
         versionProp4.put(Version.PROP_VERSION_TYPE, VersionType.MAJOR);
         
         String verisonLabel2 = policy.calculateVersionLabel(
-				DictionaryBootstrap.TYPE_BASE,
+				DictionaryBootstrap.TYPE_QNAME_BASE,
                 version2,
                 1,
                 versionProp4);

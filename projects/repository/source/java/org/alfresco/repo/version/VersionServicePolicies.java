@@ -6,11 +6,11 @@ package org.alfresco.repo.version;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 
 /**
  * Version service policy interfaces
@@ -49,7 +49,7 @@ public interface VersionServicePolicies
 		static final String NAMESPACE = NamespaceService.ALFRESCO_URI;
 		
 		public void onCreateVersion(
-				ClassRef classRef,
+				QName classRef,
 				NodeRef versionableNode, 
 				Map<String, Serializable> versionProperties,
 				PolicyScope nodeDetails);
@@ -63,7 +63,7 @@ public interface VersionServicePolicies
 		static final String NAMESPACE = NamespaceService.ALFRESCO_URI;
 		
 		public String calculateVersionLabel(
-				ClassRef classRef,
+				QName classRef,
 				Version preceedingVersion,
 				int versionNumber,
 				Map<String, Serializable>verisonProperties);

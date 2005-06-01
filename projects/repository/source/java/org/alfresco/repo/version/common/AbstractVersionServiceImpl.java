@@ -10,16 +10,15 @@ import java.util.Map;
 
 import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -103,13 +102,13 @@ public abstract class AbstractVersionServiceImpl
 		// Register the copy behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
-				DictionaryBootstrap.ASPECT_CLASS_REF_VERSION,
+				DictionaryBootstrap.ASPECT_QNAME_VERSION,
 				new JavaBehaviour(this, "onCopy"));
 		
 		// Register the onCreateVersion behavior for the version aspect
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
-				DictionaryBootstrap.ASPECT_CLASS_REF_VERSION,
+				DictionaryBootstrap.ASPECT_QNAME_VERSION,
 				new JavaBehaviour(this, "onCreateVersion"));
     }
 	
@@ -123,10 +122,10 @@ public abstract class AbstractVersionServiceImpl
 	 * @param sourceNodeRef	  the source node reference
 	 * @param copyDetails	  the copy details
 	 */
-	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Add the version aspect, but do not copy any of the properties
-		copyDetails.addAspect(DictionaryBootstrap.ASPECT_CLASS_REF_VERSION);
+		copyDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_VERSION);
 	}
 	
 	/**
@@ -141,7 +140,7 @@ public abstract class AbstractVersionServiceImpl
 	 * @param nodeDetails			the details of the node to be versioned
 	 */
 	public void onCreateVersion(
-			ClassRef classRef,
+			QName classRef,
 			NodeRef versionableNode, 
 			Map<String, Serializable> versionProperties,
 			PolicyScope nodeDetails)
@@ -170,12 +169,12 @@ public abstract class AbstractVersionServiceImpl
 			PolicyScope nodeDetails)
 	{
 		// Sort out the policies for the node type
-		ClassRef classRef = this.nodeService.getType(nodeRef);
+		QName classRef = this.nodeService.getType(nodeRef);
 		invokeOnCreateVersion(classRef, nodeRef, versionProperties, nodeDetails);
 		
 		// Sort out the policies for the aspects
-		Collection<ClassRef> aspects = this.nodeService.getAspects(nodeRef);
-		for (ClassRef aspect : aspects) 
+		Collection<QName> aspects = this.nodeService.getAspects(nodeRef);
+		for (QName aspect : aspects) 
 		{
 			invokeOnCreateVersion(aspect, nodeRef, versionProperties, nodeDetails);
 		}
@@ -191,7 +190,7 @@ public abstract class AbstractVersionServiceImpl
 	 * @param versionProperties
 	 */
 	private void invokeOnCreateVersion(
-			ClassRef classRef,
+			QName classRef,
 			NodeRef nodeRef,
 			Map<String, Serializable> versionProperties,
 			PolicyScope nodeDetails)
@@ -229,7 +228,7 @@ public abstract class AbstractVersionServiceImpl
 	 * @param nodeDetails
 	 */
 	protected void defaultOnCreateVersion(
-			ClassRef classRef,
+			QName classRef,
 			NodeRef nodeRef, 
 			Map<String, Serializable> versionProperties, 
 			PolicyScope nodeDetails)
@@ -238,17 +237,16 @@ public abstract class AbstractVersionServiceImpl
 		if (classDefinition != null)
 		{			
 			// Copy the properties
-			List<PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
-			for (PropertyDefinition propertyDefinition : propertyDefinitions) 
+			Map<QName,PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
+			for (QName propertyName : propertyDefinitions.keySet()) 
 			{
-				QName propName = propertyDefinition.getQName();
-				Serializable propValue = this.nodeService.getProperty(nodeRef, propName);
-				nodeDetails.addProperty(classRef, propName, propValue);
+				Serializable propValue = this.nodeService.getProperty(nodeRef, propertyName);
+				nodeDetails.addProperty(classRef, propertyName, propValue);
 			}			
 			
 			// Copy the associations (child and target)
-			List<AssociationDefinition> assocDefs = classDefinition.getAssociations();
-			for (AssociationDefinition assocDef : assocDefs) 
+			Map<QName,AssociationDefinition> assocDefs = classDefinition.getAssociations();
+			for (AssociationDefinition assocDef : assocDefs.values()) 
 			{
 				if (assocDef.isChild() == true)
 				{
@@ -280,7 +278,7 @@ public abstract class AbstractVersionServiceImpl
 	 * @return
 	 */
 	protected String invokeCalculateVersionLabel(
-			ClassRef classRef,
+			QName classRef,
 			Version preceedingVersion, 
 			int versionNumber, 
 			Map<String, Serializable>versionProperties)
@@ -302,7 +300,7 @@ public abstract class AbstractVersionServiceImpl
 		else
 		{
 			// Error since we can only deal with a single caculate version label policy
-			throw new VersionServiceException("More than one CalculateVersionLabelPolicy behaviour has been registered for the type " + classRef.getQName().toString());
+			throw new VersionServiceException("More than one CalculateVersionLabelPolicy behaviour has been registered for the type " + classRef.toString());
 		}
 		
 		return versionLabel;

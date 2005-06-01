@@ -11,19 +11,17 @@ import java.util.Map;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
-import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.web.ui.repo.component.UINodeDescendants;
-import org.springframework.web.jsf.FacesContextUtils;
-
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
+import org.alfresco.web.ui.repo.component.UINodeDescendants;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast
@@ -106,7 +104,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             for (int index=0; index<maximum; index++)
             {
                ChildAssocRef ref = childRefs.get(index);
-               if (service.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_SPACE))
+               if (service.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_SPACE))
                {
                   out.write(renderDescendant(context, control, ref, false));
                   

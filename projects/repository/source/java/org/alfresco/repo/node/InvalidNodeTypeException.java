@@ -1,7 +1,7 @@
 package org.alfresco.repo.node;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 
 /**
  * Thrown when an operation cannot be performed because the <b>node</b> reference
@@ -13,14 +13,14 @@ public class InvalidNodeTypeException extends RuntimeException
 {
     private static final long serialVersionUID = 3256722870754293558L;
 
-    private ClassRef typeRef;
+    private QName typeRef;
     
-    public InvalidNodeTypeException(ClassRef typeRef)
+    public InvalidNodeTypeException(QName typeRef)
     {
         this(null, typeRef);
     }
 
-    public InvalidNodeTypeException(String msg, ClassRef typeRef)
+    public InvalidNodeTypeException(String msg, QName typeRef)
     {
         super(msg);
         this.typeRef = typeRef;
@@ -29,7 +29,7 @@ public class InvalidNodeTypeException extends RuntimeException
     /**
      * @return Returns the offending node reference
      */
-    public NodeRef getTypeRef()
+    public QName getTypeRef()
     {
         return typeRef;
     }

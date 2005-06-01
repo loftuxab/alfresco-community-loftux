@@ -1,7 +1,5 @@
 package org.alfresco.repo.dictionary;
 
-import java.util.List;
-
 import org.alfresco.repo.ref.QName;
 
 
@@ -14,55 +12,80 @@ import org.alfresco.repo.ref.QName;
 public interface AssociationDefinition
 {
     /**
-     * Gets the qualified name of the association
-     * 
      * @return  the qualified name
      */
     public QName getName();
 
     /**
-     * Gets the association reference
-     * 
-     * @return  the association reference
+     * @return the human-readable class title 
      */
-    public AssociationRef getReference();
-
+    public String getTitle();
+    
     /**
-     * @return  the owning class definition
+     * @return the human-readable class description 
      */
-    public ClassDefinition getContainerClass();
-
-    /**
-     * @return  the list of classes that this association must refer to  
-     */
-    public List<ClassDefinition> getRequiredToClasses();
+    public String getDescription();
     
     /**
      * Is this a child association?
      * 
-     * @return  true => child,  false => general relationship
+     * @return true => child,  false => general relationship
      */
     public boolean isChild();
-
-    /**
-     * Gets whether this association supports a cardinality of greater than 1
-     * 
-     * @return  true => cardinality > 1, false => cardinality of 0 or 1
-     */
-    public boolean isMultiValued();
-
-    /**
-     * Gets whether this association supports a cardinality of zero
-     *  
-     * @return  true => cardinality > 0
-     */
-    public boolean isMandatory();
-
+    
     /**
      * Is this association maintained by the Repository?
      * 
-     * @return  true => system maintained, false => client may maintain 
+     * @return true => system maintained, false => client may maintain 
      */
     public boolean isProtected();
+
+    /**
+     * @return the source class
+     */
+    public ClassDefinition getSourceClass();
+
+    /**
+     * @return the role of the source class in this association? 
+     */
+    public QName getSourceRoleName();
+    
+    /**
+     * Is the source class optional in this association?
+     *  
+     * @return true => cardinality > 0
+     */
+    public boolean isSourceMandatory();
+
+    /**
+     * Can there be many source class instances in this association? 
+     * 
+     * @return true => cardinality > 1, false => cardinality of 0 or 1
+     */
+    public boolean isSourceMany();
+
+    /**
+     * @return the target class  
+     */
+    public ClassDefinition getTargetClass();
+    
+    /**
+     * @return the role of the target class in this association? 
+     */
+    public QName getTargetRoleName();
+    
+    /**
+     * Is the target class optional in this association?
+     *  
+     * @return true => cardinality > 0
+     */
+    public boolean isTargetMandatory();
+
+    /**
+     * Can there be many target class instances in this association? 
+     * 
+     * @return true => cardinality > 1, false => cardinality of 0 or 1
+     */
+    public boolean isTargetMany();
 
 }

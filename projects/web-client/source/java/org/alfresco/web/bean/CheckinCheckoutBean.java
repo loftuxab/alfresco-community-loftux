@@ -19,7 +19,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.InvalidNodeRefException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -457,11 +457,11 @@ public class CheckinCheckoutBean
          try
          {
             // TODO: find the working copy for this document and cancel the checkout on it
-            if (node.hasAspect(DictionaryBootstrap.ASPECT_WORKING_COPY))
+            if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY))
             {
                this.versionOperationsService.cancelCheckout(node.getNodeRef());
             }
-            else if (node.hasAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK))
+            else if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCK))
             {
                // TODO: is this possible? as currently only the workingcopy aspect has the copyReference
                //       attribute - this means we cannot find out where the copy is to cancel it!

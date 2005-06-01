@@ -12,11 +12,10 @@ import java.util.Set;
 
 import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.node.operations.NodeOperationsServiceException;
@@ -24,8 +23,8 @@ import org.alfresco.repo.node.operations.NodeOperationsServicePolicies;
 import org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyPolicy;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -99,7 +98,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 		// Register policy behaviours
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
-				DictionaryBootstrap.ASPECT_COPY,
+				DictionaryBootstrap.ASPECT_QNAME_COPY,
 				new JavaBehaviour(this, "copyAspectOnCopy"));
 	}
 	
@@ -120,7 +119,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
             destinationParent != null && 
 			destinationQName != null)
         {       
-			ClassRef sourceClassRef = this.nodeService.getType(sourceNodeRef);
+			QName sourceClassRef = this.nodeService.getType(sourceNodeRef);
 			PolicyScope copyDetails = getCopyDetails(sourceNodeRef);			
 			
             if (sourceNodeRef.getStoreRef().equals(destinationParent.getStoreRef()) == true)
@@ -130,14 +129,14 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
                         destinationParent, 
                         destinationAssocTypeQName,
                         destinationQName,
-                        sourceClassRef.getQName(),
+                        sourceClassRef,
                         copyDetails.getProperties());
                 destinationNodeRef = destinationChildAssocRef.getChildRef();
 				
 				//	Apply the copy aspect to the new node	
 				Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
 				copyProperties.put(DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE, sourceNodeRef);
-				this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_COPY, copyProperties);
+				this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY, copyProperties);
             }
             else
             {
@@ -169,7 +168,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 */
 	private PolicyScope getCopyDetails(NodeRef sourceNodeRef)
 	{
-		ClassRef sourceClassRef = this.nodeService.getType(sourceNodeRef);		
+		QName sourceClassRef = this.nodeService.getType(sourceNodeRef);		
 		PolicyScope copyDetails = new PolicyScope(sourceClassRef);
 		
 		// Invoke the onCopy behaviour
@@ -178,8 +177,8 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 		// TODO What do we do aboout props and assocs that are on the node node but not part of the type definition?
 		
 		// Get the source aspects
-		Set<ClassRef> sourceAspects = this.nodeService.getAspects(sourceNodeRef);
-		for (ClassRef sourceAspect : sourceAspects) 
+		Set<QName> sourceAspects = this.nodeService.getAspects(sourceNodeRef);
+		for (QName sourceAspect : sourceAspects) 
 		{
 			// Invoke the onCopy behaviour
 			invokeOnCopy(sourceAspect, sourceNodeRef, copyDetails);
@@ -195,7 +194,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param sourceNodeRef		source node reference
 	 * @param copyDetails		the copy details
 	 */
-	private void invokeOnCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	private void invokeOnCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		Collection<NodeOperationsServicePolicies.OnCopyPolicy> policies = this.onCopyDelegate.getList(sourceClassRef);
 		if (policies.isEmpty() == true)
@@ -218,23 +217,22 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param sourceNodeRef		the source node reference
 	 * @param copyDetails		details of the state being copied
 	 */
-    private void defaultOnCopy(ClassRef classRef, NodeRef sourceNodeRef, PolicyScope copyDetails) 
+    private void defaultOnCopy(QName classRef, NodeRef sourceNodeRef, PolicyScope copyDetails) 
 	{
 		ClassDefinition classDefinition = this.dictionaryService.getClass(classRef);	
 		if (classDefinition != null)
 		{			
 			// Copy the properties
-			List<PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
-			for (PropertyDefinition propertyDefinition : propertyDefinitions) 
+			Map<QName,PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
+			for (QName propertyName : propertyDefinitions.keySet()) 
 			{
-				QName propName = propertyDefinition.getQName();
-				Serializable propValue = this.nodeService.getProperty(sourceNodeRef, propName);
-				copyDetails.addProperty(classRef, propName, propValue);
+				Serializable propValue = this.nodeService.getProperty(sourceNodeRef, propertyName);
+				copyDetails.addProperty(classRef, propertyName, propValue);
 			}			
 			
 			// Copy the associations (child and target)
-			List<AssociationDefinition> assocDefs = classDefinition.getAssociations();
-			for (AssociationDefinition assocDef : assocDefs) 
+			Map<QName,AssociationDefinition> assocDefs = classDefinition.getAssociations();
+			for (AssociationDefinition assocDef : assocDefs.values()) 
 			{
 				if (assocDef.isChild() == true)
 				{
@@ -282,8 +280,8 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 */
 	private void copyAspects(NodeRef destinationNodeRef, PolicyScope copyDetails)
 	{
-		Set<ClassRef> apects = copyDetails.getAspects();
-		for (ClassRef aspect : apects) 
+		Set<QName> apects = copyDetails.getAspects();
+		for (QName aspect : apects) 
 		{
 			if (this.nodeService.hasAspect(destinationNodeRef, aspect) == false)
 			{
@@ -321,12 +319,12 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 */
 	private void copyAssociations(NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
 	{
-		ClassRef classRef = this.nodeService.getType(destinationNodeRef);
+		QName classRef = this.nodeService.getType(destinationNodeRef);
 		copyChildAssociations(classRef, destinationNodeRef, copyDetails, copyChildren);
 		copyTargetAssociations(classRef, destinationNodeRef, copyDetails);
 		
-		Set<ClassRef> apects = copyDetails.getAspects();
-		for (ClassRef aspect : apects) 
+		Set<QName> apects = copyDetails.getAspects();
+		for (QName aspect : apects) 
 		{
 			if (this.nodeService.hasAspect(destinationNodeRef, aspect) == false)
 			{
@@ -346,7 +344,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param destinationNodeRef	the destination node reference
 	 * @param copyDetails			the copy details 
 	 */
-	private void copyTargetAssociations(ClassRef classRef, NodeRef destinationNodeRef, PolicyScope copyDetails) 
+	private void copyTargetAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails) 
 	{
 		Map<QName, NodeAssocRef> nodeAssocRefs = copyDetails.getAssociations(classRef);
 		if (nodeAssocRefs != null)
@@ -374,7 +372,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param copyDetails			the copy details
 	 * @param copyChildren			indicates whether to copy the primary children
 	 */
-	private void copyChildAssociations(ClassRef classRef, NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
+	private void copyChildAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
 	{
 		Map<QName, ChildAssocRef> childAssocs = copyDetails.getChildAssociations(classRef);
 		if (childAssocs != null)
@@ -464,7 +462,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 * @param sourceNodeRef		the source node reference
 	 * @param copyDetails	    the copy details
 	 */
-	public void copyAspectOnCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	public void copyAspectOnCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Do nothing.  This will ensure that copy aspect on the source node does not get copied onto
 		// the destination node.

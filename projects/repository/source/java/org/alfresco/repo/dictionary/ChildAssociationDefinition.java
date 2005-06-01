@@ -8,9 +8,15 @@ package org.alfresco.repo.dictionary;
  */
 public interface ChildAssociationDefinition extends AssociationDefinition
 {
+
     /**
-     * @return the class definition of the default child type
+     * @return the required name of children (or null if none)
      */
-    public ClassDefinition getDefaultType();
+    public String getRequiredChildName();
+    
+    /**
+     * @return whether duplicate child names allowed within this association? 
+     */
+    public boolean getDuplicateChildNamesAllowed();
 
 }

@@ -6,14 +6,14 @@ import java.util.Map;
 
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
-import org.alfresco.repo.dictionary.metamodel.M2Association;
-import org.alfresco.repo.dictionary.metamodel.M2ChildAssociation;
-import org.alfresco.repo.dictionary.metamodel.M2Property;
-import org.alfresco.repo.dictionary.metamodel.M2Type;
-import org.alfresco.repo.dictionary.metamodel.MetaModelDAO;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryDAO;
+import org.alfresco.repo.dictionary.impl.M2Association;
+import org.alfresco.repo.dictionary.impl.M2ChildAssociation;
+import org.alfresco.repo.dictionary.impl.M2Model;
+import org.alfresco.repo.dictionary.impl.M2Property;
+import org.alfresco.repo.dictionary.impl.M2Type;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -33,7 +33,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
     protected VersionService lightWeightVersionStoreVersionService;
     protected VersionCounterDaoService versionCounterDaoService;
     protected ContentService contentService;
-	protected MetaModelDAO metaModelDAO;
+	protected DictionaryDAO dictionaryDAO;
 	
     /*
      * Data used by tests
@@ -51,19 +51,20 @@ public class VersionStoreBaseTest extends BaseSpringTest
     /*
      * Proprety names and values
      */
-	protected static final QName TEST_TYPE_QNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "testType");
-	protected static final QName PROP_1 = QName.createQName(NamespaceService.ALFRESCO_URI, "prop1");
-	protected static final QName PROP_2 = QName.createQName(NamespaceService.ALFRESCO_URI, "prop2");
-	protected static final QName PROP_3 = QName.createQName(NamespaceService.ALFRESCO_URI, "prop3");
+    protected static final String TEST_NAMESPACE = "http://www.alfresco.org/test/versionstorebasetest";
+	protected static final QName TEST_TYPE_QNAME = QName.createQName(TEST_NAMESPACE, "testType");
+	protected static final QName PROP_1 = QName.createQName(TEST_NAMESPACE, "prop1");
+	protected static final QName PROP_2 = QName.createQName(TEST_NAMESPACE, "prop2");
+	protected static final QName PROP_3 = QName.createQName(TEST_NAMESPACE, "prop3");
 	protected static final String VERSION_PROP_1 = "versionProp1";
 	protected static final String VERSION_PROP_2 = "versionProp2";
 	protected static final String VERSION_PROP_3 = "versionProp3";
 	protected static final String VALUE_1 = "value1";
 	protected static final String VALUE_2 = "value2";
 	protected static final String VALUE_3 = "value3";
-	protected static final QName TEST_CHILD_ASSOC_1 = QName.createQName(NamespaceService.ALFRESCO_URI, "childAssoc1");
-	protected static final QName TEST_CHILD_ASSOC_2 = QName.createQName(NamespaceService.ALFRESCO_URI, "childAssoc2");
-	protected static final QName TEST_ASSOC = QName.createQName(NamespaceService.ALFRESCO_URI, "assoc");	
+	protected static final QName TEST_CHILD_ASSOC_1 = QName.createQName(TEST_NAMESPACE, "childAssoc1");
+	protected static final QName TEST_CHILD_ASSOC_2 = QName.createQName(TEST_NAMESPACE, "childAssoc2");
+	protected static final QName TEST_ASSOC = QName.createQName(TEST_NAMESPACE, "assoc");	
     
     /**
      * Test content
@@ -73,11 +74,11 @@ public class VersionStoreBaseTest extends BaseSpringTest
 	/**
 	 * Sets the meta model dao
 	 * 
-	 * @param metaModelDao  the meta model dao
+	 * @param dictionaryDAO  the meta model dao
 	 */
-	public void setMetaModelDAO(MetaModelDAO metaModelDAO) 
+	public void setDictionaryDAO(DictionaryDAO dictionaryDAO) 
 	{
-		this.metaModelDAO = metaModelDAO;
+		this.dictionaryDAO = dictionaryDAO;
 	}
 	
     /**
@@ -118,29 +119,40 @@ public class VersionStoreBaseTest extends BaseSpringTest
 	 */
 	private void createTestModel()
 	{
-		M2Type testType = this.metaModelDAO.createType(TEST_TYPE_QNAME);
-		testType.setSuperClass(this.metaModelDAO.getClass(DictionaryBootstrap.TYPE_QNAME_CONTAINER));
+        M2Model model = M2Model.createModel("test:versionstorebasetest");
+        model.createNamespace(TEST_NAMESPACE, "test");
+        model.createImport(NamespaceService.ALFRESCO_DICTIONARY_URI, "d");
+        model.createImport(NamespaceService.ALFRESCO_URI, "alf");
+        
+		M2Type testType = model.createType("test:" + TEST_TYPE_QNAME.getLocalName());
+		testType.setParentName("alf:" + DictionaryBootstrap.TYPE_QNAME_CONTAINER.getLocalName());
 		
-		M2Property prop1 = testType.createProperty(PROP_1.getLocalName());
+		M2Property prop1 = testType.createProperty("test:" + PROP_1.getLocalName());
+        prop1.setType("d:text");
 		prop1.setMandatory(true);
 		prop1.setMultiValued(false);
 		
-		M2Property prop2 = testType.createProperty(PROP_2.getLocalName());
+		M2Property prop2 = testType.createProperty("test:" + PROP_2.getLocalName());
+        prop2.setType("d:text");
 		prop2.setMandatory(false);
 		prop2.setMandatory(false);
 
-		M2Property prop3 = testType.createProperty(PROP_3.getLocalName());
+		M2Property prop3 = testType.createProperty("test:" + PROP_3.getLocalName());
+        prop3.setType("d:text");
 		prop3.setMandatory(false);
 		prop3.setMandatory(false);
 		
-		M2ChildAssociation childAssoc = testType.createChildAssociation(TEST_CHILD_ASSOC_1.getLocalName());
-		childAssoc.setMandatory(false);
+		M2ChildAssociation childAssoc = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_1.getLocalName());
+        childAssoc.setTargetClassName("alf:base");
+		childAssoc.setTargetMandatory(false);
 		
-		M2ChildAssociation childAssoc2 = testType.createChildAssociation(TEST_CHILD_ASSOC_2.getLocalName());
-		childAssoc2.setMandatory(false);
+		M2ChildAssociation childAssoc2 = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_2.getLocalName());
+        childAssoc2.setTargetClassName("alf:base");
+		childAssoc2.setTargetMandatory(false);
 		
-		M2Association assoc = testType.createAssociation(TEST_ASSOC.getLocalName());
-		assoc.setMandatory(false);
+		M2Association assoc = testType.createAssociation("test:" + TEST_ASSOC.getLocalName());
+        assoc.setTargetClassName("alf:base");
+		assoc.setTargetMandatory(false);
 //		
 //		M2Aspect testAspect = this.metaModelDAO.createAspect(TEST_ASPECT_QNAME);
 //		
@@ -150,7 +162,9 @@ public class VersionStoreBaseTest extends BaseSpringTest
 //		
 //		M2Property prop4 = testAspect.createProperty(PROP4_OPTIONAL);
 //		prop4.setMandatory(false);
-//		prop4.setMultiValued(false);					
+//		prop4.setMultiValued(false);
+        
+        dictionaryDAO.putModel(model);
 	}
     
     /**
@@ -163,9 +177,6 @@ public class VersionStoreBaseTest extends BaseSpringTest
         // Use this map to retrive the versionable nodes in later tests
         this.versionableNodes = new HashMap<String, NodeRef>();
         
-        // Get the version aspect class reference
-        ClassRef aspectRef = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION);
-        
         // Create node (this node has some content)
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
@@ -173,12 +184,12 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 QName.createQName("{test}MyVersionableNode"),
                 TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(nodeRef, aspectRef, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION, new HashMap<QName, Serializable>());
         
         Map<QName, Serializable> properties = this.dbNodeService.getProperties(nodeRef);
         properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
         properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-        this.dbNodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT, properties);
+        this.dbNodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
         
         assertNotNull(nodeRef);
         this.versionableNodes.put(nodeRef.getId(), nodeRef);
@@ -195,7 +206,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_1,
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(child1, aspectRef, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(child1, DictionaryBootstrap.ASPECT_QNAME_VERSION, new HashMap<QName, Serializable>());
         assertNotNull(child1);
         this.versionableNodes.put(child1.getId(), child1);
         NodeRef child2 = this.dbNodeService.createNode(
@@ -205,7 +216,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_2,
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(child2, aspectRef, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(child2, DictionaryBootstrap.ASPECT_QNAME_VERSION, new HashMap<QName, Serializable>());
         assertNotNull(child2);
         this.versionableNodes.put(child2.getId(), child2);
         
@@ -266,7 +277,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
 	{
 		Version version = this.lightWeightVersionStoreVersionService.getCurrentVersion(nodeRef);		
 		SerialVersionLabelPolicy policy = new SerialVersionLabelPolicy();
-		return policy.calculateVersionLabel(DictionaryBootstrap.TYPE_BASE, version, versionNumber, versionProperties);
+		return policy.calculateVersionLabel(DictionaryBootstrap.TYPE_QNAME_BASE, version, versionNumber, versionProperties);
 	}
     
     /**

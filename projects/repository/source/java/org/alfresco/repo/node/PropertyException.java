@@ -1,11 +1,10 @@
 package org.alfresco.repo.node;
 
-import org.alfresco.repo.dictionary.PropertyRef;
+import org.alfresco.repo.ref.QName;
+
 
 /**
  * Thrown a <b>property</b> is not valid or not set.
- * 
- * @see org.alfresco.repo.dictionary.DictionaryService#getProperty(PropertyRef)
  * 
  * @author Derek Hulley
  */
@@ -13,14 +12,14 @@ public class PropertyException extends RuntimeException
 {
     private static final long serialVersionUID = 3976734787505631540L;
 
-    private PropertyRef propertyRef;
+    private QName propertyRef;
     
-    public PropertyException(PropertyRef typeRef)
+    public PropertyException(QName propertyRef)
     {
-        this(null, typeRef);
+        this(null, propertyRef);
     }
 
-    public PropertyException(String msg, PropertyRef propertyRef)
+    public PropertyException(String msg, QName propertyRef)
     {
         super(msg);
         this.propertyRef = propertyRef;
@@ -29,7 +28,7 @@ public class PropertyException extends RuntimeException
     /**
      * @return Returns the offending property reference
      */
-    public PropertyRef getPropertyRef()
+    public QName getPropertyRef()
     {
         return propertyRef;
     }

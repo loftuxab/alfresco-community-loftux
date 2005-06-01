@@ -5,8 +5,8 @@ package org.alfresco.util;
 
 import java.text.MessageFormat;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 
 /**
  * Used to indicate that an aspect is missing from a node.
@@ -17,7 +17,7 @@ public class AspectMissingException extends RuntimeException
 {
     private static final long serialVersionUID = 3257852099244210228L;
     
-    private ClassRef missingAspect;
+    private QName missingAspect;
     private NodeRef nodeRef;
 
     /**
@@ -29,14 +29,14 @@ public class AspectMissingException extends RuntimeException
     /**
      * Constructor
      */
-    public AspectMissingException(ClassRef missingAspect, NodeRef nodeRef)
+    public AspectMissingException(QName missingAspect, NodeRef nodeRef)
     {
-        super(MessageFormat.format(ERROR_MESSAGE, new Object[]{missingAspect.getQName().getLocalName(), nodeRef.getId()}));
+        super(MessageFormat.format(ERROR_MESSAGE, new Object[]{missingAspect.toString(), nodeRef.getId()}));
         this.missingAspect = missingAspect;
         this.nodeRef = nodeRef;
     }
 
-    public ClassRef getMissingAspect()
+    public QName getMissingAspect()
     {
         return missingAspect;
     }

@@ -17,15 +17,15 @@ import junit.framework.TestCase;
 
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
-import org.alfresco.repo.dictionary.metamodel.M2Aspect;
-import org.alfresco.repo.dictionary.metamodel.M2Property;
-import org.alfresco.repo.dictionary.metamodel.M2Type;
-import org.alfresco.repo.dictionary.metamodel.MetaModelDAO;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryDAO;
+import org.alfresco.repo.dictionary.impl.M2Aspect;
+import org.alfresco.repo.dictionary.impl.M2Model;
+import org.alfresco.repo.dictionary.impl.M2Property;
+import org.alfresco.repo.dictionary.impl.M2Type;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NamespaceException;
@@ -91,21 +91,19 @@ public class LuceneTest extends TestCase
 
     private NodeRef n14;
 
-    private MetaModelDAO metaModelDAO;
+    private DictionaryDAO dictionaryDAO;
 
     private QName testType;
 
-    private ClassRef testTypeRef;
-
     private FullTextSearchIndexer luceneFTS;
 
+    private String TEST_NAMESPACE = "http://www.alfresco.org/test/lucenetest";
+    
     private QName testSuperType;
 
     private M2Type testTypeSuperType;
 
     private QName testAspect;
-
-    private ClassRef testAspectRef;
 
     private QName testSuperAspect;
 
@@ -116,6 +114,7 @@ public class LuceneTest extends TestCase
     private QueryRegisterComponent queryRegisterComponent;
 
     private NamespacePrefixResolver namespacePrefixResolver;
+
 
     public LuceneTest()
     {
@@ -128,7 +127,7 @@ public class LuceneTest extends TestCase
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         luceneIndexLock = (LuceneIndexLock) ctx.getBean("luceneIndexLock");
         dictionaryService = (DictionaryService) ctx.getBean("dictionaryService");
-        metaModelDAO = (MetaModelDAO) ctx.getBean("metaModelDAO");
+        dictionaryDAO = (DictionaryDAO) ctx.getBean("dictionaryDAO");
         luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
         contentService = (ContentService) ctx.getBean("contentService");
         queryRegisterComponent = (QueryRegisterComponent) ctx.getBean("queryRegisterComponent");
@@ -176,27 +175,27 @@ public class LuceneTest extends TestCase
         }
 
         Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"), "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic"),
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"), "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"),
                 "TEXT THAT IS INDEXED STORED AND TOKENISED BUT NOT ATOMICALLY KEYTWO");
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "int-ista"), Integer.valueOf(1));
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "long-ista"), Long.valueOf(2));
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "float-ista"), Float.valueOf(3.4f));
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "double-ista"), Double.valueOf(5.6));
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "date-ista"), new Date());
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "datetime-ista"), new Date());
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "boolean-ista"), Boolean.valueOf(true));
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "qname-ista"), QName.createQName("{wibble}wobble"));
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "guid-ista"), "My-GUID");
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "category-ista"), "CategoryId");
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "noderef-ista"), n1);
-        testProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "path-ista"), nodeService.getPath(n3));
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "int-ista"), Integer.valueOf(1));
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "long-ista"), Long.valueOf(2));
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "float-ista"), Float.valueOf(3.4f));
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "double-ista"), Double.valueOf(5.6));
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "date-ista"), new Date());
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "datetime-ista"), new Date());
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "boolean-ista"), Boolean.valueOf(true));
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "qname-ista"), QName.createQName("{wibble}wobble"));
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "guid-ista"), "My-GUID");
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "category-ista"), "CategoryId");
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "noderef-ista"), n1);
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "path-ista"), nodeService.getPath(n3));
 
         Map<QName, Serializable> contentProperties = new HashMap<QName, Serializable>();
         contentProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "encoding"), "woof");
         contentProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype"), "woof");
 
-        n4 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}four"), testTypeRef.getQName(), testProperties).getChildRef();
+        n4 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}four"), testType, testProperties).getChildRef();
 
         nodeService.getProperties(n1);
         nodeService.getProperties(n2);
@@ -221,7 +220,7 @@ public class LuceneTest extends TestCase
         // properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE,
         // "application/msword");
         properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
-        nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_CONTENT, properties);
+        nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
 
         ContentWriter writer = contentService.getUpdatingWriter(n14);
         // InputStream is =
@@ -243,26 +242,25 @@ public class LuceneTest extends TestCase
 
     private void createTestTypes()
     {
-        testType = QName.createQName(NamespaceService.ALFRESCO_URI, "testType");
-        testTypeRef = new ClassRef(testType);
+        M2Model model = M2Model.createModel("test:lucenetest");
+        model.createImport(NamespaceService.ALFRESCO_DICTIONARY_URI, "d");
+        model.createNamespace(TEST_NAMESPACE, "test");
+        
+        testType = QName.createQName(TEST_NAMESPACE, "testType");
+        testSuperType = QName.createQName(TEST_NAMESPACE, "testSuperType");
+        testTypeSuperType = model.createType("test:" + testSuperType.getLocalName());
 
-        testSuperType = QName.createQName(NamespaceService.ALFRESCO_URI, "testSuperType");
-        testTypeSuperType = metaModelDAO.createType(testSuperType);
+        testAspect = QName.createQName(TEST_NAMESPACE, "testAspect");
+        testSuperAspect = QName.createQName(TEST_NAMESPACE, "testSuperAspect");
+        testAspectSuperAspect = model.createAspect("test:" + testSuperAspect.getLocalName());
+        M2Aspect testAspectAspect = model.createAspect("test:" + testAspect.getLocalName());
+        testAspectAspect.setParentName("test:" + testSuperAspect.getLocalName());
 
-        testAspect = QName.createQName(NamespaceService.ALFRESCO_URI, "testAspect");
-        testAspectRef = new ClassRef(testAspect);
-
-        testSuperAspect = QName.createQName(NamespaceService.ALFRESCO_URI, "testSuperAspect");
-        testAspectSuperAspect = metaModelDAO.createAspect(testSuperAspect);
-
-        M2Aspect testAspectAspect = metaModelDAO.createAspect(testAspect);
-        testAspectAspect.setSuperClass(testAspectSuperAspect);
-
-        M2Type testTypeType = metaModelDAO.createType(testType);
-        testTypeType.setSuperClass(testTypeSuperType);
-        testTypeType.getDefaultAspects().add(testAspectAspect);
-        M2Property text_indexed_stored_tokenised_atomic = testTypeType.createProperty("text-indexed-stored-tokenised-atomic");
-        text_indexed_stored_tokenised_atomic.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        M2Type testTypeType = model.createType("test:" + testType.getLocalName());
+        testTypeType.setParentName("test:" + testSuperType.getLocalName());
+        testTypeType.addMandatoryAspect("test:" + testAspect.getLocalName());
+        M2Property text_indexed_stored_tokenised_atomic = testTypeType.createProperty("test:text-indexed-stored-tokenised-atomic");
+        text_indexed_stored_tokenised_atomic.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
         text_indexed_stored_tokenised_atomic.setMandatory(true);
         text_indexed_stored_tokenised_atomic.setMultiValued(false);
         text_indexed_stored_tokenised_atomic.setIndexed(true);
@@ -270,8 +268,8 @@ public class LuceneTest extends TestCase
         text_indexed_stored_tokenised_atomic.setStoredInIndex(true);
         text_indexed_stored_tokenised_atomic.setTokenisedInIndex(true);
 
-        M2Property text_indexed_stored_tokenised_nonatomic = testTypeType.createProperty("text-indexed-stored-tokenised-nonatomic");
-        text_indexed_stored_tokenised_nonatomic.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.TEXT));
+        M2Property text_indexed_stored_tokenised_nonatomic = testTypeType.createProperty("test:text-indexed-stored-tokenised-nonatomic");
+        text_indexed_stored_tokenised_nonatomic.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
         text_indexed_stored_tokenised_nonatomic.setMandatory(true);
         text_indexed_stored_tokenised_nonatomic.setMultiValued(false);
         text_indexed_stored_tokenised_nonatomic.setIndexed(true);
@@ -279,8 +277,8 @@ public class LuceneTest extends TestCase
         text_indexed_stored_tokenised_nonatomic.setStoredInIndex(true);
         text_indexed_stored_tokenised_nonatomic.setTokenisedInIndex(true);
 
-        M2Property int_ista = testTypeType.createProperty("int-ista");
-        int_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.INT));
+        M2Property int_ista = testTypeType.createProperty("test:int-ista");
+        int_ista.setType("d:" + PropertyTypeDefinition.INT.getLocalName());
         int_ista.setMandatory(true);
         int_ista.setMultiValued(false);
         int_ista.setIndexed(true);
@@ -288,8 +286,8 @@ public class LuceneTest extends TestCase
         int_ista.setStoredInIndex(true);
         int_ista.setTokenisedInIndex(true);
 
-        M2Property long_ista = testTypeType.createProperty("long-ista");
-        long_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.LONG));
+        M2Property long_ista = testTypeType.createProperty("test:long-ista");        
+        long_ista.setType("d:" + PropertyTypeDefinition.LONG.getLocalName());
         long_ista.setMandatory(true);
         long_ista.setMultiValued(false);
         long_ista.setIndexed(true);
@@ -297,8 +295,8 @@ public class LuceneTest extends TestCase
         long_ista.setStoredInIndex(true);
         long_ista.setTokenisedInIndex(true);
 
-        M2Property float_ista = testTypeType.createProperty("float-ista");
-        float_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.FLOAT));
+        M2Property float_ista = testTypeType.createProperty("test:float-ista");
+        float_ista.setType("d:" + PropertyTypeDefinition.FLOAT.getLocalName());
         float_ista.setMandatory(true);
         float_ista.setMultiValued(false);
         float_ista.setIndexed(true);
@@ -306,8 +304,8 @@ public class LuceneTest extends TestCase
         float_ista.setStoredInIndex(true);
         float_ista.setTokenisedInIndex(true);
 
-        M2Property double_ista = testTypeType.createProperty("double-ista");
-        double_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.DOUBLE));
+        M2Property double_ista = testTypeType.createProperty("test:double-ista");
+        double_ista.setType("d:" + PropertyTypeDefinition.DOUBLE.getLocalName());
         double_ista.setMandatory(true);
         double_ista.setMultiValued(false);
         double_ista.setIndexed(true);
@@ -315,8 +313,8 @@ public class LuceneTest extends TestCase
         double_ista.setStoredInIndex(true);
         double_ista.setTokenisedInIndex(true);
 
-        M2Property date_ista = testTypeType.createProperty("date-ista");
-        date_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.DATE));
+        M2Property date_ista = testTypeType.createProperty("test:date-ista");
+        date_ista.setType("d:" + PropertyTypeDefinition.DATE.getLocalName());
         date_ista.setMandatory(true);
         date_ista.setMultiValued(false);
         date_ista.setIndexed(true);
@@ -324,8 +322,8 @@ public class LuceneTest extends TestCase
         date_ista.setStoredInIndex(true);
         date_ista.setTokenisedInIndex(true);
 
-        M2Property datetime_ista = testTypeType.createProperty("datetime-ista");
-        datetime_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.DATETIME));
+        M2Property datetime_ista = testTypeType.createProperty("test:datetime-ista");
+        datetime_ista.setType("d:" + PropertyTypeDefinition.DATETIME.getLocalName());
         datetime_ista.setMandatory(true);
         datetime_ista.setMultiValued(false);
         datetime_ista.setIndexed(true);
@@ -333,8 +331,8 @@ public class LuceneTest extends TestCase
         datetime_ista.setStoredInIndex(true);
         datetime_ista.setTokenisedInIndex(true);
 
-        M2Property boolean_ista = testTypeType.createProperty("boolean-ista");
-        boolean_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.BOOLEAN));
+        M2Property boolean_ista = testTypeType.createProperty("test:boolean-ista");
+        boolean_ista.setType("d:" + PropertyTypeDefinition.BOOLEAN.getLocalName());
         boolean_ista.setMandatory(true);
         boolean_ista.setMultiValued(false);
         boolean_ista.setIndexed(true);
@@ -342,8 +340,8 @@ public class LuceneTest extends TestCase
         boolean_ista.setStoredInIndex(true);
         boolean_ista.setTokenisedInIndex(true);
 
-        M2Property qname_ista = testTypeType.createProperty("qname-ista");
-        qname_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.QNAME));
+        M2Property qname_ista = testTypeType.createProperty("test:qname-ista");
+        qname_ista.setType("d:" + PropertyTypeDefinition.QNAME.getLocalName());
         qname_ista.setMandatory(true);
         qname_ista.setMultiValued(false);
         qname_ista.setIndexed(true);
@@ -351,8 +349,8 @@ public class LuceneTest extends TestCase
         qname_ista.setStoredInIndex(true);
         qname_ista.setTokenisedInIndex(true);
 
-        M2Property guid_ista = testTypeType.createProperty("guid-ista");
-        guid_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.GUID));
+        M2Property guid_ista = testTypeType.createProperty("test:guid-ista");
+        guid_ista.setType("d:" + PropertyTypeDefinition.GUID.getLocalName());
         guid_ista.setMandatory(true);
         guid_ista.setMultiValued(false);
         guid_ista.setIndexed(true);
@@ -360,8 +358,8 @@ public class LuceneTest extends TestCase
         guid_ista.setStoredInIndex(true);
         guid_ista.setTokenisedInIndex(true);
 
-        M2Property category_ista = testTypeType.createProperty("category-ista");
-        category_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.CATEGORY));
+        M2Property category_ista = testTypeType.createProperty("test:category-ista");
+        category_ista.setType("d:" + PropertyTypeDefinition.CATEGORY.getLocalName());
         category_ista.setMandatory(true);
         category_ista.setMultiValued(false);
         category_ista.setIndexed(true);
@@ -369,8 +367,8 @@ public class LuceneTest extends TestCase
         category_ista.setStoredInIndex(true);
         category_ista.setTokenisedInIndex(true);
 
-        M2Property noderef_ista = testTypeType.createProperty("noderef-ista");
-        noderef_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.NODE_REF));
+        M2Property noderef_ista = testTypeType.createProperty("test:noderef-ista");
+        noderef_ista.setType("d:" + PropertyTypeDefinition.NODE_REF.getLocalName());
         noderef_ista.setMandatory(true);
         noderef_ista.setMultiValued(false);
         noderef_ista.setIndexed(true);
@@ -386,6 +384,8 @@ public class LuceneTest extends TestCase
         // path_ista.setIndexedAtomically(true);
         // path_ista.setStoredInIndex(true);
         // path_ista.setTokenisedInIndex(true);
+    
+        dictionaryDAO.putModel(model);
     }
 
     public LuceneTest(String arg0)
@@ -829,71 +829,70 @@ public class LuceneTest extends TestCase
 
         // Type search tests
 
-        QName qname = QName.createQName(NamespaceService.ALFRESCO_URI, "int-ista");
+        QName qname = QName.createQName(TEST_NAMESPACE, "int-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"01\"", null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
 
-        qname = QName.createQName(NamespaceService.ALFRESCO_URI, "long-ista");
+        qname = QName.createQName(TEST_NAMESPACE, "long-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"2\"", null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
 
-        qname = QName.createQName(NamespaceService.ALFRESCO_URI, "float-ista");
+        qname = QName.createQName(TEST_NAMESPACE, "float-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"3.4\"", null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
-
-        results = searcher
-                .query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "double-ista")) + ":\"5.6\"", null, null);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "double-ista")) + ":\"5.6\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         Date date = new Date();
         String sDate = CachingDateFormat.getDateFormat().format(date);
-
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "date-ista")) + ":\"" + sDate + "\"",
-                null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "date-ista")) + ":\""+sDate+"\"", null, null);
         assertEquals(1, results.length());
         results.close();
-
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
-                "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "datetime-ista")) + ":\"" + sDate + "\"", null, null);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "datetime-ista")) + ":\""+sDate+"\"", null, null);
         assertEquals(1, results.length());
         results.close();
-
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "boolean-ista")) + ":\"true\"", null,
-                null);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "boolean-ista")) + ":\"true\"", null, null);
         assertEquals(1, results.length());
         results.close();
-
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "qname-ista")) + ":\"{wibble}wobble\"",
-                null, null);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "qname-ista")) + ":\"{wibble}wobble\"", null, null);
         assertEquals(1, results.length());
         results.close();
-
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "guid-ista")) + ":\"My-GUID\"", null,
-                null);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "guid-ista")) + ":\"My-GUID\"", null, null);
         assertEquals(1, results.length());
         results.close();
-
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "category-ista")) + ":\"CategoryId\"",
-                null, null);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "category-ista")) + ":\"CategoryId\"", null, null);
         assertEquals(1, results.length());
         results.close();
-
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "noderef-ista")) + ":\"" + n1 + "\"",
-                null, null);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "noderef-ista")) + ":\""+n1+"\"", null, null);
         assertEquals(1, results.length());
         results.close();
-
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "path-ista")) + ":\""
-                + nodeService.getPath(n3) + "\"", null, null);
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "path-ista")) + ":\""+nodeService.getPath(n3)+"\"", null, null);
         assertEquals(1, results.length());
-        assertNotNull(results.getRow(0).getValue(QName.createQName(NamespaceService.ALFRESCO_URI, "path-ista")));
+        assertNotNull(results.getRow(0).getValue(QName.createQName(TEST_NAMESPACE, "path-ista")));
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\"" + testType.toString() + "\"", null, null);
@@ -949,7 +948,7 @@ public class LuceneTest extends TestCase
         results.close();
 
         paramDef = new QueryParameterDefImpl(QName.createQName("alf:intvalue", namespacePrefixResolver), (PropertyTypeDefinition) null, true, "1");
-        qname = QName.createQName(NamespaceService.ALFRESCO_URI, "int-ista");
+        qname = QName.createQName(TEST_NAMESPACE, "int-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"${alf:intvalue}\"", null, new QueryParameterDefinition[] { paramDef });
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
@@ -1698,12 +1697,12 @@ public class LuceneTest extends TestCase
         searcher.setDictionaryService(dictionaryService);
 
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic")) + ":\"KEYONE\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic")) + ":\"KEYONE\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic")) + ":\"KEYTWO\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic")) + ":\"KEYTWO\"", null, null);
         assertEquals(0, results.length());
         results.close();
 
@@ -1723,13 +1722,13 @@ public class LuceneTest extends TestCase
         searcher.setNamespaceService(new MockNameService("namespace"));
         searcher.setDictionaryService(dictionaryService);
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"))
                 + ":\"keyone\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic")) + ":\"keytwo\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic")) + ":\"keytwo\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
@@ -1749,12 +1748,12 @@ public class LuceneTest extends TestCase
         searcher.setNamespaceService(new MockNameService("namespace"));
 
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic")) + ":\"KEYONE\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic")) + ":\"KEYONE\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic")) + ":\"KEYTWO\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic")) + ":\"KEYTWO\"", null, null);
         assertEquals(0, results.length());
         results.close();
 
@@ -1765,7 +1764,7 @@ public class LuceneTest extends TestCase
         searcher.setDictionaryService(dictionaryService);
         searcher.setNamespaceService(new MockNameService("namespace"));
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-atomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"))
                 + ":\"keyone\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -1775,16 +1774,16 @@ public class LuceneTest extends TestCase
         Thread.sleep(20000);
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "text-indexed-stored-tokenised-nonatomic")) + ":\"keytwo\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic")) + ":\"keytwo\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         runBaseTests();
     }
 
-    private String escapeQName(QName qName)
+    private String escapeQName(QName qname)
     {
-        return LuceneQueryParser.escape(qName.toString());
+        return LuceneQueryParser.escape(qname.toString());
     }
 
     public void testForKev() throws InterruptedException

@@ -3,7 +3,6 @@
  */
 package org.alfresco.repo.version.lightweight;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.version.Version;
 import org.alfresco.repo.version.VersionService;
@@ -19,7 +18,7 @@ public interface VersionStoreConst
     /**
      * Namespace
      */
-    public static final String NAMESPACE_URI = "http://www.alfresco.com/lightWeightVersionStore/1.0";
+    public static final String NAMESPACE_URI = "http://www.alfresco.org/lightweightversionstore/1.0";
     
 	 /**
      * The store protocol
@@ -37,7 +36,6 @@ public interface VersionStoreConst
      */
     public static final String TYPE_VERSION_HISTORY = "versionHistory";
     public static final QName TYPE_QNAME_VERSION_HISTORY = QName.createQName(NAMESPACE_URI, TYPE_VERSION_HISTORY);
-    public static final ClassRef CLASS_REF_VERSION_HISTORY = new ClassRef(TYPE_QNAME_VERSION_HISTORY);
     
     /**
      * Version history properties and associations
@@ -51,7 +49,6 @@ public interface VersionStoreConst
      */
     public static final String TYPE_VERSION = "version";
     public static final QName TYPE_QNAME_VERSION = QName.createQName(NAMESPACE_URI, TYPE_VERSION);
-    public static final ClassRef CLASS_REF_VERSION = new ClassRef(TYPE_QNAME_VERSION);
     
     /**
      * Version type properties and associations
@@ -71,7 +68,6 @@ public interface VersionStoreConst
      */
     public static final String TYPE_VERSIONED_PROPERTY = "versionedProperty";
     public static final QName TYPE_QNAME_VERSIONED_PROPERTY = QName.createQName(NAMESPACE_URI, TYPE_VERSIONED_PROPERTY);
-    public static final ClassRef CLASS_REF_VERSIONED_PROPERTY = new ClassRef(TYPE_QNAME_VERSIONED_PROPERTY);
     
     /**
      * Versioned attribute properties
@@ -86,7 +82,6 @@ public interface VersionStoreConst
      */
     public static final String TYPE_VERSIONED_CHILD_ASSOC = "versionedChildAssoc";
     public static final QName TYPE_QNAME_VERSIONED_CHILD_ASSOC = QName.createQName(NAMESPACE_URI, TYPE_VERSIONED_CHILD_ASSOC);
-    public static final ClassRef CLASS_REF_VERSIONED_CHILD_ASSOC = new ClassRef(TYPE_QNAME_VERSIONED_CHILD_ASSOC);
     
     /**
      * Versioned child assoc properties
@@ -103,7 +98,6 @@ public interface VersionStoreConst
      */
     public static final String TYPE_VERSIONED_ASSOC = "versionedAssoc";
     public static final QName TYPE_QNAME_VERSIONED_ASSOC = QName.createQName(NAMESPACE_URI, TYPE_VERSIONED_ASSOC);
-    public static final ClassRef CLASS_REF_VERSIONED_ASSOC = new ClassRef(TYPE_QNAME_VERSIONED_ASSOC);
     
     /**
      * Child relationship names

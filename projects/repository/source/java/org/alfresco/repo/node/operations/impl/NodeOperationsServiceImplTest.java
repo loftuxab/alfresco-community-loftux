@@ -11,14 +11,15 @@ import java.util.Map;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.ClassRef;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
-import org.alfresco.repo.dictionary.metamodel.M2Aspect;
-import org.alfresco.repo.dictionary.metamodel.M2Association;
-import org.alfresco.repo.dictionary.metamodel.M2ChildAssociation;
-import org.alfresco.repo.dictionary.metamodel.M2Property;
-import org.alfresco.repo.dictionary.metamodel.M2Type;
-import org.alfresco.repo.dictionary.metamodel.MetaModelDAO;
+import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryDAO;
+import org.alfresco.repo.dictionary.impl.M2Aspect;
+import org.alfresco.repo.dictionary.impl.M2Association;
+import org.alfresco.repo.dictionary.impl.M2ChildAssociation;
+import org.alfresco.repo.dictionary.impl.M2Model;
+import org.alfresco.repo.dictionary.impl.M2Property;
+import org.alfresco.repo.dictionary.impl.M2Type;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -41,7 +42,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	 */
 	private NodeService nodeService;
 	private NodeOperationsService nodeOperationsService;
-	private MetaModelDAO metaModelDAO;
+	private DictionaryDAO dictionaryDAO;
 	private ContentService contentService;
 	
 	/**
@@ -60,26 +61,19 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	 */
 	private static final String TEST_TYPE_NAMESPACE = "testTypeNamespaceURI";
 	private static final QName TEST_TYPE_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testType");
-	private static final String PROP1_MANDATORY = "prop1Mandatory";
-	private static final QName PROP1_QNAME_MANDATORY = QName.createQName(TEST_TYPE_NAMESPACE, PROP1_MANDATORY);
-	private static final String PROP2_OPTIONAL = "prop2Optional";
-	private static final QName PROP2_QNAME_OPTIONAL = QName.createQName(TEST_TYPE_NAMESPACE, PROP2_OPTIONAL);
+	private static final QName PROP1_QNAME_MANDATORY = QName.createQName(TEST_TYPE_NAMESPACE, "prop1Mandatory");
+	private static final QName PROP2_QNAME_OPTIONAL = QName.createQName(TEST_TYPE_NAMESPACE, "prop2Optional");
 	
 	private static final QName TEST_ASPECT_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testAspect");
-	private static final String PROP3_MANDATORY = "prop3Mandatory";
-	private static final QName PROP3_QNAME_MANDATORY = QName.createQName(TEST_TYPE_NAMESPACE, PROP3_MANDATORY);
-	private static final String PROP4_OPTIONAL = "prop4Optional";
-	private static final QName PROP4_QNAME_OPTIONAL = QName.createQName(TEST_TYPE_NAMESPACE, PROP4_OPTIONAL);
+	private static final QName PROP3_QNAME_MANDATORY = QName.createQName(TEST_TYPE_NAMESPACE, "prop3Mandatory");
+	private static final QName PROP4_QNAME_OPTIONAL = QName.createQName(TEST_TYPE_NAMESPACE, "prop4Optional");
 	
 	private static final String TEST_VALUE_1 = "testValue1";
 	private static final String TEST_VALUE_2 = "testValue2";
 	
-	private static final String TEST_CHILD_ASSOC_NAME = "testChildAssocName";
-	private static final QName TEST_CHILD_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, TEST_CHILD_ASSOC_NAME);
-	private static final String TEST_ASSOC_NAME = "testAssocName";
-	private static final QName TEST_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, TEST_ASSOC_NAME);
-	private static final String TEST_CHILD_ASSOC_NAME2 = "testChildAssocName2";
-	private static final QName TEST_CHILD_ASSOC_QNAME2 = QName.createQName(TEST_TYPE_NAMESPACE, TEST_CHILD_ASSOC_NAME2);
+	private static final QName TEST_CHILD_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testChildAssocName");
+	private static final QName TEST_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testAssocName");
+	private static final QName TEST_CHILD_ASSOC_QNAME2 = QName.createQName(TEST_TYPE_NAMESPACE, "testChildAssocName2");
 	
 	/**
 	 * Test content
@@ -89,11 +83,11 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	/**
 	 * Sets the meta model DAO
 	 * 
-	 * @param metaModelDAO  the meta model DAO
+	 * @param dictionaryDAO  the meta model DAO
 	 */
-	public void setMetaModelDAO(MetaModelDAO metaModelDAO)
+	public void setDictionaryDAO(DictionaryDAO dictionaryDAO)
     {
-        this.metaModelDAO = metaModelDAO;
+        this.dictionaryDAO = dictionaryDAO;
     }
 	
 	/**
@@ -132,7 +126,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Apply the test aspect
 		this.nodeService.addAspect(
 				this.sourceNodeRef, 
-				new ClassRef(TEST_ASPECT_QNAME), 
+				TEST_ASPECT_QNAME, 
 				aspectProperties);
 		
 		// Add a child
@@ -194,35 +188,41 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	 */
 	private void createTestModel()
 	{
-		M2Type testType = this.metaModelDAO.createType(TEST_TYPE_QNAME);
-		testType.setSuperClass(this.metaModelDAO.getClass(DictionaryBootstrap.TYPE_QNAME_CONTAINER));
-		
-		M2Property prop1 = testType.createProperty(PROP1_MANDATORY);
-		prop1.setMandatory(true);
-		prop1.setMultiValued(false);
-		
-		M2Property prop2 = testType.createProperty(PROP2_OPTIONAL);
+        M2Model model = M2Model.createModel("test:nodeoperations");
+        model.createNamespace(TEST_TYPE_NAMESPACE, "test");
+        model.createImport(NamespaceService.ALFRESCO_URI, NamespaceService.ALFRESCO_PREFIX);
+        
+        M2Type testType = model.createType("test:" + TEST_TYPE_QNAME.getLocalName());
+        testType.setParentName("alf:" + DictionaryBootstrap.TYPE_QNAME_CONTAINER.getLocalName());
+        
+        M2Property prop1 = testType.createProperty("test:" + PROP1_QNAME_MANDATORY.getLocalName());
+        prop1.setMandatory(true);
+        prop1.setMultiValued(false);
+        
+		M2Property prop2 = testType.createProperty("test:" + PROP2_QNAME_OPTIONAL.getLocalName());
 		prop2.setMandatory(false);
 		prop2.setMandatory(false);
 		
-		M2ChildAssociation childAssoc = testType.createChildAssociation(TEST_CHILD_ASSOC_NAME);
-		childAssoc.setMandatory(false);
+		M2ChildAssociation childAssoc = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_QNAME.getLocalName());
+		childAssoc.setTargetMandatory(false);
 		
-		M2ChildAssociation childAssoc2 = testType.createChildAssociation(TEST_CHILD_ASSOC_NAME2);
-		childAssoc2.setMandatory(false);
+		M2ChildAssociation childAssoc2 = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_QNAME2.getLocalName());
+		childAssoc2.setTargetMandatory(false);
 		
-		M2Association assoc = testType.createAssociation(TEST_ASSOC_NAME);
-		assoc.setMandatory(false);
+		M2Association assoc = testType.createAssociation("test:" + TEST_ASSOC_QNAME.getLocalName());
+		assoc.setTargetMandatory(false);
 		
-		M2Aspect testAspect = this.metaModelDAO.createAspect(TEST_ASPECT_QNAME);
+		M2Aspect testAspect = model.createAspect("test:" + TEST_ASPECT_QNAME.getLocalName());
 		
-		M2Property prop3 = testAspect.createProperty(PROP3_MANDATORY);
+		M2Property prop3 = testAspect.createProperty("test:" + PROP3_QNAME_MANDATORY.getLocalName());
 		prop3.setMandatory(true);
 		prop3.setMultiValued(false);
 		
-		M2Property prop4 = testAspect.createProperty(PROP4_OPTIONAL);
+		M2Property prop4 = testAspect.createProperty("test:" + PROP4_QNAME_OPTIONAL.getLocalName());
 		prop4.setMandatory(false);
-		prop4.setMultiValued(false);					
+		prop4.setMultiValued(false);
+        
+        dictionaryDAO.putModel(model);
 	}
 	
 	/**
@@ -262,7 +262,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		Map<QName, Serializable>contentProperties = new HashMap<QName, Serializable>();
 		contentProperties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
 		contentProperties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-		this.nodeService.addAspect(this.sourceNodeRef, DictionaryBootstrap.ASPECT_CONTENT, contentProperties);		
+		this.nodeService.addAspect(this.sourceNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);		
 		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.sourceNodeRef);
 		contentWriter.putContent(SOME_CONTENT);		
 		NodeRef copyWithContent = this.nodeOperationsService.copy(
@@ -271,7 +271,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 				null,
 				QName.createQName("{test}copyWithContent"));
 		checkCopiedNode(this.sourceNodeRef, copyWithContent, true, true, false);
-		assertTrue(this.nodeService.hasAspect(copyWithContent, DictionaryBootstrap.ASPECT_CONTENT));
+		assertTrue(this.nodeService.hasAspect(copyWithContent, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
 		ContentReader contentReader = this.contentService.getReader(copyWithContent);
 		assertNotNull(contentReader);
 		assertEquals(SOME_CONTENT, contentReader.getContentString());
@@ -312,7 +312,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 			if (sameStore == true)
 			{
 				// Check that the copy aspect has been applied to the copy
-				boolean hasCopyAspect = this.nodeService.hasAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_COPY);
+				boolean hasCopyAspect = this.nodeService.hasAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY);
 				assertTrue(hasCopyAspect);
 				NodeRef copyNodeRef = (NodeRef)this.nodeService.getProperty(destinationNodeRef, DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE);
 				assertNotNull(copyNodeRef);
@@ -337,7 +337,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 //		{
 //			assertEquals(sourceAspects.size(), destinationAspects.size());
 //		}
-		boolean hasTestAspect = this.nodeService.hasAspect(destinationNodeRef, new ClassRef(TEST_ASPECT_QNAME));
+		boolean hasTestAspect = this.nodeService.hasAspect(destinationNodeRef, TEST_ASPECT_QNAME);
 		assertTrue(hasTestAspect);
 		
 		// Check that all the correct properties have been copied
@@ -379,7 +379,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		assertEquals(2, childAssocRefs.size());
 		for (ChildAssocRef ref : childAssocRefs) 
 		{
-			if (ref.getQName().equals(TEST_CHILD_ASSOC_NAME2) == true)
+			if (ref.getQName().equals(TEST_CHILD_ASSOC_QNAME2) == true)
 			{
 				// Since this child is non-primary in the source it will always be non-primary in the destination
 				assertFalse(ref.isPrimary());

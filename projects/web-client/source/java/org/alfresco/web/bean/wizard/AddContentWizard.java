@@ -14,7 +14,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -121,12 +121,12 @@ public class AddContentWizard extends AbstractWizardBean
                logger.debug("Set properties on file node: " + properties);
             
             // apply the content aspect if it's not already applied
-            if (nodeService.hasAspect(fileNodeRef, DictionaryBootstrap.ASPECT_CONTENT) == false)
+            if (nodeService.hasAspect(fileNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT) == false)
             {
                Map<QName, Serializable> props = new HashMap<QName, Serializable>(3, 1.0f);
                props.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
                props.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-               nodeService.addAspect(fileNodeRef, DictionaryBootstrap.ASPECT_CONTENT, props);
+               nodeService.addAspect(fileNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, props);
                
                if (logger.isDebugEnabled())
                   logger.debug("Added content aspect to file node with properties: " + props);

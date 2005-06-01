@@ -15,29 +15,27 @@ import org.alfresco.repo.ref.QName;
  */
 public interface DictionaryService
 {
+
+    public Collection<QName> getAllModels();
+    
+    public ModelDefinition getModel(QName model);
+
+
+    Collection<QName> getAllPropertyTypes();
+    
+    Collection<QName> getPropertyTypes(QName model);
+    
+    PropertyTypeDefinition getPropertyType(QName name);
+    
+    
     /**
      * Gets all Type definitions
      * 
      * @return collection of Type References
      */
-    Collection<ClassRef> getTypes();
+    Collection<QName> getAllTypes();
     
-//    DDRef[] getTypes(String namespace);
-    
-    Collection<ClassRef> getAspects();
-    
-//    DDRef[] getAspects(String namespace);
-
-    // TODO:
-    //boolean isDefined(ClassRef classRef);
-    
-    /**
-     * Gets a Class Definition
-     *
-     * @param classRef  reference of the class to retrieve
-     * @return  the class definition (or null, if it does not exist)
-     */
-    ClassDefinition getClass(ClassRef classRef);
+    Collection<QName> getTypes(QName model);
 
     /**
      * Gets a Type Definition
@@ -45,7 +43,14 @@ public interface DictionaryService
      * @param typeRef  reference of the type to retrieve
      * @return  the type definition (or null, if it does not exist)
      */
-    TypeDefinition getType(ClassRef typeRef);
+    TypeDefinition getType(QName name);
+
+    TypeDefinition getAnonymousType(QName type, Collection<QName> aspects);
+
+    
+    Collection<QName> getAllAspects();
+    
+    Collection<QName> getAspects(QName model);
 
     /**
      * Gets an Aspect Definition
@@ -53,26 +58,25 @@ public interface DictionaryService
      * @param aspectRef  reference of the aspect to retrieve
      * @return  the aspect definition (or null, if it does not exist)
      */
-    AspectDefinition getAspect(ClassRef aspectRef);
-    
-//    TypeDef getAnonymousType(DDRef type, DDRef[] aspects);
+    AspectDefinition getAspect(QName name);
+
 
     /**
-     * Gets a Property Definition
-     * 
-     * @param propertyRef  reference of the property to retrieve
-     * @return  the property definition (or null, if it does not exist)
+     * Gets a Class Definition
+     *
+     * @param classRef  reference of the class to retrieve
+     * @return  the class definition (or null, if it does not exist)
      */
-    PropertyDefinition getProperty(PropertyRef propertyRef);
+    ClassDefinition getClass(QName name);
     
-    PropertyDefinition getProperty(QName property);
-    
-    
+    boolean isSubClass(QName className, QName ofClassName);
 
-//    AssociationDef getAssociation(AssociationRef association);
     
+    PropertyDefinition getProperty(QName className, QName propertyName);
+    
+    PropertyDefinition getProperty(QName propertyName);
+
 //    BehaviourDef[] getBehaviours();
     
-      PropertyTypeDefinition getPropertyType(DictionaryRef propertyTypeRef);
     
 }

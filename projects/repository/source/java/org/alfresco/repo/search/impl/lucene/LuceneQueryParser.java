@@ -9,10 +9,11 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.util.HashSet;
 
+import org.alfresco.repo.dictionary.AspectDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.TypeDefinition;
 import org.alfresco.repo.ref.QName;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
@@ -96,21 +97,19 @@ public class LuceneQueryParser extends QueryParser
             }
             else if (field.equals("TYPE"))
             {
-                ClassDefinition target = dictionaryService.getType(new ClassRef(QName.createQName(queryText)));
-                QName targetQName = target.getQName();
+                TypeDefinition target = dictionaryService.getType(QName.createQName(queryText));
+                QName targetQName = target.getName();
                 HashSet<QName> subclasses = new HashSet<QName>();
-                for(ClassRef classRef :  dictionaryService.getTypes())
+                for(QName classRef : dictionaryService.getAllTypes())
                 {
-                    ClassDefinition current = dictionaryService.getType(classRef);
-                    QName currentQname = current.getQName();
-                    while( (current != null) && !current.getQName().equals(targetQName))
+                    TypeDefinition current = dictionaryService.getType(classRef);
+                    while( (current != null) && !current.getName().equals(targetQName))
                     {
-                        current = current.getSuperClass();
-                        currentQname = (current == null) ? null : current.getQName();
+                        current = (current.getParentName() == null) ? null : dictionaryService.getType(current.getParentName());
                     }
                     if(current != null)
                     {
-                        subclasses.add(classRef.getQName());
+                        subclasses.add(classRef);
                     }
                 }
                 BooleanQuery booleanQuery = new BooleanQuery();
@@ -123,21 +122,19 @@ public class LuceneQueryParser extends QueryParser
             }
             else if (field.equals("ASPECT"))
             {
-                ClassDefinition target = dictionaryService.getAspect(new ClassRef(QName.createQName(queryText)));
-                QName targetQName = target.getQName();
+                AspectDefinition target = dictionaryService.getAspect(QName.createQName(queryText));
+                QName targetQName = target.getName();
                 HashSet<QName> subclasses = new HashSet<QName>();
-                for(ClassRef classRef : dictionaryService.getAspects())
+                for(QName classRef : dictionaryService.getAllAspects())
                 {
-                    ClassDefinition current = dictionaryService.getAspect(classRef);
-                    QName currentQname = current.getQName();
-                    while( (current != null) && !current.getQName().equals(targetQName))
+                    AspectDefinition current = dictionaryService.getAspect(classRef);
+                    while( (current != null) && !current.getName().equals(targetQName))
                     {
-                        current = current.getSuperClass();
-                        currentQname = (current == null) ? null : current.getQName();
+                        current = (current.getParentName() == null) ? null : dictionaryService.getAspect(current.getParentName());
                     }
                     if(current != null)
                     {
-                        subclasses.add(classRef.getQName());
+                        subclasses.add(classRef);
                     }
                 }
                 

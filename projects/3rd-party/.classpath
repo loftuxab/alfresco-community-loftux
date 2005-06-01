@@ -26,11 +26,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/spring-aop.jar"/>
 	<classpathentry exported="true" sourcepath="src/spring-mock_src.zip" kind="lib" path="lib/spring-mock.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/standard.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/common.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/common.resources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.resources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/eclipse/ecore.xmi.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.0.jar"/>
@@ -48,5 +43,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/juh.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/unoil.jar"/>
 	<classpathentry exported="true" sourcepath="src/pdfbox_src.zip" kind="lib" path="lib/pdfbox-0.7.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xpp3.jar"/>
+	<classpathentry kind="lib" path="lib/jibx/jibx-bind.jar"/>
+	<classpathentry kind="lib" path="lib/bcel.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-run.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

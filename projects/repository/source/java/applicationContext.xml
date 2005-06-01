@@ -503,15 +503,20 @@
    <!-- Data Dictionary -->
    <!--                 -->
    
-   <bean id="emfResource" class="org.alfresco.repo.dictionary.metamodel.emf.EMFResource" init-method="init">
+   <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.impl.NamespaceDAOImpl">
    </bean>
-   
-   <bean id="metaModelDAO" class="org.alfresco.repo.dictionary.metamodel.emf.EMFMetaModelDAO" init-method="init">
-      <property name='resource'><ref bean="emfResource"/></property>
-   </bean>
-   
-   <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.metamodel.emf.EMFNamespaceDAO" init-method="init">
-      <property name='resource'><ref bean="emfResource"/></property>
+
+   <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.impl.DictionaryDAOImpl" init-method="bootstrap">
+      <constructor-arg index="0">
+         <ref bean="namespaceDAO"/>
+      </constructor-arg>
+      <property name="bootstrapModels">
+         <list>
+            <value>org/alfresco/repo/dictionary/impl/dictionary_model.xml</value>
+            <value>org/alfresco/repo/dictionary/impl/content_model.xml</value>
+            <value>org/alfresco/repo/dictionary/impl/version_model.xml</value>
+         </list>
+      </property>
    </bean>
    
    <bean id="dictionaryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -520,8 +525,8 @@
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="org.alfresco.repo.dictionary.service.DictionaryComponent" >
-            <property name="metaModelDAO"><ref bean="metaModelDAO"/></property>
+         <bean class="org.alfresco.repo.dictionary.impl.DictionaryComponent" >
+            <property name="dictionaryDAO"><ref bean="dictionaryDAO"/></property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -537,7 +542,7 @@
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="org.alfresco.repo.dictionary.service.DictionaryNamespaceComponent" >
+         <bean class="org.alfresco.repo.dictionary.impl.DictionaryNamespaceComponent" >
             <property name="namespaceDAO"><ref bean="namespaceDAO"/></property>
          </bean>
       </property>
@@ -616,17 +621,12 @@
       </property>
    </bean>
    
-   <!--                 -->
-   <!-- Policy Franeworks Services -->
-   <!--                 -->
+   <!-- Policy Support -->
    
-    <bean id="policyComponent" class="org.alfresco.repo.policy.PolicyComponentImpl">
+   <bean id="policyComponent" class="org.alfresco.repo.policy.PolicyComponentImpl">
 	   <constructor-arg index="0">
-	      <ref bean="indexingNodeService"/>
-       </constructor-arg>
-	   <constructor-arg index="0">
-	      <ref bean="dictionaryService"/>
-       </constructor-arg>
+         <ref bean="dictionaryService"/>
+      </constructor-arg>
    </bean>
    
    <!-- Bean to support full text search -->

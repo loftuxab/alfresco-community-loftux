@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.node.AbstractNodeServiceImpl;
 import org.alfresco.repo.node.AssociationExistsException;
 import org.alfresco.repo.node.InvalidAspectException;
@@ -129,7 +128,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public ClassRef getType(NodeRef nodeRef) throws InvalidNodeRefException
+    public QName getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
         return nodeServiceDelegate.getType(nodeRef);
     }
@@ -140,7 +139,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @see IndexerComponent#updateNode(NodeRef)
      */
-    public void addAspect(NodeRef nodeRef, ClassRef aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
+    public void addAspect(NodeRef nodeRef, QName aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
         // call delegate
         nodeServiceDelegate.addAspect(nodeRef, aspectRef, aspectProperties);
@@ -154,7 +153,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @see IndexerComponent#updateNode(NodeRef)
      */
-    public void removeAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    public void removeAspect(NodeRef nodeRef, QName aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
         // call delegate
         nodeServiceDelegate.removeAspect(nodeRef, aspectRef);
@@ -165,7 +164,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public boolean hasAspect(NodeRef nodeRef, ClassRef aspectRef) throws InvalidNodeRefException, InvalidAspectException
+    public boolean hasAspect(NodeRef nodeRef, QName aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
         return nodeServiceDelegate.hasAspect(nodeRef, aspectRef);
     }
@@ -173,7 +172,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * Direct delegation to assigned {@link #nodeServiceDelegate}
      */
-    public Set<ClassRef> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
+    public Set<QName> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
     {
         return nodeServiceDelegate.getAspects(nodeRef);
     }

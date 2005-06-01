@@ -1,0 +1,85 @@
+<model name="d:dictionary" xmlns="http://www.alfresco.org/dictionary/0.1">
+
+   <description>Alfresco Dictionary Model</description>
+   <author>Alfresco</author>
+   <published>2005-05-30</published>
+   <version>0.1</version>
+   
+   <namespaces>
+      <!-- Default Namespace -->
+      <namespace uri="" prefix=""/>
+      <!-- Test Namespace -->
+      <!-- TODO: Remove this namespace in favour of test specific namespaces -->
+      <namespace uri="http://www.alfresco.org/test/1.0" prefix="alftest"/>
+      <!-- Dictionary Namespace -->
+      <namespace uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
+   </namespaces>
+
+   <property-types>
+
+      <property-type name="d:any">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:text">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:content">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:int">
+         <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.IntegerAnalyser</analyser-class>
+      </property-type>
+
+      <property-type name="d:long">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:float">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:double">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:date">
+         <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.DateAnalyser</analyser-class>
+      </property-type>
+
+      <property-type name="d:datetime">
+         <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.DateAnalyser</analyser-class>
+      </property-type>
+
+      <property-type name="d:boolean">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+      
+      <property-type name="d:qname">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:guid">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:category">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:noderef">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+      <property-type name="d:path">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+      </property-type>
+
+   </property-types>
+
+
+   <!-- TODO: Define dictionary meta model -->
+   
+</model>

@@ -9,9 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.lock.LockStatus;
 import org.alfresco.repo.lock.LockType;
@@ -20,8 +19,8 @@ import org.alfresco.repo.lock.UnableToAquireLockException;
 import org.alfresco.repo.lock.UnableToReleaseLockException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -78,27 +77,27 @@ public class LockServiceImpl implements LockService
         // Register the various class behaviours to enable lock checking
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateVersion"),
-				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCK,
 				new JavaBehaviour(this, "checkForLock"));	
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeUpdate"),
-				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCK,
 				new JavaBehaviour(this, "checkForLock"));
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDelete"),
-				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCK,
 				new JavaBehaviour(this, "checkForLock"));
 		
 		// Register onCopy class behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
-				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCK,
 				new JavaBehaviour(this, "onCopy"));
 		
 		// Register the onCreateVersion behavior for the version aspect
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
-				DictionaryBootstrap.ASPECT_CLASS_REF_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCK,
 				new JavaBehaviour(this, "onCreateVersion"));
     }
     
@@ -285,12 +284,9 @@ public class LockServiceImpl implements LockService
     private void checkForLockApsect(NodeRef nodeRef)
         throws AspectMissingException
     {
-        // Get the class ref for the lock aspect
-        ClassRef lockAspect = new ClassRef(DictionaryBootstrap.ASPECT_QNAME_LOCK);
-        
-        if (this.nodeService.hasAspect(nodeRef, lockAspect) == false)
+        if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK) == false)
         {
-            throw new AspectMissingException(lockAspect, nodeRef);
+            throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_LOCK, nodeRef);
         }
     }
 	
@@ -358,10 +354,10 @@ public class LockServiceImpl implements LockService
 	 * @param sourceNodeRef	  the source node reference
 	 * @param copyDetails	  the copy details
 	 */
-	public void onCopy(ClassRef sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Add the lock aspect, but do not copy any of the properties
-		copyDetails.addAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK);
+		copyDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_LOCK);
 	}
 	
 	/**
@@ -376,12 +372,12 @@ public class LockServiceImpl implements LockService
 	 * @param nodeDetails			the details of the node to be versioned
 	 */
 	public void onCreateVersion(
-			ClassRef classRef,
+			QName classRef,
 			NodeRef versionableNode, 
 			Map<String, Serializable> versionProperties,
 			PolicyScope nodeDetails)
 	{
 		// Add the lock aspect, but do not version the property values
-		nodeDetails.addAspect(DictionaryBootstrap.ASPECT_CLASS_REF_LOCK);
+		nodeDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_LOCK);
 	}
 }

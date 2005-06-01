@@ -4,7 +4,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.filestore.FileContentStore;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.content.transform.ContentTransformerRegistry;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.util.AspectMissingException;
@@ -43,9 +43,9 @@ public class RoutingContentService implements ContentService
     public ContentReader getReader(NodeRef nodeRef)
     {
         // ensure that the node exists and that it has the content aspect
-        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT))
+        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT))
         {
-            throw new AspectMissingException(DictionaryBootstrap.ASPECT_CONTENT, nodeRef);
+            throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_CONTENT, nodeRef);
         }
         
         // get the content URL
@@ -81,9 +81,9 @@ public class RoutingContentService implements ContentService
 
     public ContentWriter getWriter(NodeRef nodeRef)
     {
-        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT))
+        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT))
         {
-           throw new AspectMissingException(DictionaryBootstrap.ASPECT_CONTENT, nodeRef);
+           throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_CONTENT, nodeRef);
         }
         
         CodeMonkey.todo("Choose the store to write to at runtime");  // TODO
@@ -111,9 +111,9 @@ public class RoutingContentService implements ContentService
 	  */
     public ContentWriter getUpdatingWriter(NodeRef nodeRef)
     {
-        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_CONTENT))
+        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT))
         {
-           throw new AspectMissingException(DictionaryBootstrap.ASPECT_CONTENT, nodeRef);
+           throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_CONTENT, nodeRef);
         }
         
 		  // get the plain writer

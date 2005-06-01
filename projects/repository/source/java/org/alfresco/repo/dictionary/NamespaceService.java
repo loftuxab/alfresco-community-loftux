@@ -25,7 +25,17 @@ public interface NamespaceService extends NamespacePrefixResolver
      * Default Namespace Prefix
      */
     public static final String DEFAULT_PREFIX = "";
+
+    /**
+     * Alfresco Dictionary Namespace URI
+     */
+    public static final String ALFRESCO_DICTIONARY_URI = "http://www.alfresco.org/dictionary/0.1";
     
+    /**
+     * Alfresco Dictionary Namespace Prefix
+     */
+    public static final String ALFRESCO_DICTIONARY_PREFIX = "d";
+
     /**
      * Alfresco Namespace URI
      */

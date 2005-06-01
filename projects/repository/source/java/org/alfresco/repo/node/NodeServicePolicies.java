@@ -3,7 +3,6 @@
  */
 package org.alfresco.repo.node;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -114,7 +113,7 @@ public interface NodeServicePolicies
 		 * @param classRef	the class ref of the delete node
 		 * @param nodeRef	the reference to the deleted node
 		 */
-		public void onDelete(ClassRef classRef, NodeRef nodeRef);
+		public void onDelete(QName classRef, NodeRef nodeRef);
 	}
 	
 	// TODO

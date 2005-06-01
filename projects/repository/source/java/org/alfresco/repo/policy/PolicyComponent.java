@@ -2,7 +2,6 @@ package org.alfresco.repo.policy;
 
 import java.util.Collection;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.ref.QName;
 
 
@@ -69,7 +68,7 @@ public interface PolicyComponent
      * @param behaviour  the behaviour
      * @return  the registered behaviour definition
      */
-    public BehaviourDefinition<ClassBehaviourBinding> bindClassBehaviour(QName policy, ClassRef classRef, Behaviour behaviour);
+    public BehaviourDefinition<ClassBehaviourBinding> bindClassBehaviour(QName policy, QName classRef, Behaviour behaviour);
 
     /**
      * Bind a Service behaviour to a Class-level Policy

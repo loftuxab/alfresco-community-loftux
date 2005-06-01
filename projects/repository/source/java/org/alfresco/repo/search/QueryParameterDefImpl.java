@@ -7,7 +7,6 @@
  */
 package org.alfresco.repo.search;
 
-import org.alfresco.repo.dictionary.DictionaryRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
@@ -91,17 +90,19 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
             }
 
             PropertyDefinition propDef = null;
-            Element propDefElement = element.element(PROPERTY_QNAME.getName());
-            if (propDefElement != null)
-            {
-                propDef = dictionaryService.getProperty(QName.createQName(propDefElement.getText(), nspr));
-            }
+//            TODO: DC: This will be re-visited when notion of property is encapsulated
+//                  For now default to text property type
+//            Element propDefElement = element.element(PROPERTY_QNAME.getName());
+//            if (propDefElement != null)
+//            {
+//                propDef = dictionaryService.getProperty(QName.createQName(propDefElement.getText(), nspr));
+//            }
 
             PropertyTypeDefinition typeDef = null;
             Element typeDefElement = element.element(PROPERTY_TYPE_QNAME.getName());
             if (typeDefElement != null)
             {
-                typeDef = dictionaryService.getPropertyType(new DictionaryRef(QName.createQName(typeDefElement.getText(), nspr)));
+                typeDef = dictionaryService.getPropertyType(QName.createQName(typeDefElement.getText(), nspr));
             }
 
             boolean hasDefault = false;

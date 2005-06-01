@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.ClassRef;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
@@ -71,7 +70,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         Version version = createVersion(versionableNode, this.versionProperties);
 	
         // Get the type from the versioned state
-        ClassRef versionedType = this.lightWeightVersionStoreNodeService.getType(version.getNodeRef());
+        QName versionedType = this.lightWeightVersionStoreNodeService.getType(version.getNodeRef());
         assertNotNull(versionedType);
         assertEquals(this.dbNodeService.getType(versionableNode), versionedType);
     }
@@ -201,12 +200,12 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         
         boolean test1 = this.lightWeightVersionStoreNodeService.hasAspect(
                 version.getNodeRef(), 
-                DictionaryBootstrap.ASPECT_SPACE);
+                DictionaryBootstrap.ASPECT_QNAME_SPACE);
         assertFalse(test1);
         
         boolean test2 = this.lightWeightVersionStoreNodeService.hasAspect(
                 version.getNodeRef(),
-                new ClassRef(DictionaryBootstrap.ASPECT_QNAME_VERSION));
+                DictionaryBootstrap.ASPECT_QNAME_VERSION);
         assertTrue(test2);
     }
 
@@ -217,12 +216,12 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
     {
         // Create a new versionable node
         NodeRef versionableNode = createNewVersionableNode();
-        Set<ClassRef> origAspects = this.dbNodeService.getAspects(versionableNode);
+        Set<QName> origAspects = this.dbNodeService.getAspects(versionableNode);
         
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
         
-        Set<ClassRef> aspects = this.lightWeightVersionStoreNodeService.getAspects(version.getNodeRef());
+        Set<QName> aspects = this.lightWeightVersionStoreNodeService.getAspects(version.getNodeRef());
         assertEquals(origAspects.size(), aspects.size());
         
         // TODO check that the set's contain the same items
@@ -265,7 +264,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         {
             this.lightWeightVersionStoreNodeService.addAspect(
                     dummyNodeRef,
-                    DictionaryBootstrap.ASPECT_CONTENT,
+                    DictionaryBootstrap.ASPECT_QNAME_CONTENT,
                     null);
             fail("This operation is not supported.");
         }
@@ -287,7 +286,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         {
             this.lightWeightVersionStoreNodeService.removeAspect(
                     dummyNodeRef,
-                    DictionaryBootstrap.ASPECT_CONTENT);
+                    DictionaryBootstrap.ASPECT_QNAME_CONTENT);
             fail("This operation is not supported.");
         }
         catch (UnsupportedOperationException exception)

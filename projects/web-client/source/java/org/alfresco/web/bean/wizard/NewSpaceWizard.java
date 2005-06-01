@@ -15,7 +15,7 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
@@ -163,7 +163,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                properties.put(propDescription, this.description);
                
                // add the space aspect to the folder
-               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_SPACE, properties);
+               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_SPACE, properties);
    
                if (logger.isDebugEnabled())
                   logger.debug("Created space aspect with properties: " + properties);
@@ -627,7 +627,7 @@ public class NewSpaceWizard extends AbstractWizardBean
             for (ResultSetRow row : results)
             {
                NodeRef node = row.getNodeRef();
-               if (this.nodeService.hasAspect(node, DictionaryBootstrap.ASPECT_SPACE))
+               if (this.nodeService.hasAspect(node, DictionaryBootstrap.ASPECT_QNAME_SPACE))
                {
                   String name = row.getQName().getLocalName();
                   String id = node.getId();
@@ -644,7 +644,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          {
             NodeRef child = ref.getChildRef();
             // if the node has the space aspect applied add it to the list
-            if (this.nodeService.hasAspect(child, DictionaryBootstrap.ASPECT_SPACE))
+            if (this.nodeService.hasAspect(child, DictionaryBootstrap.ASPECT_QNAME_SPACE))
             {
                String id = child.getId();
                String name = ref.getQName().getLocalName();

@@ -4,10 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.TypeDefinition;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.ContainerNode;
 import org.alfresco.repo.domain.Node;
@@ -102,11 +101,10 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
 
     public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidNodeTypeException
     {
-        ClassRef classRef = new ClassRef(nodeTypeQName);
-        TypeDefinition typeDef = dictionaryService.getType(classRef);
+        TypeDefinition typeDef = dictionaryService.getType(nodeTypeQName);
         if (typeDef == null)
         {
-            throw new InvalidNodeTypeException(classRef);
+            throw new InvalidNodeTypeException(nodeTypeQName);
         }
         boolean allowedChildren = typeDef.getChildAssociations().size() > 0;
         // build a concrete node based on a bootstrap type

@@ -14,13 +14,11 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.ClassRef;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.dictionary.TypeDefinition;
-import org.alfresco.repo.dictionary.bootstrap.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.SearcherException;
 import org.apache.lucene.document.Document;
@@ -534,7 +532,7 @@ public class LeafScorer extends Scorer
                         Field typeField = document.getField("TYPE");
                         if ((typeField != null) && (typeField.stringValue() != null))
                         {
-                            ClassRef typeRef = new ClassRef(QName.createQName(typeField.stringValue()));
+                            QName typeRef = QName.createQName(typeField.stringValue());
                             if (isCategory(typeRef))
                             {
                                 Counter counter = parentIds.get(parentID);
@@ -548,18 +546,18 @@ public class LeafScorer extends Scorer
 
                         if (aspectQName != null)
                         {
-                            ClassRef classRef = new ClassRef(QName.createQName(aspectQName));
+                            QName classRef = QName.createQName(aspectQName);
                             AspectDefinition aspDef = dictionaryService.getAspect(classRef);
                             if (isCategorised(aspDef))
                             {
-                                for (PropertyDefinition propDef : aspDef.getProperties())
+                                for (PropertyDefinition propDef : aspDef.getProperties().values())
                                 {
                                     if (propDef.getPropertyType().getName().equals(PropertyTypeDefinition.CATEGORY))
                                     {
                                         // get field and compare to ID
                                         // Check in path as QName
                                         // somewhere
-                                        Field[] categoryFields = document.getFields("@" + propDef.getQName());
+                                        Field[] categoryFields = document.getFields("@" + propDef.getName());
                                         if (categoryFields != null)
                                         {
                                             for (Field categoryField : categoryFields)
@@ -613,31 +611,27 @@ public class LeafScorer extends Scorer
         }
     }
 
-    private boolean isCategory(ClassRef classRef)
+    private boolean isCategory(QName classRef)
     {
         if (classRef == null)
         {
             return false;
         }
         TypeDefinition current = dictionaryService.getType(classRef);
-        ClassDefinition nextDefinition;
         while (current != null)
         {
-            if (current.getQName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORY))
+            if (current.equals(DictionaryBootstrap.TYPE_QNAME_CATEGORY))
             {
                 return true;
             }
             else
             {
-                nextDefinition = current.getSuperClass();
-                if (nextDefinition instanceof TypeDefinition)
+                QName parentName = current.getParentName();
+                if (parentName == null)
                 {
-                    current = (TypeDefinition) nextDefinition;
+                    break;
                 }
-                else
-                {
-                    current = null;
-                }
+                current = dictionaryService.getType(parentName);
             }
         }
         return false;
@@ -646,24 +640,20 @@ public class LeafScorer extends Scorer
     private boolean isCategorised(AspectDefinition aspDef)
     {
         AspectDefinition current = aspDef;
-        ClassDefinition nextDefinition;
         while (current != null)
         {
-            if (current.getQName().equals(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION))
+            if (current.equals(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION))
             {
                 return true;
             }
             else
             {
-                nextDefinition = current.getSuperClass();
-                if (nextDefinition instanceof AspectDefinition)
+                QName parentName = current.getParentName();
+                if (parentName == null)
                 {
-                    current = (AspectDefinition) nextDefinition;
+                    break;
                 }
-                else
-                {
-                    current = null;
-                }
+                current = dictionaryService.getAspect(parentName);
             }
         }
         return false;
