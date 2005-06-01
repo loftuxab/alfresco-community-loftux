@@ -53,22 +53,6 @@ public class UIPanel extends UICommand
       
       ResponseWriter out = context.getResponseWriter();
       
-      String bgcolor = getBgcolor();
-      if (bgcolor == null)
-      {
-         bgcolor = PanelGenerator.BGCOLOR_WHITE;
-      }
-      
-      // output first part of border table
-      if (getBorder() != null)
-      {
-         PanelGenerator.generatePanelStart(
-               out,
-               context.getExternalContext().getRequestContextPath(),
-               getBorder(),
-               bgcolor);
-      }
-      
       // determine if we have a link on the header
       boolean linkPresent = false;
       String linkLabel = getLinkLabel();
@@ -79,17 +63,70 @@ public class UIPanel extends UICommand
       }
       
       // determine whether we have any adornment
-      boolean adornments = false;
       String label = getLabel();
       if (label != null || isProgressive() == true || linkPresent == true)
       {
-         adornments = true;
+         this.hasAdornments = true;
       }
-         
-      if (adornments)
+      
+      // make sure we have a default background color for the content area
+      String bgcolor = getBgcolor();
+      if (bgcolor == null)
+      {
+         bgcolor = PanelGenerator.BGCOLOR_WHITE;
+      }
+      
+      // determine if we have a bordered title area, note, we also need to have
+      // the content area border defined as well
+      if ((getTitleBgcolor() != null) && (getTitleBorder() != null) && 
+          (getBorder() != null) && this.hasAdornments)
+      {
+         this.hasBorderedTitleArea = true;
+      }
+      
+      // output first part of border table
+      if (this.hasBorderedTitleArea)
+      {
+         PanelGenerator.generatePanelStart(
+               out,
+               context.getExternalContext().getRequestContextPath(),
+               getTitleBorder(),
+               getTitleBgcolor());
+      }
+      else if (getBorder() != null)
+      {
+         PanelGenerator.generatePanelStart(
+               out,
+               context.getExternalContext().getRequestContextPath(),
+               getBorder(),
+               bgcolor);
+      }
+
+      if (this.hasAdornments)
       {
          // start the containing table if we have any adornments
          out.write("<table border='0' cellspacing='0' cellpadding='0' width='100%'><tr><td>");
+      }
+
+      // output progressive disclosure icon in appropriate state
+      // TODO: manage state of this icon via component Id!
+      if (isProgressive() == true)
+      {
+         out.write("<a href='#' onclick=\"");
+         String value = getClientId(context) + NamingContainer.SEPARATOR_CHAR + Boolean.toString(!isExpanded());
+         out.write(Utils.generateFormSubmit(context, this, getHiddenFieldName(), value));
+         out.write("\">");
+         
+         if (isExpanded() == true)
+         {
+            out.write(Utils.buildImageTag(context, EXPANDED_IMG, 10, 10, ""));
+         }
+         else
+         {
+            out.write(Utils.buildImageTag(context, COLLAPSED_IMG, 10, 10, ""));
+         }
+         
+         out.write("</a>&nbsp;&nbsp;");
       }
       
       // output textual label
@@ -102,31 +139,10 @@ public class UIPanel extends UICommand
          
          out.write(Utils.encode(label));
          
-         out.write("</span>&nbsp;");
-      }
-      
-      // output progressive disclosure icon in appropriate state
-      // TODO: manage state of this icon via component Id!
-      if (isProgressive() == true)
-      {
-         out.write("<a href='#' onclick=\"");
-         String value = getClientId(context) + NamingContainer.SEPARATOR_CHAR + Boolean.toString(!isExpanded());
-         out.write(Utils.generateFormSubmit(context, this, getHiddenFieldName(), value));
-         out.write("\">");
-         
-         if (isExpanded() == true)
-         {
-            out.write(Utils.buildImageTag(context, EXPANDED_IMG, 7, 6, ""));
-         }
-         else
-         {
-            out.write(Utils.buildImageTag(context, COLLAPSED_IMG, 6, 7, ""));
-         }
-         
-         out.write("</a>");
+         out.write("</span>");
       }
 
-      if (adornments)
+      if (this.hasAdornments)
       {
          out.write("</td>");
       }
@@ -158,9 +174,20 @@ public class UIPanel extends UICommand
          out.write("</a></td>");
       }
       
-      if (adornments)
+      if (this.hasAdornments)
       {
          out.write("</tr></table>");
+      }
+      
+      // if we have the titled border area, output the middle section
+      if (this.hasBorderedTitleArea && isExpanded())
+      {
+         PanelGenerator.generateTitledPanelMiddle(
+               out,
+               context.getExternalContext().getRequestContextPath(),
+               getTitleBorder(),
+               getBorder(),
+               getBgcolor());
       }
    }
 
@@ -177,7 +204,14 @@ public class UIPanel extends UICommand
       ResponseWriter out = context.getResponseWriter();
       
       // output final part of border table
-      if (getBorder() != null)
+      if (this.hasBorderedTitleArea && isExpanded() == false)
+      {
+         PanelGenerator.generatePanelEnd(
+               out,
+               context.getExternalContext().getRequestContextPath(),
+               getTitleBorder());
+      }
+      else if (getBorder() != null)
       {
          PanelGenerator.generatePanelEnd(
                out,
@@ -245,6 +279,8 @@ public class UIPanel extends UICommand
       this.linkIcon = (String)values[7];
       this.linkStyleClass = (String)values[8];
       this.linkTooltip = (String)values[9];
+      this.titleBgcolor = (String)values[10];
+      this.titleBorder = (String)values[11];
    }
    
    /**
@@ -252,7 +288,7 @@ public class UIPanel extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[10];
+      Object values[] = new Object[12];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = (isExpanded() ? Boolean.TRUE : Boolean.FALSE);
@@ -264,6 +300,8 @@ public class UIPanel extends UICommand
       values[7] = this.linkIcon;
       values[8] = this.linkStyleClass;
       values[9] = this.linkTooltip;
+      values[10] = this.titleBgcolor;
+      values[11] = this.titleBorder;
       return values;
    }
    
@@ -313,6 +351,50 @@ public class UIPanel extends UICommand
    public void setBorder(String border)
    {
       this.border = border;
+   }
+   
+   /**
+    * @return Returns the bgcolor of the title area
+    */
+   public String getTitleBgcolor()
+   {
+      ValueBinding vb = getValueBinding("titleBgcolor");
+      if (vb != null)
+      {
+         this.titleBgcolor = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.titleBgcolor;
+   }
+
+   /**
+    * @param titleBgcolor Sets the bgcolor of the title area
+    */
+   public void setTitleBgcolor(String titleBgcolor)
+   {
+      this.titleBgcolor = titleBgcolor;
+   }
+
+   /**
+    * @return Returns the border style of the title area
+    */
+   public String getTitleBorder()
+   {
+      ValueBinding vb = getValueBinding("titleBorder");
+      if (vb != null)
+      {
+         this.titleBorder = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.titleBorder;
+   }
+
+   /**
+    * @param titleBorder Sets the border style of the title area
+    */
+   public void setTitleBorder(String titleBorder)
+   {
+      this.titleBorder = titleBorder;
    }
 
    /**
@@ -508,8 +590,8 @@ public class UIPanel extends UICommand
    // ------------------------------------------------------------------------------
    // Constants 
    
-   private final static String EXPANDED_IMG  = "/images/icons/arrow_expanded.gif";
-   private final static String COLLAPSED_IMG = "/images/icons/arrow_collapsed.gif";
+   private final static String EXPANDED_IMG  = "/images/icons/expanded.gif";
+   private final static String COLLAPSED_IMG = "/images/icons/collapsed.gif";
    private final static String LINK_CLICKED = "link-clicked";
    
    // ------------------------------------------------------------------------------
@@ -518,6 +600,8 @@ public class UIPanel extends UICommand
    // component settings
    private String border = null;
    private String bgcolor = null;
+   private String titleBorder = null;
+   private String titleBgcolor = null;
    private Boolean progressive = null;
    private String label = null;
    private String linkLabel = null;
@@ -526,5 +610,7 @@ public class UIPanel extends UICommand
    private String linkStyleClass = null;
    
    // component state
+   private boolean hasAdornments = false;
+   private boolean hasBorderedTitleArea = false;
    private Boolean expanded = Boolean.TRUE;
 }

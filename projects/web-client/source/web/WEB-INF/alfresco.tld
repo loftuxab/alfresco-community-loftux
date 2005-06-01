@@ -420,6 +420,18 @@
       </attribute>
       
       <attribute>
+         <name>titleBorder</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>titleBgcolor</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+            
+      <attribute>
          <name>expanded</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>

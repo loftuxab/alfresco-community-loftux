@@ -46,6 +46,8 @@ public class PanelTag extends HtmlComponentTag
       setStringProperty(component, "border", this.border);
       setBooleanProperty(component, "progressive", this.progressive);
       setStringProperty(component, "bgcolor", this.bgcolor);
+      setStringProperty(component, "titleBorder", this.titleBorder);
+      setStringProperty(component, "titleBgcolor", this.titleBgcolor);
       setBooleanProperty(component, "expanded", this.expanded);
       setStringProperty(component, "linkLabel", this.linkLabel);
       setStringProperty(component, "linkIcon", this.linkIcon);
@@ -141,6 +143,22 @@ public class PanelTag extends HtmlComponentTag
    }
    
    /**
+    * @param titleBgcolor The title area background color
+    */
+   public void setTitleBgcolor(String titleBgcolor)
+   {
+      this.titleBgcolor = titleBgcolor;
+   }
+
+   /**
+    * @param titleBorder The title area border style
+    */
+   public void setTitleBorder(String titleBorder)
+   {
+      this.titleBorder = titleBorder;
+   }
+
+   /**
     * Set whether the panel is expanded, default is true.
     *
     * @param expanded     the expanded flag
@@ -212,6 +230,12 @@ public class PanelTag extends HtmlComponentTag
 
    /** the bgcolor */
    private String bgcolor;
+
+   /** the title border style */
+   private String titleBorder;
+   
+   /** the title bgcolor */
+   private String titleBgcolor;
    
    /** the action */
    private String action;

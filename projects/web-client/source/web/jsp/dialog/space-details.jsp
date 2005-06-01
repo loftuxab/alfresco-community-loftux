@@ -85,7 +85,8 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" 
+                              <a:panel label="Properties" id="properties-panel" border="white" bgcolor="white" 
+                                       titleBorder="greyround" titleBgcolor="#eaeaea"
                                        progressive="true" action="editSpaceProperties" linkTooltip="Modify"
                                        actionListener="#{EditSpaceDialog.startWizardForEdit}"
                                        linkIcon="/images/icons/Change_details.gif">
@@ -95,16 +96,16 @@
                                  <h:messages styleClass="errorMessage" />
                               </a:panel>
                               <br/>
-                              <a:panel label="Preferences" id="preferences-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true" expanded="false"><br/>
+                              <a:panel label="Preferences" id="preferences-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
                               </a:panel>
                               <br/>
-                              <a:panel label="Rules" id="rules-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true" expanded="false"><br/>
+                              <a:panel label="Rules" id="rules-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
                               </a:panel>
                               <br/>
-                              <a:panel label="Space Members" id="members-panel" border="greyround" bgcolor="#eaeaea" 
-                                       progressive="true" expanded="false"><br/>
+                              <a:panel label="Space Members" id="members-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
                               </a:panel>
                               <br/>
                            </td>

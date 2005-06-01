@@ -324,6 +324,14 @@
       
       </a:panel>
       
+      <p/>
+      
+      <a:panel id="panel4" expanded="true" progressive="true"
+               border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea"
+               label="Bordered Title Area Progressive Panel" styleClass="mainSubTitle">
+         <h:outputText id="panel4-text" value="The content of a bordered title area"/> 
+      </a:panel>
+
       <p>
       
       <%-- component evaluators --%>

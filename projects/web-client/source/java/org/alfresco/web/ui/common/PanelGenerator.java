@@ -118,5 +118,58 @@ public final class PanelGenerator
       out.write("_09.gif' width=7 height=7 alt=''></td></tr></table>");
    }
    
+   public static void generateTitledPanelMiddle(Writer out, String contextPath, String titlePanel, 
+         String contentPanel, String contentBgColor) throws IOException
+   {
+      // generate the expanded part, just under the title
+      out.write("</td><td background='");
+      out.write(contextPath);
+      out.write("/images/parts/");
+      out.write(titlePanel);
+      out.write("_06.gif'><img src='");
+      out.write(contextPath);
+      out.write("/images/parts/");
+      out.write(titlePanel);
+      out.write("_06.gif' width=7 height=7 alt=''></td></tr>");
+      
+      out.write("<tr><td width=7><img src='");
+      out.write(contextPath);
+      out.write("/images/parts/");
+      out.write(titlePanel);
+      out.write("_");
+      out.write(contentPanel);
+      out.write("_07.gif' width=7 height=7 alt=''></td>");
+      
+      out.write("<td background='");
+      out.write(contextPath);
+      out.write("/images/parts/");
+      out.write(titlePanel);
+      out.write("_08.gif'><img src='");
+      out.write(contextPath);
+      out.write("/images/parts/");
+      out.write(titlePanel);
+      out.write("_08.gif' width=7 height=7 alt=''></td>");
+      
+      out.write("<td width=7><img src='");
+      out.write(contextPath);
+      out.write("/images/parts/");
+      out.write(titlePanel);
+      out.write("_");
+      out.write(contentPanel);
+      out.write("_09.gif' width=7 height=7 alt=''></td></tr>");
+      
+      out.write("<tr><td background='");
+      out.write(contextPath);
+      out.write("/images/parts/");
+      out.write(contentPanel);
+      out.write("_04.gif'><img src='");
+      out.write(contextPath);
+      out.write("/images/parts/");
+      out.write(contentPanel);
+      out.write("_04.gif' width=7 height=7 alt=''></td><td bgcolor='");
+      out.write(contentBgColor);
+      out.write("' style='padding-top:6px;'>");
+   }
+   
    public final static String BGCOLOR_WHITE = "#FFFFFF";
 }
