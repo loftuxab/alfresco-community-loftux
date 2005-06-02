@@ -91,7 +91,8 @@ public class AddContentWizard extends AbstractWizardBean
             // TODO: deal with existing files and determine what to do from the
             //       this.overwrite member variable
             
-            // add the name, created and modified date as properties for now
+            // add the properties needed during creation - some are mandatory in the model
+            // TODO: TEMP: add the created and modified date as properties for now
             Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
             
@@ -108,7 +109,7 @@ public class AddContentWizard extends AbstractWizardBean
             properties.put(propMimeType, RepoUtils.getMimeTypeForFileName(FacesContext.getCurrentInstance(), this.fileName));
             
             QName propEncoding = QName.createQName(NamespaceService.ALFRESCO_URI, "encoding");
-            properties.put(propEncoding, "UTF-16");
+            properties.put(propEncoding, "UTF-8");
             
             // create the node to represent the node
             String assocName = this.fileName.replace('.', '-');
@@ -122,23 +123,8 @@ public class AddContentWizard extends AbstractWizardBean
             if (logger.isDebugEnabled())
                logger.debug("Created file node for file: " + this.fileName);
             
-            // add the properties to the node
-            //nodeService.setProperties(fileNodeRef, properties);
-            
             if (logger.isDebugEnabled())
                logger.debug("Set properties on file node: " + properties);
-            
-            // apply the content aspect if it's not already applied
-            if (nodeService.hasAspect(fileNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT) == false)
-            {
-               Map<QName, Serializable> props = new HashMap<QName, Serializable>(3, 1.0f);
-               props.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-               props.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-               nodeService.addAspect(fileNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, props);
-               
-               if (logger.isDebugEnabled())
-                  logger.debug("Added content aspect to file node with properties: " + props);
-            }
             
             // get a writer for the content and put the file
             ContentWriter writer = contentService.getUpdatingWriter(fileNodeRef);
