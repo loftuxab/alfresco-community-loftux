@@ -12,6 +12,7 @@ import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Aspect;
@@ -68,8 +69,12 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	private static final QName PROP3_QNAME_MANDATORY = QName.createQName(TEST_TYPE_NAMESPACE, "prop3Mandatory");
 	private static final QName PROP4_QNAME_OPTIONAL = QName.createQName(TEST_TYPE_NAMESPACE, "prop4Optional");
 	
+    private static final QName TEST_MANDATORY_ASPECT_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testMandatoryAspect");
+    private static final QName PROP5_QNAME_MANDATORY = QName.createQName(TEST_TYPE_NAMESPACE, "prop5Mandatory");
+    
 	private static final String TEST_VALUE_1 = "testValue1";
 	private static final String TEST_VALUE_2 = "testValue2";
+    private static final String TEST_VALUE_3 = "testValue3";
 	
 	private static final QName TEST_CHILD_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testChildAssocName");
 	private static final QName TEST_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testAssocName");
@@ -161,6 +166,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Create a node we can use as the destination in a copy
 		Map<QName, Serializable> destinationProps = new HashMap<QName, Serializable>();
 		destinationProps.put(PROP1_QNAME_MANDATORY, TEST_VALUE_1);			
+        destinationProps.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3);          
 		ChildAssocRef temp5 = this.nodeService.createNode(
 				this.rootNodeRef,
 				null,
@@ -180,6 +186,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		Map<QName, Serializable> result = new HashMap<QName, Serializable>();
 		result.put(PROP1_QNAME_MANDATORY, TEST_VALUE_1);
 		result.put(PROP2_QNAME_OPTIONAL, TEST_VALUE_2);
+        result.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3);
 		return result;
 	}
 	
@@ -190,37 +197,52 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	{
         M2Model model = M2Model.createModel("test:nodeoperations");
         model.createNamespace(TEST_TYPE_NAMESPACE, "test");
+        model.createImport(NamespaceService.ALFRESCO_DICTIONARY_URI, NamespaceService.ALFRESCO_DICTIONARY_PREFIX);
         model.createImport(NamespaceService.ALFRESCO_URI, NamespaceService.ALFRESCO_PREFIX);
-        
+
         M2Type testType = model.createType("test:" + TEST_TYPE_QNAME.getLocalName());
         testType.setParentName("alf:" + DictionaryBootstrap.TYPE_QNAME_CONTAINER.getLocalName());
         
         M2Property prop1 = testType.createProperty("test:" + PROP1_QNAME_MANDATORY.getLocalName());
         prop1.setMandatory(true);
+        prop1.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
         prop1.setMultiValued(false);
         
 		M2Property prop2 = testType.createProperty("test:" + PROP2_QNAME_OPTIONAL.getLocalName());
 		prop2.setMandatory(false);
+        prop2.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
 		prop2.setMandatory(false);
 		
 		M2ChildAssociation childAssoc = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_QNAME.getLocalName());
+        childAssoc.setTargetClassName("alf:base");
 		childAssoc.setTargetMandatory(false);
 		
 		M2ChildAssociation childAssoc2 = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_QNAME2.getLocalName());
+        childAssoc2.setTargetClassName("alf:base");
 		childAssoc2.setTargetMandatory(false);
 		
 		M2Association assoc = testType.createAssociation("test:" + TEST_ASSOC_QNAME.getLocalName());
+        assoc.setTargetClassName("alf:base");
 		assoc.setTargetMandatory(false);
 		
 		M2Aspect testAspect = model.createAspect("test:" + TEST_ASPECT_QNAME.getLocalName());
 		
 		M2Property prop3 = testAspect.createProperty("test:" + PROP3_QNAME_MANDATORY.getLocalName());
 		prop3.setMandatory(true);
+        prop3.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
 		prop3.setMultiValued(false);
 		
 		M2Property prop4 = testAspect.createProperty("test:" + PROP4_QNAME_OPTIONAL.getLocalName());
 		prop4.setMandatory(false);
+        prop4.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
 		prop4.setMultiValued(false);
+
+        M2Aspect testMandatoryAspect = model.createAspect("test:" + TEST_MANDATORY_ASPECT_QNAME.getLocalName());
+        M2Property prop5 = testMandatoryAspect.createProperty("test:" + PROP5_QNAME_MANDATORY.getLocalName());
+        prop5.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
+        prop5.setMandatory(true);
+
+        testType.addMandatoryAspect("test:" + TEST_MANDATORY_ASPECT_QNAME.getLocalName());
         
         dictionaryDAO.putModel(model);
 	}

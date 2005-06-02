@@ -10,12 +10,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.repo.dictionary.AspectDefinition;
 import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
+import org.alfresco.repo.dictionary.TypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.node.InvalidNodeTypeException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.node.operations.NodeOperationsServiceException;
@@ -118,33 +121,47 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
         if (sourceNodeRef != null && 
             destinationParent != null && 
 			destinationQName != null)
-        {       
-			QName sourceClassRef = this.nodeService.getType(sourceNodeRef);
-			PolicyScope copyDetails = getCopyDetails(sourceNodeRef);			
-			
-            if (sourceNodeRef.getStoreRef().equals(destinationParent.getStoreRef()) == true)
+        {
+            if (sourceNodeRef.getStoreRef().equals(destinationParent.getStoreRef()) == false)
             {
-				// Create the new node
-                ChildAssocRef destinationChildAssocRef = this.nodeService.createNode(
-                        destinationParent, 
-                        destinationAssocTypeQName,
-                        destinationQName,
-                        sourceClassRef,
-                        copyDetails.getProperties());
-                destinationNodeRef = destinationChildAssocRef.getChildRef();
-				
-				//	Apply the copy aspect to the new node	
-				Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
-				copyProperties.put(DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE, sourceNodeRef);
-				this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY, copyProperties);
-            }
-            else
-            {
-				// TODO We need to create a new node in the other store with the same id as the source
+                // TODO We need to create a new node in the other store with the same id as the source
 
                 // Error - since at the moment we do not support cross store copying
-				throw new UnsupportedOperationException("Copying nodes across stores is not currently supported.");
+                throw new UnsupportedOperationException("Copying nodes across stores is not currently supported.");
             }
+
+            // Extract Type Definition
+			QName sourceTypeRef = this.nodeService.getType(sourceNodeRef);
+            TypeDefinition typeDef = dictionaryService.getType(sourceTypeRef);
+            if (typeDef == null)
+            {
+                throw new InvalidNodeTypeException(sourceTypeRef);
+            }
+            
+            // Establish the scope of the copy
+			PolicyScope copyDetails = getCopyDetails(sourceNodeRef);
+			
+            // Create collection of properties for type and mandatory aspects
+            Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
+            properties.putAll(copyDetails.getProperties());
+            for (AspectDefinition aspectDef : typeDef.getDefaultAspects())
+            {
+                properties.putAll(copyDetails.getProperties(aspectDef.getName()));
+            }
+            
+			// Create the new node
+            ChildAssocRef destinationChildAssocRef = this.nodeService.createNode(
+                    destinationParent, 
+                    destinationAssocTypeQName,
+                    destinationQName,
+                    sourceTypeRef,
+                    properties);
+            destinationNodeRef = destinationChildAssocRef.getChildRef();
+			
+			//	Apply the copy aspect to the new node	
+			Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
+			copyProperties.put(DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE, sourceNodeRef);
+			this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY, copyProperties);
 			
 			// Copy the aspects 
 			copyAspects(destinationNodeRef, copyDetails);
@@ -221,39 +238,39 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	{
 		ClassDefinition classDefinition = this.dictionaryService.getClass(classRef);	
 		if (classDefinition != null)
-		{			
-			// Copy the properties
-			Map<QName,PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
-			for (QName propertyName : propertyDefinitions.keySet()) 
-			{
-				Serializable propValue = this.nodeService.getProperty(sourceNodeRef, propertyName);
-				copyDetails.addProperty(classRef, propertyName, propValue);
-			}			
-			
-			// Copy the associations (child and target)
-			Map<QName,AssociationDefinition> assocDefs = classDefinition.getAssociations();
-			for (AssociationDefinition assocDef : assocDefs.values()) 
-			{
-				if (assocDef.isChild() == true)
-				{
-					List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(sourceNodeRef, assocDef.getName());
-					for (ChildAssocRef childAssocRef : childAssocRefs) 
-					{
-						copyDetails.addChildAssociation(classRef, assocDef.getName(), childAssocRef);
-					}
-				}
-				else
-				{
-					List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(sourceNodeRef, assocDef.getName());
-					for (NodeAssocRef nodeAssocRef : nodeAssocRefs) 
-					{
-						copyDetails.addAssociation(classRef, assocDef.getName(), nodeAssocRef);
-					}
-				}
-			}
+		{
+            // Copy the properties
+            Map<QName,PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
+            for (QName propertyName : propertyDefinitions.keySet()) 
+            {
+                Serializable propValue = this.nodeService.getProperty(sourceNodeRef, propertyName);
+                copyDetails.addProperty(classDefinition.getName(), propertyName, propValue);
+            }           
+
+            // Copy the associations (child and target)
+            Map<QName,AssociationDefinition> assocDefs = classDefinition.getAssociations();
+            for (AssociationDefinition assocDef : assocDefs.values()) 
+            {
+                if (assocDef.isChild() == true)
+                {
+                    List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(sourceNodeRef, assocDef.getName());
+                    for (ChildAssocRef childAssocRef : childAssocRefs) 
+                    {
+                        copyDetails.addChildAssociation(classDefinition.getName(), assocDef.getName(), childAssocRef);
+                    }
+                }
+                else
+                {
+                    List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(sourceNodeRef, assocDef.getName());
+                    for (NodeAssocRef nodeAssocRef : nodeAssocRefs) 
+                    {
+                        copyDetails.addAssociation(classDefinition.getName(), assocDef.getName(), nodeAssocRef);
+                    }
+                }
+            }
 		}
 	}
-	
+    
 	/**
 	 * Copies the properties for the node type onto the destination node.
 	 * 	
