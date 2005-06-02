@@ -16,8 +16,7 @@ public class DictionaryDAOTest extends TestCase
         
         List<String> bootstrapModels = new ArrayList<String>();
         bootstrapModels.add("org/alfresco/repo/dictionary/impl/dictionary_model.xml");
-        bootstrapModels.add("org/alfresco/repo/dictionary/impl/test_model.xml");
-        bootstrapModels.add("org/alfresco/repo/dictionary/impl/content_model.xml");
+        bootstrapModels.add("org/alfresco/repo/dictionary/impl/new_content_model.xml");
         bootstrapModels.add("org/alfresco/repo/dictionary/impl/version_model.xml");
         dictionaryDAO.setBootstrapModels(bootstrapModels);
         dictionaryDAO.bootstrap();

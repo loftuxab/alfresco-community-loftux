@@ -10,7 +10,7 @@
    </imports>
    
    <namespaces>
-      <namespace uri="http://www.alfresco.org/contentmodel/1.0" prefix="alf"/>
+      <namespace uri="http://www.alfresco.org/test/contentmodel/1.0" prefix="alf"/>
    </namespaces>
 
    <types>

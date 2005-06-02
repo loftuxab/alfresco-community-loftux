@@ -1,13 +1,11 @@
 <model name="alf:contentmodel" xmlns="http://www.alfresco.org/dictionary/0.1">
 
    <!--
-      TODO: Replace with domain model from Paul
-      
-      TODO: Some base types/aspects should be split out into core
-            model e.g. root
+      Only use this model in emergencies.  It will be removed when the new content
+      model is in place and the app is and running again
    -->
 
-   <description>Alfresco Content Model</description>
+   <description>Alfresco Content Model - The old one</description>
    <author>Alfresco</author>
    <published>2005-05-30</published>
    <version>0.1</version>
