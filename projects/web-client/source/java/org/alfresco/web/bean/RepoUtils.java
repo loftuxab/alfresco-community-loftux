@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
@@ -20,6 +21,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.value.ValueConverter;
 import org.alfresco.web.bean.repository.Node;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast
@@ -184,6 +186,36 @@ public final class RepoUtils
       }
       
       return image;
+   }
+   
+   /**
+    * Return the mimetype code for the specified file name.
+    * <p>
+    * The file extension will be extracted from the filename and used to lookup the mimetype.
+    * 
+    * @param context       FacesContext
+    * @param filename      Non-null filename to process
+    * 
+    * @return mimetype for the specified filename - falls back to 'text/plain' if not found.
+    */
+   public static String getMimeTypeForFileName(FacesContext context, String filename)
+   {
+      // base the mimetype from the file extension
+      MimetypeMap mimetypeMap = (MimetypeMap)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("mimetypeMap");
+      
+      // fall back if mimetype not found
+      String mimetype = "text/plain";
+      int extIndex = filename.lastIndexOf('.');
+      if (extIndex != -1)
+      {
+         String mt = mimetypeMap.getMimetypesByExtension().get(extIndex);
+         if (mt != null)
+         {
+            mimetype = mt;
+         }
+      }
+      
+      return mimetype;
    }
    
    

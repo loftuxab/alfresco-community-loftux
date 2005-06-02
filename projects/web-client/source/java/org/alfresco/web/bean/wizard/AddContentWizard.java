@@ -20,6 +20,7 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.util.Conversion;
 import org.alfresco.web.bean.FileUploadBean;
+import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.log4j.Logger;
@@ -90,17 +91,6 @@ public class AddContentWizard extends AbstractWizardBean
             // TODO: deal with existing files and determine what to do from the
             //       this.overwrite member variable
             
-            // create the node to represent the node
-            String assocName = this.fileName.replace('.', '-');
-            ChildAssocRef assocRef = this.nodeService.createNode(containerNodeRef,
-                   null,
-                   QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
-                   DictionaryBootstrap.TYPE_QNAME_FILE);
-            NodeRef fileNodeRef = assocRef.getChildRef();
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Created file node for file: " + this.fileName);
-            
             // add the name, created and modified date as properties for now
             Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
@@ -110,12 +100,30 @@ public class AddContentWizard extends AbstractWizardBean
             
             QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
             properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
-           
+            
             QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
             properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
             
+            QName propMimeType = QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype");
+            properties.put(propMimeType, RepoUtils.getMimeTypeForFileName(FacesContext.getCurrentInstance(), this.fileName));
+            
+            QName propEncoding = QName.createQName(NamespaceService.ALFRESCO_URI, "encoding");
+            properties.put(propEncoding, "UTF-16");
+            
+            // create the node to represent the node
+            String assocName = this.fileName.replace('.', '-');
+            ChildAssocRef assocRef = this.nodeService.createNode(containerNodeRef,
+                   null,
+                   QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
+                   DictionaryBootstrap.TYPE_QNAME_FILE,
+                   properties);
+            NodeRef fileNodeRef = assocRef.getChildRef();
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Created file node for file: " + this.fileName);
+            
             // add the properties to the node
-            nodeService.setProperties(fileNodeRef, properties);
+            //nodeService.setProperties(fileNodeRef, properties);
             
             if (logger.isDebugEnabled())
                logger.debug("Set properties on file node: " + properties);
