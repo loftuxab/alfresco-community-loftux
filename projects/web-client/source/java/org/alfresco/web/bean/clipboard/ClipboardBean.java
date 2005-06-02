@@ -134,6 +134,14 @@ public class ClipboardBean
    }
    
    /**
+    * Action handler call from the browse screen to Paste All clipboard items into the current Space
+    */
+   public void pasteAll(ActionEvent event)
+   {
+      performPasteItems(-1);
+   }
+   
+   /**
     * Action handler called to paste one or all items from the clipboard
     */
    public void pasteItem(ActionEvent event)
@@ -146,6 +154,16 @@ public class ClipboardBean
          throw new IllegalStateException("Clipboard attempting paste a non existent item index: " + index);
       }
       
+      performPasteItems(index);
+   }
+   
+   /**
+    * Perform a paste for the specified clipboard item(s)
+    * 
+    * @param index      of clipboard item to paste or -1 for all
+    */
+   private void performPasteItems(int index)
+   {
       UserTransaction tx = null;
       try
       {
@@ -160,12 +178,28 @@ public class ClipboardBean
             {
                performClipboardOperation(this.items.get(i));
             }
+            // remove the cut operation item from the clipboard
+            List<ClipboardItem> newItems = new ArrayList<ClipboardItem>(this.items.size());
+            for (int i=0; i<this.items.size(); i++)
+            {
+               ClipboardItem item = this.items.get(i);
+               if (item.Mode != ClipboardStatus.CUT)
+               {
+                  newItems.add(item);
+               }
+            }
+            setItems(newItems);
             // TODO: after a paste all - remove items from the clipboard...? or not. ask linton
          }
          else
          {
             // single paste operation
-            performClipboardOperation(this.items.get(index));
+            ClipboardItem item = this.items.get(index);
+            performClipboardOperation(item);
+            if (item.Mode == ClipboardStatus.CUT)
+            {
+               this.items.remove(index);
+            }
          }
          
          // commit the transaction
@@ -191,6 +225,11 @@ public class ClipboardBean
    {
       NodeRef parentRef = new NodeRef(Repository.getStoreRef(), this.navigator.getCurrentNodeId());
       
+      // TODO: should we use primary parent here?
+      //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
+      //       It's naff backend design if we need to pass childassocref around everywhere...!
+      ChildAssocRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
+      
       if (item.Mode == ClipboardStatus.COPY)
       {
          if (logger.isDebugEnabled())
@@ -198,10 +237,6 @@ public class ClipboardBean
          
          // call the node ops service to initiate the copy
          // TODO: what should the assoc QName be?
-         // TODO: should we use primary parent here?
-         //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
-         //       It's naff backend design if we need to pass childassocref around everywhere...!
-         ChildAssocRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
          boolean copyChildren = (item.Node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE));
          NodeRef copyRef = this.nodeOperationsService.copy(item.Node.getNodeRef(), parentRef, null, assocRef.getQName(), copyChildren);
          
@@ -213,7 +248,8 @@ public class ClipboardBean
          if (logger.isDebugEnabled())
             logger.debug("Trying to move node ID: " + item.Node.getId() + " into node ID: " + parentRef.getId());
          
-         // TODO: implement when Move service is available!
+         // move the node
+         this.nodeService.moveNode(item.Node.getNodeRef(), parentRef, null, assocRef.getQName());
       }
    }
    

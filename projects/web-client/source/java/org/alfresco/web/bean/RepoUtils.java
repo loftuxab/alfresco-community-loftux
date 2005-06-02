@@ -63,6 +63,17 @@ public final class RepoUtils
       return name;
    }
    
+   /**
+    * Return the string value of a QName property based on the supplied property name.
+    * <p>
+    * If convertNull is set, the method will convert null values to the empty string.
+    * 
+    * @param props            Property map to retrieve value from
+    * @param property         The name of the property to retrieve via QName 
+    * @param convertNull      Whether to convert null values to the empty string
+    * 
+    * @return property as string value
+    */
    public static String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
    {
       String value = null;
@@ -82,6 +93,17 @@ public final class RepoUtils
       return value;
    }
    
+   /**
+    * Return the string value of a QName property based on the supplied property name.
+    * <p>
+    * If convertNull is set, the method will convert null values to the empty string.
+    * 
+    * @param row              ResultSetRow to retrieve value from
+    * @param property         The name of the property to retrieve via QName 
+    * @param convertNull      Whether to convert null values to the empty string
+    * 
+    * @return property as string value
+    */
    public static String getValueProperty(ResultSetRow row, String name, boolean convertNull)
    {
       Serializable value = row.getValue(QName.createQName(NamespaceService.ALFRESCO_URI, name));
@@ -99,6 +121,13 @@ public final class RepoUtils
       return property;
    }
    
+   /**
+    * Escape a QName value so it can be used in lucene search strings
+    * 
+    * @param qName      QName to escape
+    * 
+    * @return escaped value
+    */
    public static String escapeQName(QName qName)
    {
        String string = qName.toString();
