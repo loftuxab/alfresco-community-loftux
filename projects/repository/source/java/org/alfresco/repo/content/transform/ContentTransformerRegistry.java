@@ -12,6 +12,9 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.util.debug.CodeMonkey;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.util.Assert;
 
 /**
@@ -33,6 +36,7 @@ public class ContentTransformerRegistry
     private MimetypeMap mimetypeMap;
     /** Cache of previously used transactions */
     private Map<TransformationKey, ContentTransformer> transformationCache;
+    private short accessCount;
     /** Controls read access to the transformation cache */
     private Lock transformationCacheReadLock;
     private Lock transformationCacheWriteLock;
@@ -51,6 +55,7 @@ public class ContentTransformerRegistry
         this.transformers = transformers;
         this.mimetypeMap = mimetypeMap;
         transformationCache = new HashMap<TransformationKey, ContentTransformer>(17);
+        accessCount = 0;
         // create lock objects for access to the cache
         ReadWriteLock transformationCacheLock = new ReentrantReadWriteLock();
         transformationCacheReadLock = transformationCacheLock.readLock();
@@ -68,11 +73,16 @@ public class ContentTransformerRegistry
         try
         {
             transformationCache.clear();
-            // done
+            accessCount = 0;
         }
         finally
         {
             transformationCacheWriteLock.unlock();
+        }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Content transformation cache reset");
         }
     }
     
@@ -274,6 +284,29 @@ public class ContentTransformerRegistry
         public int hashCode()
         {
             return key.hashCode();
+        }
+    }
+
+    /**
+     * Resets the {@link ContentTransformerRegistry#resetCache() cache}.
+     * <p>
+     * It takes a <b>contentTransformerRegistry</b> job parameter.
+     * 
+     * @author Derek Hulley
+     */
+    public static class CacheResetJob implements Job
+    {
+        public static final String KEY_REGISTRY = "contentTransformerRegistry";
+        
+        public void execute(JobExecutionContext context) throws JobExecutionException
+        {
+            Object registryObj = context.getJobDetail().getJobDataMap().get(KEY_REGISTRY);
+            if (registryObj == null || !(registryObj instanceof ContentTransformerRegistry))
+            {
+                throw new AlfrescoRuntimeException("Job data must contain valid 'contentTransformerRegistry' reference");
+            }
+            ContentTransformerRegistry registry = (ContentTransformerRegistry) registryObj;
+            registry.resetCache();
         }
     }
 }

@@ -733,6 +733,29 @@
       </property>
    </bean>
 
+   <bean id="contentTransformerCacheResetTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+      <property name="jobDetail">
+         <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+            <property name="jobClass">
+               <value>org.alfresco.repo.content.transform.ContentTransformerRegistry$CacheResetJob</value>
+            </property>
+            <property name="jobDataAsMap">
+               <map>
+                  <entry key="contentTransformerRegistry">
+                     <ref bean="contentTransformerRegistry" />
+                  </entry>
+               </map>
+            </property>
+         </bean>
+      </property>
+      <property name="startDelay">
+         <value>600000</value>                     <!-- start after 10 minutes -->
+      </property>
+      <property name="repeatInterval">
+         <value>600000</value>                      <!-- repeat every 10 minutes -->
+      </property>
+   </bean>
+
    <!-- passing a list to the SchedulerFactoryBean only instantiates the first one -->   
    <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
       <property name="triggers">
@@ -740,6 +763,7 @@
             <ref local="ftsIndexerTrigger"/>
             <ref local="tempFileCleanerTrigger"/>
             <ref local="fileContentStoreCleanerTrigger"/>
+            <ref local="contentTransformerCacheResetTrigger"/>
          </list>
       </property>
    </bean>
