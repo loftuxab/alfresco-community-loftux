@@ -10,7 +10,7 @@ package org.alfresco.repo.search.impl.lucene;
 import java.util.ArrayList;
 
 import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.search.impl.lucene.analysis.PathTokenFilter;
 import org.alfresco.repo.search.impl.lucene.query.AbsoluteStructuredFieldPosition;
 import org.alfresco.repo.search.impl.lucene.query.DescendantAndSelfStructuredFieldPosition;
@@ -31,7 +31,7 @@ public class LuceneXPathHandler implements XPathHandler
 
     int absolutePosition = 0;
 
-    private NamespaceService nameSpaceService;
+    private NamespacePrefixResolver namespacePrefixResolver;
 
     private DictionaryService dictionaryService;
 
@@ -339,19 +339,19 @@ public class LuceneXPathHandler implements XPathHandler
         if ((nameSpace == null) || (nameSpace.length() == 0))
         {
 
-            if (nameSpaceService.getNamespaceURI("") == null)
+            if (namespacePrefixResolver.getNamespaceURI("") == null)
             {
                 answer.add(new AbsoluteStructuredFieldPosition(PathTokenFilter.NO_NS_TOKEN_TEXT, absolutePosition));
             }
             else
             {
-                answer.add(new AbsoluteStructuredFieldPosition(nameSpaceService.getNamespaceURI(""), absolutePosition));
+                answer.add(new AbsoluteStructuredFieldPosition(namespacePrefixResolver.getNamespaceURI(""), absolutePosition));
             }
 
         }
         else
         {
-            answer.add(new AbsoluteStructuredFieldPosition(nameSpaceService.getNamespaceURI(nameSpace), absolutePosition));
+            answer.add(new AbsoluteStructuredFieldPosition(namespacePrefixResolver.getNamespaceURI(nameSpace), absolutePosition));
         }
 
         absolutePosition++;
@@ -372,18 +372,18 @@ public class LuceneXPathHandler implements XPathHandler
         ArrayList<StructuredFieldPosition> answer = new ArrayList<StructuredFieldPosition>(2);
         if ((nameSpace == null) || (nameSpace.length() == 0))
         {
-            if (nameSpaceService.getNamespaceURI("") == null)
+            if (namespacePrefixResolver.getNamespaceURI("") == null)
             {
                 answer.add(new RelativeStructuredFieldPosition(PathTokenFilter.NO_NS_TOKEN_TEXT));
             }
             else
             {
-                answer.add(new RelativeStructuredFieldPosition(nameSpaceService.getNamespaceURI("")));
+                answer.add(new RelativeStructuredFieldPosition(namespacePrefixResolver.getNamespaceURI("")));
             }
         }
         else
         {
-            answer.add(new RelativeStructuredFieldPosition(nameSpaceService.getNamespaceURI(nameSpace)));
+            answer.add(new RelativeStructuredFieldPosition(namespacePrefixResolver.getNamespaceURI(nameSpace)));
         }
 
         if ((localName == null) || (localName.length() == 0))
@@ -455,9 +455,9 @@ public class LuceneXPathHandler implements XPathHandler
        
     }
 
-    public void setNameSpaceService(NamespaceService nameSpaceService)
+    public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
     {
-        this.nameSpaceService = nameSpaceService;
+        this.namespacePrefixResolver = namespacePrefixResolver;
     }
 
     public void setDictionaryService(DictionaryService dictionaryService)

@@ -58,7 +58,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      */
     private static final String DEFAULT_FIELD = "FTS";
 
-    private NamespaceService nameSpaceService;
+    private NamespacePrefixResolver namespacePrefixResolver;
 
     private NodeService nodeService;
 
@@ -85,7 +85,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                         map.put(qpd.getQName(), qpd);
                     }
                 }
-                parameterisedQueryString = parameterise(queryString, map, null, nameSpaceService);
+                parameterisedQueryString = parameterise(queryString, map, null, namespacePrefixResolver);
             }
             else
             {
@@ -97,7 +97,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                 try
                 {
 
-                    Query query = LuceneQueryParser.parse(parameterisedQueryString, DEFAULT_FIELD, new LuceneAnalyser(dictionaryService), nameSpaceService, dictionaryService);
+                    Query query = LuceneQueryParser.parse(parameterisedQueryString, DEFAULT_FIELD, new LuceneAnalyser(dictionaryService), namespacePrefixResolver, dictionaryService);
                     Searcher searcher = getSearcher();
 
                     Hits hits = searcher.search(query);
@@ -119,7 +119,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                 {
                     XPathReader reader = new XPathReader();
                     LuceneXPathHandler handler = new LuceneXPathHandler();
-                    handler.setNameSpaceService(nameSpaceService);
+                    handler.setNamespacePrefixResolver(namespacePrefixResolver);
                     handler.setDictionaryService(dictionaryService);
                     // TODO: Handler should have the query parameters to use in building its lucene query
                     // At the moment xpath style parameters in the PATH expression are not supported.
@@ -187,9 +187,9 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         return getSearcher(storeRef, null);
     }
 
-    public void setNamespaceService(NamespaceService nameSpaceService)
+    public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
     {
-        this.nameSpaceService = nameSpaceService;
+        this.namespacePrefixResolver = namespacePrefixResolver;
     }
 
     public boolean indexExists()

@@ -963,7 +963,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // xdoc.add(new Field("PARENT", parentBuffer.toString(), true, true,
             // true));
 
-            xdoc.add(new Field("PRIMARYPARENT", nodeService.getPrimaryParent(nodeRef).getParentRef().getId(), true, true, false));
+            ChildAssocRef primary = nodeService.getPrimaryParent(nodeRef);
+            xdoc.add(new Field("PRIMARYPARENT", primary.getParentRef().getId(), true, true, false));
             xdoc.add(new Field("TYPE", nodeService.getType(nodeRef).toString(), true, true, false));
             for (QName classRef : nodeService.getAspects(nodeRef))
             {

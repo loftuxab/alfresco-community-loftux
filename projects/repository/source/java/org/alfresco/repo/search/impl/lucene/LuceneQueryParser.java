@@ -10,10 +10,9 @@ package org.alfresco.repo.search.impl.lucene;
 import java.util.HashSet;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.TypeDefinition;
+import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.QName;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
@@ -26,7 +25,7 @@ import com.werken.saxpath.XPathReader;
 
 public class LuceneQueryParser extends QueryParser
 {
-    private NamespaceService nameSpaceService;
+    private NamespacePrefixResolver namespacePrefixResolver;
     
     private DictionaryService dictionaryService;
     
@@ -42,17 +41,17 @@ public class LuceneQueryParser extends QueryParser
      * @throws ParseException
      *             if the parsing fails
      */
-    static public Query parse(String query, String field, Analyzer analyzer, NamespaceService nameSpaceService, DictionaryService dictionaryService) throws ParseException
+    static public Query parse(String query, String field, Analyzer analyzer, NamespacePrefixResolver namespacePrefixResolver, DictionaryService dictionaryService) throws ParseException
     {
         LuceneQueryParser parser = new LuceneQueryParser(field, analyzer);
-        parser.setNameSpaceService(nameSpaceService);
+        parser.setNamespacePrefixResolver(namespacePrefixResolver);
         parser.setDictionaryService(dictionaryService);
         return parser.parse(query);
     }
 
-    public void setNameSpaceService(NamespaceService nameSpaceService)
+    public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
     {
-        this.nameSpaceService = nameSpaceService;
+        this.namespacePrefixResolver = namespacePrefixResolver;
     }
     
 
@@ -79,7 +78,7 @@ public class LuceneQueryParser extends QueryParser
             {
                 XPathReader reader = new XPathReader();
                 LuceneXPathHandler handler = new LuceneXPathHandler();
-                handler.setNameSpaceService(nameSpaceService);
+                handler.setNamespacePrefixResolver(namespacePrefixResolver);
                 handler.setDictionaryService(dictionaryService);
                 reader.setXPathHandler(handler);
                 reader.parse(queryText);
@@ -89,7 +88,7 @@ public class LuceneQueryParser extends QueryParser
             {
                 XPathReader reader = new XPathReader();
                 LuceneXPathHandler handler = new LuceneXPathHandler();
-                handler.setNameSpaceService(nameSpaceService);
+                handler.setNamespacePrefixResolver(namespacePrefixResolver);
                 handler.setDictionaryService(dictionaryService);
                 reader.setXPathHandler(handler);
                 reader.parse("//"+queryText);
@@ -155,12 +154,12 @@ public class LuceneQueryParser extends QueryParser
                     if(colonPosition == -1)
                     {
                         // use the default namespace
-                        return super.getFieldQuery("@{"+nameSpaceService.getNamespaceURI("")+"}"+field.substring(1), queryText);
+                        return super.getFieldQuery("@{"+namespacePrefixResolver.getNamespaceURI("")+"}"+field.substring(1), queryText);
                     }
                     else
                     {
                         // find the prefix
-                        return super.getFieldQuery("@{"+nameSpaceService.getNamespaceURI(field.substring(1, colonPosition))+"}"+field.substring(colonPosition+1), queryText);
+                        return super.getFieldQuery("@{"+namespacePrefixResolver.getNamespaceURI(field.substring(1, colonPosition))+"}"+field.substring(colonPosition+1), queryText);
                     }
                 }
                 else

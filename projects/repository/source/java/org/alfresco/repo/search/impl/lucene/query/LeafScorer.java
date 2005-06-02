@@ -620,7 +620,7 @@ public class LeafScorer extends Scorer
         TypeDefinition current = dictionaryService.getType(classRef);
         while (current != null)
         {
-            if (current.equals(DictionaryBootstrap.TYPE_QNAME_CATEGORY))
+            if (current.getName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORY))
             {
                 return true;
             }
@@ -642,7 +642,7 @@ public class LeafScorer extends Scorer
         AspectDefinition current = aspDef;
         while (current != null)
         {
-            if (current.equals(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION))
+            if (current.getName().equals(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION))
             {
                 return true;
             }
