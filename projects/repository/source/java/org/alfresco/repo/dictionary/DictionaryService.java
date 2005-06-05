@@ -69,6 +69,14 @@ public interface DictionaryService
      */
     ClassDefinition getClass(QName name);
     
+    
+    /**
+     * Determines whether the class is a sub-class of the specified class
+     * 
+     * @param className  the sub-class to test
+     * @param ofClassName  the class to test against
+     * @return  true => the class is a sub-class (or itself)
+     */
     boolean isSubClass(QName className, QName ofClassName);
 
     

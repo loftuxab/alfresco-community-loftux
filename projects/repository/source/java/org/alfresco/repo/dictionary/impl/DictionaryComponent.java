@@ -11,7 +11,9 @@ import org.alfresco.repo.dictionary.ModelDefinition;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.dictionary.TypeDefinition;
+import org.alfresco.repo.node.InvalidNodeTypeException;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.util.ParameterCheck;
 
 
 /**
@@ -28,6 +30,8 @@ public class DictionaryComponent implements DictionaryService
     private DictionaryDAO dictionaryDAO;
 
 
+    // TODO: Check passed arguments are valid
+    
     /**
      * Sets the Meta Model DAO
      * 
@@ -113,10 +117,41 @@ public class DictionaryComponent implements DictionaryService
 
     public boolean isSubClass(QName className, QName ofClassName)
     {
-        // TODO Auto-generated method stub
-        return true;
+        // Validate arguments
+        ParameterCheck.mandatory("className", className);
+        ParameterCheck.mandatory("ofClassName", ofClassName);
+        ClassDefinition classDef = getClass(className);
+        if (classDef == null)
+        {
+            throw new InvalidNodeTypeException(className);
+        }
+        ClassDefinition ofClassDef = getClass(ofClassName);
+        if (ofClassDef == null)
+        {
+            throw new InvalidNodeTypeException(ofClassName);
+        }
+        
+        // Only check if both ends are either a type or an aspect
+        boolean subClassOf = false;
+        if (classDef.isAspect() == ofClassDef.isAspect())
+        {
+            while (classDef != null)
+            {
+                if (classDef.equals(ofClassDef))
+                {
+                    subClassOf = true;
+                    break;
+                }
+                
+                // No match yet, so go to parent class
+                QName parentClassName = classDef.getParentName();
+                classDef = (parentClassName == null) ? null : getClass(parentClassName);
+            }
+        }        
+        return subClassOf;
     }
 
+    
     public PropertyTypeDefinition getPropertyType(QName name)
     {
         return dictionaryDAO.getPropertyType(name);

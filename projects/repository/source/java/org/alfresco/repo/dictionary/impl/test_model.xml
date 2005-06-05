@@ -1,4 +1,4 @@
-<model name="alf:contentmodel" xmlns="http://www.alfresco.org/dictionary/0.1">
+<model name="test:dictionarydaotest" xmlns="http://www.alfresco.org/dictionary/0.1">
 
    <description>Alfresco Content Model</description>
    <author>Alfresco</author>
@@ -10,18 +10,18 @@
    </imports>
    
    <namespaces>
-      <namespace uri="http://www.alfresco.org/test/contentmodel/1.0" prefix="alf"/>
+      <namespace uri="http://www.alfresco.org/test/dictionarydaotest/1.0" prefix="test"/>
    </namespaces>
 
    <types>
       
-      <type name="alf:base">
+      <type name="test:base">
          <title>Base</title>
          <description>The Base Type</description>
          <parent></parent>
          
          <properties>
-            <property name="alf:type">
+            <property name="test:type">
                <type>d:text</type>
                <protected>true</protected>
                <default></default>
@@ -29,35 +29,35 @@
          </properties>
          
          <associations>
-            <association name="alf:assoc1">
+            <association name="test:assoc1">
                <source>
                   <mandatory>true</mandatory>
                   <many>false</many>
                </source>
                <target>
-                  <class>alf:base</class>
+                  <class>test:base</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
             </association>
-            <association name="alf:assoc2">
+            <association name="test:assoc2">
                <source>
                   <mandatory>true</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:referencable</class>
+                  <class>test:referencable</class>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>
             </association>
-            <child-association name="alf:childassoc1">
+            <child-association name="test:childassoc1">
                <source>
                   <mandatory>true</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:referencable</class>
+                  <class>test:referencable</class>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>
@@ -67,15 +67,15 @@
          </associations>
          
          <mandatory-aspects>
-            <aspect>alf:referencable</aspect>
+            <aspect>test:referencable</aspect>
          </mandatory-aspects>
       </type>
    
-      <type name="alf:file">
-         <parent>alf:base</parent>
+      <type name="test:file">
+         <parent>test:base</parent>
          
          <properties>
-            <property name="alf:fileprop">
+            <property name="test:fileprop">
                <type>d:text</type>
                <protected>true</protected>
                <default></default>
@@ -84,9 +84,9 @@
          </properties>
 
          <associations>
-            <child-association name="alf:childassoc2">
+            <child-association name="test:childassoc2">
                <target>
-                  <class>alf:referencable</class>
+                  <class>test:referencable</class>
                </target>
                <child-name>fred</child-name>
                <duplicate>true</duplicate>
@@ -94,22 +94,36 @@
          </associations>
 
          <overrides>
-            <property name="alf:type">
+            <property name="test:type">
                <default>an overriden default value</default>
             </property>
          </overrides>
+      </type>
+
+      <type name="test:folder">
+         <parent>test:base</parent>
+         
+         <properties>
+            <property name="test:folderprop">
+               <type>d:text</type>
+               <protected>true</protected>
+               <default></default>
+            </property>
+
+         </properties>
+
       </type>
       
    </types>
    
    <aspects>
-      <aspect name="alf:referencable">
+      <aspect name="test:referencable">
          <title>Referencable</title>
          <description>The referencable aspect</description>
          <parent></parent>
          
          <properties>
-            <property name="alf:id">
+            <property name="test:id">
                <type>d:int</type>
                <protected>true</protected>
                <mandatory>true</mandatory>

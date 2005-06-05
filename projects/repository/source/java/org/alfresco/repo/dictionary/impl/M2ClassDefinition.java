@@ -246,4 +246,20 @@ import org.alfresco.repo.ref.QName;
         return Collections.unmodifiableMap(inheritedChildAssociations);
     }
 
+    @Override
+    public int hashCode()
+    {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (!(obj instanceof M2ClassDefinition))
+        {
+            return false;
+        }
+        return name.equals(((M2ClassDefinition)obj).name);
+    }
+
 }
