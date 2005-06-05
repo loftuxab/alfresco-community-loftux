@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
+import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.repo.rule.ParameterDefinition;
 import org.alfresco.repo.rule.ParameterType;
@@ -133,7 +134,8 @@ import org.alfresco.repo.rule.RuleServiceException;
      */
     private void initRuleTypes()
     {
-        Config ruleTypesConfig = this.configService.getConfig(RULE_TYPES_CONFIG, RULE_CONFIG_AREA);
+        Config ruleTypesConfig = this.configService.getConfig(RULE_TYPES_CONFIG, 
+              new ConfigLookupContext(RULE_CONFIG_AREA));
         ConfigElement configElement = ruleTypesConfig.getConfigElement(CE_RULE_TYPES);
         for (ConfigElement ruleTypeConfig : configElement.getChildren())
         {
@@ -192,7 +194,8 @@ import org.alfresco.repo.rule.RuleServiceException;
      */
     private void initActionDefinitions()
     {
-        Config config = this.configService.getConfig(ACTION_DEFINITIONS_CONFIG, RULE_CONFIG_AREA);
+        Config config = this.configService.getConfig(ACTION_DEFINITIONS_CONFIG, 
+              new ConfigLookupContext(RULE_CONFIG_AREA));
         ConfigElement configElement = config.getConfigElement(CE_ACTION_DEFINITIONS);
         for (ConfigElement ruleItemConfig : configElement.getChildren())
         {
@@ -213,7 +216,8 @@ import org.alfresco.repo.rule.RuleServiceException;
      */
     private void initConditionDefinitions()
     {
-        Config config = this.configService.getConfig(CONDITION_DEFINITIONS_CONFIG, RULE_CONFIG_AREA);
+        Config config = this.configService.getConfig(CONDITION_DEFINITIONS_CONFIG, 
+              new ConfigLookupContext(RULE_CONFIG_AREA));
         ConfigElement configElement = config.getConfigElement(CE_CONDITION_DEFINITIONS);
         for (ConfigElement ruleItemConfig : configElement.getChildren())
         {

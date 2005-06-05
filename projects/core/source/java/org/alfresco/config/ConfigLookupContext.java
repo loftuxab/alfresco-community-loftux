@@ -21,6 +21,28 @@ public class ConfigLookupContext
    {
       this.algorithm = new DefaultLookupAlgorithm();
    }
+   
+   /**
+    * Constructs a lookup context for the given area
+    * 
+    * @param area The area to search in
+    */
+   public ConfigLookupContext(String area)
+   {
+      this();
+      this.addArea(area);
+   }
+   
+   /**
+    * Constructs a lookup context for the list of the given areas
+    * 
+    * @param areas The list of areas to search in
+    */
+   public ConfigLookupContext(List<String> areas)
+   {
+      this();
+      this.setAreas(areas);
+   }
 
    /**
     * @return Returns the lookup algorithm, uses the default implementation if a 

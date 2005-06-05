@@ -198,9 +198,7 @@ public class XMLConfigServiceTest extends BaseTest
         // get an error
         try
         {
-            lookupContext = new ConfigLookupContext();
-            lookupContext.addArea("not-there");
-            Config notThere = svc.getConfig("Unit Test", lookupContext);
+            Config notThere = svc.getConfig("Unit Test", new ConfigLookupContext("not-there"));
             fail("Retrieving a non existent area should have thrown an exception!");
         }
         catch (ConfigException ce)

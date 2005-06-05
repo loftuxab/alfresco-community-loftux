@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
+import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.apache.commons.logging.Log;
@@ -66,7 +67,7 @@ public class MimetypeMap
         this. displaysByMimetype = new HashMap<String, String>(59);
         this.displaysByExtension = new HashMap<String, String>(59);
 
-        Config config = configService.getConfig(CONFIG_CONDITION, CONFIG_AREA);
+        Config config = configService.getConfig(CONFIG_CONDITION, new ConfigLookupContext(CONFIG_AREA));
         ConfigElement mimetypesElement = config.getConfigElement(ELEMENT_MIMETYPES);
         List<ConfigElement> mimetypes = mimetypesElement.getChildren();
         int count = 0;
