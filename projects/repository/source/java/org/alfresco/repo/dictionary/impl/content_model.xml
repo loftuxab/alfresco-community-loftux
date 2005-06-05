@@ -37,7 +37,7 @@
          <title>Folder</title>
          <parent>alf:cmobject</parent>
          <properties>
-            <property name="alf:orderedhildren">
+            <property name="alf:orderedchildren">
                <type>d:boolean</type>
             </property>
          </properties>
