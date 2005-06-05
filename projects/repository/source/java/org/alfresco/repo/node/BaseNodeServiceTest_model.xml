@@ -1,0 +1,52 @@
+<model name="test:contentmodel" xmlns="http://www.alfresco.org/dictionary/0.1">
+
+   <description>Test Model for NodeService tests</description>
+   <author>Alfresco</author>
+   <published>2005-06-05</published>
+   <version>0.1</version>
+
+   <imports>
+      <import uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
+      <import uri="http://www.alfresco.org/1.0" prefix="alf"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/test/BaseNodeServiceTest" prefix="test"/>
+   </namespaces>
+
+   <types>
+      <type name="test:content">
+         <title>Content</title>
+         <parent>alf:base</parent>
+         <properties>
+            <property name="test:contentUrl">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:mimetype">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+         <mandatory-aspects>
+            <aspect>test:titled</aspect>
+         </mandatory-aspects>
+      </type>
+   </types>
+   
+   <aspects>
+      <aspect name="test:titled">
+         <title>Titled</title>
+         <properties>
+            <property name="test:title">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:description">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </aspect>
+   </aspects>
+
+</model>

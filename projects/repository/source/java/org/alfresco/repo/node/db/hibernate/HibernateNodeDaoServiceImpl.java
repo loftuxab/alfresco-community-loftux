@@ -85,7 +85,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(store);
         // create and assign a root node
-        RealNode rootNode = newRealNode(store, DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+        RealNode rootNode = newRealNode(store, DictionaryBootstrap.TYPE_QNAME_STOREROOT);
         store.setRootNode(rootNode);
         // done
         return store;

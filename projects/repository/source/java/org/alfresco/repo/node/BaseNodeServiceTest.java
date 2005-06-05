@@ -1,9 +1,9 @@
 package org.alfresco.repo.node;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +12,12 @@ import java.util.Set;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.dictionary.impl.DictionaryComponent;
+import org.alfresco.repo.dictionary.impl.DictionaryDAO;
+import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
@@ -28,7 +30,6 @@ import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.repo.search.QueryParameterDefinition;
 import org.alfresco.util.BaseSpringTest;
-import org.alfresco.util.Conversion;
 import org.alfresco.util.debug.CodeMonkey;
 import org.hibernate.Session;
 
@@ -50,6 +51,10 @@ import com.vladium.utils.timing.TimerFactory;
  */
 public abstract class BaseNodeServiceTest extends BaseSpringTest
 {
+    public static final String NAMESPACE = "http://www.alfresco.org/test/BaseNodeServiceTest";
+    public static final String TEST_PREFIX = "alftest";
+    public static final QName TYPE_QNAME_TEST_CONTENT = QName.createQName(NAMESPACE, "content");
+    public static final QName ASPECT_QNAME_TEST_TITLED = QName.createQName(NAMESPACE, "titled");
     
     private static ITimer timer = TimerFactory.newTimer();
     
@@ -62,7 +67,23 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
 
     protected void onSetUpInTransaction() throws Exception
     {
-        dictionaryService = getDictionaryService();
+        DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
+        // load the system model
+        ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
+        InputStream modelStream = cl.getResourceAsStream("org/alfresco/repo/dictionary/impl/content_model.xml");
+        assertNotNull(modelStream);
+        M2Model model = M2Model.createModel(modelStream);
+        dictionaryDao.putModel(model);
+        // load the test model
+        modelStream = cl.getResourceAsStream("org/alfresco/repo/node/BaseNodeServiceTest_model.xml");
+        assertNotNull(modelStream);
+        model = M2Model.createModel(modelStream);
+        dictionaryDao.putModel(model);
+        
+        DictionaryComponent dictionary = new DictionaryComponent();
+        dictionary.setDictionaryDAO(dictionaryDao);
+        dictionaryService = dictionary;
+        
         nodeService = getNodeService();
         contentService = getContentService();
         
@@ -72,14 +93,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
     }
-    
-    /**
-     * Usually just implemented by fetching the bean directly from the bean factory.
-
-     * @return Returns the implementation of <code>DictionaryService</code> to be
-     *      used for this test.
-     */
-    protected abstract DictionaryService getDictionaryService();
     
     /**
      * Usually just implemented by fetching the bean directly from the bean factory,
@@ -116,7 +129,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      * Apart from the root node having the root aspect, node 6 (<b>n6</b>) also has the
      * root aspect.
      * <p>
-     * The namespace URI for all associations is <b>{@link NamespaceService.alfresco_TEST_URI}</b>.
+     * The namespace URI for all associations is <b>{@link BaseNodeServiceTest#NAMESPACE}</b>.
      * <p>
      * The naming convention is:
      * <pre>
@@ -135,12 +148,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     protected Map<QName, ChildAssocRef> buildNodeGraph() throws Exception
     {
-        String ns = NamespaceService.ALFRESCO_TEST_URI;
+        String ns = BaseNodeServiceTest.NAMESPACE;
         QName qname = null;
         ChildAssocRef assoc = null;
         Map<QName, ChildAssocRef> ret = new HashMap<QName, ChildAssocRef>(13);
-        
-        
         
         // LEVEL 0
 
@@ -158,8 +169,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // LEVEL 2
         
         Map<QName, Serializable> attributes = new HashMap<QName, Serializable>();
-        attributes.put(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "animal"), "monkey");
-        attributes.put(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "reference"), n2.toString());
+        attributes.put(QName.createQName(ns, "animal"), "monkey");
+        attributes.put(QName.createQName(ns, "reference"), n2.toString());
         
         qname = QName.createQName(ns, "n1_p_n3");
         assoc = nodeService.createNode(n1, null, qname, DictionaryBootstrap.TYPE_QNAME_CONTAINER, attributes);
@@ -250,6 +261,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // make sure that it has the root aspect
         boolean isRoot = nodeService.hasAspect(storeRootNode, DictionaryBootstrap.ASPECT_QNAME_ROOT);
         assertTrue("Root node of store does not have root aspect", isRoot);
+        // and is of the correct type
+        QName rootType = nodeService.getType(storeRootNode);
+        assertEquals("Store root node of incorrect type", DictionaryBootstrap.TYPE_QNAME_STOREROOT, rootType);
     }
     
     public void testExists() throws Exception
@@ -278,7 +292,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     {
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 null,
-                QName.createQName("pathA"), DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+                QName.createQName("pathA"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
         // get the type
         QName type = nodeService.getType(nodeRef);
@@ -315,14 +330,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         ChildAssocRef assocRef = nodeService.createNode(
                 rootNodeRef,
                 null,
-                QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test-content"),
-                DictionaryBootstrap.TYPE_QNAME_BASE);
+                QName.createQName(BaseNodeServiceTest.NAMESPACE, "test-container"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
         // add the content aspect to the node, but don't supply any properties
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(20);
         try
         {
-            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
+            nodeService.addAspect(nodeRef, BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED, properties);
             fail("Failed to detect inadequate properties for aspect");
         }
         catch (PropertyException e)
@@ -330,15 +345,15 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             // expected
         }
         // get the properties required for the aspect
-        fillProperties(DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
+        fillProperties(BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED, properties);
         // get the node properties before
         Map<QName, Serializable> propertiesBefore = nodeService.getProperties(nodeRef);
         // add the aspect
-        nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
+        nodeService.addAspect(nodeRef, BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED, properties);
         // get the properties after and check
         Map<QName, Serializable> propertiesAfter = nodeService.getProperties(nodeRef);
         assertEquals("Aspect properties not added",
-                propertiesBefore.size() + 3,
+                propertiesBefore.size() + 2,
                 propertiesAfter.size());
         
         // attempt to override node properties with insufficient properties
@@ -355,17 +370,16 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         
         // check that we know that the aspect is present
         Set<QName> aspects = nodeService.getAspects(nodeRef);
-        assertEquals("Incorrect number of aspects", 1, aspects.size());
-        assertTrue("Content aspect not present",
-                aspects.contains(DictionaryBootstrap.ASPECT_QNAME_CONTENT));
+        assertTrue("Titled aspect not present",
+                aspects.contains(BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED));
         
         // check that hasAspect works
-        boolean hasAspect = nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT);
+        boolean hasAspect = nodeService.hasAspect(nodeRef, BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED);
         assertTrue("Aspect not confirmed to be on node", hasAspect);
         
         // remove the aspect
-        nodeService.removeAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT);
-        hasAspect = nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT);
+        nodeService.removeAspect(nodeRef, BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED);
+        hasAspect = nodeService.hasAspect(nodeRef, BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED);
         assertFalse("Aspect not removed from node", hasAspect);
         
         // check that the associated properties were removed
@@ -375,42 +389,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 propertiesAfter.size());
     }
     
-    public void testSpaceAspect() throws Exception
-    {
-       // create a folder node
-        ChildAssocRef assocRef = nodeService.createNode(
-                rootNodeRef,
-                null,
-                QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "test-space"),
-                DictionaryBootstrap.TYPE_QNAME_FOLDER);
-        NodeRef nodeRef = assocRef.getChildRef();
-        
-        // define properties required for the space aspect
-        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-        
-        QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
-        Date now = new Date();
-        properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
-        
-        QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
-        properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
-        
-        QName propIcon = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
-        properties.put(propIcon, "space.gif");
-        
-        QName propDescription = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
-        properties.put(propDescription, "Short description");
-        
-        QName propSpaceType = QName.createQName(NamespaceService.ALFRESCO_URI, "spacetype");
-        properties.put(propSpaceType, "container");
-        
-        // try and add the aspect to the folder node
-        nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_SPACE, properties);
-        
-        Set<QName> aspects = nodeService.getAspects(nodeRef);
-        assertEquals("There should only be 1 aspect applied", 1, aspects.size());
-    }
-
     public void testCreateNodeNoProperties() throws Exception
     {
         // flush to ensure that the pure JDBC query will work
@@ -425,18 +403,17 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     }
     
     /**
-     * @see DictionaryBootstrap#ASPECT_CONTENT
-     * @see DictionaryBootstrap#TYPE_CONTENT
+     * @see #ASPECT_QNAME_TEST_TITLED
      */
-    public void testCreateNodeWithAspects() throws Exception
+    public void testCreateNodeWithProperties() throws Exception
     {
         try
         {
             ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                     null,
-                    QName.createQName("MyContent"),
-                    DictionaryBootstrap.TYPE_QNAME_CONTENT);
-            fail("Failed to detect missing properties for required aspect");
+                    QName.createQName("MyContentNode"),
+                    TYPE_QNAME_TEST_CONTENT);
+            fail("Failed to detect missing properties for type");
         }
         catch (PropertyException e)
         {
@@ -444,23 +421,24 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         // fill properties
-        fillProperties(DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
+        fillProperties(TYPE_QNAME_TEST_CONTENT, properties);
+        fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
         
         // create node for real
         ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
                 null,
                 QName.createQName("MyContent"),
-                DictionaryBootstrap.TYPE_QNAME_CONTENT,
+                TYPE_QNAME_TEST_CONTENT,
                 properties);
         NodeRef nodeRef = assocRef.getChildRef();
-        // check that the content aspect is present
-        assertTrue("Content aspect not present",
-                nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
+        // check that the titled aspect is present
+        assertTrue("Titled aspect not present",
+                nodeService.hasAspect(nodeRef, ASPECT_QNAME_TEST_TITLED));
         
         // attempt to remove the aspect
         try
         {
-            nodeService.removeAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT);
+            nodeService.removeAspect(nodeRef, ASPECT_QNAME_TEST_TITLED);
             fail("Failed to prevent removal of type-required aspect");
         }
         catch (InvalidAspectException e)
@@ -622,12 +600,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetParentAssocs() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        ChildAssocRef n3pn6Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n3_p_n6"));
-        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n5_p_n7"));
-        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n6_p_n8"));
-        ChildAssocRef n7n8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n7_n8"));
+        ChildAssocRef n3pn6Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n3_p_n6"));
+        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n7"));
+        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
+        ChildAssocRef n7n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n7_n8"));
         // get a child node's parents
-        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n6_p_n8")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8")).getChildRef();
         List<ChildAssocRef> parentAssocs = nodeService.getParentAssocs(n8Ref);
         assertEquals("Incorrect number of parents", 2, parentAssocs.size());
         assertTrue("Expected assoc not found", parentAssocs.contains(n6pn8Ref));
@@ -645,7 +623,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetChildAssocs() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n1Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI,"root_p_n1")).getChildRef();
+        NodeRef n1Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE,"root_p_n1")).getChildRef();
         
         // get the parent node's children
         Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
@@ -655,8 +633,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testMoveNode() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n5_p_n7"));
-        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n6_p_n8"));
+        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n7"));
+        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
         NodeRef n5Ref = n5pn7Ref.getParentRef();
         NodeRef n6Ref = n6pn8Ref.getParentRef();
         NodeRef n8Ref = n6pn8Ref.getChildRef();
@@ -665,11 +643,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 n8Ref,
                 n5Ref,
                 null,
-                QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n5_p_n8"));
+                QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n8"));
         // check that n6 is no longer the parent
         List<ChildAssocRef> n6ChildRefs = nodeService.getChildAssocs(
                 n6Ref,
-                QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n6_p_n8"));
+                QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
         assertEquals("Primary child assoc is still present", 0, n6ChildRefs.size());
         // check that n5 is the parent
         ChildAssocRef checkRef = nodeService.getPrimaryParent(n8Ref);
@@ -684,17 +662,18 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     private NodeAssocRef createAssociation() throws Exception
     {
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-        fillProperties(DictionaryBootstrap.TYPE_QNAME_REFERENCE, properties);
+        fillProperties(TYPE_QNAME_TEST_CONTENT, properties);
+        fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
         
         ChildAssocRef childAssocRef = nodeService.createNode(rootNodeRef,
                 null,
                 QName.createQName(null, "N1"),
-                DictionaryBootstrap.TYPE_QNAME_BASE);
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         NodeRef sourceRef = childAssocRef.getChildRef();
         childAssocRef = nodeService.createNode(rootNodeRef,
                 null,
                 QName.createQName(null, "N2"),
-                DictionaryBootstrap.TYPE_QNAME_REFERENCE,
+                TYPE_QNAME_TEST_CONTENT,
                 properties);
         NodeRef targetRef = childAssocRef.getChildRef();
         
@@ -774,12 +753,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetPath() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI,"n6_p_n8")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE,"n6_p_n8")).getChildRef();
 
         // get the primary node path for n8
         Path path = nodeService.getPath(n8Ref);
         assertEquals("Primary path incorrect",
-                "/{" + NamespaceService.ALFRESCO_TEST_URI + "}root_p_n1/{" + NamespaceService.ALFRESCO_TEST_URI + "}n1_p_n3/{" + NamespaceService.ALFRESCO_TEST_URI + "}n3_p_n6/{" + NamespaceService.ALFRESCO_TEST_URI + "}n6_p_n8",
+                "/{" + BaseNodeServiceTest.NAMESPACE + "}root_p_n1/{" + BaseNodeServiceTest.NAMESPACE + "}n1_p_n3/{" + BaseNodeServiceTest.NAMESPACE + "}n3_p_n6/{" + BaseNodeServiceTest.NAMESPACE + "}n6_p_n8",
                 path.toString());
     }
     
@@ -789,8 +768,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetPaths() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        NodeRef n6Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI,"n3_p_n6")).getChildRef();
-        NodeRef n8Ref = assocRefs.get(QName.createQName(NamespaceService.ALFRESCO_TEST_URI,"n6_p_n8")).getChildRef();
+        NodeRef n6Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n3_p_n6")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8")).getChildRef();
         
         // get all paths for the root node
         Collection<Path> paths = nodeService.getPaths(rootNodeRef, false);
@@ -846,17 +825,17 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testNodeXPath() throws Exception
     {
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        QName qname = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "n2_p_n4");
+        QName qname = QName.createQName(BaseNodeServiceTest.NAMESPACE, "n2_p_n4");
         
         NodeServiceXPath xpath;
         List list;
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
-        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+//        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         
         xpath = new NodeServiceXPath("//.[@alftest:animal='monkey']", nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
       
@@ -886,29 +865,31 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals(11, list.size());
         
         xpath = new NodeServiceXPath("alftest:root_p_n1", nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath("*//.[@alftest:animal]", nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath("*//.[@alftest:animal='monkey']", nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath("//.[@alftest:animal='monkey']", nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
         
-        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:test", namespacePrefixResolver), dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT), true, "monkey");
-        xpath = new NodeServiceXPath("//.[@alftest:animal=$alf:test]", nodeService, namespacePrefixResolver, new QueryParameterDefinition[]{paramDef}, false);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
-        xpath.addNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(
+                QName.createQName("alftest:test", namespacePrefixResolver),
+                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT), true, "monkey");
+        xpath = new NodeServiceXPath("//.[@alftest:animal=$alftest:test]", nodeService, namespacePrefixResolver, new QueryParameterDefinition[]{paramDef}, false);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX,   BaseNodeServiceTest.NAMESPACE);
+//        xpath.addNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
         
@@ -925,18 +906,18 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals(2, list.size());
         
         xpath = new NodeServiceXPath("//@alftest:animal", nodeService, namespacePrefixResolver, null, true);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(assocRefs.get(qname));
         assertEquals(1, list.size());
         assertTrue(list.get(0) instanceof DocumentNavigator.Property);
         
         xpath = new NodeServiceXPath("//@alftest:reference", nodeService, namespacePrefixResolver, null, true);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(assocRefs.get(qname));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath("deref(/alftest:root_p_n1/alftest:n1_p_n3/@alftest:reference, '')", nodeService, namespacePrefixResolver, null, true);
-        xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(assocRefs.get(qname));
         assertEquals(1, list.size());
         
@@ -948,8 +929,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
-        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+//        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         
         List<ChildAssocRef> answer =  nodeService.selectNodes(rootNodeRef, "*", null, namespacePrefixResolver, false);
         assertEquals(2, answer.size());
@@ -963,8 +944,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
-        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+//        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         
         List<ChildAssocRef> answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, 'monkey')", null, namespacePrefixResolver, false);
         assertEquals(0, answer.size());
@@ -1035,7 +1016,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
 //    
 //    private Map<NodeRef, QName> createLevel(NodeRef container, String root, String filePrefix, String directoryPrefix)
 //    {
-//        String ns = NamespaceService.ALFRESCO_TEST_URI;
+//        String ns = BaseNodeServiceTest.NAMESPACE;
 //        QName qname = null;
 //        ChildAssocRef assoc = null;
 //        Map<NodeRef, QName> ret = new HashMap<NodeRef, QName>(10);

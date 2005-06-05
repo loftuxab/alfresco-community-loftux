@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.repo.node.NodeService;
@@ -29,11 +28,6 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
     private static StoreRef myStoreRef;
 
     private static NodeRef myRootNode;
-
-    protected DictionaryService getDictionaryService()
-    {
-        return (DictionaryService) applicationContext.getBean("dictionaryService");
-    }
 
     protected NodeService getNodeService()
     {
@@ -78,7 +72,7 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
+        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         
         List<ChildAssocRef> answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, '*monkey')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());

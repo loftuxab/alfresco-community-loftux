@@ -33,12 +33,16 @@ public class DictionaryBootstrap
     public static final QName CHILD_ASSOC_CONTENTS = QName.createQName(NamespaceService.ALFRESCO_URI, "contents");
 
     // Content type constants
-    public static final QName QNAME_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "content");
     public static final QName PROP_QNAME_CONTENT_URL = QName.createQName(NamespaceService.ALFRESCO_URI, "contentUrl");
     public static final QName PROP_QNAME_MIME_TYPE = QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype");
     public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.ALFRESCO_URI, "encoding");
     public static final QName PROP_QNAME_SIZE = QName.createQName(NamespaceService.ALFRESCO_URI, "size");
     
+    
+    // title aspect
+    public static final QName ASPECT_QNAME_TITLED = QName.createQName(NamespaceService.ALFRESCO_URI, "titled");
+    public static final QName PROP_QNAME_TITLE = QName.createQName(NamespaceService.ALFRESCO_URI, "title");
+    public static final QName PROP_QNAME_DESCRIPTION = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
     
     // Categories and roots
     
