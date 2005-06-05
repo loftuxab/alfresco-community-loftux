@@ -184,7 +184,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 QName.createQName("{test}MyVersionableNode"),
                 TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, new HashMap<QName, Serializable>());
         
         Map<QName, Serializable> properties = this.dbNodeService.getProperties(nodeRef);
         properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
@@ -206,7 +206,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_1,
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(child1, DictionaryBootstrap.ASPECT_QNAME_VERSION, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(child1, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, new HashMap<QName, Serializable>());
         assertNotNull(child1);
         this.versionableNodes.put(child1.getId(), child1);
         NodeRef child2 = this.dbNodeService.createNode(
@@ -216,7 +216,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_2,
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(child2, DictionaryBootstrap.ASPECT_QNAME_VERSION, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(child2, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, new HashMap<QName, Serializable>());
         assertNotNull(child2);
         this.versionableNodes.put(child2.getId(), child2);
         

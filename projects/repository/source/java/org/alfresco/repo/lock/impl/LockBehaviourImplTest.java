@@ -79,7 +79,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
                 QName.createQName("{}ParentNode"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.nodeRef);
         
         // Create a node with no lockAspect
@@ -200,7 +200,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 	public void testVersionServiceLockBehaviour()
 	{
 		// Add the version aspect to the node
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION, null);
+		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, null);
 		
 		try
 		{
@@ -275,7 +275,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		Map<QName, Serializable> propMap = new HashMap<QName, Serializable>();
 		propMap.put(QName.createQName("{test}prop2"), "value2");
 		this.nodeService.setProperties(this.nodeRef, propMap);
-		this.nodeService.removeAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION);
+		this.nodeService.removeAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);
 		// TODO there are various other calls that could be more vigirously checked
 		
 		// Lock the node as the 'bad' user

@@ -461,7 +461,7 @@ public class CheckinCheckoutBean
             {
                this.versionOperationsService.cancelCheckout(node.getNodeRef());
             }
-            else if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCK))
+            else if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE))
             {
                // TODO: is this possible? as currently only the workingcopy aspect has the copyReference
                //       attribute - this means we cannot find out where the copy is to cancel it!

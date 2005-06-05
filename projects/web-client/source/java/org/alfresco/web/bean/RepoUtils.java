@@ -157,7 +157,7 @@ public final class RepoUtils
    public static Boolean isNodeLocked(Node node, LockService lockService, NodeRef ref)
    {
       Boolean locked = Boolean.FALSE;
-      if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCK))
+      if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE))
       {
          // TODO: replace username with real user name ref here!
          LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);

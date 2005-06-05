@@ -74,7 +74,7 @@
                <mandatory>false</mandatory>
             </property>
             <property name="alf:size">
-               <!-- This property should be system maintained and mandatory -->
+               <!-- This property should be system maintained -->
                <type>d:long</type>
                <mandatory>false</mandatory>
             </property>

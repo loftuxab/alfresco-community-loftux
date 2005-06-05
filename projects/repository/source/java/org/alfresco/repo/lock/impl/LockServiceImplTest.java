@@ -68,7 +68,7 @@ public class LockServiceImplTest extends BaseSpringTest
                 QName.createQName("{}ParentNode"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.parentNode, DictionaryBootstrap.ASPECT_QNAME_LOCK, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.parentNode, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.parentNode);
         
         // Add some children to the node
@@ -78,7 +78,7 @@ public class LockServiceImplTest extends BaseSpringTest
                 QName.createQName("{}ChildNode1"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.childNode1, DictionaryBootstrap.ASPECT_QNAME_LOCK, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.childNode1, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.childNode1);
         this.childNode2 = this.nodeService.createNode(
                 this.parentNode,
@@ -86,7 +86,7 @@ public class LockServiceImplTest extends BaseSpringTest
                 QName.createQName("{}ChildNode2"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.childNode2, DictionaryBootstrap.ASPECT_QNAME_LOCK, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.childNode2, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.childNode2);
         
         // Create a node with no lockAspect

@@ -423,7 +423,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	{
 		Version version = null;
 		
-		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION) == true)
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE) == true)
 		{
 			VersionHistory versionHistory = getVersionHistory(nodeRef);
 			if (versionHistory != null)
@@ -910,7 +910,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     private void checkForVersionAspect(NodeRef nodeRef)
        throws AspectMissingException
     {
-        QName aspectRef = DictionaryBootstrap.ASPECT_QNAME_VERSION;
+        QName aspectRef = DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE;
         
         if (this.nodeService.hasAspect(nodeRef, aspectRef) == false)
         {

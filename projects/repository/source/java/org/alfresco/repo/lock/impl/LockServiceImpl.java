@@ -77,27 +77,27 @@ public class LockServiceImpl implements LockService
         // Register the various class behaviours to enable lock checking
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateVersion"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));	
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeUpdate"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDelete"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));
 		
 		// Register onCopy class behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "onCopy"));
 		
 		// Register the onCreateVersion behavior for the version aspect
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCK,
+				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "onCreateVersion"));
     }
     
@@ -284,9 +284,9 @@ public class LockServiceImpl implements LockService
     private void checkForLockApsect(NodeRef nodeRef)
         throws AspectMissingException
     {
-        if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK) == false)
+        if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE) == false)
         {
-            throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_LOCK, nodeRef);
+            throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, nodeRef);
         }
     }
 	
@@ -357,7 +357,7 @@ public class LockServiceImpl implements LockService
 	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Add the lock aspect, but do not copy any of the properties
-		copyDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_LOCK);
+		copyDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE);
 	}
 	
 	/**
@@ -378,6 +378,6 @@ public class LockServiceImpl implements LockService
 			PolicyScope nodeDetails)
 	{
 		// Add the lock aspect, but do not version the property values
-		nodeDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_LOCK);
+		nodeDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE);
 	}
 }

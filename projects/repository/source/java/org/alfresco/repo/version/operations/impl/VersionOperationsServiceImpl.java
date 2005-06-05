@@ -151,15 +151,15 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		// TODO should this be done here ??
 		
 		// Apply the lock aspect if required
-		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK) == false)
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE) == false)
 		{
-			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK, null);
+			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, null);
 		}
 		
 		// Apply the version aspect if required
-		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION) == false)
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE) == false)
 		{
-			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION, null);
+			this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, null);
 		}
 		
 		// Make the working copy
@@ -222,7 +222,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		}
 		
 		// Check that the working node still has the copy aspect applied
-		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY) == true)
+		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM) == true)
 		{
 			// Try and get the origional node reference
 			nodeRef = (NodeRef)this.nodeService.getProperty(workingCopyNodeRef, DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE);
@@ -259,7 +259,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		else
 		{
 			// Error since the copy aspect is missing
-			throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_COPY, workingCopyNodeRef);
+			throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM, workingCopyNodeRef);
 		}
 		
 		return nodeRef;
@@ -301,7 +301,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		}
 		
 		// Ensure that the node has the copy aspect
-		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY) == true)
+		if (this.nodeService.hasAspect(workingCopyNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM) == true)
 		{
 			// Get the origional node
 			nodeRef = (NodeRef)this.nodeService.getProperty(workingCopyNodeRef, DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE);
@@ -322,7 +322,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		else
 		{
 			// Error since the copy aspect is missing
-			throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_COPY, workingCopyNodeRef);
+			throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM, workingCopyNodeRef);
 		}
 		
 		return nodeRef;

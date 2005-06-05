@@ -334,7 +334,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 			if (sameStore == true)
 			{
 				// Check that the copy aspect has been applied to the copy
-				boolean hasCopyAspect = this.nodeService.hasAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY);
+				boolean hasCopyAspect = this.nodeService.hasAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM);
 				assertTrue(hasCopyAspect);
 				NodeRef copyNodeRef = (NodeRef)this.nodeService.getProperty(destinationNodeRef, DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE);
 				assertNotNull(copyNodeRef);

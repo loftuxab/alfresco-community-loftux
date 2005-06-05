@@ -205,7 +205,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         
         boolean test2 = this.lightWeightVersionStoreNodeService.hasAspect(
                 version.getNodeRef(),
-                DictionaryBootstrap.ASPECT_QNAME_VERSION);
+                DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);
         assertTrue(test2);
     }
 

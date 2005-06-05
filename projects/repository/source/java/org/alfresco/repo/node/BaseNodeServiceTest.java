@@ -288,12 +288,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     /**
      * Fills the given property map with some values according to the property definitions on the given class
      */
-    protected void fillProperties(QName classRef, Map<QName, Serializable> properties)
+    protected void fillProperties(QName qname, Map<QName, Serializable> properties)
     {
-        ClassDefinition classDef = dictionaryService.getClass(classRef);
+        ClassDefinition classDef = dictionaryService.getClass(qname);
         if (classDef == null)
         {
-            throw new RuntimeException("No such class: " + classRef);
+            throw new RuntimeException("No such class: " + qname);
         }
         Map<QName,PropertyDefinition> propertyDefs = classDef.getProperties();
         // make up a property value for each property

@@ -87,8 +87,8 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		contentWriter.putContent(CONTENT_1);	
 		
 		// Add the lock and version aspects to the created node
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSION, null);
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCK, null);		
+		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, null);
+		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, null);		
 	}
 	
 	/**
@@ -127,7 +127,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		
 		// Ensure that the working copy and copy aspect has been applied
 		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));	
-		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_QNAME_COPY));
+		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM));
 		
 		// Ensure that the content has been copied correctly
 		ContentReader contentReader = this.contentService.getReader(this.nodeRef);

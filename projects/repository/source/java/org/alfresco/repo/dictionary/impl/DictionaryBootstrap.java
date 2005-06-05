@@ -19,13 +19,13 @@ public class DictionaryBootstrap
     public static final QName PROP_QNAME_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_REFERENCE);
       
 	// Copy aspect constants
-	public static final String ASPECT_NAME_COPY = "copy";
-	public static final QName ASPECT_QNAME_COPY = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_COPY);
+	public static final String ASPECT_NAME_COPIEDFROM = "copiedfrom";
+	public static final QName ASPECT_QNAME_COPIEDFROM = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_COPIEDFROM);
 	public static final String PROP_COPY_REFERENCE = "copyReference";
 	public static final QName PROP_QNAME_COPY_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_COPY_REFERENCE);
 	
 	// Working copy aspect contants
-	public static final String ASPECT_NAME_WORKING_COPY = "workingCopy";
+	public static final String ASPECT_NAME_WORKING_COPY = "workingcopy";
 	public static final QName ASPECT_QNAME_WORKING_COPY = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_WORKING_COPY);
 	
     // Container type constants
@@ -51,10 +51,10 @@ public class DictionaryBootstrap
     public static final QName TYPE_QNAME_CATEGORYROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "category_root");  
     
 	/**
-     * Lock aspect QName and ClassRef
+     * Lock aspect QName
      */
-    public final static String ASPECT_LOCK = "lock";
-    public final static QName ASPECT_QNAME_LOCK = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_LOCK);
+    public final static String ASPECT_LOCKABLE = "lockable";
+    public final static QName ASPECT_QNAME_LOCKABLE = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_LOCKABLE);
     
     /**
      * Lock aspect attribute names
@@ -67,8 +67,8 @@ public class DictionaryBootstrap
 	/**
 	 * Version aspect name and attributes
 	 */
-	public static final String ASPECT_VERSION = "version";
-	public static final QName ASPECT_QNAME_VERSION = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_VERSION);
+	public static final String ASPECT_VERSIONABLE = "versionable";
+	public static final QName ASPECT_QNAME_VERSIONABLE = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_VERSIONABLE);
 	public static final String PROP_CURRENT_VERSION_LABEL = "currentVersionLabel";
 	public static final QName PROP_QNAME_CURRENT_VERSION_LABEL = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_CURRENT_VERSION_LABEL);
 

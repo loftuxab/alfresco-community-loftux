@@ -102,13 +102,13 @@ public abstract class AbstractVersionServiceImpl
 		// Register the copy behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
-				DictionaryBootstrap.ASPECT_QNAME_VERSION,
+				DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE,
 				new JavaBehaviour(this, "onCopy"));
 		
 		// Register the onCreateVersion behavior for the version aspect
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
-				DictionaryBootstrap.ASPECT_QNAME_VERSION,
+				DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE,
 				new JavaBehaviour(this, "onCreateVersion"));
     }
 	
@@ -125,7 +125,7 @@ public abstract class AbstractVersionServiceImpl
 	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Add the version aspect, but do not copy any of the properties
-		copyDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_VERSION);
+		copyDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);
 	}
 	
 	/**

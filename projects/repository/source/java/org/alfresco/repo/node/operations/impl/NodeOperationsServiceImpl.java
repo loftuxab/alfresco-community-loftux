@@ -101,7 +101,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 		// Register policy behaviours
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
-				DictionaryBootstrap.ASPECT_QNAME_COPY,
+				DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM,
 				new JavaBehaviour(this, "copyAspectOnCopy"));
 	}
 	
@@ -161,7 +161,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 			//	Apply the copy aspect to the new node	
 			Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
 			copyProperties.put(DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE, sourceNodeRef);
-			this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPY, copyProperties);
+			this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM, copyProperties);
 			
 			// Copy the aspects 
 			copyAspects(destinationNodeRef, copyDetails);
