@@ -32,14 +32,13 @@ public class DictionaryBootstrap
     public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ALFRESCO_URI, "container");
     public static final QName CHILD_ASSOC_CONTENTS = QName.createQName(NamespaceService.ALFRESCO_URI, "contents");
 
-    // Content aspect constants
-    public static final QName ASPECT_QNAME_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_content");
-    public static final String PROP_CONTENT_URL = "contentUrl";
-    public static final QName PROP_QNAME_CONTENT_URL = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_CONTENT_URL);
-    public static final String PROP_ENCODING = "encoding";
-    public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_ENCODING);
-    public static final String PROP_MIME_TYPE = "mimetype";
-    public static final QName PROP_QNAME_MIME_TYPE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_MIME_TYPE);
+    // Content type constants
+    public static final QName QNAME_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "content");
+    public static final QName PROP_QNAME_CONTENT_URL = QName.createQName(NamespaceService.ALFRESCO_URI, "contentUrl");
+    public static final QName PROP_QNAME_MIME_TYPE = QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype");
+    public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.ALFRESCO_URI, "encoding");
+    public static final QName PROP_QNAME_SIZE = QName.createQName(NamespaceService.ALFRESCO_URI, "size");
+    
     
     // Categories and roots
     

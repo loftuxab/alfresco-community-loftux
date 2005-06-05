@@ -4,10 +4,12 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.filestore.FileContentStore;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.content.transform.ContentTransformerRegistry;
+import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.node.InvalidNodeTypeException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.util.AspectMissingException;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.util.TempFileProvider;
 import org.alfresco.util.debug.CodeMonkey;
 
@@ -19,6 +21,7 @@ import org.alfresco.util.debug.CodeMonkey;
  */
 public class RoutingContentService implements ContentService
 {
+    private DictionaryService dictionaryService;
     private NodeService nodeService;
     /** a registry of all available content transformers */
     private ContentTransformerRegistry transformerRegistry;
@@ -28,16 +31,19 @@ public class RoutingContentService implements ContentService
     private ContentStore tempStore;
     
     /**
-     * 
+     * @param dictionaryService used to check the validity of content node references
      * @param nodeService the node service that will be used to update nodes after
      *      content writes
      * @param store temporary measure to set a working store
      */
-    public RoutingContentService(NodeService nodeService,
+    public RoutingContentService(
+            DictionaryService dictionaryService,
+            NodeService nodeService,
             ContentTransformerRegistry transformerRegistry,
             ContentStore store)
     {
         CodeMonkey.todo("The store root should be set on the store directly and via a config file");  // TODO
+        this.dictionaryService = dictionaryService;
         this.nodeService = nodeService;
         this.transformerRegistry = transformerRegistry;
         this.store = store;
@@ -46,10 +52,11 @@ public class RoutingContentService implements ContentService
 
     public ContentReader getReader(NodeRef nodeRef)
     {
-        // ensure that the node exists and that it has the content aspect
-        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT))
+        // ensure that the node exists and is of type content
+        QName nodeType = nodeService.getType(nodeRef);
+        if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
         {
-            throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_CONTENT, nodeRef);
+            throw new InvalidNodeTypeException("The node must be an instance of type content", nodeType);
         }
         
         // get the content URL
@@ -85,9 +92,11 @@ public class RoutingContentService implements ContentService
 
     public ContentWriter getWriter(NodeRef nodeRef)
     {
-        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT))
+        // ensure that the node exists and is of type content
+        QName nodeType = nodeService.getType(nodeRef);
+        if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
         {
-           throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_CONTENT, nodeRef);
+            throw new InvalidNodeTypeException("The node must be an instance of type content", nodeType);
         }
         
         CodeMonkey.todo("Choose the store to write to at runtime");  // TODO
@@ -115,9 +124,11 @@ public class RoutingContentService implements ContentService
 	  */
     public ContentWriter getUpdatingWriter(NodeRef nodeRef)
     {
-        if (!nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT))
+        // ensure that the node exists and is of type content
+        QName nodeType = nodeService.getType(nodeRef);
+        if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
         {
-           throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_CONTENT, nodeRef);
+            throw new InvalidNodeTypeException("The node must be an instance of type content", nodeType);
         }
         
 		  // get the plain writer

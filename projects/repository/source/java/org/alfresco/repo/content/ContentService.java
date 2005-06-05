@@ -1,7 +1,8 @@
 package org.alfresco.repo.content;
 
+import org.alfresco.repo.node.InvalidNodeRefException;
+import org.alfresco.repo.node.InvalidNodeTypeException;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.util.AspectMissingException;
 
 /**
  * Provides methods for accessing and transforming content.
@@ -32,10 +33,11 @@ public interface ContentService
      * @param nodeRef a reference to a node with the <b>content</b> aspect
      * @return Returns a reader for the content associated with the node,
      *      or null if no content has been written for the node
-     * @throws AspectMissingException if the node does not have the <b>content</b>
-     *      aspect
+     * @throws InvalidNodeRefException if the node doesn't exist
+     * @throws InvalidNodeTypeException if the node is not of type <b>content</b>
      */
-    public ContentReader getReader(NodeRef nodeRef) throws AspectMissingException;
+    public ContentReader getReader(NodeRef nodeRef)
+            throws InvalidNodeRefException, InvalidNodeTypeException;
 
 	/**
 	 * Gets a writer for the content associated with the given node.
@@ -45,8 +47,11 @@ public interface ContentService
 	 * 
      * @param nodeRef a reference to a node.
      * @return Returns a writer for the content associated with the node.
+     * @throws InvalidNodeRefException if the node doesn't exist
+     * @throws InvalidNodeTypeException if the node is not of type <b>content</b>
 	 */
-	public ContentWriter getWriter(NodeRef nodeRef);
+	public ContentWriter getWriter(NodeRef nodeRef)
+            throws InvalidNodeRefException, InvalidNodeTypeException;
 	
     /**
      * Gets a writer for the content associated with the given node.
@@ -57,8 +62,11 @@ public interface ContentService
      * 
      * @param nodeRef a reference to a node with the <b>content</b> aspect.
      * @return Returns a writer for the content associated with the node.
+     * @throws InvalidNodeRefException if the node doesn't exist
+     * @throws InvalidNodeTypeException if the node is not of type <b>content</b>
      */
-    public ContentWriter getUpdatingWriter(NodeRef nodeRef);
+    public ContentWriter getUpdatingWriter(NodeRef nodeRef)
+            throws InvalidNodeRefException, InvalidNodeTypeException;
     
     /**
      * Gets a writer to a temporary location.  The longevity of the stored

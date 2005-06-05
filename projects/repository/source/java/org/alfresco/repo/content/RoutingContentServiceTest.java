@@ -3,6 +3,7 @@ package org.alfresco.repo.content;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.transaction.RollbackException;
@@ -53,16 +54,16 @@ public class RoutingContentServiceTest extends BaseSpringTest
         }
         rootNodeRef = nodeService.getRootNode(storeRef);
         // create a basic node and add the content aspect
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(7);
+        properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+        properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
         ChildAssocRef assocRef = nodeService.createNode(
                 rootNodeRef,
                 null,
                 QName.createQName(NamespaceService.ALFRESCO_TEST_PREFIX, GUID.generate()),
-                DictionaryBootstrap.TYPE_QNAME_BASE);
+                DictionaryBootstrap.TYPE_QNAME_CONTENT,
+                properties);
         contentNodeRef = assocRef.getChildRef();
-        Map<QName, Serializable> properties = nodeService.getProperties(contentNodeRef);
-        properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
-        nodeService.addAspect(contentNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
     }
     
     private UserTransaction getUserTransaction()

@@ -248,6 +248,9 @@
       <property name="target">
          <bean class="org.alfresco.repo.content.RoutingContentService" >
             <constructor-arg>
+               <ref bean="dictionaryService" />
+            </constructor-arg>
+            <constructor-arg>
                <ref bean="indexingNodeService" />
             </constructor-arg>
             <constructor-arg>

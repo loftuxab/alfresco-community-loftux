@@ -114,7 +114,7 @@ public class DictionaryComponent implements DictionaryService
     public boolean isSubClass(QName className, QName ofClassName)
     {
         // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     public PropertyTypeDefinition getPropertyType(QName name)
