@@ -75,8 +75,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          Node node = new Node(ref.getChildRef(), nodeService);
          
          // look for Space aspect
-         if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE) &&
-             node.getName().equals(qname.getLocalName()))
+         if (node.getName().equals(qname.getLocalName()))
          {
             companySpaceFound = true;
             companySpaceId = node.getId();
@@ -123,7 +122,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             properties.put(propDescription, "The root company space");
             
             // add the space aspect to the folder
-            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_SPACE, properties);
+            //nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_SPACE, properties);
+            nodeService.setProperties(nodeRef, properties);
             
             // commit the transaction
             tx.commit();
