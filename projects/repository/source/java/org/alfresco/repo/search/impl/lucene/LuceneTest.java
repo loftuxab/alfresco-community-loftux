@@ -187,10 +187,6 @@ public class LuceneTest extends TestCase
         testProperties.put(QName.createQName(TEST_NAMESPACE, "noderef-ista"), n1);
         testProperties.put(QName.createQName(TEST_NAMESPACE, "path-ista"), nodeService.getPath(n3));
 
-        Map<QName, Serializable> contentProperties = new HashMap<QName, Serializable>();
-        contentProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "encoding"), "woof");
-        contentProperties.put(QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype"), "woof");
-
         n4 = nodeService.createNode(rootNodeRef, null, QName.createQName("{namespace}four"), testType, testProperties).getChildRef();
 
         nodeService.getProperties(n1);
@@ -209,14 +205,15 @@ public class LuceneTest extends TestCase
         n11 = nodeService.createNode(n5, null, QName.createQName("{namespace}eleven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         n12 = nodeService.createNode(n5, null, QName.createQName("{namespace}twelve"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         n13 = nodeService.createNode(n12, null, QName.createQName("{namespace}thirteen"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n14 = nodeService.createNode(n13, null, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_QNAME_CONTENT, contentProperties).getChildRef();
+       
 
-        Map<QName, Serializable> properties = nodeService.getProperties(n14);
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
         // properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE,
         // "application/msword");
         properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
-        nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
+        n14 = nodeService.createNode(n13, null, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_QNAME_CONTENT, properties).getChildRef();
+        //nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
 
         ContentWriter writer = contentService.getUpdatingWriter(n14);
         // InputStream is =

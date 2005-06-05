@@ -1169,7 +1169,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         AspectDefinition current = aspDef;
         while (current != null)
         {
-            if (current.getName().equals(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION))
+            if (current.getName().equals(DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE))
             {
                 return true;
             }

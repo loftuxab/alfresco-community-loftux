@@ -430,6 +430,7 @@ public class LeafScorer extends Scorer
 
     private boolean check() throws IOException
     {
+        String name = reader.document(doc()).getField("QNAME").stringValue();
         // We have duplicate entries
         // The match must be in a known term range
         int count = root.freq();
@@ -456,7 +457,7 @@ public class LeafScorer extends Scorer
         return this.counter > 0;
     }
 
-    private boolean check(int start, int end, int position) throws IOException
+    private void check(int start, int end, int position) throws IOException
     {
         int offset = 0;
         for (int i = 0, l = sfps.length; i < l; i++)
@@ -464,19 +465,19 @@ public class LeafScorer extends Scorer
             offset = sfps[i].matches(start, end, offset);
             if (offset == -1)
             {
-                return false;
+                return;
             }
         }
         // Last match may fail
         if (offset == -1)
         {
-            return false;
+            return;
         }
         else
         {
             if ((sfps[sfps.length - 1].isTerminal()) && (offset != 2))
             {
-                return false;
+                return;
             }
         }
 
@@ -493,17 +494,17 @@ public class LeafScorer extends Scorer
             linkAspect = linkFields[position].stringValue();
         }
 
-        return containersIncludeCurrent(parentID, linkAspect);
+        containersIncludeCurrent(parentID, linkAspect);
 
     }
 
-    private boolean containersIncludeCurrent(String parentID, String aspectQName) throws IOException
+    private void containersIncludeCurrent(String parentID, String aspectQName) throws IOException
     {
         if ((containerScorer != null) || (level0 != null))
         {
             if (sfps.length == 0)
             {
-                return false;
+                return;
             }
             Document document = reader.document(doc());
             StructuredFieldPosition last = sfps[sfps.length - 1];
@@ -519,7 +520,7 @@ public class LeafScorer extends Scorer
                     {
                         this.counter += counter.count;
                         selfLinks.add(id);
-                        return true;
+                        return;
                     }
                 }
             }
@@ -539,7 +540,7 @@ public class LeafScorer extends Scorer
                                 if (counter != null)
                                 {
                                     this.counter += counter.count;
-                                    return true;
+                                    return;
                                 }
                             }
                         }
@@ -579,7 +580,7 @@ public class LeafScorer extends Scorer
                                                             }
                                                         }
                                                         this.counter += count;
-                                                        return count > 0;
+                                                        return;
                                                     }
                                                 }
                                             }
@@ -596,18 +597,18 @@ public class LeafScorer extends Scorer
                         if (counter != null)
                         {
                             this.counter += counter.count;
-                            return true;
+                            return;
                         }
                     }
 
                 }
             }
 
-            return false;
+            return;
         }
         else
         {
-            return true;
+            return;
         }
     }
 
@@ -642,7 +643,7 @@ public class LeafScorer extends Scorer
         AspectDefinition current = aspDef;
         while (current != null)
         {
-            if (current.getName().equals(DictionaryBootstrap.ASPECT_QNAME_CATEGORISATION))
+            if (current.getName().equals(DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE))
             {
                 return true;
             }

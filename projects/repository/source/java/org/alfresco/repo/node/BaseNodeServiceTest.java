@@ -859,61 +859,51 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
-        //System.out.println(list);
+      
         
         xpath = new NodeServiceXPath("*", nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(2, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("*/*", nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(4, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("*/*/*", nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(3, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("*/*/*/*", nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(2, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("*/*/*/*/..", nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(2, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("*//.", nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(11, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("alftest:root_p_n1", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("*//.[@alftest:animal]", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("*//.[@alftest:animal='monkey']", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("//.[@alftest:animal='monkey']", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
-        //System.out.println(list);
         
         QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:test", namespacePrefixResolver), dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT), true, "monkey");
         xpath = new NodeServiceXPath("//.[@alftest:animal=$alf:test]", nodeService, namespacePrefixResolver, new QueryParameterDefinition[]{paramDef}, false);
@@ -921,22 +911,18 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         xpath.addNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
         list = xpath.selectNodes(new ChildAssocRef(null, null, rootNodeRef));
         assertEquals(1, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath(".", nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(assocRefs.get(qname));
         assertEquals(1, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("..", nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(assocRefs.get(qname));
         assertEquals(1, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("..", nodeService, namespacePrefixResolver, null, true);
         list = xpath.selectNodes(assocRefs.get(qname));
         assertEquals(2, list.size());
-        //System.out.println(list);
         
         xpath = new NodeServiceXPath("//@alftest:animal", nodeService, namespacePrefixResolver, null, true);
         xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
@@ -953,7 +939,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         xpath.addNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
         list = xpath.selectNodes(assocRefs.get(qname));
         assertEquals(1, list.size());
-        //System.out.println(list);
         
     }
     
@@ -970,7 +955,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals(2, answer.size());
         
         List<Serializable> attributes = nodeService.selectProperties(rootNodeRef, "//@alftest:animal", null, namespacePrefixResolver, false);
-        System.out.println(attributes);
         assertEquals(1, attributes.size());
     }
     

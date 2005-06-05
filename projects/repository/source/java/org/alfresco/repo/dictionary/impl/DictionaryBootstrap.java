@@ -43,8 +43,9 @@ public class DictionaryBootstrap
     // Categories and roots
     
     public static final QName ASPECT_QNAME_ROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_root");
-    public static final QName ASPECT_QNAME_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_categorisation");
-    public static final QName ASPECT_QNAME_GEN_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_gen_categorisation");
+    public static final QName ASPECT_QNAME_CLASSIFIABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "classifiable");
+    //public static final QName ASPECT_QNAME_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_categorisation");
+    //public static final QName ASPECT_QNAME_GEN_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_gen_categorisation");
     public static final QName TYPE_QNAME_CATEGORY = QName.createQName(NamespaceService.ALFRESCO_URI, "category");
     public static final QName TYPE_QNAME_STOREROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "store_root");
     public static final QName TYPE_QNAME_CATEGORYROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "category_root");  
@@ -82,6 +83,8 @@ public class DictionaryBootstrap
     public static final String PROP_MODIFIED_DATE = "modifieddate";
     public static final String PROP_DESCRIPTION = "description";
     public static final String PROP_ICON = "icon";
-    public static final String PROP_SPACE_TYPE = "spacetype";    
+    public static final String PROP_SPACE_TYPE = "spacetype";
+
+       
     
 }
