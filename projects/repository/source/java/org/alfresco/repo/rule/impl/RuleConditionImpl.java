@@ -15,7 +15,6 @@ import org.alfresco.repo.rule.RuleConditionDefinition;
 public class RuleConditionImpl extends RuleItemImpl implements Serializable,
         RuleCondition
 {
-
     /**
      * 
      */

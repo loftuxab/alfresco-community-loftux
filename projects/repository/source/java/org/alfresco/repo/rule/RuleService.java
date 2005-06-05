@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.rule.impl.RuleImpl;
 
 /**
  * Rule service interface.
@@ -63,7 +64,7 @@ public interface RuleService
 	 * @param nodeRef	the node reference
 	 * @return			a list of the rules associated with the node 
 	 */
-	public List<Rule> getRules(NodeRef nodeRef);
+	public List<RuleImpl> getRules(NodeRef nodeRef);
 	
 	/**
 	 * Get the rules associated with an actionable node.
@@ -78,7 +79,7 @@ public interface RuleService
 	 * 						    in the result list or not
 	 * @return					a list of the rules associated with the node 
 	 */
-	public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied);
+	public List<RuleImpl> getRules(NodeRef nodeRef, boolean includeInhertied);
 	
 	/**
 	 * Get the rules associated with an actionable node that would be executed for a 
@@ -92,26 +93,29 @@ public interface RuleService
 	 * @param executionContext	the execution context
 	 * @return					a list of the rules that would be executed
 	 */
-	public List<Rule> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext);	
+	public List<RuleImpl> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext);	
 	
 	/**
-	 * Associates a new rule with the given node.
+     * Helper method to create a new rule.
+     * <p>
+     * Call add rule once the details of the rule have been specified in
+     * order to associate the rule with a node reference.
+     * 
+     * @param   ruleType    the type of rule to create
+     * @return              the created rule
+	 */
+	public Rule createRule(RuleType ruleType);
+	
+	/**
+	 * Adds the details of the rule to the specified node reference.
+     * <p>
+     * If the rule is already associated with the node, the details are 
+     * updated with those specified.
 	 * 
 	 * @param nodeRef
 	 * @param rule
 	 */
-	// TODO don't hink we need this as update can be used for create/update
-	//public void addRule(NodeRef nodeRef, RuleType ruleType, Rule rule);
-	
-	/**
-	 * Updates a rule associated with a node.
-	 * <p>
-	 * Adds the rule if its new.
-	 * 
-	 * @param nodeRef
-	 * @param rule
-	 */
-	public void updateRule(NodeRef nodeRef, Rule rule);
+	public void addRule(NodeRef nodeRef, Rule rule);
 	
 	/**
 	 * Removes a rule associated with a node

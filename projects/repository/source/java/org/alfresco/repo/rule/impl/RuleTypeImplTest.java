@@ -23,9 +23,9 @@ public class RuleTypeImplTest extends TestCase
     private RuleTypeImpl create()
     {
         RuleTypeImpl temp = new RuleTypeImpl(
-                NAME,
-                DISPLAY_LABEL);
+                NAME);
         assertNotNull(temp);
+        temp.setDisplayLabel(DISPLAY_LABEL);
         return temp;
     }
     

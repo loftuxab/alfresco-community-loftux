@@ -33,4 +33,12 @@ public interface RuleItemDefinition
 	 * @return	a list of parameter definitions
 	 */
 	public List<ParameterDefinition> getParameterDefinitions();
+    
+    /**
+     * Get the parameter definition by name
+     * 
+     * @param name  the name of the parameter
+     * @return      the parameter definition, null if none found
+     */
+    public ParameterDefinition getParameterDefintion(String name);
 }

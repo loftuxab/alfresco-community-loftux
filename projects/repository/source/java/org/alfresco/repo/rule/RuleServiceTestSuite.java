@@ -9,7 +9,9 @@ import org.alfresco.repo.rule.impl.RuleActionImplTest;
 import org.alfresco.repo.rule.impl.RuleConditionDefinitionImplTest;
 import org.alfresco.repo.rule.impl.RuleConditionImplTest;
 import org.alfresco.repo.rule.impl.RuleServiceImplTest;
+import org.alfresco.repo.rule.impl.RuleStoreTest;
 import org.alfresco.repo.rule.impl.RuleTypeImplTest;
+import org.alfresco.repo.rule.impl.RuleXMLUtilTest;
 
 /**
  * Version test suite
@@ -32,6 +34,8 @@ public class RuleServiceTestSuite extends TestSuite
         suite.addTestSuite(RuleConditionDefinitionImplTest.class);
         suite.addTestSuite(RuleActionImplTest.class);
         suite.addTestSuite(RuleConditionImplTest.class);
+        suite.addTestSuite(RuleXMLUtilTest.class);
+        suite.addTestSuite(RuleStoreTest.class);
         suite.addTestSuite(RuleServiceImplTest.class);
         return suite;
     }

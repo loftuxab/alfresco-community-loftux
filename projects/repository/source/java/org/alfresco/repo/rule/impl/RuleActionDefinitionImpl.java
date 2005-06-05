@@ -3,9 +3,6 @@
  */
 package org.alfresco.repo.rule.impl;
 
-import java.util.List;
-
-import org.alfresco.repo.rule.ParameterDefinition;
 import org.alfresco.repo.rule.RuleActionDefinition;
 
 /**
@@ -24,18 +21,10 @@ public class RuleActionDefinitionImpl extends RuleItemDefinitionImpl
     /**
      * Constructor
      * 
-     * @param name                  the name
-     * @param title                 the title
-     * @param description           the description
-     * @param parameterDefinitions  the parameterDefinitions
+     * @param name  the name
      */
-    public RuleActionDefinitionImpl(
-            String name, 
-            String title, 
-            String description, 
-            List<ParameterDefinition> parameterDefinitions)
+    public RuleActionDefinitionImpl(String name)
     {
-        super(name, title, description, parameterDefinitions);
+        super(name);
     }
-
 }

@@ -6,6 +6,7 @@ package org.alfresco.repo.rule.impl;
 import java.io.Serializable;
 
 import org.alfresco.repo.rule.ParameterDefinition;
+import org.alfresco.repo.rule.ParameterType;
 
 /**
  * Parameter definition implementation class.
@@ -14,7 +15,7 @@ import org.alfresco.repo.rule.ParameterDefinition;
  */
 public class ParameterDefinitionImpl implements ParameterDefinition, Serializable
 {
-    /**
+    /** 
      * Serial version UID
      */
     private static final long serialVersionUID = 3976741384558751799L;
@@ -27,7 +28,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     /**
      * The type of the parameter
      */
-    private Class type;
+    private ParameterType type;
     
     /**
      * The display label
@@ -43,7 +44,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
      */
     public ParameterDefinitionImpl(
             String name, 
-            Class type, 
+            ParameterType type, 
             String displayLabel)
     {
         this.name = name;
@@ -62,7 +63,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     /**
      * @see org.alfresco.repo.rule.ParameterDefinition#getType()
      */
-    public Class getType()
+    public ParameterType getType()
     {
         return this.type;
     }

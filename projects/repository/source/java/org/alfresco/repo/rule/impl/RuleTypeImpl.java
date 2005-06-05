@@ -25,10 +25,9 @@ public class RuleTypeImpl implements RuleType
     /**
      * 
      */
-    public RuleTypeImpl(String name, String displayLabel)
+    public RuleTypeImpl(String name)
     {
         this.name = name;
-        this.displayLabel = displayLabel;
     }
 
     /**
@@ -37,6 +36,16 @@ public class RuleTypeImpl implements RuleType
     public String getName()
     {
         return this.name;
+    }
+    
+    /**
+     * Set the display label
+     * 
+     * @param displayLabel  the displaylabel
+     */
+    public void setDisplayLabel(String displayLabel)
+    {
+        this.displayLabel = displayLabel;
     }
 
     /**

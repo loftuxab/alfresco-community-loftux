@@ -1,0 +1,102 @@
+<alfresco-config area="rule_config">
+   
+    <!-- Rule type configuration -->
+	
+	<config evaluator="string-compare" condition="Rule Types">
+		<rule-types>
+			<rule-type name="inbound">
+				<display-label>Inbound</display-label>
+			</rule-type>
+			<rule-type name="outbound">
+				<display-label>Outbound</display-label>
+			</rule-type>
+		</rule-types>
+	</config>
+   
+    <!-- Action definitions configuration -->
+   
+	<config evaluator="string-compare" condition="Action Definitions">
+		<action-definitions>
+			<action-definition name="simple-workflow">
+				<title>Add simple workflow to content</title>	
+				<description>
+					This will add a simple workflow to the matched content. 
+					This will allow the content to be moved to a different space for
+                    its next step in a workflow.  You can also give a space for
+                    it to be moved to if you want a reject step.
+				</description>
+			</action-definition>
+			<action-definition name="link-category">
+				<title>Link content to category</title>	
+				<description>
+					This will apply a category to the matched content.	
+				</description>
+			</action-definition>
+			<action-definition name="add-features">
+				<title>Add features to content</title>	
+				<description>
+					This will add a feature to the matched content.			
+				</description>
+			</action-definition>
+			<action-definition name="copy">
+				<title>Create a copy of content in a given format at a specific location</title>	
+				<description>
+					This will copy the matched content to another location with a
+                    specific format.
+				</description>
+			</action-definition>
+			<action-definition name="move">
+				<title>Move content to a specific space</title>	
+				<description>
+					This will move the matched content to another space.
+				</description>
+			</action-definition>
+			<action-definition name="email">
+				<title>Send an email to specified users</title>	
+				<description>
+					This will send an email to a list of users when the content matches.	
+				</description>
+			</action-definition>
+			<action-definition name="check-in">
+				<title>Check in content</title>	
+				<description>
+					This will check in the matched content.
+				</description>
+			</action-definition>
+			<action-definition name="check-out">
+				<title>Check out content</title>	
+				<description>
+					This will check out the matched content.
+				</description>
+			</action-definition>			
+		</action-definitions>						
+	</config>
+   
+    <!-- Condition definitions configuration --> 
+		
+    <config evaluator="string-compare" condition="Condition Definitions">
+		<condition-definitions>
+			<condition-definition name="no-condition">
+				<title>All Content</title>	
+				<description>
+					This condition will match any item of content added to the space.
+                    Use this when you wish to apply an action to everything when it is 
+                    added to the space.
+				</description>
+			</condition-definition>
+			<condition-definition name="in-category">
+				<title>Content in a specific category</title>	
+				<description>
+					The rule is applied to all content that has a specific category.
+				</description>
+			</condition-definition>
+			<condition-definition name="contains-text">
+				<title>Content which contains specific text in its name</title>	
+				<description>
+					The rule is applied to all content that has specific text in its name.
+				</description>
+			</condition-definition>
+		</condition-definitions>
+	</config>
+	
+</alfresco-config>

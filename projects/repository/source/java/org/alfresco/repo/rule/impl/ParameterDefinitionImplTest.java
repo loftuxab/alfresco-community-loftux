@@ -3,6 +3,8 @@
  */
 package org.alfresco.repo.rule.impl;
 
+import org.alfresco.repo.rule.ParameterType;
+
 import junit.framework.TestCase;
 
 /**
@@ -13,7 +15,6 @@ import junit.framework.TestCase;
 public class ParameterDefinitionImplTest extends TestCase
 {
     private static final String NAME = "param-name";
-    private static final Class CLASS = String.class;
     private static final String DISPLAY_LABEL = "The display label.";
     
     public void testConstructor()
@@ -25,7 +26,7 @@ public class ParameterDefinitionImplTest extends TestCase
     {
         ParameterDefinitionImpl paramDef = new ParameterDefinitionImpl(
                 NAME,
-                CLASS,
+                ParameterType.STRING,
                 DISPLAY_LABEL);
         assertNotNull(paramDef);
         return paramDef;
@@ -40,7 +41,7 @@ public class ParameterDefinitionImplTest extends TestCase
     public void testGetClass()
     {
         ParameterDefinitionImpl temp = create();
-        assertEquals(CLASS, temp.getType());
+        assertEquals(ParameterType.STRING, temp.getType());
     }
     
     public void testGetDisplayLabel()

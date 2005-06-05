@@ -166,7 +166,9 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Create a node we can use as the destination in a copy
 		Map<QName, Serializable> destinationProps = new HashMap<QName, Serializable>();
 		destinationProps.put(PROP1_QNAME_MANDATORY, TEST_VALUE_1);			
-        destinationProps.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3);          
+        destinationProps.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3); 
+        destinationProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+        destinationProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
 		ChildAssocRef temp5 = this.nodeService.createNode(
 				this.rootNodeRef,
 				null,
@@ -187,6 +189,8 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		result.put(PROP1_QNAME_MANDATORY, TEST_VALUE_1);
 		result.put(PROP2_QNAME_OPTIONAL, TEST_VALUE_2);
         result.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3);
+        result.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+        result.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
 		return result;
 	}
 	
@@ -201,7 +205,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
         model.createImport(NamespaceService.ALFRESCO_URI, NamespaceService.ALFRESCO_PREFIX);
 
         M2Type testType = model.createType("test:" + TEST_TYPE_QNAME.getLocalName());
-        testType.setParentName("alf:" + DictionaryBootstrap.TYPE_QNAME_CONTAINER.getLocalName());
+        testType.setParentName("alf:" + DictionaryBootstrap.TYPE_QNAME_CONTENT.getLocalName());
         
         M2Property prop1 = testType.createProperty("test:" + PROP1_QNAME_MANDATORY.getLocalName());
         prop1.setMandatory(true);
@@ -281,10 +285,10 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// TODO check copying from a lockable copy
 		
 		// Check copying from a node with content
-		Map<QName, Serializable>contentProperties = new HashMap<QName, Serializable>();
-		contentProperties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-		contentProperties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-		this.nodeService.addAspect(this.sourceNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);		
+		//Map<QName, Serializable>contentProperties = new HashMap<QName, Serializable>();
+		//contentProperties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+		//contentProperties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+		//this.nodeService.addAspect(this.sourceNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);		
 		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.sourceNodeRef);
 		contentWriter.putContent(SOME_CONTENT);		
 		NodeRef copyWithContent = this.nodeOperationsService.copy(
@@ -293,7 +297,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 				null,
 				QName.createQName("{test}copyWithContent"));
 		checkCopiedNode(this.sourceNodeRef, copyWithContent, true, true, false);
-		assertTrue(this.nodeService.hasAspect(copyWithContent, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
+		//assertTrue(this.nodeService.hasAspect(copyWithContent, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
 		ContentReader contentReader = this.contentService.getReader(copyWithContent);
 		assertNotNull(contentReader);
 		assertEquals(SOME_CONTENT, contentReader.getContentString());

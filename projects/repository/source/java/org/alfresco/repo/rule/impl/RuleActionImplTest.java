@@ -11,7 +11,7 @@ import org.alfresco.repo.rule.RuleActionDefinition;
  */
 public class RuleActionImplTest extends RuleItemImplTest
 {
-    private RuleActionDefinition ruleActionDefinition;    
+    private RuleActionDefinitionImpl ruleActionDefinition;    
 
     @Override
     protected void setUp() throws Exception
@@ -19,11 +19,10 @@ public class RuleActionImplTest extends RuleItemImplTest
         super.setUp();
         
         // Create the rule action definition
-        this.ruleActionDefinition = new RuleActionDefinitionImpl(
-                NAME,
-                TITLE,
-                DESCRIPTION,
-                this.paramDefs);
+        this.ruleActionDefinition = new RuleActionDefinitionImpl(NAME);
+        this.ruleActionDefinition.setTitle(TITLE);
+        this.ruleActionDefinition.setDescription(DESCRIPTION);
+        this.ruleActionDefinition.setParameterDefinitions(this.paramDefs);
     }
     
     /**

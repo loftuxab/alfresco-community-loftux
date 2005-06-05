@@ -11,7 +11,7 @@ import org.alfresco.repo.rule.RuleConditionDefinition;
  */
 public class RuleConditionImplTest extends RuleItemImplTest
 {
-    private RuleConditionDefinition ruleConditionDefinition;    
+    private RuleConditionDefinitionImpl ruleConditionDefinition;    
 
     @Override
     protected void setUp() throws Exception
@@ -19,11 +19,10 @@ public class RuleConditionImplTest extends RuleItemImplTest
         super.setUp();
         
         // Create the rule condition definition
-        this.ruleConditionDefinition = new RuleConditionDefinitionImpl(
-                NAME,
-                TITLE,
-                DESCRIPTION,
-                this.paramDefs);
+        this.ruleConditionDefinition = new RuleConditionDefinitionImpl(NAME);
+        this.ruleConditionDefinition.setTitle(TITLE);
+        this.ruleConditionDefinition.setDescription(DESCRIPTION);
+        this.ruleConditionDefinition.setParameterDefinitions(this.paramDefs);                
     }
     
     /**

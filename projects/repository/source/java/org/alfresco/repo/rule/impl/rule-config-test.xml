@@ -1,0 +1,41 @@
+<alfresco-config area="rule_config">
+   
+    <!-- Rule type configuration -->
+	
+	<config evaluator="string-compare" condition="Rule Types">
+		<rule-types>
+			<rule-type name="ruleType">
+				<display-label>displayLabel</display-label>
+			</rule-type>
+		</rule-types>
+	</config>
+   
+    <!-- Action definitions configuration -->
+   
+	<config evaluator="string-compare" condition="Action Definitions">
+		<action-definitions>
+			<action-definition name="actionDefinition">
+				<title>title</title>	
+				<description>description</description>
+				<parameters>
+					<parameter name='actionPropName1' type='STRING' display-label='displayLabel'/>
+				</parameters>
+			</action-definition>					
+		</action-definitions>						
+	</config>
+   
+    <!-- Condition definitions configuration --> 
+		
+    <config evaluator="string-compare" condition="Condition Definitions">
+		<condition-definitions>
+			<condition-definition name="conditionDefinition">
+				<title>title</title>	
+				<description>description</description>
+				<parameters>
+					<parameter name='condPropName1' type='STRING' display-label='displayLabel'/>
+				</parameters>
+			</condition-definition>
+		</condition-definitions>
+	</config>
+	
+</alfresco-config>

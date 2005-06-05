@@ -5,31 +5,92 @@ package org.alfresco.repo.rule.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.config.ConfigService;
+import org.alfresco.repo.content.ContentService;
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.rule.Rule;
 import org.alfresco.repo.rule.RuleActionDefinition;
 import org.alfresco.repo.rule.RuleConditionDefinition;
 import org.alfresco.repo.rule.RuleService;
 import org.alfresco.repo.rule.RuleType;
+import org.alfresco.util.GUID;
 
 /**
  * @author Roy Wetherall
  */
-public class RuleServiceImpl implements RuleService{
+public class RuleServiceImpl implements RuleService
+{
+    /**
+     * The config service
+     */
+    private ConfigService configService;
+    
+    private NodeService nodeService;
+    
+    private ContentService contentService;
+    
+    private RuleConfig ruleConfiguration;
+    
+    private RuleStore ruleStore;
+    
+    
+    /**
+     * Service intialization method
+     */
+    public void init()
+    {
+        // Create the rule configuration and store
+        this.ruleConfiguration = new RuleConfig(this.configService);
+        this.ruleStore = new RuleStore(
+                this.nodeService, 
+                this.contentService,
+                this.ruleConfiguration);
+    }       
 
+    /**
+     * Set the config service
+     * 
+     * @param configService     the config service
+     */
+    public void setConfigService(ConfigService configService)
+    {
+        this.configService = configService;
+    }
+    
+    /**
+     * Set the node service 
+     * 
+     * @param nodeService   the node service
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+    
+    /**
+     * Set the content service
+     * 
+     * @param contentService    the content service
+     */
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+    
     /**
      * @see org.alfresco.repo.rule.RuleService#getRuleTypes()
      */
     public List<RuleType> getRuleTypes()
     {
-        // TODO tempory result to aid UI development
-        ArrayList<RuleType> ruleTypes = new ArrayList<RuleType>(2);
-        ruleTypes.add(new RuleTypeImpl("inbound", "Inbound"));
-        ruleTypes.add(new RuleTypeImpl("outbound", "Outbound"));
-        return ruleTypes;
+        Collection<RuleTypeImpl> ruleTypes = this.ruleConfiguration.getRuleTypes();
+        ArrayList<RuleType> result = new ArrayList<RuleType>(ruleTypes.size());
+        result.addAll(ruleTypes);
+        return result;
     }
 
     /**
@@ -37,19 +98,10 @@ public class RuleServiceImpl implements RuleService{
      */
     public List<RuleConditionDefinition> getConditionDefinitions()
     {
-        // TODO tempory result to aid UI development
-        ArrayList<RuleConditionDefinition> ruleConditions = new ArrayList<RuleConditionDefinition>(3);
-        ruleConditions.add(new RuleConditionDefinitionImpl("no-condition", "All Content", 
-                             "This condition will match any item of content added to the space. " +
-                             "Use this when you wish to apply an action to everything when it is " +
-                             "added to the space.", null));
-        ruleConditions.add(new RuleConditionDefinitionImpl("in-category", "Content in a specific category", 
-                             "The rule is applied to all content that has a specific category", null));
-        ruleConditions.add(new RuleConditionDefinitionImpl("contains-text", "Content which contains " +
-                             "specific text in its name", 
-                             "The rule is applied to all content that has specific text in " +
-                             "its name", null));
-        return ruleConditions;
+        Collection<RuleConditionDefinitionImpl> items = this.ruleConfiguration.getConditionDefinitions();
+        ArrayList<RuleConditionDefinition> result = new ArrayList<RuleConditionDefinition>(items.size());
+        result.addAll(items);
+        return result;
     }
 
     /**
@@ -57,31 +109,10 @@ public class RuleServiceImpl implements RuleService{
      */
     public List<RuleActionDefinition> getActionDefinitions()
     {
-        // TODO tempory result to aid UI development
-        ArrayList<RuleActionDefinition> ruleActions = new ArrayList<RuleActionDefinition>(8);
-        ruleActions.add(new RuleActionDefinitionImpl("simple-workflow", "Add simple workflow to content",
-                          "This will add a simple workflow to the matched content. This " +
-                          "will allow the content to be moved to a different space for " +
-                          "its next step in a workflow.  You can also give a space for " +
-                          "it to be moved to if you want a reject step", null));
-        ruleActions.add(new RuleActionDefinitionImpl("link-category", "Link content to category",
-                          "This will apply a category to the matched content.", null));
-        ruleActions.add(new RuleActionDefinitionImpl("add-features", "Add features to content",
-                          "This will add a feature to the matched content.", null));
-        ruleActions.add(new RuleActionDefinitionImpl("copy", "Create a copy of content in a given format at " +
-                          "a specific location",
-                          "This will copy the matched content to another location with a" +
-                          "specific format.", null));
-        ruleActions.add(new RuleActionDefinitionImpl("move", "Move content to a specific space",
-                          "This will move the matched content to another space.", null));
-        ruleActions.add(new RuleActionDefinitionImpl("email", "Send an email to specified users",
-                          "This will send an email to a list of users when the content matches.", null));
-        ruleActions.add(new RuleActionDefinitionImpl("check-in", "Check in content",
-                          "This will check in the matched content.", null));
-        ruleActions.add(new RuleActionDefinitionImpl("check-out", "Check out content",
-                          "This will check out the matched content.", null));
-        
-        return ruleActions;
+        Collection<RuleActionDefinitionImpl> items = this.ruleConfiguration.getActionDefinitions();
+        ArrayList<RuleActionDefinition> result = new ArrayList<RuleActionDefinition>(items.size());
+        result.addAll(items);
+        return result;
     }
 
     /**
@@ -105,7 +136,7 @@ public class RuleServiceImpl implements RuleService{
     /**
      * @see org.alfresco.repo.rule.RuleService#getRules(org.alfresco.repo.ref.NodeRef)
      */
-    public List<Rule> getRules(NodeRef nodeRef)
+    public List<RuleImpl> getRules(NodeRef nodeRef)
     {
         throw new UnsupportedOperationException();
     }
@@ -113,7 +144,7 @@ public class RuleServiceImpl implements RuleService{
     /**
      * @see org.alfresco.repo.rule.RuleService#getRules(org.alfresco.repo.ref.NodeRef, boolean)
      */
-    public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied)
+    public List<RuleImpl> getRules(NodeRef nodeRef, boolean includeInhertied)
     {
         throw new UnsupportedOperationException();
     }
@@ -121,24 +152,33 @@ public class RuleServiceImpl implements RuleService{
     /**
      * @see org.alfresco.repo.rule.RuleService#previewExecutingRules(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleType, java.util.Map)
      */
-    public List<Rule> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext)
+    public List<RuleImpl> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext)
     {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleService#updateRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.Rule)
+     * @see org.alfresco.repo.rule.RuleService#createRule(org.alfresco.repo.rule.RuleType)
      */
-    public void updateRule(NodeRef nodeRef, Rule rule)
+    public Rule createRule(RuleType ruleType)
     {
-        throw new UnsupportedOperationException();
+        String id = GUID.generate();
+        return new RuleImpl(id, ruleType);
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleService#removeRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.Rule)
+     * @see org.alfresco.repo.rule.RuleService#addRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.Rule)
+     */
+    public void addRule(NodeRef nodeRef, Rule rule)
+    {
+        throw new UnsupportedOperationException();
+    }
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleService#removeRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.impl.RuleImpl)
      */
     public void removeRule(NodeRef nodeRef, Rule rule)
     {
         throw new UnsupportedOperationException();
-    }
+    } 
 }

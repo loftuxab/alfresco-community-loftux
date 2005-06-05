@@ -264,7 +264,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         {
             this.lightWeightVersionStoreNodeService.addAspect(
                     dummyNodeRef,
-                    DictionaryBootstrap.ASPECT_QNAME_CONTENT,
+                    TEST_ASPECT_QNAME,
                     null);
             fail("This operation is not supported.");
         }
@@ -286,7 +286,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         {
             this.lightWeightVersionStoreNodeService.removeAspect(
                     dummyNodeRef,
-                    DictionaryBootstrap.ASPECT_QNAME_CONTENT);
+                    TEST_ASPECT_QNAME);
             fail("This operation is not supported.");
         }
         catch (UnsupportedOperationException exception)

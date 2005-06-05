@@ -3,9 +3,6 @@
  */
 package org.alfresco.repo.rule.impl;
 
-import java.util.List;
-
-import org.alfresco.repo.rule.ParameterDefinition;
 import org.alfresco.repo.rule.RuleConditionDefinition;
 
 /**
@@ -25,17 +22,10 @@ public class RuleConditionDefinitionImpl extends RuleItemDefinitionImpl
      * Constructor
      * 
      * @param name                  the name
-     * @param title                 the title
-     * @param description           the description
-     * @param parameterDefinitions  the parameter definitions
      */
-    public RuleConditionDefinitionImpl(
-            String name, 
-            String title, 
-            String description, 
-            List<ParameterDefinition> parameterDefinitions)
+    public RuleConditionDefinitionImpl(String name)
     {
-        super(name, title, description, parameterDefinitions);
+        super(name);
     }
 
 

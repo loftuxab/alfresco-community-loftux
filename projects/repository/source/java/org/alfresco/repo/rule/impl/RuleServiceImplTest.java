@@ -42,6 +42,7 @@ public class RuleServiceImplTest extends BaseSpringTest
         {
             assertNotNull(ruleType.getName());
             assertNotNull(ruleType.getDisplayLabel());
+            System.out.println("Rule type: " + ruleType.getName() + " " + ruleType.getDisplayLabel());
         }
     }
     
@@ -55,7 +56,9 @@ public class RuleServiceImplTest extends BaseSpringTest
         for (RuleActionDefinition action : actions)
         {
             assertNotNull(action.getName());
+            assertNotNull(action.getTitle());
             assertNotNull(action.getDescription());
+            System.out.println("Action defintion: " + action.getName());
         }
     }
     
@@ -69,7 +72,14 @@ public class RuleServiceImplTest extends BaseSpringTest
         for (RuleConditionDefinition cond : conds)
         {
             assertNotNull(cond.getName());
+            assertNotNull(cond.getTitle());
             assertNotNull(cond.getDescription());
+            System.out.println("Condition defintion: " + cond.getName());
         }
+    }
+    
+    public void testcreateRule()
+    {
+        // TODO
     }
 }

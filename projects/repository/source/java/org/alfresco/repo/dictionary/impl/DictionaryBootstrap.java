@@ -11,7 +11,7 @@ import org.alfresco.repo.ref.QName;
 public class DictionaryBootstrap
 {   
     // Base type constants
-    public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ALFRESCO_URI, "base");
+    public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ALFRESCO_URI, "cmobject");
     
     // Referenceable aspect constants
     public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "reference");
@@ -21,7 +21,7 @@ public class DictionaryBootstrap
 	// Copy aspect constants
 	public static final String ASPECT_NAME_COPIEDFROM = "copiedfrom";
 	public static final QName ASPECT_QNAME_COPIEDFROM = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_COPIEDFROM);
-	public static final String PROP_COPY_REFERENCE = "copyReference";
+	public static final String PROP_COPY_REFERENCE = "source";
 	public static final QName PROP_QNAME_COPY_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_COPY_REFERENCE);
 	
 	// Working copy aspect contants
@@ -69,7 +69,7 @@ public class DictionaryBootstrap
 	 */
 	public static final String ASPECT_VERSIONABLE = "versionable";
 	public static final QName ASPECT_QNAME_VERSIONABLE = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_VERSIONABLE);
-	public static final String PROP_CURRENT_VERSION_LABEL = "currentVersionLabel";
+	public static final String PROP_CURRENT_VERSION_LABEL = "versionLabel";
 	public static final QName PROP_QNAME_CURRENT_VERSION_LABEL = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_CURRENT_VERSION_LABEL);
 
     // Content type constants

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.repo.rule.ParameterDefinition;
+import org.alfresco.repo.rule.ParameterType;
 
 import junit.framework.TestCase;
 
@@ -23,8 +24,8 @@ public abstract class RuleItemDefinitionImplTest extends TestCase
     
     private static final String PARAM1_DISPLAYNAME = "param1-displayname";
     private static final String PARAM1_NAME = "param1-name";
-    private static final Class PARAM1_CLASS = String.class;
-    private static final Class PARAM2_CLASS = String.class;
+    private static final ParameterType PARAM1_TYPE = ParameterType.STRING;
+    private static final ParameterType PARAM2_TYPE = ParameterType.STRING;
     private static final String PARAM2_DISPLAYNAME = "param2-displaname";
     private static final String PARAM2_NAME = "param2-name";
     
@@ -32,10 +33,10 @@ public abstract class RuleItemDefinitionImplTest extends TestCase
     protected void setUp() throws Exception
     {
         // Create param def lists
-        this.paramDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_CLASS, PARAM1_DISPLAYNAME));
-        this.paramDefs.add(new ParameterDefinitionImpl(PARAM2_NAME, PARAM2_CLASS, PARAM2_DISPLAYNAME));        
-        this.duplicateParamDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_CLASS, PARAM1_DISPLAYNAME));
-        this.duplicateParamDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_CLASS, PARAM1_DISPLAYNAME));
+        this.paramDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, PARAM1_DISPLAYNAME));
+        this.paramDefs.add(new ParameterDefinitionImpl(PARAM2_NAME, PARAM2_TYPE, PARAM2_DISPLAYNAME));        
+        this.duplicateParamDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, PARAM1_DISPLAYNAME));
+        this.duplicateParamDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, PARAM1_DISPLAYNAME));
     }
     
     public void testConstructor()
@@ -75,16 +76,29 @@ public abstract class RuleItemDefinitionImplTest extends TestCase
             if (i == 0)
             {
                 assertEquals(PARAM1_NAME, definition.getName());
-                assertEquals(PARAM1_CLASS, definition.getType());
+                assertEquals(PARAM1_TYPE, definition.getType());
                 assertEquals(PARAM1_DISPLAYNAME, definition.getDisplayLabel());
             }
             else
             {
                 assertEquals(PARAM2_NAME, definition.getName());
-                assertEquals(PARAM2_CLASS, definition.getType());
+                assertEquals(PARAM2_TYPE, definition.getType());
                 assertEquals(PARAM2_DISPLAYNAME, definition.getDisplayLabel());
             }
             i++;
         }
+    }
+    
+    public void testGetParameterDefinition()
+    {
+        RuleItemDefinitionImpl temp = create();
+        ParameterDefinition definition = temp.getParameterDefintion(PARAM1_NAME);
+        assertNotNull(definition);
+        assertEquals(PARAM1_NAME, definition.getName());
+        assertEquals(PARAM1_TYPE, definition.getType());
+        assertEquals(PARAM1_DISPLAYNAME, definition.getDisplayLabel());
+        
+        ParameterDefinition nullDef = temp.getParameterDefintion("bobbins");
+        assertNull(nullDef);
     }
 }

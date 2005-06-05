@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.repo.rule.ParameterDefinition;
+import org.alfresco.repo.rule.ParameterType;
 
 import junit.framework.TestCase;
 
@@ -35,8 +36,8 @@ public abstract class RuleItemImplTest extends TestCase
     protected void setUp() throws Exception
     {
         // Create param defs
-        paramDefs.add(new ParameterDefinitionImpl(PARAM_1, String.class, PARAM_DISPLAYLABEL));
-        paramDefs.add(new ParameterDefinitionImpl(PARAM_2, String.class, PARAM_DISPLAYLABEL));
+        paramDefs.add(new ParameterDefinitionImpl(PARAM_1, ParameterType.STRING, PARAM_DISPLAYLABEL));
+        paramDefs.add(new ParameterDefinitionImpl(PARAM_2, ParameterType.STRING, PARAM_DISPLAYLABEL));
         
         // Create param values
         paramValues.put(PARAM_1, VALUE_1);

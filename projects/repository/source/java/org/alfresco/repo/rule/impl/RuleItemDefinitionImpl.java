@@ -4,8 +4,10 @@
 package org.alfresco.repo.rule.impl;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.repo.rule.ParameterDefinition;
 import org.alfresco.repo.rule.RuleItemDefinition;
@@ -37,6 +39,11 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
      * The list of parameters associated with the rule item
      */
     private List<ParameterDefinition> parameterDefinitions;
+    
+    /**
+     * A map of the parameter definitions by name
+     */
+    private Map<String, ParameterDefinition> paramDefinitionsByName;
 
     /**
      * Error messages
@@ -49,30 +56,79 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
      * Constructor
      * 
      * @param name                  the name 
-     * @param title                 the title
-     * @param description           the description
+     */
+    public RuleItemDefinitionImpl(String name)
+    {
+        this.name = name;        
+    }
+
+    /**
+     * @see org.alfresco.repo.rule.RuleItemDefinition#getName()
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+
+    /**
+     * Set the title of the rule item
+     * 
+     * @param title  the title
+     */
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleItemDefinition#getTitle()
+     */
+    public String getTitle()
+    {
+        return this.title;
+    }
+
+    /**
+     * Set the description of the rule item.
+     * 
+     * @param description  the description
+     */
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleItemDefinition#getDescription()
+     */
+    public String getDescription()
+    {
+        return this.description;
+    }
+
+    /**
+     * Set the parameter definitions for the rule item
+     * 
      * @param parameterDefinitions  the parameter definitions
      */
-    public RuleItemDefinitionImpl(
-            String name, 
-            String title, 
-            String description, 
+    public void setParameterDefinitions(
             List<ParameterDefinition> parameterDefinitions)
     {
-        this.name = name;
-        this.title = title;
-        this.description = description;
-        
-        if (hasDuplicateNames(parameterDefinitions) == false)
-        {
-            this.parameterDefinitions = parameterDefinitions;
-        }
-        else
+        if (hasDuplicateNames(parameterDefinitions) == true)
         {
             throw new RuleServiceException(ERR_NAME_DUPLICATION);
         }
+        
+        this.parameterDefinitions = parameterDefinitions;
+        
+        // Create a map of the definitions to use for subsequent calls
+        this.paramDefinitionsByName = new HashMap<String, ParameterDefinition>(this.parameterDefinitions.size());
+        for (ParameterDefinition definition : this.parameterDefinitions)
+        {
+            this.paramDefinitionsByName.put(definition.getName(), definition);
+        }
     }
-
+    
     /**
      * Determines whether the list of parameter defintions contains duplicate
      * names of not.
@@ -95,36 +151,25 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
         }
         return result;
     }
-
-    /**
-     * @see org.alfresco.repo.rule.RuleItemDefinition#getName()
-     */
-    public String getName()
-    {
-        return this.name;
-    }
-
-    /**
-     * @see org.alfresco.repo.rule.RuleItemDefinition#getTitle()
-     */
-    public String getTitle()
-    {
-        return this.title;
-    }
-
-    /**
-     * @see org.alfresco.repo.rule.RuleItemDefinition#getDescription()
-     */
-    public String getDescription()
-    {
-        return this.description;
-    }
-
+    
     /**
      * @see org.alfresco.repo.rule.RuleItemDefinition#getParameterDefinitions()
      */
     public List<ParameterDefinition> getParameterDefinitions()
     {
         return this.parameterDefinitions;
+    }
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleItemDefinition#getParameterDefintion(java.lang.String)
+     */
+    public ParameterDefinition getParameterDefintion(String name)
+    {
+        ParameterDefinition result = null;
+        if (paramDefinitionsByName != null)
+        {
+            result = this.paramDefinitionsByName.get(name);
+        }
+        return result;
     }
 }

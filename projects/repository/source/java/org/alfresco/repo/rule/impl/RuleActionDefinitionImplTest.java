@@ -16,11 +16,8 @@ public class RuleActionDefinitionImplTest extends RuleItemDefinitionImplTest
         // Test duplicate param name
         try
         {
-            RuleActionDefinitionImpl temp = new RuleActionDefinitionImpl(
-                    NAME,
-                    TITLE,
-                    DESCRIPTION,
-                    duplicateParamDefs);
+            RuleActionDefinitionImpl temp = new RuleActionDefinitionImpl(NAME);
+            temp.setParameterDefinitions(duplicateParamDefs);
             fail("Duplicate param names are not allowed.");
         }
         catch (RuleServiceException exception)
@@ -29,12 +26,11 @@ public class RuleActionDefinitionImplTest extends RuleItemDefinitionImplTest
         }
         
         // Create a good one
-        RuleActionDefinitionImpl temp = new RuleActionDefinitionImpl(
-                NAME,
-                TITLE,
-                DESCRIPTION,
-                paramDefs);
+        RuleActionDefinitionImpl temp = new RuleActionDefinitionImpl(NAME);
         assertNotNull(temp);
+        temp.setTitle(TITLE);
+        temp.setDescription(DESCRIPTION);
+        temp.setParameterDefinitions(paramDefs);
         return temp;
     }
 }

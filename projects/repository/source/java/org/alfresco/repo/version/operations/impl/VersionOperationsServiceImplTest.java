@@ -70,19 +70,21 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		this.rootNodeRef = this.nodeService.getRootNode(storeRef);
 		
 		// Create the node used for tests
+        Map<QName, Serializable> bagOfProps = createTypePropertyBag();
+        bagOfProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+        bagOfProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+        
 		ChildAssocRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
 				null,
 				QName.createQName("{test}test"),
-				DictionaryBootstrap.TYPE_QNAME_CONTAINER,
-				createTypePropertyBag());
+				DictionaryBootstrap.TYPE_QNAME_CONTENT,
+				bagOfProps);
 		this.nodeRef = childAssocRef.getChildRef();
 		
 		// Add the initial content to the node
-		Map<QName, Serializable>contentProperties = new HashMap<QName, Serializable>();
-		contentProperties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-		contentProperties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);
+		//Map<QName, Serializable>contentProperties = new HashMap<QName, Serializable>();
+		//this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);
 		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.nodeRef);
 		contentWriter.putContent(CONTENT_1);	
 		
@@ -161,11 +163,11 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		// Test check-in with content
-		ContentWriter tempWriter = this.contentService.getTempWriter();
+        NodeRef workingCopy3 = checkout();
+        ContentWriter tempWriter = this.contentService.getWriter(workingCopy3);
 		assertNotNull(tempWriter);
 		tempWriter.putContent(CONTENT_2);
 		String contentUrl = tempWriter.getContentUrl();
-		NodeRef workingCopy3 = checkout();
 		Map<String, Serializable> versionProperties3 = new HashMap<String, Serializable>();
 		versionProperties3.put(Version.PROP_VERSION_TYPE, VersionType.MAJOR);
 		NodeRef origNodeRef = this.versionOperationsService.checkin(workingCopy3, versionProperties3, contentUrl, true);
@@ -184,8 +186,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		this.versionOperationsService.checkin(workingCopy2, versionProperties2, null, true);
 		this.versionOperationsService.checkin(workingCopy2, new HashMap<String, Serializable>(), null, true);
 		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
-		
+				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));		
 	}
 	
 	/**

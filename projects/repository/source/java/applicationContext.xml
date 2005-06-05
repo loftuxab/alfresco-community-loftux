@@ -89,6 +89,7 @@
             <constructor-arg>
                <list>
                   <value>org/alfresco/repo/content/mimetype-map.xml</value>
+				  <value>org/alfresco/repo/rule/rule-config.xml</value>
                </list>
             </constructor-arg>
          </bean>
@@ -595,7 +596,7 @@
    </bean> 
    
    <!--                 -->
-   <!-- Version Operations Service (should change to the checkIn CheckOut service) -->
+   <!-- Version Operations Service  -->
    <!--                 -->
 
    <bean id="versionOperationsService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -781,7 +782,10 @@
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="org.alfresco.repo.rule.impl.RuleServiceImpl">
+         <bean class="org.alfresco.repo.rule.impl.RuleServiceImpl" init-method="init">
+			<property name="configService">
+				<ref bean="repoConfigService"/>
+			</property>
          </bean>
       </property>
       <property name="transactionAttributes">

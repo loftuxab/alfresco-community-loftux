@@ -24,7 +24,7 @@ public interface ParameterDefinition
 	 * 
 	 * @return	the parameter type
 	 */
-	public Class getType();
+	public ParameterType getType();
 	
 	/**
 	 * Get the display label of the parameter.
