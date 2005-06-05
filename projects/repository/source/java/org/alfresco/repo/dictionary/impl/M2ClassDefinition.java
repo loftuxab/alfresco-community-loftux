@@ -172,7 +172,7 @@ import org.alfresco.repo.ref.QName;
         }
 
         // Derive Child Associations
-        for (AssociationDefinition def : associations.values())
+        for (AssociationDefinition def : inheritedAssociations.values())
         {
             if (def instanceof ChildAssociationDefinition)
             {
