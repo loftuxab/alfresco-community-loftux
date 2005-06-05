@@ -279,6 +279,8 @@ public class RichListRenderer extends BaseRenderer
       // maximum displayable textual lines within a single item cell
       private final static int MAX_DISPLAYABLE_LINES = 3;
       
+      private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='padding:3px'></div</td></tr>";
+      
       public static final String VIEWMODEID = "list";
       
       /**
@@ -341,16 +343,14 @@ public class RichListRenderer extends BaseRenderer
       {
          ResponseWriter out = context.getResponseWriter();
          
-         // output a new TABLE per row item
-         out.write("<tr><td colspan=99><table cellspacing=0 cellpadding=2 border=0");
-         outputAttribute(out, richList.getAttributes().get("width"), "width");
-         out.write('>');
-         
+         // start new row if we are on an even column in this view
+         // we show 2 columns, left to right
          String rowStyle = (String)richList.getAttributes().get("rowStyleClass");
-         String altStyle = (String)richList.getAttributes().get("altRowStyleClass");
-         if (altStyle != null && this.rowIndex++ % 2 == 1)
+         if (this.rowIndex % 2 == 0)
          {
-            rowStyle = altStyle;
+            out.write("<tr");
+            outputAttribute(out, rowStyle, "class");
+            out.write('>');
          }
          
          // find the actions column if it exists
@@ -376,59 +376,59 @@ public class RichListRenderer extends BaseRenderer
             logger.warn("No primary column found for RichList definition: " + richList.getId());
          }
          
-         // primary column cell contains the small icon
+         // get the icon from the primary column
+         out.write("<td width=50%><table cellspacing=0 cellpadding=2 border=0>");
          if (primaryColumn != null)
          {
             UIColumn column = primaryColumn;
             
-            // output row or alt style row if set
-            out.write("<tr valign=top");
-            outputAttribute(out, rowStyle, "class");
-            out.write("><td rowspan=10 width=20");
-            outputAttribute(out, column.getAttributes().get("style"), "style");
-            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
-            out.write('>');
-            
-            // output the small icon for this column
-            UIComponent smallIcon = column.getSmallIcon();
-            if (smallIcon != null)
+            if (column.isRendered() == true)
             {
-               smallIcon.encodeBegin(context);
-               smallIcon.encodeChildren(context);
-               smallIcon.encodeEnd(context);
-            }
-            out.write("</td>");
-            
-            // start the next cell which contains the first column component
-            out.write("<td align=left");
-            outputAttribute(out, column.getAttributes().get("style"), "style");
-            outputAttribute(out, column.getAttributes().get("styleClass"), "class");
-            out.write('>');
-            
-            if (column.getChildCount() != 0)
-            {
-               // allow child controls inside the columns to render themselves
-               Utils.encodeRecursive(context, column);
-            }
-            out.write("</td>");
-            
-            // output actions column if any
-            if (actionsColumn != null)
-            {
-               out.write("<td align=right");
-               outputAttribute(out, actionsColumn.getAttributes().get("style"), "style");
-               outputAttribute(out, actionsColumn.getAttributes().get("styleClass"), "class");
+               out.write("<tr><td rowspan=10");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
                out.write('>');
                
-               if (actionsColumn.getChildCount() != 0)
+               // output the large icon for this column
+               UIComponent icon = column.getLargeIcon();
+               if (icon != null)
                {
-                  // allow child controls inside the columns to render themselves
-                  Utils.encodeRecursive(context, actionsColumn);
+                  icon.encodeBegin(context);
+                  icon.encodeChildren(context);
+                  icon.encodeEnd(context);
                }
                out.write("</td>");
+               
+               // start the next cell which contains the first column component
+               out.write("<td width=100%");
+               outputAttribute(out, column.getAttributes().get("style"), "style");
+               outputAttribute(out, column.getAttributes().get("styleClass"), "class");
+               out.write('>');
+               if (column.getChildCount() != 0)
+               {
+                  // allow child controls inside the column to render themselves
+                  Utils.encodeRecursive(context, column);
+               }
+               out.write("</td>");
+               
+               // output actions column if any
+               if (actionsColumn != null)
+               {
+                  out.write("<td");
+                  outputAttribute(out, actionsColumn.getAttributes().get("style"), "style");
+                  outputAttribute(out, actionsColumn.getAttributes().get("styleClass"), "class");
+                  out.write("><nobr>");
+                  
+                  if (actionsColumn.getChildCount() != 0)
+                  {
+                     // allow child controls inside the columns to render themselves
+                     Utils.encodeRecursive(context, actionsColumn);
+                  }
+                  out.write("</nobr></td>");
+               }
+               
+               out.write("</tr>");
             }
-            
-            out.write("</tr>");
          }
          
          // render remaining columns as lines of data up to a max display limit
@@ -443,7 +443,7 @@ public class RichListRenderer extends BaseRenderer
                // output row or alt style row if set
                out.write("<tr valign=top");
                outputAttribute(out, rowStyle, "class");
-               out.write("><td");
+               out.write("><td colspan=2");     // render into above actions column
                outputAttribute(out, column.getAttributes().get("style"), "style");
                outputAttribute(out, column.getAttributes().get("styleClass"), "class");
                out.write('>');
@@ -452,14 +452,20 @@ public class RichListRenderer extends BaseRenderer
                   // allow child controls inside the columns to render themselves
                   Utils.encodeRecursive(context, column);
                }
-               out.write("</td><td></td></tr>");
+               // end this cell and end row
+               out.write("</td></tr>");
                
                count++;
             }
          }
          
-         // end row and output a blank padding row/div
-         out.write("</table></td></tr><tr colspan=99><td><div style='padding:3px'></div></td></tr>");
+         out.write("</table></td>");
+         
+         if (this.rowIndex % 2 == 1)
+         {
+            // end row and output a blank padding row/div
+            out.write(END_ROW_SEPARATOR);
+         }
          
          this.rowIndex++;
       }
@@ -471,6 +477,12 @@ public class RichListRenderer extends BaseRenderer
             throws IOException
       {
          ResponseWriter out = context.getResponseWriter();
+         
+         // finish last row if required (we used an open-ended column rendering algorithm)
+         if ((this.rowIndex-1) % 2 != 1)
+         {
+            out.write(END_ROW_SEPARATOR);
+         }
          
          out.write("<tr><td colspan=99 align=right>");
          for (Iterator i=richList.getChildren().iterator(); i.hasNext(); /**/)

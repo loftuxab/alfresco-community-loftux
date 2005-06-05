@@ -311,7 +311,7 @@ public class BrowseBean implements IContextListener
       }
       else if (viewMode.equals(RichListRenderer.ListViewRenderer.VIEWMODEID))
       {
-         setBrowsePageSize(5);
+         setBrowsePageSize(10);
       }
       else
       {

@@ -100,19 +100,21 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             {
                separator = DEFAULT_SEPARATOR;
             }
+            int total = 0;
             int maximum = childRefs.size() > control.getMaxChildren() ? control.getMaxChildren() : childRefs.size();
             for (int index=0; index<maximum; index++)
             {
                ChildAssocRef ref = childRefs.get(index);
                if (service.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_SPACE))
                {
-                  out.write(renderDescendant(context, control, ref, false));
-                  
                   // output separator if appropriate
-                  if (index < maximum - 1)
+                  if (total > 0)
                   {
                      out.write( separator );
                   }
+                  
+                  out.write(renderDescendant(context, control, ref, false));
+                  total++;
                }
             }
             

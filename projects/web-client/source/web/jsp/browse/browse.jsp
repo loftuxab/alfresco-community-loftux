@@ -172,9 +172,7 @@
                   <td>
                      <div style="padding:4px">
                      
-                     <a:panel id="spaces-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
-                     
-                     <div style="padding:3px"></div>
+                     <a:panel id="spaces-panel" border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
                      <%-- Spaces List --%>
                      <a:richList id="spacesList" binding="#{BrowseBean.spacesRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
@@ -210,8 +208,8 @@
                         
                         <%-- Primary column for list view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
-                           <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{BrowseBean.clickSpace}" showLink="false">
+                           <f:facet name="large-icon">
+                              <a:actionLink value="#{r.name}" image="/images/icons/#{r.icon}.gif" actionListener="#{BrowseBean.clickSpace}" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </f:facet>
@@ -289,9 +287,7 @@
                   <td>
                      <div style="padding:4px">
                      
-                     <a:panel id="content-panel" border="white" styleClass="mainSubTitle" label="#{msg.browse_content}">
-                     
-                     <div style="padding:3px"></div>
+                     <a:panel id="content-panel" border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea" styleClass="mainSubTitle" label="#{msg.browse_content}">
                      
                      <%-- Content list --%>
                      <a:richList id="contentRichList" binding="#{BrowseBean.contentRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
@@ -315,7 +311,7 @@
                         <%-- Primary column for icons view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left;vertical-align:top;" rendered="#{BrowseBean.browseViewMode == 'icons'}">
                            <f:facet name="large-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file_large.gif" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file_medium.gif" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="header">
                               <f:param name="id" value="#{r.id}" />
@@ -325,8 +321,8 @@
                         
                         <%-- Primary column for list view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
-                           <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileTypeImage}" showLink="false" styleClass="inlineAction" />
+                           <f:facet name="large-icon">
+                              <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file_medium.gif" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="title">
                               <f:param name="id" value="#{r.id}" />

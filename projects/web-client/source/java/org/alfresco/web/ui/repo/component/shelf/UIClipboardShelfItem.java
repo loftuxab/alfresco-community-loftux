@@ -199,11 +199,17 @@ public class UIClipboardShelfItem extends UIShelfItem
       return this.collections;
    }
    
+   /** 
+    * @param binding    The MethodBinding to call when Paste is selected by the user
+    */
    public void setPasteActionListener(MethodBinding binding)
    {
       this.pasteActionListener = binding;
    }
    
+   /** 
+    * @return The MethodBinding to call when Paste is selected by the user
+    */
    public MethodBinding getPasteActionListener()
    {
       return this.pasteActionListener;
@@ -273,6 +279,13 @@ public class UIClipboardShelfItem extends UIShelfItem
       return buf.toString();
    }
    
+   /**
+    * Invoke the method encapsulated by the supplied MethodBinding
+    * 
+    * @param method     MethodBinding to invoke
+    * @param event      ActionEvent to pass to the method of signature:
+    *                   public void myMethodName(ActionEvent event)
+    */
    private void processActionMethod(MethodBinding method, ActionEvent event)
    {
       try
