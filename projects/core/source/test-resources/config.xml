@@ -3,11 +3,23 @@
    <config>
       <global-item>The global value</global-item>
       <override>false</override>
+      <merge-children>
+         <child-one>child one value</child-one>
+      </merge-children>
    </config>
    
    <config evaluator="string-compare" condition="Unit Test">
       <item>The value</item>
       <override>true</override>
+   </config>
+   
+   <config evaluator="string-compare" condition="Merge Test">
+      <first-item>first value</first-item>
+      <second-item>second value</second-item>
+      <third-item>third value</third-item>
+      <children>
+         <child-one>child one value</child-one>
+      </children>
    </config>
    
 </alfresco-config>

@@ -1,5 +1,6 @@
 package org.alfresco.config;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +11,8 @@ import java.util.Map;
 public interface Config
 {
     /**
-     * Returns the config element with the given name
+     * Returns the config element with the given name, if there is more
+     * than one with the given name the first one added is returned.
      * 
      * @param name
      *            Name of the config element to retrieve
@@ -19,12 +21,29 @@ public interface Config
     public ConfigElement getConfigElement(String name);
 
     /**
+     * Returns the given config element as a list.
+     * 
+     * @param name Name of the config element to retrieve
+     * @return A list of the config elements with the given name 
+     *         or null if it doesn't exist
+     */
+    public List<ConfigElement> getConfigElementList(String name);
+    
+    /**
      * Returns all the config elements
      * 
      * @return All the config elements
      */
-    public Map<String, ConfigElement> getConfigElements();
+    public Map<String, Object> getConfigElements();
 
+    /**
+     * Determines whether the given config element exists
+     *  
+     * @param name The name of the config element to look for
+     * @return true if the config element exists
+     */
+    public boolean hasConfigElement(String name);
+    
     // TODO: Add more methods to this interface to allow for easier client
     // access to the results i.e. by using an XPath expression for
     // example?

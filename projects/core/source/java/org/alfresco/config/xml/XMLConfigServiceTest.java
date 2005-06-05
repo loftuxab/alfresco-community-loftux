@@ -6,6 +6,7 @@ import java.util.List;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
+import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.source.FileConfigSource;
 import org.alfresco.config.source.HTTPConfigSource;
@@ -149,13 +150,6 @@ public class XMLConfigServiceTest extends BaseTest
                 globalItem2.getValue());
         logger.info("globalItem2 = " + globalItem2.getValue());
 
-        // make sure that the override config value got overridden in the global
-        // section
-        ConfigElement overrideItem = globalSection.getConfigElement("override");
-        assertNotNull("overrideItem should not be null", overrideItem);
-        assertEquals("The override item should be true", "true", overrideItem.getValue());
-        logger.info("overrideItem = " + overrideItem.getValue());
-
         // lookup the "Unit Test" section, this should match a section in each
         // file so
         // we should be able to get hold of config elements "item" and
@@ -188,13 +182,15 @@ public class XMLConfigServiceTest extends BaseTest
 
         // try and get an section defined in an area (with an area restricted
         // search)
-        config = svc.getConfig("Area Specific Config", "test-area");
+        ConfigLookupContext lookupContext = new ConfigLookupContext();
+        lookupContext.addArea("test-area");
+        config = svc.getConfig("Area Specific Config", lookupContext);
         areaTest = config.getConfigElement("parent-item");
         assertNotNull("areaTest should not be null as it is defined in test-area", areaTest);
 
         // try and find a section defined outside an area with an area
         // restricted search
-        config = svc.getConfig("Unit Test", "test-area");
+        config = svc.getConfig("Unit Test", lookupContext);
         ConfigElement unitTest = config.getConfigElement("item");
         assertNull("unitTest should be null as it is not defined in test-area", unitTest);
 
@@ -202,20 +198,65 @@ public class XMLConfigServiceTest extends BaseTest
         // get an error
         try
         {
-            Config notThere = svc.getConfig("Unit Test", "not-there");
+            lookupContext = new ConfigLookupContext();
+            lookupContext.addArea("not-there");
+            Config notThere = svc.getConfig("Unit Test", lookupContext);
             fail("Retrieving a non existent area should have thrown an exception!");
         }
         catch (ConfigException ce)
         {
             // expected to get this error
         }
-
-        // TODO: Add more tests for searching multiple areas
     }
 
-    public void xtestMerging()
+    public void testMerging()
     {
-        // TODO: Add tests to make sure merging works 
-        // include tests including and excluding globals and areas
+        // setup the config service
+        List<String> configFiles = new ArrayList<String>(2);
+        configFiles.add(getResourcesDir() + "config.xml");
+        configFiles.add(getResourcesDir() + "config-multi.xml");
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
+        svc.init();
+        
+        // try and get the global config section
+        Config globalSection = svc.getGlobalConfig();
+        assertNotNull("global section should not be null", globalSection);
+        
+        // make sure that the override config value got overridden in the global
+        // section
+        ConfigElement overrideItem = globalSection.getConfigElement("override");
+        assertNotNull("overrideItem should not be null", overrideItem);
+        assertEquals("The override item should be true", "true", overrideItem.getValue());
+        logger.info("overrideItem = " + overrideItem.getValue());
+        
+        // make sure the global section gets merged properly
+        ConfigElement mergeChildren = globalSection.getConfigElement("merge-children");
+        assertNotNull("mergeChildren should not be null", mergeChildren);
+        List<ConfigElement> kids = mergeChildren.getChildren();
+        assertEquals("There should be 2 children", 2, kids.size());
+        
+        // get the merge test config section
+        Config mergeTest = svc.getConfig("Merge Test");
+        assertNotNull("Merge test config should not be null", mergeTest);
+        
+        // check that there is a first, second, thrid and fourth config element
+        ConfigElement first = mergeTest.getConfigElement("first-item");
+        ConfigElement second = mergeTest.getConfigElement("second-item");
+        ConfigElement third = mergeTest.getConfigElement("third-item");
+        ConfigElement fourth = mergeTest.getConfigElement("fourth-item");
+        assertNotNull("first should not be null", first);
+        assertNotNull("second should not be null", second);
+        assertNotNull("third should not be null", third);
+        assertNotNull("fourth should not be null", fourth);
+        
+        // test that the first-item got overridden
+        String firstValue = first.getValue();
+        assertEquals("The first value is wrong", "the overridden first value", firstValue);
+        
+        // test that there are two child items under the children config element
+        ConfigElement children = mergeTest.getConfigElement("children");
+        assertNotNull("children should not be null", children);
+        kids = children.getChildren();
+        assertEquals("There should be 3 children", 3, kids.size());
     }
 }
