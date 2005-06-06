@@ -113,7 +113,7 @@ public abstract class LuceneBase implements Lockable
 
     private LuceneIndexLock luceneIndexLock;
 
-    private String indexRootLocation = File.separator + "lucene-indexes";
+    private String indexRootLocation = null; //File.separator + "lucene-indexes";
 
     /**
      * Initiase the configuration elements of the lucene store indexers and
@@ -164,6 +164,10 @@ public abstract class LuceneBase implements Lockable
      */
     private String getBasePath()
     {
+        if(indexRootLocation == null)
+        {
+            throw new IndexerException("No configuration for index location");
+        }
         String basePath = indexRootLocation + File.separator + store.getProtocol() + File.separator + store.getIdentifier() + File.separator;
         return basePath;
     }

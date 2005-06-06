@@ -160,9 +160,10 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      * @param deltaId
      * @return
      */
-    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, String deltaId)
+    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, String deltaId, String indexRootLocation)
     {
         LuceneSearcherImpl searcher = new LuceneSearcherImpl();
+        searcher.setIndexRootLocation(indexRootLocation);
         try
         {
             searcher.initialise(storeRef, deltaId, false);
@@ -182,9 +183,9 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      * @param storeRef
      * @return
      */
-    public static LuceneSearcherImpl getSearcher(StoreRef storeRef)
+    public static LuceneSearcherImpl getSearcher(StoreRef storeRef,  String indexRootLocation)
     {
-        return getSearcher(storeRef, null);
+        return getSearcher(storeRef, null, indexRootLocation);
     }
 
     public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)

@@ -343,9 +343,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * @param deltaId
      * @return
      */
-    public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId)
+    public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId, String indexRootLocation)
     {
         LuceneIndexerImpl indexer = new LuceneIndexerImpl();
+        indexer.setIndexRootLocation(indexRootLocation);
         try
         {
             indexer.initialise(storeRef, deltaId, false);

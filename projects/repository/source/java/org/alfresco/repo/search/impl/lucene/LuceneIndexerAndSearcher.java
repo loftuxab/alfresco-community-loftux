@@ -16,5 +16,6 @@ public interface LuceneIndexerAndSearcher extends IndexerAndSearcher
     public int prepare() throws IndexerException;
     public void commit() throws IndexerException;
     public void rollback();
+    public String getIndexLocation();
     
 }

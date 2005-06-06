@@ -39,8 +39,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class LuceneCategoryTest extends TestCase
-{
-    
+{    
     ApplicationContext ctx;
     NodeService nodeService;
     DictionaryService dictionaryService;
@@ -79,6 +78,7 @@ public class LuceneCategoryTest extends TestCase
     private NodeRef catRTwo;
     private NodeRef catRThree;
     private Searcher searcher;
+    private LuceneIndexerAndSearcher indexerAndSearcher;
 
     public LuceneCategoryTest()
     {
@@ -99,6 +99,7 @@ public class LuceneCategoryTest extends TestCase
         luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
         dictionaryDAO = (DictionaryDAO) ctx.getBean("dictionaryDAO");
         searcher = (Searcher) ctx.getBean("searcherComponent");
+        indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
         
         createTestTypes();
         
@@ -288,7 +289,7 @@ public class LuceneCategoryTest extends TestCase
     
     private void buildBaseIndex()
     {
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()));
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher.getIndexLocation());
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -331,7 +332,7 @@ public class LuceneCategoryTest extends TestCase
     {
         buildBaseIndex();
         
-        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher.getIndexLocation());
         
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
@@ -490,7 +491,7 @@ public class LuceneCategoryTest extends TestCase
     {
         buildBaseIndex();
         
-        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef());
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher.getIndexLocation());
         
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);

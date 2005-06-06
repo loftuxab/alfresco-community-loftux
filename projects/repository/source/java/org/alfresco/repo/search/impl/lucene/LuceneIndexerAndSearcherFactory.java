@@ -290,7 +290,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      */
     private LuceneIndexerImpl createIndexer(StoreRef storeRef, String deltaId)
     {
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(storeRef, deltaId);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(storeRef, deltaId, indexRootLocation);
         indexer.setNodeService(nodeService);
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneIndexLock(luceneIndexLock);
@@ -695,6 +695,11 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     public void setContentService(ContentService contentService)
     {
         this.contentService = contentService;
+    }
+
+    public String getIndexLocation()
+    {
+        return indexRootLocation;
     }
     
 }
