@@ -128,14 +128,14 @@
                                  <tr>
                                     <td>Name:</td>
                                     <td>
-                                       <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" 
+                                       <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState(this);" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>Description:</td>
                                     <td>
-                                       <h:inputText value="#{NewSpaceWizard.description}" size="35" />
+                                       <h:inputText value="#{NewSpaceWizard.description}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -172,7 +172,7 @@
                                  </tr>
                                  <tr>
                                     <td align="middle">Name:</td>
-                                    <td><h:inputText value="#{NewSpaceWizard.templateName}" size="35" disabled="true" />&nbsp;*</td>
+                                    <td><h:inputText value="#{NewSpaceWizard.templateName}" size="35" disabled="true" maxlength="1024" />&nbsp;*</td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>

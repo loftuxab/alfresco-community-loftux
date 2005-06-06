@@ -17,6 +17,7 @@ import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.lock.LockService;
 import org.alfresco.repo.lock.LockStatus;
 import org.alfresco.repo.node.NodeService;
+import org.alfresco.repo.ref.InvalidQNameException;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSetRow;
@@ -260,6 +261,34 @@ public final class RepoUtils
    {
       return (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
                context).getBean(Repository.USER_TRANSACTION);
+   }
+   
+   /**
+    * Create a valid QName from the specified name
+    * 
+    * @param name       Name to create QName from
+    * @return valid QName
+    */
+   public static String createValidQName(String name)
+   {
+      if (name == null || name.length() == 0)
+      {
+         throw new IllegalArgumentException("Name cannot be null or empty.");
+      }
+      
+      if (name.length() > QName.MAX_LENGTH)
+      {
+         name = name.substring(0, QNAME_NAME.MAX_LENGTH);
+      }
+      
+      // search for any invalid QName characters
+      for (int i=0; i<QName.INVALID_CHARS.length; i++)
+      {
+         // replace if found - slow but this is a rare case
+         name = name.replace(QName.INVALID_CHARS[i], '_');
+      }
+      
+      return name;
    }
    
    

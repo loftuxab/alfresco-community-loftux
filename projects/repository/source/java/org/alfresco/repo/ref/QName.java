@@ -29,7 +29,8 @@ public final class QName implements QNamePattern, Serializable
     private static final char NAMESPACE_PREFIX = ':';
     private static final char NAMESPACE_BEGIN = '{';
     private static final char NAMESPACE_END = '}';
-    private static final char[] INVALID_CHARS = { '/', '.' };
+    public static final char[] INVALID_CHARS = { '/', '.' };
+    public static final int MAX_LENGTH = 100;
 
     
     /**
@@ -169,12 +170,12 @@ public final class QName implements QNamePattern, Serializable
     private QName(String namespace, String name, String prefix)
     {
         // Validate local name
-        for (char invalidChar : INVALID_CHARS)
+        for (int i=0; i<INVALID_CHARS.length; i++)
         {
-            if (name.indexOf(invalidChar) > -1)
-            {
-                throw new InvalidQNameException("The local part of a QName may not contain '" + invalidChar + "'");
-            }
+           if (name.indexOf(INVALID_CHARS[i]) != -1)
+           {
+               throw new InvalidQNameException("The local part of a QName may not contain '" + INVALID_CHARS[i] + "'");
+           }
         }
         
         this.namespaceURI = (namespace == null) ? NamespaceService.DEFAULT_URI : namespace;

@@ -93,13 +93,13 @@
                                  <tr>
                                     <td>Name:</td>
                                     <td>
-                                       <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" />&nbsp;*
+                                       <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" maxlength="1024" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>Description:</td>
                                     <td>
-                                       <h:inputText value="#{NewSpaceDialog.description}" size="35" />
+                                       <h:inputText value="#{NewSpaceDialog.description}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

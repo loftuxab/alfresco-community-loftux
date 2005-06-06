@@ -124,14 +124,14 @@
                                  <tr>
                                     <td>Title:</td>
                                     <td>
-                                       <h:inputText id="title" value="#{NewRuleWizard.title}" size="35" 
+                                       <h:inputText id="title" value="#{NewRuleWizard.title}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState(this);" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>Description:</td>
                                     <td>
-                                       <h:inputText value="#{NewRuleWizard.description}" size="35" />
+                                       <h:inputText value="#{NewRuleWizard.description}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

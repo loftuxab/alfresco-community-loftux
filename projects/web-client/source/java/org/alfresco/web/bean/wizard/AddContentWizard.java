@@ -96,6 +96,10 @@ public class AddContentWizard extends AbstractWizardBean
             
             // create the node to represent the node
             String assocName = this.fileName.replace('.', '-');
+            if (assocName.length() > QName.MAX_LENGTH)
+            {
+               assocName = assocName.substring(0, QName.MAX_LENGTH);
+            }
             ChildAssocRef assocRef = this.nodeService.createNode(containerNodeRef,
                    null,
                    QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
