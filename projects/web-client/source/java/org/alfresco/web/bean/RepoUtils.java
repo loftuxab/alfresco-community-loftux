@@ -239,7 +239,7 @@ public final class RepoUtils
       if (extIndex != -1)
       {
          String ext = filename.substring(extIndex + 1);
-         String mt = mimetypeMap.getMimetypesByExtension().get(extIndex);
+         String mt = mimetypeMap.getMimetypesByExtension().get(ext);
          if (mt != null)
          {
             mimetype = mt;
