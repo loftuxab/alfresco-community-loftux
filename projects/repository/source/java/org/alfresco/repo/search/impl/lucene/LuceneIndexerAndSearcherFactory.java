@@ -324,7 +324,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      */
     private LuceneSearcher getSearcher(StoreRef storeRef, String deltaId) throws SearcherException
     {
-        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, deltaId);
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, deltaId, indexRootLocation);
         searcher.setNamespacePrefixResolver(nameSpaceService);
         searcher.setLuceneIndexLock(luceneIndexLock);
         searcher.setNodeService(nodeService);
