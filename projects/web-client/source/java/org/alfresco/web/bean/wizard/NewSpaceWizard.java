@@ -20,6 +20,7 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
+import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -89,8 +90,7 @@ public class NewSpaceWizard extends AbstractWizardBean
       
          try
          {
-            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-                    FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             if (this.editMode)

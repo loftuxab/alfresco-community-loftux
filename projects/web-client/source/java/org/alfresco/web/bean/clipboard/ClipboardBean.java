@@ -167,8 +167,7 @@ public class ClipboardBean
       UserTransaction tx = null;
       try
       {
-         tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-               FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+         tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
          if (index == -1)

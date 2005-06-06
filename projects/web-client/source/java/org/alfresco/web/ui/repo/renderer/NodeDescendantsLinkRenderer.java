@@ -17,6 +17,7 @@ import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
@@ -85,8 +86,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          UserTransaction tx = null;
          try
          {
-            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-                  FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
                
             List<ChildAssocRef> childRefs = service.getChildAssocs(parentRef);
@@ -177,8 +177,8 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
       if (ellipses == false)
       {
          // label is the name of the child node assoc
-         // TODO: get the NAME attribute here!
-         buf.append(Utils.encode(childRef.getQName().getLocalName()));
+         String name = RepoUtils.getNameForNode(getNodeService(context), childRef.getChildRef());
+         buf.append(Utils.encode(name));
       }
       else
       {

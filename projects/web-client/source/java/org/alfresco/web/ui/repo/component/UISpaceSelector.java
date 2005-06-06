@@ -236,8 +236,7 @@ public class UISpaceSelector extends UIInput
             UserTransaction tx = null;
             try
             {
-               tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-                     FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+               tx = RepoUtils.getUserTransaction(context);
                tx.begin();
                
                buf.append("<table border=0 cellspacing=1 cellpadding=1");

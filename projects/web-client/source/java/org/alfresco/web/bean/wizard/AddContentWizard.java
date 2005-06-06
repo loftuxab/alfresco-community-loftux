@@ -72,8 +72,7 @@ public class AddContentWizard extends AbstractWizardBean
          
          try
          {
-            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-                    FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             // get the node ref of the node that will contain the content

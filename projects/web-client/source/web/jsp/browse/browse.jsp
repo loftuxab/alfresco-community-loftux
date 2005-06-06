@@ -350,18 +350,15 @@
                            </h:outputText>
                         </a:column>
                         
-                        <%-- Node Descendants links for list view mode --%>
-                        <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
-                           <r:nodeDescendants value="#{r.nodeRef}" styleClass="header" actionListener="#{BrowseBean.clickDescendantSpace}" />
-                        </a:column>
-                        
                         <%-- Actions column --%>
                         <a:column actions="true" style="text-align:left">
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
                            <a:booleanEvaluator value="#{r.locked == false}">
-                              <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="editFile">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
                               <a:actionLink value="#{msg.update}" image="/images/icons/file.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>

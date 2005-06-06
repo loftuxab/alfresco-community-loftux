@@ -274,6 +274,12 @@ public class CheckinCheckoutBean
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             Node node = new Node(ref, this.nodeService);
             
+            // create content URL to the content download servlet with ID and expected filename
+            // the myfile part will be ignored by the servlet but gives the browser a hint
+            String url = DownloadContentServlet.generateURL(ref, node.getName());
+            node.getProperties().put("url", url);
+            node.getProperties().put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));            
+            
             // remember the document
             setDocument(node);
             
@@ -308,8 +314,7 @@ public class CheckinCheckoutBean
       {
          try
          {
-            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-                  FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             if (logger.isDebugEnabled())
@@ -404,6 +409,31 @@ public class CheckinCheckoutBean
       else
       {
          logger.warn("WARNING: checkoutFileOK called without a current WorkingDocument!");
+      }
+      
+      return outcome;
+   }
+   
+   /**
+    * Action called upon completion of the Edit File download page
+    */
+   public String editFileOK()
+   {
+      String outcome = null;
+      
+      Node node = getDocument();
+      if (node != null)
+      {
+         // clean up and clear action context
+         clearUpload();
+         setDocument(null);
+         setWorkingDocument(null);
+         
+         outcome = "browse";
+      }
+      else
+      {
+         logger.warn("WARNING: editFileOK called without a current Document!");
       }
       
       return outcome;
@@ -505,8 +535,7 @@ public class CheckinCheckoutBean
       {
          try
          {
-            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-                  FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             if (logger.isDebugEnabled())
@@ -596,8 +625,7 @@ public class CheckinCheckoutBean
       {
          try
          {
-            tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-                  FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             if (logger.isDebugEnabled())

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
+import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.NamespaceService;
@@ -21,6 +22,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.value.ValueConverter;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -150,17 +152,16 @@ public final class RepoUtils
     * 
     * @param node             The Node wrapper to test against
     * @param lockService      The LockService to use
-    * @param ref              NodeRef to test
     * 
     * @return whether a Node is current Locked
     */
-   public static Boolean isNodeLocked(Node node, LockService lockService, NodeRef ref)
+   public static Boolean isNodeLocked(Node node, LockService lockService)
    {
       Boolean locked = Boolean.FALSE;
       if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE))
       {
          // TODO: replace username with real user name ref here!
-         LockStatus lockStatus = lockService.getLockStatus(ref, USERNAME);
+         LockStatus lockStatus = lockService.getLockStatus(node.getNodeRef(), USERNAME);
          if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
          {
             locked = Boolean.TRUE;
@@ -245,6 +246,19 @@ public final class RepoUtils
       }
       
       return mimetype;
+   }
+   
+   /**
+    * Return a UserTransaction instance
+    * 
+    * @param context    FacesContext
+    * 
+    * @return UserTransaction
+    */
+   public static UserTransaction getUserTransaction(FacesContext context)
+   {
+      return (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
+               context).getBean(Repository.USER_TRANSACTION);
    }
    
    

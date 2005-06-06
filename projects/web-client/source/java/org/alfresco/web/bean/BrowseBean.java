@@ -339,8 +339,7 @@ public class BrowseBean implements IContextListener
       UserTransaction tx = null;
       try
       {
-         tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-               FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+         tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
          NodeRef parentRef;
@@ -419,8 +418,7 @@ public class BrowseBean implements IContextListener
       UserTransaction tx = null;
       try
       {
-         tx = (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-               FacesContext.getCurrentInstance()).getBean(Repository.USER_TRANSACTION);
+         tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
          if (logger.isDebugEnabled())
@@ -481,7 +479,7 @@ public class BrowseBean implements IContextListener
    private void setupDataBindingProperties(MapNode node)
    {
       // special properties to be used by the value binding components on the page
-      node.put("locked", RepoUtils.isNodeLocked(node, this.lockService, node.getNodeRef()));
+      node.put("locked", RepoUtils.isNodeLocked(node, this.lockService));
       node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));
       node.put("url", DownloadContentServlet.generateURL(node.getNodeRef(), node.getName()));
       node.put("fileTypeImage", RepoUtils.getFileTypeImage(node));

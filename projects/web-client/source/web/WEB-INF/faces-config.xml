@@ -300,8 +300,20 @@
          <to-view-id>/jsp/dialog/update-file.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>editFile</from-outcome>
+         <to-view-id>/jsp/dialog/edit-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>manageRules</from-outcome>
          <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-file.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
