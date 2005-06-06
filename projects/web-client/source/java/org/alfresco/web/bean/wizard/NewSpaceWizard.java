@@ -3,7 +3,6 @@ package org.alfresco.web.bean.wizard;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
-import org.alfresco.util.Conversion;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -59,8 +57,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    private String icon;
    private String templateName;
    private boolean saveAsTemplate;
-   private List spaces;
-   private List templates;
+   private List<SelectItem> templates;
    
    /**
     * Deals with the finish button being pressed
@@ -300,11 +297,6 @@ public class NewSpaceWizard extends AbstractWizardBean
       super.init();
       
       // clear the cached query results
-      if (this.spaces != null)
-      {
-         this.spaces.clear();
-         this.spaces = null;
-      }
       if (this.templates != null)
       {
          this.templates.clear();
@@ -362,23 +354,28 @@ public class NewSpaceWizard extends AbstractWizardBean
    {
       if (this.templates == null)
       {
-         this.templates = querySpaces(true);
+         NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+         this.templates = new ArrayList<SelectItem>();
+         
+         String actNs = NamespaceService.ALFRESCO_PREFIX;
+         String s = "PATH:\"/" + actNs + ":Glossary/" + actNs + ":Templates/" + actNs + ":*\"";
+         ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
+         if (results.length() > 0)
+         {
+            for (ResultSetRow row : results)
+            {
+               NodeRef node = row.getNodeRef();
+               if (this.nodeService.getType(node).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+               {
+                  String name = row.getQName().getLocalName();
+                  String id = node.getId();
+                  this.templates.add(new SelectItem(id, name));
+               }
+            }
+         }
       }
       
       return this.templates;
-   }
-   
-   /**
-    * @return Returns a list of spaces currently in the system
-    */
-   public List getSpaces()
-   {
-      if (this.spaces == null)
-      {
-         this.spaces = querySpaces(false);
-      }
-      
-      return this.spaces;
    }
 
    /**
@@ -589,61 +586,5 @@ public class NewSpaceWizard extends AbstractWizardBean
       }
       
       return outcome;
-   }
-   
-   /**
-    * Returns a list of spaces in the system 
-    * 
-    * @param templates Determines whether to return template spaces or not 
-    * @return List of spaces
-    */
-   private List querySpaces(boolean templates)
-   {
-      // get the node service and root node
-      NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
-      
-      List<SelectItem> items = new ArrayList<SelectItem>();
-      
-      if (templates)
-      {
-         String actNs = NamespaceService.ALFRESCO_PREFIX;
-         String s = "PATH:\"/" + actNs + ":Glossary/" + actNs + ":Templates/" + actNs + ":*\"";
-         ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
-         if (results.length() > 0)
-         {
-            for (ResultSetRow row : results)
-            {
-               NodeRef node = row.getNodeRef();
-               if (this.nodeService.hasAspect(node, DictionaryBootstrap.ASPECT_QNAME_SPACE))
-               {
-                  String name = row.getQName().getLocalName();
-                  String id = node.getId();
-                  items.add(new SelectItem(id, name));
-               }
-            }
-         }
-      }
-      else
-      {
-         // get all the child nodes from the root
-         Collection<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(rootNodeRef);
-         for (ChildAssocRef ref: childRefs)
-         {
-            NodeRef child = ref.getChildRef();
-            // if the node has the space aspect applied add it to the list
-            if (this.nodeService.hasAspect(child, DictionaryBootstrap.ASPECT_QNAME_SPACE))
-            {
-               String id = child.getId();
-               String name = ref.getQName().getLocalName();
-               // also filter out the Glossary space  TODO: make this a system type or space
-               if (name.equals("Glossary") == false)
-               {
-                  items.add(new SelectItem(id, name));
-               }
-            }
-         }
-      }
-      
-      return items;
    }
 }

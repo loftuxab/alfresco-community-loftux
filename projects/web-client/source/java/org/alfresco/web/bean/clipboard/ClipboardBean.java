@@ -237,7 +237,7 @@ public class ClipboardBean
          
          // call the node ops service to initiate the copy
          // TODO: what should the assoc QName be?
-         boolean copyChildren = (item.Node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE));
+         boolean copyChildren = (item.Node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FOLDER));
          NodeRef copyRef = this.nodeOperationsService.copy(item.Node.getNodeRef(), parentRef, null, assocRef.getQName(), copyChildren);
          
          // TODO: a temp fix for the fact that the NAME attribute is not copied as DD not here yet

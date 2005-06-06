@@ -19,21 +19,21 @@ public class DictionaryBootstrap
     public static final String PROP_REFERENCE = "reference";
     public static final QName PROP_QNAME_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_REFERENCE);
       
-	// Copy aspect constants
-	public static final String ASPECT_NAME_COPIEDFROM = "copiedfrom";
-	public static final QName ASPECT_QNAME_COPIEDFROM = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_COPIEDFROM);
-	public static final String PROP_COPY_REFERENCE = "source";
-	public static final QName PROP_QNAME_COPY_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_COPY_REFERENCE);
+	 // Copy aspect constants
+	 public static final String ASPECT_NAME_COPIEDFROM = "copiedfrom";
+	 public static final QName ASPECT_QNAME_COPIEDFROM = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_COPIEDFROM);
+	 public static final String PROP_COPY_REFERENCE = "source";
+	 public static final QName PROP_QNAME_COPY_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, PROP_COPY_REFERENCE);
 	
-	// Working copy aspect contants
-	public static final String ASPECT_NAME_WORKING_COPY = "workingcopy";
-	public static final QName ASPECT_QNAME_WORKING_COPY = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_WORKING_COPY);
+	 // Working copy aspect contants
+	 public static final String ASPECT_NAME_WORKING_COPY = "workingcopy";
+	 public static final QName ASPECT_QNAME_WORKING_COPY = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_WORKING_COPY);
 	
     // Container type constants
     public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ALFRESCO_URI, "container");
     public static final QName CHILD_ASSOC_CONTENTS = QName.createQName(NamespaceService.ALFRESCO_URI, "contents");
 
-    // Content type constants
+    // Content type and aspect constants
     public static final QName PROP_QNAME_CONTENT_URL = QName.createQName(NamespaceService.ALFRESCO_URI, "contentUrl");
     public static final QName PROP_QNAME_MIME_TYPE = QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype");
     public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.ALFRESCO_URI, "encoding");
@@ -94,13 +94,4 @@ public class DictionaryBootstrap
     // expected application types
     public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "folder");
     public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ALFRESCO_URI, "file");
-    public static final QName ASPECT_QNAME_SPACE = QName.createQName(NamespaceService.ALFRESCO_URI, "space");
-    public static final String PROP_CREATED_DATE = "createddate";
-    public static final String PROP_MODIFIED_DATE = "modifieddate";
-    public static final String PROP_DESCRIPTION = "description";
-    public static final String PROP_ICON = "icon";
-    public static final String PROP_SPACE_TYPE = "spacetype";
-
-       
-    
 }

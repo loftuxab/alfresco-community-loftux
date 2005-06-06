@@ -280,7 +280,7 @@ public class UISpaceSelector extends UIInput
                   for (int index=0; index<childRefs.size(); index++)
                   {
                      ChildAssocRef childRef = childRefs.get(index);
-                     if (service.hasAspect(childRef.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_SPACE))
+                     if (service.getType(childRef.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
                      {
                         // render each space found
                         String childId = childRef.getChildRef().getId();

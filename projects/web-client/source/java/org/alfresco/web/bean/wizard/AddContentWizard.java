@@ -87,44 +87,35 @@ public class AddContentWizard extends AbstractWizardBean
             {
                containerNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
             }
-            
-            // TODO: deal with existing files and determine what to do from the
-            //       this.overwrite member variable
-            
-            // add the properties needed during creation - some are mandatory in the model
-            // TODO: TEMP: add the created and modified date as properties for now
-            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-            Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-            
-            QName propName = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
-            properties.put(propName, this.fileName);
-            
-            QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
-            properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
-            
-            QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
-            properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
-            
-            QName propMimeType = QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype");
-            properties.put(propMimeType, RepoUtils.getMimeTypeForFileName(FacesContext.getCurrentInstance(), this.fileName));
-            
-            QName propEncoding = QName.createQName(NamespaceService.ALFRESCO_URI, "encoding");
-            properties.put(propEncoding, "UTF-8");
+
+            // create properties for content type
+            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(3);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, 
+                  RepoUtils.getMimeTypeForFileName(FacesContext.getCurrentInstance(), this.fileName));
             
             // create the node to represent the node
             String assocName = this.fileName.replace('.', '-');
             ChildAssocRef assocRef = this.nodeService.createNode(containerNodeRef,
                    null,
                    QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
-                   DictionaryBootstrap.TYPE_QNAME_FILE,
-                   properties);
+                   DictionaryBootstrap.TYPE_QNAME_CONTENT,
+                   contentProps);
             NodeRef fileNodeRef = assocRef.getChildRef();
             
             if (logger.isDebugEnabled())
                logger.debug("Created file node for file: " + this.fileName);
             
+            // apply the auditable aspect - created and modified date
+            Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(5);
+            Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
+            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+            this.nodeService.addAspect(fileNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+
             if (logger.isDebugEnabled())
-               logger.debug("Set properties on file node: " + properties);
+               logger.debug("Added auditable aspect with properties: " + auditProps);
             
             // get a writer for the content and put the file
             ContentWriter writer = contentService.getUpdatingWriter(fileNodeRef);

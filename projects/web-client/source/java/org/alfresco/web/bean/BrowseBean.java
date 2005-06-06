@@ -373,7 +373,7 @@ public class BrowseBean implements IContextListener
             {
                this.containerNodes.add(node);
             }
-            else if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FILE))
+            else if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
             {
                setupDataBindingProperties(node);
                
@@ -440,11 +440,11 @@ public class BrowseBean implements IContextListener
                MapNode node = new MapNode(nodeRef, this.nodeService);
                
                // look for Space or File nodes
-               if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE))
+               if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
                {
                   this.containerNodes.add(node);
                }
-               else if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FILE))
+               else if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
                {
                   setupDataBindingProperties(node);
                   

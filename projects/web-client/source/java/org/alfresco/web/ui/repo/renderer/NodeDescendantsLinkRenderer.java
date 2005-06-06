@@ -105,7 +105,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             for (int index=0; index<maximum; index++)
             {
                ChildAssocRef ref = childRefs.get(index);
-               if (service.hasAspect(ref.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_SPACE))
+               if (service.getType(ref.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
                {
                   // output separator if appropriate
                   if (total > 0)

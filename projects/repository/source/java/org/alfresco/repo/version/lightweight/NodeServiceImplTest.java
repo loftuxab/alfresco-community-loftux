@@ -200,7 +200,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         
         boolean test1 = this.lightWeightVersionStoreNodeService.hasAspect(
                 version.getNodeRef(), 
-                DictionaryBootstrap.ASPECT_QNAME_SPACE);
+                DictionaryBootstrap.ASPECT_QNAME_UIFACETS);
         assertFalse(test1);
         
         boolean test2 = this.lightWeightVersionStoreNodeService.hasAspect(
