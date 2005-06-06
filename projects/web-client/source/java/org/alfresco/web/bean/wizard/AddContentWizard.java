@@ -101,7 +101,7 @@ public class AddContentWizard extends AbstractWizardBean
                assocName = assocName.substring(0, QName.MAX_LENGTH);
             }
             ChildAssocRef assocRef = this.nodeService.createNode(containerNodeRef,
-                   null,
+                   RepoUtils.QNAME_CONTAINS,
                    QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
                    DictionaryBootstrap.TYPE_QNAME_CONTENT,
                    contentProps);

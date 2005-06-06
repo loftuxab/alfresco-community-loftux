@@ -293,6 +293,7 @@ public final class RepoUtils
    
    
    public static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
+   public static final QName QNAME_CONTAINS = QName.createQName(NamespaceService.ALFRESCO_URI, "contains"); 
    
    // TODO: TEMP! Replace this once we have "users" in the system!
    private static final String USERNAME = "admin";

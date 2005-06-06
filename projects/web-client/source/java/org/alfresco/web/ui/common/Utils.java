@@ -134,6 +134,29 @@ public final class Utils
    
    private final static int CROP_CHARS_LENGTH = 32;
    
+   public static String replace(String str, String repl, String with)
+   {
+       int lastindex = 0;
+       int pos = str.indexOf(repl);
+
+       // If no replacement needed, return the original string
+       // and save StringBuffer allocation/char copying
+       if (pos < 0)
+       {
+           return str;
+       }
+       
+       int len = repl.length();
+       int lendiff = with.length() - repl.length();
+       StringBuilder out = new StringBuilder((lendiff <= 0) ? str.length() : (str.length() + (10 * lendiff)));
+       for (; pos >= 0; pos = str.indexOf(repl, lastindex = pos + len))
+       {
+           out.append(str.substring(lastindex, pos)).append(with);
+       }
+       
+       return out.append(str.substring(lastindex, str.length())).toString();
+   }
+   
    /**
     * Helper to output an attribute to the output stream
     * 

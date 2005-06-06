@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -460,7 +461,7 @@ public class BrowseBean implements IContextListener
       catch (Exception err)
       {
          logger.info("Search failed for: " + query);
-         Utils.addErrorMessage( MessageFormat.format(ERROR_SEARCH, new Object[] {err.getMessage()}) );
+         Utils.addErrorMessage( MessageFormat.format(ERROR_SEARCH, new Object[] {err.getMessage()}), err );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
@@ -498,11 +499,36 @@ public class BrowseBean implements IContextListener
       // the QName for the well known "name" attribute
       String nameAttr = RepoUtils.escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "name"));
       
+      // match against content text
+      String contentQuery;
+      if (text.indexOf(' ') == -1 ||
+          (text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"'))
+      {
+         text = text.replace('"', ' ');
+         // simple single word text or whole phrase text search
+         contentQuery = " TEXT:\"" + text + '"';
+      }
+      else
+      {
+         // multiple word search
+         text = text.replace('"', ' ');
+         StringTokenizer t = new StringTokenizer(text, " ");
+         StringBuilder buf = new StringBuilder(64);
+         buf.append('(');
+         while (t.hasMoreTokens())
+         {
+            buf.append("TEXT:\"").append(t.nextToken()).append('"');
+            if (t.hasMoreTokens())
+            {
+               buf.append(" OR ");
+            }
+         }
+         buf.append(')');
+         contentQuery = buf.toString();
+      }
+      
       // match against the "name" attribute
       String nameAttrQuery = " +@" + nameAttr + ":\"" + text + "*\"";
-      
-      // match against content text
-      String contentQuery = " TEXT:\"" + text + "\"";
       
       // match against FILE type
       String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"";

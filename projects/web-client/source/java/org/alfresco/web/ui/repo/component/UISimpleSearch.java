@@ -86,7 +86,7 @@ public class UISimpleSearch extends UICommand
          String searchText = (String)requestMap.get(getClientId(context));
          
          // TODO: strip or escape undesirable characters - for screen and search API
-         searchText = searchText.replace('"', ' ');
+         //searchText = searchText.replace('"', ' ');
          if (searchText.length() != 0)
          {
             if (logger.isDebugEnabled())
@@ -202,7 +202,7 @@ public class UISimpleSearch extends UICommand
       out.write("' onkeypress=\"return _noenter(event)\"");
       out.write(" type='text' maxlength='255' style='width:90px;padding-top:3px' value=\"");
       // output previous search text stored in this component!
-      out.write(getLastSearch());
+      out.write(Utils.replace(getLastSearch(), "\"", "&quot;"));
       out.write("\">");
       
       // search Go image button

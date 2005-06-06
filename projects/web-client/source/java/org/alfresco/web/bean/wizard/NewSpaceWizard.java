@@ -122,7 +122,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                
                String qname = RepoUtils.createValidQName(this.name);
                ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
-                         null, QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+                         RepoUtils.QNAME_CONTAINS, QName.createQName(NamespaceService.ALFRESCO_URI, qname),
                          DictionaryBootstrap.TYPE_QNAME_FOLDER);
                
                NodeRef nodeRef = assocRef.getChildRef();
