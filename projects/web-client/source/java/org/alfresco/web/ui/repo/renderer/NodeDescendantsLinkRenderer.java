@@ -5,6 +5,7 @@ package org.alfresco.web.ui.repo.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -89,22 +90,33 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
                
-            List<ChildAssocRef> childRefs = service.getChildAssocs(parentRef);
-            
             // TODO: need a comparator to sort node refs (based on childref qname)
             //       as currently the list is returned in a random order per request
             
-            // walk each child ref and output a descendant link control for each item
             String separator = (String)component.getAttributes().get("separator");
             if (separator == null)
             {
                separator = DEFAULT_SEPARATOR;
             }
-            int total = 0;
-            int maximum = childRefs.size() > control.getMaxChildren() ? control.getMaxChildren() : childRefs.size();
-            for (int index=0; index<maximum; index++)
+            
+            // calculate the number of displayed child refs
+            List<ChildAssocRef> childRefs = service.getChildAssocs(parentRef);
+            List<ChildAssocRef> refs = new ArrayList<ChildAssocRef>(childRefs.size());
+            for (int index=0; index<childRefs.size(); index++)
             {
                ChildAssocRef ref = childRefs.get(index);
+               if (service.getType(ref.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+               {
+                  refs.add(ref);
+               }
+            }
+            
+            // walk each child ref and output a descendant link control for each item
+            int total = 0;
+            int maximum = refs.size() > control.getMaxChildren() ? control.getMaxChildren() : refs.size();
+            for (int index=0; index<maximum; index++)
+            {
+               ChildAssocRef ref = refs.get(index);
                if (service.getType(ref.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
                {
                   // output separator if appropriate
@@ -119,7 +131,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             }
             
             // do we need to render ellipses to indicate more items than the maximum
-            if (control.getShowEllipses() == true && childRefs.size() > control.getMaxChildren())
+            if (control.getShowEllipses() == true && total > control.getMaxChildren())
             {
                out.write( separator );
                // TODO: is this the correct way to get the information we need?

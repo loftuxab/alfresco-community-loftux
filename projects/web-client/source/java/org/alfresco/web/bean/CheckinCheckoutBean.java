@@ -561,9 +561,9 @@ public class CheckinCheckoutBean
             {
                // add the content to a repo temp writer location
                // we can then retrieve the URL to the content to to be set on the node during checkin
-               ContentWriter tempWriter = this.contentService.getTempWriter();
-               tempWriter.putContent(this.file);
-               contentUrl = tempWriter.getContentUrl();
+               ContentWriter writer = this.contentService.getWriter(node.getNodeRef());
+               writer.putContent(this.file);
+               contentUrl = writer.getContentUrl();
             }
             
             if (contentUrl == null || contentUrl.length() == 0)
@@ -571,7 +571,7 @@ public class CheckinCheckoutBean
                throw new IllegalStateException("Content URL is empty for specified working copy content node!");
             }
             
-            // TODO: what props should we add here? - e.g. version history text
+            // add version history text to props
             Map<String, Serializable> props = new HashMap<String, Serializable>(1, 1.0f);
             props.put(Version.PROP_DESCRIPTION, this.versionNotes);
             NodeRef originalDoc = this.versionOperationsService.checkin(

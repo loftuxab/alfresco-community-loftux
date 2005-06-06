@@ -359,8 +359,6 @@ public class BrowseBean implements IContextListener
          this.contentNodes = new ArrayList<Node>(childRefs.size());
          for (ChildAssocRef ref: childRefs)
          {
-            QName qname = ref.getQName();
-            
             // create our Node representation from the NodeRef
             NodeRef nodeRef = ref.getChildRef();
             
@@ -602,7 +600,7 @@ public class BrowseBean implements IContextListener
       }
       
       if (logger.isDebugEnabled())
-         logger.debug("*Selected noderef Id: " + nodeRef.getId());
+         logger.debug("Selected noderef Id: " + nodeRef.getId());
       
       try
       {

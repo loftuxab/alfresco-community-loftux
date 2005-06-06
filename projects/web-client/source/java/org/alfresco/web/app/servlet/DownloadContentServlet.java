@@ -91,7 +91,8 @@ public class DownloadContentServlet extends HttpServlet
          int extIndex = filename.lastIndexOf('.');
          if (extIndex != -1)
          {
-            String mt = mimetypeMap.getMimetypesByExtension().get(extIndex);
+            String ext = filename.substring(extIndex + 1);
+            String mt = mimetypeMap.getMimetypesByExtension().get(ext);
             if (mt != null)
             {
                mimetype = mt;

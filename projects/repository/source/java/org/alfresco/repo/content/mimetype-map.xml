@@ -160,7 +160,7 @@
             <extension>pgm</extension>
          </mimetype>
          <mimetype mimetype="image/png" display="PNG Image">
-            <extension>pgn</extension>
+            <extension>png</extension>
          </mimetype>
          <mimetype mimetype="image/x-portable-anymap" display="Anymap Image">
             <extension>pnm</extension>
