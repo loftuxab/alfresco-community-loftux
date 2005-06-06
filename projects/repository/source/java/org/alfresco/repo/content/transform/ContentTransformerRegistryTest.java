@@ -60,12 +60,12 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         transformers.add(new DummyTransformer(A, C, 0.5, 10L));
         transformers.add(new DummyTransformer(A, C, 1.0, 10L));
         transformers.add(new DummyTransformer(B, C, 0.2, 10L));
-        // create some dummy transformers for speed tests - execute the fast one to give it poor average
-        ContentTransformer slowTransformer = new DummyTransformer(A, D, 1.0, 20L);
-        ContentTransformer fastTransformer = new DummyTransformer(A, D, 1.0, 10L);
-        fastTransformer.transform(reader, writer);  // force a non-zero average time
-        transformers.add(slowTransformer);
-        transformers.add(fastTransformer);
+        // create some dummy transformers for speed tests
+        transformers.add(new DummyTransformer(A, D, 1.0, 20L));
+        transformers.add(new DummyTransformer(A, D, 1.0, 20L));
+        transformers.add(new DummyTransformer(A, D, 1.0, 10L));  // the fast one
+        transformers.add(new DummyTransformer(A, D, 1.0, 20L));
+        transformers.add(new DummyTransformer(A, D, 1.0, 20L));
         // create the dummyRegistry
         dummyRegistry = new ContentTransformerRegistry(transformers, mimetypeMap);
     }
@@ -116,26 +116,11 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
      */
     public void testPerformanceRetrieval() throws Exception
     {
-        ContentTransformer transformer = null;
-
-        // A -> D expect 1.0, 0ms (slow transformer that was not executed)
-        transformer = dummyRegistry.getTransformer(A, D);
-        assertEquals("Incorrect reliability", 1.0, transformer.getReliability(A, D));
-        assertEquals("Incorrect reliability", 0.0, transformer.getReliability(D, A));
-        assertEquals("Incorrect transformation time", 0L, transformer.getTransformationTime());
-        // now execute the dummy transformer - it will start a meaningful but slow average
-        transformer.transform(reader, writer);
-        transformer.transform(reader, writer);
-        assertEquals("Incorrent transformation time", 20L, transformer.getTransformationTime());
-        
-        // reset the registry cache
-        dummyRegistry.resetCache();
-
-        // A -> D expect 1.0, 10ms (fast transformer should be back with a better average)
-        transformer = dummyRegistry.getTransformer(A, D);
-        assertEquals("Incorrect reliability", 1.0, transformer.getReliability(A, D));
-        assertEquals("Incorrect reliability", 0.0, transformer.getReliability(D, A));
-        assertEquals("Incorrect transformation time", 10L, transformer.getTransformationTime());
+        // A -> D expect 1.0, 10ms
+        ContentTransformer transformer1 = dummyRegistry.getTransformer(A, D);
+        assertEquals("Incorrect reliability", 1.0, transformer1.getReliability(A, D));
+        assertEquals("Incorrect reliability", 0.0, transformer1.getReliability(D, A));
+        assertEquals("Incorrect transformation time", 10L, transformer1.getTransformationTime());
     }
     
     public void testScoredRetrieval() throws Exception
@@ -193,6 +178,14 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         {
             // just update the transformation time
             super.recordTime(transformationTime);
+        }
+
+        /**
+         * @return Returns the fixed dummy average transformation time
+         */
+        public synchronized long getTransformationTime()
+        {
+            return transformationTime;
         }
     }
 }

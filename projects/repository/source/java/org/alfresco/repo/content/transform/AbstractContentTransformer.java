@@ -127,7 +127,8 @@ public abstract class AbstractContentTransformer implements ContentTransformer
         {
             logger.debug("Completed transformation: \n" +
                     "   reader: " + reader + "\n" +
-                    "   writer: " + writer);
+                    "   writer: " + writer + "\n" +
+                    "   transformer: " + this);
         }
     }
 
@@ -144,6 +145,9 @@ public abstract class AbstractContentTransformer implements ContentTransformer
      * <p>
      * Subclasses should call this after every transformation in order to keep
      * the running average of the transformation times up to date.
+     * <p>
+     * This method is thread-safe.  The time spent in this method is negligible
+     * so the impact will be minor.
      * 
      * @param transformationTime the time it took to perform the transformation.
      *      The value may be 0.

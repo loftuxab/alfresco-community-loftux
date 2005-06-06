@@ -1,5 +1,7 @@
 package org.alfresco.repo.content.transform;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,7 @@ public class ContentTransformerRegistry
     private List<ContentTransformer> transformers;
     private MimetypeMap mimetypeMap;
     /** Cache of previously used transactions */
-    private Map<TransformationKey, ContentTransformer> transformationCache;
+    private Map<TransformationKey, List<ContentTransformer>> transformationCache;
     private short accessCount;
     /** Controls read access to the transformation cache */
     private Lock transformationCacheReadLock;
@@ -54,7 +56,7 @@ public class ContentTransformerRegistry
         Assert.notNull(mimetypeMap, "The MimetypeMap is mandatory");
         this.transformers = transformers;
         this.mimetypeMap = mimetypeMap;
-        transformationCache = new HashMap<TransformationKey, ContentTransformer>(17);
+        transformationCache = new HashMap<TransformationKey, List<ContentTransformer>>(17);
         accessCount = 0;
         // create lock objects for access to the cache
         ReadWriteLock transformationCacheLock = new ReentrantReadWriteLock();
@@ -87,7 +89,8 @@ public class ContentTransformerRegistry
     }
     
     /**
-     * Gets the best transformer possible.
+     * Gets the best transformer possible.  This is a combination of the most reliable
+     * and the most performant transformer.
      * <p>
      * The result is cached for quicker access next time.
      * 
@@ -109,6 +112,7 @@ public class ContentTransformerRegistry
         }
         
         TransformationKey key = new TransformationKey(sourceMimetype, targetMimetype);
+        List<ContentTransformer> transformers = null;
         transformationCacheReadLock.lock();
         try
         {
@@ -116,113 +120,125 @@ public class ContentTransformerRegistry
             {
                 // the translation has been requested before
                 // it might have been null
-                return transformationCache.get(key);
+                transformers = transformationCache.get(key);
             }
         }
         finally
         {
             transformationCacheReadLock.unlock();
         }
-        // the translation has not been requested before
-        // get a write lock on the cache
-        // no double check done as it is not an expensive task
-        transformationCacheWriteLock.lock();
-        try
+        
+        if (transformers == null)
         {
-            // find the most suitable transformer - may be null
-            ContentTransformer transformer = findTransformer(sourceMimetype, targetMimetype);
-            // store the result even if it is null
-            transformationCache.put(key, transformer);
-            // done
-            return transformer;
+            // the translation has not been requested before
+            // get a write lock on the cache
+            // no double check done as it is not an expensive task
+            transformationCacheWriteLock.lock();
+            try
+            {
+                // find the most suitable transformer - may be empty list
+                transformers = findTransformers(sourceMimetype, targetMimetype);
+                // store the result even if it is null
+                transformationCache.put(key, transformers);
+            }
+            finally
+            {
+                transformationCacheWriteLock.unlock();
+            }
         }
-        finally
-        {
-            transformationCacheWriteLock.unlock();
-        }
-    }
-    
-    /**
-     * Attempts to get a transformer that does the exact transformation before
-     * attempting to find a chain of transformers that can perform the transformation.
-     * 
-     * @return Returns best transformer for the translation - null if all
-     *      score 0.0 on reliability
-     */
-    private ContentTransformer findTransformer(String sourceMimetype, String targetMimetype)
-    {
-        // search for a simple transformer that can do the job
-        ContentTransformer transformer = findDirectTransformer(sourceMimetype, targetMimetype);
-        if (transformer == null)
-        {
-            // attempt to build a transformer from several others
-            transformer = findComplexTransformer(sourceMimetype, targetMimetype);
-        }
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Searched for transformer: \n" +
-                    "   source mimetype: " + sourceMimetype + "\n" +
-                    "   target mimetype: " + targetMimetype + "\n" +
-                    "   transformer: " + transformer);
-        }
-        return transformer;
-    }
-    
-    /**
-     * Loops through the content transformers and picks the one with the highest reliability.
-     * <p>
-     * Where there are several transformers that are equally reliable, the fastest will be 
-     * returned.  A good example of this would be for a <pre>text/plain --> text/plain</pre>
-     * conversion.  A transformer that merely passed the stream across without any actuall
-     * interpretation of the data will be much faster than a transformer that had to open
-     * an application and then save the file back to disk.
-     * 
-     * @return Returns best transformer for the translation - null if
-     *      all score 0.0 on reliability
-     */
-    private ContentTransformer findDirectTransformer(String sourceMimetype, String targetMimetype)
-    {
-        double maxReliability = 0.0;
-        long leastTime = 100000L;   // 100 seconds - longer than anyone would think of waiting 
+        // select the most performant transformer
+        long bestTime = -1L;
         ContentTransformer bestTransformer = null;
-        // loop through transformers
-        for (ContentTransformer transformer : this.transformers)
+        for (ContentTransformer transformer : transformers)
         {
-            double reliability = transformer.getReliability(sourceMimetype, targetMimetype);
-            long time = transformer.getTransformationTime();
-            if (reliability <= 0.0)
+            long transformationTime = transformer.getTransformationTime();
+            // is it better?
+            if (bestTransformer == null || transformationTime < bestTime)
             {
-                // it is unusable
-                continue;
+                bestTransformer = transformer;
+                bestTime = transformationTime;
             }
-            if (reliability < maxReliability)
-            {
-                // it is not the best one to use
-                continue;
-            }
-            else if (reliability == maxReliability && time >= leastTime)
-            {
-                // it is as good as the best so far, but it takes longer
-                continue;
-            }
-            bestTransformer = transformer;
-            maxReliability = reliability;
-            leastTime = time;
         }
         // done
         return bestTransformer;
     }
     
     /**
-     * Uses a list of known mimetypes to build a transformation from several
-     * direct transformations. 
+     * Gets all transformers, of equal reliability, that can perform the requested transformation.
+     * 
+     * @return Returns best transformer for the translation - null if all
+     *      score 0.0 on reliability
      */
-    private ContentTransformer findComplexTransformer(String sourceMimetype, String targetMimetype)
+    private List<ContentTransformer> findTransformers(String sourceMimetype, String targetMimetype)
+    {
+        // search for a simple transformer that can do the job
+        List<ContentTransformer> transformers = findDirectTransformers(sourceMimetype, targetMimetype);
+        // get the complex transformers that can do the job
+        List<ContentTransformer> complexTransformers = findComplexTransformer(sourceMimetype, targetMimetype);
+        transformers.addAll(complexTransformers);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Searched for transformer: \n" +
+                    "   source mimetype: " + sourceMimetype + "\n" +
+                    "   target mimetype: " + targetMimetype + "\n" +
+                    "   transformers: " + transformers);
+        }
+        return transformers;
+    }
+    
+    /**
+     * Loops through the content transformers and picks the ones with the highest reliabilities.
+     * <p>
+     * Where there are several transformers that are equally reliable, they are all returned.
+     * 
+     * @return Returns the most reliable transformers for the translation - empty list if there
+     *      are none.
+     */
+    private List<ContentTransformer> findDirectTransformers(String sourceMimetype, String targetMimetype)
+    {
+        double maxReliability = 0.0;
+        long leastTime = 100000L;   // 100 seconds - longer than anyone would think of waiting 
+        List<ContentTransformer> bestTransformers = new ArrayList<ContentTransformer>(2);
+        // loop through transformers
+        for (ContentTransformer transformer : this.transformers)
+        {
+            double reliability = transformer.getReliability(sourceMimetype, targetMimetype);
+            if (reliability <= 0.0)
+            {
+                // it is unusable
+                continue;
+            }
+            else if (reliability < maxReliability)
+            {
+                // it is not the best one to use
+                continue;
+            }
+            else if (reliability == maxReliability)
+            {
+                // it is as reliable as a previous transformer
+            }
+            else
+            {
+                // it is better than any previous transformer - wipe them
+                bestTransformers.clear();
+                maxReliability = reliability;
+            }
+            // add the transformer to the list
+            bestTransformers.add(transformer);
+        }
+        // done
+        return bestTransformers;
+    }
+    
+    /**
+     * Uses a list of known mimetypes to build transformations from several direct transformations. 
+     */
+    private List<ContentTransformer> findComplexTransformer(String sourceMimetype, String targetMimetype)
     {
         // get a complete list of mimetypes
-        CodeMonkey.todo("Build complex transformer by searching for transformations by mimetype"); // TODO
-        return null;
+        CodeMonkey.todo("Build complex transformers by searching for transformations by mimetype"); // TODO
+        return Collections.emptyList();
     }
     
     /**

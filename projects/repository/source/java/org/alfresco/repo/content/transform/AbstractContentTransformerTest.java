@@ -82,7 +82,13 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
      * {@link #getTransformer(String, String) transformer} subject to the
      * {@link org.alfresco.util.test.QuickFileTest available test files}
      * and the {@link ContentTransformer#getReliability(String, String) reliability} of
-     * the {@link #getTransformer(String, String) transformer} itself. 
+     * the {@link #getTransformer(String, String) transformer} itself.
+     * <p>
+     * Each transformation is repeated several times, with a transformer being
+     * {@link #getTransformer(String, String) requested} for each transformation.  In the
+     * case where optimizations are being done around the selection of the most
+     * appropriate transformer, different transformers could be used during the iteration
+     * process.
      */
     public void testAllConversions() throws Exception
     {
@@ -101,25 +107,25 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
             // attempt to convert to every other mimetype
             for (String targetMimetype : mimetypes)
             {
-                // must we test the transformation?
-                ContentTransformer transformer = getTransformer(sourceMimetype, targetMimetype);
-                if (transformer == null)
-                {
-                    continue;   // test is not required
-                }
-                else if (transformer.getReliability(sourceMimetype, targetMimetype) <= 0.0)
-                {
-                    continue;   // not reliable for this transformation
-                }
-                
+                ContentWriter targetWriter = null;
                 // construct a reader onto the source file
                 ContentReader sourceReader = new FileContentReader(sourceFile);
-                
+
                 // perform the transformation several times so that we get a good idea of performance
-                int iterations = 5;
-                ContentWriter targetWriter = null;
-                for (int i = 0; i < iterations; i++)
+                int count = 0;
+                for (int i = 0; i < 5; i++)
                 {
+                    // must we test the transformation?
+                    ContentTransformer transformer = getTransformer(sourceMimetype, targetMimetype);
+                    if (transformer == null)
+                    {
+                        continue;   // test is not required
+                    }
+                    else if (transformer.getReliability(sourceMimetype, targetMimetype) <= 0.0)
+                    {
+                        continue;   // not reliable for this transformation
+                    }
+                    
                     // make a writer for the target file
                     String targetExtension = mimetypeMap.getExtension(targetMimetype);
                     File targetFile = TempFileProvider.createTempFile(getName(), "." + targetExtension);
@@ -138,11 +144,13 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
                         assertTrue("Quick phrase not present in document converted to text by transformer: " + transformer,
                                 checkContent.contains(QUICK_CONTENT));
                     }
+                    // increment count
+                    count++;
                 }
                 
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Transformation performed " + iterations + " time: " +
+                    logger.debug("Transformation performed " + count + " time: " +
                             sourceMimetype + " --> " + targetMimetype + "\n" +
                             "   source: " + sourceReader + "\n" +
                             "   target: " + targetWriter + "\n" +

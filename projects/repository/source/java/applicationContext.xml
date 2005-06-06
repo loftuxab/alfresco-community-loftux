@@ -226,6 +226,7 @@
             <bean class="org.alfresco.repo.content.transform.BinaryPassThroughContentTransformer" />
             <bean class="org.alfresco.repo.content.transform.PdfBoxContentTransformer" />
             <bean class="org.alfresco.repo.content.transform.PoiHssfContentTransformer" />
+            <bean class="org.alfresco.repo.content.transform.TextMiningContentTransformer" />
          </list>
       </constructor-arg>
       <constructor-arg>
