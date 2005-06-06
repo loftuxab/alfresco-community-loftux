@@ -369,7 +369,7 @@ public class BrowseBean implements IContextListener
             MapNode node = new MapNode(nodeRef, this.nodeService);
             
             // look for Space or File nodes
-            if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_SPACE))
+            if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
             {
                this.containerNodes.add(node);
             }
@@ -382,7 +382,7 @@ public class BrowseBean implements IContextListener
             else
             {
                if (logger.isDebugEnabled())
-                  logger.debug("Found neither a Space or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
+                  logger.debug("Found neither a Folder or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
             }
          }
          

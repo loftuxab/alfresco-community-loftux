@@ -104,17 +104,10 @@ public class NewSpaceWizard extends AbstractWizardBean
                Date now = new Date( Calendar.getInstance().getTimeInMillis() );
                
                // update the modified timestamp
-               QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
-               this.nodeService.setProperty(nodeRef, propModifiedDate, Conversion.dateToXmlDate(now));
-               
-               QName propName = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
-               this.nodeService.setProperty(nodeRef, propName, this.name);
-               
-               QName propIcon = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
-               this.nodeService.setProperty(nodeRef, propIcon, this.icon);
-               
-               QName propDescription = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
-               this.nodeService.setProperty(nodeRef, propDescription, this.description);
+               this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+               this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
+               this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
+               this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
             }
             else
             {
@@ -131,42 +124,36 @@ public class NewSpaceWizard extends AbstractWizardBean
                }
                
                ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
-                         null,
-                         QName.createQName(NamespaceService.ALFRESCO_URI, this.name),
+                         null, QName.createQName(NamespaceService.ALFRESCO_URI, this.name),
                          DictionaryBootstrap.TYPE_QNAME_FOLDER);
-               
-               if (logger.isDebugEnabled())
-                  logger.debug("Created folder node with name: " + this.name);
                
                NodeRef nodeRef = assocRef.getChildRef();
                
-               // set the properties
-               Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+               // set the name property on the node
+               this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Created folder node with name: " + this.name);
+
+               // apply the uifacets aspect - icon, title and description props
+               Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
+               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
+               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.name);
+               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
+               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Added uifacets aspect with properties: " + uiFacetsProps);
+               
+               // apply the auditable aspect - created and modified date
+               Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(5);
                Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-               
-               QName propName = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
-               properties.put(propName, this.name);
-               
-               QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
-               properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
-              
-               QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
-               properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
-              
-               QName propIcon = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
-               properties.put(propIcon, this.icon);
-              
-               QName propSpaceType = QName.createQName(NamespaceService.ALFRESCO_URI, "spacetype");
-               properties.put(propSpaceType, this.spaceType);
-              
-               QName propDescription = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
-               properties.put(propDescription, this.description);
-               
-               // add the space aspect to the folder
-               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_SPACE, properties);
+               auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
+               auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
    
                if (logger.isDebugEnabled())
-                  logger.debug("Created space aspect with properties: " + properties);
+                  logger.debug("Added auditable aspect with properties: " + auditProps);
             }
             
             // commit the transaction

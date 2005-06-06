@@ -97,6 +97,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             tx = (UserTransaction)ctx.getBean(Repository.USER_TRANSACTION);
             tx.begin();
             
+            
             // create the folder node
             ChildAssocRef assocRef = nodeService.createNode(nodeService.getRootNode(
                   Repository.getStoreRef()), null,
@@ -104,38 +105,35 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
                   DictionaryBootstrap.TYPE_QNAME_FOLDER);
             NodeRef nodeRef = assocRef.getChildRef();
             companySpaceId = nodeRef.getId();
+
+            // set the name property on the node
+            nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, companySpaceName);
+
+            // apply the uifacets aspect - icon, title and description props
+            Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
+            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-default");
+            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, companySpaceName);
+            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, "The company root space");
+            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
             
-            // set the properties
-            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(6);
+            // apply the auditable aspect - created and modified date
+            Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(5);
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-            QName propName = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
-            properties.put(propName, companySpaceName);
-            QName propCreatedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "createddate");
-            properties.put(propCreatedDate, Conversion.dateToXmlDate(now));
-            QName propModifiedDate = QName.createQName(NamespaceService.ALFRESCO_URI, "modifieddate");
-            properties.put(propModifiedDate, Conversion.dateToXmlDate(now));
-            QName propIcon = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
-            properties.put(propIcon, "space-icon-default");
-            QName propSpaceType = QName.createQName(NamespaceService.ALFRESCO_URI, "spacetype");
-            properties.put(propSpaceType, "container");
-            QName propDescription = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
-            properties.put(propDescription, "The root company space");
-            
-            // add the space aspect to the folder
-            //nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_SPACE, properties);
-            nodeService.setProperties(nodeRef, properties);
+            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
+            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
             
             // commit the transaction
             tx.commit();
             
             if (logger.isDebugEnabled())
-            logger.debug("Created company space with id: " + companySpaceId);
+            logger.debug("Created company root space with id: " + companySpaceId);
          }
          catch (Exception e)
          {
             // rollback the transaction
             try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-            throw new AlfrescoRuntimeException("Failed to create company space", e);
+            throw new AlfrescoRuntimeException("Failed to create company root space", e);
          }
       }
       

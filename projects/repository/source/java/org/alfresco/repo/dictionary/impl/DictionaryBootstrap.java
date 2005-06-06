@@ -12,6 +12,7 @@ public class DictionaryBootstrap
 {   
     // Base type constants
     public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ALFRESCO_URI, "cmobject");
+    public static final QName PROP_QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
     
     // Referenceable aspect constants
     public static final QName TYPE_QNAME_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "reference");
@@ -38,11 +39,22 @@ public class DictionaryBootstrap
     public static final QName PROP_QNAME_ENCODING = QName.createQName(NamespaceService.ALFRESCO_URI, "encoding");
     public static final QName PROP_QNAME_SIZE = QName.createQName(NamespaceService.ALFRESCO_URI, "size");
     
+    // ui facets aspect
+    public static final QName ASPECT_QNAME_UIFACETS = QName.createQName(NamespaceService.ALFRESCO_URI, "uifacets");
+    public static final QName PROP_QNAME_ICON = QName.createQName(NamespaceService.ALFRESCO_URI, "icon");
     
     // title aspect
     public static final QName ASPECT_QNAME_TITLED = QName.createQName(NamespaceService.ALFRESCO_URI, "titled");
     public static final QName PROP_QNAME_TITLE = QName.createQName(NamespaceService.ALFRESCO_URI, "title");
     public static final QName PROP_QNAME_DESCRIPTION = QName.createQName(NamespaceService.ALFRESCO_URI, "description");
+    
+    // auditable aspect
+    public static final QName ASPECT_QNAME_AUDITABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "auditable");
+    public static final QName PROP_QNAME_CREATED = QName.createQName(NamespaceService.ALFRESCO_URI, "created");
+    public static final QName PROP_QNAME_CREATOR = QName.createQName(NamespaceService.ALFRESCO_URI, "creator");
+    public static final QName PROP_QNAME_MODIFIED = QName.createQName(NamespaceService.ALFRESCO_URI, "modified");
+    public static final QName PROP_QNAME_MODIFIER = QName.createQName(NamespaceService.ALFRESCO_URI, "modifier");
+    public static final QName PROP_QNAME_ACCESSED = QName.createQName(NamespaceService.ALFRESCO_URI, "accessed");
     
     // Categories and roots
     
