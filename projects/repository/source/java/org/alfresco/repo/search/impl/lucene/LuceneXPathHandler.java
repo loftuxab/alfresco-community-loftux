@@ -339,7 +339,11 @@ public class LuceneXPathHandler implements XPathHandler
         if ((nameSpace == null) || (nameSpace.length() == 0))
         {
 
-            if (namespacePrefixResolver.getNamespaceURI("") == null)
+            if(localName.equals("*"))
+            {
+                answer.add(new RelativeStructuredFieldPosition("*"));
+            }
+            else if (namespacePrefixResolver.getNamespaceURI("") == null)
             {
                 answer.add(new AbsoluteStructuredFieldPosition(PathTokenFilter.NO_NS_TOKEN_TEXT, absolutePosition));
             }
@@ -372,7 +376,11 @@ public class LuceneXPathHandler implements XPathHandler
         ArrayList<StructuredFieldPosition> answer = new ArrayList<StructuredFieldPosition>(2);
         if ((nameSpace == null) || (nameSpace.length() == 0))
         {
-            if (namespacePrefixResolver.getNamespaceURI("") == null)
+            if(localName.equals("*"))
+            {
+                answer.add(new RelativeStructuredFieldPosition("*"));
+            }
+            else if (namespacePrefixResolver.getNamespaceURI("") == null)
             {
                 answer.add(new RelativeStructuredFieldPosition(PathTokenFilter.NO_NS_TOKEN_TEXT));
             }

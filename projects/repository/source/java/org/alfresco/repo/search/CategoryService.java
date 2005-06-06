@@ -12,6 +12,7 @@ import java.util.Collection;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.ref.StoreRef;
 
 /**
  * Category Service
@@ -56,14 +57,14 @@ public interface CategoryService
      * @param depth - the enum depth for what level to recover
      * @return a collection of all the nodes found identified by thier ChildAssocRef's
      */
-    Collection<ChildAssocRef> getCategories(QName attributeQName, Depth depth );
+    Collection<ChildAssocRef> getCategories(StoreRef storeRef, QName attributeQName, Depth depth );
 
     /**
      * Get all the root categories
      * 
      * @return
      */
-    Collection<ChildAssocRef> getRootCategories();
+    Collection<ChildAssocRef> getRootCategories(StoreRef storeRef);
 
     /**
      * Get all the types that represent categories
@@ -80,6 +81,6 @@ public interface CategoryService
      * @param typeName
      * @param attributeName
      */
-    void newCategory(QName typeName, String attributeName);
+    NodeRef newCategory(QName typeName, String attributeName);
 
 }

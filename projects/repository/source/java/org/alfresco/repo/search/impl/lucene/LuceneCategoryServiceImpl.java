@@ -5,27 +5,36 @@
  * 
  * 
  */
-package org.alfresco.repo.search;
+package org.alfresco.repo.search.impl.lucene;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.search.impl.lucene.LuceneSearcher;
+import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.repo.search.CategoryService;
+import org.alfresco.repo.search.IndexerException;
+import org.alfresco.repo.search.ResultSet;
+import org.alfresco.repo.search.ResultSetRow;
 
 public class LuceneCategoryServiceImpl implements CategoryService
 {
     private NodeService nodeService;
     
     private NamespacePrefixResolver namespacePrefixResolver;
+    
+    private DictionaryService dictionaryService;
 
     private LuceneSearcher searcher;
     
@@ -45,9 +54,13 @@ public class LuceneCategoryServiceImpl implements CategoryService
     {
         this.namespacePrefixResolver = namespacePrefixResolver;
     }
+    
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+    
 
-    
-    
     public void setSearcher(LuceneSearcher searcher)
     {
         this.searcher = searcher;
@@ -56,6 +69,10 @@ public class LuceneCategoryServiceImpl implements CategoryService
 
     public Collection<ChildAssocRef> getChildren(NodeRef categoryRef, Mode mode, Depth depth)
     {
+        if(categoryRef == null)
+        {
+            return Collections.<ChildAssocRef>emptyList();
+        }
         ResultSet resultSet = null;
         StringBuffer luceneQuery = new StringBuffer();
 
@@ -149,25 +166,47 @@ public class LuceneCategoryServiceImpl implements CategoryService
         return collection;
     }
 
-    public Collection<ChildAssocRef> getCategories(QName attributeQName, Depth depth)
+    public Collection<ChildAssocRef> getCategories(StoreRef storeRef, QName attributeQName, Depth depth)
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        QName qname = dictionaryService.getProperty(attributeQName).getContainerClass().getName();
+        return getChildren(getCategoryRootNode(storeRef, qname), Mode.SUB_CATEGORIES, depth);
     }
-
-    public Collection<ChildAssocRef> getRootCategories()
+    
+    private NodeRef getCategoryRootNode(StoreRef storeRef, QName qname)
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        ResultSet resultSet = searcher.query(storeRef, "lucene", "PATH:\"/"+getPrefix(qname.getNamespaceURI())+qname.getLocalName()+"\"", null, null);
+        if(resultSet.length() != 1)
+        {
+            return null;
+        }
+        else
+        {
+            return resultSet.getNodeRef(0);
+        }
+    }
+    
+
+    public Collection<ChildAssocRef> getRootCategories(StoreRef storeRef)
+    {
+        
+        ResultSet resultSet = searcher.query(storeRef, "lucene", "PATH:\"//alf:categoryRoot/*\"", null, null);
+        return resultSetToChildAssocCollection(resultSet);
     }
 
     public Collection<QName> getCategoryAspects()
     {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        List<QName> list = new ArrayList<QName>();
+        for(QName aspect :dictionaryService.getAllAspects())
+        {
+            if(dictionaryService.isSubClass(aspect, DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE))
+            {
+                list.add(aspect);
+            }
+        }
+        return list;
     }
 
-    public void newCategory(QName typeName, String attributeName)
+    public NodeRef newCategory(QName typeName, String attributeName)
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();

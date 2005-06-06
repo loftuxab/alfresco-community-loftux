@@ -31,7 +31,6 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.CategoryService;
-import org.alfresco.repo.search.LuceneCategoryServiceImpl;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
@@ -487,7 +486,7 @@ public class LuceneCategoryTest extends TestCase
         results.close();
     }
     
-    public void xtestCategoryService()
+    public void testCategoryService()
     {
         buildBaseIndex();
         
@@ -511,8 +510,10 @@ public class LuceneCategoryTest extends TestCase
         impl.setNodeService(nodeService);
         impl.setNamespacePrefixResolver(getNamespacePrefixReolsver(""));
         impl.setSearcher(searcher);
+        impl.setDictionaryService(dictionaryService);
         
-        Collection<ChildAssocRef> result = impl.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE);
+        Collection<ChildAssocRef>
+        result = impl.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE);
         assertEquals(1, result.size());
         
         result = impl.getChildren(catACBase , CategoryService.Mode.ALL, CategoryService.Depth.IMMEDIATE);
@@ -521,8 +522,23 @@ public class LuceneCategoryTest extends TestCase
         result = impl.getChildren(catACBase , CategoryService.Mode.SUB_CATEGORIES, CategoryService.Depth.IMMEDIATE);
         assertEquals(2, result.size());
         
+        result = impl.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.ANY);
+        assertEquals(18, result.size());
         
+        result = impl.getChildren(catACBase , CategoryService.Mode.ALL, CategoryService.Depth.ANY);
+        assertEquals(21, result.size());
         
+        result = impl.getChildren(catACBase , CategoryService.Mode.SUB_CATEGORIES, CategoryService.Depth.ANY);
+        assertEquals(3, result.size());
+        
+        result = impl.getRootCategories(rootNodeRef.getStoreRef());
+        assertEquals(4, result.size());
+        
+        result = impl.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "assetClass"), CategoryService.Depth.IMMEDIATE);
+        assertEquals(2, result.size());
+        
+        Collection<QName> aspects = impl.getCategoryAspects();
+        assertEquals(6, aspects.size());    
     }
     
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
