@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
+import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.ModelDefinition;
@@ -193,6 +194,23 @@ public class DictionaryComponent implements DictionaryService
     public PropertyDefinition getProperty(QName propertyName)
     {
         return dictionaryDAO.getProperty(propertyName);
+    }
+
+    public AssociationDefinition getAssociation(QName className, QName associationName)
+    {
+        AssociationDefinition assocDef = null;
+        ClassDefinition classDef = dictionaryDAO.getClass(className);
+        if (classDef != null)
+        {
+            Map<QName,AssociationDefinition> assocDefs = classDef.getAssociations();
+            assocDef = assocDefs.get(associationName);
+        }
+        return assocDef;
+    }
+
+    public AssociationDefinition getAssociation(QName associationName)
+    {
+        return dictionaryDAO.getAssociation(associationName);
     }
     
 }

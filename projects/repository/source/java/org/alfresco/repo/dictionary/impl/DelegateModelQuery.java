@@ -1,6 +1,7 @@
 package org.alfresco.repo.dictionary.impl;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
+import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
@@ -66,6 +67,16 @@ import org.alfresco.repo.ref.QName;
         if (def == null)
         {
             def = delegate.getProperty(name);
+        }
+        return def;
+    }
+
+    public AssociationDefinition getAssociation(QName name)
+    {
+        AssociationDefinition def = query.getAssociation(name);
+        if (def == null)
+        {
+            def = delegate.getAssociation(name);
         }
         return def;
     }

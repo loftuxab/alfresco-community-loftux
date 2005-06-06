@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
+import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryException;
 import org.alfresco.repo.dictionary.ModelDefinition;
@@ -125,7 +126,12 @@ public class DictionaryDAOImpl implements DictionaryDAO
         return (model == null) ? null : model.getProperty(propertyName);
     }
     
-    
+    public AssociationDefinition getAssociation(QName assocName)
+    {
+        CompiledModel model = getCompiledModelForNamespace(assocName.getNamespaceURI());
+        return (model == null) ? null : model.getAssociation(assocName);
+    }
+
     
     public void putModel(M2Model model)
     {

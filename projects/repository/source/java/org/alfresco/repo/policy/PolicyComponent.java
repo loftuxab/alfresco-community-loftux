@@ -33,7 +33,23 @@ public interface PolicyComponent
      */
     public <P extends ClassPolicy> ClassPolicyDelegate<P> registerClassPolicy(Class<P> policy);
 
-    // TODO: register property and association level policies
+    /**
+     * Register a Property-level Policy
+     * 
+     * @param <P>  the policy interface  
+     * @param policy  the policy interface class
+     * @return  A delegate for the property-level policy (typed by the policy interface)
+     */
+    public <P extends PropertyPolicy> PropertyPolicyDelegate<P> registerPropertyPolicy(Class<P> policy); 
+    
+    /**
+     * Register a Association-level Policy
+     * 
+     * @param <P>  the policy interface  
+     * @param policy  the policy interface class
+     * @return  A delegate for the association-level policy (typed by the policy interface)
+     */
+    public <P extends AssociationPolicy> AssociationPolicyDelegate<P> registerAssociationPolicy(Class<P> policy); 
     
     /**
      * Gets all registered Policies
@@ -80,6 +96,68 @@ public interface PolicyComponent
      */
     public BehaviourDefinition<ServiceBehaviourBinding> bindClassBehaviour(QName policy, Object service, Behaviour behaviour);
     
-    // TODO: bind Property and Association level behaviours
+    /**
+     * Bind a Property specific behaviour to a Property-level Policy
+     * 
+     * @param policy  the policy name
+     * @param classRef  the class to bind against
+     * @param propertyRef  the property to bind against
+     * @param behaviour  the behaviour
+     * @return  the registered behaviour definition
+     */
+    public BehaviourDefinition<ClassFeatureBehaviourBinding> bindPropertyBehaviour(QName policy, QName className, QName propertyName, Behaviour behaviour);
 
+    /**
+     * Bind a Property specific behaviour to a Property-level Policy (for all properties of a Class)
+     * 
+     * @param policy  the policy name
+     * @param classRef  the class to bind against
+     * @param behaviour  the behaviour
+     * @return  the registered behaviour definition
+     */
+    public BehaviourDefinition<ClassFeatureBehaviourBinding> bindPropertyBehaviour(QName policy, QName className, Behaviour behaviour);
+
+    /**
+     * Bind a Service specific behaviour to a Property-level Policy
+     * 
+     * @param policy  the policy name
+     * @param service  the binding service
+     * @param behaviour  the behaviour
+     * @return  the registered behaviour definition
+     */
+    public BehaviourDefinition<ServiceBehaviourBinding> bindPropertyBehaviour(QName policy, Object service, Behaviour behaviour);
+
+    /**
+     * Bind an Association specific behaviour to an Association-level Policy
+     * 
+     * @param policy  the policy name
+     * @param classRef  the class to bind against
+     * @param assocRef  the association to bind against
+     * @param behaviour  the behaviour
+     * @return  the registered behaviour definition
+     */
+    public BehaviourDefinition<ClassFeatureBehaviourBinding> bindAssociationBehaviour(QName policy, QName className, QName assocName, Behaviour behaviour);
+
+    /**
+     * Bind an Association specific behaviour to an Association-level Policy (for all associations of a Class)
+     * 
+     * @param policy  the policy name
+     * @param classRef  the class to bind against
+     * @param behaviour  the behaviour
+     * @return  the registered behaviour definition
+     */
+    public BehaviourDefinition<ClassFeatureBehaviourBinding> bindAssociationBehaviour(QName policy, QName className, Behaviour behaviour);
+
+    /**
+     * Bind a Service specific behaviour to an Association-level Policy
+     * 
+     * @param policy  the policy name
+     * @param service  the binding service
+     * @param behaviour  the behaviour
+     * @return  the registered behaviour definition
+     */
+    public BehaviourDefinition<ServiceBehaviourBinding> bindAssociationBehaviour(QName policy, Object service, Behaviour behaviour);
+    
 }
+
+

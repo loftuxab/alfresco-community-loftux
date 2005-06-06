@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
+import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.DictionaryException;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.TypeDefinition;
@@ -26,9 +27,9 @@ import org.alfresco.repo.ref.QName;
     private List<AspectDefinition> inheritedDefaultAspects = new ArrayList<AspectDefinition>();
 
 
-    /*package*/ M2TypeDefinition(M2Type m2Type, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties)
+    /*package*/ M2TypeDefinition(M2Type m2Type, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
     {
-        super(m2Type, resolver, modelProperties);
+        super(m2Type, resolver, modelProperties, modelAssociations);
 
         // Resolve qualified names
         for (String aspectName : m2Type.getMandatoryAspects())

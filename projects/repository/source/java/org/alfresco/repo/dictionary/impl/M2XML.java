@@ -13,14 +13,24 @@ public class M2XML
     public static Date deserialiseDate(String date)
         throws ParseException
     {
-        SimpleDateFormat df = CachingDateFormat.getDateOnlyFormat();
-        return df.parse(date);
+        Date xmlDate = null;
+        if (date != null)
+        {
+            SimpleDateFormat df = CachingDateFormat.getDateOnlyFormat();
+            xmlDate = df.parse(date);
+        }
+        return xmlDate;
     }
 
     public static String serialiseDate(Date date)
     {
-        SimpleDateFormat df = CachingDateFormat.getDateOnlyFormat();
-        return df.format(date);
+        String xmlDate = null;
+        if (date != null)
+        {
+            SimpleDateFormat df = CachingDateFormat.getDateOnlyFormat();
+            xmlDate = df.format(date);
+        }
+        return xmlDate;
     }
     
 }

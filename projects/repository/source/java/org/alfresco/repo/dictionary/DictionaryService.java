@@ -84,6 +84,11 @@ public interface DictionaryService
     
     PropertyDefinition getProperty(QName propertyName);
 
+    AssociationDefinition getAssociation(QName className, QName associationName);
+    
+    AssociationDefinition getAssociation(QName associationName);
+    
+    
 //    BehaviourDef[] getBehaviours();
     
     

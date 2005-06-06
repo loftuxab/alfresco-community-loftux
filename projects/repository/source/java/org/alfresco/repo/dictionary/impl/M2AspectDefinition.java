@@ -3,6 +3,7 @@ package org.alfresco.repo.dictionary.impl;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
+import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.QName;
@@ -17,9 +18,9 @@ import org.alfresco.repo.ref.QName;
 {
 
     
-    /*package*/ M2AspectDefinition(M2Aspect m2Aspect, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties)
+    /*package*/ M2AspectDefinition(M2Aspect m2Aspect, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
     {
-        super(m2Aspect, resolver, modelProperties);
+        super(m2Aspect, resolver, modelProperties, modelAssociations);
     }
 
     

@@ -32,6 +32,11 @@ import org.alfresco.repo.ref.QName;
         this.classRef = classRef;
     }
 
+    /*package*/ DictionaryService getDictionary()
+    {
+        return dictionary;
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.BehaviourBinding#generaliseBinding()
      */

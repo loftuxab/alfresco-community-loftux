@@ -14,19 +14,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author David Caruana
  *
  */
-/*package*/ class ClassBehaviourIndex implements BehaviourIndex<ClassBehaviourBinding>
+/*package*/ class ClassBehaviourIndex<B extends ClassBehaviourBinding> implements BehaviourIndex<B>
 {
     // Lock
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     
     // Map of class bindings  
-    private BehaviourMap<ClassBehaviourBinding> classMap = new BehaviourMap<ClassBehaviourBinding>();
+    private BehaviourMap<B> classMap = new BehaviourMap<B>();
     
     // Map of service bindings
     private BehaviourMap<ServiceBehaviourBinding> serviceMap = new BehaviourMap<ServiceBehaviourBinding>();
     
     // List of registered observers
-    private List<BehaviourChangeObserver<ClassBehaviourBinding>> observers = new ArrayList<BehaviourChangeObserver<ClassBehaviourBinding>>();
+    private List<BehaviourChangeObserver<B>> observers = new ArrayList<BehaviourChangeObserver<B>>();
 
 
     /**
@@ -35,11 +35,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
     /*package*/ ClassBehaviourIndex()
     {
         // Observe class binding changes and propagate to our own observers 
-        this.classMap.addChangeObserver(new BehaviourChangeObserver<ClassBehaviourBinding>()
+        this.classMap.addChangeObserver(new BehaviourChangeObserver<B>()
         {
-            public void addition(ClassBehaviourBinding binding, Behaviour behaviour)
+            public void addition(B binding, Behaviour behaviour)
             {
-                for (BehaviourChangeObserver<ClassBehaviourBinding> listener : observers)
+                for (BehaviourChangeObserver<B> listener : observers)
                 {
                     listener.addition(binding, behaviour);
                 }
@@ -51,7 +51,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
         {
             public void addition(ServiceBehaviourBinding binding, Behaviour behaviour)
             {
-                for (BehaviourChangeObserver<ClassBehaviourBinding> listener : observers)
+                for (BehaviourChangeObserver<B> listener : observers)
                 {
                     // Note: Don't specify class ref as service-level bindings affect all classes
                     listener.addition(null, behaviour);
@@ -85,12 +85,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.BehaviourIndex#find()
      */
-    public Collection<BehaviourDefinition> find(ClassBehaviourBinding binding)
+    public Collection<BehaviourDefinition> find(B binding)
     {
         lock.readLock().lock();
         
         try
         {
+            List<BehaviourDefinition> behaviours = new ArrayList<BehaviourDefinition>();
+
             // Find class behaviour by scanning up the class hierarchy
             BehaviourDefinition behaviour = null;
             while(behaviour == null && binding != null)
@@ -98,17 +100,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
                 behaviour = classMap.get(binding);
                 if (behaviour == null)
                 {
-                    binding = (ClassBehaviourBinding)binding.generaliseBinding();
+                    binding = (B)binding.generaliseBinding();
                 }
             }
-    
-            // Append all service-level behaviours
-            List<BehaviourDefinition> behaviours = new ArrayList<BehaviourDefinition>();
             if (behaviour != null)
             {
                 behaviours.add(behaviour);
             }
+            
+            // Append all service-level behaviours
             behaviours.addAll(serviceMap.getAll());
+
             return behaviours;
         }
         finally
@@ -121,7 +123,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.BehaviourIndex#find()
      */
-    public void addChangeObserver(BehaviourChangeObserver<ClassBehaviourBinding> observer)
+    public void addChangeObserver(BehaviourChangeObserver<B> observer)
     {
         observers.add(observer);
     }
@@ -132,7 +134,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
      * 
      * @param behaviour  the class bound behaviour
      */
-    public void putClassBehaviour(BehaviourDefinition<ClassBehaviourBinding> behaviour)
+    public void putClassBehaviour(BehaviourDefinition<B> behaviour)
     {
         lock.writeLock().lock();
         try

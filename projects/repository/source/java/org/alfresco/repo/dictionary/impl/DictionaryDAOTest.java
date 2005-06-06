@@ -14,7 +14,7 @@ import org.alfresco.repo.ref.QName;
 public class DictionaryDAOTest extends TestCase
 {
     
-    private static final String TEST_MODEL = "org/alfresco/repo/dictionary/impl/test_model.xml";
+    private static final String TEST_MODEL = "org/alfresco/repo/dictionary/impl/dictionarydaotest_model.xml";
     private DictionaryService service; 
     
     

@@ -7,9 +7,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.util.ParameterCheck;
 import org.apache.commons.logging.Log;
@@ -37,7 +39,16 @@ public class PolicyComponentImpl implements PolicyComponent
     private Map<PolicyKey, PolicyDefinition> registeredPolicies;; 
 
     // Map of Class Behaviours (by policy name)
-    private Map<QName, ClassBehaviourIndex> classBehaviours = new HashMap<QName, ClassBehaviourIndex>();
+    private Map<QName, ClassBehaviourIndex<ClassBehaviourBinding>> classBehaviours = new HashMap<QName, ClassBehaviourIndex<ClassBehaviourBinding>>();
+    
+    // Map of Property Behaviours (by policy name)
+    private Map<QName, ClassBehaviourIndex<ClassFeatureBehaviourBinding>> propertyBehaviours = new HashMap<QName, ClassBehaviourIndex<ClassFeatureBehaviourBinding>>();
+
+    // Map of Association Behaviours (by policy name)
+    private Map<QName, ClassBehaviourIndex<ClassFeatureBehaviourBinding>> associationBehaviours = new HashMap<QName, ClassBehaviourIndex<ClassFeatureBehaviourBinding>>();
+
+    // Wild Card Feature
+    private static final QName FEATURE_WILDCARD = QName.createQName(NamespaceService.DEFAULT_URI, "*"); 
     
 
     /**
@@ -55,19 +66,53 @@ public class PolicyComponentImpl implements PolicyComponent
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.PolicyComponent#registerClassPolicy()
      */
-    public <T extends ClassPolicy> ClassPolicyDelegate<T> registerClassPolicy(Class<T> policy)
+    public <P extends ClassPolicy> ClassPolicyDelegate<P> registerClassPolicy(Class<P> policy)
     {
         ParameterCheck.mandatory("Policy interface class", policy);
         PolicyDefinition definition = createPolicyDefinition(policy);
         registeredPolicies.put(new PolicyKey(definition.getType(), definition.getName()), definition);
-        ClassPolicyDelegate<T> delegate = new ClassPolicyDelegate<T>(dictionary, policy, getClassBehaviourIndex(definition.getName()));
+        ClassPolicyDelegate<P> delegate = new ClassPolicyDelegate<P>(dictionary, policy, getClassBehaviourIndex(definition.getName()));
         
         if (logger.isInfoEnabled())
             logger.info("Registered class policy " + definition.getName() + " (" + definition.getPolicyInterface() + ")");
         
         return delegate;
     }
+
     
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.PolicyComponent#registerPropertyPolicy(java.lang.Class)
+     */
+    public <P extends PropertyPolicy> PropertyPolicyDelegate<P> registerPropertyPolicy(Class<P> policy)
+    {
+        ParameterCheck.mandatory("Policy interface class", policy);
+        PolicyDefinition definition = createPolicyDefinition(policy);
+        registeredPolicies.put(new PolicyKey(definition.getType(), definition.getName()), definition);
+        PropertyPolicyDelegate<P> delegate = new PropertyPolicyDelegate<P>(dictionary, policy, getPropertyBehaviourIndex(definition.getName()));
+        
+        if (logger.isInfoEnabled())
+            logger.info("Registered property policy " + definition.getName() + " (" + definition.getPolicyInterface() + ")");
+        
+        return delegate;
+    }
+
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.PolicyComponent#registerAssociationPolicy(java.lang.Class)
+     */
+    public <P extends AssociationPolicy> AssociationPolicyDelegate<P> registerAssociationPolicy(Class<P> policy)
+    {
+        ParameterCheck.mandatory("Policy interface class", policy);
+        PolicyDefinition definition = createPolicyDefinition(policy);
+        registeredPolicies.put(new PolicyKey(definition.getType(), definition.getName()), definition);
+        AssociationPolicyDelegate<P> delegate = new AssociationPolicyDelegate<P>(dictionary, policy, getAssociationBehaviourIndex(definition.getName()));
+        
+        if (logger.isInfoEnabled())
+            logger.info("Registered association policy " + definition.getName() + " (" + definition.getPolicyInterface() + ")");
+        
+        return delegate;
+    }
+
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.PolicyComponent#getRegisteredPolicies()
@@ -145,26 +190,224 @@ public class PolicyComponentImpl implements PolicyComponent
 
         return definition;
     }    
+
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.PolicyComponent#bindPropertyBehaviour(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, org.alfresco.repo.policy.Behaviour)
+     */
+    public BehaviourDefinition<ClassFeatureBehaviourBinding> bindPropertyBehaviour(QName policy, QName className, QName propertyName, Behaviour behaviour)
+    {
+        // Validate arguments
+        ParameterCheck.mandatory("Policy", policy);
+        ParameterCheck.mandatory("Class Reference", className);
+        ParameterCheck.mandatory("Property Reference", propertyName);
+        ParameterCheck.mandatory("Behaviour", behaviour);
+
+        // Validate Binding
+        PropertyDefinition propertyDefinition = dictionary.getProperty(className, propertyName);
+        if (propertyDefinition == null)
+        {
+            throw new IllegalArgumentException("Property " + propertyName + " of class " + className + " has not been defined in the data dictionary");
+        }
+        
+        // Create behaviour definition and bind to policy
+        ClassFeatureBehaviourBinding binding = new ClassFeatureBehaviourBinding(dictionary, className, propertyName);
+        BehaviourDefinition<ClassFeatureBehaviourBinding> definition = createBehaviourDefinition(PolicyType.Property, policy, binding, behaviour);
+        getPropertyBehaviourIndex(policy).putClassBehaviour(definition);
+        
+        if (logger.isInfoEnabled())
+            logger.info("Bound " + behaviour + " to policy " + policy + " for property " + propertyName + " of class " + className);
+
+        return definition;
+    }
     
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.PolicyComponent#bindPropertyBehaviour(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, org.alfresco.repo.policy.Behaviour)
+     */
+    public BehaviourDefinition<ClassFeatureBehaviourBinding> bindPropertyBehaviour(QName policy, QName className, Behaviour behaviour)
+    {
+        // Validate arguments
+        ParameterCheck.mandatory("Policy", policy);
+        ParameterCheck.mandatory("Class Reference", className);
+        ParameterCheck.mandatory("Behaviour", behaviour);
+
+        // Validate Binding
+        ClassDefinition classDefinition = dictionary.getClass(className);
+        if (classDefinition == null)
+        {
+            throw new IllegalArgumentException("Class " + className + " has not been defined in the data dictionary");
+        }
+        
+        // Create behaviour definition and bind to policy
+        ClassFeatureBehaviourBinding binding = new ClassFeatureBehaviourBinding(dictionary, className, FEATURE_WILDCARD);
+        BehaviourDefinition<ClassFeatureBehaviourBinding> definition = createBehaviourDefinition(PolicyType.Property, policy, binding, behaviour);
+        getPropertyBehaviourIndex(policy).putClassBehaviour(definition);
+        
+        if (logger.isInfoEnabled())
+            logger.info("Bound " + behaviour + " to policy " + policy + " for property " + FEATURE_WILDCARD + " of class " + className);
+
+        return definition;
+    }
+
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.PolicyComponent#bindPropertyBehaviour(org.alfresco.repo.ref.QName, java.lang.Object, org.alfresco.repo.policy.Behaviour)
+     */
+    public BehaviourDefinition<ServiceBehaviourBinding> bindPropertyBehaviour(QName policy, Object service, Behaviour behaviour)
+    {
+        // Validate arguments
+        ParameterCheck.mandatory("Policy", policy);
+        ParameterCheck.mandatory("Service", service);
+        ParameterCheck.mandatory("Behaviour", behaviour);
+        
+        // Create behaviour definition and bind to policy
+        ServiceBehaviourBinding binding = new ServiceBehaviourBinding(service);
+        BehaviourDefinition<ServiceBehaviourBinding> definition = createBehaviourDefinition(PolicyType.Property, policy, binding, behaviour);
+        getPropertyBehaviourIndex(policy).putServiceBehaviour(definition);
+        
+        if (logger.isInfoEnabled())
+            logger.info("Bound " + behaviour + " to property policy " + policy + " for service " + service);
+
+        return definition;
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.PolicyComponent#bindAssociationBehaviour(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, org.alfresco.repo.policy.Behaviour)
+     */
+    public BehaviourDefinition<ClassFeatureBehaviourBinding> bindAssociationBehaviour(QName policy, QName className, QName assocName, Behaviour behaviour)
+    {
+        // Validate arguments
+        ParameterCheck.mandatory("Policy", policy);
+        ParameterCheck.mandatory("Class Reference", className);
+        ParameterCheck.mandatory("Association Reference", assocName);
+        ParameterCheck.mandatory("Behaviour", behaviour);
+
+        // Validate Binding
+        AssociationDefinition assocDefinition = dictionary.getAssociation(className, assocName);
+        if (assocDefinition == null)
+        {
+            throw new IllegalArgumentException("Association " + assocName + " of class " + className + " has not been defined in the data dictionary");
+        }
+        
+        // Create behaviour definition and bind to policy
+        ClassFeatureBehaviourBinding binding = new ClassFeatureBehaviourBinding(dictionary, className, assocName);
+        BehaviourDefinition<ClassFeatureBehaviourBinding> definition = createBehaviourDefinition(PolicyType.Association, policy, binding, behaviour);
+        getAssociationBehaviourIndex(policy).putClassBehaviour(definition);
+        
+        if (logger.isInfoEnabled())
+            logger.info("Bound " + behaviour + " to policy " + policy + " for association " + assocName + " of class " + className);
+
+        return definition;
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.PolicyComponent#bindAssociationBehaviour(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, org.alfresco.repo.policy.Behaviour)
+     */
+    public BehaviourDefinition<ClassFeatureBehaviourBinding> bindAssociationBehaviour(QName policy, QName className, Behaviour behaviour)
+    {
+        // Validate arguments
+        ParameterCheck.mandatory("Policy", policy);
+        ParameterCheck.mandatory("Class Reference", className);
+        ParameterCheck.mandatory("Behaviour", behaviour);
+
+        // Validate Binding
+        ClassDefinition classDefinition = dictionary.getClass(className);
+        if (classDefinition == null)
+        {
+            throw new IllegalArgumentException("Class " + className + " has not been defined in the data dictionary");
+        }
+        
+        // Create behaviour definition and bind to policy
+        ClassFeatureBehaviourBinding binding = new ClassFeatureBehaviourBinding(dictionary, className, FEATURE_WILDCARD);
+        BehaviourDefinition<ClassFeatureBehaviourBinding> definition = createBehaviourDefinition(PolicyType.Association, policy, binding, behaviour);
+        getAssociationBehaviourIndex(policy).putClassBehaviour(definition);
+        
+        if (logger.isInfoEnabled())
+            logger.info("Bound " + behaviour + " to policy " + policy + " for association " + FEATURE_WILDCARD + " of class " + className);
+
+        return definition;
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.PolicyComponent#bindAssociationBehaviour(org.alfresco.repo.ref.QName, java.lang.Object, org.alfresco.repo.policy.Behaviour)
+     */
+    public BehaviourDefinition<ServiceBehaviourBinding> bindAssociationBehaviour(QName policy, Object service, Behaviour behaviour)
+    {
+        // Validate arguments
+        ParameterCheck.mandatory("Policy", policy);
+        ParameterCheck.mandatory("Service", service);
+        ParameterCheck.mandatory("Behaviour", behaviour);
+        
+        // Create behaviour definition and bind to policy
+        ServiceBehaviourBinding binding = new ServiceBehaviourBinding(service);
+        BehaviourDefinition<ServiceBehaviourBinding> definition = createBehaviourDefinition(PolicyType.Association, policy, binding, behaviour);
+        getAssociationBehaviourIndex(policy).putServiceBehaviour(definition);
+        
+        if (logger.isInfoEnabled())
+            logger.info("Bound " + behaviour + " to association policy " + policy + " for service " + service);
+
+        return definition;
+    }
+    
+    
     /**
      * Gets the Class behaviour index for the specified Policy
      * 
      * @param policy  the policy
      * @return  the class behaviour index
      */
-    private synchronized ClassBehaviourIndex getClassBehaviourIndex(QName policy)
+    private synchronized ClassBehaviourIndex<ClassBehaviourBinding> getClassBehaviourIndex(QName policy)
     {
-        ClassBehaviourIndex index = classBehaviours.get(policy);
+        ClassBehaviourIndex<ClassBehaviourBinding> index = classBehaviours.get(policy);
         if (index == null)
         {
-            index = new ClassBehaviourIndex();
+            index = new ClassBehaviourIndex<ClassBehaviourBinding>();
             classBehaviours.put(policy, index);
+        }
+        return index;
+    }
+
+    
+    /**
+     * Gets the Property behaviour index for the specified Policy
+     * 
+     * @param policy  the policy
+     * @return  the property behaviour index
+     */
+    private synchronized ClassBehaviourIndex<ClassFeatureBehaviourBinding> getPropertyBehaviourIndex(QName policy)
+    {
+        ClassBehaviourIndex<ClassFeatureBehaviourBinding> index = propertyBehaviours.get(policy);
+        if (index == null)
+        {
+            index = new ClassBehaviourIndex<ClassFeatureBehaviourBinding>();
+            propertyBehaviours.put(policy, index);
         }
         return index;
     }
     
 
+    /**
+     * Gets the Association behaviour index for the specified Policy
+     * 
+     * @param policy  the policy
+     * @return  the association behaviour index
+     */
+    private synchronized ClassBehaviourIndex<ClassFeatureBehaviourBinding> getAssociationBehaviourIndex(QName policy)
+    {
+        ClassBehaviourIndex<ClassFeatureBehaviourBinding> index = associationBehaviours.get(policy);
+        if (index == null)
+        {
+            index = new ClassBehaviourIndex<ClassFeatureBehaviourBinding>();
+            associationBehaviours.put(policy, index);
+        }
+        return index;
+    }
+
+    
     /**
      * Create a Behaviour Definition
      * 
@@ -384,5 +627,6 @@ public class PolicyComponentImpl implements PolicyComponent
             return behaviour;
         }
     }
+    
 
 }

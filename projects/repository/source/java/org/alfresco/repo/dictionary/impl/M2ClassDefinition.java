@@ -33,7 +33,7 @@ import org.alfresco.repo.ref.QName;
     private Map<QName, ChildAssociationDefinition> inheritedChildAssociations = new HashMap<QName, ChildAssociationDefinition>();
     
    
-    /*package*/ M2ClassDefinition(M2Class m2Class, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties)
+    /*package*/ M2ClassDefinition(M2Class m2Class, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
     {
         this.m2Class = m2Class;
         
@@ -82,7 +82,18 @@ import org.alfresco.repo.ref.QName;
             {
                 throw new DictionaryException("Found duplicate association definition " + def.getName().toPrefixString() + " within class " + name.toPrefixString());
             }
+            
+            // Check for existence of association elsewhere within the model
+            AssociationDefinition existingDef = modelAssociations.get(def.getName());
+            if (existingDef != null)
+            {
+                // TODO: Consider sharing association, if association definitions are equal
+                throw new DictionaryException("Found duplicate association definition " + def.getName().toPrefixString() + " within class " 
+                    + name.toPrefixString() + " and class " + existingDef.getSourceClass().getName().toPrefixString());
+            }
+            
             associations.put(def.getName(), def);
+            modelAssociations.put(def.getName(), def);
         }
         
         // Construct Property overrides

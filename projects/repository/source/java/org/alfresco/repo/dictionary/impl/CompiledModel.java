@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.alfresco.repo.dictionary.AspectDefinition;
+import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryException;
 import org.alfresco.repo.dictionary.ModelDefinition;
@@ -18,10 +19,15 @@ import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
 import org.alfresco.repo.ref.NamespaceException;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /*package*/ class CompiledModel implements ModelQuery
 {
+    
+    // Logger
+    private static final Log logger = LogFactory.getLog(DictionaryDAOImpl.class);
     
     private M2Model model;
     private ModelDefinition modelDefinition;
@@ -30,6 +36,7 @@ import org.alfresco.repo.ref.QName;
     private Map<QName, TypeDefinition> types = new HashMap<QName, TypeDefinition>();
     private Map<QName, AspectDefinition> aspects = new HashMap<QName, AspectDefinition>();
     private Map<QName, PropertyDefinition> properties = new HashMap<QName, PropertyDefinition>();
+    private Map<QName, AssociationDefinition> associations = new HashMap<QName, AssociationDefinition>();
     
     
     /*package*/ CompiledModel(M2Model model, DictionaryDAO dictionaryDAO, NamespaceDAO namespaceDAO)
@@ -89,6 +96,9 @@ import org.alfresco.repo.ref.QName;
                 order.put(depth, classes);
             }
             classes.add(def);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Resolving inheritance: class " + def.getName() + " found at depth " + depth);
         }
         
         // Resolve inheritance of each class
@@ -136,7 +146,7 @@ import org.alfresco.repo.ref.QName;
         // Construct Type Definitions
         for (M2Type type : model.getTypes())
         {
-            M2TypeDefinition def = new M2TypeDefinition(type, localPrefixes, properties);
+            M2TypeDefinition def = new M2TypeDefinition(type, localPrefixes, properties, associations);
             if (classes.containsKey(def.getName()))
             {
                 throw new DictionaryException("Found duplicate class definition " + type.getName() + " (a type)");
@@ -148,7 +158,7 @@ import org.alfresco.repo.ref.QName;
         // Construct Aspect Definitions
         for (M2Aspect aspect : model.getAspects())
         {
-            M2AspectDefinition def = new M2AspectDefinition(aspect, localPrefixes, properties);
+            M2AspectDefinition def = new M2AspectDefinition(aspect, localPrefixes, properties, associations);
             if (classes.containsKey(def.getName()))
             {
                 throw new DictionaryException("Found duplicate class definition " + aspect.getName() + " (an aspect)");
@@ -208,6 +218,11 @@ import org.alfresco.repo.ref.QName;
         return properties.get(name);
     }
 
+    public AssociationDefinition getAssociation(QName name)
+    {
+        return associations.get(name);
+    }
+
     
     private NamespacePrefixResolver createLocalPrefixResolver(M2Model model, NamespaceDAO namespaceDAO)
     {
@@ -232,5 +247,7 @@ import org.alfresco.repo.ref.QName;
         }
         return prefixResolver;
     }
+
+
     
 }

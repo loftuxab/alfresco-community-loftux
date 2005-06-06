@@ -13,7 +13,7 @@ import org.alfresco.util.ParameterCheck;
 /**
  * Java based Behaviour.
  * 
- * This behavior acts like a delegate (a method pointer).  The pointer is
+ * A behavior acts like a delegate (a method pointer).  The pointer is
  * represented by an instance object and method name.
  * 
  * @author David Caruana
