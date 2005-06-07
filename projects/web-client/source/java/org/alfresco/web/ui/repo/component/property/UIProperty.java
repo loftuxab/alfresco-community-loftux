@@ -2,6 +2,7 @@ package org.alfresco.web.ui.repo.component.property;
 
 import java.io.IOException;
 
+import javax.faces.FacesException;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
@@ -9,6 +10,7 @@ import javax.faces.component.UIOutput;
 import javax.faces.component.UIPanel;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
 import javax.faces.el.ValueBinding;
 
 import org.alfresco.repo.dictionary.PropertyDefinition;
@@ -33,6 +35,7 @@ public class UIProperty extends UIPanel implements NamingContainer
    
    private String name;
    private String displayLabel;
+   private String converter;
    private Boolean readOnly;
    
    /**
@@ -172,6 +175,31 @@ public class UIProperty extends UIPanel implements NamingContainer
    }
    
    /**
+    * @return Returns the converter
+    */
+   public String getConverter()
+   {
+      if (this.converter == null)
+      {
+         ValueBinding vb = getValueBinding("converter");
+         if (vb != null)
+         {
+            this.converter = (String)vb.getValue(getFacesContext());
+         }
+      }
+      
+      return this.converter;
+   }
+
+   /**
+    * @param converter Sets the converter
+    */
+   public void setConverter(String converter)
+   {
+      this.converter = converter;
+   }
+
+   /**
     * @return Returns whether the property is read only
     */
    public boolean isReadOnly()
@@ -212,6 +240,7 @@ public class UIProperty extends UIPanel implements NamingContainer
       this.name = (String)values[1];
       this.displayLabel = (String)values[2];
       this.readOnly = (Boolean)values[3];
+      this.converter = (String)values[4];
    }
    
    /**
@@ -219,12 +248,13 @@ public class UIProperty extends UIPanel implements NamingContainer
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[4];
+      Object values[] = new Object[5];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.name;
       values[2] = this.displayLabel;
       values[3] = this.readOnly;
+      values[4] = this.converter;
       return (values);
    }
    
@@ -279,15 +309,7 @@ public class UIProperty extends UIPanel implements NamingContainer
          PropertyTypeDefinition propTypeDef = propDef.getPropertyType();
          QName typeName = propTypeDef.getName();
          
-         if (typeName.equals(PropertyTypeDefinition.TEXT) || typeName.equals(PropertyTypeDefinition.INT) ||
-             typeName.equals(PropertyTypeDefinition.LONG) || typeName.equals(PropertyTypeDefinition.DOUBLE) ||
-             typeName.equals(PropertyTypeDefinition.GUID) || typeName.equals(PropertyTypeDefinition.FLOAT))
-         {
-            control = (UIInput)context.getApplication().
-                            createComponent("javax.faces.Input");
-            control.setRendererType("javax.faces.Text");
-         }
-         else if (typeName.equals(PropertyTypeDefinition.DATE) || typeName.equals(PropertyTypeDefinition.DATETIME))
+         if (typeName.equals(PropertyTypeDefinition.DATE) || typeName.equals(PropertyTypeDefinition.DATETIME))
          {
             control = (UIInput)context.getApplication().
                             createComponent("javax.faces.Input");
@@ -308,6 +330,13 @@ public class UIProperty extends UIPanel implements NamingContainer
          else if (typeName.equals(PropertyTypeDefinition.CATEGORY))
          {
             // TODO: Handle lists of values by retrieving them from category service?
+         }
+         else
+         {
+            // any other type is represented as an input text field
+            control = (UIInput)context.getApplication().
+                            createComponent("javax.faces.Input");
+            control.setRendererType("javax.faces.Text");
          }
       
          // set control to disabled state if set to read only or if the
@@ -332,6 +361,23 @@ public class UIProperty extends UIPanel implements NamingContainer
       control.setId(context.getViewRoot().createUniqueId());
       control.setValueBinding("value", vb);
       
+      // if a converter has been specified we need to instantiate it
+      // and apply it to the control
+      if (getConverter() != null)
+      {
+         // catch null pointer exception to workaround bug in myfaces
+         try
+         {
+            Converter conv = context.getApplication().createConverter(getConverter());
+            control.setConverter(conv);
+         }
+         catch (FacesException fe)
+         {
+            logger.warn("Converter " + getConverter() + " could not be applied");
+         }
+      }
+      
+      // add the control itself
       this.getChildren().add(control);
       
       if (logger.isDebugEnabled())
@@ -378,9 +424,26 @@ public class UIProperty extends UIPanel implements NamingContainer
          }
       }
       
-      // set the common attributes and add to the parent
+      // set the common attributes
       control.setId(context.getViewRoot().createUniqueId());
       control.setValueBinding("value", vb);
+      
+      // if a converter has been specified we need to instantiate it
+      // and apply it to the control
+      if (getConverter() != null)
+      {
+         try
+         {
+            Converter conv = context.getApplication().createConverter(getConverter());
+            control.setConverter(conv);
+         }
+         catch (FacesException fe)
+         {
+            logger.warn("Converter " + getConverter() + " could not be applied");
+         }
+      }
+      
+      // add the control itself
       this.getChildren().add(control);
       
       if (logger.isDebugEnabled())

@@ -8,7 +8,6 @@
       <element-readers>
          <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
          <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
-         <element-reader element-name="mimetypes" class="org.alfresco.web.config.MimeTypesElementReader"/>
       </element-readers>
    </plug-ins>
    
@@ -17,16 +16,34 @@
          <mode>servlet</mode>
          <error-page>/jsp/error.jsp</error-page>
       </server>
+      <!--
+      <repository>
+         <store-name>SpacesStore</store-name>
+         <company-root-path>/Company Home</company-root-path>
+         <glossary-folder-name>Glossary</glossary-folder-name>
+         <templates-folder-name>Templates</templates-folder-name>
+      </repository>
+      -->
    </config>
    
-   <config evaluator="aspect-name" condition="uifacets">
+   <config evaluator="node-type" condition="content">
+      <property-sheet>
+         <show-property name="name" displayLabel="File Name" />
+         <show-property name="mimetype" displayLabel="Content Type" converter="org.alfresco.faces.MimeTypeConverter" />
+         <show-property name="title" displayLabel="Title" />
+         <show-property name="description" displayLabel="Description" />
+         <show-property name="creator" displayLabel="Author" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="node-type" condition="folder">
       <property-sheet>
          <show-property name="name" displayLabel="Name" />
          <show-property name="description" displayLabel="Description" />
       </property-sheet>
    </config>
    
-   <config evaluator="node-type" condition="folder">
+   <config evaluator="aspect-name" condition="auditable">
       <property-sheet>
          <show-property name="created" displayLabel="Created" readOnly="true" />
          <show-property name="modified" displayLabel="Modified" readOnly="true" />

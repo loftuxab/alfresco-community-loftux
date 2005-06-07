@@ -13,6 +13,7 @@ public class PropertyTag extends BaseComponentTag
    private String displayLabel;
    private String readOnly;
    private String mode;
+   private String converter;
    
    /**
     * @see javax.faces.webapp.UIComponentTag#getRendererType()
@@ -61,6 +62,14 @@ public class PropertyTag extends BaseComponentTag
    {
       this.mode = mode;
    }
+   
+   /**
+    * @param converter Sets the id of the converter
+    */
+   public void setConverter(String converter)
+   {
+      this.converter = converter;
+   }
 
    /**
     * @see javax.faces.webapp.UIComponentTag#setProperties(javax.faces.component.UIComponent)
@@ -72,6 +81,7 @@ public class PropertyTag extends BaseComponentTag
       setStringProperty(component, "name", this.name);
       setStringProperty(component, "displayLabel", this.displayLabel);
       setStringProperty(component, "mode", this.mode);
+      setStringProperty(component, "converter", this.converter);
       setBooleanProperty(component, "readOnly", this.readOnly);
    }
    
@@ -83,6 +93,7 @@ public class PropertyTag extends BaseComponentTag
       this.name = null;
       this.displayLabel = null;
       this.mode = null;
+      this.converter = null;
       this.readOnly = null;
       
       super.release();

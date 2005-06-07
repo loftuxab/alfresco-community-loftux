@@ -62,7 +62,6 @@
          <fileset dir="." includes="**/project-build.xml" />
       </subant>
       <antcall target="deploy-tomcat" />
-      <antcall target="start-tomcat" />
    </target>
 
    <target name="incremental-tomcat" depends="common-init">
@@ -70,7 +69,6 @@
          <fileset dir="." includes="**/project-build.xml" />
       </subant>
       <antcall target="deploy-tomcat" />
-      <antcall target="start-tomcat" />
    </target>
 
    <target name="deploy-exploded-web-client-tomcat" depends="common-init">

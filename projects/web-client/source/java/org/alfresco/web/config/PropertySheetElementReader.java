@@ -19,6 +19,7 @@ public class PropertySheetElementReader implements ConfigElementReader
    public static final String ATTR_NAME = "name";
    public static final String ATTR_DISPLAY_LABEL = "displayLabel";
    public static final String ATTR_READ_ONLY = "readOnly";
+   public static final String ATTR_CONVERTER = "converter";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -47,9 +48,10 @@ public class PropertySheetElementReader implements ConfigElementReader
             String propName = property.attributeValue(ATTR_NAME);
             String label = property.attributeValue(ATTR_DISPLAY_LABEL);
             String readOnly = property.attributeValue(ATTR_READ_ONLY);
+            String converter = property.attributeValue(ATTR_CONVERTER);
             
             // add the property to show to the custom config element
-            configElement.addProperty(propName, label, readOnly);
+            configElement.addProperty(propName, label, readOnly, converter);
          }
       }
       

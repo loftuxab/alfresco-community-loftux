@@ -94,16 +94,9 @@
                                        border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea"
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
                                        actionListener="#{EditDocPropsDialog.startWizardForEdit}">
-                                 <r:propertySheetGrid id="general-props" value="#{BrowseBean.document}" var="generalProps" 
-                                                      columns="1" mode="view" labelStyleClass="propertiesLabel">
-                                    <r:property name="name" displayLabel="File Name" />
-                                    <r:property name="mimetype" displayLabel="Content Type" />
-                                    <r:property name="title" displayLabel="Title" />
-                                    <r:property name="description" displayLabel="Description" />
-                                    <r:property name="creator" displayLabel="Author" />
-                                    <r:property name="created" displayLabel="Created" readOnly="true" />
-                                    <r:property name="modified" displayLabel="Modified" readOnly="true" />
-                                 </r:propertySheetGrid>
+                                 <r:propertySheetGrid id="document-props" value="#{BrowseBean.document}" var="documentProps" 
+                                                      columns="1" mode="view" labelStyleClass="propertiesLabel" 
+                                                      externalConfig="true" />
                                  <h:messages styleClass="errorMessage" />
                               </a:panel>
                               <br/>

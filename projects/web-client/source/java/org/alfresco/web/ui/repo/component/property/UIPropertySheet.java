@@ -289,7 +289,8 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
          if (logger.isDebugEnabled())
             logger.debug("Created property component " + propComp + "(" + 
                    propComp.getClientId(context) + 
-                   ") and added it to property sheet " + this);
+                   ") for '" + propertyName +
+                   "' and added it to property sheet " + this);
       }
    }
    
@@ -311,6 +312,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
          propComp.setId(context.getViewRoot().createUniqueId());
          propComp.setName(property.getName());
          propComp.setDisplayLabel(property.getDisplayLabel());
+         propComp.setConverter(property.getConverter());
          
          // if this property sheet is set as read only or the config says the property
          // should be read only set it as such
@@ -324,7 +326,8 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
          if (logger.isDebugEnabled())
             logger.debug("Created property component " + propComp + "(" + 
                    propComp.getClientId(context) + 
-                   ") and added it to property sheet " + this);
+                   ") for '" + property.getName() + 
+                   "' and added it to property sheet " + this);
       }
    }
 }

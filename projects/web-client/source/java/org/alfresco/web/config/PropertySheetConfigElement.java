@@ -65,6 +65,7 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
                ce.addAttribute(PropertySheetElementReader.ATTR_NAME, pc.getName());
                ce.addAttribute(PropertySheetElementReader.ATTR_DISPLAY_LABEL, pc.getDisplayLabel());
                ce.addAttribute(PropertySheetElementReader.ATTR_READ_ONLY, Boolean.toString(pc.isReadOnly()));
+               ce.addAttribute(PropertySheetElementReader.ATTR_CONVERTER, pc.getConverter());
                this.children.add(ce);
             }
             
@@ -122,10 +123,11 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
     * @param name The name of the property
     * @param displayLabel Display label to use for the property
     * @param readOnly Sets whether the property should be rendered as read only
+    * @param converter The name of a converter to apply to the property control
     */
-   public void addProperty(String name, String displayLabel, String readOnly)
+   public void addProperty(String name, String displayLabel, String readOnly, String converter)
    {
-      addProperty(new PropertyConfig(name, displayLabel, Boolean.parseBoolean(readOnly)));
+      addProperty(new PropertyConfig(name, displayLabel, Boolean.parseBoolean(readOnly), converter));
    }
    
    /**
@@ -159,13 +161,15 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
    {
       private String name;
       private String displayLabel;
+      private String converter;
       private boolean readOnly;
       
-      public PropertyConfig(String name, String displayLabel, boolean readOnly)
+      public PropertyConfig(String name, String displayLabel, boolean readOnly, String converter)
       {
          this.name = name;
          this.displayLabel = displayLabel;
          this.readOnly = readOnly;
+         this.converter = converter;
       }
       
       /**
@@ -173,7 +177,7 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
        */
       public String getDisplayLabel()
       {
-         return displayLabel;
+         return this.displayLabel;
       }
       
       /**
@@ -181,7 +185,7 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
        */
       public String getName()
       {
-         return name;
+         return this.name;
       }
       
       /**
@@ -189,7 +193,12 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
        */
       public boolean isReadOnly()
       {
-         return readOnly;
+         return this.readOnly;
+      }
+      
+      public String getConverter()
+      {
+         return this.converter;
       }
       
       /**
@@ -200,6 +209,7 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
          StringBuilder buffer = new StringBuilder(super.toString());
          buffer.append(" (name=").append(this.name);
          buffer.append(" displaylabel=").append(this.displayLabel);
+         buffer.append(" converter=").append(this.converter);
          buffer.append(" readonly=").append(this.readOnly).append(")");
          return buffer.toString();
       }
