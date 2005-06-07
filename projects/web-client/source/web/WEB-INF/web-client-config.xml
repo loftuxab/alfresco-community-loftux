@@ -19,14 +19,9 @@
       </server>
    </config>
    
-   <config evaluator="node-type" condition="folder">
+   <config evaluator="aspect-name" condition="uifacets">
       <property-sheet>
          <show-property name="name" displayLabel="Name" />
-      </property-sheet>
-   </config>
-   
-   <config evaluator="aspect-name" condition="space">
-      <property-sheet>
          <show-property name="description" displayLabel="Description" />
       </property-sheet>
    </config>

@@ -13,6 +13,20 @@
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
+<script language="JavaScript1.2">
+   function checkButtonState(inputField)
+   {
+      if (inputField.selectedIndex == 0)
+      {
+         document.getElementById("new-space-from-template:next-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("new-space-from-template:next-button").disabled = false;
+      }
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -113,7 +127,8 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:selectOneMenu value="#{NewSpaceWizard.templateSpaceId}">
+                                       <h:selectOneMenu id="templateSpaceId" value="#{NewSpaceWizard.templateSpaceId}" 
+                                                        onchange="javascript:checkButtonState(this);">
                                           <f:selectItems value="#{NewSpaceWizard.templateSpaces}" />
                                        </h:selectOneMenu>
                                     </td>
@@ -147,7 +162,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton id="next-button" value="Next" action="#{NewSpaceWizard.next}" 
+                                                        styleClass="wizardButton" disabled="#{NewSpaceWizard.templateSpaceId == null}"/>
                                     </td>
                                  </tr>
                                  <tr>

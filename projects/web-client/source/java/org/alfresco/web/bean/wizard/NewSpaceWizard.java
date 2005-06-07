@@ -15,7 +15,9 @@ import javax.transaction.UserTransaction;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSet;
@@ -25,7 +27,6 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.log4j.Logger;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -48,6 +49,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To close this wizard and create your space click Finish.";
    
    // new space wizard specific properties
+   private NodeOperationsService nodeOperationsService;
    private String createFrom;
    private String spaceType;
    private String existingSpaceId;
@@ -68,14 +70,6 @@ public class NewSpaceWizard extends AbstractWizardBean
    public String finish()
    {
       String outcome = FINISH_OUTCOME;
-      
-      // *******************************************************************************
-      // TODO: The user may have selected to create the space from an existing space
-      //       or a template space, if so we need to copy rather than create, but there
-      //       are no repository services available yet to do this!
-      //       We also need to be aware of copying structure and/or content.
-      //       For now we always create the space from scratch.
-      // *******************************************************************************
       
       if (this.name == null || this.name.length() == 0)
       {
@@ -108,50 +102,114 @@ public class NewSpaceWizard extends AbstractWizardBean
             }
             else
             {
-               // create the space (just create a folder for now)
-               NodeRef parentNodeRef;
-               String nodeId = getNavigator().getCurrentNodeId();
-               if (nodeId == null)
-               {
-                  parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
-               }
-               else
-               {
-                  parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
-               }
+               String newSpaceId = null;
                
-               String qname = RepoUtils.createValidQName(this.name);
-               ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
+               if (this.createFrom.equals("scratch"))
+               {
+                  // create the space (just create a folder for now)
+                  NodeRef parentNodeRef;
+                  String nodeId = getNavigator().getCurrentNodeId();
+                  if (nodeId == null)
+                  {
+                     parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+                  }
+                  else
+                  {
+                     parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
+                  }
+                  
+                  String qname = RepoUtils.createValidQName(this.name);
+                  ChildAssocRef assocRef = this.nodeService.createNode(parentNodeRef,
                          RepoUtils.QNAME_CONTAINS, QName.createQName(NamespaceService.ALFRESCO_URI, qname),
                          DictionaryBootstrap.TYPE_QNAME_FOLDER);
-               
-               NodeRef nodeRef = assocRef.getChildRef();
-               
-               // set the name property on the node
-               this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
-               
-               if (logger.isDebugEnabled())
-                  logger.debug("Created folder node with name: " + this.name);
-
-               // apply the uifacets aspect - icon, title and description props
-               Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
-               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
-               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.name);
-               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
-               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
-               
-               if (logger.isDebugEnabled())
-                  logger.debug("Added uifacets aspect with properties: " + uiFacetsProps);
-               
-               // apply the auditable aspect - created and modified date
-               Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(5);
-               Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-               auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
-               auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+                  
+                  
+                  NodeRef nodeRef = assocRef.getChildRef();
+                  newSpaceId = nodeRef.getId();
+                  
+                  // set the name property on the node
+                  this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
+                  
+                  if (logger.isDebugEnabled())
+                     logger.debug("Created folder node with name: " + this.name);
    
-               if (logger.isDebugEnabled())
-                  logger.debug("Added auditable aspect with properties: " + auditProps);
+                  // apply the uifacets aspect - icon, title and description props
+                  Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
+                  uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
+                  uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.name);
+                  uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
+                  this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+                  
+                  if (logger.isDebugEnabled())
+                     logger.debug("Added uifacets aspect with properties: " + uiFacetsProps);
+                  
+                  // apply the auditable aspect - created and modified date
+                  Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(5);
+                  Date now = new Date( Calendar.getInstance().getTimeInMillis() );
+                  auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
+                  auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+                  this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+      
+                  if (logger.isDebugEnabled())
+                     logger.debug("Added auditable aspect with properties: " + auditProps);
+               }
+               else if (this.createFrom.equals("existing"))
+               {
+                  // copy the selected space and update the name, description and icon
+                  NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), this.existingSpaceId);
+                  NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
+                  NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, null,
+                        QName.createQName(NamespaceService.ALFRESCO_URI, this.name), true);
+                  // also need to set the new description and icon properties
+                  // TODO: remove this when the copy also copies the name
+                  this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
+                  this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
+                  this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
+                  
+                  newSpaceId = copiedNode.getId();
+                     
+                  if (logger.isDebugEnabled())
+                     logger.debug("Copied space with id of " + sourceNode.getId() + " to " + this.name);
+               }
+               else if (this.createFrom.equals("template"))
+               {
+                  // copy the selected space and update the name, description and icon
+                  NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), this.templateSpaceId);
+                  NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
+                  NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, null,
+                        QName.createQName(NamespaceService.ALFRESCO_URI, this.name), true);
+                  // also need to set the new description and icon properties
+                  // TODO: remove this when the copy also copies the name
+                  this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
+                  this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
+                  this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
+                  
+                  newSpaceId = copiedNode.getId();
+                  
+                  if (logger.isDebugEnabled())
+                     logger.debug("Copied template space with id of " + sourceNode.getId() + " to " + this.name);
+               }
+               
+               // if the user selected to save the space as a template space copy the new
+               // space to the templates folder
+               if (this.saveAsTemplate)
+               {
+                  // get hold of the Templates node
+                  DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+                  namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+                  
+                  List<ChildAssocRef> templateNodeList = this.nodeService.selectNodes(this.nodeService.getRootNode(Repository.getStoreRef()),
+                        "/alf:Glossary/alf:Templates/alf:*", null, namespacePrefixResolver, false);
+                  if (templateNodeList.size() > 0)
+                  {
+                     // get the first item in the list as there should only be one!
+                     NodeRef templateNode = templateNodeList.get(0).getChildRef();
+                     NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), newSpaceId);
+                     NodeRef templateCopyNode = this.nodeOperationsService.copy(sourceNode, templateNode, null, 
+                           QName.createQName(NamespaceService.ALFRESCO_URI, "contains"));
+                     this.nodeService.setProperty(templateCopyNode, DictionaryBootstrap.PROP_QNAME_NAME, this.templateName);
+                  }
+               }
             }
             
             // commit the transaction
@@ -352,12 +410,14 @@ public class NewSpaceWizard extends AbstractWizardBean
     * @return Returns a list of template spaces currently in the system
     */
    public List getTemplateSpaces()
-   {
+   {      
       if (this.templates == null)
       {
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
          this.templates = new ArrayList<SelectItem>();
-         
+         // add an entry to instruct the user to select a template
+         this.templates.add(new SelectItem("none", "Select a template..."));
+        
          String actNs = NamespaceService.ALFRESCO_PREFIX;
          String s = "PATH:\"/" + actNs + ":Glossary/" + actNs + ":Templates/" + actNs + ":*\"";
          ResultSet results = this.searchService.query(rootNodeRef.getStoreRef(), "lucene", s, null, null);
@@ -374,11 +434,31 @@ public class NewSpaceWizard extends AbstractWizardBean
                }
             }
          }
+         else
+         {
+            logger.info("There were no search results!");
+         }
       }
       
       return this.templates;
    }
 
+   /**
+    * @return Returns the NodeOperationsService.
+    */
+   public NodeOperationsService getNodeOperationsService()
+   {
+      return this.nodeOperationsService;
+   }
+
+   /**
+    * @param nodeOperationsService   The NodeOperationsService to set.
+    */
+   public void setNodeOperationsService(NodeOperationsService nodeOperationsService)
+   {
+      this.nodeOperationsService = nodeOperationsService;
+   }
+   
    /**
     * @return Returns the copyPolicy.
     */

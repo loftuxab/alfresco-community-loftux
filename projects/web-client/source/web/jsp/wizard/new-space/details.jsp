@@ -14,9 +14,11 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
 <script language="JavaScript1.2">
-   function checkButtonState(inputField)
+   function checkButtonState()
    {
-      if (inputField.value.length == 0)
+      if (document.getElementById("new-space-details:name").value.length == 0 ||
+          (document.getElementById("new-space-details:saveAsTemplate").checked && 
+           document.getElementById("new-space-details:templateName").value.length == 0) )
       {
          document.getElementById("new-space-details:next-button").disabled = true;
          document.getElementById("new-space-details:finish-button").disabled = true;
@@ -26,6 +28,19 @@
          document.getElementById("new-space-details:next-button").disabled = false;
          document.getElementById("new-space-details:finish-button").disabled = false;
       }
+   }
+   
+   function toggleTemplateName()
+   {
+      document.getElementById('new-space-details:templateName').disabled = 
+         !document.getElementById('new-space-details:saveAsTemplate').checked;
+      
+      if (document.getElementById('new-space-details:templateName').disabled == false)
+      {
+         document.getElementById('new-space-details:templateName').focus();
+      }
+      
+      checkButtonState();
    }
 </script>
 
@@ -129,7 +144,7 @@
                                     <td>Name:</td>
                                     <td>
                                        <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" maxlength="1024"
-                                                    onkeyup="javascript:checkButtonState(this);" />&nbsp;*
+                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
@@ -166,13 +181,19 @@
                                  </tr>
                                  <tr>
                                     <td colspan="2">
-                                       <h:selectBooleanCheckbox value="#{NewSpaceWizard.saveAsTemplate}"/>&nbsp;
+                                       <h:selectBooleanCheckbox id="saveAsTemplate" value="#{NewSpaceWizard.saveAsTemplate}" 
+                                          onclick="javascript:toggleTemplateName();" />&nbsp;
                                        <span style="vertical-align:20%">Save as template</span>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="middle">Name:</td>
-                                    <td><h:inputText value="#{NewSpaceWizard.templateName}" size="35" disabled="true" maxlength="1024" />&nbsp;*</td>
+                                    <td>
+                                       <h:inputText id="templateName" value="#{NewSpaceWizard.templateName}" 
+                                                     size="35" disabled="#{!NewSpaceWizard.saveAsTemplate}" 
+                                                     onkeyup="javascript:checkButtonState();" maxlength="1024" />
+                                                     &nbsp;*
+                                    </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>

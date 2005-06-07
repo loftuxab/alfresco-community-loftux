@@ -144,7 +144,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" 
+                                                        disabled="#{NewSpaceWizard.existingSpaceId == null}"/>
                                     </td>
                                  </tr>
                                  <tr>
