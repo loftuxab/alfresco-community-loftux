@@ -137,6 +137,21 @@
    <!--                    -->
    <!--  PUBLIC SERVICES   -->
    <!--                    -->
+
+   <bean id="nodeService" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
+      <property name="proxyInterface">
+         <value>org.alfresco.repo.node.NodeService</value>
+      </property>
+      <property name="defaultBinding">
+         <ref bean="indexingNodeService"></ref>
+      </property>
+      <property name="redirectedBindings">
+         <map>
+            <entry key="workspace"><ref bean="indexingNodeService"></ref></entry>
+            <entry key="versionStore"><ref bean="lightWeightVersionStoreNodeService"></ref></entry>
+         </map>
+      </property>
+   </bean>
    
    <!-- NodeService implemented to persist to Database -->
    <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -253,7 +268,7 @@
                <ref bean="dictionaryService" />
             </constructor-arg>
             <constructor-arg>
-               <ref bean="indexingNodeService" />
+               <ref bean="dbNodeService" />
             </constructor-arg>
             <constructor-arg>
                <ref bean="contentTransformerRegistry" />
@@ -468,10 +483,6 @@
       </property>
       <property name="target">
          <bean class="org.alfresco.repo.version.lightweight.NodeServiceImpl">
-			 <property name="nodeService">
-				<!-- TODO This should point to the general node service -->	
-				<ref bean="dbNodeService" />
-			 </property>
 			 <property name="dbNodeService">
 				<ref bean="dbNodeService" />
 			 </property>
@@ -548,7 +559,7 @@
       </property>
    </bean>
    
-   <bean id="namespaceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="namespaceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" depends-on="dictionaryDAO">
       <property name="proxyInterfaces">
          <value>org.alfresco.repo.dictionary.NamespaceService</value>
       </property>

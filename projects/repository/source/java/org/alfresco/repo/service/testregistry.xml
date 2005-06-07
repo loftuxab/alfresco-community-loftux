@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+   
+   <import resource="testredirector.xml"/>
+   
+   
+   <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.impl.NamespaceDAOImpl">
+   </bean>
+
+   <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.impl.DictionaryDAOImpl" init-method="bootstrap">
+      <constructor-arg index="0">
+         <ref bean="namespaceDAO"/>
+      </constructor-arg>
+      <property name="bootstrapModels">
+         <list>
+            <value>org/alfresco/repo/service/serviceregistrytest_model.xml</value>
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="namespaceService" class="org.alfresco.repo.dictionary.impl.DictionaryNamespaceComponent" depends-on="dictionaryDAO">
+      <property name="namespaceDAO"><ref bean="namespaceDAO"/></property>
+   </bean>
+
+   <bean id="serviceRegistry" class="org.alfresco.repo.service.ServiceFactoryRegistry">
+   </bean>
+      
+   <bean id="serviceFactory" abstract="true" class="org.alfresco.repo.service.ServiceFactory">
+      <property name="namespaceService"><ref bean="namespaceService"/></property>
+   </bean>
+
+   <bean id="test:service1" parent="serviceFactory">
+      <property name="serviceInterface">
+         <value>org.alfresco.repo.service.ServiceRegistryTest$TestServiceInterface</value>
+      </property>
+      <property name="description">
+         <value>Test Service 1</value>
+      </property>
+      <property name="implementation">
+         <ref bean="test1Component"/>
+      </property>
+   </bean>
+
+   <bean id="test:service2" parent="serviceFactory">
+      <property name="serviceInterface">
+         <value>org.alfresco.repo.service.ServiceRegistryTest$TestServiceInterface</value>
+      </property>
+      <property name="description">
+         <value>Test Service 2</value>
+      </property>
+      <property name="implementation">
+         <ref bean="test2Component"/>
+      </property>
+   </bean>
+
+   <bean id="test:service3" parent="serviceFactory">
+      <property name="serviceInterface">
+         <value>org.alfresco.repo.service.StoreRedirectorProxyFactoryTest$TestServiceInterface</value>
+      </property>
+      <property name="description">
+         <value>Test Service 3</value>
+      </property>
+      <property name="implementation">
+         <ref bean="service1"/>
+      </property>
+   </bean>
+   
+   <bean id="test1Component" class="org.alfresco.repo.service.ServiceRegistryTest$Test1Component">
+   </bean>
+
+   <bean id="test2Component" class="org.alfresco.repo.service.ServiceRegistryTest$Test2Component">
+   </bean>
+   
+</beans>

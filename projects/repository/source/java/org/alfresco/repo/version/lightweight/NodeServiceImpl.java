@@ -44,11 +44,6 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     private final static String MSG_UNSUPPORTED = 
         "This operation is not supported by a version store implementation of the node service.";
 	
-	/**
-     * The common node service
-     */
-    protected NodeService nodeService ;
-    
     /**
      * The db node service, used as the version store implementation
      */
@@ -64,15 +59,6 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     protected DictionaryService dicitionaryService;
 	
-	/**
-     * Sets the general node service
-     * 
-     * @param nodeService   the node service
-     */
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
     
     /**
      * Sets the db node service, used as the version store implementation

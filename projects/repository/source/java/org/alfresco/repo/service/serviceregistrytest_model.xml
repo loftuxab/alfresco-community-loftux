@@ -1,0 +1,8 @@
+<model name="test:serviceregistrytest" xmlns="http://www.alfresco.org/dictionary/0.1">
+
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/test/serviceregistrytest" prefix="test"/>
+   </namespaces>
+
+</model>
+
