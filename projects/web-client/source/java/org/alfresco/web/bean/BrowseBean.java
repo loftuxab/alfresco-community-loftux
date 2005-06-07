@@ -530,8 +530,8 @@ public class BrowseBean implements IContextListener
       // match against the "name" attribute
       String nameAttrQuery = " +@" + nameAttr + ":\"" + text + "*\"";
       
-      // match against FILE type
-      String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}file\"";
+      // match against CONTENT type
+      String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}content\"";
       
       // match against FOLDER type
       String folderTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"";

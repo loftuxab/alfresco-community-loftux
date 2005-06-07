@@ -164,9 +164,9 @@ public class UIClipboardShelfItem extends UIShelfItem
       if (items.size() != 0)
       {
          out.write("<tr><td></td><td><nobr>");
-         out.write(buildActionLink(ACTION_REMOVE_ALL, -1, "Remove All", null));
-         out.write("&nbsp;");
          out.write(buildActionLink(ACTION_PASTE_ALL, -1, "Paste All", null));
+         out.write("&nbsp;");
+         out.write(buildActionLink(ACTION_REMOVE_ALL, -1, "Remove All", null));
          out.write("</nobr></td><td></td></tr>");
       }
       

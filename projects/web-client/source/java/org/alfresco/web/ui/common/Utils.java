@@ -107,18 +107,33 @@ public final class Utils
    /**
     * Crop a label within a SPAN element, using ellipses '...' at the end of label and
     * and encode the result for HTML output. A SPAN will only be generated if the label
-    * is beyond 32 characters in length.
+    * is beyond the default setting of 32 characters in length.
     * 
-    * @param text    to crop and encode
+    * @param text       to crop and encode
     * 
     * @return encoded and cropped resulting label HTML
     */
    public static String cropEncode(String text)
    {
-      if (text.length() > CROP_CHARS_LENGTH)
+      return cropEncode(text, 32);
+   }
+   
+   /**
+    * Crop a label within a SPAN element, using ellipses '...' at the end of label and
+    * and encode the result for HTML output. A SPAN will only be generated if the label
+    * is beyond the specified number of characters in length.
+    * 
+    * @param text       to crop and encode
+    * @param length     length of string to crop too
+    * 
+    * @return encoded and cropped resulting label HTML
+    */
+   public static String cropEncode(String text, int length)
+   {
+      if (text.length() > length)
       {
-         String label = text.substring(0, CROP_CHARS_LENGTH - 3) + "...";
-         StringBuilder buf = new StringBuilder(32 + 32 + text.length());
+         String label = text.substring(0, length - 3) + "...";
+         StringBuilder buf = new StringBuilder(length + 32 + text.length());
          buf.append("<span title=\"")
             .append(Utils.encode(text))
             .append("\">")
@@ -132,8 +147,15 @@ public final class Utils
       }
    }
    
-   private final static int CROP_CHARS_LENGTH = 32;
-   
+   /**
+    * Replace one string instance with another within the specified string
+    * 
+    * @param str
+    * @param repl
+    * @param with
+    * 
+    * @return replaced string
+    */
    public static String replace(String str, String repl, String with)
    {
        int lastindex = 0;
@@ -148,7 +170,7 @@ public final class Utils
        
        int len = repl.length();
        int lendiff = with.length() - repl.length();
-       StringBuilder out = new StringBuilder((lendiff <= 0) ? str.length() : (str.length() + (10 * lendiff)));
+       StringBuilder out = new StringBuilder((lendiff <= 0) ? str.length() : (str.length() + (lendiff << 3)));
        for (; pos >= 0; pos = str.indexOf(repl, lastindex = pos + len))
        {
            out.append(str.substring(lastindex, pos)).append(with);
@@ -592,7 +614,6 @@ public final class Utils
          err.printStackTrace();
       }
    }
-   
    
    private static Logger logger = Logger.getLogger(Utils.class);
 }
