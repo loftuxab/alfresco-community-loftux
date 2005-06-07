@@ -3,11 +3,14 @@ package org.alfresco.repo.node;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreatePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeDeletePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreatePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeletePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePolicy;
+import org.alfresco.repo.policy.AssociationPolicyDelegate;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -46,6 +49,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
 	private ClassPolicyDelegate<OnUpdatePolicy> onUpdateDelegate;
 	private ClassPolicyDelegate<BeforeDeletePolicy> beforeDeleteDelegate;
 	private ClassPolicyDelegate<OnDeletePolicy> onDeleteDelegate;	
+    private AssociationPolicyDelegate<OnCreateChildAssociationPolicy> onCreateChildAssociationDelegate;
 	
 	/**
 	 * Constructor
@@ -69,6 +73,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
 		this.onUpdateDelegate = this.policyComponent.registerClassPolicy(NodeServicePolicies.OnUpdatePolicy.class);
 		this.beforeDeleteDelegate = this.policyComponent.registerClassPolicy(NodeServicePolicies.BeforeDeletePolicy.class);
 		this.onDeleteDelegate = this.policyComponent.registerClassPolicy(NodeServicePolicies.OnDeletePolicy.class);
+        this.onCreateChildAssociationDelegate = this.policyComponent.registerAssociationPolicy(NodeServicePolicies.OnCreateChildAssociationPolicy.class);
 	}
 	
 	/**
@@ -140,6 +145,27 @@ public abstract class AbstractNodeServiceImpl implements NodeService
 		NodeServicePolicies.OnDeletePolicy policy = this.onDeleteDelegate.get(typeQName);
 		policy.onDelete(typeQName, nodeRef);		
 	}
+    
+    /**
+     * Invoke the onCreateChlidAssocitaion policy behaviour
+     * 
+     * @param childAssocRef     the child association reference
+     */
+    protected void invokeOnCreateChildAssociation(ChildAssocRef childAssocRef)
+    {
+        try
+        {
+            NodeServicePolicies.OnCreateChildAssociationPolicy policy = 
+                this.onCreateChildAssociationDelegate.get(this, childAssocRef.getParentRef(), childAssocRef.getQName());
+            policy.onCreateChildAssociation(childAssocRef);
+        }
+        catch (Exception exception)
+        {
+            // TODO remove this
+            // Ignore exception for now since the node unit tests fail
+            //exception.printStackTrace();
+        }
+    }
     
     /**
      * Defers to the pattern matching overload

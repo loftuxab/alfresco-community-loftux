@@ -200,6 +200,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         return this.createNode(parentRef, null, assocQName, nodeTypeQName, null);
     }
 
+    /**
+     * @see org.alfresco.repo.node.NodeService#createNode(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName, java.util.Map)
+     */
     public ChildAssocRef createNode(NodeRef parentRef,
             QName assocTypeQName,
             QName assocQName,
@@ -255,6 +258,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // Invoke policy behaviour
         ChildAssocRef childAssocRef = assoc.getChildAssocRef();
+        invokeOnCreateChildAssociation(childAssocRef);
 		invokeOnCreate(childAssocRef);
 		invokeOnUpdate(parentRef);
 		
@@ -292,6 +296,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ChildAssoc newAssoc = nodeDaoService.newChildAssoc(newParentNode, nodeToMove, true, assocQName);
 
         // invoke policy behaviour
+        invokeOnCreateChildAssociation(newAssoc.getChildAssocRef());
         invokeOnUpdate(oldParentNode.getNodeRef());
         invokeOnUpdate(newParentRef);
         
@@ -530,6 +535,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, childNode, false, qname);
 
 		// Invoke policy behaviours
+        invokeOnCreateChildAssociation(assoc.getChildAssocRef());
 		invokeOnUpdate(parentRef);
 		
         return assoc.getChildAssocRef();

@@ -23,6 +23,11 @@ public class RuleTypeImpl implements RuleType
     private String displayLabel;
     
     /**
+     * The ruleType adapter
+     */
+    private String ruleTypeAdapter;
+    
+    /**
      * 
      */
     public RuleTypeImpl(String name)
@@ -55,5 +60,24 @@ public class RuleTypeImpl implements RuleType
     {
         return this.displayLabel;
     }
-
+    
+    /**
+     * Sets the rule type adapter
+     * 
+     * @param ruleTypeAdapter  the rule type adapter
+     */
+    public void setRuleTypeAdapter(String ruleTypeAdapter)
+    {
+        this.ruleTypeAdapter = ruleTypeAdapter;
+    }
+    
+    /**
+     * Gets the rule type adapter
+     * 
+     * @return  the rule type adapter
+     */
+    public String getRuleTypeAdapter()
+    {
+        return ruleTypeAdapter;
+    }
 }

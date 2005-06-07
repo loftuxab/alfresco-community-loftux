@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.rule.impl.RuleImpl;
 
 /**
  * Rule service interface.
@@ -41,10 +40,10 @@ public interface RuleService
 	/**
 	 * Makes a specified node Actionable.
 	 * 
-	 * @param nodeRef						the node reference
-	 * @param ruleDefinitionFolderParent 	the node in which to create the rule defintion folder
+	 * @param nodeRef					the node reference
+	 * @param configurationsNodeRef 	the configurations node reference
 	 */
-	public void makeActionable(NodeRef nodeRef, NodeRef ruleDefinitionFolderParent);
+	public void makeActionable(NodeRef nodeRef, NodeRef configurationsNodeRef);
 	
 	/**
 	 * Indicates whether a node is actionable.
@@ -54,6 +53,8 @@ public interface RuleService
 	 */
 	public boolean isActionable(NodeRef nodeRef);
 	
+    public boolean hasRules(NodeRef nodeRef);
+    
 	/**
 	 * Get all the rules associated with an actionable node, including those
 	 * inherited from parents.
@@ -64,7 +65,7 @@ public interface RuleService
 	 * @param nodeRef	the node reference
 	 * @return			a list of the rules associated with the node 
 	 */
-	public List<RuleImpl> getRules(NodeRef nodeRef);
+	public List<Rule> getRules(NodeRef nodeRef);
 	
 	/**
 	 * Get the rules associated with an actionable node.
@@ -79,7 +80,9 @@ public interface RuleService
 	 * 						    in the result list or not
 	 * @return					a list of the rules associated with the node 
 	 */
-	public List<RuleImpl> getRules(NodeRef nodeRef, boolean includeInhertied);
+	public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied);
+    
+    public List<Rule> getRulesByRuleType(NodeRef nodeRef, RuleType ruleType);
 	
 	/**
 	 * Get the rules associated with an actionable node that would be executed for a 
@@ -93,7 +96,7 @@ public interface RuleService
 	 * @param executionContext	the execution context
 	 * @return					a list of the rules that would be executed
 	 */
-	public List<RuleImpl> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext);	
+	public List<Rule> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext);	
 	
 	/**
      * Helper method to create a new rule.

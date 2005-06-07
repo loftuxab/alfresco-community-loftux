@@ -82,7 +82,7 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
         AssociationDefinition assocDef = dictionary.getAssociation(assocRef);
         if (assocDef == null)
         {
-            throw new IllegalArgumentException("Association" + assocDef + " has not been defined in the data dictionary");
+            throw new IllegalArgumentException("Association " + assocRef + " has not been defined in the data dictionary");
         }
         return factory.createList(new ClassFeatureBehaviourBinding(dictionary, classRef, assocRef));
     }

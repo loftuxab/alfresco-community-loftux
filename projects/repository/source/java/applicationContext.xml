@@ -787,6 +787,18 @@
 			<property name="configService">
 				<ref bean="repoConfigService"/>
 			</property>
+			<property name="nodeService">
+				<ref bean="indexingNodeService"/>
+			</property>
+			<property name="contentService">
+				<ref bean="contentService"/>
+			</property>
+			<property name="dictionaryService">
+				<ref bean="dictionaryService"/>
+			</property>
+			<property name="policyComponent">
+				<ref bean="policyComponent"/>
+			</property>
          </bean>
       </property>
       <property name="transactionAttributes">

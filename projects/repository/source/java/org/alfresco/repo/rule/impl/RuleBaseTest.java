@@ -12,6 +12,12 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.config.ConfigSource;
 import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.xml.XMLConfigService;
+import org.alfresco.repo.content.ContentService;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.node.NodeService;
+import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.rule.RuleAction;
 import org.alfresco.repo.rule.RuleCondition;
 import org.alfresco.repo.rule.RuleType;
@@ -36,19 +42,57 @@ public class RuleBaseTest extends BaseSpringTest
     protected static final String CONDITION_DEF_NAME = "conditionDefinition";
     protected static final String ACTION_DEF_NAME = "actionDefinition";
     
+    protected NodeService nodeService;
+    protected ContentService contentService;
+    
     /**
      * Config services used
      */
     protected ConfigService configService;
     protected static final String TEST_CONFIG = "org/alfresco/repo/rule/impl/rule-config-test.xml";
+    
+    protected StoreRef testStoreRef;
+    protected NodeRef rootNodeRef;
+    protected NodeRef nodeRef;
+    protected NodeRef configFolder;
    
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
+        this.nodeService = (NodeService)this.applicationContext.getBean("indexingNodeService");
+        this.contentService = (ContentService)this.applicationContext.getBean("contentService");
+        
         // Sort out the required config
         ConfigSource configSource = new ClassPathConfigSource(TEST_CONFIG);
         this.configService = new XMLConfigService(configSource);
         ((XMLConfigService)this.configService).init();
+        
+        this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
+        
+        // Create the node used for tests
+        this.nodeRef = this.nodeService.createNode(
+                rootNodeRef,
+                null,
+                QName.createQName("{test}testnode"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        
+        // Create the config folder
+        this.configFolder = this.nodeService.createNode(
+                rootNodeRef,
+                null,
+                QName.createQName("{test}configfolder"),
+                DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
+    }
+    
+    protected void makeTestNodeActionable()
+    {
+        // Manually make the test node actionable
+        this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE, null);
+        this.nodeService.createAssociation(
+                this.nodeRef, 
+                configFolder, 
+                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
     }
     
     protected RuleImpl createTestRule(String id)

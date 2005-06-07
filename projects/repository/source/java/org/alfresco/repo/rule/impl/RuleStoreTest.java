@@ -6,37 +6,25 @@ package org.alfresco.repo.rule.impl;
 import java.util.List;
 
 import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.repo.rule.Rule;
+import org.springframework.util.StopWatch;
 
 /**
  * @author Roy Wetherall
  */
 public class RuleStoreTest extends RuleBaseTest
 {
-    private static final String RULE_ID = "1";
-    
     /**
-     * Services used during tests
+     * Rule id
      */
-    private NodeService nodeService;
-    private ContentService contentService;
+    private static final String RULE_ID = "1";
     
     /**
      * Rule store
      */
     private RuleStore ruleStore;
-    
-    /**
-     * Items used during tests
-     */
-    private StoreRef storeRef;
-    private NodeRef rootNodeRef;
-    private NodeRef nodeRef;
     
     /**
      * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpInTransaction()
@@ -46,49 +34,34 @@ public class RuleStoreTest extends RuleBaseTest
     {
         super.onSetUpInTransaction();
         
-        // Set the services
-        this.nodeService = (NodeService)this.applicationContext.getBean("indexingNodeService");
-        this.contentService = (ContentService)this.applicationContext.getBean("contentService");
-        
         // Create the rule store
         this.ruleStore = new RuleStore(
                 this.nodeService, 
                 this.contentService,
                 new RuleConfig(this.configService));
         
-        // Create the store and get the root node reference
-        this.storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
-        this.rootNodeRef = this.nodeService.getRootNode(this.storeRef);
-        
-        // Create the node used for tests
-        this.nodeRef = this.nodeService.createNode(
-                rootNodeRef,
-                null,
-                QName.createQName("{test}contains"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        
-        // TODO this should be made actionable in the correct way !!!
-        // Create the config folder
-        NodeRef configFolder = this.nodeService.createNode(
-                rootNodeRef,
-                null,
-                QName.createQName("{test}contains"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        this.nodeService.createAssociation(this.nodeRef, configFolder, RuleStore.ASSOC_QNAME_CONFIGURATIONS);
+        // Make the test node actionable
+        makeTestNodeActionable();
     }
     
+    /**
+     * Test get
+     */
     public void testGet()
     {
         testPut();
         
-        List<RuleImpl> rules = this.ruleStore.get(this.nodeRef);
+        List<? extends Rule> rules = this.ruleStore.get(this.nodeRef, true);
         assertNotNull(rules);
         assertEquals(1, rules.size());
         
-        RuleImpl rule = rules.get(0);
+        RuleImpl rule = (RuleImpl)rules.get(0);
         checkRule(rule, RULE_ID);
     }
     
+    /**
+     * Test put
+     */
     public void testPut()
     {
         RuleImpl newRule = createTestRule(RULE_ID);
@@ -102,31 +75,171 @@ public class RuleStoreTest extends RuleBaseTest
         String ruleXML = contentReader.getContentString();
         assertNotNull(ruleXML);
     }
-
-//    private RuleImpl newRule()
-//    {
-//        // Rule properties
-//        Map<String, Serializable> conditionProps = new HashMap<String, Serializable>();
-//        conditionProps.put("prop1", "value1");
-//        Map<String, Serializable> actionProps = new HashMap<String, Serializable>();
-//        actionProps.put("prop1", "value1");
-//        
-//        // Create a new rule
-//        RuleImpl newRule = new RuleImpl("1", new RuleTypeImpl("ruleType1"));
-//        newRule.setTitle("The title");
-//        newRule.setDescription("The description");
-//        newRule.addRuleCondition(
-//                new RuleConditionDefinitionImpl("condition1"), 
-//                conditionProps);
-//        newRule.addRuleAction(
-//                new RuleActionDefinitionImpl("action1"), 
-//                actionProps);
-//        
-//        return newRule;
-//    }
     
+    /**
+     * Test getByRuleType
+     */
+    public void testGetByRuleType()
+    {
+        List<? extends Rule> empty = this.ruleStore.getByRuleType(this.nodeRef, RULE_TYPE);
+        assertNotNull(empty);
+        assertTrue(empty.isEmpty());
+        
+        testPut();
+        List<? extends Rule> rules = this.ruleStore.getByRuleType(this.nodeRef, RULE_TYPE);
+        assertNotNull(rules);
+        assertEquals(1, rules.size());
+        assertEquals(RULE_TYPE_NAME, ((RuleImpl)rules.get(0)).getRuleType().getName());
+        
+        List<? extends Rule> empty2 = this.ruleStore.getByRuleType(this.nodeRef, new RuleTypeImpl("anOtherRuleType"));
+        assertNotNull(empty2);
+        assertTrue(empty2.isEmpty());        
+    }
+    
+    /**
+     * Test hasRules
+     */
+    public void testHasRules()
+    {
+        // Check that the node does not have any rules
+        assertFalse(this.ruleStore.hasRules(this.nodeRef));
+        
+        // Put some rules and check that the value is now true
+        testPut();
+        assertTrue(this.ruleStore.hasRules(this.nodeRef));
+    }
+    
+    /**
+     * Test remove
+     */
     public void testRemove()
     {
+        RuleImpl newRule = createTestRule(RULE_ID);
+        this.ruleStore.put(this.nodeRef, newRule);
+        List<? extends Rule> rules = this.ruleStore.get(this.nodeRef, true);
+        assertNotNull(rules);
+        assertEquals(1, rules.size());
         
+        this.ruleStore.remove(nodeRef, newRule);
+        
+        List<? extends Rule> moreRules = this.ruleStore.get(this.nodeRef, true);
+        assertNotNull(moreRules);
+        assertEquals(0, moreRules.size());        
+    }
+    
+    /**
+     * Test the performace of the cache with non hierarchical rules.
+     */
+    public void /*test*/CacheNonHierarchical()
+    {
+        // Create actionable nodes
+        NodeRef[] nodes = new NodeRef[100];
+        for (int i = 0; i < 100; i++)
+        {
+            NodeRef nodeRef = this.nodeService.createNode(
+                    rootNodeRef,
+                    null,
+                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                    DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+            NodeRef configFolder = this.nodeService.createNode(
+                    rootNodeRef,
+                    null,
+                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                    DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
+            this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE, null);
+            this.nodeService.createAssociation(
+                    nodeRef, 
+                    configFolder, 
+                    DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
+            nodes[i] = nodeRef;
+        }
+        
+        StopWatch sw = new StopWatch();
+        sw.start("put");
+        try
+        {
+            // Put rules
+            for (int i = 0; i < 100; i++)
+            {
+                NodeRef nodeRef = nodes[i];
+                for (int j = 0; j < 10; j++)
+                {
+                    RuleImpl newRule = createTestRule(Integer.toString(i) + "." + Integer.toString(j));
+                    this.ruleStore.put(nodeRef, newRule);
+                }
+            }
+        }
+        finally
+        {
+            sw.stop();
+        }
+        
+        sw.start("get (not cached)");
+        try
+        {
+            // Get rules (not cached)
+            for (int i = 0; i < 100; i++)
+            {
+                NodeRef nodeRef = nodes[i];
+                List<RuleImpl> rules = (List<RuleImpl>)this.ruleStore.get(nodeRef, true);
+                assertNotNull(rules);
+                assertEquals(10, rules.size());
+            }
+        }
+        finally
+        {
+            sw.stop();
+        }
+        
+        sw.start("get (cached)");
+        try
+        {
+            // Get rules (should now be cached)
+            for (int i = 0; i < 100; i++)
+            {
+                NodeRef nodeRef = nodes[i];
+                List<? extends Rule> rules = this.ruleStore.get(nodeRef, true);
+                assertNotNull(rules);
+                assertEquals(10, rules.size());
+            }
+        }
+        finally
+        {
+            sw.stop();
+        }
+        
+        sw.start("put & get (put one, get five)");
+        try
+        {
+            // Put and get
+            for (int i = 0; i < 95; i++)
+            {
+                NodeRef nodeRef = nodes[i];
+                RuleImpl newRule = createTestRule(Integer.toString(i) + ".new");
+                this.ruleStore.put(nodeRef, newRule);
+                
+                for (int j = 0; j < 5; j++)
+                {
+                    NodeRef getNodeRef = nodes[i+j];
+                    List<? extends Rule> rules = this.ruleStore.get(getNodeRef, true);    
+                    assertNotNull(rules);
+                    if (j == 0)
+                    {
+                        assertEquals(11, rules.size());
+                    }
+                    else
+                    {
+                        assertEquals(10, rules.size());
+                    }
+                }
+            }
+        }
+        finally
+        {
+            sw.stop();
+        }
+        
+        
+        System.out.println(sw.prettyPrint());
     }
 }

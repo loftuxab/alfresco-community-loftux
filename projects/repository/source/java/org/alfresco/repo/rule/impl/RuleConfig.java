@@ -44,6 +44,7 @@ import org.alfresco.repo.rule.RuleServiceException;
     private static final String CE_RULE_TYPES = "rule-types";
     private static final String CA_NAME = "name";
     private static final String CE_DISPLAY_LABEL = "display-label";
+    private static final String CE_ADAPTER = "adapter";
     private static final String ACTION_DEFINITIONS_CONFIG = "Action Definitions";
     private static final String CE_ACTION_DEFINITIONS = "action-definitions";
     private static final String CONDITION_DEFINITIONS_CONFIG = "Condition Definitions";
@@ -153,8 +154,10 @@ import org.alfresco.repo.rule.RuleServiceException;
                 {
                     ruleTypeData.setDisplayLabel(childConfig.getValue());
                 }
-                
-                // TODO get the other information that we currently don't know about !!
+                else if (CE_ADAPTER.equals(configElementName) == true)
+                {
+                    ruleTypeData.setRuleTypeAdapter(childConfig.getValue());
+                }
             }
                                   
             

@@ -4,6 +4,7 @@
 package org.alfresco.repo.node;
 
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
@@ -119,4 +120,22 @@ public interface NodeServicePolicies
 	// TODO
 	// onAddAspect
 	// onRemoveAspect
+    
+    /**
+     * OnCreateChildAssociationPolicy interface
+     */
+    public interface OnCreateChildAssociationPolicy extends AssociationPolicy
+    {
+        /**
+         * Policy meta data
+         */
+        static final String NAMESPACE = NamespaceService.ALFRESCO_URI;
+        
+        /**
+         * Called after a node child association has been created.
+         * 
+         * @param childAssocRef     the created child association reference
+         */
+        public void onCreateChildAssociation(ChildAssocRef childAssocRef);
+    }
 }

@@ -12,14 +12,15 @@ import java.util.Map;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.rule.Rule;
 import org.alfresco.repo.rule.RuleServiceException;
+import org.alfresco.repo.rule.RuleType;
 
 
 /**
@@ -27,12 +28,6 @@ import org.alfresco.repo.rule.RuleServiceException;
  */
 /*package*/ class RuleStore
 {
-    /**
-     * Tempory model constants 
-     */
-    public static final QName ASSOC_QNAME_CONFIGURATIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "configurations");
-    private static final QName CHILD_ASSOC_QNAME_CONTAINS = QName.createQName(NamespaceService.ALFRESCO_URI, "contains");
-    
     /**
      * The node service
      */
@@ -48,6 +43,9 @@ import org.alfresco.repo.rule.RuleServiceException;
      */
     private RuleConfig ruleConfig;
     
+    /**
+     * Rule cache entries indexed by node reference
+     */
     private Map<NodeRef, RuleCacheEntry> ruleCache = new HashMap<NodeRef, RuleCacheEntry>();
     
     /**
@@ -65,42 +63,109 @@ import org.alfresco.repo.rule.RuleServiceException;
         this.nodeService = nodeService;
         this.contentService = contentService;
         this.ruleConfig = ruleConfig;
+        
+        // TODO need to register interest in the change event for any config folder (and its children!!)
+        // TODO need to register interest in update to check for node changes that might effect the cache
+        // TODO need to register interest in move as this would also effect the cache
     }
     
-    public List<RuleImpl> get(NodeRef nodeRef)
+    public boolean hasRules(NodeRef nodeRef)
     {
-        RuleCacheEntry ruleCacheEntry = this.ruleCache.get(nodeRef);
-        if (ruleCacheEntry == null)
+        RuleCacheEntry ruleCacheEntry = getRuleCacheEntry(nodeRef);
+        return ruleCacheEntry.hasRules();
+    }
+    
+    public List<? extends Rule> getByRuleType(NodeRef nodeRef, RuleType ruleType)
+    {
+        RuleCacheEntry ruleCacheEntry = getRuleCacheEntry(nodeRef);
+        return ruleCacheEntry.getRulesByRuleType(ruleType);
+    }
+    
+    /**
+     * Get a list of rules from the store.
+     * 
+     * @param nodeRef               the node reference
+     * @param includeInherited      true if list includes inherited rules, false otherwise
+     * @return                      a list of rules
+     */
+    public List<? extends Rule> get(NodeRef nodeRef, boolean includeInherited)
+    {
+        List<RuleImpl> result = null;
+        RuleCacheEntry ruleCacheEntry = getRuleCacheEntry(nodeRef);
+        
+        if (includeInherited == true)
         {
-            ruleCacheEntry = new RuleCacheEntry(nodeRef);
+            result = ruleCacheEntry.getRules();
+        }
+        else
+        {
+            result = ruleCacheEntry.getMyRules();
         }
         
-        return ruleCacheEntry.getRules();
+        return result;
     }
     
+    /**
+     * 
+     * @param nodeRef
+     * @param rule
+     */
     public void put(NodeRef nodeRef, RuleImpl rule)
     {
         // Write the rule to the repository
         writeRule(getConfigFolder(nodeRef), rule);
         
-        //dirtyCache(nodeRef, rule);        
+        RuleCacheEntry ruleCacheEntry = this.ruleCache.get(nodeRef);
+        if (ruleCacheEntry != null)
+        {
+            ruleCacheEntry.dirtyMyRules();
+        }
     }
     
+    /**
+     * 
+     * @param nodeRef
+     * @param rule
+     */
     public void remove(NodeRef nodeRef, RuleImpl rule)
     {
-        throw new UnsupportedOperationException();
-    }
+        // Remove the entry from the cache
+        this.ruleCache.remove(nodeRef);
+        // TODO what do we do about the children
+        
+        // Delete the rule content from the repository
+        NodeRef ruleContent = rule.getRuleContentNodeRef();
+        if (ruleContent != null && this.nodeService.exists(ruleContent) == false)
+        {
+            this.nodeService.deleteNode(ruleContent);
+        }
+    }   
     
-    private void dirtyCache(NodeRef nodeRef, RuleImpl rule)
+    private RuleCacheEntry getRuleCacheEntry(NodeRef nodeRef)
     {
-        throw new UnsupportedOperationException();
+        RuleCacheEntry ruleCacheEntry = this.ruleCache.get(nodeRef);
+        if (ruleCacheEntry == null)
+        {
+            ruleCacheEntry = new RuleCacheEntry(nodeRef);
+            this.ruleCache.put(nodeRef, ruleCacheEntry);
+        }
+        return ruleCacheEntry;
     }
 
+    /**
+     * 
+     * @param configFolder
+     * @param rule
+     */
     private void writeRule(NodeRef configFolder, RuleImpl rule)
     {
         NodeRef ruleContent = rule.getRuleContentNodeRef();
         
-        // TODO should check to make sure that the node is valid
+        // Check that the rule content node still exists
+        if (ruleContent != null && this.nodeService.exists(ruleContent) == false)
+        {
+            ruleContent = null;
+        }
         
         if (ruleContent == null)
         {
@@ -110,12 +175,11 @@ import org.alfresco.repo.rule.RuleServiceException;
             properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
             
             // Create the rule content node
-            // TODO should be creating a rule content node a content node
             ruleContent = this.nodeService.createNode(
                     configFolder, 
                     null, 
-                    CHILD_ASSOC_QNAME_CONTAINS, 
-                    DictionaryBootstrap.TYPE_QNAME_CONTENT,
+                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+                    DictionaryBootstrap.TYPE_QNAME_RULE_CONTENT,
                     properties).getChildRef();
             
             // Set the ruleContent node on the rule
@@ -160,10 +224,10 @@ import org.alfresco.repo.rule.RuleServiceException;
      */
     private NodeRef getConfigFolder(NodeRef nodeRef)
     {
-        // TODO use the correct const for the assoc QName
+        // Get the configurations folder
         List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
                                                nodeRef, 
-                                               ASSOC_QNAME_CONFIGURATIONS);
+                                               DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
         if (nodeAssocRefs.size() == 0)
         {
             throw new RuleServiceException("The configuaration folder for this actionable node has not been set.");
@@ -172,32 +236,90 @@ import org.alfresco.repo.rule.RuleServiceException;
         return nodeAssocRefs.get(0).getTargetRef();
     }       
     
+    /**
+     * Rule cache entry
+     * 
+     * @author Roy Wetherall
+     */
     private class RuleCacheEntry
     {
         private NodeRef nodeRef;
+        
         private List<RuleImpl> myRules;
+        private List<RuleImpl> allRules;
         private List<RuleImpl> inheritedRules;
-        //private List<RuleImpl> allRules;
         private List<RuleCacheEntry> parentEntries;
         private List<RuleCacheEntry> childEntries;
+        private Map<String, List<RuleImpl>> allRulesByRuleType;
         
+        /**
+         * Constructor
+         * 
+         * @param nodeRef
+         */
         public RuleCacheEntry(NodeRef nodeRef)
         {
             this.nodeRef = nodeRef;
+            
+            // TODO sort out how this links up with parents (and children??)
+        }
+        
+        public void dirtyMyRules()
+        {
+            this.myRules = null;
+            this.allRules = null;
+            this.allRulesByRuleType = null;
+            
+            // TODO ... this has implications for the cached inherited rules ...
+        }
+        
+        public boolean hasRules()
+        {
+            return (getRules().isEmpty() == false);
         }
         
         public List<RuleImpl> getRules()
         {
-            //if (this.allRules == null)
-            //{
-                List<RuleImpl> result = new ArrayList<RuleImpl>(getMyRules());
-                result.addAll(getInheritedRules());
-            //}
-            //return this.allRules;
+            if (this.allRules == null)
+            {
+                this.allRules = new ArrayList<RuleImpl>(getMyRules());
+                this.allRules.addAll(getInheritedRules());
+            }
+            
+            return this.allRules;
+        }
+        
+        /**
+         * 
+         * @param ruleType
+         * @return
+         */
+        public List<RuleImpl> getRulesByRuleType(RuleType ruleType)
+        {
+            if (this.allRulesByRuleType == null)
+            {
+                this.allRulesByRuleType = new HashMap<String, List<RuleImpl>>();
+            }
+            
+            List<RuleImpl> result = this.allRulesByRuleType.get(ruleType.getName());
+            if (result == null)
+            {
+                result = new ArrayList<RuleImpl>();
+                for (RuleImpl rule : getRules())
+                {
+                    if (ruleType.getName().equals(rule.getRuleType().getName())== true)
+                    {
+                        result.add(rule);
+                    }
+                }
+                
+                this.allRulesByRuleType.put(ruleType.getName(), result);
+            }
+            
             return result;
         }
 
-        private List<RuleImpl> getMyRules()
+        public List<RuleImpl> getMyRules()
         {
             if (this.myRules == null)
             {
@@ -206,7 +328,7 @@ import org.alfresco.repo.rule.RuleServiceException;
             return this.myRules;
         }
         
-        private List<RuleImpl> getInheritedRules()
+        public List<RuleImpl> getInheritedRules()
         {
             if (this.inheritedRules == null)
             {

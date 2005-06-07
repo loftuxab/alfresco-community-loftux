@@ -5,16 +5,21 @@ package org.alfresco.repo.rule.impl;
 
 import java.util.List;
 
+import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.ref.NodeAssocRef;
+import org.alfresco.repo.rule.ParameterDefinition;
+import org.alfresco.repo.rule.Rule;
 import org.alfresco.repo.rule.RuleActionDefinition;
 import org.alfresco.repo.rule.RuleConditionDefinition;
 import org.alfresco.repo.rule.RuleService;
 import org.alfresco.repo.rule.RuleType;
-import org.alfresco.util.BaseSpringTest;
 
 /**
  * @author Roy Wetherall
  */
-public class RuleServiceImplTest extends BaseSpringTest
+public class RuleServiceImplTest extends RuleBaseTest
 {
     /**
      * Rule service
@@ -22,64 +27,120 @@ public class RuleServiceImplTest extends BaseSpringTest
     private RuleService ruleService;
     
     /**
-     * Sets the rule service
-     * 
-     * @param ruleService
+     * Dictionary service
      */
-    public void setRuleService(RuleService ruleService)
+    private DictionaryService dictionaryService;
+    
+    private PolicyComponent policyComponent;
+    
+    @Override
+    protected void onSetUpInTransaction() throws Exception
     {
-        this.ruleService = ruleService;
+        super.onSetUpInTransaction();      
+        
+        this.dictionaryService = (DictionaryService)this.applicationContext.getBean("dictionaryService");
+        this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
+        
+        this.ruleService = new RuleServiceImpl();
+        ((RuleServiceImpl)this.ruleService).setConfigService(this.configService);
+        ((RuleServiceImpl)this.ruleService).setNodeService(this.nodeService);
+        ((RuleServiceImpl)this.ruleService).setContentService(this.contentService);
+        ((RuleServiceImpl)this.ruleService).setDictionaryService(this.dictionaryService);
+        ((RuleServiceImpl)this.ruleService).setPolicyComponent(this.policyComponent);
+        ((RuleServiceImpl)this.ruleService).init();
     }
     
+    /**
+     * Test get rule type
+     */
     public void testGetRuleType()
     {
-        // TODO at the moment this is just a holding test to 
-        //      ensure the data reuired by the UI is returned
-        
         List<RuleType> ruleTypes = this.ruleService.getRuleTypes();
         assertNotNull(ruleTypes);
+        assertEquals(1, ruleTypes.size());
+        
         for (RuleType ruleType : ruleTypes)
         {
-            assertNotNull(ruleType.getName());
-            assertNotNull(ruleType.getDisplayLabel());
-            System.out.println("Rule type: " + ruleType.getName() + " " + ruleType.getDisplayLabel());
-        }
+            assertEquals("displayLabel", ruleType.getDisplayLabel());
+            assertEquals("org.alfresco.repo.rule.impl.ruletype.InboundRuleTypeAdapter", ((RuleTypeImpl)ruleType).getRuleTypeAdapter());
+        }        
     }
     
+    /**
+     * Test getActionDefintions
+     */
     public void testGetActionDefinitions()
     {
-        // TODO at the moment this is just a holding test to 
-        // ensure the data reuired by the UI is returned        
-        
         List<RuleActionDefinition> actions = this.ruleService.getActionDefinitions();
         assertNotNull(actions);
+        assertEquals(2, actions.size());
+        
         for (RuleActionDefinition action : actions)
         {
-            assertNotNull(action.getName());
-            assertNotNull(action.getTitle());
-            assertNotNull(action.getDescription());
-            System.out.println("Action defintion: " + action.getName());
-        }
+            assertEquals("title", action.getTitle());
+            assertEquals("description", action.getDescription());
+            List<ParameterDefinition> params = action.getParameterDefinitions();
+            assertNotNull(params);
+            assertEquals(1, params.size());
+        }        
     }
     
+    /**
+     * Test getConditionDefinitions
+     */
     public void testGetConditionDefinitions()
     {
-        // TODO at the moment this is just a holding test to 
-        // ensure the data reuired by the UI is returned        
-        
         List<RuleConditionDefinition> conds = this.ruleService.getConditionDefinitions();
         assertNotNull(conds);
+        assertEquals(2, conds.size());
+        
         for (RuleConditionDefinition cond : conds)
         {
-            assertNotNull(cond.getName());
-            assertNotNull(cond.getTitle());
-            assertNotNull(cond.getDescription());
-            System.out.println("Condition defintion: " + cond.getName());
+            assertEquals("title", cond.getTitle());
+            assertEquals("description", cond.getDescription());
+            List<ParameterDefinition> params = cond.getParameterDefinitions();
+            assertNotNull(params);
+            assertEquals(1, params.size());
         }
+        
     }
     
-    public void testcreateRule()
+    /**
+     * Test makeActionable
+     *
+     */
+    public void testMakeActionable()
     {
-        // TODO
+        this.ruleService.makeActionable(this.nodeRef, this.configFolder);
+        assertTrue(this.nodeService.hasAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE));
+        
+        List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
+                                               nodeRef, 
+                                               DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
+        assertEquals(1, nodeAssocRefs.size());
+        assertEquals(this.configFolder, nodeAssocRefs.get(0).getTargetRef());
+    }
+    
+    /**
+     * Test isActionable
+     *
+     */
+    public void testIsActionable()
+    {
+        assertFalse(this.ruleService.isActionable(this.nodeRef));
+        this.ruleService.makeActionable(this.nodeRef, this.configFolder);
+        assertTrue(this.ruleService.isActionable(this.nodeRef));
+    }
+    
+    /**
+     * Test createRule
+     */
+    public void testCreateRule()
+    {
+        RuleType ruleType = new RuleTypeImpl("testRuleType");
+        Rule newRule = this.ruleService.createRule(ruleType);
+        assertNotNull(newRule);
+        assertNotNull(newRule.getId());
+        assertEquals("testRuleType", newRule.getRuleType().getName());
     }
 }

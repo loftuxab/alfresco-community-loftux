@@ -6,6 +6,7 @@
 		<rule-types>
 			<rule-type name="inbound">
 				<display-label>Inbound</display-label>
+				<adapter>org.alfresco.repo.rule.impl.ruletype.InboundRuleTypeAdapter</adapter>
 			</rule-type>
 			<rule-type name="outbound">
 				<display-label>Outbound</display-label>

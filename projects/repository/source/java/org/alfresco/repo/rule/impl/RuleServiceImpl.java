@@ -11,13 +11,19 @@ import java.util.Map;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.repo.content.ContentService;
+import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.rule.Rule;
 import org.alfresco.repo.rule.RuleActionDefinition;
 import org.alfresco.repo.rule.RuleConditionDefinition;
 import org.alfresco.repo.rule.RuleService;
+import org.alfresco.repo.rule.RuleServiceException;
 import org.alfresco.repo.rule.RuleType;
+import org.alfresco.repo.rule.RuleTypeAdapter;
 import org.alfresco.util.GUID;
 
 /**
@@ -30,14 +36,38 @@ public class RuleServiceImpl implements RuleService
      */
     private ConfigService configService;
     
+    /**
+     * The node service
+     */
     private NodeService nodeService;
     
+    /**
+     * The content service
+     */
     private ContentService contentService;
     
+    /**
+     * The dictionary service
+     */
+    private DictionaryService dictionaryService;
+    
+    /**
+     * The policy component
+     */
+    private PolicyComponent policyComponent;
+    
+    /**
+     * The rule config
+     */
     private RuleConfig ruleConfiguration;
     
+    /**
+     * The rule store
+     */
     private RuleStore ruleStore;
     
+    
+    private List<RuleTypeAdapter> adapters;
     
     /**
      * Service intialization method
@@ -50,6 +80,42 @@ public class RuleServiceImpl implements RuleService
                 this.nodeService, 
                 this.contentService,
                 this.ruleConfiguration);
+        
+        // Initialise the rule types
+        initRuleTypes();
+    }
+
+    /**
+     * Initialise the rule types
+     */
+    private void initRuleTypes()
+    {
+        // Register the rule type policy bahviours
+        List<RuleType> ruleTypes = getRuleTypes();
+        List<RuleTypeAdapter> adapters = new ArrayList<RuleTypeAdapter>(ruleTypes.size());
+        for (RuleType ruleType : ruleTypes)
+        {
+            // Create the rule type adapter and register policy bahaviours
+            String ruleTypeAdapter = ((RuleTypeImpl)ruleType).getRuleTypeAdapter();
+            if (ruleTypeAdapter != null && ruleTypeAdapter.length() != 0)
+            {
+                try
+                {
+                    // Create the rule type adapter
+                    RuleTypeAdapter adapter = (RuleTypeAdapter)Class.forName(ruleTypeAdapter).
+                            getConstructor(new Class[]{RuleType.class, PolicyComponent.class, RuleService.class}).
+                            newInstance(new Object[]{ruleType, this.policyComponent, this});
+                    
+                    // Register the adapters policy behaviour
+                    adapter.registerPolicyBehaviour();
+                }
+                catch(Exception exception)
+                {
+                    // Error creating and initialising the adapter
+                    throw new RuleServiceException("Unable to initialise the rule type adapter.", exception);
+                }
+            }
+        }
     }       
 
     /**
@@ -83,10 +149,31 @@ public class RuleServiceImpl implements RuleService
     }
     
     /**
+     * Set the dictionary service
+     * 
+     * @param dictionaryService     the dictionary service
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+    
+    /**
+     * Sets the policy component
+     * 
+     * @param policyComponent  the policy component
+     */
+    public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
+    
+    /**
      * @see org.alfresco.repo.rule.RuleService#getRuleTypes()
      */
     public List<RuleType> getRuleTypes()
     {
+        // Get the rule types from the rule config
         Collection<RuleTypeImpl> ruleTypes = this.ruleConfiguration.getRuleTypes();
         ArrayList<RuleType> result = new ArrayList<RuleType>(ruleTypes.size());
         result.addAll(ruleTypes);
@@ -98,6 +185,7 @@ public class RuleServiceImpl implements RuleService
      */
     public List<RuleConditionDefinition> getConditionDefinitions()
     {
+        // Get the condition defintion from the rule config
         Collection<RuleConditionDefinitionImpl> items = this.ruleConfiguration.getConditionDefinitions();
         ArrayList<RuleConditionDefinition> result = new ArrayList<RuleConditionDefinition>(items.size());
         result.addAll(items);
@@ -109,6 +197,7 @@ public class RuleServiceImpl implements RuleService
      */
     public List<RuleActionDefinition> getActionDefinitions()
     {
+        // Get the rule action defintions from the config
         Collection<RuleActionDefinitionImpl> items = this.ruleConfiguration.getActionDefinitions();
         ArrayList<RuleActionDefinition> result = new ArrayList<RuleActionDefinition>(items.size());
         result.addAll(items);
@@ -120,9 +209,24 @@ public class RuleServiceImpl implements RuleService
      */
     public void makeActionable(
             NodeRef nodeRef, 
-            NodeRef ruleDefinitionFolderParent)
+            NodeRef configurationsNodeRef)
     {
-        throw new UnsupportedOperationException();
+        // Check that the provided node is the correct type
+        QName className = this.nodeService.getType(configurationsNodeRef);
+        if (this.dictionaryService.isSubClass(className, DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS) == false)
+        {
+            throw new RuleServiceException("The passed configuration node reference must be a sub-tpye of 'configurations'.");
+        }
+        
+        // Apply the aspect and add the configurations folder
+        this.nodeService.addAspect(
+                nodeRef, 
+                DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE, 
+                null);
+        this.nodeService.createAssociation(
+                nodeRef, 
+                configurationsNodeRef, 
+                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
     }
 
     /**
@@ -130,29 +234,46 @@ public class RuleServiceImpl implements RuleService
      */
     public boolean isActionable(NodeRef nodeRef)
     {
-        throw new UnsupportedOperationException();
+        // Determine whether a node is actionable or not
+        return (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE) == true);          
+    }
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleService#hasRules(org.alfresco.repo.ref.NodeRef)
+     */
+    public boolean hasRules(NodeRef nodeRef)
+    {
+        return this.ruleStore.hasRules(nodeRef);
     }
 
     /**
      * @see org.alfresco.repo.rule.RuleService#getRules(org.alfresco.repo.ref.NodeRef)
      */
-    public List<RuleImpl> getRules(NodeRef nodeRef)
+    public List<Rule> getRules(NodeRef nodeRef)
     {
-        throw new UnsupportedOperationException();
+        return getRules(nodeRef, true);
     }
 
     /**
      * @see org.alfresco.repo.rule.RuleService#getRules(org.alfresco.repo.ref.NodeRef, boolean)
      */
-    public List<RuleImpl> getRules(NodeRef nodeRef, boolean includeInhertied)
+    public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied)
     {
-        throw new UnsupportedOperationException();
+        return (List<Rule>)this.ruleStore.get(nodeRef, includeInhertied);
+    }
+
+    /**
+     * @see org.alfresco.repo.rule.RuleService#getRulesByRuleType(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleType)
+     */
+    public List<Rule> getRulesByRuleType(NodeRef nodeRef, RuleType ruleType)
+    {
+        return (List<Rule>)this.ruleStore.getByRuleType(nodeRef, ruleType);
     }
 
     /**
      * @see org.alfresco.repo.rule.RuleService#previewExecutingRules(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleType, java.util.Map)
      */
-    public List<RuleImpl> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext)
+    public List<Rule> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext)
     {
         throw new UnsupportedOperationException();
     }
@@ -162,6 +283,7 @@ public class RuleServiceImpl implements RuleService
      */
     public Rule createRule(RuleType ruleType)
     {
+        // Create the new rule, giving it a unique rule id
         String id = GUID.generate();
         return new RuleImpl(id, ruleType);
     }
@@ -171,7 +293,8 @@ public class RuleServiceImpl implements RuleService
      */
     public void addRule(NodeRef nodeRef, Rule rule)
     {
-        throw new UnsupportedOperationException();
+        // Add the rule to the rule store
+        this.ruleStore.put(nodeRef, (RuleImpl)rule);
     }
     
     /**
@@ -179,6 +302,7 @@ public class RuleServiceImpl implements RuleService
      */
     public void removeRule(NodeRef nodeRef, Rule rule)
     {
-        throw new UnsupportedOperationException();
+        // Remove the rule from the rule store
+        this.ruleStore.remove(nodeRef, (RuleImpl)rule);
     } 
 }

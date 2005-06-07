@@ -94,4 +94,14 @@ public class DictionaryBootstrap
     // expected application types
     public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "folder");
     public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ALFRESCO_URI, "file");
+
+    /**
+     * Rule types and aspects
+     */
+    public static final QName ASPECT_QNAME_ACTIONABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "actionable");
+    public static final QName TYPE_QNAME_CONFIGURATIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "configurations");
+    public static final QName TYPE_QNAME_RULE_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "rulecontent");
+    public static final QName ASSOC_QNAME_CONFIGURATIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "configurations");
+    public static final QName CHILD_ASSOC_QNAME_CONTAINS = QName.createQName(NamespaceService.ALFRESCO_URI, "contains");
+    
 }
