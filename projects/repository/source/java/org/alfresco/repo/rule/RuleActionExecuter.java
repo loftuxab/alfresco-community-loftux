@@ -12,8 +12,10 @@ public interface RuleActionExecuter
 {
     /**
      * 
-     * @param nodeRef
-     * @param ruleAction
+     * @param actionableNodeRef
+     * @param actionedUponNodeRef TODO
      */
-    public void execute(NodeRef nodeRef, RuleAction ruleAction);
+    public void execute(
+            NodeRef actionableNodeRef, 
+            NodeRef actionedUponNodeRef);
 }

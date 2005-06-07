@@ -66,7 +66,9 @@ public class RuleServiceImpl implements RuleService
      */
     private RuleStore ruleStore;
     
-    
+    /**
+     * List of rule type adapters
+     */
     private List<RuleTypeAdapter> adapters;
     
     /**
@@ -103,8 +105,8 @@ public class RuleServiceImpl implements RuleService
                 {
                     // Create the rule type adapter
                     RuleTypeAdapter adapter = (RuleTypeAdapter)Class.forName(ruleTypeAdapter).
-                            getConstructor(new Class[]{RuleType.class, PolicyComponent.class, RuleService.class}).
-                            newInstance(new Object[]{ruleType, this.policyComponent, this});
+                            getConstructor(new Class[]{RuleType.class, PolicyComponent.class, RuleService.class, NodeService.class}).
+                            newInstance(new Object[]{ruleType, this.policyComponent, this, this.nodeService});
                     
                     // Register the adapters policy behaviour
                     adapter.registerPolicyBehaviour();
@@ -179,6 +181,14 @@ public class RuleServiceImpl implements RuleService
         result.addAll(ruleTypes);
         return result;
     }
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleService#getRuleType(java.lang.String)
+     */
+    public RuleType getRuleType(String name)
+    {
+        return this.ruleConfiguration.getRuleType(name);
+    }
 
     /**
      * @see org.alfresco.repo.rule.RuleService#getConditionDefinitions()
@@ -191,6 +201,14 @@ public class RuleServiceImpl implements RuleService
         result.addAll(items);
         return result;
     }
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleService#getConditionDefintion(java.lang.String)
+     */
+    public RuleConditionDefinition getConditionDefintion(String name)
+    {
+        return this.ruleConfiguration.getConditionDefinition(name);
+    }
 
     /**
      * @see org.alfresco.repo.rule.RuleService#getActionDefinitions()
@@ -202,6 +220,14 @@ public class RuleServiceImpl implements RuleService
         ArrayList<RuleActionDefinition> result = new ArrayList<RuleActionDefinition>(items.size());
         result.addAll(items);
         return result;
+    }
+
+    /**
+     * @see org.alfresco.repo.rule.RuleService#getActionDefinition(java.lang.String)
+     */
+    public RuleActionDefinition getActionDefinition(String name)
+    {
+        return this.ruleConfiguration.getActionDefinition(name);
     }
 
     /**
@@ -304,5 +330,5 @@ public class RuleServiceImpl implements RuleService
     {
         // Remove the rule from the rule store
         this.ruleStore.remove(nodeRef, (RuleImpl)rule);
-    } 
+    }     
 }

@@ -11,6 +11,8 @@ import org.alfresco.repo.rule.RuleServiceException;
  */
 public class RuleActionDefinitionImplTest extends RuleItemDefinitionImplTest
 {
+    private static final String RULE_ACTION_EXECUTOR = "ruleActionExector";
+    
     protected RuleItemDefinitionImpl create()
     {    
         // Test duplicate param name
@@ -31,6 +33,16 @@ public class RuleActionDefinitionImplTest extends RuleItemDefinitionImplTest
         temp.setTitle(TITLE);
         temp.setDescription(DESCRIPTION);
         temp.setParameterDefinitions(paramDefs);
+        temp.setRuleActionExecutor(RULE_ACTION_EXECUTOR);
         return temp;
+    }
+    
+    /**
+     * Test getRuleActionExecutor
+     */
+    public void testGetRuleActionExecutor()
+    {
+        RuleActionDefinitionImpl temp = (RuleActionDefinitionImpl)create();
+        assertEquals(RULE_ACTION_EXECUTOR, temp.getRuleActionExecutor());
     }
 }

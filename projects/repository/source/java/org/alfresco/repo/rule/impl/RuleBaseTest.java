@@ -20,6 +20,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.rule.RuleAction;
 import org.alfresco.repo.rule.RuleCondition;
+import org.alfresco.repo.rule.RuleConditionDefinition;
 import org.alfresco.repo.rule.RuleType;
 import org.alfresco.util.BaseSpringTest;
 
@@ -31,7 +32,7 @@ public class RuleBaseTest extends BaseSpringTest
     /**
      * Data used in the tests
      */
-    protected static final String RULE_TYPE_NAME = "ruleType";
+    protected static final String RULE_TYPE_NAME = "ruleType1";
     protected static final RuleType RULE_TYPE = new RuleTypeImpl(RULE_TYPE_NAME);
     protected static final String ACTION_PROP_NAME_1 = "actionPropName1";
     protected static final String ACTION_PROP_VALUE_1 = "actionPropValue1";
@@ -44,6 +45,7 @@ public class RuleBaseTest extends BaseSpringTest
     
     protected NodeService nodeService;
     protected ContentService contentService;
+    protected RuleConfig ruleConfig;
     
     /**
      * Config services used
@@ -66,6 +68,8 @@ public class RuleBaseTest extends BaseSpringTest
         ConfigSource configSource = new ClassPathConfigSource(TEST_CONFIG);
         this.configService = new XMLConfigService(configSource);
         ((XMLConfigService)this.configService).init();
+        
+        this.ruleConfig = new RuleConfig(this.configService);
         
         this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
@@ -103,15 +107,18 @@ public class RuleBaseTest extends BaseSpringTest
         Map<String, Serializable> actionProps = new HashMap<String, Serializable>();
         actionProps.put(ACTION_PROP_NAME_1, ACTION_PROP_VALUE_1);
         
+        RuleConditionDefinition cond = this.ruleConfig.getConditionDefinition(CONDITION_DEF_NAME);
+        RuleActionDefinitionImpl action = this.ruleConfig.getActionDefinition(ACTION_DEF_NAME);
+        
         // Create the rule
         RuleImpl rule = new RuleImpl(id, RULE_TYPE);
         rule.setTitle(TITLE);
         rule.setDescription(DESCRIPTION);
         rule.addRuleCondition(
-                new RuleConditionDefinitionImpl(CONDITION_DEF_NAME), 
+                cond, 
                 conditionProps);
         rule.addRuleAction(
-                new RuleActionDefinitionImpl(ACTION_DEF_NAME), 
+                action, 
                 actionProps);
         
         return rule;

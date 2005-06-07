@@ -57,12 +57,11 @@ public class RuleServiceImplTest extends RuleBaseTest
     {
         List<RuleType> ruleTypes = this.ruleService.getRuleTypes();
         assertNotNull(ruleTypes);
-        assertEquals(1, ruleTypes.size());
+        assertEquals(2, ruleTypes.size());
         
         for (RuleType ruleType : ruleTypes)
         {
             assertEquals("displayLabel", ruleType.getDisplayLabel());
-            assertEquals("org.alfresco.repo.rule.impl.ruletype.InboundRuleTypeAdapter", ((RuleTypeImpl)ruleType).getRuleTypeAdapter());
         }        
     }
     
@@ -104,7 +103,7 @@ public class RuleServiceImplTest extends RuleBaseTest
         }
         
     }
-    
+
     /**
      * Test makeActionable
      *

@@ -4,14 +4,12 @@
 	
 	<config evaluator="string-compare" condition="Rule Types">
 		<rule-types>
-			<rule-type name="ruleType">
-				<display-label>displayLabel</display-label>
-				<adapter>org.alfresco.repo.rule.impl.ruletype.InboundRuleTypeAdapter</adapter>
-			</rule-type> <!--
+			<rule-type name="ruleType1">
+				<display-label>displayLabel</display-label>				
+			</rule-type> 
 			<rule-type name="ruleType2">
-				<display-label>displayLabel</display-label>
-				<adapter>org.alfresco.repo.rule.impl.ruletype.InboundRuleTypeAdapter</adapter>
-			</rule-type> -->
+				<display-label>displayLabel</display-label>				
+			</rule-type>
 		</rule-types>
 	</config>
    

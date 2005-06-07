@@ -8,9 +8,9 @@
 				<display-label>Inbound</display-label>
 				<adapter>org.alfresco.repo.rule.impl.ruletype.InboundRuleTypeAdapter</adapter>
 			</rule-type>
-			<rule-type name="outbound">
+			<!-- <rule-type name="outbound">
 				<display-label>Outbound</display-label>
-			</rule-type>
+			</rule-type> -->
 		</rule-types>
 	</config>
    
@@ -18,6 +18,17 @@
    
 	<config evaluator="string-compare" condition="Action Definitions">
 		<action-definitions>
+			<action-definition name="add-features">
+				<title>Add features to content</title>	
+				<description>
+					This will add a feature to the matched content.			
+				</description>
+				<parameters>
+					<parameter name="aspect-name" type="QNAME"/>
+				</parameters>
+				<executor>org.alfresco.repo.rule.impl.action.AddFeaturesActionExecutor</executor>
+			</action-definition>
+			<!--
 			<action-definition name="simple-workflow">
 				<title>Add simple workflow to content</title>	
 				<description>
@@ -31,12 +42,6 @@
 				<title>Link content to category</title>	
 				<description>
 					This will apply a category to the matched content.	
-				</description>
-			</action-definition>
-			<action-definition name="add-features">
-				<title>Add features to content</title>	
-				<description>
-					This will add a feature to the matched content.			
 				</description>
 			</action-definition>
 			<action-definition name="copy">
@@ -69,7 +74,7 @@
 				<description>
 					This will check out the matched content.
 				</description>
-			</action-definition>			
+			</action-definition>	-->		
 		</action-definitions>						
 	</config>
    
@@ -84,7 +89,9 @@
                     Use this when you wish to apply an action to everything when it is 
                     added to the space.
 				</description>
+				<evaluator>org.alfresco.repo.rule.impl.condition.NoConditionEvaluator</evaluator>
 			</condition-definition>
+			<!--
 			<condition-definition name="in-category">
 				<title>Content in a specific category</title>	
 				<description>
@@ -97,6 +104,7 @@
 					The rule is applied to all content that has specific text in its name.
 				</description>
 			</condition-definition>
+			-->
 		</condition-definitions>
 	</config>
 	

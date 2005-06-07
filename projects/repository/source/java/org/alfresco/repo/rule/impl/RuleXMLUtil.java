@@ -6,10 +6,14 @@ package org.alfresco.repo.rule.impl;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.rule.ParameterDefinition;
+import org.alfresco.repo.rule.ParameterType;
 import org.alfresco.repo.rule.RuleAction;
 import org.alfresco.repo.rule.RuleActionDefinition;
 import org.alfresco.repo.rule.RuleCondition;
@@ -171,10 +175,8 @@ import org.dom4j.io.SAXReader;
             }
             
             // Get the value of the parameter
-            String value = paramElement.getStringValue();
-            
-            // TODO switch based on the parameter type and recreate the
-            //      correct type off value object
+            String valueAsString = paramElement.getStringValue();
+            Serializable value = getValueFromString(valueAsString, paramDef.getType());
             
             params.put(name, value);
         }
@@ -204,7 +206,7 @@ import org.dom4j.io.SAXReader;
         {
             builder.
                append("<condition name='").append(ruleCondition.getRuleConditionDefinition().getName()).append("'>").
-               append(parametersToXML(ruleCondition)).
+               append(parametersToXML(ruleCondition, ruleCondition.getRuleConditionDefinition())).
                append("</condition>");
         }
         builder.append("</conditions>");
@@ -215,7 +217,7 @@ import org.dom4j.io.SAXReader;
         {
             builder.
                append("<action name='").append(ruleAction.getRuleActionDefinition().getName()).append("'>").
-               append(parametersToXML(ruleAction)).
+               append(parametersToXML(ruleAction, ruleAction.getRuleActionDefinition())).
                append("</action>");
         }
         builder.append("</actions>");
@@ -231,18 +233,89 @@ import org.dom4j.io.SAXReader;
      * @param ruleItem  the rule item
      * @return          the XML string
      */
-    private static String parametersToXML(RuleItem ruleItem)
+    private static String parametersToXML(RuleItem ruleItem, RuleItemDefinition ruleItemDefinition)
     {
         StringBuilder builder = new StringBuilder();
         
         for (Map.Entry entry : ruleItem.getParameterValues().entrySet())
         {
+            ParameterDefinition paramDef = ruleItemDefinition.getParameterDefintion((String)entry.getKey());
+            if (paramDef == null)
+            {
+                throw new RuleServiceException(
+                        MessageFormat.format("Unable to find defintion of parameter {0}", new Object[]{entry.getKey()}));
+            }
+            
             builder.
                 append("<parameter name='").append(entry.getKey()).append("'>").
-                append(entry.getValue().toString()).
+                append(getStringFromValue((Serializable)entry.getValue(), paramDef.getType())).
                 append("</parameter>");
         }
         
         return builder.toString();
+    }
+    
+    /**
+     * 
+     * @param valueAsString
+     * @param type
+     * @return
+     */
+    private static Serializable getValueFromString(
+            String valueAsString, 
+            ParameterType type)
+    {
+        Serializable result = null;
+        switch (type)
+        {
+            case DATE:
+                result = new Date(Long.parseLong(valueAsString));
+                break;
+            case QNAME:
+                result = QName.createQName(valueAsString);
+                break;
+            case NODE_REF:
+                result = new NodeRef(valueAsString);
+                break;
+            case INT:
+                result = Integer.getInteger(valueAsString);
+                break;
+            case LIST:
+                throw new UnsupportedOperationException();
+                //break;
+            default:
+                result = valueAsString;
+                break;
+        }
+        return result;
+    }
+
+    /**
+     * 
+     * @param value
+     * @param type
+     * @return
+     */
+    private static String getStringFromValue(
+            Serializable value, 
+            ParameterType type)
+    {
+        String result = null;
+        switch (type)
+        {
+            case DATE:
+                result = Long.toString(((Date)value).getTime());
+                break;
+            case LIST:
+                throw new UnsupportedOperationException();
+                //break;
+            case QNAME:
+            case NODE_REF:
+            case INT:    
+            default:
+                result = value.toString();
+                break;
+        }
+        return result;
     }
 }

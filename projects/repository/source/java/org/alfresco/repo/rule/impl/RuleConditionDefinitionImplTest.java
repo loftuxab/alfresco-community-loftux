@@ -11,6 +11,14 @@ import org.alfresco.repo.rule.RuleServiceException;
  */
 public class RuleConditionDefinitionImplTest extends RuleItemDefinitionImplTest
 {
+    /**
+     * Constants used during tests
+     */
+    private static final String CONDITION_EVALUATOR = "conditionEvaluator";
+
+    /**
+     * @see org.alfresco.repo.rule.impl.RuleItemDefinitionImplTest#create()
+     */
     protected RuleItemDefinitionImpl create()
     {    
         // Test duplicate param name
@@ -31,6 +39,16 @@ public class RuleConditionDefinitionImplTest extends RuleItemDefinitionImplTest
         temp.setTitle(TITLE);
         temp.setDescription(DESCRIPTION);
         temp.setParameterDefinitions(this.paramDefs);
+        temp.setConditionEvaluator(CONDITION_EVALUATOR);
         return temp;
+    }
+    
+    /**
+     * Test getConditionEvaluator
+     */
+    public void testGetConditionEvaluator()
+    {
+        RuleConditionDefinitionImpl cond = (RuleConditionDefinitionImpl)create();
+        assertEquals(CONDITION_EVALUATOR, cond.getConditionEvaluator());
     }
 }

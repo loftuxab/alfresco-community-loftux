@@ -4,6 +4,7 @@
 package org.alfresco.repo.rule.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +39,7 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
     /**
      * The list of parameters associated with the rule item
      */
-    private List<ParameterDefinition> parameterDefinitions;
+    private List<ParameterDefinition> parameterDefinitions = new ArrayList<ParameterDefinition>();
     
     /**
      * A map of the parameter definitions by name

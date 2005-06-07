@@ -16,7 +16,12 @@ public class RuleActionDefinitionImpl extends RuleItemDefinitionImpl
     /**
      * Serial version UID
      */
-    private static final long serialVersionUID = 4048797883396863026L;
+    private static final long serialVersionUID = 4048797883396863026L;    
+    
+    /**
+     * The rule action executor
+     */
+    private String ruleActionExecutor;
 
     /**
      * Constructor
@@ -26,5 +31,25 @@ public class RuleActionDefinitionImpl extends RuleItemDefinitionImpl
     public RuleActionDefinitionImpl(String name)
     {
         super(name);
+    }
+        
+    /**
+     * Set the rule action executor
+     * 
+     * @param ruleActionExecutor    the rule action executor
+     */
+    public void setRuleActionExecutor(String ruleActionExecutor)
+    {
+        this.ruleActionExecutor = ruleActionExecutor;
+    }
+    
+    /**
+     * Get the rule aciton executor
+     * 
+     * @return  the rule action executor
+     */
+    public String getRuleActionExecutor()
+    {
+        return ruleActionExecutor;
     }
 }

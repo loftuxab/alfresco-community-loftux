@@ -1,6 +1,7 @@
 package org.alfresco.repo.rule.impl;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.repo.rule.RuleItem;
@@ -34,7 +35,8 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
      * @param parameterValues   the parameter values
      */
     public RuleItemImpl(Map<String, Serializable> parameterValues)
-    {        
+    {     
+        
         // TODO need to check that the parameter values being set correspond
         // correctly to the parameter definions on the rule item defintion
         this.parameterValues = parameterValues;
@@ -45,7 +47,12 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
      */
     public Map<String, Serializable> getParameterValues()
     {
-        return this.parameterValues;
+        Map<String, Serializable> result = this.parameterValues;
+        if (result == null)
+        {
+            result = new HashMap<String, Serializable>();
+        }
+        return result;
     }
 
     /**

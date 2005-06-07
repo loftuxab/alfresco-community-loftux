@@ -16,17 +16,17 @@ public class RuleConditionImpl extends RuleItemImpl implements Serializable,
         RuleCondition
 {
     /**
-     * 
+     * Serial version UID
      */
     private static final long serialVersionUID = 3257288015402644020L;
     
     /**
-     * 
+     * Rule condition defintion
      */
     private RuleConditionDefinition ruleConditionDefinition;
 
     /**
-     * 
+     * Constructor
      */
     public RuleConditionImpl(RuleConditionDefinition ruleConditionDefinition)
     {

@@ -788,7 +788,7 @@
    <!-- Rules Service -->
    <!--                -->
    
-   <bean id="RuleService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="ruleService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.repo.rule.RuleService</value>
       </property>

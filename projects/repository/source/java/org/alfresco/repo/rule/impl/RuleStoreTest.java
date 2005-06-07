@@ -38,7 +38,7 @@ public class RuleStoreTest extends RuleBaseTest
         this.ruleStore = new RuleStore(
                 this.nodeService, 
                 this.contentService,
-                new RuleConfig(this.configService));
+                this.ruleConfig);
         
         // Make the test node actionable
         makeTestNodeActionable();
@@ -130,9 +130,12 @@ public class RuleStoreTest extends RuleBaseTest
     /**
      * Test the performace of the cache with non hierarchical rules.
      */
-    public void /*test*/CacheNonHierarchical()
+    public void testCacheNonHierarchical()
     {
+        StopWatch sw = new StopWatch();
+        
         // Create actionable nodes
+        sw.start("create actionable nodes");
         NodeRef[] nodes = new NodeRef[100];
         for (int i = 0; i < 100; i++)
         {
@@ -153,9 +156,9 @@ public class RuleStoreTest extends RuleBaseTest
                     DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
             nodes[i] = nodeRef;
         }
+        sw.stop();
         
-        StopWatch sw = new StopWatch();
-        sw.start("put");
+        sw.start("put 10 rules on each node");
         try
         {
             // Put rules
@@ -174,7 +177,7 @@ public class RuleStoreTest extends RuleBaseTest
             sw.stop();
         }
         
-        sw.start("get (not cached)");
+        sw.start("get rules (not cached)");
         try
         {
             // Get rules (not cached)
@@ -191,7 +194,7 @@ public class RuleStoreTest extends RuleBaseTest
             sw.stop();
         }
         
-        sw.start("get (cached)");
+        sw.start("get rules (cached)");
         try
         {
             // Get rules (should now be cached)
@@ -208,7 +211,7 @@ public class RuleStoreTest extends RuleBaseTest
             sw.stop();
         }
         
-        sw.start("put & get (put one, get five)");
+        sw.start("put & get rules (put one, get five)");
         try
         {
             // Put and get

@@ -16,17 +16,19 @@ public class RuleActionImpl extends RuleItemImpl implements Serializable,
         RuleAction
 {
     /**
-     * 
+     * Serial version UID
      */
     private static final long serialVersionUID = 3258135760426186548L;
     
     /**
-     * 
+     * Rule action definition
      */
     private RuleActionDefinition ruleActionDefinition;
 
     /**
+     * Constructor
      * 
+     * @param ruleActionDefinition  the rule action definition
      */
     public RuleActionImpl(RuleActionDefinition ruleActionDefinition)
     {
@@ -34,7 +36,10 @@ public class RuleActionImpl extends RuleItemImpl implements Serializable,
     }
 
     /**
-     * @param parameterValues
+     * Constructor 
+     * 
+     * @param ruleActionDefinition  the rule action definition
+     * @param parameterValues       the parameter values
      */
     public RuleActionImpl(
             RuleActionDefinition ruleActionDefinition, 
@@ -51,5 +56,4 @@ public class RuleActionImpl extends RuleItemImpl implements Serializable,
     {
         return this.ruleActionDefinition;
     }
-
 }

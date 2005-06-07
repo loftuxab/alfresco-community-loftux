@@ -12,9 +12,11 @@ public interface RuleConditionEvaluator
 {
     /**
      * 
-     * @param nodeRef
-     * @param ruleCondition
+     * @param actionableNodeRef
+     * @param actionedUponNodeRef TODO
      * @return
      */
-    public boolean evaluate(NodeRef nodeRef, RuleCondition ruleCondition);
+    public boolean evaluate(
+            NodeRef actionableNodeRef, 
+            NodeRef actionedUponNodeRef);
 }

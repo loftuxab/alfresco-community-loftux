@@ -4,6 +4,7 @@
 package org.alfresco.repo.rule.impl.ruletype;
 
 import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -23,9 +24,10 @@ public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
     public InboundRuleTypeAdapter(
             RuleType ruleType,
             PolicyComponent policyComponent,
-            RuleService ruleService)
+            RuleService ruleService,
+            NodeService nodeService)
     {
-        super(ruleType, policyComponent, ruleService);
+        super(ruleType, policyComponent, ruleService, nodeService);
     }
 
     /**
@@ -41,6 +43,6 @@ public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
 
     public void onCreateChildAssociation(ChildAssocRef childAssocRef)
     {
-        executeRules(childAssocRef.getParentRef());
+        executeRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());
     }
 }

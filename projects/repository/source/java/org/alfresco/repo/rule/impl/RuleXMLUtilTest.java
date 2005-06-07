@@ -15,7 +15,7 @@ public class RuleXMLUtilTest extends RuleBaseTest
      * Rule XML
      */
     private static final String XML = 
-        "<rule id='" + RULE_ID + "' ruleType='ruleType'>" +
+        "<rule id='" + RULE_ID + "' ruleType='" + RULE_TYPE_NAME + "'>" +
             "<title>title</title>" +
             "<description>description</description>" +
             "<conditions>" +
@@ -36,11 +36,6 @@ public class RuleXMLUtilTest extends RuleBaseTest
     private RuleImpl rule;   
     
     /**
-     * Config services used
-     */
-    private RuleConfig ruleConfig;
-    
-    /**
      * Setup the tests
      * 
      * @see junit.framework.TestCase#setUp()
@@ -48,9 +43,6 @@ public class RuleXMLUtilTest extends RuleBaseTest
     protected void onSetUpInTransaction() throws Exception
     {
         super.onSetUpInTransaction();
-        
-        // Sort out the required config
-        this.ruleConfig = new RuleConfig(this.configService);
         
         // Create the test rule
         this.rule = createTestRule(RULE_ID);

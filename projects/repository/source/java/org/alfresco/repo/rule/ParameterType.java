@@ -11,5 +11,7 @@ public enum ParameterType
     STRING,
     INT,
     DATE,
-    NODE_REF
+    QNAME,
+    NODE_REF,
+    LIST
 }

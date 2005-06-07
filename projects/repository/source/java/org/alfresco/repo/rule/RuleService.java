@@ -22,6 +22,14 @@ public interface RuleService
 	 * @return	a list of rule types
 	 */
 	public List<RuleType> getRuleTypes();
+    
+    /**
+     * Gets a rule type by name.
+     * 
+     * @param name      the name of the rule type
+     * @return          the rule type, null if not found
+     */
+    public RuleType getRuleType(String name);
 	
 	/**
 	 * Get the condition definitions currently defined in the repository.
@@ -30,6 +38,14 @@ public interface RuleService
 	 */
 	public List<RuleConditionDefinition> getConditionDefinitions();
 	
+    /**
+     * Get a condition defintion by name.
+     * 
+     * @param name  the name of the condition definition
+     * @return      the condition definition, null if not found
+     */
+    public RuleConditionDefinition getConditionDefintion(String name);
+    
 	/**
 	 * Get the action definitions currently defined in the repository.
 	 * 
@@ -37,6 +53,14 @@ public interface RuleService
 	 */
 	public List<RuleActionDefinition> getActionDefinitions();
 	
+    /**
+     * Get an action definition by name
+     * 
+     * @param name  the name of the action definition
+     * @return      the action definition, null if not found
+     */
+    public RuleActionDefinition getActionDefinition(String name);
+    
 	/**
 	 * Makes a specified node Actionable.
 	 * 
@@ -53,6 +77,12 @@ public interface RuleService
 	 */
 	public boolean isActionable(NodeRef nodeRef);
 	
+    /**
+     * Indicates whether the node in question has any rules associated with it.
+     * 
+     * @param nodeRef   the node reference
+     * @return          true if the node has rules associated, false otherwise
+     */
     public boolean hasRules(NodeRef nodeRef);
     
 	/**
@@ -82,6 +112,12 @@ public interface RuleService
 	 */
 	public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied);
     
+    /**
+     * 
+     * @param nodeRef
+     * @param ruleType
+     * @return
+     */
     public List<Rule> getRulesByRuleType(NodeRef nodeRef, RuleType ruleType);
 	
 	/**

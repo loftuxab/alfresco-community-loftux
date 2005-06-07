@@ -113,7 +113,12 @@ import org.alfresco.repo.rule.RuleType;
     public void put(NodeRef nodeRef, RuleImpl rule)
     {
         // Write the rule to the repository
-        writeRule(getConfigFolder(nodeRef), rule);
+        NodeRef configFolder = getConfigFolder(nodeRef);
+        if (configFolder == null)
+        {
+            throw new RuleServiceException("The configuration folder for the acitonable node has not been set.");
+        }
+        writeRule(configFolder, rule);
         
         RuleCacheEntry ruleCacheEntry = this.ruleCache.get(nodeRef);
         if (ruleCacheEntry != null)
@@ -224,16 +229,22 @@ import org.alfresco.repo.rule.RuleType;
      */
     private NodeRef getConfigFolder(NodeRef nodeRef)
     {
+        NodeRef configFolder = null;
+        
         // Get the configurations folder
         List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
                                                nodeRef, 
                                                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
-        if (nodeAssocRefs.size() == 0)
+        if (nodeAssocRefs.size() > 1)
         {
-            throw new RuleServiceException("The configuaration folder for this actionable node has not been set.");
+            throw new RuleServiceException("More than one configuration folder has been set.");
+        }
+        else if (nodeAssocRefs.size() == 1)
+        {
+            configFolder = nodeAssocRefs.get(0).getTargetRef();
         }
         
-        return nodeAssocRefs.get(0).getTargetRef();
+        return configFolder;
     }       
     
     /**
@@ -323,7 +334,15 @@ import org.alfresco.repo.rule.RuleType;
         {
             if (this.myRules == null)
             {
-                this.myRules = readRules(getConfigFolder(this.nodeRef));
+                NodeRef configFolder = getConfigFolder(this.nodeRef);
+                if (configFolder == null)
+                {
+                    this.myRules = new ArrayList<RuleImpl>();
+                }
+                else
+                {
+                    this.myRules = readRules(configFolder);
+                }
             }
             return this.myRules;
         }

@@ -55,6 +55,8 @@ import org.alfresco.repo.rule.RuleServiceException;
     private static final String CE_PARAMETER = "parameter";
     private static final String CA_TYPE = "type";
     private static final String CA_DISPLAY_LABEL = "display-label";
+    private static final String CE_EVALUTOR = "evaluator";    
+    private static final String CE_EXECUTOR = "executor";
 
     /**
      * Error messages
@@ -63,7 +65,9 @@ import org.alfresco.repo.rule.RuleServiceException;
     private static final String ERR_UNIQUENESS = "Invalid rule config.  The name {0} is not unique.";
         
     /**
+     * Constructor
      * 
+     * @param configService     the config service
      */
     public RuleConfig(ConfigService configService)
     {
@@ -76,6 +80,8 @@ import org.alfresco.repo.rule.RuleServiceException;
     
     /**
      * Get a list of all the rule types
+     * 
+     * @return  the rule types
      */
     public Collection<RuleTypeImpl> getRuleTypes()
     {
@@ -83,9 +89,10 @@ import org.alfresco.repo.rule.RuleServiceException;
     }
     
     /**
+     * Gets a rule type by name
      * 
-     * @param name
-     * @return
+     * @param name  the rule type name
+     * @return      the rule type 
      */
     public RuleTypeImpl getRuleType(String name)
     {
@@ -209,6 +216,16 @@ import org.alfresco.repo.rule.RuleServiceException;
             RuleActionDefinitionImpl actionDefintionData = new RuleActionDefinitionImpl(name);
             initItemDefintion(actionDefintionData, ruleItemConfig);
             
+            // Get the executor string
+            for (ConfigElement childConfig : ruleItemConfig.getChildren())
+            {   
+                String configElementName = childConfig.getName();
+                if (CE_EXECUTOR.equals(configElementName) == true)
+                {
+                    actionDefintionData.setRuleActionExecutor(childConfig.getValue());
+                }
+            }
+            
             // Add the item to the cache
             this.actionDefinitions.put(name, actionDefintionData);
         }
@@ -231,6 +248,16 @@ import org.alfresco.repo.rule.RuleServiceException;
             RuleConditionDefinitionImpl conditionDefintionData = new RuleConditionDefinitionImpl(name);
             initItemDefintion(conditionDefintionData, ruleItemConfig);
             
+            // Get the evaluator string
+            for (ConfigElement childConfig : ruleItemConfig.getChildren())
+            {   
+                String configElementName = childConfig.getName();
+                if (CE_EVALUTOR.equals(configElementName) == true)
+                {
+                    conditionDefintionData.setConditionEvaluator(childConfig.getValue());
+                }
+            }
+                       
             // Add the item to the cache
             this.conditionDefinitions.put(name, conditionDefintionData);
 
