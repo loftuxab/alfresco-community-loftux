@@ -563,7 +563,6 @@ public class AddContentWizard extends AbstractWizardBean
       
       // remove the file upload bean from the session
       FacesContext ctx = FacesContext.getCurrentInstance();
-      FileUploadBean fileBean = (FileUploadBean)ctx.getExternalContext().getSessionMap().
-         remove(FileUploadBean.FILE_UPLOAD_BEAN_NAME);
+      ctx.getExternalContext().getSessionMap().remove(FileUploadBean.FILE_UPLOAD_BEAN_NAME);
    }
 }

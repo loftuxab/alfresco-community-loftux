@@ -16,6 +16,7 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.NamespaceService;
@@ -247,6 +248,38 @@ public class CheckinCheckoutBean
       }
    }
    
+   /**
+    * @return Returns the document content used for in-line editing.
+    */
+   public String getDocumentContent()
+   {
+      return this.documentContent;
+   }
+   
+   /**
+    * @param documentContent     The document content for in-line editing.
+    */
+   public void setDocumentContent(String documentContent)
+   {
+      this.documentContent = documentContent;
+   }
+   
+   /**
+    * @return Returns output from the in-line editor page.
+    */
+   public String getEditorOutput()
+   {
+      return this.editorOutput;
+   }
+
+   /**
+    * @param editorOutput  The output from the in-line editor page
+    */
+   public void setEditorOutput(String editorOutput)
+   {
+      this.editorOutput = editorOutput;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Navigation action event handlers
@@ -265,32 +298,7 @@ public class CheckinCheckoutBean
       String id = params.get("id");
       if (id != null && id.length() != 0)
       {
-         if (logger.isDebugEnabled())
-            logger.debug("Setup for action, setting current document to: " + id);
-         
-         try
-         {
-            // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
-            
-            // create content URL to the content download servlet with ID and expected filename
-            // the myfile part will be ignored by the servlet but gives the browser a hint
-            String url = DownloadContentServlet.generateURL(ref, node.getName());
-            node.getProperties().put("url", url);
-            node.getProperties().put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));            
-            
-            // remember the document
-            setDocument(node);
-            
-            // refresh the UI, calling this method now is fine as it basically makes sure certain
-            // beans clear the state - so when we finish here other beans will have been reset
-            UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
-         }
-         catch (InvalidNodeRefException refErr)
-         {
-            Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
-         }
+         setupContentDocument(id);
       }
       else
       {
@@ -298,6 +306,47 @@ public class CheckinCheckoutBean
       }
       
       clearUpload();
+   }
+   
+   /**
+    * Setup a content document node context
+    * 
+    * @param id      GUID of the node to setup as the content document context
+    * 
+    * @return The Node
+    */
+   private Node setupContentDocument(String id)
+   {
+      if (logger.isDebugEnabled())
+         logger.debug("Setup for action, setting current document to: " + id);
+
+      Node node = null;
+      
+      try
+      {
+         // create the node ref, then our node representation
+         NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+         node = new Node(ref, this.nodeService);
+         
+         // create content URL to the content download servlet with ID and expected filename
+         // the myfile part will be ignored by the servlet but gives the browser a hint
+         String url = DownloadContentServlet.generateURL(ref, node.getName());
+         node.getProperties().put("url", url);
+         node.getProperties().put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));            
+         
+         // remember the document
+         setDocument(node);
+         
+         // refresh the UI, calling this method now is fine as it basically makes sure certain
+         // beans clear the state - so when we finish here other beans will have been reset
+         UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
+      }
+      
+      return node;
    }
    
    /**
@@ -434,6 +483,91 @@ public class CheckinCheckoutBean
       else
       {
          logger.warn("WARNING: editFileOK called without a current Document!");
+      }
+      
+      return outcome;
+   }
+   
+   /**
+    * Action handler called to calculate which editing screen to display based on the mimetype
+    * of a document. If appropriate, the in-line editing screen will be shown.
+    */
+   public void editFile(ActionEvent event)
+   {
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         Node node = setupContentDocument(id);
+         // TODO: detect the inline editing aspect here instead
+         String mimetype = RepoUtils.getMimeTypeForFileName(FacesContext.getCurrentInstance(), node.getName());
+         if ("text/html".equals(mimetype))
+         {
+            // found a document that can be edited in-line
+            // retrieve the content so it's available to the editing screen
+            ContentReader reader = getContentService().getReader(node.getNodeRef());
+            setDocumentContent( reader.getContentString() );
+            setEditorOutput(null);
+            
+            // navigate to appropriate screen
+            FacesContext fc = FacesContext.getCurrentInstance();
+            fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "editInline");
+         }
+         else
+         {
+            // normal downloadable document
+            FacesContext fc = FacesContext.getCurrentInstance();
+            fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "editFile");
+         }
+      }
+   }
+   
+   /**
+    * Action handler called to set the content of a node from an inline editing page.
+    */
+   public String editInlineOK()
+   {
+      String outcome = null;
+      
+      UserTransaction tx = null;
+      
+      Node node = getDocument();
+      if (node != null)
+      {
+         try
+         {
+            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+            tx.begin();
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Trying to update content node Id: " + node.getId());
+            
+            // get an updating writer that we can use to modify the content on the current node
+            ContentWriter writer = this.contentService.getUpdatingWriter(node.getNodeRef());
+            writer.putContent(this.editorOutput);
+            
+            // commit the transaction
+            tx.commit();
+            
+            // clean up and clear action context
+            clearUpload();
+            setDocument(null);
+            setDocumentContent(null);
+            setEditorOutput(null);
+            
+            outcome = "browse";
+         }
+         catch (Throwable err)
+         {
+            // rollback the transaction
+            try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+            Utils.addErrorMessage("Unable to update Content Node due to system error: " + err.getMessage());
+         }
+      }
+      else
+      {
+         logger.warn("WARNING: editInlineOK called without a current Document!");
       }
       
       return outcome;
@@ -690,7 +824,7 @@ public class CheckinCheckoutBean
       
       // remove the file upload bean from the session
       FacesContext ctx = FacesContext.getCurrentInstance();
-      FileUploadBean fileBean = (FileUploadBean)ctx.getExternalContext().getSessionMap().remove(FileUploadBean.FILE_UPLOAD_BEAN_NAME);
+      ctx.getExternalContext().getSessionMap().remove(FileUploadBean.FILE_UPLOAD_BEAN_NAME);
    }
    
    
@@ -714,6 +848,12 @@ public class CheckinCheckoutBean
    /** The working copy of the document we are checking out */
    private Node workingDocument;
    
+   /** Content of the document used for in-line editing */
+   private String documentContent;
+   
+   /** Content of the document returned from in-line editing */
+   private String editorOutput;
+   
    /** transient form and upload properties */
    private File file;
    private String fileName;
@@ -732,5 +872,5 @@ public class CheckinCheckoutBean
    private VersionOperationsService versionOperationsService;
    
    /** The ContentService to be used by the bean */
-   private ContentService contentService;   
+   private ContentService contentService;
 }

@@ -88,7 +88,7 @@
                               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
                                     <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
-                                    <td>If you undo the check out of a document, the associated working copy will be deleted and all changes to it since the Check Out will be lost.
+                                    <td class="mainSubText">If you undo the check out of a document, the associated working copy will be deleted and all changes to it since the Check Out will be lost.
                                     </td>
                                  </tr>
                               </table>

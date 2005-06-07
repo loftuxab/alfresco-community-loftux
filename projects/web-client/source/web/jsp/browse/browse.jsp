@@ -356,7 +356,7 @@
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
                            <a:booleanEvaluator value="#{r.locked == false}">
-                              <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="editFile">
+                              <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.editFile}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                               <a:actionLink value="#{msg.update}" image="/images/icons/file.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">

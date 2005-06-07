@@ -349,6 +349,10 @@
          <to-view-id>/jsp/dialog/edit-file.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>editInline</from-outcome>
+         <to-view-id>/jsp/dialog/edit-file-inline.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>manageRules</from-outcome>
          <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
       </navigation-case>
@@ -356,6 +360,14 @@
    
    <navigation-rule>
       <from-view-id>/jsp/dialog/edit-file.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-file-inline.jsp</from-view-id>
       <navigation-case>
          <from-outcome>checkoutFile</from-outcome>
          <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>

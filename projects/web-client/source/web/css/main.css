@@ -251,7 +251,7 @@ a.headbarLink
    padding: 4px;
 }
 
-input,textarea
+input,textarea,select
 {
    font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 11px;
