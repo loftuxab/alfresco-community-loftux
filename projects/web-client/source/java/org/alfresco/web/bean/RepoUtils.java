@@ -232,7 +232,8 @@ public final class RepoUtils
    public static String getMimeTypeForFileName(FacesContext context, String filename)
    {
       // base the mimetype from the file extension
-      MimetypeMap mimetypeMap = (MimetypeMap)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("mimetypeMap");
+      MimetypeMap mimetypeMap = (MimetypeMap)FacesContextUtils.
+         getRequiredWebApplicationContext(context).getBean(Repository.MIMETYPE_MAP);
       
       // fall back if mimetype not found
       String mimetype = "text/plain";

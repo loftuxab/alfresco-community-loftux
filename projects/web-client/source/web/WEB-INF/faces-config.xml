@@ -40,12 +40,16 @@
          <value>#{indexingNodeService}</value>
       </managed-property>
       <managed-property>
-         <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
-      </managed-property>
-      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
       </managed-property>
       <managed-property>
          <property-name>nodeOperationsService</property-name>
@@ -65,12 +69,16 @@
          <value>#{indexingNodeService}</value>
       </managed-property>
       <managed-property>
-         <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
-      </managed-property>
-      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
       </managed-property>
    </managed-bean>
    
@@ -86,16 +94,16 @@
          <value>#{indexingNodeService}</value>
       </managed-property>
       <managed-property>
-         <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
-      </managed-property>
-      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
       </managed-property>
       <managed-property>
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{searcherComponent}</value>
       </managed-property>
    </managed-bean>
    
@@ -111,12 +119,41 @@
          <value>#{indexingNodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
          <property-name>contentService</property-name>
          <value>#{contentService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that backs up the Edit Document Properties Dialog
+      </description>
+      <managed-bean-name>EditDocPropsDialog</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.wizard.AddContentWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>contentService</property-name>
+         <value>#{contentService}</value>
       </managed-property>
    </managed-bean>
    
@@ -132,12 +169,16 @@
          <value>#{indexingNodeService}</value>
       </managed-property>
       <managed-property>
-         <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
-      </managed-property>
-      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>contentService</property-name>
+         <value>#{contentService}</value>
       </managed-property>
       <managed-property>
          <property-name>ruleService</property-name>
@@ -350,6 +391,26 @@
    </navigation-rule>
    
    <navigation-rule>
+      <from-view-id>/jsp/dialog/document-details.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>editDocProperties</from-outcome>
+         <to-view-id>/jsp/dialog/edit-document-properties.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-document-properties.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
       <from-view-id>/jsp/dialog/rules.jsp</from-view-id>
       <navigation-case>
          <from-outcome>createRule</from-outcome>
@@ -427,6 +488,10 @@
       <navigation-case>
          <from-outcome>upload</from-outcome>
          <to-view-id>/jsp/wizard/add-content/upload.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>properties</from-outcome>
+         <to-view-id>/jsp/wizard/add-content/properties.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>summary</from-outcome>

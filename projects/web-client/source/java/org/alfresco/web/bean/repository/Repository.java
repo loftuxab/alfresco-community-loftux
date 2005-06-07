@@ -17,6 +17,7 @@ public final class Repository
    public static final String RULE_SERVICE = "ruleService";
    public static final String DATA_DICTIONARY = "dataDictionary";
    public static final String USER_TRANSACTION = "userTransaction";
+   public static final String MIMETYPE_MAP = "mimetypeMap";
    
    /**
     * Returns a store reference object

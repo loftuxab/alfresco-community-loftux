@@ -26,4 +26,11 @@
       </property-sheet>
    </config>
    
+   <config evaluator="node-type" condition="folder">
+      <property-sheet>
+         <show-property name="created" displayLabel="Created" readOnly="true" />
+         <show-property name="modified" displayLabel="Modified" readOnly="true" />
+      </property-sheet>
+   </config>
+   
 </alfresco-config>

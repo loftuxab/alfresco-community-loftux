@@ -1,27 +1,42 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://myfaces.apache.org/extensions" prefix="x"%>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
-<%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
-<%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
 
 <r:page>
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
+<script language="JavaScript1.2">
+   function checkButtonState()
+   {
+      if (document.getElementById("add-content-properties:file-name").value.length == 0 ||
+          document.getElementById("add-content-properties:title").value.length == 0)
+      {
+         document.getElementById("add-content-properties:next-button").disabled = true;
+         document.getElementById("add-content-properties:finish-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("add-content-properties:next-button").disabled = false;
+         document.getElementById("add-content-properties:finish-button").disabled = false;
+      }
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <h:form id="add-content-upload-start">
+   <%-- REPLACE ME: set the form name here --%>
+   <h:form id="add-content-properties">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -56,7 +71,7 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/other_file.gif" />
+                              <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
                            </td>
                            <td>
                               <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
@@ -76,7 +91,7 @@
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_8.gif)"></td>
                   <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width="4" height="9"></td>
                </tr>
-                              
+               
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
@@ -87,86 +102,89 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                          value="1" disabled="true">
+                                    value="2" disabled="true">
                                  <a:listItem value="1" label="1. Upload Document" />
                                  <a:listItem value="2" label="2. Properties" />
                                  <a:listItem value="3" label="3. Summary" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>   
-                           
-                           </h:form>
-                        
+                           </td>
                            <td width="100%" valign="top">
                               
                               <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
                               
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0">
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{AddContentWizard.stepTitle}" /></td>
+                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{AddContentWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr>
-                                    <td class="mainSubText"><h:outputText value="#{AddContentWizard.stepDescription}" /></td>
+                                    <td colspan="2" class="mainSubText"><h:outputText value="#{AddContentWizard.stepDescription}" /></td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText">1. Locate document to upload</td>
+                                    <td colspan="2" class="wizardSectionHeading">General</td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 
-                                 <r:uploadForm>
                                  <tr>
+                                    <td>File Name:</td>
+                                    <td width="85%">
+                                       <h:inputText id="file-name" value="#{AddContentWizard.fileName}" size="35" maxlength="1024"
+                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>Content Type:</td>
                                     <td>
-                                       Location:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
+                                       <h:selectOneMenu value="#{AddContentWizard.contentType}">
+                                          <f:selectItems value="#{AddContentWizard.contentTypes}" />
+                                       </h:selectOneMenu>&nbsp;*
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>Title:</td>
+                                    <td>
+                                       <h:inputText id="title" value="#{AddContentWizard.title}" size="35" maxlength="1024"
+                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>Description:</td>
+                                    <td>
+                                       <h:inputText value="#{AddContentWizard.description}" size="35" maxlength="1024" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>Author:</td>
+                                    <td>
+                                       <h:inputText value="#{AddContentWizard.author}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText">2. Click upload</td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <input style="margin-left:12px;" type="submit" value="Upload" />
-                                    </td>
-                                 </tr>
-                                 </r:uploadForm>
-                                 
-                                 <h:form id="add-content-upload-end">
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <%
-                                 AddContentWizard wiz = (AddContentWizard)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "AddContentWizard");
-                                 if (wiz == null)
-                                 {
-                                 	wiz = (AddContentWizard)session.getAttribute("AddContentWizard");
-                                 }
-                                 if (wiz != null && wiz.getFileName() != null) {
-                                 %>
-                                    <tr>
-                                       <td>
-                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                          The file "<%=wiz.getFileName()%>" was uploaded successfully.
-                                       </td>
-                                    </tr>
-                                 <% } %>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td><h:outputText value="#{AddContentWizard.stepInstructions}" escape="false" /></td>
+                                    <td colspan="2"><h:outputText value="#{AddContentWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
+                           
                            <td valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{AddContentWizard.next}" styleClass="wizardButton" disabled="#{AddContentWizard.fileName == null}" />
+                                       <h:commandButton id="next-button" value="Next" action="#{AddContentWizard.next}" 
+                                                        styleClass="wizardButton" disabled="#{AddContentWizard.nextFinishDisabled}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="Back" action="#{AddContentWizard.back}" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton id="finish-button" value="Finish" action="#{AddContentWizard.finish}" 
+                                                        styleClass="wizardButton" disabled="#{AddContentWizard.nextFinishDisabled}" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
@@ -196,7 +214,7 @@
        </tr>
     </table>
     
-  </h:form>
+    </h:form>
     
 </f:view>
 

@@ -29,7 +29,6 @@ public abstract class AbstractWizardBean
    protected int currentStep = 1;
    protected boolean editMode = false;
    protected NodeService nodeService;
-   protected Searcher searchService;
    protected NavigationBean navigator;
    protected BrowseBean browseBean;
    
@@ -201,22 +200,6 @@ public abstract class AbstractWizardBean
    public void setNodeService(NodeService nodeService)
    {
       this.nodeService = nodeService;
-   }
-   
-   /**
-    * @return Returns the searchService.
-    */
-   public Searcher getSearchService()
-   {
-      return searchService;
-   }
-
-   /**
-    * @param searchService The searchService to set.
-    */
-   public void setSearchService(Searcher searchService)
-   {
-      this.searchService = searchService;
    }
    
    /**

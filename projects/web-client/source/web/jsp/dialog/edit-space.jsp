@@ -13,6 +13,20 @@
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
+<script language="JavaScript1.2">
+   function checkButtonState()
+   {
+      if (document.getElementById("edit-space:name").value.length == 0)
+      {
+         document.getElementById("edit-space:ok-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("edit-space:ok-button").disabled = false;
+      }
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -92,7 +106,8 @@
                                  <tr>
                                     <td>Name:</td>
                                     <td>
-                                       <h:inputText id="name" value="#{EditSpaceDialog.name}" size="35" maxlength="1024" />&nbsp;*
+                                       <h:inputText id="name" value="#{EditSpaceDialog.name}" size="35" maxlength="1024" 
+                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
@@ -139,7 +154,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="OK" action="#{EditSpaceDialog.finish}" styleClass="wizardButton" />
+                                       <h:commandButton id="ok-button" value="OK" action="#{EditSpaceDialog.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>

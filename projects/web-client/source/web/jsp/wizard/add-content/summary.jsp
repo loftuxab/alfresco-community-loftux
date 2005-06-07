@@ -85,9 +85,10 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                    value="2" disabled="true">
-                                 <a:listItem value="1" label="1. Starting Space" />
-                                 <a:listItem value="2" label="2. Summary" />
+                                    value="3" disabled="true">
+                                 <a:listItem value="1" label="1. Upload Document" />
+                                 <a:listItem value="2" label="2. Properties" />
+                                 <a:listItem value="3" label="3. Summary" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>

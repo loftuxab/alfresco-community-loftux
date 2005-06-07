@@ -57,7 +57,7 @@
                            </td>
                            <td>
                               <h:outputText value="#{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
-                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.properties.title}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>
@@ -85,36 +85,40 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <a:panel label="Preview" id="preview-panel" border="greyround" bgcolor="#eaeaea" progressive="true"><br/>
+                              <a:panel label="Preview" id="preview-panel" progressive="true"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
                                  <a:actionLink value="#{BrowseBean.document.name}" href="#{BrowseBean.document.properties.url}" />
                               </a:panel>
                               <br/>
-                              <a:panel label="Properties" id="properties-panel" border="greyround" bgcolor="#eaeaea" progressive="true"><br/>
-                                 <table border="0" cellpadding="0" cellspacing="0">
-                                    <tr><td style="border-bottom: 1px solid black;padding-bottom:2px;">General</td></tr>
-                                    <tr>
-                                       <td style="padding-top:6px;">
-                                       <r:propertySheetGrid id="general-props" value="#{BrowseBean.document}" var="generalProps" 
-                                                            columns="1" mode="view" labelStyleClass="propertiesLabel">
-                                          <r:property name="name" displayLabel="File Name" />
-                                       </r:propertySheetGrid>
-                                       </td>
-                                    </tr>
-                                    <tr>
-                                       <td><h:messages styleClass="errorMessage" /></td>
-                                    </tr>
-                                 </table>
+                              <a:panel label="Properties" id="properties-panel" progressive="true"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea"
+                                       action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
+                                       actionListener="#{EditDocPropsDialog.startWizardForEdit}">
+                                 <r:propertySheetGrid id="general-props" value="#{BrowseBean.document}" var="generalProps" 
+                                                      columns="1" mode="view" labelStyleClass="propertiesLabel">
+                                    <r:property name="name" displayLabel="File Name" />
+                                    <r:property name="mimetype" displayLabel="Content Type" />
+                                    <r:property name="title" displayLabel="Title" />
+                                    <r:property name="description" displayLabel="Description" />
+                                    <r:property name="creator" displayLabel="Author" />
+                                    <r:property name="created" displayLabel="Created" readOnly="true" />
+                                    <r:property name="modified" displayLabel="Modified" readOnly="true" />
+                                 </r:propertySheetGrid>
+                                 <h:messages styleClass="errorMessage" />
                               </a:panel>
                               <br/>
-                              <a:panel label="Workflow" id="workflow-panel" border="greyround" bgcolor="#eaeaea" progressive="true" expanded="false"><br/>
+                              <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
                                  Workflow options
                               </a:panel>
                               <br/>
-                              <a:panel label="Categories" id="categories-panel" border="greyround" bgcolor="#eaeaea" progressive="true" expanded="false"><br/>
+                              <a:panel label="Categories" id="categories-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
                                  Categories
                               </a:panel>
                               <br/>
-                              <a:panel label="Version History" id="version-history-panel" border="greyround" bgcolor="#eaeaea" progressive="true" expanded="false"><br/>
+                              <a:panel label="Version History" id="version-history-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
                                  Version History
                               </a:panel>
                               <br/>

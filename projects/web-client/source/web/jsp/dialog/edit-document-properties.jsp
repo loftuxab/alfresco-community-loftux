@@ -1,27 +1,40 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://myfaces.apache.org/extensions" prefix="x"%>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
-<%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
-<%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
 
 <r:page>
 
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
+<script language="JavaScript1.2">
+   function checkButtonState()
+   {
+      if (document.getElementById("edit-doc-properties:file-name").value.length == 0 ||
+          document.getElementById("edit-doc-properties:title").value.length == 0)
+      {
+         document.getElementById("edit-doc-properties:ok-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("edit-doc-properties:ok-button").disabled = false;
+      }
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <h:form id="add-content-upload-start">
+   <%-- REPLACE ME: set the form name here --%>
+   <h:form id="edit-doc-properties">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -29,7 +42,7 @@
       <%-- Title bar --%>
       <tr>
          <td colspan="2">
-            <%@ include file="../../parts/titlebar.jsp" %>
+            <%@ include file="../parts/titlebar.jsp" %>
          </td>
       </tr>
       
@@ -37,14 +50,14 @@
       <tr valign="top">
          <%-- Shelf --%>
          <td>
-            <%@ include file="../../parts/shelf.jsp" %>
+            <%@ include file="../parts/shelf.jsp" %>
          </td>
          
          <%-- Work Area --%>
          <td width="100%">
             <table cellspacing="0" cellpadding="0" width="100%">
                <%-- Breadcrumb --%>
-               <%@ include file="../../parts/breadcrumb.jsp" %>
+               <%@ include file="../parts/breadcrumb.jsp" %>
                
                <%-- Status and Actions --%>
                <tr>
@@ -56,12 +69,12 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/other_file.gif" />
+                              <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
                            </td>
                            <td>
                               <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
-                              <div class="mainTitle"><h:outputText value="#{AddContentWizard.wizardTitle}" /></div>
-                              <div class="mainSubText"><h:outputText value="#{AddContentWizard.wizardDescription}" /></div>
+                              <div class="mainTitle">Modify Properties of '<h:outputText value="#{BrowseBean.document.properties.title}" />'</div>
+                              <div class="mainSubText">Use this page to modify the document properties then click OK.</div>
                            </td>
                         </tr>
                      </table>
@@ -76,103 +89,69 @@
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_8.gif)"></td>
                   <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width="4" height="9"></td>
                </tr>
-                              
+               
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
-                           <td width="20%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
-                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                          value="1" disabled="true">
-                                 <a:listItem value="1" label="1. Upload Document" />
-                                 <a:listItem value="2" label="2. Properties" />
-                                 <a:listItem value="3" label="3. Summary" />
-                              </a:modeList>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>   
-                           
-                           </h:form>
-                        
                            <td width="100%" valign="top">
-                              
-                              <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
-                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0">
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{AddContentWizard.stepTitle}" /></td>
+                                    <td colspan="2" class="wizardSectionHeading">Document Properties</td>
                                  </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText"><h:outputText value="#{AddContentWizard.stepDescription}" /></td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td class="mainSubText">1. Locate document to upload</td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 
-                                 <r:uploadForm>
-                                 <tr>
-                                    <td>
-                                       Location:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
+                                    <td>File&nbsp;Name:</td>
+                                    <td width="90%">
+                                       <h:inputText id="file-name" value="#{EditDocPropsDialog.fileName}" size="35" maxlength="1024"
+                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText">2. Click upload</td>
-                                 </tr>
-                                 <tr>
+                                    <td>Content&nbsp;Type:</td>
                                     <td>
-                                       <input style="margin-left:12px;" type="submit" value="Upload" />
+                                       <h:selectOneMenu value="#{EditDocPropsDialog.contentType}">
+                                          <f:selectItems value="#{EditDocPropsDialog.contentTypes}" />
+                                       </h:selectOneMenu>&nbsp;*
                                     </td>
                                  </tr>
-                                 </r:uploadForm>
-                                 
-                                 <h:form id="add-content-upload-end">
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <%
-                                 AddContentWizard wiz = (AddContentWizard)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "AddContentWizard");
-                                 if (wiz == null)
-                                 {
-                                 	wiz = (AddContentWizard)session.getAttribute("AddContentWizard");
-                                 }
-                                 if (wiz != null && wiz.getFileName() != null) {
-                                 %>
-                                    <tr>
-                                       <td>
-                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                          The file "<%=wiz.getFileName()%>" was uploaded successfully.
-                                       </td>
-                                    </tr>
-                                 <% } %>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{AddContentWizard.stepInstructions}" escape="false" /></td>
+                                    <td>Title:</td>
+                                    <td>
+                                       <h:inputText id="title" value="#{EditDocPropsDialog.title}" size="35" maxlength="1024"
+                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>Description:</td>
+                                    <td>
+                                       <h:inputText value="#{EditDocPropsDialog.description}" size="35" maxlength="1024" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>Author:</td>
+                                    <td>
+                                       <h:inputText value="#{EditDocPropsDialog.author}" size="35" maxlength="1024" />
+                                    </td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
+                           
                            <td valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{AddContentWizard.next}" styleClass="wizardButton" disabled="#{AddContentWizard.fileName == null}" />
+                                       <h:commandButton id="ok-button" value="OK" action="#{EditDocPropsDialog.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" disabled="true" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Cancel" action="#{AddContentWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="Cancel" action="#{EditDocPropsDialog.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
@@ -196,7 +175,7 @@
        </tr>
     </table>
     
-  </h:form>
+    </h:form>
     
 </f:view>
 

@@ -22,6 +22,7 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.ResultSetRow;
+import org.alfresco.repo.search.Searcher;
 import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -49,6 +50,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To close this wizard and create your space click Finish.";
    
    // new space wizard specific properties
+   private Searcher searchService;
    private NodeOperationsService nodeOperationsService;
    private String createFrom;
    private String spaceType;
@@ -443,6 +445,22 @@ public class NewSpaceWizard extends AbstractWizardBean
       return this.templates;
    }
 
+   /**
+    * @return Returns the searchService.
+    */
+   public Searcher getSearchService()
+   {
+      return searchService;
+   }
+
+   /**
+    * @param searchService The searchService to set.
+    */
+   public void setSearchService(Searcher searchService)
+   {
+      this.searchService = searchService;
+   }
+   
    /**
     * @return Returns the NodeOperationsService.
     */

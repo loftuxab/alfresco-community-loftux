@@ -2,7 +2,6 @@ package org.alfresco.web.ui.repo.component.property;
 
 import java.io.IOException;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
@@ -10,7 +9,6 @@ import javax.faces.component.UIOutput;
 import javax.faces.component.UIPanel;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.DateTimeConverter;
 import javax.faces.el.ValueBinding;
 
 import org.alfresco.repo.dictionary.PropertyDefinition;
@@ -20,6 +18,7 @@ import org.alfresco.web.bean.repository.DataDictionary;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.converter.XMLDateConverter;
 import org.apache.log4j.Logger;
 import org.springframework.web.jsf.FacesContextUtils;
 
@@ -247,7 +246,7 @@ public class UIProperty extends UIPanel implements NamingContainer
       
       if (logger.isDebugEnabled())
          logger.debug("Created label " + label.getClientId(context) + 
-                      " and added it to component " + this);
+                      " for '" + displayLabel + "' and added it to component " + this);
    }
    
    /**
@@ -264,7 +263,7 @@ public class UIProperty extends UIPanel implements NamingContainer
    {
       UIOutput control = null;
       ValueBinding vb = context.getApplication().
-                        createValueBinding("#{" + varName + "." + 
+                        createValueBinding("#{" + varName + ".properties." + 
                         propDef.getName().getLocalName() + "}");
       
       UIPropertySheet propSheet = (UIPropertySheet)this.getParent();
@@ -295,8 +294,8 @@ public class UIProperty extends UIPanel implements NamingContainer
             control.setRendererType("javax.faces.Text");
             
             // add a converter for datetime types
-            DateTimeConverter conv = (DateTimeConverter)context.getApplication().
-                                      createConverter("javax.faces.DateTime");
+            XMLDateConverter conv = (XMLDateConverter)context.getApplication().
+                                      createConverter("org.alfresco.faces.XMLDataConverter");
             conv.setDateStyle("long");
             control.setConverter(conv);
          }
@@ -338,7 +337,8 @@ public class UIProperty extends UIPanel implements NamingContainer
       if (logger.isDebugEnabled())
          logger.debug("Created control " + control + "(" + 
                       control.getClientId(context) + 
-                      ") and added it to component " + this);
+                      ") for '" + propDef.getName().getLocalName() + 
+                      "' and added it to component " + this);
    }
    
    /**
@@ -354,8 +354,8 @@ public class UIProperty extends UIPanel implements NamingContainer
                                 String varName)
    {
       ValueBinding vb = context.getApplication().
-                        createValueBinding("#{" + varName + ".properties[\"" + 
-                        propName + "\"]}");
+                        createValueBinding("#{" + varName + ".properties." + 
+                        propName + "}");
       
       UIOutput control = null;
       UIPropertySheet propSheet = (UIPropertySheet)this.getParent();
@@ -386,6 +386,7 @@ public class UIProperty extends UIPanel implements NamingContainer
       if (logger.isDebugEnabled())
          logger.debug("Created control " + control + "(" + 
                       control.getClientId(context) + 
-                      ") and added it to component " + this);
+                      ") for '" + propName +  
+                      "' and added it to component " + this);
    }
 }
