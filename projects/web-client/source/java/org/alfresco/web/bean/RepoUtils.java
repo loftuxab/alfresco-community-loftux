@@ -52,7 +52,7 @@ public final class RepoUtils
       String name;
       
       // try to find a display "name" property for this node
-      Object nameProp = nodeService.getProperty(ref, QNAME_NAME);
+      Object nameProp = nodeService.getProperty(ref, DictionaryBootstrap.PROP_QNAME_NAME);
       if (nameProp != null)
       {
          name = nameProp.toString();
@@ -279,7 +279,7 @@ public final class RepoUtils
       
       if (name.length() > QName.MAX_LENGTH)
       {
-         name = name.substring(0, QNAME_NAME.MAX_LENGTH);
+         name = name.substring(0, QName.MAX_LENGTH);
       }
       
       // search for any invalid QName characters
@@ -292,9 +292,6 @@ public final class RepoUtils
       return name;
    }
    
-   
-   public static final QName QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
-   public static final QName QNAME_CONTAINS = QName.createQName(NamespaceService.ALFRESCO_URI, "contains"); 
    
    // TODO: TEMP! Replace this once we have "users" in the system!
    private static final String USERNAME = "admin";

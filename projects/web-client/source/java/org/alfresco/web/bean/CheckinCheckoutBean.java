@@ -404,7 +404,7 @@ public class CheckinCheckoutBean
             {
                workingCopyName = originalName + WORKING_COPY;
             }
-            this.nodeService.setProperty(workingCopyRef, RepoUtils.QNAME_NAME, workingCopyName);
+            this.nodeService.setProperty(workingCopyRef, DictionaryBootstrap.PROP_QNAME_NAME, workingCopyName);
             this.nodeService.setProperty(workingCopyRef, QNAME_ORIGINALNAME, originalName);
             
             // set the working copy Node instance
@@ -501,7 +501,7 @@ public class CheckinCheckoutBean
       {
          Node node = setupContentDocument(id);
          // TODO: detect the inline editing aspect here instead
-         String mimetype = RepoUtils.getMimeTypeForFileName(FacesContext.getCurrentInstance(), node.getName());
+         String mimetype = (String)node.getProperties().get("mimetype");
          if ("text/html".equals(mimetype))
          {
             // found a document that can be edited in-line
@@ -681,7 +681,7 @@ public class CheckinCheckoutBean
             
             // switch the name back to the original name before checkin
             // otherwise the working copy name will get set on the original doc!
-            this.nodeService.setProperty(node.getNodeRef(), RepoUtils.QNAME_NAME, origNameProp);
+            this.nodeService.setProperty(node.getNodeRef(), DictionaryBootstrap.PROP_QNAME_NAME, origNameProp);
             
             // we can either checkin the content from the current working copy node
             // which would have been previously updated by the user
@@ -717,7 +717,7 @@ public class CheckinCheckoutBean
             // restore working copy name after checkin copy opp
             if (this.keepCheckedOut == true)
             {
-               this.nodeService.setProperty(node.getNodeRef(), RepoUtils.QNAME_NAME, nameProp);
+               this.nodeService.setProperty(node.getNodeRef(), DictionaryBootstrap.PROP_QNAME_NAME, nameProp);
             }
             
             // commit the transaction

@@ -187,7 +187,7 @@ public class UISpaceSelector extends UIInput
             else
             {
                NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), valueId);
-               label = (String)getNodeService(context).getProperty(nodeRef, RepoUtils.QNAME_NAME);
+               label = (String)getNodeService(context).getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME);
             }
             
             // output surrounding span for style purposes

@@ -19,6 +19,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.StoreRef;
@@ -83,19 +84,24 @@ public class DownloadContentServlet extends HttpServlet
          // useful debug output!
          //logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
          
-         // base the mimetype from the file extension
-         MimetypeMap mimetypeMap = (MimetypeMap)context.getBean("mimetypeMap");
+         // get the content mimetype from the node properties
+         NodeService nodeService = (NodeService)context.getBean("indexingNodeService");
+         String mimetype = (String)nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MIME_TYPE);
          
-         // fall back if mimetype not found
-         String mimetype = "text/plain";
-         int extIndex = filename.lastIndexOf('.');
-         if (extIndex != -1)
+         // fall back if unable to resolve mimetype property
+         if (mimetype == null || mimetype.length() == 0)
          {
-            String ext = filename.substring(extIndex + 1);
-            String mt = mimetypeMap.getMimetypesByExtension().get(ext);
-            if (mt != null)
+            MimetypeMap mimetypeMap = (MimetypeMap)context.getBean("mimetypeMap");
+            mimetype = "text/plain";
+            int extIndex = filename.lastIndexOf('.');
+            if (extIndex != -1)
             {
-               mimetype = mt;
+               String ext = filename.substring(extIndex + 1);
+               String mt = mimetypeMap.getMimetypesByExtension().get(ext);
+               if (mt != null)
+               {
+                  mimetype = mt;
+               }
             }
          }
          res.setContentType(mimetype);

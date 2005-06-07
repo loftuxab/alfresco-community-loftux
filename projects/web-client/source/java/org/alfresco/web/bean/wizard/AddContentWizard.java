@@ -147,11 +147,13 @@ public class AddContentWizard extends AbstractWizardBean
                
                // create the node to represent the node
                String assocName = RepoUtils.createValidQName(this.fileName);
-               ChildAssocRef assocRef = this.nodeService.createNode(containerNodeRef,
-                      RepoUtils.QNAME_CONTAINS,
-                      QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
-                      DictionaryBootstrap.TYPE_QNAME_CONTENT,
-                      contentProps);
+               ChildAssocRef assocRef = this.nodeService.createNode(
+                     containerNodeRef,
+                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                     QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
+                     DictionaryBootstrap.TYPE_QNAME_CONTENT,
+                     contentProps);
+               
                NodeRef fileNodeRef = assocRef.getChildRef();
                
                if (logger.isDebugEnabled())
@@ -470,7 +472,7 @@ public class AddContentWizard extends AbstractWizardBean
    {
       if (this.contentTypes == null)
       {
-         this.contentTypes = new ArrayList<SelectItem>(30);
+         this.contentTypes = new ArrayList<SelectItem>(80);
          MimetypeMap mimetypeMap = (MimetypeMap)FacesContextUtils.
             getRequiredWebApplicationContext(FacesContext.getCurrentInstance()).
             getBean(Repository.MIMETYPE_MAP);
