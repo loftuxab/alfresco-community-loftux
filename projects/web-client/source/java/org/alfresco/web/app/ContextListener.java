@@ -97,10 +97,10 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             tx = (UserTransaction)ctx.getBean(Repository.USER_TRANSACTION);
             tx.begin();
             
-            
             // create the folder node
-            ChildAssocRef assocRef = nodeService.createNode(nodeService.getRootNode(
-                  Repository.getStoreRef()), null,
+            ChildAssocRef assocRef = nodeService.createNode(
+                  nodeService.getRootNode(Repository.getStoreRef()),
+                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, companySpaceName),
                   DictionaryBootstrap.TYPE_QNAME_FOLDER);
             NodeRef nodeRef = assocRef.getChildRef();
