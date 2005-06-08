@@ -31,6 +31,9 @@
                <type>d:text</type>
             </property>
          </properties>
+         <mandatory-aspects>
+            <aspect>alf:auditable</aspect>
+         </mandatory-aspects>
       </type>
       
       <type name="alf:folder">
@@ -94,7 +97,13 @@
       <type name="alf:person">
          <title>Person</title>
          <properties>
-            <property name="alf:firstName">
+            <property name="alf:userName">
+               <type>d:text</type>
+            </property>
+            <property name="alf:homeFolder">
+               <type>d:text</type>
+            </property>
+             <property name="alf:firstName">
                <type>d:text</type>
             </property>
             <property name="alf:lastName">
@@ -177,31 +186,6 @@
          </associations>
       </type>
       
-      <type name="alf:user">
-         <title>User</title>
-         <properties>
-            <property name="alf:userName">
-               <type>d:text</type>
-            </property>
-            <property name="alf:homeFolder">
-               <type>d:text</type>
-            </property>
-         </properties>
-         <associations>
-            <association name="alf:userPerson">
-               <source>
-                  <mandatory>false</mandatory>
-                  <many>true</many>
-               </source>
-               <target>
-                  <class>alf:person</class>
-                  <mandatory>true</mandatory>
-                  <many>false</many>
-               </target>
-            </association>
-         </associations>
-      </type>
-
       <type name="alf:permissionrole">
          <title>Permission</title>
          <properties>
@@ -211,13 +195,13 @@
             </property>
          </properties>
          <associations>
-            <association name="alf:user">
+            <association name="alf:person">
                <source>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:user</class>
+                  <class>alf:person</class>
                   <mandatory>true</mandatory>
                   <many>false</many>
                </target>
@@ -380,6 +364,15 @@
          <properties>
             <property name="alf:subject">
                <type>d:text</type>
+            </property>
+         </properties>
+      </aspect>
+   
+      <aspect name="alf:inlineeditable">
+         <title>Inline Editable</title>
+         <properties>
+            <property name="alf:editInline">
+               <type>d:boolean</type>
             </property>
          </properties>
       </aspect>
@@ -610,7 +603,7 @@
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:user</class>
+                  <class>alf:person</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -647,13 +640,13 @@
          <title>Role Permissionable</title>
          <parent>alf:permissionable</parent>
          <associations>
-            <association name="alf:userRole">
+            <association name="alf:personRole">
                <source>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:user</class>
+                  <class>alf:person</class>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>
