@@ -76,8 +76,9 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	private static final String TEST_VALUE_2 = "testValue2";
     private static final String TEST_VALUE_3 = "testValue3";
 	
-	private static final QName TEST_CHILD_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testChildAssocName");
-	private static final QName TEST_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testAssocName");
+    private static final QName TEST_CHILD_ASSOC_TYPE_QNAME = DictionaryBootstrap.ASSOC_QNAME_CONTAINS;
+    private static final QName TEST_CHILD_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testChildAssocName");
+	private static final QName TEST_ASSOC_TYPE_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testAssocName");
 	private static final QName TEST_CHILD_ASSOC_QNAME2 = QName.createQName(TEST_TYPE_NAMESPACE, "testChildAssocName2");
 	
 	/**
@@ -117,7 +118,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Create the node used for copying
 		ChildAssocRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
-				null,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}test"),
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());
@@ -137,7 +138,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Add a child
 		ChildAssocRef temp3 =this.nodeService.createNode(
 				this.sourceNodeRef, 
-				null, 
+                TEST_CHILD_ASSOC_TYPE_QNAME, 
 				TEST_CHILD_ASSOC_QNAME, 
 				TEST_TYPE_QNAME, 
 				createTypePropertyBag());
@@ -151,17 +152,21 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());
 		this.nonPrimaryChildNodeRef = temp2.getChildRef();
-		this.nodeService.addChild(this.sourceNodeRef, this.nonPrimaryChildNodeRef, TEST_CHILD_ASSOC_QNAME2);
+		this.nodeService.addChild(
+                this.sourceNodeRef,
+                this.nonPrimaryChildNodeRef,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
+                TEST_CHILD_ASSOC_QNAME2);
 		
 		// Add a target assoc
 		ChildAssocRef temp = this.nodeService.createNode(
 				rootNodeRef,
-				null,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}testAssoc"),
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());
 		this.targetNodeRef = temp.getChildRef();
-		this.nodeService.createAssociation(this.sourceNodeRef, this.targetNodeRef, TEST_ASSOC_QNAME);
+		this.nodeService.createAssociation(this.sourceNodeRef, this.targetNodeRef, TEST_ASSOC_TYPE_QNAME);
 		
 		// Create a node we can use as the destination in a copy
 		Map<QName, Serializable> destinationProps = new HashMap<QName, Serializable>();
@@ -171,7 +176,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
         destinationProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
 		ChildAssocRef temp5 = this.nodeService.createNode(
 				this.rootNodeRef,
-				null,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}testDestinationNode"),
 				TEST_TYPE_QNAME,
 				destinationProps);
@@ -225,7 +230,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
         childAssoc2.setTargetClassName("alf:base");
 		childAssoc2.setTargetMandatory(false);
 		
-		M2Association assoc = testType.createAssociation("test:" + TEST_ASSOC_QNAME.getLocalName());
+		M2Association assoc = testType.createAssociation("test:" + TEST_ASSOC_TYPE_QNAME.getLocalName());
         assoc.setTargetClassName("alf:base");
 		assoc.setTargetMandatory(false);
 		
@@ -260,7 +265,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		NodeRef copy = this.nodeOperationsService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
-				null,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}copyAssoc"));		
 		checkCopiedNode(this.sourceNodeRef, copy, true, true, false);
 		
@@ -268,7 +273,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		NodeRef copy2 = this.nodeOperationsService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
-				null,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}copyAssoc"),
 				true);		
 		checkCopiedNode(this.sourceNodeRef, copy2, true, true, true);
@@ -277,7 +282,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		NodeRef copyOfCopy = this.nodeOperationsService.copy(
 				copy,
 				this.rootNodeRef,
-				null,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}copyOfCopy"));
 		checkCopiedNode(copy, copyOfCopy, true, true, false);
 		
@@ -294,7 +299,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		NodeRef copyWithContent = this.nodeOperationsService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
-				null,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}copyWithContent"));
 		checkCopiedNode(this.sourceNodeRef, copyWithContent, true, true, false);
 		//assertTrue(this.nodeService.hasAspect(copyWithContent, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
@@ -392,7 +397,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		assertEquals(TEST_VALUE_2, value4);
 		
 		// Check all the target associations have been copied
-		List<NodeAssocRef> destinationTargets = this.nodeService.getTargetAssocs(destinationNodeRef, TEST_ASSOC_QNAME);
+		List<NodeAssocRef> destinationTargets = this.nodeService.getTargetAssocs(destinationNodeRef, TEST_ASSOC_TYPE_QNAME);
 		assertNotNull(destinationTargets);
 		assertEquals(1, destinationTargets.size());
 		NodeAssocRef nodeAssocRef = destinationTargets.get(0);

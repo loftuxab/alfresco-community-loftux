@@ -80,17 +80,17 @@ public class LockServiceImpl implements LockService
 				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));	
 		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeUpdate"),
+				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeUpdateNode"),
 				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));
 		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDelete"),
+				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDeleteNode"),
 				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));
 		
 		// Register onCopy class behaviour
 		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
 				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
 				new JavaBehaviour(this, "onCopy"));
 		

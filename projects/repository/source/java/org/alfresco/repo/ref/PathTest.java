@@ -11,6 +11,7 @@ public class PathTest extends TestCase
 {
     private Path absolutePath;
     private Path relativePath;
+    private QName typeQName;
     private QName qname;
     private StoreRef storeRef;
     private NodeRef parentRef;
@@ -26,6 +27,7 @@ public class PathTest extends TestCase
         super.setUp();
         absolutePath = new Path();
         relativePath = new Path();
+        typeQName = QName.createQName("http://www.alfresco.org/PathTest/1.0", "testType");
         qname = QName.createQName("http://www.google.com", "documentx");
         storeRef = new StoreRef("x", "y");
         parentRef = new NodeRef(storeRef, "P");
@@ -35,12 +37,12 @@ public class PathTest extends TestCase
     public void testQNameElement() throws Exception
     {
         // plain
-        Path.Element element = new Path.ChildAssocElement(new ChildAssocRef(parentRef, qname, childRef));
+        Path.Element element = new Path.ChildAssocElement(new ChildAssocRef(typeQName, parentRef, qname, childRef));
         assertEquals("Element string incorrect",
                 qname.toString(),
                 element.getElementString());
         // sibling
-        element = new Path.ChildAssocElement(new ChildAssocRef(parentRef, qname, childRef, true, 5));
+        element = new Path.ChildAssocElement(new ChildAssocRef(typeQName, parentRef, qname, childRef, true, 5));
         assertEquals("Element string incorrect", "{http://www.google.com}documentx[5]", element.getElementString());
     }
     
@@ -60,8 +62,8 @@ public class PathTest extends TestCase
     
     public void testAppendingAndPrepending() throws Exception
     {
-        Path.Element element0 = new Path.ChildAssocElement(new ChildAssocRef(null, null, parentRef));
-        Path.Element element1 = new Path.ChildAssocElement(new ChildAssocRef(parentRef, qname, childRef, true, 4));
+        Path.Element element0 = new Path.ChildAssocElement(new ChildAssocRef(null, null, null, parentRef));
+        Path.Element element1 = new Path.ChildAssocElement(new ChildAssocRef(typeQName, parentRef, qname, childRef, true, 4));
         Path.Element element2 = new Path.DescendentOrSelfElement();
         Path.Element element3 = new Path.ParentElement();
         Path.Element element4 = new Path.SelfElement();

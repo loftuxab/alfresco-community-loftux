@@ -25,7 +25,6 @@ import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.content.NoTransformerException;
 import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
@@ -1158,7 +1157,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             if (pair.getFirst().last() instanceof Path.ChildAssocElement)
             {
                 Path.ChildAssocElement cae = (Path.ChildAssocElement) pair.getFirst().last();
-                pair.getFirst().append(new Path.ChildAssocElement(new ChildAssocRef(cae.getRef().getChildRef(), QName.createQName("member"), nodeRef)));
+                ChildAssocRef assocRef = cae.getRef();
+                pair.getFirst().append(new Path.ChildAssocElement(new ChildAssocRef(assocRef.getTypeQName(), assocRef.getChildRef(), QName.createQName("member"), nodeRef)));
             }
         }
 

@@ -84,9 +84,11 @@ public interface NodeDaoService
      * @return Returns the persisted and filled association
      * @see ChildAssoc
      */
-    public ChildAssoc newChildAssoc(ContainerNode parentNode,
+    public ChildAssoc newChildAssoc(
+            ContainerNode parentNode,
             Node childNode,
             boolean isPrimary,
+            QName assocTypeQName,
             QName qname);
     
     /**
@@ -107,26 +109,28 @@ public interface NodeDaoService
      * @return Returns the persisted and filled association
      * @see NodeAssoc
      */
-    public NodeAssoc newNodeAssoc(RealNode sourceNode,
+    public NodeAssoc newNodeAssoc(
+            RealNode sourceNode,
             Node targetNode,
-            QName assocQName);
+            QName assocTypeQName);
     
     /**
      * @return Returns the node association or null if not found
      */
-    public NodeAssoc getNodeAssoc(RealNode sourceNode,
+    public NodeAssoc getNodeAssoc(
+            RealNode sourceNode,
             Node targetNode,
-            QName assocQName);
+            QName assocTypeQName);
     
     /**
      * @return Returns the target nodes for the association
      */
-    public Collection<Node> getNodeAssocTargets(RealNode sourceNode, QName assocQName);
+    public Collection<Node> getNodeAssocTargets(RealNode sourceNode, QName assocTypeQName);
     
     /**
      * @return Returns the source nodes for the association
      */
-    public Collection<RealNode> getNodeAssocSources(Node targetNode, QName assocQName);
+    public Collection<RealNode> getNodeAssocSources(Node targetNode, QName assocTypeQName);
     
     /**
      * @param assoc the node association to remove

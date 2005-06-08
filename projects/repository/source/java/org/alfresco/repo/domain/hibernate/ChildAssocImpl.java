@@ -14,6 +14,8 @@ public class ChildAssocImpl implements ChildAssoc
     private Long id;
     private ContainerNode parent;
     private Node child;
+    private String typeNamespaceUri;
+    private String typeLocalName;
     private String namespaceUri;
     private String localName;
     private boolean isPrimary;
@@ -41,8 +43,10 @@ public class ChildAssocImpl implements ChildAssoc
     {
         if (childAssocRef == null)
         {
-            childAssocRef = new ChildAssocRef(getParent().getNodeRef(),
-                    QName.createQName(getNamespaceUri(), getLocalName()),
+            childAssocRef = new ChildAssocRef(
+                    getTypeQName(),
+                    getParent().getNodeRef(),
+                    getQName(),
                     getChild().getNodeRef(),
                     this.isPrimary,
                     -1);
@@ -101,6 +105,57 @@ public class ChildAssocImpl implements ChildAssoc
         child = node;
     }
     
+    /**
+     * @see #getTypeNamespaceUri()
+     * @see #getTypeLocalName()
+     */
+    public QName getTypeQName()
+    {
+        return QName.createQName(getTypeNamespaceUri(), getTypeLocalName());
+    }
+    
+    /**
+     * @see #setTypeNamespaceUri(String)
+     * @see #setTypeLocalName(String)
+     */
+    public void setTypeQName(QName qname)
+    {
+        setTypeNamespaceUri(qname.getNamespaceURI());
+        setTypeLocalName(qname.getLocalName());
+    }
+    
+    /**
+     * For Hibernate use only
+     */
+    private String getTypeNamespaceUri()
+    {
+        return typeNamespaceUri;
+    }
+
+    /**
+     * For Hibernate use only
+     */
+    private void setTypeNamespaceUri(String typeNamespaceUri)
+    {
+        this.typeNamespaceUri = typeNamespaceUri;
+    }
+
+    /**
+     * For Hibernate use only
+     */
+    private String getTypeLocalName()
+    {
+        return typeLocalName;
+    }
+
+    /**
+     * For Hibernate use only
+     */
+    private void setTypeLocalName(String name)
+    {
+        this.typeLocalName = name;
+    }
+
     /**
      * @see #getNamespaceUri()
      * @see #getLocalName()

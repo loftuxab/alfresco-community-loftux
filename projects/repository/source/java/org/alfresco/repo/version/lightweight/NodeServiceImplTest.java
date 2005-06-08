@@ -327,6 +327,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
 			this.lightWeightVersionStoreNodeService.addChild(
 					this.dummyNodeRef,
 					this.dummyNodeRef,
+                    this.dummyQName,
 					this.dummyQName);
 			fail("This operation is not supported.");
 		}
@@ -360,27 +361,27 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
 		}	
     }
 
-    /**
-     * Test removeChildren
-     */
-    public void testRemoveChildren()
-    {
-        try
-        {
-            this.lightWeightVersionStoreNodeService.removeChildren(
-                    this.dummyNodeRef,
-                    this.dummyQName);
-            fail("This operation is not supported.");
-        }
-        catch (UnsupportedOperationException exception)
-        {
-            if (exception.getMessage() != MSG_ERR)
-            {
-                fail("Unexpected exception raised during method excution: " + exception.getMessage());
-            }
-        }
-    }
-    
+//    /**
+//     * Test removeChildren
+//     */
+//    public void testRemoveChildren()
+//    {
+//        try
+//        {
+//            this.lightWeightVersionStoreNodeService.removeChildren(
+//                    this.dummyNodeRef,
+//                    this.dummyQName);
+//            fail("This operation is not supported.");
+//        }
+//        catch (UnsupportedOperationException exception)
+//        {
+//            if (exception.getMessage() != MSG_ERR)
+//            {
+//                fail("Unexpected exception raised during method excution: " + exception.getMessage());
+//            }
+//        }
+//    }
+//    
     /**
      * Test setProperties
      */

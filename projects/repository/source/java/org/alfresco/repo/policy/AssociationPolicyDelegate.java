@@ -8,6 +8,7 @@ import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.util.debug.CodeMonkey;
 
 
 /**
@@ -55,51 +56,51 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
      * aggregate policy implementation is returned which invokes each policy
      * in turn.
      * 
-     * @param classRef  the class reference
-     * @param assocRef  the association reference
+     * @param classQName  the class qualified name
+     * @param assocTypeQName  the association type qualified name
      * @return  the policy
      */
-    public P get(QName classRef, QName assocRef)
+    public P get(QName classQName, QName assocTypeQName)
     {
-        AssociationDefinition assocDef = dictionary.getAssociation(assocRef);
+        AssociationDefinition assocDef = dictionary.getAssociation(assocTypeQName);
         if (assocDef == null)
         {
             throw new IllegalArgumentException("Association" + assocDef + " has not been defined in the data dictionary");
         }
-        return factory.create(new ClassFeatureBehaviourBinding(dictionary, classRef, assocRef));
+        return factory.create(new ClassFeatureBehaviourBinding(dictionary, classQName, assocTypeQName));
     }
 
     
     /**
      * Gets the collection of Policy implementations for the specified Class and Property
      * 
-     * @param classRef  the class reference
-     * @param assocRef  the association reference
+     * @param classQName  the class qualified name
+     * @param assocTypeQName  the association type qualified name
      * @return  the collection of policies
      */
-    public Collection<P> getList(QName classRef, QName assocRef)
+    public Collection<P> getList(QName classQName, QName assocTypeQName)
     {
-        AssociationDefinition assocDef = dictionary.getAssociation(assocRef);
+        AssociationDefinition assocDef = dictionary.getAssociation(assocTypeQName);
         if (assocDef == null)
         {
-            throw new IllegalArgumentException("Association " + assocRef + " has not been defined in the data dictionary");
+            throw new IllegalArgumentException("Association " + assocTypeQName + " has not been defined in the data dictionary");
         }
-        return factory.createList(new ClassFeatureBehaviourBinding(dictionary, classRef, assocRef));
+        return factory.createList(new ClassFeatureBehaviourBinding(dictionary, classQName, assocTypeQName));
     }
 
     
     /**
-     * Gets the Policy implementation for the specified Node and Property
+     * Gets the Policy implementation for the specified Node and association type
      * 
      * All behaviours bound to the Node's class and aspects are aggregated.
      * 
      * @param nodeRef the node reference
-     * @param assocRef  the property reference
+     * @param assocTypeQName  the association type qualified name
      * @return the collection of policies
      */
-    public P get(NodeService nodeService, NodeRef nodeRef, QName assocRef)
+    public P get(NodeService nodeService, NodeRef nodeRef, QName assocTypeQName)
     {
-        return factory.toPolicy(getList(nodeService, nodeRef, assocRef));
+        return factory.toPolicy(getList(nodeService, nodeRef, assocTypeQName));
     }
 
 
@@ -109,22 +110,26 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
      * All behaviours bound to the Node's class and aspects are returned.
      * 
      * @param nodeRef  the node reference
-     * @param assocRef  the association reference
+     * @param assocTypeQName  the association type qualified name
      * @return the collection of policies
      */
-	public Collection<P> getList(NodeService nodeService, NodeRef nodeRef, QName assocRef)
+	public Collection<P> getList(NodeService nodeService, NodeRef nodeRef, QName assocTypeQName)
 	{
+        // the NodeService is an issue here - we can't guarantee that the NodeService can even
+        // handle the NodeRef given
+        CodeMonkey.todo("The required information should be passed in the separate this class from NodeService"); // TODO
+        
 		Collection<P> result = new ArrayList<P>();
 		
 		// Get the behaviour for the node's type
-		QName classRef = nodeService.getType(nodeRef);
-		result.addAll(getList(classRef, assocRef));
+		QName classQName = nodeService.getType(nodeRef);
+		result.addAll(getList(classQName, assocTypeQName));
 		
 		// Get the behaviour for all the aspect types
-		Collection<QName> aspects = nodeService.getAspects(nodeRef);
-		for (QName aspect : aspects) 
+		Collection<QName> aspectQNames = nodeService.getAspects(nodeRef);
+		for (QName aspectQName : aspectQNames) 
 		{
-			result.addAll(getList(aspect, assocRef));
+			result.addAll(getList(aspectQName, assocTypeQName));
 		}
 		
 		return result;

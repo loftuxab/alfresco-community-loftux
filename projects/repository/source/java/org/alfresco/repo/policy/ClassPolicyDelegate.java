@@ -8,6 +8,7 @@ import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Delegate for a Class-level Policy.  Provides access to Policy Interface
@@ -54,34 +55,34 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      * aggregate policy implementation is returned which invokes each policy
      * in turn.
      * 
-     * @param classRef  the class reference
+     * @param classQName  the class qualified name
      * @return  the policy
      */
-    public P get(QName classRef)
+    public P get(QName classQName)
     {
-        ClassDefinition classDefinition = dictionary.getClass(classRef);
+        ClassDefinition classDefinition = dictionary.getClass(classQName);
         if (classDefinition == null)
         {
-            throw new IllegalArgumentException("Class " + classRef + " has not been defined in the data dictionary");
+            throw new IllegalArgumentException("Class " + classQName + " has not been defined in the data dictionary");
         }
-        return factory.create(new ClassBehaviourBinding(dictionary, classRef));
+        return factory.create(new ClassBehaviourBinding(dictionary, classQName));
     }
 
     
     /**
      * Gets the collection of Policy implementations for the specified Class
      * 
-     * @param classRef  the class reference
+     * @param classQName  the class qualified name
      * @return  the collection of policies
      */
-    public Collection<P> getList(QName classRef)
+    public Collection<P> getList(QName classQName)
     {
-        ClassDefinition classDefinition = dictionary.getClass(classRef);
+        ClassDefinition classDefinition = dictionary.getClass(classQName);
         if (classDefinition == null)
         {
-            throw new IllegalArgumentException("Class " + classRef + " has not been defined in the data dictionary");
+            throw new IllegalArgumentException("Class " + classQName + " has not been defined in the data dictionary");
         }
-        return factory.createList(new ClassBehaviourBinding(dictionary, classRef));
+        return factory.createList(new ClassBehaviourBinding(dictionary, classQName));
     }
 
     
@@ -109,17 +110,19 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      */
 	public Collection<P> getList(NodeService nodeService, NodeRef nodeRef)
 	{
+        CodeMonkey.issue("Separate this node from the NodeService by passing in the required info");
+        
 		Collection<P> result = new ArrayList<P>();
 		
 		// Get the behaviour for the node's type
-		QName classRef = nodeService.getType(nodeRef);
-		result.addAll(getList(classRef));
+		QName classQName = nodeService.getType(nodeRef);
+		result.addAll(getList(classQName));
 		
 		// Get the behaviour for all the aspect types
-		Collection<QName> aspects = nodeService.getAspects(nodeRef);
-		for (QName aspect : aspects) 
+		Collection<QName> aspectQNames = nodeService.getAspects(nodeRef);
+		for (QName aspectQName : aspectQNames) 
 		{
-			result.addAll(getList(aspect));
+			result.addAll(getList(aspectQName));
 		}
 		
 		return result;

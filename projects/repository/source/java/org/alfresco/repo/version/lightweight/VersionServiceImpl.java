@@ -547,7 +547,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
             
             // Set the qname of the association
-            properties.put(PROP_QNAME_ASSOC_QNAME, targetAssoc.getQName());
+            properties.put(PROP_QNAME_ASSOC_TYPE_QNAME, targetAssoc.getTypeQName());
             
             // Need to determine whether the target is versioned or not
             NodeRef versionHistoryRef = getVersionHistoryNodeRef(targetAssoc.getTargetRef());
@@ -586,6 +586,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             
             // Set the qname, isPrimary and nthSibling properties
             properties.put(PROP_QNAME_ASSOC_QNAME, childAssocRef.getQName());
+            properties.put(PROP_QNAME_ASSOC_TYPE_QNAME, childAssocRef.getTypeQName());
             properties.put(PROP_QNAME_IS_PRIMARY, Boolean.valueOf(childAssocRef.isPrimary()));
             properties.put(PROP_QNAME_NTH_SIBLING, Integer.valueOf(childAssocRef.getNthSibling()));
             

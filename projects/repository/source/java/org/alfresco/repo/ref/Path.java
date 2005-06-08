@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.alfresco.util.debug.CodeMonkey;
+
 /**
  * Representation of a simple path e.g.
  * <b><pre>
@@ -186,9 +188,11 @@ public final class Path implements Iterable<Path.Element>, Serializable
      */
     public static class ChildAssocElement extends Element
     {
-        /**
-         * 
-         */
+        static
+        {
+            // TODO:
+            CodeMonkey.issue("This is carrying a ChildAssocRef and is being misused.  Fix to carry correct data");
+        }
         private static final long serialVersionUID = 3689352104636790840L;
         private ChildAssocRef ref;
         

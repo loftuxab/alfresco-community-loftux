@@ -17,6 +17,7 @@ import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.value.ValueConverter;
 import org.jaxen.DefaultNavigator;
 import org.jaxen.UnsupportedAxisException;
@@ -265,7 +266,9 @@ public class DocumentNavigator extends DefaultNavigator
 
     public Object getDocumentNode(Object o)
     {
-        return new ChildAssocRef(null, null, nodeService.getRootNode(((ChildAssocRef)o).getChildRef().getStoreRef()));
+        ChildAssocRef assocRef = (ChildAssocRef) o;
+        StoreRef storeRef = assocRef.getChildRef().getStoreRef();
+        return new ChildAssocRef(null, null, null, nodeService.getRootNode(storeRef));
     }
 
     public Object getNode(NodeRef nodeRef)

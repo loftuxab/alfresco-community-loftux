@@ -165,7 +165,7 @@ public class PolicyComponentTest extends TestCase
             BehaviourDefinition<ClassBehaviourBinding> definition = policyComponent.bindClassBehaviour(policyName, FILE_TYPE, validBehaviour);
             assertNotNull(definition);
             assertEquals(policyName, definition.getPolicy());
-            assertEquals(FILE_TYPE, definition.getBinding().getClassRef());
+            assertEquals(FILE_TYPE, definition.getBinding().getClassQName());
         }
         catch(PolicyException e)
         {

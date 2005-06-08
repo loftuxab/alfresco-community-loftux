@@ -52,67 +52,37 @@ public class LuceneTest extends TestCase
     static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 
     NodeService nodeService;
-
     DictionaryService dictionaryService;
-
     LuceneIndexLock luceneIndexLock;
-
     private NodeRef rootNodeRef;
-
     private NodeRef n1;
-
     private NodeRef n2;
-
     private NodeRef n3;
-
     private NodeRef n4;
-
-    private NodeRef n6;
-
     private NodeRef n5;
-
+    private NodeRef n6;
     private NodeRef n7;
-
     private NodeRef n8;
-
     private NodeRef n9;
-
     private NodeRef n10;
-
     private NodeRef n11;
-
     private NodeRef n12;
-
     private NodeRef n13;
-
     private NodeRef n14;
-
     private DictionaryDAO dictionaryDAO;
-
     private QName testType;
-
     private FullTextSearchIndexer luceneFTS;
-
     private String TEST_NAMESPACE = "http://www.alfresco.org/test/lucenetest";
-    
+    private QName assocTypeQName = QName.createQName(TEST_NAMESPACE, "contains");
     private QName testSuperType;
-
     private M2Type testTypeSuperType;
-
     private QName testAspect;
-
     private QName testSuperAspect;
-
     private M2Aspect testAspectSuperAspect;
-
     private ContentService contentService;
-
     private QueryRegisterComponent queryRegisterComponent;
-
     private NamespacePrefixResolver namespacePrefixResolver;
-
     private LuceneIndexerAndSearcher indexerAndSearcher;
-
 
     public LuceneTest()
     {
@@ -224,16 +194,16 @@ public class LuceneTest extends TestCase
         // writer.putContent(is);
         writer.putContent("The quick brown fox jumped over the lazy dog");
 
-        nodeService.addChild(rootNodeRef, n8, QName.createQName("{namespace}eight-0"));
-        nodeService.addChild(n1, n8, QName.createQName("{namespace}eight-1"));
-        nodeService.addChild(n2, n13, QName.createQName("{namespace}link"));
+        nodeService.addChild(rootNodeRef, n8, assocTypeQName, QName.createQName("{namespace}eight-0"));
+        nodeService.addChild(n1, n8, assocTypeQName, QName.createQName("{namespace}eight-1"));
+        nodeService.addChild(n2, n13, assocTypeQName, QName.createQName("{namespace}link"));
 
-        nodeService.addChild(n1, n14, QName.createQName("{namespace}common"));
-        nodeService.addChild(n2, n14, QName.createQName("{namespace}common"));
-        nodeService.addChild(n5, n14, QName.createQName("{namespace}common"));
-        nodeService.addChild(n6, n14, QName.createQName("{namespace}common"));
-        nodeService.addChild(n12, n14, QName.createQName("{namespace}common"));
-        nodeService.addChild(n13, n14, QName.createQName("{namespace}common"));
+        nodeService.addChild(n1, n14, assocTypeQName, QName.createQName("{namespace}common"));
+        nodeService.addChild(n2, n14, assocTypeQName, QName.createQName("{namespace}common"));
+        nodeService.addChild(n5, n14, assocTypeQName, QName.createQName("{namespace}common"));
+        nodeService.addChild(n6, n14, assocTypeQName, QName.createQName("{namespace}common"));
+        nodeService.addChild(n12, n14, assocTypeQName, QName.createQName("{namespace}common"));
+        nodeService.addChild(n13, n14, assocTypeQName, QName.createQName("{namespace}common"));
     }
 
     private void createTestTypes()
@@ -479,9 +449,9 @@ public class LuceneTest extends TestCase
 
         indexer.clearIndex();
 
-        indexer.createNode(new ChildAssocRef(null, null, rootNodeRef));
-        indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}one"), n1));
-        indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}two"), n2));
+        indexer.createNode(new ChildAssocRef(null, null, null, rootNodeRef));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, rootNodeRef, QName.createQName("{namespace}one"), n1));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, rootNodeRef, QName.createQName("{namespace}two"), n2));
         indexer.updateNode(n1);
         // indexer.deleteNode(new ChildRelationshipRef(rootNode, "path",
         // newNode));
@@ -593,21 +563,21 @@ public class LuceneTest extends TestCase
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
         indexer.clearIndex();
-        indexer.createNode(new ChildAssocRef(null, null, rootNodeRef));
-        indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}one"), n1));
-        indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}two"), n2));
-        indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}three"), n3));
-        indexer.createNode(new ChildAssocRef(rootNodeRef, QName.createQName("{namespace}four"), n4));
-        indexer.createNode(new ChildAssocRef(n1, QName.createQName("{namespace}five"), n5));
-        indexer.createNode(new ChildAssocRef(n1, QName.createQName("{namespace}six"), n6));
-        indexer.createNode(new ChildAssocRef(n2, QName.createQName("{namespace}seven"), n7));
-        indexer.createNode(new ChildAssocRef(n2, QName.createQName("{namespace}eight"), n8));
-        indexer.createNode(new ChildAssocRef(n5, QName.createQName("{namespace}nine"), n9));
-        indexer.createNode(new ChildAssocRef(n5, QName.createQName("{namespace}ten"), n10));
-        indexer.createNode(new ChildAssocRef(n5, QName.createQName("{namespace}eleven"), n11));
-        indexer.createNode(new ChildAssocRef(n5, QName.createQName("{namespace}twelve"), n12));
-        indexer.createNode(new ChildAssocRef(n12, QName.createQName("{namespace}thirteen"), n13));
-        indexer.createNode(new ChildAssocRef(n13, QName.createQName("{namespace}fourteen"), n14));
+        indexer.createNode(new ChildAssocRef(null, null, null, rootNodeRef));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, rootNodeRef, QName.createQName("{namespace}one"), n1));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, rootNodeRef, QName.createQName("{namespace}two"), n2));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, rootNodeRef, QName.createQName("{namespace}three"), n3));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, rootNodeRef, QName.createQName("{namespace}four"), n4));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n1, QName.createQName("{namespace}five"), n5));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n1, QName.createQName("{namespace}six"), n6));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n2, QName.createQName("{namespace}seven"), n7));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n2, QName.createQName("{namespace}eight"), n8));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n5, QName.createQName("{namespace}nine"), n9));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n5, QName.createQName("{namespace}ten"), n10));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n5, QName.createQName("{namespace}eleven"), n11));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n5, QName.createQName("{namespace}twelve"), n12));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n12, QName.createQName("{namespace}thirteen"), n13));
+        indexer.createNode(new ChildAssocRef(assocTypeQName, n13, QName.createQName("{namespace}fourteen"), n14));
         indexer.prepare();
         indexer.commit();
     }
@@ -1050,7 +1020,7 @@ public class LuceneTest extends TestCase
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
 
-        indexer.deleteNode(new ChildAssocRef(n13, QName.createQName("{namespace}fourteen"), n14));
+        indexer.deleteNode(new ChildAssocRef(assocTypeQName, n13, QName.createQName("{namespace}fourteen"), n14));
 
         indexer.commit();
 
@@ -1227,7 +1197,7 @@ public class LuceneTest extends TestCase
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
 
-        indexer.deleteNode(new ChildAssocRef(n12, QName.createQName("{namespace}thirteen"), n13));
+        indexer.deleteNode(new ChildAssocRef(assocTypeQName, n12, QName.createQName("{namespace}thirteen"), n13));
 
         indexer.commit();
 
@@ -1405,7 +1375,7 @@ public class LuceneTest extends TestCase
         indexer.setContentService(contentService);
 
         nodeService.removeChild(n2, n13);
-        indexer.deleteChildRelationship(new ChildAssocRef(n2, QName.createQName("{namespace}link"), n13));
+        indexer.deleteChildRelationship(new ChildAssocRef(assocTypeQName, n2, QName.createQName("{namespace}link"), n13));
 
         indexer.commit();
 
@@ -1574,8 +1544,8 @@ public class LuceneTest extends TestCase
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
 
-        nodeService.addChild(n2, n13, QName.createQName("{namespace}link"));
-        indexer.createChildRelationship(new ChildAssocRef(n2, QName.createQName("{namespace}link"), n13));
+        nodeService.addChild(n2, n13, assocTypeQName, QName.createQName("{namespace}link"));
+        indexer.createChildRelationship(new ChildAssocRef(assocTypeQName, n2, QName.createQName("{namespace}link"), n13));
 
         indexer.commit();
 
@@ -1610,9 +1580,11 @@ public class LuceneTest extends TestCase
         indexer.setContentService(contentService);
 
         nodeService.removeChild(n2, n13);
-        nodeService.addChild(n2, n13, QName.createQName("{namespace}renamed_link"));
+        nodeService.addChild(n2, n13, assocTypeQName, QName.createQName("{namespace}renamed_link"));
 
-        indexer.updateChildRelationship(new ChildAssocRef(n2, QName.createQName("namespace", "link"), n13), new ChildAssocRef(n2, QName.createQName("namespace", "renamed_link"),
+        indexer.updateChildRelationship(
+                new ChildAssocRef(assocTypeQName, n2, QName.createQName("namespace", "link"), n13),
+                new ChildAssocRef(assocTypeQName, n2, QName.createQName("namespace", "renamed_link"),
                 n13));
 
         indexer.commit();
@@ -1837,7 +1809,7 @@ public class LuceneTest extends TestCase
         {
             indexer.clearIndex();
         }
-        indexer.createNode(new ChildAssocRef(null, null, rootNodeRef));
+        indexer.createNode(new ChildAssocRef(null, null, null, rootNodeRef));
 
         long startTime = System.currentTimeMillis();
         int count = 0;
@@ -1853,8 +1825,8 @@ public class LuceneTest extends TestCase
             }
 
             QName qname = QName.createQName("{namespace}a_" + i);
-            NodeRef ref = nodeService.createNode(rootNodeRef, null, qname, DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-            indexer.createNode(new ChildAssocRef(rootNodeRef, qname, ref));
+            NodeRef ref = nodeService.createNode(rootNodeRef, assocTypeQName, qname, DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+            indexer.createNode(new ChildAssocRef(assocTypeQName, rootNodeRef, qname, ref));
 
         }
         indexer.commit();

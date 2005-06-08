@@ -43,6 +43,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.util.debug.CodeMonkey;
+import org.springframework.util.Assert;
 
 /**
  * Node service using database persistence layer to fulfill functionality
@@ -162,6 +163,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      */
     public StoreRef createStore(String protocol, String identifier)
     {
+        StoreRef storeRef = new StoreRef(protocol, identifier);
         // check that the store does not already exist
         Store store = nodeDaoService.getStore(protocol, identifier);
         if (store != null)
@@ -169,6 +171,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             throw new StoreExistsException("Unable to create a store that already exists",
                     new StoreRef(protocol, identifier));
         }
+        
+        // invoke policies
+        invokeBeforeCreateStore(DictionaryBootstrap.TYPE_QNAME_STOREROOT, storeRef);
+        
         // create a new one
         store = nodeDaoService.createStore(protocol, identifier);
         // get the root node
@@ -177,8 +183,15 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         addAspect(rootNode.getNodeRef(),
                 DictionaryBootstrap.ASPECT_QNAME_ROOT,
                 Collections.<QName, Serializable>emptyMap());
+        
+        // invoke policies
+        invokeOnCreateStore(rootNode.getNodeRef());
+        
         // done
-        StoreRef storeRef = store.getStoreRef();
+        if (!store.getStoreRef().equals(storeRef))
+        {
+            throw new RuntimeException("Incorrect store reference");
+        }
         return storeRef;
     }
 
@@ -197,7 +210,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             QName assocQName,
             QName nodeTypeQName)
     {
-        return this.createNode(parentRef, null, assocQName, nodeTypeQName, null);
+        return this.createNode(parentRef, assocTypeQName, assocQName, nodeTypeQName, null);
     }
 
     /**
@@ -209,6 +222,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             QName nodeTypeQName,
             Map<QName, Serializable> properties)
     {
+        Assert.notNull(parentRef);
+        Assert.notNull(assocTypeQName);
+        Assert.notNull(assocQName);
+        
         CodeMonkey.todo("Check that the child association is allowed"); // TODO
         if (properties == null)
         {
@@ -216,8 +233,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
 		
 		// Invoke policy behaviour
-		invokeBeforeUpdate(parentRef);
-		invokeBeforeCreate(parentRef, assocTypeQName, assocQName, nodeTypeQName);
+		invokeBeforeUpdateNode(parentRef);
+		invokeBeforeCreateNode(parentRef, assocTypeQName, assocQName, nodeTypeQName);
         
         // get the store that the parent belongs to
         StoreRef storeRef = parentRef.getStoreRef();
@@ -231,7 +248,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // get the parent node
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         // create the association
-        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocQName);
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocTypeQName, assocQName);
         
         // get the mandatory aspects for the node type
         TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeQName);
@@ -259,8 +276,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // Invoke policy behaviour
         ChildAssocRef childAssocRef = assoc.getChildAssocRef();
         invokeOnCreateChildAssociation(childAssocRef);
-		invokeOnCreate(childAssocRef);
-		invokeOnUpdate(parentRef);
+		invokeOnCreateNode(childAssocRef);
+        // TODO
+        CodeMonkey.issue("The parent isn't being updated - enough info is given by the assoc");
+        {
+            invokeOnUpdateNode(parentRef);
+        }
 		
 		// done
 		return childAssocRef;
@@ -276,6 +297,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             QName assocQName)
             throws InvalidNodeRefException
     {
+        Assert.notNull(nodeToMoveRef);
+        Assert.notNull(newParentRef);
+        Assert.notNull(assocTypeQName);
+        Assert.notNull(assocQName);
+        
         CodeMonkey.todo("Check that the child association is allowed"); // TODO
         
         // check the node references
@@ -287,18 +313,23 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ContainerNode oldParentNode = oldAssoc.getParent();
         
         // Invoke policy behaviour
-        invokeBeforeUpdate(oldParentNode.getNodeRef());    // old parent will be updated
-        invokeBeforeUpdate(newParentRef);                  // new parent ditto
+        invokeBeforeUpdateNode(oldParentNode.getNodeRef());    // old parent will be updated
+        invokeBeforeUpdateNode(newParentRef);                  // new parent ditto
         
         // remove the child assoc from the old parent
         nodeDaoService.deleteChildAssoc(oldAssoc);
         // create a new assoc
-        ChildAssoc newAssoc = nodeDaoService.newChildAssoc(newParentNode, nodeToMove, true, assocQName);
+        ChildAssoc newAssoc = nodeDaoService.newChildAssoc(newParentNode, nodeToMove, true, assocTypeQName, assocQName);
 
         // invoke policy behaviour
         invokeOnCreateChildAssociation(newAssoc.getChildAssocRef());
-        invokeOnUpdate(oldParentNode.getNodeRef());
-        invokeOnUpdate(newParentRef);
+        invokeOnDeleteChildAssociation(oldAssoc.getChildAssocRef());
+        //TODO
+        CodeMonkey.issue("Updates are really only on the associatons");
+        {
+            invokeOnUpdateNode(oldParentNode.getNodeRef());
+            invokeOnUpdateNode(newParentRef);
+        }
         
         // done
         return newAssoc.getChildAssocRef();
@@ -393,7 +424,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
 		// Invoke policy behaviours
-		invokeBeforeUpdate(nodeRef);
+		invokeBeforeUpdateNode(nodeRef);
 		
         // get the aspect
         AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
@@ -417,7 +448,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		}
 		
 		// Invoke policy behaviours
-		invokeOnUpdate(nodeRef);
+		invokeOnUpdateNode(nodeRef);
     }
 
     /**
@@ -427,7 +458,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             throws InvalidNodeRefException, InvalidAspectException
     {
 		// Invoke policy behaviours
-		invokeBeforeUpdate(nodeRef);
+		invokeBeforeUpdateNode(nodeRef);
 		
         // get the aspect
         AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
@@ -466,7 +497,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
 		
 		// Invoke policy behaviours
-		invokeOnUpdate(nodeRef);
+		invokeOnUpdateNode(nodeRef);
     }
 
     /**
@@ -496,25 +527,25 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     public void deleteNode(NodeRef nodeRef)
     {
 		// Invoke policy behaviours
-		invokeBeforeDelete(nodeRef);
+		invokeBeforeDeleteNode(nodeRef);
 		
-		// get the store
-		StoreRef storeRef = nodeRef.getStoreRef();
         // get the node
         Node node = getNodeNotNull(nodeRef);
-		// get type QName
-		QName typeQName = node.getTypeQName();
+        // get the primary parent-child relationship before it is gone
+        ChildAssocRef childAssocRef = getPrimaryParent(nodeRef);
+		// get type QName as it will be unavailable after the delete
+		QName nodeTypeQName = node.getTypeQName();
         // delete it
         nodeDaoService.deleteNode(node);
 		
 		// Invoke policy behaviours
-		invokeOnDelete(typeQName, nodeRef);
+		invokeOnDeleteNode(nodeTypeQName, childAssocRef);
     }
 
-    public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
+    public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName assocTypeQName, QName qname)
     {
 		// Invoke policy behaviours
-		invokeBeforeUpdate(parentRef);
+		invokeBeforeUpdateNode(parentRef);
 		
         CodeMonkey.todo("Check that the child association is allowed"); // TODO
         // check that both nodes belong to the same store
@@ -532,20 +563,17 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // get the child node
         Node childNode = getNodeNotNull(childRef);
         // make the association
-        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, childNode, false, qname);
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, childNode, false, assocTypeQName, qname);
 
 		// Invoke policy behaviours
         invokeOnCreateChildAssociation(assoc.getChildAssocRef());
-		invokeOnUpdate(parentRef);
+		invokeOnUpdateNode(parentRef);
 		
         return assoc.getChildAssocRef();
     }
 
     public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
     {
-		// Invoke policy behaviours
-		invokeBeforeUpdate(parentRef);
-		
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         Node childNode = getNodeNotNull(childRef);
         NodeKey childNodeKey = childNode.getKey();
@@ -554,7 +582,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         List<EntityRef> deletedRefs = new ArrayList<EntityRef>(5);
         
         // get all the child assocs
-        boolean deleteChild = false;
+        ChildAssocRef primaryAssocRef = null;
         Set<ChildAssoc> assocs = parentNode.getChildAssocs();
         assocs = new HashSet<ChildAssoc>(assocs);   // copy set as we will be modifying it
         for (ChildAssoc assoc : assocs)
@@ -563,62 +591,40 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             {
                 continue;  // not a matching association
             }
-            // is this a primary association?
+            ChildAssocRef assocRef = assoc.getChildAssocRef();
+            // Is this a primary association?
             if (assoc.getIsPrimary())
             {
-                deleteChild = true;
+                // keep the primary associaton for last
+                primaryAssocRef = assocRef;
             }
-            // delete the association instance
-            nodeDaoService.deleteChildAssoc(assoc);
-            deletedRefs.add(assoc.getChildAssocRef());    // save for return value
+            else
+            {
+                // delete the association instance - it is not primary
+                invokeBeforeDeleteChildAssociation(assocRef);
+                nodeDaoService.deleteChildAssoc(assoc);
+                invokeOnDeleteChildAssociation(assocRef);
+                deletedRefs.add(assoc.getChildAssocRef());    // save for return value
+            }
         }
+        // remove the child if the primary association was found
         // must the child be deleted?
-        if (deleteChild)
+        if (primaryAssocRef != null)
         {
+            invokeBeforeDeleteChildAssociation(primaryAssocRef);
+            invokeBeforeDeleteNode(childRef);
+            
+            QName childNodeTypeQName = getType(childRef);
             nodeDaoService.deleteNode(childNode);
             deletedRefs.add(childNode.getNodeRef());    // save for return value
+            deletedRefs.add(primaryAssocRef);           // cascade deleted by the persistence layer
+
+            invokeOnDeleteChildAssociation(primaryAssocRef);
+            invokeOnDeleteNode(childNodeTypeQName, primaryAssocRef);
         }
 
 		// Invoke policy behaviours
-		invokeOnUpdate(parentRef);
-		
-        // done
-        return deletedRefs;
-    }
-
-    public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
-    {
-		// Invoke policy behaviours
-		invokeBeforeUpdate(parentRef);
-		
-        ContainerNode parentNode = getContainerNodeNotNull(parentRef);
-
-        // maintain a list of deleted entities
-        List<EntityRef> deletedRefs = new ArrayList<EntityRef>(5);
-        
-        // get all the child assocs
-        Set<ChildAssoc> assocs = parentNode.getChildAssocs();
-        assocs = new HashSet<ChildAssoc>(assocs);   // copy set as we will be modifying it
-        for (ChildAssoc assoc : assocs)
-        {
-            if (!assoc.getQName().equals(qname))
-            {
-                continue;   // not a matching association
-            }
-            // we have a match
-            nodeDaoService.deleteChildAssoc(assoc);
-            deletedRefs.add(assoc.getChildAssocRef());    // save for return value
-            // must we remove the child?
-            if (assoc.getIsPrimary())
-            {
-                Node childNode = assoc.getChild();
-                nodeDaoService.deleteNode(childNode);
-                deletedRefs.add(childNode.getNodeRef());    // save for return value
-            }
-        }
-
-		// Invoke policy behaviours
-		invokeOnUpdate(parentRef);
+		invokeOnUpdateNode(parentRef);
 		
         // done
         return deletedRefs;
@@ -660,7 +666,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
     {
 		// Invoke policy behaviours
-		invokeBeforeUpdate(nodeRef);
+		invokeBeforeUpdateNode(nodeRef);
 		
         if (properties == null)
         {
@@ -690,7 +696,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
 
 		// Invoke policy behaviours
-		invokeOnUpdate(nodeRef);
+		invokeOnUpdateNode(nodeRef);
     }
 
     /**
@@ -701,7 +707,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException
     {
 		// Invoke policy behaviours
-		invokeBeforeUpdate(nodeRef);
+		invokeBeforeUpdateNode(nodeRef);
 		
         Node node = getNodeNotNull(nodeRef);
         Map<String, Serializable> properties = node.getProperties();
@@ -709,7 +715,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         properties.put(qname.toString(), value);
 
 		// Invoke policy behaviours
-		invokeOnUpdate(nodeRef);
+		invokeOnUpdateNode(nodeRef);
     }
 
     /**
@@ -801,7 +807,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ChildAssocRef assocRef = null;
         if (assoc == null)
         {
-            assocRef = new ChildAssocRef(null, null, nodeRef);
+            assocRef = new ChildAssocRef(null, null, null, nodeRef);
         }
         else
         {
@@ -814,7 +820,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             throws InvalidNodeRefException, AssociationExistsException
     {
 		// Invoke policy behaviours
-		invokeBeforeUpdate(sourceRef);
+		invokeBeforeUpdateNode(sourceRef);
 		
         CodeMonkey.todo("Check that the association is allowed"); // TODO
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
@@ -830,7 +836,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         NodeAssocRef assocRef = assoc.getNodeAssocRef();
 
 		// Invoke policy behaviours
-		invokeOnUpdate(sourceRef);
+		invokeOnUpdateNode(sourceRef);
 		
         return assocRef;
     }
@@ -839,7 +845,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             throws InvalidNodeRefException
     {
 		// Invoke policy behaviours
-		invokeBeforeUpdate(sourceRef);
+		invokeBeforeUpdateNode(sourceRef);
 		
         RealNode sourceNode = getRealNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
@@ -849,7 +855,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         nodeDaoService.deleteNodeAssoc(assoc);
 		
 		// Invoke policy behaviours
-		invokeOnUpdate(sourceRef);
+		invokeOnUpdateNode(sourceRef);
     }
 
     /**
@@ -866,7 +872,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         for (NodeAssoc assoc : assocs)
         {
             // check qname pattern
-            if (!qnamePattern.isMatch(assoc.getQName()))
+            if (!qnamePattern.isMatch(assoc.getTypeQName()))
             {
                 continue;   // the assoc name doesn't match the pattern given 
             }
@@ -890,7 +896,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         for (NodeAssoc assoc : assocs)
         {
             // check qname pattern
-            if (!qnamePattern.isMatch(assoc.getQName()))
+            if (!qnamePattern.isMatch(assoc.getTypeQName()))
             {
                 continue;   // the assoc name doesn't match the pattern given 
             }
@@ -936,26 +942,38 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         if (isRoot && !(primaryOnly && hasParents))  // exclude primary search with parents present
         {
             // create a one-sided assoc ref for the root node and prepend to the stack
-            ChildAssocRef assocRef = new ChildAssocRef(null, getType(currentNodeRef), getRootNode(currentNode.getNodeRef().getStoreRef()));
+            CodeMonkey.todo("Fix hack where we pass in the node type where the assoc qname is not available");
+            CodeMonkey.issue("Why is the root node of the entire store being used here - what about virtual roots?");
+            ChildAssocRef assocRef = new ChildAssocRef(
+                    null,
+                    null,
+                    getType(currentNodeRef),   // TODO:  Fix this hack - no assoc therefore there is no assoc qname
+                    getRootNode(currentNode.getNodeRef().getStoreRef()));  // TODO: what about virtual roots?
             // create a path to save and add the 'root' assoc
             Path pathToSave = new Path();
             Path.ChildAssocElement first = null;
-            for(Path.Element element: currentPath)
+            for (Path.Element element: currentPath)
             {
-                if(first == null)
+                if (first == null)
                 {
-                    first = (Path.ChildAssocElement)element;
+                    first = (Path.ChildAssocElement) element;
                 }
                 else
                 {
                     pathToSave.append(element);
                 }
             }
-            if(first != null)
+            if (first != null)
             {
-               ChildAssocRef updateAssocRef = new ChildAssocRef(getRootNode(currentNode.getNodeRef().getStoreRef()), first.getRef().getQName(), first.getRef().getChildRef());
-               Path.Element newFirst =  new Path.ChildAssocElement(updateAssocRef);
-               pathToSave.prepend(newFirst);
+                CodeMonkey.todo("Replace Path.ChildAssocElement with something more appropriate to the data required");
+                // TODO: This is a misuse of ChildAssocRef - fix update ChildAssocElement to carry the correct data
+                ChildAssocRef updateAssocRef = new ChildAssocRef(
+                       null,
+                       getRootNode(currentNode.getNodeRef().getStoreRef()),
+                       first.getRef().getQName(),
+                       first.getRef().getChildRef());
+                Path.Element newFirst =  new Path.ChildAssocElement(updateAssocRef);
+                pathToSave.prepend(newFirst);
             }
             
             Path.Element element = new Path.ChildAssocElement(assocRef);
@@ -994,7 +1012,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             QName qname = assoc.getQName();
             NodeRef childRef = assoc.getChild().getNodeRef();
             boolean isPrimary = assoc.getIsPrimary();
-            ChildAssocRef assocRef = new ChildAssocRef(parentRef, qname, childRef, isPrimary, -1);
+            ChildAssocRef assocRef = new ChildAssocRef(assoc.getTypeQName(), parentRef, qname, childRef, isPrimary, -1);
             CodeMonkey.issue("Is ordering relevant here?");  // TODO: consider ordering
             Path.Element element = new Path.ChildAssocElement(assocRef);
             // create a new path that builds on the current path

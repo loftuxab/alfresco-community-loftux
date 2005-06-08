@@ -39,12 +39,12 @@ public interface NodeAssoc
     public Node getTarget();
 
     /**
-     * @return Returns the qualified name of this association 
+     * @return Returns the qualified name of this association type 
      */
-    public QName getQName();
+    public QName getTypeQName();
 
     /**
-     * @param qname the qualified name of the association
+     * @param qname the qualified name of the association type
      */
-    public void setQName(QName qname);
+    public void setTypeQName(QName qname);
 }

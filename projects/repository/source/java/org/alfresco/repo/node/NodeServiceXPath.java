@@ -9,6 +9,7 @@ package org.alfresco.repo.node;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -16,7 +17,6 @@ import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.QueryParameterDefinition;
-import org.alfresco.repo.search.SearcherComponent;
 import org.jaxen.BaseXPath;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -27,12 +27,11 @@ import org.jaxen.SimpleFunctionContext;
 import org.jaxen.SimpleVariableContext;
 import org.jaxen.function.StringFunction;
 
+/**
+ * @author Andy Hind
+ */
 public class NodeServiceXPath extends BaseXPath
 {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3834032441789592882L;
     private boolean followAllParentLinks;
 

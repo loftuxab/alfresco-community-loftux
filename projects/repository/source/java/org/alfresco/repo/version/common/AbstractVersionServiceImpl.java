@@ -101,7 +101,7 @@ public abstract class AbstractVersionServiceImpl
 		
 		// Register the copy behaviour
 		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
 				DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE,
 				new JavaBehaviour(this, "onCopy"));
 		

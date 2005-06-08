@@ -24,7 +24,7 @@
             column="auto_type"
             type="string"
             length="18" />
-      <property name="typeNamespaceUri" column="type_namespace_uri" length="100" not-null="false" />
+      <property name="typeNamespaceUri" column="type_namespace_uri" length="100" not-null="true" />
       <property name="typeLocalName" column="type_local_name" length="100" not-null="true" />
       <map
             name="properties"
@@ -139,8 +139,10 @@
             type="long" >
          <generator class="increment" />
       </id>
-      <property name="namespaceUri" column="namespace_uri" length="100" not-null="false" />
-      <property name="localName" length="100" not-null="true" />
+      <property name="typeNamespaceUri" column="type_namespace_uri" length="100" not-null="true" />
+      <property name="typeLocalName" column="type_local_name" length="100" not-null="true" />
+      <property name="namespaceUri" column="namespace_uri" length="100" not-null="true" />
+      <property name="localName" column="local_name" length="100" not-null="true" />
       <property name="isPrimary" />
       <!-- forward assoc to parent node -->
       <many-to-one
@@ -172,8 +174,8 @@
             type="long" >
          <generator class="increment" />
       </id>
-      <property name="namespaceUri" column="namespace_uri" length="100" not-null="false" />
-      <property name="localName" length="100" not-null="true" />
+      <property name="typeNamespaceUri" column="type_namespace_uri" length="100" not-null="true" />
+      <property name="typeLocalName" column="type_local_name" length="100" not-null="true" />
       <!-- forward assoc to source node -->
       <many-to-one
             name="source"
@@ -205,8 +207,8 @@
          source.key.protocol = :sourceKeyProtocol and
          source.key.identifier = :sourceKeyIdentifier and
          source.key.guid = :sourceKeyGuid and
-         assoc.namespaceUri = :assocNamespaceUri and
-         assoc.localName = :assocLocalName and
+         assoc.typeNamespaceUri = :assocTypeNamespaceUri and
+         assoc.typeLocalName = :assocTypeLocalName and
          target.key.protocol = :targetKeyProtocol and
          target.key.identifier = :targetKeyIdentifier and
          target.key.guid = :targetKeyGuid
@@ -223,8 +225,8 @@
          source.key.protocol = :sourceKeyProtocol and
          source.key.identifier = :sourceKeyIdentifier and
          source.key.guid = :sourceKeyGuid and
-         assoc.namespaceUri = :assocNamespaceUri and
-         assoc.localName = :assocLocalName
+         assoc.typeNamespaceUri = :assocTypeNamespaceUri and
+         assoc.typeLocalName = :assocTypeLocalName
    </query>
 
    <query name="node.GetNodeAssocSources">
@@ -238,8 +240,8 @@
          target.key.protocol = :targetKeyProtocol and
          target.key.identifier = :targetKeyIdentifier and
          target.key.guid = :targetKeyGuid and
-         assoc.namespaceUri = :assocNamespaceUri and
-         assoc.localName = :assocLocalName
+         assoc.typeNamespaceUri = :assocTypeNamespaceUri and
+         assoc.typeLocalName = :assocTypeLocalName
    </query>
 
 </hibernate-mapping>

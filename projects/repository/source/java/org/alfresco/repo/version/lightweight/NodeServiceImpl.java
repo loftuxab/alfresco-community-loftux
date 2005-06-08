@@ -163,6 +163,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     public ChildAssocRef addChild(NodeRef parentRef,
             NodeRef childRef,
+            QName assocTypeQName,
             QName qname) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
@@ -178,15 +179,6 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }
 
-    /**
-     * @throws UnsupportedOperationException always
-     */
-    public Collection<EntityRef>  removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
-    {
-        // This operation is not supported for a verion store
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
-    }
-    
     /**
      * @throws UnsupportedOperationException always
      */
@@ -353,11 +345,13 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
                 }
                 
                 // Retrieve the isPrimary and nthSibling values of the forzen child association
+                QName assocType = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_TYPE_QNAME);
                 boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
                 int nthSibling = ((Integer)this.dbNodeService.getProperty(childRef, PROP_QNAME_NTH_SIBLING)).intValue();
                 
                 // Build a child assoc ref to add to the returned list
                 ChildAssocRef newChildAssocRef = new ChildAssocRef(
+                        assocType,
                         nodeRef, 
                         qName, 
                         referencedNode, 
@@ -415,8 +409,8 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
             NodeRef childRef = childAssocRef.getChildRef();
             NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
             
-            // get the qualified name of the frozen child association and filter out unwanted names
-            QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_QNAME);
+            // get the qualified type name of the frozen child association and filter out unwanted names
+            QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_TYPE_QNAME);
             
             if (qnamePattern.isMatch(qName) == true)
             {

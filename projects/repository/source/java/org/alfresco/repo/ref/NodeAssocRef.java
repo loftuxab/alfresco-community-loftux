@@ -14,7 +14,7 @@ public class NodeAssocRef implements EntityRef, Serializable
     private static final long serialVersionUID = 3977867284482439475L;
 
     private NodeRef sourceRef;
-    private QName assocQName;
+    private QName assocTypeQName;
     private NodeRef targetRef;
 
     /**
@@ -23,15 +23,15 @@ public class NodeAssocRef implements EntityRef, Serializable
      * 
      * @param sourceRef
      *            the source reference - never null
-     * @param assocQName
-     *            the qualified name of the association - never null
+     * @param assocTypeQName
+     *            the qualified name of the association type - never null
      * @param targetRef
      *            the target node reference - never null.
      */
-    public NodeAssocRef(NodeRef sourceRef, QName assocQName, NodeRef targetRef)
+    public NodeAssocRef(NodeRef sourceRef, QName assocTypeQName, NodeRef targetRef)
     {
         this.sourceRef = sourceRef;
-        this.assocQName = assocQName;
+        this.assocTypeQName = assocTypeQName;
         this.targetRef = targetRef;
 
         // check
@@ -39,7 +39,7 @@ public class NodeAssocRef implements EntityRef, Serializable
         {
             throw new IllegalArgumentException("Source reference may not be null");
         }
-        if (assocQName == null)
+        if (assocTypeQName == null)
         {
             throw new IllegalArgumentException("QName may not be null");
         }
@@ -54,9 +54,9 @@ public class NodeAssocRef implements EntityRef, Serializable
      * 
      * @return Returns the qualified name of the source-target association.
      */
-    public QName getQName()
+    public QName getTypeQName()
     {
-        return assocQName;
+        return assocTypeQName;
     }
 
     /**
@@ -81,7 +81,7 @@ public class NodeAssocRef implements EntityRef, Serializable
      * <ul>
      * <li>{@link #sourceRef}</li>
      * <li>{@link #targetRef}</li>
-     * <li>{@link #assocQName}</li>
+     * <li>{@link #assocTypeQName}</li>
      * </ul>
      */
     public boolean equals(Object o)
@@ -97,14 +97,14 @@ public class NodeAssocRef implements EntityRef, Serializable
         NodeAssocRef other = (NodeAssocRef) o;
 
         return (EqualsHelper.nullSafeEquals(this.sourceRef, other.sourceRef)
-                && EqualsHelper.nullSafeEquals(this.assocQName, other.assocQName)
+                && EqualsHelper.nullSafeEquals(this.assocTypeQName, other.assocTypeQName)
                 && EqualsHelper.nullSafeEquals(this.targetRef, other.targetRef));
     }
 
     public int hashCode()
     {
         int hashCode = (getSourceRef() == null) ? 0 : getSourceRef().hashCode();
-        hashCode = 37 * hashCode + ((getQName() == null) ? 0 : getQName().hashCode());
+        hashCode = 37 * hashCode + ((getTypeQName() == null) ? 0 : getTypeQName().hashCode());
         hashCode = 37 * hashCode + getTargetRef().hashCode();
         return hashCode;
     }
@@ -113,7 +113,7 @@ public class NodeAssocRef implements EntityRef, Serializable
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append(getSourceRef());
-        buffer.append(" --- ").append(getQName()).append(" ---> ");
+        buffer.append(" --- ").append(getTypeQName()).append(" ---> ");
         buffer.append(getTargetRef());
         return buffer.toString();
     }

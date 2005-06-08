@@ -58,7 +58,8 @@ public interface NodeService
     /**
      * @see #createNode(NodeRef, QName, QName, QName, Map<QName,Serializable>)
      */
-    public ChildAssocRef createNode(NodeRef parentRef,
+    public ChildAssocRef createNode(
+            NodeRef parentRef,
             QName assocTypeQName,
             QName assocQName,
             QName nodeTypeQName)
@@ -80,7 +81,8 @@ public interface NodeService
      * 
      * @see org.alfresco.repo.dictionary.DictionaryService
      */
-    public ChildAssocRef createNode(NodeRef parentRef,
+    public ChildAssocRef createNode(
+            NodeRef parentRef,
             QName assocTypeQName,
             QName assocQName,
             QName nodeTypeQName,
@@ -135,7 +137,8 @@ public interface NodeService
      * @see org.alfresco.repo.dictionary.DictionaryService#getAspect(QName)
      * @see org.alfresco.repo.dictionary.ClassDefinition#getProperties()
      */
-    public void addAspect(NodeRef nodeRef,
+    public void addAspect(
+            NodeRef nodeRef,
             QName aspectRef,
             Map<QName, Serializable> aspectProperties)
             throws InvalidNodeRefException, InvalidAspectException, PropertyException;
@@ -187,12 +190,15 @@ public interface NodeService
      * 
      * @param parentRef
      * @param childRef 
+     * @param assocTypeQName the qualified name of the association type as defined in the datadictionary
      * @param qname the qualified name of the association
      * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
      */
-    public ChildAssocRef addChild(NodeRef parentRef,
+    public ChildAssocRef addChild(
+            NodeRef parentRef,
             NodeRef childRef,
+            QName assocTypeQName,
             QName qname) throws InvalidNodeRefException;
     
     /**
@@ -208,17 +214,6 @@ public interface NodeService
      */
     public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException;
 
-    /**
-     * Removes named child associations and deletes the children where the association
-     * was the primary association, i.e. the one with which the child node was created.
-     * 
-     * @param parentRef the parent of the associations to remove
-     * @param qname the qualified name of the association
-     * @return Returns a collection of references to all deleted entities
-     * @throws InvalidNodeRefException if the node could not be found
-     */
-    public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException;
-    
     /**
      * @param nodeRef
      * @return Returns all properties keyed by their qualified name
@@ -407,29 +402,64 @@ public interface NodeService
     /**
      * Select nodes using an xpath expression.
      * 
-     * @param contextNode - the context node for relative expressions etc
+     * @param contextNodeRef - the context node for relative expressions etc
      * @param XPath - the xpath string to evaluate
      * @param parameters - parameters to bind in to the xpath expression
      * @param namespacePrefixResolver - prefix to namespace mappings
      * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
      * @return a list of all the child assoc relationships to the selected nodes
      */
-    public List<ChildAssocRef> selectNodes(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks);
+    public List<ChildAssocRef> selectNodes(
+            NodeRef contextNodeRef,
+            String XPath,
+            QueryParameterDefinition[] parameters,
+            NamespacePrefixResolver namespacePrefixResolver,
+            boolean followAllParentLinks)
+            throws InvalidNodeRefException, XPathException;
 
     /**
      * Select properties using an xpath expression 
      * 
-     * @param contextNode - the context node for relative expressions etc
+     * @param contextNodeRef - the context node for relative expressions etc
      * @param XPath - the xpath string to evaluate
      * @param parameters - parameters to bind in to the xpath expression
      * @param namespacePrefixResolver - prefix to namespace mappings
      * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
      * @return a list of property values 
-     * TODO: Should be returning a property object 
      */
-    public List<Serializable> selectProperties(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks);
+    public List<Serializable> selectProperties(
+            NodeRef contextNodeRef,
+            String XPath,
+            QueryParameterDefinition[] parameters,
+            NamespacePrefixResolver namespacePrefixResolver,
+            boolean followAllParentLinks)
+            throws InvalidNodeRefException, XPathException;
 
-    public boolean like(NodeRef nodeRef, QName property, String sqlLikePattern);
+    /**
+     * Search for string pattern in both the node text (if present) and node properties
+     * 
+     * @param nodeRef the node to get
+     * @param propertyQName the name of the property
+     * @param googleLikePattern a Google-like pattern to search for in the property value
+     * @return Returns true if the pattern could be found
+     */
+    public boolean contains(
+            NodeRef nodeRef,
+            QName propertyQName,
+            String googleLikePattern)
+            throws InvalidNodeRefException;
     
-    public boolean contains(NodeRef nodeRef, QName property, String googleLikePattern);
+    /**
+     * Search for string pattern in both the node text (if present) and node properties
+     * 
+     * @param nodeRef the node to get
+     * @param propertyQName the name of the property
+     * @param sqlLikePattern a SQL-like pattern to search for
+     * @return Returns true if the pattern could be found
+     */
+    public boolean like(
+            NodeRef nodeRef,
+            QName propertyQName,
+            String sqlLikePattern)
+            throws InvalidNodeRefException;
 }

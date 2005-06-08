@@ -87,9 +87,11 @@ public interface VersionStoreConst
      * Versioned child assoc properties
      */
     public static final String PROP_ASSOC_QNAME = "assocQName";
+    public static final String PROP_ASSOC_TYPE_QNAME = "assocTypeQName";
     public static final String PROP_IS_PRIMARY = "isPrimary";
     public static final String PROP_NTH_SIBLING = "nthSibling";
     public static final QName PROP_QNAME_ASSOC_QNAME = QName.createQName(NAMESPACE_URI, PROP_ASSOC_QNAME);
+    public static final QName PROP_QNAME_ASSOC_TYPE_QNAME = QName.createQName(NAMESPACE_URI, PROP_ASSOC_TYPE_QNAME);
     public static final QName PROP_QNAME_IS_PRIMARY = QName.createQName(NAMESPACE_URI, PROP_IS_PRIMARY);
     public static final QName PROP_QNAME_NTH_SIBLING = QName.createQName(NAMESPACE_URI, PROP_NTH_SIBLING);
     

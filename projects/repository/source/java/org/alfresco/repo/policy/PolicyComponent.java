@@ -80,7 +80,6 @@ public interface PolicyComponent
      * Bind a Class specific behaviour to a Class-level Policy
      * 
      * @param policy  the policy name
-     * @param classRef  the class to bind against
      * @param behaviour  the behaviour
      * @return  the registered behaviour definition
      */
@@ -100,8 +99,8 @@ public interface PolicyComponent
      * Bind a Property specific behaviour to a Property-level Policy
      * 
      * @param policy  the policy name
-     * @param classRef  the class to bind against
-     * @param propertyRef  the property to bind against
+     * @param className  the class to bind against
+     * @param propertyName  the property to bind against
      * @param behaviour  the behaviour
      * @return  the registered behaviour definition
      */
@@ -111,7 +110,7 @@ public interface PolicyComponent
      * Bind a Property specific behaviour to a Property-level Policy (for all properties of a Class)
      * 
      * @param policy  the policy name
-     * @param classRef  the class to bind against
+     * @param className  the class to bind against
      * @param behaviour  the behaviour
      * @return  the registered behaviour definition
      */
@@ -131,7 +130,7 @@ public interface PolicyComponent
      * Bind an Association specific behaviour to an Association-level Policy
      * 
      * @param policy  the policy name
-     * @param classRef  the class to bind against
+     * @param className  the class to bind against
      * @param assocRef  the association to bind against
      * @param behaviour  the behaviour
      * @return  the registered behaviour definition
@@ -142,7 +141,7 @@ public interface PolicyComponent
      * Bind an Association specific behaviour to an Association-level Policy (for all associations of a Class)
      * 
      * @param policy  the policy name
-     * @param classRef  the class to bind against
+     * @param className  the class to bind against
      * @param behaviour  the behaviour
      * @return  the registered behaviour definition
      */

@@ -3,6 +3,7 @@ package org.alfresco.repo.ref;
 import java.io.Serializable;
 
 import org.alfresco.util.EqualsHelper;
+import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * This class represents a child relationship between two nodes. This
@@ -22,15 +23,24 @@ public class ChildAssocRef implements EntityRef, Serializable
 {
     private static final long serialVersionUID = 4051322336257127729L;
 
+    private QName assocTypeQName;
     private NodeRef parentRef;
     private QName childQName;
     private NodeRef childRef;
     private boolean isPrimary;
     private int nthSibling;
+    
+    static
+    {
+        // TODO
+        CodeMonkey.todo("Add assoc type qname to the data held here");
+    }
 
     /**
      * Construct a representation of a parent --- name ----> child relationship.
      * 
+     * @param assocTypeQName
+     *            the type of the association
      * @param parentRef
      *            the parent reference - may be null
      * @param childQName
@@ -43,8 +53,15 @@ public class ChildAssocRef implements EntityRef, Serializable
      *            the nth association with the same properties. Usually -1 to be
      *            ignored.
      */
-    public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef, boolean isPrimary, int nthSibling)
+    public ChildAssocRef(
+            QName assocTypeQName,
+            NodeRef parentRef,
+            QName childQName,
+            NodeRef childRef,
+            boolean isPrimary,
+            int nthSibling)
     {
+        this.assocTypeQName = assocTypeQName;
         this.parentRef = parentRef;
         this.childQName = childQName;
         this.childRef = childRef;
@@ -62,11 +79,23 @@ public class ChildAssocRef implements EntityRef, Serializable
      * Constructs a <b>non-primary</b>, -1th sibling parent-child association
      * reference.
      * 
-     * @see ChildAssocRef#ChildRelationshipRef(NodeRef, QName, NodeRef, int)
+     * @see ChildAssocRef#ChildAssocRef(QName, NodeRef, QName, NodeRef, boolean, int)
      */
-    public ChildAssocRef(NodeRef parentRef, QName childQName, NodeRef childRef)
+    public ChildAssocRef(QName assocTypeQName, NodeRef parentRef, QName childQName, NodeRef childRef)
     {
-        this(parentRef, childQName, childRef, false, -1);
+        this(assocTypeQName, parentRef, childQName, childRef, false, -1);
+    }
+    
+    /**
+     * Get the qualified name of the association type
+     * 
+     * @return Returns the qualified name of the parent-child association type
+     *      as defined in the data dictionary.  It may be null if this is the
+     *      imaginary association to the root node.
+     */
+    public QName getTypeQName()
+    {
+        return assocTypeQName;
     }
 
     /**
@@ -133,14 +162,16 @@ public class ChildAssocRef implements EntityRef, Serializable
         }
         ChildAssocRef other = (ChildAssocRef) o;
 
-        return (EqualsHelper.nullSafeEquals(this.parentRef, other.parentRef)
+        return (EqualsHelper.nullSafeEquals(this.assocTypeQName, other.assocTypeQName)
+                && EqualsHelper.nullSafeEquals(this.parentRef, other.parentRef)
                 && EqualsHelper.nullSafeEquals(this.childQName, other.childQName)
                 && EqualsHelper.nullSafeEquals(this.childRef, other.childRef));
     }
 
     public int hashCode()
     {
-        int hashCode = (getParentRef() == null) ? 0 : getParentRef().hashCode();
+        int hashCode = ((getTypeQName() == null) ? 0 : getTypeQName().hashCode());
+        hashCode = 37 * hashCode + ((getParentRef() == null) ? 0 : getParentRef().hashCode());
         hashCode = 37 * hashCode + ((getQName() == null) ? 0 : getQName().hashCode());
         hashCode = 37 * hashCode + getChildRef().hashCode();
         return hashCode;
@@ -148,10 +179,11 @@ public class ChildAssocRef implements EntityRef, Serializable
 
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(getParentRef());
-        buffer.append(" --- ").append(getQName()).append(" ---> ");
-        buffer.append(getChildRef());
-        return buffer.toString();
+        StringBuffer sb = new StringBuffer();
+        sb.append("[").append(getTypeQName()).append("]");
+        sb.append(getParentRef());
+        sb.append(" --- ").append(getQName()).append(" ---> ");
+        sb.append(getChildRef());
+        return sb.toString();
     }
 }

@@ -3,7 +3,6 @@
  */
 package org.alfresco.repo.node.operations;
 
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.ref.NodeRef;
@@ -15,19 +14,17 @@ import org.alfresco.repo.ref.QName;
 public interface NodeOperationsServicePolicies 
 {
 	/**
-	 * 
+	 * Policy invoked when a <b>node</b> is copied
 	 */
-	public interface OnCopyPolicy extends ClassPolicy
+	public interface OnCopyNodePolicy extends ClassPolicy
 	{
-		/**
-		 * Namespace 
-		 */
-		static final String NAMESPACE = NamespaceService.ALFRESCO_URI;
-		
-		/**
-		 * 
-		 */
-		public void onCopy(
+        /**
+         * 
+         * @param classRef the type of node being copied
+         * @param sourceNodeRef node being copied
+         * @param copyDetails modifiable <b>node</b> details
+         */
+		public void onCopyNode(
 				QName classRef,
 				NodeRef sourceNodeRef,
 				PolicyScope copyDetails);

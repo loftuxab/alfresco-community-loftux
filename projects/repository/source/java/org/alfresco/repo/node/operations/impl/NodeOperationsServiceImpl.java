@@ -23,7 +23,7 @@ import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.node.operations.NodeOperationsServiceException;
 import org.alfresco.repo.node.operations.NodeOperationsServicePolicies;
-import org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyPolicy;
+import org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyNodePolicy;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -32,6 +32,7 @@ import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Node operations service implmentation.
@@ -58,7 +59,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	/**
 	 * Policy delegates
 	 */
-	private ClassPolicyDelegate<OnCopyPolicy> onCopyDelegate;
+	private ClassPolicyDelegate<OnCopyNodePolicy> onCopyNodeDelegate;
     
     /**
      * Set the node service
@@ -96,11 +97,11 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	public void init()
 	{
 		// Register the policies
-		this.onCopyDelegate = this.policyComponent.registerClassPolicy(NodeOperationsServicePolicies.OnCopyPolicy.class);
+		this.onCopyNodeDelegate = this.policyComponent.registerClassPolicy(NodeOperationsServicePolicies.OnCopyNodePolicy.class);
 		
 		// Register policy behaviours
 		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
 				DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM,
 				new JavaBehaviour(this, "copyAspectOnCopy"));
 	}
@@ -213,16 +214,16 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 */
 	private void invokeOnCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
-		Collection<NodeOperationsServicePolicies.OnCopyPolicy> policies = this.onCopyDelegate.getList(sourceClassRef);
+		Collection<NodeOperationsServicePolicies.OnCopyNodePolicy> policies = this.onCopyNodeDelegate.getList(sourceClassRef);
 		if (policies.isEmpty() == true)
 		{
 			defaultOnCopy(sourceClassRef, sourceNodeRef, copyDetails);
 		}
 		else
 		{
-			for (NodeOperationsServicePolicies.OnCopyPolicy policy : policies) 
+			for (NodeOperationsServicePolicies.OnCopyNodePolicy policy : policies) 
 			{
-				policy.onCopy(sourceClassRef, sourceNodeRef, copyDetails);
+				policy.onCopyNode(sourceClassRef, sourceNodeRef, copyDetails);
 			}
 		}
 	}
@@ -372,7 +373,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 				
 				// Add the association
 				NodeRef targetRef = entry.getValue().getTargetRef();
-				this.nodeService.createAssociation(destinationNodeRef, targetRef, entry.getValue().getQName());
+				this.nodeService.createAssociation(destinationNodeRef, targetRef, entry.getValue().getTypeQName());
 											
 			}
 		}
@@ -397,16 +398,18 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 			for (Map.Entry<QName, ChildAssocRef> entry : childAssocs.entrySet()) 
 			{
 				// TODO Currently the order of child associations is not preserved during copy
+                CodeMonkey.todo("A List should be used instead of map so that order is preserved");
 				
+                ChildAssocRef assocRef = entry.getValue();
 				if (copyChildren == true)
 				{
 					if (entry.getValue().isPrimary() == true)
 					{
 						// Copy the child
 						NodeRef childCopy = copy(
-								entry.getValue().getChildRef(), 
+								assocRef.getChildRef(), 
 								destinationNodeRef, 
-								null, 
+                                assocRef.getTypeQName(), 
 								entry.getKey(),
 								copyChildren);
 					}
@@ -414,14 +417,14 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 					{
 						// Add the child 
 						NodeRef childRef = entry.getValue().getChildRef();
-						this.nodeService.addChild(destinationNodeRef, childRef, entry.getKey());
+						this.nodeService.addChild(destinationNodeRef, childRef, assocRef.getTypeQName(), entry.getKey());
 					}
 				}
 				else
 				{
 					// Add the child (will not be primary reguardless of its origional state)
 					NodeRef childRef = entry.getValue().getChildRef();
-					this.nodeService.addChild(destinationNodeRef, childRef, entry.getKey());
+					this.nodeService.addChild(destinationNodeRef, childRef, assocRef.getTypeQName(), entry.getKey());
 				}							
 			}
 		}

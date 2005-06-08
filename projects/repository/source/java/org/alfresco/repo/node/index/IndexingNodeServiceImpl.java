@@ -24,9 +24,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.repo.search.Indexer;
-import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.Searcher;
-import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 
 /**
  * A lightweight <code>NodeService</code> that delegates the work to a
@@ -45,7 +43,6 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     private NodeService nodeServiceDelegate;
 
     private Indexer indexer;
-
     private Searcher searcher;
 
     public IndexingNodeServiceImpl(PolicyComponent policyComponent, NodeService nodeServiceDelegate, Indexer indexer, Searcher searcher)
@@ -69,7 +66,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         // get the root node
         NodeRef rootNodeRef = getRootNode(storeRef);
         // index it
-        ChildAssocRef rootAssocRef = new ChildAssocRef(null, null, rootNodeRef);
+        ChildAssocRef rootAssocRef = new ChildAssocRef(null, null, null, rootNodeRef);
         indexer.createNode(rootAssocRef);
         // done
         return storeRef;
@@ -102,9 +99,14 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * @see #createNode(NodeRef, QName, String, Map<QName,Serializable>)
      */
-    public ChildAssocRef createNode(NodeRef parentRef, QName assocTypeQName, QName assocQName, QName nodeTypeQName) throws InvalidNodeRefException
+    public ChildAssocRef createNode(
+            NodeRef parentRef,
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName)
+            throws InvalidNodeRefException
     {
-        return this.createNode(parentRef, null, assocQName, nodeTypeQName, null);
+        return this.createNode(parentRef, assocTypeQName, assocQName, nodeTypeQName, null);
     }
 
     /**
@@ -113,11 +115,16 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @see Indexer#createNode(ChildAssocRef)
      */
-    public ChildAssocRef createNode(NodeRef parentRef, QName assocTypeQName, QName assocQName, QName nodeTypeQName, Map<QName, Serializable> properties)
+    public ChildAssocRef createNode(
+            NodeRef parentRef,
+            QName assocTypeQName,
+            QName assocQName,
+            QName nodeTypeQName,
+            Map<QName, Serializable> properties)
             throws InvalidNodeRefException
     {
         // call delegate
-        ChildAssocRef assocRef = nodeServiceDelegate.createNode(parentRef, null, assocQName, nodeTypeQName, properties);
+        ChildAssocRef assocRef = nodeServiceDelegate.createNode(parentRef, assocTypeQName, assocQName, nodeTypeQName, properties);
         // update index
         indexer.createNode(assocRef);
         // done
@@ -233,10 +240,10 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @see Indexer#createChildRelationship(ChildAssocRef)
      */
-    public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName qname) throws InvalidNodeRefException
+    public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName assocTypeQName, QName qname)
     {
         // call delegate
-        ChildAssocRef assoc = nodeServiceDelegate.addChild(parentRef, childRef, qname);
+        ChildAssocRef assoc = nodeServiceDelegate.addChild(parentRef, childRef, assocTypeQName, qname);
         // update index
         indexer.createChildRelationship(assoc);
         // done
@@ -254,37 +261,6 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     {
         // call delegate
         Collection<EntityRef> entityRefs = nodeServiceDelegate.removeChild(parentRef, childRef);
-        // update index
-        for (EntityRef ref : entityRefs)
-        {
-            if (ref instanceof ChildAssocRef)
-            {
-                ChildAssocRef assoc = (ChildAssocRef) ref;
-                if (assoc.isPrimary())
-                {
-                    // the node will have been deleted as well
-                    indexer.deleteNode(assoc);
-                }
-                else
-                {
-                    indexer.deleteChildRelationship(assoc);
-                }
-            }
-        }
-        return entityRefs;
-    }
-
-    /**
-     * Delegates to the assigned {@link #nodeServiceDelegate} before using the
-     * {@link #indexer} to update the search index.
-     * 
-     * @see Indexer#deleteChildRelationship(ChildAssocRef)
-     * @see Indexer#deleteNode(ChildAssocRef)
-     */
-    public Collection<EntityRef> removeChildren(NodeRef parentRef, QName qname) throws InvalidNodeRefException
-    {
-        // call delegate
-        Collection<EntityRef> entityRefs = nodeServiceDelegate.removeChildren(parentRef, qname);
         // update index
         for (EntityRef ref : entityRefs)
         {
@@ -420,65 +396,4 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
     {
         return nodeServiceDelegate.getProperty(nodeRef, qname);
     }
-
-    public boolean contains(NodeRef nodeRef, QName property, String googleLikePattern)
-    {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(googleLikePattern).append(") ");
-        if (property != null)
-        {
-            buffer.append("@").append(LuceneQueryParser.escape(property.toString())).append(":(").append(googleLikePattern).append(")");
-        }
-        else
-        {
-            for (QName key : nodeServiceDelegate.getProperties(nodeRef).keySet())
-            {
-                buffer.append("@").append(LuceneQueryParser.escape(key.toString())).append(":(").append(googleLikePattern).append(")");
-            }
-        }
-        buffer.append(")");
-
-        ResultSet resultSet = searcher.query(nodeRef.getStoreRef(), "lucene", buffer.toString());
-        boolean answer = resultSet.length() > 0;
-        return answer;
-    }
-
-    public boolean like(NodeRef nodeRef, QName property, String sqlLikePattern)
-    {
-        // Need to turn the SQL like patter into lucene line
-        // Need to replace unescaped % with * (? and ? will match and \ is used
-        // for escape so the rest is OK)
-
-        StringBuffer patternBuffer = new StringBuffer();
-        char previous = ' ';
-        char current = ' ';
-        for (int i = 0; i < sqlLikePattern.length(); i++)
-        {
-            previous = current;
-            current = sqlLikePattern.charAt(i);
-            if ((current == '%') && (previous != '\\'))
-            {
-                patternBuffer.append("*");
-            }
-            else
-            {
-                patternBuffer.append(current);
-            }
-        }
-
-        String pattern = patternBuffer.toString();
-
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(pattern).append(") ");
-        if (property != null)
-        {
-            buffer.append("@").append(LuceneQueryParser.escape(property.toString())).append(":(").append(pattern).append(")");
-        }
-        buffer.append(")");
-
-        ResultSet resultSet = searcher.query(nodeRef.getStoreRef(), "lucene", buffer.toString());
-        boolean answer = resultSet.length() > 0;
-        return answer;
-    }
-
 }

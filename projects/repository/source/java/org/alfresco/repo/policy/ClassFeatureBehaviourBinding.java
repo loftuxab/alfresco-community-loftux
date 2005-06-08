@@ -13,32 +13,32 @@ import org.alfresco.repo.ref.QName;
  */
 /*package*/ class ClassFeatureBehaviourBinding extends ClassBehaviourBinding
 {
-    // The feature reference (property or association)
-    private QName featureRef;
-    private QName activeFeatureRef;
+    // The feature qualified name (property or association)
+    private QName featureQName;
+    private QName activeFeatureQName;
 
     // Wild Card feature match (match all features)
     private static final QName ALL_FEATURES = QName.createQName("", "*");
 
 
 
-    private ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classRef, QName featureRef, QName activeFeatureRef)
+    private ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classQName, QName featureQName, QName activeFeatureQName)
     {
-        super(dictionary, classRef);
-        this.featureRef = featureRef;
-        this.activeFeatureRef = activeFeatureRef;
+        super(dictionary, classQName);
+        this.featureQName = featureQName;
+        this.activeFeatureQName = activeFeatureQName;
     }
 
     /**
      * Construct.
      * 
      * @param dictionary  the dictionary service
-     * @param classRef  the reference of the Class
-     * @param featureRef  the reference of the Class feature (property or association)
+     * @param classQName  the Class qualified name
+     * @param featureQName  the Class feature (property or association) qualifed name
      */
-    /*package*/ ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classRef, QName featureRef)
+    /*package*/ ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classQName, QName featureQName)
     {
-        this(dictionary, classRef, featureRef, featureRef);
+        this(dictionary, classQName, featureQName, featureQName);
     }
 
     
@@ -46,11 +46,11 @@ import org.alfresco.repo.ref.QName;
      * Construct.
      * 
      * @param dictionary  the dictionary service
-     * @param classRef  the reference of the Class
+     * @param classQName  the Class qualified name
      */
-    /*package*/ ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classRef)
+    /*package*/ ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classQName)
     {
-        this(dictionary, classRef, ALL_FEATURES);
+        this(dictionary, classQName, ALL_FEATURES);
     }
         
     
@@ -60,27 +60,27 @@ import org.alfresco.repo.ref.QName;
     public BehaviourBinding generaliseBinding()
     {
         BehaviourBinding generalisedBinding = null;
-        ClassDefinition classDefinition = getDictionary().getClass(getClassRef());
+        ClassDefinition classDefinition = getDictionary().getClass(getClassQName());
         
-        if (activeFeatureRef.equals(ALL_FEATURES))
+        if (activeFeatureQName.equals(ALL_FEATURES))
         {
             QName parentClassName = classDefinition.getParentName();
             if (parentClassName != null)
             {
-                generalisedBinding = new ClassFeatureBehaviourBinding(getDictionary(), parentClassName, featureRef, featureRef);
+                generalisedBinding = new ClassFeatureBehaviourBinding(getDictionary(), parentClassName, featureQName, featureQName);
             }
         }
         else
         {
-            generalisedBinding = new ClassFeatureBehaviourBinding(getDictionary(), getClassRef(), featureRef, ALL_FEATURES);
+            generalisedBinding = new ClassFeatureBehaviourBinding(getDictionary(), getClassQName(), featureQName, ALL_FEATURES);
         }
         
         return generalisedBinding;
     }
     
-    public QName getFeatureRef()
+    public QName getFeatureQName()
     {
-        return activeFeatureRef;
+        return activeFeatureQName;
     }
 
     @Override
@@ -90,20 +90,20 @@ import org.alfresco.repo.ref.QName;
         {
             return false;
         }
-        return getClassRef().equals(((ClassFeatureBehaviourBinding)obj).getClassRef()) &&
-               activeFeatureRef.equals(((ClassFeatureBehaviourBinding)obj).activeFeatureRef);
+        return getClassQName().equals(((ClassFeatureBehaviourBinding)obj).getClassQName()) &&
+               activeFeatureQName.equals(((ClassFeatureBehaviourBinding)obj).activeFeatureQName);
     }
 
     @Override
     public int hashCode()
     {
-        return 37 * getClassRef().hashCode() + activeFeatureRef.hashCode();
+        return 37 * getClassQName().hashCode() + activeFeatureQName.hashCode();
     }
 
     @Override
     public String toString()
     {
-        return "ClassFeatureBinding[class=" + getClassRef() + ";feature=" + activeFeatureRef + "]";
+        return "ClassFeatureBinding[class=" + getClassQName() + ";feature=" + activeFeatureQName + "]";
     }
     
 }

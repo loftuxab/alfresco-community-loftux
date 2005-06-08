@@ -16,8 +16,8 @@ public class NodeAssocImpl implements NodeAssoc
     private long id;
     private RealNode source;
     private Node target;
-    private String namespaceUri;
-    private String localName;
+    private String typeNamespaceUri;
+    private String typeLocalName;
     private NodeAssocRef nodeAssocRef;
 
     public NodeAssocImpl()
@@ -47,7 +47,7 @@ public class NodeAssocImpl implements NodeAssoc
         if (nodeAssocRef == null)
         {
             nodeAssocRef = new NodeAssocRef(getSource().getNodeRef(),
-                    QName.createQName(getNamespaceUri(), getLocalName()),
+                    QName.createQName(getTypeNamespaceUri(), getTypeLocalName()),
                     getTarget().getNodeRef());
         }
         return nodeAssocRef;
@@ -59,7 +59,7 @@ public class NodeAssocImpl implements NodeAssoc
         sb.append("NodeAssoc")
           .append("[ source=").append(source)
           .append(", target=").append(target)
-          .append(", name=").append(getQName())
+          .append(", name=").append(getTypeQName())
           .append("]");
         return sb.toString();
     }
@@ -107,50 +107,50 @@ public class NodeAssocImpl implements NodeAssoc
      * @see #getNamespaceUri()
      * @see #getLocalName()
      */
-    public QName getQName()
+    public QName getTypeQName()
     {
-        return QName.createQName(getNamespaceUri(), getLocalName());
+        return QName.createQName(getTypeNamespaceUri(), getTypeLocalName());
     }
 
     /**
      * @see #setNamespaceUri(String)
      * @see #setLocalName(String)
      */
-    public void setQName(QName qname)
+    public void setTypeQName(QName qname)
     {
-        setNamespaceUri(qname.getNamespaceURI());
-        setLocalName(qname.getLocalName());
+        setTypeNamespaceUri(qname.getNamespaceURI());
+        setTypeLocalName(qname.getLocalName());
     }
 
     /**
      * For Hibernate use only
      */
-    private String getNamespaceUri()
+    private String getTypeNamespaceUri()
     {
-        return namespaceUri;
+        return typeNamespaceUri;
     }
 
     /**
      * For Hibernate use only
      */
-    private void setNamespaceUri(String namespaceUri)
+    private void setTypeNamespaceUri(String typeNamespaceUri)
     {
-        this.namespaceUri = namespaceUri;
+        this.typeNamespaceUri = typeNamespaceUri;
     }
 
     /**
      * For Hibernate use only
      */
-    private String getLocalName()
+    private String getTypeLocalName()
     {
-        return localName;
+        return typeLocalName;
     }
 
     /**
      * For Hibernate use only
      */
-    private void setLocalName(String name)
+    private void setTypeLocalName(String name)
     {
-        this.localName = name;
+        this.typeLocalName = name;
     }
 }

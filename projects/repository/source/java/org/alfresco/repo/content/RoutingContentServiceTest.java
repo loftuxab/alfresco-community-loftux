@@ -59,7 +59,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
         ChildAssocRef assocRef = nodeService.createNode(
                 rootNodeRef,
-                null,
+                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
                 QName.createQName(NamespaceService.ALFRESCO_TEST_PREFIX, GUID.generate()),
                 DictionaryBootstrap.TYPE_QNAME_CONTENT,
                 properties);

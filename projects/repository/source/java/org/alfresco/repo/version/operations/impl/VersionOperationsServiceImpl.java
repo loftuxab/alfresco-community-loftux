@@ -120,7 +120,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	{
 		// Register copy behaviour for the working copy aspect
 		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopy"),
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
 				DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY,
 				new JavaBehaviour(this, "onCopy"));
 	}

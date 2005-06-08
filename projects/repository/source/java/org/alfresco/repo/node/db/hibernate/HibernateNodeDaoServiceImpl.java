@@ -154,12 +154,15 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // done
     }
     
-    public ChildAssoc newChildAssoc(ContainerNode parentNode,
+    public ChildAssoc newChildAssoc(
+            ContainerNode parentNode,
             Node childNode,
             boolean isPrimary,
+            QName assocTypeQName,
             QName qname)
     {
         ChildAssoc assoc = new ChildAssocImpl();
+        assoc.setTypeQName(assocTypeQName);
         assoc.setIsPrimary(isPrimary);
         assoc.setQName(qname);
         assoc.buildAssociation(parentNode, childNode);
@@ -220,10 +223,10 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return primaryAssoc;
     }
 
-    public NodeAssoc newNodeAssoc(RealNode sourceNode, Node targetNode, QName assocQName)
+    public NodeAssoc newNodeAssoc(RealNode sourceNode, Node targetNode, QName assocTypeQName)
     {
         NodeAssoc assoc = new NodeAssocImpl();
-        assoc.setQName(assocQName);
+        assoc.setTypeQName(assocTypeQName);
         assoc.buildAssociation(sourceNode, targetNode);
         // persist
         getHibernateTemplate().save(assoc);
@@ -231,9 +234,10 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return assoc;
     }
 
-    public NodeAssoc getNodeAssoc(final RealNode sourceNode,
+    public NodeAssoc getNodeAssoc(
+            final RealNode sourceNode,
             final Node targetNode,
-            final QName assocQName)
+            final QName assocTypeQName)
     {
         final NodeKey sourceKey = sourceNode.getKey();
         final NodeKey targetKey = targetNode.getKey();
@@ -245,8 +249,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 query.setString("sourceKeyProtocol", sourceKey.getProtocol())
                      .setString("sourceKeyIdentifier", sourceKey.getIdentifier())
                      .setString("sourceKeyGuid", sourceKey.getGuid())
-                     .setString("assocNamespaceUri", assocQName.getNamespaceURI())
-                     .setString("assocLocalName", assocQName.getLocalName())
+                     .setString("assocTypeNamespaceUri", assocTypeQName.getNamespaceURI())
+                     .setString("assocTypeLocalName", assocTypeQName.getLocalName())
                      .setString("targetKeyProtocol", targetKey.getProtocol())
                      .setString("targetKeyIdentifier", targetKey.getIdentifier())
                      .setString("targetKeyGuid", targetKey.getGuid());
@@ -264,7 +268,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return assoc;
     }
 
-    public Collection<Node> getNodeAssocTargets(final RealNode sourceNode, final QName assocQName)
+    public Collection<Node> getNodeAssocTargets(final RealNode sourceNode, final QName assocTypeQName)
     {
         final NodeKey sourceKey = sourceNode.getKey();
         HibernateCallback callback = new HibernateCallback()
@@ -275,8 +279,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 query.setString("sourceKeyProtocol", sourceKey.getProtocol())
                      .setString("sourceKeyIdentifier", sourceKey.getIdentifier())
                      .setString("sourceKeyGuid", sourceKey.getGuid())
-                     .setString("assocNamespaceUri", assocQName.getNamespaceURI())
-                     .setString("assocLocalName", assocQName.getLocalName());
+                     .setString("assocTypeNamespaceUri", assocTypeQName.getNamespaceURI())
+                     .setString("assocTypeLocalName", assocTypeQName.getLocalName());
                 return query.list();
             }
         };
@@ -285,7 +289,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return queryResults;
     }
 
-    public Collection<RealNode> getNodeAssocSources(final Node targetNode, final QName assocQName)
+    public Collection<RealNode> getNodeAssocSources(final Node targetNode, final QName assocTypeQName)
     {
         final NodeKey targetKey = targetNode.getKey();
         HibernateCallback callback = new HibernateCallback()
@@ -296,8 +300,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 query.setString("targetKeyProtocol", targetKey.getProtocol())
                      .setString("targetKeyIdentifier", targetKey.getIdentifier())
                      .setString("targetKeyGuid", targetKey.getGuid())
-                     .setString("assocNamespaceUri", assocQName.getNamespaceURI())
-                     .setString("assocLocalName", assocQName.getLocalName());
+                     .setString("assocTypeNamespaceUri", assocTypeQName.getNamespaceURI())
+                     .setString("assocTypeLocalName", assocTypeQName.getLocalName());
                 return query.list();
             }
         };

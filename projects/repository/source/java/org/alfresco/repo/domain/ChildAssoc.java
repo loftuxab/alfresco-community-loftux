@@ -38,6 +38,17 @@ public interface ChildAssoc
     public ContainerNode getParent();
 
     public Node getChild();
+    
+    /**
+     * @return Returns the qualified name of the association type
+     */
+    public QName getTypeQName();
+    
+    /**
+     * @param assocTypeQName the qualified name of the association type as defined
+     *      in the data dictionary
+     */
+    public void setTypeQName(QName assocTypeQName);
 
     /**
      * @return Returns the qualified name of this association 

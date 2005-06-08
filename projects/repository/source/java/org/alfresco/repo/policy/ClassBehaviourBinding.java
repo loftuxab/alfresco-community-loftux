@@ -16,20 +16,20 @@ import org.alfresco.repo.ref.QName;
     // The dictionary service
     private DictionaryService dictionary;
     
-    // The class reference
-    private QName classRef; 
+    // The class qualified name
+    private QName classQName; 
 
 
     /**
      * Construct.
      * 
      * @param dictionary  the dictionary service
-     * @param classRef  the reference of the Class
+     * @param classQName  the Class qualified name
      */
-    /*package*/ ClassBehaviourBinding(DictionaryService dictionary, QName classRef)
+    /*package*/ ClassBehaviourBinding(DictionaryService dictionary, QName classQName)
     {
         this.dictionary = dictionary;
-        this.classRef = classRef;
+        this.classQName = classQName;
     }
 
     /*package*/ DictionaryService getDictionary()
@@ -43,7 +43,7 @@ import org.alfresco.repo.ref.QName;
     public BehaviourBinding generaliseBinding()
     {
         BehaviourBinding generalisedBinding = null;
-        ClassDefinition classDefinition = dictionary.getClass(classRef);
+        ClassDefinition classDefinition = dictionary.getClass(classQName);
         QName parentClassName = classDefinition.getParentName();
         if (parentClassName != null)
         {
@@ -53,13 +53,13 @@ import org.alfresco.repo.ref.QName;
     }
     
     /**
-     * Gets the class reference
+     * Gets the class qualified name
      * 
-     * @return  the class reference
+     * @return  the class qualified name
      */
-    public QName getClassRef()
+    public QName getClassQName()
     {
-        return classRef;
+        return classQName;
     }
 
     @Override
@@ -69,19 +69,19 @@ import org.alfresco.repo.ref.QName;
         {
             return false;
         }
-        return classRef.equals(((ClassBehaviourBinding)obj).classRef);
+        return classQName.equals(((ClassBehaviourBinding)obj).classQName);
     }
 
     @Override
     public int hashCode()
     {
-        return classRef.hashCode();
+        return classQName.hashCode();
     }
 
     @Override
     public String toString()
     {
-        return "ClassBinding[class=" + classRef + "]";
+        return "ClassBinding[class=" + classQName + "]";
     }
     
 }
