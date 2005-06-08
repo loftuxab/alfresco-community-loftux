@@ -356,55 +356,88 @@
    <!-- Generic factory for making indexers and searchers for a given protol or store -->
    <!--                                                                               -->
 
-   
-   <bean id="indexerAndSearcherFactory" 
-      class="org.alfresco.repo.search.IndexerAndSearcherFactory">
-      <property name="protocolFactories">
+   <bean id="indexerAndSearcherFactory" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
+      <property name="proxyInterface">
+         <value>org.alfresco.repo.search.IndexerAndSearcher</value>
+      </property>
+      <property name="defaultBinding">
+         <ref bean="luceneIndexerAndSearcherFactory"></ref>
+      </property>
+      <property name="redirectedProtocolBindings">
          <map>
-            <entry key="workspace">
-               <ref bean="luceneIndexerAndSearcherFactory"></ref>
-            </entry>
-            <entry key="versionStore">
-               <ref bean="luceneIndexerAndSearcherFactory"></ref>
-            </entry>
+            <entry key="workspace"><ref bean="luceneIndexerAndSearcherFactory"></ref></entry>
+            <entry key="versionStore"><ref bean="luceneIndexerAndSearcherFactory"></ref></entry>
+         </map>
+      </property>
+   </bean>
+   
+   
+   <bean id="categoryService" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
+      <property name="proxyInterface">
+         <value>org.alfresco.repo.search.CategoryService</value>
+      </property>
+      <property name="defaultBinding">
+         <ref bean="luceneCategoryService"></ref>
+      </property>
+      <property name="redirectedProtocolBindings">
+         <map>
+            <entry key="workspace"><ref bean="luceneCategoryService"></ref></entry>
+            <entry key="versionStore"><ref bean="luceneCategoryService"></ref></entry>
          </map>
       </property>
    </bean>
    
 
-     <!-- Indexer and searchers for lucene -->
-    <bean id="luceneIndexerAndSearcherFactory" 
+   <!-- Indexer and searchers for lucene -->
+   <bean id="luceneIndexerAndSearcherFactory" 
         class="org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
-        <property name="nodeService">
-            <ref bean="dbNodeService"/>
-        </property>
-        <property name="dictionaryService">
-            <ref bean="dictionaryService"/>
-        </property>
-        <property name="nameSpaceService">
-            <ref bean="namespaceService"/>
-        </property>
-        <property name="luceneIndexLock">
-            <ref bean="luceneIndexLock"/>
-        </property>
-        <property name="luceneFullTextSearchIndexer">
-            <ref bean="LuceneFullTextSearchIndexer"/>
-        </property>
-        <property name="indexRootLocation">
-            <value>w:/lucene-indexes</value>
-        </property>
-        <property name="contentService">
-            <ref bean="contentService"/>
-        </property>
-        <property name="queryRegister">
-            <ref bean="queryRegisterComponent"/>
-        </property>
-    </bean>
+      <property name="nodeService">
+         <ref bean="dbNodeService"/>
+      </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService"/>
+      </property>
+      <property name="nameSpaceService">
+         <ref bean="namespaceService"/>
+      </property>
+      <property name="luceneIndexLock">
+         <ref bean="luceneIndexLock"/>
+      </property>
+      <property name="luceneFullTextSearchIndexer">
+         <ref bean="LuceneFullTextSearchIndexer"/>
+      </property>
+      <property name="indexRootLocation">
+         <value>w:/lucene-indexes</value>
+      </property>
+      <property name="contentService">
+         <ref bean="contentService"/>
+      </property>
+      <property name="queryRegister">
+         <ref bean="queryRegisterComponent"/>
+      </property>
+   </bean>
+   
+    <!-- Indexer and searchers for lucene -->
+   <bean id="luceneCategoryService" 
+        class="org.alfresco.repo.search.impl.lucene.LuceneCategoryServiceImpl">
+      <property name="nodeService">
+         <ref bean="dbNodeService"/>
+      </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService"/>
+      </property>
+      <property name="namespacePrefixResolver">
+         <ref bean="namespaceService"/>
+      </property>
+      <property name="indexerAndSearcher">
+         <ref bean="luceneIndexerAndSearcherFactory"/>
+      </property>
+   </bean>
     
-    <!-- Support for locking lucene indexes for deletion and update -->
+   <!-- Support for locking lucene indexes for deletion and update -->
     
-    <bean id="luceneIndexLock" class="org.alfresco.repo.search.transaction.LuceneIndexLock">
-	</bean>
+   <bean id="luceneIndexLock" class="org.alfresco.repo.search.transaction.LuceneIndexLock">
+   </bean>
     
  
    <!--                               -->

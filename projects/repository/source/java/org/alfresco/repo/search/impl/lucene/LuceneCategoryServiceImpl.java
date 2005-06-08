@@ -36,7 +36,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
     
     private DictionaryService dictionaryService;
 
-    private LuceneSearcher searcher;
+    private LuceneIndexerAndSearcher indexerAndSearcher;
     
     public LuceneCategoryServiceImpl()
     {
@@ -61,9 +61,9 @@ public class LuceneCategoryServiceImpl implements CategoryService
     }
     
 
-    public void setSearcher(LuceneSearcher searcher)
+    public void setIndexerAndSearcher(LuceneIndexerAndSearcher indexerAndSearcher)
     {
-        this.searcher = searcher;
+        this.indexerAndSearcher = indexerAndSearcher;
     }
     
 
@@ -98,11 +98,11 @@ public class LuceneCategoryServiceImpl implements CategoryService
             luceneQuery.append("*").append("\" ");
         }
         
-        resultSet = searcher.query(categoryRef.getStoreRef(), "lucene", luceneQuery.toString(), null, null);
+        resultSet = indexerAndSearcher.getSearcher(categoryRef.getStoreRef(), false).query(categoryRef.getStoreRef(), "lucene", luceneQuery.toString(), null, null);
 
         return resultSetToChildAssocCollection(resultSet);
     }
-
+    
     private String buildXPath(Path path)
     {
         StringBuffer pathBuffer = new StringBuffer();
@@ -174,7 +174,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
     
     private NodeRef getCategoryRootNode(StoreRef storeRef, QName qname)
     {
-        ResultSet resultSet = searcher.query(storeRef, "lucene", "PATH:\"/"+getPrefix(qname.getNamespaceURI())+qname.getLocalName()+"\"", null, null);
+        ResultSet resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH:\"/"+getPrefix(qname.getNamespaceURI())+qname.getLocalName()+"\"", null, null);
         if(resultSet.length() != 1)
         {
             return null;
@@ -189,7 +189,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
     public Collection<ChildAssocRef> getRootCategories(StoreRef storeRef)
     {
         
-        ResultSet resultSet = searcher.query(storeRef, "lucene", "PATH:\"//alf:categoryRoot/*\"", null, null);
+        ResultSet resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH:\"//alf:categoryRoot/*\"", null, null);
         return resultSetToChildAssocCollection(resultSet);
     }
 

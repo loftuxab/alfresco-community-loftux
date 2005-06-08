@@ -1769,7 +1769,7 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "( +TYPE:\"{http://www.alfresco.org/1.0}linkfile\" +@\\{http\\://www.alfresco.org/1.0\\}name:\"content*\") OR  TEXT:\"content\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "( +TYPE:\"{http://www.alfresco.org/1.0}linkfile\" +@\\{http\\://www.alfresco.org/1.0\\}name:\"content woof\") OR  TEXT:\"content\"", null, null);
         
        
 

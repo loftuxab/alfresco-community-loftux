@@ -82,6 +82,8 @@ public class LuceneCategoryTest extends TestCase
     private Searcher searcher;
     private LuceneIndexerAndSearcher indexerAndSearcher;
 
+    private CategoryService categoryService;
+
     public LuceneCategoryTest()
     {
         super();
@@ -102,6 +104,7 @@ public class LuceneCategoryTest extends TestCase
         dictionaryDAO = (DictionaryDAO) ctx.getBean("dictionaryDAO");
         searcher = (Searcher) ctx.getBean("searcherComponent");
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
+        categoryService = (CategoryService) ctx.getBean("categoryService");
         
         createTestTypes();
         
@@ -489,7 +492,7 @@ public class LuceneCategoryTest extends TestCase
         results.close();
     }
     
-    public void testCategoryService()
+    public void testCategoryServiceImpl()
     {
         buildBaseIndex();
         
@@ -512,7 +515,7 @@ public class LuceneCategoryTest extends TestCase
         LuceneCategoryServiceImpl impl = new LuceneCategoryServiceImpl();
         impl.setNodeService(nodeService);
         impl.setNamespacePrefixResolver(getNamespacePrefixReolsver(""));
-        impl.setSearcher(searcher);
+        impl.setIndexerAndSearcher(indexerAndSearcher);
         impl.setDictionaryService(dictionaryService);
         
         Collection<ChildAssocRef>
@@ -553,5 +556,14 @@ public class LuceneCategoryTest extends TestCase
         nspr.addDynamicNamespace("test", TEST_NAMESPACE);
         nspr.addDynamicNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
         return nspr;
+    }
+    
+    public void testCategoryService()
+    {
+        buildBaseIndex();
+        assertEquals(1, categoryService.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE).size());
+        assertEquals(4, categoryService.getRootCategories(rootNodeRef.getStoreRef()).size());
+        assertEquals(2, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "assetClass"), CategoryService.Depth.IMMEDIATE).size());
+        assertEquals(6, categoryService.getCategoryAspects().size());
     }
 }

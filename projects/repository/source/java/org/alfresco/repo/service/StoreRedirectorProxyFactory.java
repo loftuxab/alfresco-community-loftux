@@ -229,6 +229,11 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
         {
             StoreRef storeRef = null;
 
+            if(args == null)
+            {
+                return null;
+            }
+            
             for (Object arg : args)
             {
                 // Extract store type from argument, if store type provided
