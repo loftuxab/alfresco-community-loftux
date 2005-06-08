@@ -125,7 +125,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" init-method="init" >
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
                <constructor-arg>
                   <value>nodeDaoService</value>
                </constructor-arg>
@@ -182,7 +182,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" init-method="init" >
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
                <constructor-arg>
                   <value>dbNodeService</value>
                </constructor-arg>
@@ -190,6 +190,16 @@
          </list>
       </property>
    </bean>   
+   
+   <!-- Handles policy callbacks to ensure that node hierarchy gets indexed -->
+   <bean id="nodeIndexer" class="org.alfresco.repo.node.index.NodeIndexer" >
+      <constructor-arg>
+         <ref bean="policyComponent" />
+      </constructor-arg>
+      <constructor-arg>
+         <ref bean="indexerComponent" />
+      </constructor-arg>
+   </bean>
    
    <!-- NodeService implemented to call a delegate and ensure that nodes get indexed -->
    <!-- TODO: To be replaced by use of callbacks using policy framework -->
@@ -311,7 +321,7 @@
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" init-method="init" >
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
                <constructor-arg>
                   <value>indexerComponent</value>
                </constructor-arg>
