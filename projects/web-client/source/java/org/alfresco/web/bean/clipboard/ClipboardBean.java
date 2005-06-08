@@ -237,7 +237,12 @@ public class ClipboardBean
          // call the node ops service to initiate the copy
          // TODO: what should the assoc QName be?
          boolean copyChildren = (item.Node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FOLDER));
-         NodeRef copyRef = this.nodeOperationsService.copy(item.Node.getNodeRef(), parentRef, null, assocRef.getQName(), copyChildren);
+         NodeRef copyRef = this.nodeOperationsService.copy(
+               item.Node.getNodeRef(),
+               parentRef,
+               DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+               assocRef.getQName(),
+               copyChildren);
       }
       else
       {
@@ -245,7 +250,11 @@ public class ClipboardBean
             logger.debug("Trying to move node ID: " + item.Node.getId() + " into node ID: " + parentRef.getId());
          
          // move the node
-         this.nodeService.moveNode(item.Node.getNodeRef(), parentRef, null, assocRef.getQName());
+         this.nodeService.moveNode(
+               item.Node.getNodeRef(),
+               parentRef,
+               DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+               assocRef.getQName());
       }
    }
    
