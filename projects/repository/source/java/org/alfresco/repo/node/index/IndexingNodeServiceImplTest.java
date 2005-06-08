@@ -72,21 +72,24 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-        namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+        namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+   
         
-        List<ChildAssocRef> answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, '*monkey')", null, namespacePrefixResolver, false);
+        
+        List<ChildAssocRef> 
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, '*monkey')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         
-        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, '%monkey')", null, namespacePrefixResolver, false);
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, '%monkey')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         
-        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, 'monk*')", null, namespacePrefixResolver, false);
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monk*')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         
-        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, 'monk%')", null, namespacePrefixResolver, false);
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monk%')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         
-        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@alftest:animal, 'monk\\%')", null, namespacePrefixResolver, false);
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monk\\%')", null, namespacePrefixResolver, false);
         assertEquals(0, answer.size());
         
         answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('monkey')", null, namespacePrefixResolver, false);

@@ -7,6 +7,7 @@
  */
 package org.alfresco.repo.search;
 
+import java.util.Iterator;
 import java.util.ListIterator;
 
 /**

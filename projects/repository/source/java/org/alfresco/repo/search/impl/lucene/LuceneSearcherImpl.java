@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.Path;
@@ -101,7 +100,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     Searcher searcher = getSearcher();
 
                     Hits hits = searcher.search(query);
-                    return new LuceneResultSet(store, hits, searcher, nodeService);
+                    return new LuceneResultSet(store, hits, searcher, nodeService, queryOptions);
 
                 }
                 catch (ParseException e)
@@ -128,7 +127,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     Query query = handler.getQuery();
                     Searcher searcher = getSearcher();
                     Hits hits = searcher.search(query);
-                    return new LuceneResultSet(store, hits, searcher, nodeService);
+                    return new LuceneResultSet(store, hits, searcher, nodeService, queryOptions);
                 }
                 catch (SAXPathException e)
                 {

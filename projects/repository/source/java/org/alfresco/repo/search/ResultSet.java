@@ -3,6 +3,9 @@
  */
 package org.alfresco.repo.search;
 
+import java.util.List;
+
+import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 
@@ -53,4 +56,10 @@ public interface ResultSet extends Iterable<ResultSetRow> // Specfic iterator
     void close();
     
     ResultSetRow getRow(int i);
+    
+    List<NodeRef> getNodeRefs();
+    
+    List<ChildAssocRef> getChildAssocRefs();
+    
+    ChildAssocRef getChildAssocRef(int n);
 }

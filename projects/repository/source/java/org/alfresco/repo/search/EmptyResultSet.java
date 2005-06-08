@@ -8,8 +8,11 @@
 package org.alfresco.repo.search;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
+import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 
@@ -53,6 +56,22 @@ public class EmptyResultSet implements ResultSet
     }
 
     public ResultSetRow getRow(int i)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public List<NodeRef> getNodeRefs()
+    {
+        return Collections.<NodeRef>emptyList();
+    }
+
+    public List<ChildAssocRef> getChildAssocRefs()
+    {
+        return Collections.<ChildAssocRef>emptyList();
+    }
+
+    public ChildAssocRef getChildAssocRef(int n)
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();

@@ -7,6 +7,7 @@ package org.alfresco.repo.search;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
@@ -73,4 +74,16 @@ public interface ResultSetRow
     
     public QName getQName();
 
+    /**
+     * Get the position of this row in the containing set.
+     * @return
+     */
+    public int getIndex();
+    
+    /**
+     * Return the child assoc ref for this row
+     * @return
+     */
+    public ChildAssocRef getChildAssocRef();
+    
 }

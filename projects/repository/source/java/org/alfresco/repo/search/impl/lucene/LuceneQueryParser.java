@@ -14,6 +14,7 @@ import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.TypeDefinition;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.search.SearcherException;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
@@ -97,6 +98,10 @@ public class LuceneQueryParser extends QueryParser
             else if (field.equals("TYPE"))
             {
                 TypeDefinition target = dictionaryService.getType(QName.createQName(queryText));
+                if(target == null)
+                {
+                    throw new SearcherException("Invalid type: "+queryText);
+                }
                 QName targetQName = target.getName();
                 HashSet<QName> subclasses = new HashSet<QName>();
                 for(QName classRef : dictionaryService.getAllTypes())

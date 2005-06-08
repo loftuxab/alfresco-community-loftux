@@ -1253,7 +1253,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             Searcher searcher = getSearcher();
             Hits hits = searcher.search(booleanQuery);
-            LuceneResultSet results = new LuceneResultSet(store, hits, searcher, nodeService);
+            LuceneResultSet results = new LuceneResultSet(store, hits, searcher, nodeService, null);
             int count = 0;
             for (ResultSetRow row : results)
             {

@@ -430,4 +430,18 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         boolean answer = resultSet.length() > 0;
         return answer;
     }
+
+    protected Indexer getIndexer()
+    {
+        return indexer;
+    }
+    
+
+    protected Searcher getSearcher()
+    {
+        return searcher;
+    }
+    
+    
+    
 }

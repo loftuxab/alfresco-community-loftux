@@ -7,10 +7,11 @@ package org.alfresco.repo.search.impl.lucene;
 import java.io.IOException;
 
 import org.alfresco.repo.node.NodeService;
+import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.search.ResultSet;
+import org.alfresco.repo.search.AbstractResultSet;
 import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.ResultSetRowIterator;
 import org.alfresco.repo.search.SearcherException;
@@ -24,7 +25,7 @@ import org.apache.lucene.search.Searcher;
  * @author andyh
  * 
  */
-public class LuceneResultSet implements ResultSet
+public class LuceneResultSet extends AbstractResultSet
 {
     /**
      * The underlying hits
@@ -47,9 +48,9 @@ public class LuceneResultSet implements ResultSet
      * @param storeRef
      * @param hits
      */
-    public LuceneResultSet(StoreRef storeRef, Hits hits, Searcher searcher, NodeService nodeService)
+    public LuceneResultSet(StoreRef storeRef, Hits hits, Searcher searcher, NodeService nodeService, Path[]propertyPaths)
     {
-        super();
+        super(propertyPaths);
         this.hits = hits;
         this.storeRef = storeRef;
         this.searcher = searcher;
@@ -59,11 +60,6 @@ public class LuceneResultSet implements ResultSet
     /*
      * ResultSet implementation
      */
-
-    public Path[] getPropertyPaths()
-    {
-        throw new UnsupportedOperationException();
-    }
 
     public ResultSetRowIterator iterator()
     {
@@ -144,8 +140,9 @@ public class LuceneResultSet implements ResultSet
             throw new SearcherException("Invalid row");
         }
     }
-    
 
-    
-    
+    public ChildAssocRef getChildAssocRef(int n)
+    {
+       return getRow(n).getChildAssocRef();
+    }
 }

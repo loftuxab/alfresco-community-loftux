@@ -8,10 +8,11 @@
 package org.alfresco.repo.search.impl.lucene;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.AbstractResultSetRow;
@@ -25,14 +26,12 @@ import org.apache.lucene.document.Document;
  */
 public class LuceneResultSetRow extends AbstractResultSetRow
 {
+    public static final QName ASSOC_TYPE_QNAME = DictionaryBootstrap.ASSOC_QNAME_CONTAINS;
     
-
     /**
      * The current document - cached so we do not get it for each value
      */
     private Document document;
-    
-    private Map<Path, Serializable> properties;
 
     /**
      * Wrap a position in a lucene Hits class with node support
@@ -54,7 +53,7 @@ public class LuceneResultSetRow extends AbstractResultSetRow
     {
         if (document == null)
         {
-            document = ((LuceneResultSet)getResultSet()).getDocument(getIndex());
+            document = ((LuceneResultSet) getResultSet()).getDocument(getIndex());
         }
         return document;
     }
@@ -63,23 +62,10 @@ public class LuceneResultSetRow extends AbstractResultSetRow
      * ResultSetRow implementation
      */
 
-    public Map<Path, Serializable> getValues()
+    protected Map<QName, Serializable> getDirectProperties()
     {
-        if(properties == null)
-        {
-            properties = new LinkedHashMap<Path, Serializable>();
-            LuceneResultSet lrs = (LuceneResultSet)getResultSet();
-            Map<QName, Serializable> byQname = lrs.getNodeService().getProperties(lrs.getNodeRef(getIndex()));
-            for(QName qname: byQname.keySet())
-            {
-                Serializable value = byQname.get(qname);
-                Path path = new Path();
-                path.append(new Path.SelfElement());
-                path.append(new Path.AttributeElement(qname));
-                properties.put(path, value);
-            }
-        }
-        return Collections.unmodifiableMap(properties);
+        LuceneResultSet lrs = (LuceneResultSet) getResultSet();
+        return lrs.getNodeService().getProperties(lrs.getNodeRef(getIndex()));
     }
 
     public Serializable getValue(Path path)
@@ -89,24 +75,18 @@ public class LuceneResultSetRow extends AbstractResultSetRow
         throw new UnsupportedOperationException();
     }
 
-  
-
-    public Serializable getValue(QName qname)
+    public QName getQName()
     {
-        Path path = new Path();
-        path.append(new Path.SelfElement());
-        path.append(new Path.AttributeElement(qname));
-       return getValues().get(path);
+        String qname = getDocument().getField("QNAME").stringValue();
+        return QName.createQName(qname);
     }
-    
- 
 
-   public QName getQName()
-   {
-      String qname = getDocument().getField("QNAME").stringValue();
-      return QName.createQName(qname);
-   }
-    
-    
+    public ChildAssocRef getChildAssocRef()
+    {
+        String primaryParent = getDocument().getField("PRIMARYPARENT").stringValue();
+        NodeRef childNodeRef = getNodeRef();
+        NodeRef paretnNodeRef = new NodeRef(childNodeRef.getStoreRef(), primaryParent);
+        return new ChildAssocRef(ASSOC_TYPE_QNAME, paretnNodeRef, getQName(), childNodeRef);
+    }
 
 }

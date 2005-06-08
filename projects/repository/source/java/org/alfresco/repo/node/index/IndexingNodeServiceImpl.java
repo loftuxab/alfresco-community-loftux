@@ -42,16 +42,12 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
 {
     private NodeService nodeServiceDelegate;
 
-    private Indexer indexer;
-    private Searcher searcher;
-
     public IndexingNodeServiceImpl(PolicyComponent policyComponent, NodeService nodeServiceDelegate, Indexer indexer, Searcher searcher)
     {
         super(policyComponent);
-
+        setIndexer(indexer);
+        setSearcher(searcher);
         this.nodeServiceDelegate = nodeServiceDelegate;
-        this.indexer = indexer;
-        this.searcher = searcher;
     }
 
     /**
@@ -67,7 +63,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         NodeRef rootNodeRef = getRootNode(storeRef);
         // index it
         ChildAssocRef rootAssocRef = new ChildAssocRef(null, null, null, rootNodeRef);
-        indexer.createNode(rootAssocRef);
+        getIndexer().createNode(rootAssocRef);
         // done
         return storeRef;
     }
@@ -126,7 +122,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         // call delegate
         ChildAssocRef assocRef = nodeServiceDelegate.createNode(parentRef, assocTypeQName, assocQName, nodeTypeQName, properties);
         // update index
-        indexer.createNode(assocRef);
+        getIndexer().createNode(assocRef);
         // done
         return assocRef;
     }
@@ -154,8 +150,8 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
                 assocTypeQName,
                 assocQName);
         // update index
-        indexer.deleteChildRelationship(oldAssocRef);
-        indexer.createChildRelationship(assocRef);
+        getIndexer().deleteChildRelationship(oldAssocRef);
+        getIndexer().createChildRelationship(assocRef);
         // done
         return assocRef;
     }
@@ -179,7 +175,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         // call delegate
         nodeServiceDelegate.addAspect(nodeRef, aspectRef, aspectProperties);
         // update index
-        indexer.updateNode(nodeRef);
+        getIndexer().updateNode(nodeRef);
     }
 
     /**
@@ -193,7 +189,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         // call delegate
         nodeServiceDelegate.removeAspect(nodeRef, aspectRef);
         // update index
-        indexer.updateNode(nodeRef);
+        getIndexer().updateNode(nodeRef);
     }
 
     /**
@@ -230,7 +226,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         // call delegate
         nodeServiceDelegate.deleteNode(nodeRef);
         // update index
-        indexer.deleteNode(assoc);
+        getIndexer().deleteNode(assoc);
         // done
     }
 
@@ -245,7 +241,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         // call delegate
         ChildAssocRef assoc = nodeServiceDelegate.addChild(parentRef, childRef, assocTypeQName, qname);
         // update index
-        indexer.createChildRelationship(assoc);
+        getIndexer().createChildRelationship(assoc);
         // done
         return assoc;
     }
@@ -270,11 +266,11 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
                 if (assoc.isPrimary())
                 {
                     // the node will have been deleted as well
-                    indexer.deleteNode(assoc);
+                    getIndexer().deleteNode(assoc);
                 }
                 else
                 {
-                    indexer.deleteChildRelationship(assoc);
+                    getIndexer().deleteChildRelationship(assoc);
                 }
             }
         }
@@ -292,7 +288,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         // call delegate
         nodeServiceDelegate.setProperties(nodeRef, properties);
         // update index
-        indexer.updateNode(nodeRef);
+        getIndexer().updateNode(nodeRef);
     }
 
     /**
@@ -306,7 +302,7 @@ public class IndexingNodeServiceImpl extends AbstractNodeServiceImpl
         // call delegate
         nodeServiceDelegate.setProperty(nodeRef, qname, value);
         // update index
-        indexer.updateNode(nodeRef);
+        getIndexer().updateNode(nodeRef);
     }
 
     /**
