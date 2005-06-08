@@ -73,12 +73,12 @@ public class ServiceRegistryTest extends TestCase
         StoreRedirector theService3 = (StoreRedirector)registry.getService(service3);
         assertNotNull(service3);
         
-        Collection<String> descStores = desc3.getSupportedStores();
+        Collection<String> descStores = desc3.getSupportedStoreProtocols();
         assertTrue(descStores.contains("Type1"));
         assertTrue(descStores.contains("Type2"));
         assertFalse(descStores.contains("Invalid"));
         
-        Collection<String> serviceStores = theService3.getSupportedStores();
+        Collection<String> serviceStores = theService3.getSupportedStoreProtocols();
         for (String store: descStores)
         {
             assertTrue(serviceStores.contains(store));

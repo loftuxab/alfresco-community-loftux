@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.util.ParameterCheck;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -138,14 +139,27 @@ public class ServiceFactory
     /* (non-Javadoc)
      * @see org.alfresco.repo.service.ServiceDescriptor#getSupportedStores()
      */
-    public Collection<String> getSupportedStores()
+    public Collection<String> getSupportedStoreProtocols()
     {
         Collection<String> stores = null;
+        if (implementation instanceof StoreRedirector)
+        {
+            stores = ((StoreRedirector)implementation).getSupportedStoreProtocols();
+        }
+        return stores;
+    }
+
+
+    public Collection<StoreRef> getSupportedStores()
+    {
+        Collection<StoreRef> stores = null;
         if (implementation instanceof StoreRedirector)
         {
             stores = ((StoreRedirector)implementation).getSupportedStores();
         }
         return stores;
     }
+    
+    
 
 }

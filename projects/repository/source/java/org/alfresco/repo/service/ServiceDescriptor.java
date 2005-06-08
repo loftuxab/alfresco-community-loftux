@@ -1,7 +1,5 @@
 package org.alfresco.repo.service;
 
-import java.util.Collection;
-
 import org.alfresco.repo.ref.QName;
 
 
@@ -11,7 +9,7 @@ import org.alfresco.repo.ref.QName;
  * @author David Caruana
  *
  */
-public interface ServiceDescriptor
+public interface ServiceDescriptor extends StoreRedirector
 {
     /**
      * @return  the name of the service
@@ -27,9 +25,4 @@ public interface ServiceDescriptor
      * @return  the service interface
      */
     public Class getInterface();
-
-    /**
-     * @return  the store types supported by the service (or null, if not applicable)
-     */
-    public Collection<String> getSupportedStores();
 }

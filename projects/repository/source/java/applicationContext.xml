@@ -145,7 +145,7 @@
       <property name="defaultBinding">
          <ref bean="indexingNodeService"></ref>
       </property>
-      <property name="redirectedBindings">
+      <property name="redirectedProtocolBindings">
          <map>
             <entry key="workspace"><ref bean="indexingNodeService"></ref></entry>
             <entry key="versionStore"><ref bean="lightWeightVersionStoreNodeService"></ref></entry>

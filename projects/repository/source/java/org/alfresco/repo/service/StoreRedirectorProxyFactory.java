@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.repo.ref.NodeRef;
@@ -15,21 +16,21 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-
 /**
- * This factory provides component redirection based on Store or Node
- * References passed into the component.
- *
- * Redirection is driven by StoreRef and NodeRef parameters.  If none
- * are given in the method call, the default component is called.  Otherwise,
- * the store type is extracted from these parameters and the appropriate
- * component called for the store type. 
+ * This factory provides component redirection based on Store or Node References
+ * passed into the component.
+ * 
+ * Redirection is driven by StoreRef and NodeRef parameters. If none are given
+ * in the method call, the default component is called. Otherwise, the store
+ * type is extracted from these parameters and the appropriate component called
+ * for the store type.
  * 
  * An error is thrown if multiple store types are found.
  * 
  * @author David Caruana
- *
- * @param <I>  The component interface class
+ * 
+ * @param <I>
+ *            The component interface class
  */
 public class StoreRedirectorProxyFactory<I> implements FactoryBean, InitializingBean
 {
@@ -38,21 +39,24 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
 
     // The component interface class
     private Class<I> proxyInterface = null;
-    
+
     // The default component binding
-    private I binding = null;
-    
+    private I defaultBinding = null;
+
     // The map of store types to component bindings
-    private Map<String, I> redirectedBindings = null; 
+    private Map<String, I> redirectedProtocolBindings = null;
+
+    // the map if more specific store Refs to component bindings
+    private Map<StoreRef, I> redirectedStoreBindings = null;
 
     // The proxy responsible for redirection based on store type
     private I redirectorProxy = null;
 
-
     /**
      * Sets the proxy interface
      * 
-     * @param proxyInterface  the proxy interface
+     * @param proxyInterface
+     *            the proxy interface
      */
     public void setProxyInterface(Class<I> proxyInterface)
     {
@@ -62,41 +66,62 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
     /**
      * Sets the default component binding
      * 
-     * @param binding  the component to call by default
+     * @param binding
+     *            the component to call by default
      */
-    public void setDefaultBinding(I binding)
+    public void setDefaultBinding(I defaultBinding)
     {
-        this.binding = binding;
+        this.defaultBinding = defaultBinding;
     }
-    
-    /**
-     * Sets the binding of store type to component
-     * 
-     * @param bindings  the bindings
-     */
-    public void setRedirectedBindings(Map<String, I> bindings)
-    {
-        this.redirectedBindings = bindings;
-    }
-    
 
-    /* (non-Javadoc)
+    /**
+     * Sets the binding of store type (protocol string) to component
+     * 
+     * @param bindings
+     *            the bindings
+     */
+    public void setRedirectedProtocolBindings(Map<String, I> protocolBindings)
+    {
+        this.redirectedProtocolBindings = protocolBindings;
+    }
+
+    /**
+     * Sets the binding of store type (protocol string) to component
+     * 
+     * @param bindings
+     *            the bindings
+     */
+    public void setRedirectedStoreBindings(Map<String, I> storeBindings)
+    {
+        redirectedStoreBindings = new HashMap<StoreRef, I>(storeBindings.size());
+        for(String ref: storeBindings.keySet())
+        {
+            redirectedStoreBindings.put(new StoreRef(ref), storeBindings.get(ref));
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
-    public void afterPropertiesSet()
-        throws ServiceException
+    public void afterPropertiesSet() throws ServiceException
     {
         ParameterCheck.mandatory("Proxy Interface", proxyInterface);
-        ParameterCheck.mandatory("Default Binding", binding);
-        ParameterCheck.mandatory("Redirected Bindings", binding);
+        ParameterCheck.mandatory("Default Binding", defaultBinding);
+        // / Nothing is mandatory as it can fall back to the default
+        // implementation
+        // ParameterCheck.mandatory("Redirected Protocol Bindings",
+        // redirectedProtocolBindings);
 
         // Setup the redirector proxy
-        this.redirectorProxy = (I)Proxy.newProxyInstance(proxyInterface.getClassLoader(), 
-                new Class[] {proxyInterface, StoreRedirector.class}, new RedirectorInvocationHandler());
+        this.redirectorProxy = (I) Proxy
+                .newProxyInstance(proxyInterface.getClassLoader(), new Class[] { proxyInterface, StoreRedirector.class }, new RedirectorInvocationHandler());
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.beans.factory.FactoryBean#getObject()
      */
     public I getObject()
@@ -104,7 +129,9 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
         return redirectorProxy;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.beans.factory.FactoryBean#getObjectType()
      */
     public Class getObjectType()
@@ -112,7 +139,9 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
         return proxyInterface;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.beans.factory.FactoryBean#isSingleton()
      */
     public boolean isSingleton()
@@ -120,94 +149,111 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
         return true;
     }
 
-    
     /**
      * Invocation handler that redirects based on store type
      */
-    /*package*/ class RedirectorInvocationHandler
-        implements InvocationHandler, StoreRedirector
+    /* package */class RedirectorInvocationHandler implements InvocationHandler, StoreRedirector
     {
-        /* (non-Javadoc)
-         * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
+         *      java.lang.reflect.Method, java.lang.Object[])
          */
-        public Object invoke(Object proxy, Method method, Object[] args)
-            throws Throwable
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
             // Handle StoreRedirector Interface
             if (method.getDeclaringClass().equals(StoreRedirector.class))
             {
                 return method.invoke(this, args);
             }
-            
-            // Otherwise, determine the apropriate implementation to invoke for the service interface method
+
+            // Otherwise, determine the apropriate implementation to invoke for
+            // the service interface method
             Object binding = null;
-            String storeType = getStoreType(args);
-            if (storeType == null)
+            StoreRef storeRef = getStoreRef(args);
+            if (storeRef == null)
             {
-                binding = StoreRedirectorProxyFactory.this.binding;
+                binding = StoreRedirectorProxyFactory.this.defaultBinding;
             }
             else
             {
-                binding = StoreRedirectorProxyFactory.this.redirectedBindings.get(storeType);
-                if (binding ==  null)
+                if (StoreRedirectorProxyFactory.this.redirectedStoreBindings != null)
                 {
-                    throw new ServiceException("Store type " + storeType + " is not supported");
+                    binding = StoreRedirectorProxyFactory.this.redirectedStoreBindings.get(storeRef);
+                }
+                if ((binding == null) && (StoreRedirectorProxyFactory.this.redirectedProtocolBindings != null))
+                {
+                    binding = StoreRedirectorProxyFactory.this.redirectedProtocolBindings.get(storeRef.getProtocol());
+                }
+                if (binding == null)
+                {
+                    binding = StoreRedirectorProxyFactory.this.defaultBinding;
+                }
+                if (binding == null)
+                {
+                    throw new ServiceException("Store type " + storeRef + " is not supported");
                 }
             }
-            
+
             if (logger.isDebugEnabled())
-                logger.debug("Redirecting method " + method + " to binding " + binding + " based on store type " + storeType);
-            
+                logger.debug("Redirecting method " + method + " to binding " + binding + " based on store type " + storeRef);
+
             // Invoke the implementation
             return method.invoke(binding, args);
         }
 
-        
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see org.alfresco.repo.service.ServiceDescriptor#getSupportedStores()
          */
-        public Collection<String> getSupportedStores()
+        public Collection<String> getSupportedStoreProtocols()
         {
-            return Collections.unmodifiableCollection(StoreRedirectorProxyFactory.this.redirectedBindings.keySet());
+            return Collections.unmodifiableCollection(StoreRedirectorProxyFactory.this.redirectedProtocolBindings.keySet());
         }
-        
+
+        public Collection<StoreRef> getSupportedStores()
+        {
+            return Collections.unmodifiableCollection(StoreRedirectorProxyFactory.this.redirectedStoreBindings.keySet());
+        }
 
         /**
          * Determine store type from array of method arguments
          * 
-         * @param args  the method arguments
-         * @return  the store type (or null, if one is not specified)
+         * @param args
+         *            the method arguments
+         * @return the store type (or null, if one is not specified)
          */
-        private String getStoreType(Object[] args)
+        private StoreRef getStoreRef(Object[] args)
         {
-            String storeType = null;
-            
+            StoreRef storeRef = null;
+
             for (Object arg : args)
             {
                 // Extract store type from argument, if store type provided
-                String argStoreType = null;
+                StoreRef argStoreRef = null;
                 if (arg instanceof NodeRef)
                 {
-                    argStoreType = ((NodeRef)arg).getStoreRef().getProtocol();
+                    argStoreRef = ((NodeRef) arg).getStoreRef();
                 }
                 else if (arg instanceof StoreRef)
                 {
-                    argStoreType = ((StoreRef)arg).getProtocol();
+                    argStoreRef = ((StoreRef) arg);
                 }
-                
+
                 // Only allow one store type
-				if (argStoreType != null)
-				{
-					if (storeType != null && !storeType.equals(argStoreType))
-					{
-	                    throw new ServiceException("Multiple store types are not supported - types " + storeType + " and " + argStoreType + " passed");
-					}
-                    storeType = argStoreType;
-				}
+                if (argStoreRef != null)
+                {
+                    if (storeRef != null && !storeRef.equals(argStoreRef))
+                    {
+                        throw new ServiceException("Multiple store types are not supported - types " + storeRef + " and " + argStoreRef + " passed");
+                    }
+                    storeRef = argStoreRef;
+                }
             }
-            
-            return storeType;
+
+            return storeRef;
         }
     }
-
 }
