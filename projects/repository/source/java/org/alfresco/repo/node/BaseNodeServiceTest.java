@@ -535,14 +535,19 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testProperties() throws Exception
     {
         QName qnameProperty1 = QName.createQName("PROPERTY1");
+        String valueProperty1 = "VALUE1";
         QName qnameProperty2 = QName.createQName("PROPERTY2");
+        String valueProperty2 = "VALUE2";
+        QName qnameProperty3 = QName.createQName("PROPERTY3");
         
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-        properties.put(qnameProperty1, "VALUE1");
+        properties.put(qnameProperty1, valueProperty1);
         // add some properties to the root node
         nodeService.setProperties(rootNodeRef, properties);
         // set a single property
-        nodeService.setProperty(rootNodeRef, qnameProperty2, "VALUE2");
+        nodeService.setProperty(rootNodeRef, qnameProperty2, valueProperty2);
+        // set a null property
+        nodeService.setProperty(rootNodeRef, qnameProperty3, null);
         
         // force a flush
         getSession().flush();
@@ -551,8 +556,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // now get them back
         Map<QName, Serializable> checkMap = nodeService.getProperties(rootNodeRef);
         assertNotNull("Properties were not set/retrieved", checkMap);
-        assertNotNull("Property value not set", checkMap.get(qnameProperty1));
-        assertNotNull("Property value not set", checkMap.get(qnameProperty2));
+        assertEquals("Property value incorrect", valueProperty1, checkMap.get(qnameProperty1));
+        assertEquals("Property value incorrect", valueProperty2, checkMap.get(qnameProperty2));
+        assertTrue("Null property not persisted", checkMap.containsKey(qnameProperty3));
+        assertNull("Null value not persisted correctly", checkMap.get(qnameProperty3));
         
         // get a single property direct from the node
         Serializable valueCheck = nodeService.getProperty(rootNodeRef, qnameProperty2);

@@ -157,7 +157,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         NodeKey nodeKey = new NodeKey(store.getKey(), GUID.generate());
         node.setKey(nodeKey);
         node.setStore(store);
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_BASE);
+        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CMOBJECT);
         
         // add some aspects
         QName aspect1 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "1");
@@ -191,7 +191,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         NodeKey sourceKey = new NodeKey(store.getKey(), GUID.generate());
         sourceNode.setKey(sourceKey);
         sourceNode.setStore(store);
-        sourceNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_BASE);
+        sourceNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CMOBJECT);
         Serializable realNodeKey = getSession().save(sourceNode);
         
         // make a container node

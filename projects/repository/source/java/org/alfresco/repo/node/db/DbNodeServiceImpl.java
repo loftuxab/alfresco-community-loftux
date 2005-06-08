@@ -640,6 +640,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             String key = (String) entry.getKey();
             Serializable value = (Serializable) entry.getValue();
+            // check if the property is a null
+            if (value instanceof DbNodeServiceImpl.NullPropertyValue)
+            {
+                value = null;
+            }
             QName qname = QName.createQName(key.toString());
             // copy across
             ret.put(qname, value);
@@ -651,7 +656,14 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Node node = getNodeNotNull(nodeRef);
         Map<String, Serializable> properties = node.getProperties();
-        return properties.get(qname.toString());
+        Serializable value = properties.get(qname.toString());
+        // check if the property is a null
+        if (value instanceof DbNodeServiceImpl.NullPropertyValue)
+        {
+            value = null;
+        }
+        // done
+        return value;
     }
 
     /**
@@ -659,6 +671,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      * property values to the <code>Node</code>.
      * <p>
      * Null-valued properties are removed.
+     * <p>
+     * If any of the values are null, a marker object is put in to mimic nulls.  They will be turned back into
+     * a real nulls when the properties are requested again.
      * 
      * @see #checkProperties(ClassDefinition, List<AspectDefinition>, Map<QName,Serializable>)
      * @see Node#getProperties()
@@ -688,11 +703,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         for (QName qname : properties.keySet())
         {
             Serializable value = properties.get(qname);
-          //  if (value == null)
-          //  {
-          //      throw new IllegalArgumentException("Property values may not be null: " + qname);
-          //  }
-            nodeProperties.put(qname.toString(), properties.get(qname));
+            // if the value is null, it gets replaced with a dummy serializable
+            if (value == null)
+            {
+                value = new DbNodeServiceImpl.NullPropertyValue();
+            }
+            nodeProperties.put(qname.toString(), value);
         }
 
 		// Invoke policy behaviours
@@ -700,18 +716,29 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     }
 
     /**
-     * Null values are not allowed for properties - hence no checking is done against
-     * the node type definition as this is only an addition or modification of a
-     * property.
+     * Gets the properties map, sets the value (null is allowed) and checks that the new set
+     * of properties is valid.
+     * <p>
+     * If the value is null, a marker object is put in to mimic a null.  It will be turned back into
+     * a real null when the property is requested again.
+     * 
+     * @see DbNodeServiceImpl.NullPropertyValue
      */
     public void setProperty(NodeRef nodeRef, QName qname, Serializable value) throws InvalidNodeRefException
     {
+        Assert.notNull(qname);
+        
+        // if the value is null, it gets replaced with a dummy serializable
+        if (value == null)
+        {
+            value = new DbNodeServiceImpl.NullPropertyValue();
+        }
+        
 		// Invoke policy behaviours
 		invokeBeforeUpdateNode(nodeRef);
 		
         Node node = getNodeNotNull(nodeRef);
         Map<String, Serializable> properties = node.getProperties();
-        // Null value means remove property
         properties.put(qname.toString(), value);
 
 		// Invoke policy behaviours
@@ -937,18 +964,18 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // does the current node have a root aspect?
         boolean isRoot = hasAspect(currentNodeRef, DictionaryBootstrap.ASPECT_QNAME_ROOT);
         
-        // look for a root.  If we only want the primary root, then ignore all but the
-        // top-level root.
+        // look for a root.  If we only want the primary root, then ignore all but the top-level root.
         if (isRoot && !(primaryOnly && hasParents))  // exclude primary search with parents present
         {
             // create a one-sided assoc ref for the root node and prepend to the stack
-            CodeMonkey.todo("Fix hack where we pass in the node type where the assoc qname is not available");
-            CodeMonkey.issue("Why is the root node of the entire store being used here - what about virtual roots?");
+            // this effectively spoofs the fact that the current node is not below the root
+            // - we put this assoc in as the first assoc in the path must be a one-sided
+            //   reference pointing to the root node
             ChildAssocRef assocRef = new ChildAssocRef(
                     null,
                     null,
-                    getType(currentNodeRef),   // TODO:  Fix this hack - no assoc therefore there is no assoc qname
-                    getRootNode(currentNode.getNodeRef().getStoreRef()));  // TODO: what about virtual roots?
+                    null,
+                    getRootNode(currentNode.getNodeRef().getStoreRef()));
             // create a path to save and add the 'root' assoc
             Path pathToSave = new Path();
             Path.ChildAssocElement first = null;
@@ -965,10 +992,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             }
             if (first != null)
             {
-                CodeMonkey.todo("Replace Path.ChildAssocElement with something more appropriate to the data required");
-                // TODO: This is a misuse of ChildAssocRef - fix update ChildAssocElement to carry the correct data
+                // mimic an association that would appear if the current node was below
+                // the root node
                 ChildAssocRef updateAssocRef = new ChildAssocRef(
-                       null,
+                       DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN,
                        getRootNode(currentNode.getNodeRef().getStoreRef()),
                        first.getRef().getQName(),
                        first.getRef().getChildRef());
@@ -978,8 +1005,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             
             Path.Element element = new Path.ChildAssocElement(assocRef);
             pathToSave.prepend(element);
-            // append the current path elements onto the 'root' assoc
-            //pathToSave.append(currentPath);
+            
+            // store the path just built
             completedPaths.add(pathToSave);
         }
 
@@ -1012,6 +1039,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             QName qname = assoc.getQName();
             NodeRef childRef = assoc.getChild().getNodeRef();
             boolean isPrimary = assoc.getIsPrimary();
+            // build a real association reference
             ChildAssocRef assocRef = new ChildAssocRef(assoc.getTypeQName(), parentRef, qname, childRef, isPrimary, -1);
             CodeMonkey.issue("Is ordering relevant here?");  // TODO: consider ordering
             Path.Element element = new Path.ChildAssocElement(assocRef);
@@ -1074,5 +1102,13 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // done
         return Collections.unmodifiableCollection(paths);
+    }
+    
+    /**
+     * Simple marker class to allow setting and retrieval of null property values. 
+     */
+    private static class NullPropertyValue implements Serializable
+    {
+        private static final long serialVersionUID = 3977860683100664115L;
     }
 }

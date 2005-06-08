@@ -145,7 +145,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		// Regiseter the serial version label behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "calculateVersionLabel"),
-				DictionaryBootstrap.TYPE_QNAME_BASE,
+				DictionaryBootstrap.TYPE_QNAME_CMOBJECT,
 				new JavaBehaviour(new SerialVersionLabelPolicy(), "calculateVersionLabel"));
 	}
     

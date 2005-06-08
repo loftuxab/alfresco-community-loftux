@@ -228,7 +228,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
 	{
 		Version version = this.lightWeightVersionStoreVersionService.getCurrentVersion(nodeRef);		
 		SerialVersionLabelPolicy policy = new SerialVersionLabelPolicy();
-		return policy.calculateVersionLabel(DictionaryBootstrap.TYPE_QNAME_BASE, version, versionNumber, versionProperties);
+		return policy.calculateVersionLabel(DictionaryBootstrap.TYPE_QNAME_CMOBJECT, version, versionNumber, versionProperties);
 	}
     
     /**

@@ -11,7 +11,7 @@ import org.alfresco.repo.ref.QName;
 public class DictionaryBootstrap
 {   
     // Base type constants
-    public static final QName TYPE_QNAME_BASE = QName.createQName(NamespaceService.ALFRESCO_URI, "cmobject");
+    public static final QName TYPE_QNAME_CMOBJECT = QName.createQName(NamespaceService.ALFRESCO_URI, "cmobject");
     public static final QName PROP_QNAME_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
     
     // Referenceable aspect constants
@@ -31,7 +31,7 @@ public class DictionaryBootstrap
 	
     // Container type constants
     public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ALFRESCO_URI, "container");
-    public static final QName CHILD_ASSOC_CONTENTS = QName.createQName(NamespaceService.ALFRESCO_URI, "contents");
+    public static final QName CHILD_ASSOC_QNAME_CHILDREN = QName.createQName(NamespaceService.ALFRESCO_URI, "children");
 
     // Content type and aspect constants
     public static final QName PROP_QNAME_CONTENT_URL = QName.createQName(NamespaceService.ALFRESCO_URI, "contentUrl");

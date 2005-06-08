@@ -231,10 +231,10 @@ public interface NodeService
     
     /**
      * Set the values of all properties to be an <code>Serializable</code> instances.
-     * Use this method to remove unwanted properties.  The properties given must still
-     * fulfill the requirements of the class and aspects relevant to the node.
+     * The properties given must still fulfill the requirements of the class and
+     * aspects relevant to the node.
      * <p>
-     * <b>NOTE:</b> Null values are not allowed.
+     * <b>NOTE:</b> Null values <u>are</u> allowed.
      * 
      * @param nodeRef
      * @param properties all the properties of the node keyed by their qualified names
@@ -247,7 +247,7 @@ public interface NodeService
      * To remove a property value, use {@link #getProperties(NodeRef)}, remove the
      * value and call {@link #setProperties(NodeRef, Map<QName,Serializable>)}.
      * <p>
-     * <b>NOTE:</b> Null values are not allowed.
+     * <b>NOTE:</b> Null values <u>are</u> allowed.
      * 
      * @param nodeRef
      * @param qname the fully qualified name of the property

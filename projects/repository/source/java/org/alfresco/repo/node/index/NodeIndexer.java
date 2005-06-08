@@ -48,19 +48,19 @@ public class NodeIndexer
     {
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateStore"),
-                DictionaryBootstrap.TYPE_QNAME_BASE,
+                this,
                 new JavaBehaviour(this, "onCreateStore"));   
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
-                DictionaryBootstrap.TYPE_QNAME_BASE,
+                DictionaryBootstrap.TYPE_QNAME_CMOBJECT,
                 new JavaBehaviour(this, "onCreateNode"));   
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateNode"),
-                DictionaryBootstrap.TYPE_QNAME_BASE,
+                DictionaryBootstrap.TYPE_QNAME_CMOBJECT,
                 new JavaBehaviour(this, "onUpdateNode"));   
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onNode"),
-                DictionaryBootstrap.TYPE_QNAME_BASE,
+                DictionaryBootstrap.TYPE_QNAME_CMOBJECT,
                 new JavaBehaviour(this, "onUpdateNode"));   
         policyComponent.bindAssociationBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"),
