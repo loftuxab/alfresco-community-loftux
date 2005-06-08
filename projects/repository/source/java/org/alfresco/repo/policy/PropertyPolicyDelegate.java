@@ -2,6 +2,7 @@ package org.alfresco.repo.policy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
@@ -118,7 +119,7 @@ public class PropertyPolicyDelegate<P extends PropertyPolicy>
         // TODO
         CodeMonkey.issue("Pass in the required types rather than having a dependency on the NodeService");
         
-		Collection<P> result = new ArrayList<P>();
+		Collection<P> result = new HashSet<P>();
 		
 		// Get the behaviour for the node's type
 		QName classQName = nodeService.getType(nodeRef);

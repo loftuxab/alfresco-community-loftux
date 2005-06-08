@@ -1,7 +1,7 @@
 package org.alfresco.repo.policy;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
@@ -112,7 +112,7 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
 	{
         CodeMonkey.issue("Separate this node from the NodeService by passing in the required info");
         
-		Collection<P> result = new ArrayList<P>();
+		Collection<P> result = new HashSet<P>();
 		
 		// Get the behaviour for the node's type
 		QName classQName = nodeService.getType(nodeRef);

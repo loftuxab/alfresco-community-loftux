@@ -1,7 +1,7 @@
 package org.alfresco.repo.policy;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
@@ -119,7 +119,7 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
         // handle the NodeRef given
         CodeMonkey.todo("The required information should be passed in the separate this class from NodeService"); // TODO
         
-		Collection<P> result = new ArrayList<P>();
+		Collection<P> result = new HashSet<P>();
 		
 		// Get the behaviour for the node's type
 		QName classQName = nodeService.getType(nodeRef);
