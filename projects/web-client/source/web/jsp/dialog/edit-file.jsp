@@ -112,12 +112,12 @@
                                     <tr>
                                        <td class="mainSubText">
                                           You may want to:
-                                          <p>
+                                          <div style="padding-top:6px"></div>
                                           &nbsp;&nbsp;
                                           <a:actionLink value="#{msg.checkout_document}" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
                                              <f:param name="id" value="#{CheckinCheckoutBean.document.id}" />
                                           </a:actionLink>
-                                          <p>
+                                          <div style="padding-top:6px"></div>
                                           Hint: Check out a document to lock it and prevent other users from editing it. When you check out a document a copy is made for you to work with. When you have finished editing the copy you need to check it in to release the lock and allow other users to view the changes.
                                        </td>
                                     </tr>
