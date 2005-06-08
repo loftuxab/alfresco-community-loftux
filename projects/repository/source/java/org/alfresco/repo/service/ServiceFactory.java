@@ -16,7 +16,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @author David Caruana
  *
  */
-/*package*/ class ServiceFactory 
+public class ServiceFactory 
     implements FactoryBean, BeanNameAware, InitializingBean, ServiceDescriptor
 {
     // Namespace Service

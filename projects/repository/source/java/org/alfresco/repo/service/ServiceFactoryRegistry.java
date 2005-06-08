@@ -26,7 +26,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  * 
  * @author David Caruana
  */
-/*package*/ class ServiceFactoryRegistry
+public class ServiceFactoryRegistry
     implements BeanFactoryAware, BeanFactoryPostProcessor, ServiceRegistry
 {
     // Bean Factory within which the registry lives

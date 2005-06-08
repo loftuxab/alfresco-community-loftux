@@ -31,7 +31,7 @@ import org.springframework.beans.factory.InitializingBean;
  *
  * @param <I>  The component interface class
  */
-/*package*/ class StoreRedirectorProxyFactory<I> implements FactoryBean, InitializingBean
+public class StoreRedirectorProxyFactory<I> implements FactoryBean, InitializingBean
 {
     // Logger
     private static final Log logger = LogFactory.getLog(StoreRedirectorProxyFactory.class);
