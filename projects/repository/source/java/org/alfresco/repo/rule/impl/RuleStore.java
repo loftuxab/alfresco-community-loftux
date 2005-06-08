@@ -182,7 +182,7 @@ import org.alfresco.repo.rule.RuleType;
             // Create the rule content node
             ruleContent = this.nodeService.createNode(
                     configFolder, 
-                    null, 
+					DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
                     DictionaryBootstrap.TYPE_QNAME_RULE_CONTENT,
                     properties).getChildRef();

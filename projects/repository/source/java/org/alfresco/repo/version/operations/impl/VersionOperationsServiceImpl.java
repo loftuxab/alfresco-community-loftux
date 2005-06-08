@@ -190,8 +190,8 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 		// Find the primary parent in order to determine where to put the copy
 		ChildAssocRef childAssocRef = this.nodeService.getPrimaryParent(nodeRef);
 		
-		//TODO The destination assoc type qname should come from the child assoc ref.
-		return checkout(nodeRef, childAssocRef.getParentRef(), null, childAssocRef.getQName());		
+		// Checkout the working copy to the same destination
+		return checkout(nodeRef, childAssocRef.getParentRef(), childAssocRef.getTypeQName(), childAssocRef.getQName());		
 	}
 
 	/**

@@ -49,14 +49,14 @@ public class RuleServiceSystemTest extends BaseSpringTest
         // Create the node used for tests
         this.nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-                null,
+				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         
         // Create the config folder
         this.configFolder = this.nodeService.createNode(
                 this.rootNodeRef,
-                null,
+				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
     }
@@ -131,8 +131,8 @@ public class RuleServiceSystemTest extends BaseSpringTest
         {
             NodeRef nodeRef = this.nodeService.createNode(
                     this.nodeRef,
-                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+					QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+					QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                     DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
             assertTrue(this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));
         }

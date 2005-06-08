@@ -77,14 +77,14 @@ public class RuleBaseTest extends BaseSpringTest
         // Create the node used for tests
         this.nodeRef = this.nodeService.createNode(
                 rootNodeRef,
-                null,
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                 QName.createQName("{test}testnode"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         
         // Create the config folder
         this.configFolder = this.nodeService.createNode(
                 rootNodeRef,
-                null,
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                 QName.createQName("{test}configfolder"),
                 DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
     }

@@ -196,12 +196,14 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
                 }
                 
                 // Only allow one store type
-                if (storeType != null && argStoreType != null && !storeType.equals(argStoreType))
-                {
-                    throw new ServiceException("Multiple store types are not supported - types " + storeType + " and " + argStoreType + " passed");
-                }
-                
-                storeType = argStoreType;
+				if (argStoreType != null)
+				{
+					if (storeType != null && !storeType.equals(argStoreType))
+					{
+	                    throw new ServiceException("Multiple store types are not supported - types " + storeType + " and " + argStoreType + " passed");
+					}
+                    storeType = argStoreType;
+				}
             }
             
             return storeType;

@@ -76,7 +76,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
         
 		ChildAssocRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
-				null,
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
 				QName.createQName("{test}test"),
 				DictionaryBootstrap.TYPE_QNAME_CONTENT,
 				bagOfProps);
@@ -124,7 +124,11 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		// Check out the node
-		NodeRef workingCopy = this.versionOperationsService.checkout(this.nodeRef, this.rootNodeRef, null, QName.createQName("{test}workingCopy"));
+		NodeRef workingCopy = this.versionOperationsService.checkout(
+				this.nodeRef, 
+				this.rootNodeRef, 
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+				QName.createQName("{test}workingCopy"));
 		assertNotNull(workingCopy);
 		
 		// Ensure that the working copy and copy aspect has been applied

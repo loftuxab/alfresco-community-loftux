@@ -121,53 +121,6 @@ public class VersionStoreBaseTest extends BaseSpringTest
         InputStream is = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/version/lightweight/VersionStoreBaseTest_model.xml");
         M2Model model = M2Model.createModel(is);
         dictionaryDAO.putModel(model);
-        
-//        M2Model model = M2Model.createModel("test:versionstorebasetest");
-//        model.createNamespace(TEST_NAMESPACE, "test");
-//        model.createImport(NamespaceService.ALFRESCO_DICTIONARY_URI, "d");
-//        model.createImport(NamespaceService.ALFRESCO_URI, "alf");
-//        
-//		M2Type testType = model.createType("test:" + TEST_TYPE_QNAME.getLocalName());
-//		testType.setParentName("alf:" + DictionaryBootstrap.TYPE_QNAME_CONTAINER.getLocalName());
-//		
-//		M2Property prop1 = testType.createProperty("test:" + PROP_1.getLocalName());
-//        prop1.setType("d:text");
-//		prop1.setMandatory(true);
-//		prop1.setMultiValued(false);
-//		
-//		M2Property prop2 = testType.createProperty("test:" + PROP_2.getLocalName());
-//        prop2.setType("d:text");
-//		prop2.setMandatory(false);
-//		prop2.setMandatory(false);
-//
-//		M2Property prop3 = testType.createProperty("test:" + PROP_3.getLocalName());
-//        prop3.setType("d:text");
-//		prop3.setMandatory(false);
-//		prop3.setMandatory(false);
-//		
-//		M2ChildAssociation childAssoc = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_1.getLocalName());
-//        childAssoc.setTargetClassName("alf:base");
-//		childAssoc.setTargetMandatory(false);
-//		
-//		M2ChildAssociation childAssoc2 = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_2.getLocalName());
-//        childAssoc2.setTargetClassName("alf:base");
-//		childAssoc2.setTargetMandatory(false);
-//		
-//		M2Association assoc = testType.createAssociation("test:" + TEST_ASSOC.getLocalName());
-//        assoc.setTargetClassName("alf:base");
-//		assoc.setTargetMandatory(false);
-////		
-////		M2Aspect testAspect = this.metaModelDAO.createAspect(TEST_ASPECT_QNAME);
-////		
-////		M2Property prop3 = testAspect.createProperty(PROP3_MANDATORY);
-////		prop3.setMandatory(true);
-////		prop3.setMultiValued(false);
-////		
-////		M2Property prop4 = testAspect.createProperty(PROP4_OPTIONAL);
-////		prop4.setMandatory(false);
-////		prop4.setMultiValued(false);
-//        
-//        dictionaryDAO.putModel(model);
 	}
     
     /**
@@ -183,7 +136,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
         // Create node (this node has some content)
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
-                null, 
+                DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
                 QName.createQName("{test}MyVersionableNode"),
                 TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
@@ -199,7 +152,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
         // Add some children to the node
         NodeRef child1 = this.dbNodeService.createNode(
                 nodeRef,
-                null,
+				TEST_CHILD_ASSOC_1,
                 //QName.createQName("{test}ChildNode1"),
                 TEST_CHILD_ASSOC_1,
 				TEST_TYPE_QNAME,
@@ -209,7 +162,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
         this.versionableNodes.put(child1.getId(), child1);
         NodeRef child2 = this.dbNodeService.createNode(
                 nodeRef,
-                null,
+				TEST_CHILD_ASSOC_2,
                 //QName.createQName("{test}ChildNode2"),
                 TEST_CHILD_ASSOC_2,
 				TEST_TYPE_QNAME,
@@ -221,7 +174,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
         // Create a node that can be associated with the root node
         NodeRef assocNode = this.dbNodeService.createNode(
                 rootNodeRef,
-                null,
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                 QName.createQName("{test}MyAssocNode"),
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();

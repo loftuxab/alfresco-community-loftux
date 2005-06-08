@@ -53,9 +53,10 @@ public class ContentServiceImplTest extends VersionStoreBaseTest
         
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
-        
+        NodeRef versionNodeRef = version.getNodeRef();
+		
         // Get the content reader for the frozen node
-        ContentReader contentReader = this.contentService.getReader(version.getNodeRef());
+        ContentReader contentReader = this.contentService.getReader(versionNodeRef);
         assertNotNull(contentReader);
         assertEquals(TEST_CONTENT, contentReader.getContentString());
         
@@ -64,9 +65,10 @@ public class ContentServiceImplTest extends VersionStoreBaseTest
         assertNotNull(contentWriter);
         contentWriter.putContent(UPDATED_CONTENT);        
         Version version2 = createVersion(versionableNode, this.versionProperties);
-        
+        NodeRef version2NodeRef = version2.getNodeRef();
+		
         // Get the content reader for the new verisoned content
-        ContentReader contentReader2 = this.contentService.getReader(version2.getNodeRef());
+        ContentReader contentReader2 = this.contentService.getReader(version2NodeRef);
         assertNotNull(contentReader2);
         assertEquals(UPDATED_CONTENT, contentReader2.getContentString());
     }

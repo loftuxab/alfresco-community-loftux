@@ -141,12 +141,12 @@ public class RuleStoreTest extends RuleBaseTest
         {
             NodeRef nodeRef = this.nodeService.createNode(
                     rootNodeRef,
-                    null,
+					DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                     DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
             NodeRef configFolder = this.nodeService.createNode(
                     rootNodeRef,
-                    null,
+					DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                     DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
             this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE, null);

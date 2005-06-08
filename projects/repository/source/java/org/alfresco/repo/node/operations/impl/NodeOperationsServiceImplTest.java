@@ -147,7 +147,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Add a child that is primary
 		ChildAssocRef temp2 = this.nodeService.createNode(
 				rootNodeRef,
-				null,
+				TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}testNonPrimaryChild"),
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());

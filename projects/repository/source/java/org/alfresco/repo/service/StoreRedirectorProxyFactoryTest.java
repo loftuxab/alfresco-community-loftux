@@ -50,6 +50,8 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
         assertEquals("Type2:" + storeRef2 + "," + nodeRef2, result11);
         String result12 = service.mixedStoreNodeRef(null, null);
         assertEquals("Type1:null,null", result12);
+        String result13 = service.mixedStoreNodeRef(storeRef1, null);
+        assertEquals("Type1:" + storeRef1 + ",null", result13);
     }
 
     

@@ -75,7 +75,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         // Create node 
         this.nodeRef = this.nodeService.createNode(
                 rootNodeRef, 
-                null, 
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
                 QName.createQName("{}ParentNode"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
@@ -85,7 +85,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         // Create a node with no lockAspect
         this.noAspectNode = this.nodeService.createNode(
                 rootNodeRef, 
-                null, 
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
                 QName.createQName("{}noAspectNode"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER,
                 nodeProperties).getChildRef();
@@ -256,7 +256,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		// Check that we can create a new node and set of it properties when no lock is present
 		ChildAssocRef childAssocRef = this.nodeService.createNode(
 				this.nodeRef, 
-				null,
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
 				QName.createQName("{test}nodeServiceLockTest"),
 				DictionaryBootstrap.TYPE_QNAME_CONTAINER);
 		NodeRef nodeRef = childAssocRef.getChildRef();
@@ -265,7 +265,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		this.lockService.lock(this.nodeRef, GOOD_USER, LockType.WRITE_LOCK);
 		ChildAssocRef childAssocRef2 = this.nodeService.createNode(
 				this.nodeRef, 
-				null,				
+				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,				
 				QName.createQName("{test}nodeServiceLockTest"),
 				DictionaryBootstrap.TYPE_QNAME_CONTAINER);
 		NodeRef nodeRef2 = childAssocRef.getChildRef();
@@ -287,7 +287,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		{
 			this.nodeService.createNode(
 					this.nodeRef, 
-					null,
+					DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
 					QName.createQName("{test}nodeServiceLockTest"),
 					DictionaryBootstrap.TYPE_QNAME_CONTAINER);
 			fail("The parent is locked so a new child should not have been created.");

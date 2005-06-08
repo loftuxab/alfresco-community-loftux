@@ -278,7 +278,7 @@
                <ref bean="dictionaryService" />
             </constructor-arg>
             <constructor-arg>
-               <ref bean="dbNodeService" />
+               <ref bean="nodeService" />
             </constructor-arg>
             <constructor-arg>
                <ref bean="contentTransformerRegistry" />
@@ -421,8 +421,7 @@
       <property name="target">
          <bean class="org.alfresco.repo.lock.impl.LockServiceImpl" init-method="initialise">
             <property name="nodeService">
-               <!-- TODO This should point to the general node service -->	
-               <ref bean="dbNodeService" />
+                <ref bean="nodeService" />
             </property>     
 			<property name="policyComponent">
 				<ref bean="policyComponent"/>
@@ -451,18 +450,14 @@
       <property name="target">
          <bean class="org.alfresco.repo.version.lightweight.VersionServiceImpl" init-method="initialise">
              <property name="nodeService">
-             <!-- TODO This should point to the general node service -->	
-               <ref bean="dbNodeService" />
+				<ref bean="nodeService" />
              </property>
          	 <property name="dbNodeService">
-				   <ref bean="dbNodeService" />
+				<ref bean="dbNodeService" />
 			 </property>
 			 <property name="contentService">
 				<ref bean="contentService" />
 			 </property>			 	
-			 <!--<property name="versionContentStore">
-				<ref bean="lightWeightVersionStoreContentStore"/>
-			 </property>-->
 			 <property name="versionCounterDaoService">
 				<ref bean="versionCounterDaoService"/>
 			 </property>
@@ -603,7 +598,7 @@
                <ref bean="dictionaryService" />
             </property>
             <property name="nodeService">
-               <ref bean="dbNodeService" />
+               <ref bean="nodeService" />
             </property>    
 			<property name="policyComponent">
 				<ref bean="policyComponent"/>
@@ -631,7 +626,7 @@
       <property name="target">
          <bean class="org.alfresco.repo.version.operations.impl.VersionOperationsServiceImpl" init-method="init">
             <property name="nodeService">
-               <ref bean="dbNodeService" />
+               <ref bean="nodeService" />
             </property>
             <property name="versionService">
                <ref bean="lightWeightVersionStoreVersionService" />
@@ -809,7 +804,7 @@
 				<ref bean="repoConfigService"/>
 			</property>
 			<property name="nodeService">
-				<ref bean="indexingNodeService"/>
+				<ref bean="nodeService"/>
 			</property>
 			<property name="contentService">
 				<ref bean="contentService"/>
