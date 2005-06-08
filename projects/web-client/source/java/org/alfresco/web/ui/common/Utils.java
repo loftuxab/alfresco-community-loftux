@@ -180,6 +180,36 @@ public final class Utils
    }
    
    /**
+    * Remove all occurances of a String from a String
+    * 
+    * @param str     String to remove occurances from
+    * @param match   The string to remove
+    * 
+    * @return new String with occurances of the match removed
+    */
+   public static String remove(String str, String match)
+   {
+      int lastindex = 0;
+      int pos = str.indexOf(match);
+
+      // If no replacement needed, return the original string
+      // and save StringBuffer allocation/char copying
+      if (pos < 0)
+      {
+          return str;
+      }
+      
+      int len = match.length();
+      StringBuilder out = new StringBuilder(str.length());
+      for (; pos >= 0; pos = str.indexOf(match, lastindex = pos + len))
+      {
+          out.append(str.substring(lastindex, pos));
+      }
+      
+      return out.append(str.substring(lastindex, str.length())).toString();
+   }
+   
+   /**
     * Helper to output an attribute to the output stream
     * 
     * @param out        ResponseWriter

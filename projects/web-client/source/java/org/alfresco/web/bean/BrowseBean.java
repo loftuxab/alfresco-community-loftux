@@ -504,15 +504,13 @@ public class BrowseBean implements IContextListener
       if (text.indexOf(' ') == -1 ||
           (text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"'))
       {
-         text = text.replace('"', ' ');
          // simple single word text or whole phrase text search
-         contentQuery = " TEXT:\"" + text + '"';
+         contentQuery = " TEXT:\"" + Utils.remove(text, "\"") + '"';
       }
       else
       {
          // multiple word search
-         text = text.replace('"', ' ');
-         StringTokenizer t = new StringTokenizer(text, " ");
+         StringTokenizer t = new StringTokenizer(Utils.remove(text, "\""), " ");
          StringBuilder buf = new StringBuilder(64);
          buf.append('(');
          while (t.hasMoreTokens())
@@ -528,7 +526,16 @@ public class BrowseBean implements IContextListener
       }
       
       // match against the "name" attribute
-      String nameAttrQuery = " +@" + nameAttr + ":\"" + text + "*\"";
+      String nameAttrQuery;
+      if (text.indexOf(' ') != -1 ||
+          (text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"'))
+      {
+         nameAttrQuery = " +@" + nameAttr + ":\"" + Utils.remove(text, "\"") + "\"";
+      }
+      else
+      {
+         nameAttrQuery = " +@" + nameAttr + ":" + text + "*";
+      }
       
       // match against CONTENT type
       String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}content\"";
