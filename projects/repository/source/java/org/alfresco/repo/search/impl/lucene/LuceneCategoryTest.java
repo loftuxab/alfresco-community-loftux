@@ -40,7 +40,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class LuceneCategoryTest extends TestCase
 {    
-    public static final QName ASSOC_TYPE_QNAME = DictionaryBootstrap.ASSOC_QNAME_CONTAINS;
+    public static final QName ASSOC_TYPE_QNAME = DictionaryBootstrap.ASSOC_QNAME_CHILDREN;
     
     ApplicationContext ctx;
     NodeService nodeService;

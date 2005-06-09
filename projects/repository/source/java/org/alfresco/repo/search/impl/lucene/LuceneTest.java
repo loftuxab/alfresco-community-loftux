@@ -116,10 +116,10 @@ public class LuceneTest extends TestCase
         rootNodeRef = nodeService.getRootNode(storeRef);
 
         n1 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}one"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "value-1");
+        nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "ValueOne");
         n2 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}two"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "value-1");
-        nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "value-2");
+        nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "valueone");
+        nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "valuetwo");
 
         n3 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}three"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
 
@@ -392,7 +392,7 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher.getIndexLocation());
         searcher.setDictionaryService(dictionaryService);
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"value-2\"", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"valuetwo\"", null, null);
         results.close();
         luceneFTS.resume();
     }
@@ -465,7 +465,7 @@ public class LuceneTest extends TestCase
         searcher.setDictionaryService(dictionaryService);
         searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"value-2\"", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"valuetwo\"", null, null);
         simpleResultSetTest(results);
         
         ChildAssocRefResultSet r2 = new ChildAssocRefResultSet(nodeService, results.getNodeRefs(), null, false);
@@ -494,7 +494,7 @@ public class LuceneTest extends TestCase
         
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-1:\"value-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-1:\"valueone\"", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
         assertEquals(n1.getId(), results.getNodeRef(1).getId());
@@ -502,7 +502,7 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(1));
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@namespace\\:property\\-1:\"value-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@namespace\\:property\\-1:\"valueone\"", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
         assertEquals(n1.getId(), results.getNodeRef(1).getId());
@@ -510,13 +510,39 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(1));
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:\"value-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:\"valueone\"", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
         assertEquals(n1.getId(), results.getNodeRef(1).getId());
         assertEquals(1.0f, results.getScore(0));
         assertEquals(1.0f, results.getScore(1));
         results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:\"Valueone\"", null, null);
+        assertEquals(2, results.length());
+        assertEquals(n2.getId(), results.getNodeRef(0).getId());
+        assertEquals(n1.getId(), results.getNodeRef(1).getId());
+        assertEquals(1.0f, results.getScore(0));
+        assertEquals(1.0f, results.getScore(1));
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:ValueOne", null, null);
+        assertEquals(2, results.length());
+        assertEquals(n2.getId(), results.getNodeRef(0).getId());
+        assertEquals(n1.getId(), results.getNodeRef(1).getId());
+        assertEquals(1.0f, results.getScore(0));
+        assertEquals(1.0f, results.getScore(1));
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:valueone", null, null);
+        assertEquals(2, results.length());
+        assertEquals(n2.getId(), results.getNodeRef(0).getId());
+        assertEquals(n1.getId(), results.getNodeRef(1).getId());
+        assertEquals(1.0f, results.getScore(0));
+        assertEquals(1.0f, results.getScore(1));
+        results.close();
+        
+        
 
         QName qname = QName.createQName("", "property-1");
 
@@ -542,7 +568,7 @@ public class LuceneTest extends TestCase
         assertEquals(new ChildAssocRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2), results.getRow(0).getChildAssocRef());
         assertEquals(n2, results.getRow(0).getNodeRef());
         assertEquals(QName.createQName("{namespace}two"), results.getRow(0).getQName());
-        assertEquals("value-2", results.getRow(0).getValue(QName.createQName("{namespace}property-2")));
+        assertEquals("valuetwo", results.getRow(0).getValue(QName.createQName("{namespace}property-2")));
         for(ResultSetRow row: results)
         {
             assertNotNull(row);
@@ -558,7 +584,7 @@ public class LuceneTest extends TestCase
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "@\\{namespace\\}property-1:value-1", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "@\\{namespace\\}property-1:valueone", null, null);
         try
         {
             assertEquals(2, results.length());

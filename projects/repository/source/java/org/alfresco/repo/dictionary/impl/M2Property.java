@@ -20,7 +20,7 @@ public class M2Property
     private boolean isIndexed = true;
     private boolean isIndexedAtomically = true;
     private boolean isStoredInIndex = false;
-    private boolean isTokenisedInIndex = false;
+    private boolean isTokenisedInIndex = true;
     
 
     /*package*/ M2Property()

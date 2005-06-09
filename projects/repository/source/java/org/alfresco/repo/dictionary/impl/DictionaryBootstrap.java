@@ -28,6 +28,7 @@ public class DictionaryBootstrap
 	 // Working copy aspect contants
 	 public static final String ASPECT_NAME_WORKING_COPY = "workingcopy";
 	 public static final QName ASPECT_QNAME_WORKING_COPY = QName.createQName(NamespaceService.ALFRESCO_URI, ASPECT_NAME_WORKING_COPY);
+  
 	
     // Container type constants
     public static final QName TYPE_QNAME_CONTAINER = QName.createQName(NamespaceService.ALFRESCO_URI, "container");
@@ -59,6 +60,7 @@ public class DictionaryBootstrap
     // Categories and roots
     
     public static final QName ASPECT_QNAME_ROOT = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_root");
+    public static final QName ASSOC_QNAME_CHILDREN =QName.createQName(NamespaceService.ALFRESCO_URI, "children");
     public static final QName ASPECT_QNAME_CLASSIFIABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "classifiable");
     //public static final QName ASPECT_QNAME_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_categorisation");
     //public static final QName ASPECT_QNAME_GEN_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_gen_categorisation");

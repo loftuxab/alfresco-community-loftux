@@ -1131,10 +1131,19 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             {
                                 for (Path path : nodeService.getPaths(catRef, false))
                                 {
-                                    if (path.first() instanceof Path.ChildAssocElement)
+                                    if (path.get(1) instanceof Path.ChildAssocElement)
                                     {
-                                        Path.ChildAssocElement cae = (Path.ChildAssocElement) path.first();
-                                        if ((cae.getRef().getParentRef() == null) && (cae.getRef().getQName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORYROOT)))
+                                        Path.ChildAssocElement cae = (Path.ChildAssocElement) path.get(1);
+                                        boolean isFakeRoot = true;
+                                        for(ChildAssocRef car : nodeService.getParentAssocs(cae.getRef().getChildRef()))
+                                        {
+                                            if(cae.getRef().equals(car))
+                                            {
+                                                isFakeRoot = false;
+                                                break;
+                                            }
+                                        }
+                                        if (isFakeRoot)
                                         {
                                             if (path.toString().indexOf(aspDef.getName().toString()) != -1)
                                             {

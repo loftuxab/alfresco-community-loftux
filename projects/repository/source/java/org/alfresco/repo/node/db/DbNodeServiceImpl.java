@@ -963,6 +963,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         boolean hasParents = parentAssocs.size() > 0;
         // does the current node have a root aspect?
         boolean isRoot = hasAspect(currentNodeRef, DictionaryBootstrap.ASPECT_QNAME_ROOT);
+        boolean isStoreRoot = currentNode.getTypeQName().equals(DictionaryBootstrap.TYPE_QNAME_STOREROOT);
         
         // look for a root.  If we only want the primary root, then ignore all but the top-level root.
         if (isRoot && !(primaryOnly && hasParents))  // exclude primary search with parents present
@@ -994,8 +995,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             {
                 // mimic an association that would appear if the current node was below
                 // the root node
+                // or if first beneath the root node it will make the real thing 
                 ChildAssocRef updateAssocRef = new ChildAssocRef(
-                       DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN,
+                       isStoreRoot ? DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN : first.getRef().getTypeQName(),
                        getRootNode(currentNode.getNodeRef().getStoreRef()),
                        first.getRef().getQName(),
                        first.getRef().getChildRef());
