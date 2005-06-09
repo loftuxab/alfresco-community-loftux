@@ -23,7 +23,7 @@ import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.RepoUtils;
+import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.springframework.web.jsf.FacesContextUtils;
@@ -186,7 +186,7 @@ public class UISpaceSelector extends UIInput
             }
             else
             {
-               NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), valueId);
+               NodeRef nodeRef = new NodeRef(Repository.getStoreRef(context), valueId);
                label = (String)getNodeService(context).getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME);
             }
             
@@ -236,7 +236,7 @@ public class UISpaceSelector extends UIInput
             UserTransaction tx = null;
             try
             {
-               tx = RepoUtils.getUserTransaction(context);
+               tx = Repository.getUserTransaction(context);
                tx.begin();
                
                buf.append("<table border=0 cellspacing=1 cellpadding=1");
@@ -262,7 +262,7 @@ public class UISpaceSelector extends UIInput
                   String id = null;
                   if (this.navigationId.equals(Application.getCurrentUser(context).getHomeSpaceId()) == false)
                   {
-                     ChildAssocRef parentRef = service.getPrimaryParent(new NodeRef(Repository.getStoreRef(), this.navigationId));
+                     ChildAssocRef parentRef = service.getPrimaryParent(new NodeRef(Repository.getStoreRef(context), this.navigationId));
                      id = parentRef.getParentRef().getId();
                   }
                   // render a link to the parent node
@@ -273,7 +273,7 @@ public class UISpaceSelector extends UIInput
                // display the children of the specified navigation node ID
                if (this.navigationId != null)
                {
-                  NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.navigationId);
+                  NodeRef nodeRef = new NodeRef(Repository.getStoreRef(context), this.navigationId);
                   
                   List<ChildAssocRef> childRefs = service.getChildAssocs(nodeRef);
                   for (int index=0; index<childRefs.size(); index++)
@@ -295,11 +295,11 @@ public class UISpaceSelector extends UIInput
                {
                   // no node set - special case so show the root node for our current user
                   String rootId = Application.getCurrentUser(context).getHomeSpaceId();
-                  NodeRef rootRef = new NodeRef(Repository.getStoreRef(), rootId);
+                  NodeRef rootRef = new NodeRef(Repository.getStoreRef(context), rootId);
                   buf.append("<tr><td><input type='radio' name='")
                      .append(clientId).append(OPTION).append("' value='")
                      .append(rootId).append("'/></td><td>");
-                  renderNodeLink(context, rootId, RepoUtils.getNameForNode(service, rootRef), buf);
+                  renderNodeLink(context, rootId, Repository.getNameForNode(service, rootRef), buf);
                   buf.append("</td></tr>");
                }
                
@@ -441,6 +441,10 @@ public class UISpaceSelector extends UIInput
       
       // label is the name of the child node assoc
       // TODO: get the NAME attribute here!
+      NodeRef childNodeRef = new NodeRef(id);
+      Node childNode = new Node(childNodeRef, getNodeService(context));
+      name = childNode.getName();
+      
       buf.append(Utils.encode(name));
       
       buf.append("</a>");
@@ -457,7 +461,7 @@ public class UISpaceSelector extends UIInput
     */
    private static NodeService getNodeService(FacesContext context)
    {
-      NodeService service = (NodeService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean(Repository.NODE_SERVICE);
+      NodeService service = (NodeService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean(Repository.BEAN_NODE_SERVICE);
       if (service == null)
       {
          throw new IllegalStateException("Unable to obtain NodeService bean reference.");

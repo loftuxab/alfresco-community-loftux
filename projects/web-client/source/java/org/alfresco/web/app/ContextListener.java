@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSessionEvent;
@@ -18,11 +19,12 @@ import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.util.Conversion;
-import org.alfresco.web.bean.repository.Node;
+import org.alfresco.repo.search.ResultSet;
+import org.alfresco.repo.search.Searcher;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
@@ -45,103 +47,170 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
    public void contextInitialized(ServletContextEvent event)
    {
       // make sure that the spaces store in the repository exists
-      WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(event.getServletContext());
-      NodeService nodeService = (NodeService)ctx.getBean(Repository.NODE_SERVICE);
-      //Searcher searchService = (Searcher)ctx.getBean(Repository.SEARCH_SERVICE);
-         
-      if (nodeService.exists(Repository.getStoreRef()) == false)
+      ServletContext servletContext = event.getServletContext();
+      WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+      NodeService nodeService = (NodeService)ctx.getBean(Repository.BEAN_NODE_SERVICE);
+      Searcher searchService = (Searcher)ctx.getBean(Repository.BEAN_SEARCH_SERVICE);
+
+      String repoStoreName = Application.getRepositoryStoreName(servletContext);
+      if (repoStoreName == null)
       {
-         // create the store
-         nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, Repository.REPOSITORY_STORE);
+         throw new Error("Repository store name has not been configured, is 'store-name' element missing?");
       }
       
-      // TODO: Use a search
-//      String actNs = NamespaceService.ALFRESCO_PREFIX;
-//      String s = "PATH:\"/" + actNs + ":" + companySpaceName + "\"";
-//      ResultSet results = searchService.query(Repository.getStoreRef(), "lucene", s, null, null);
-//      if (results.length() == 0)
-      
-      // see if the company home space is present
+      // check the repository exists, create if it doesn't
+      UserTransaction tx = null;
       String companySpaceId = null;
-      String companySpaceName = Application.COMPANY_SPACE_NAME;
-      boolean companySpaceFound = false;
-      List<ChildAssocRef> childRefs = nodeService.getChildAssocs(
-            nodeService.getRootNode(Repository.getStoreRef()));
-      for (ChildAssocRef ref: childRefs)
+      try
       {
-         QName qname = ref.getQName();
+         tx = (UserTransaction)ctx.getBean(Repository.BEAN_USER_TRANSACTION);
+         tx.begin();
          
-         // create our Node representation
-         Node node = new Node(ref.getChildRef(), nodeService);
-         
-         // look for Space aspect
-         if (node.getName().equals(qname.getLocalName()))
+         if (nodeService.exists(Repository.getStoreRef(servletContext)) == false)
          {
-            companySpaceFound = true;
-            companySpaceId = node.getId();
+            nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, repoStoreName);
             
             if (logger.isDebugEnabled())
-               logger.debug("Found existing company space with id: " + companySpaceId);
-            
-            break;
+               logger.debug("Created store with name: " + repoStoreName);
          }
-      }
       
-      // if we didn't find the company space, create it
-      if (!companySpaceFound)
-      {
-         UserTransaction tx = null;
-      
-         try
+         // see if the company home space is present
+         boolean companySpaceFound = false;
+         String companySpaceName = Application.getCompanyRootName(servletContext);
+         String companySpaceDescription = Application.getCompanyRootDescription(servletContext);
+         String glossaryFolderName = Application.getGlossaryFolderName(servletContext);
+         String templatesFolderName = Application.getTemplatesFolderName(servletContext);
+         
+         if (companySpaceName == null)
          {
-            tx = (UserTransaction)ctx.getBean(Repository.USER_TRANSACTION);
-            tx.begin();
+            throw new Error("Company root name has not been configured, is 'company-root-name' element missing?");
+         }
+         if (glossaryFolderName == null)
+         {
+            throw new Error("Glossary folder name has not been configured, is 'glossary-folder-name' element missing?");
+         }
+         if (templatesFolderName == null)
+         {
+            throw new Error("Templates folder name has not been configured, is 'templates-folder-name' element missing?");
+         }
             
-            // create the folder node
+         String xpath = NamespaceService.ALFRESCO_PREFIX + ":" + Repository.createValidQName(companySpaceName);
+         DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
+         resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+         List<ChildAssocRef> nodes = nodeService.selectNodes(nodeService.getRootNode(
+               Repository.getStoreRef(servletContext)), 
+               xpath, null, resolver, false);
+         if (nodes.size() > 0)
+         {
+            companySpaceFound = true;
+            companySpaceId = nodes.get(0).getChildRef().getId();
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Found company space with id: " + companySpaceId);
+         }
+         
+         // if we didn't find the company space, create it
+         // NOTE: This will eventually be performed by the install process, for now
+         //       we need to do it here
+         if (companySpaceFound == false)
+         {
+            // create the folder node to represent the company home
+            String qname = Repository.createValidQName(companySpaceName);
             ChildAssocRef assocRef = nodeService.createNode(
-                  nodeService.getRootNode(Repository.getStoreRef()),
+                  nodeService.getRootNode(Repository.getStoreRef(servletContext)),
                   DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, companySpaceName),
+                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
                   DictionaryBootstrap.TYPE_QNAME_FOLDER);
-            NodeRef nodeRef = assocRef.getChildRef();
-            companySpaceId = nodeRef.getId();
+            
+            NodeRef companyNodeRef = assocRef.getChildRef();
+            companySpaceId = companyNodeRef.getId();
 
             // set the name property on the node
-            nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, companySpaceName);
+            nodeService.setProperty(companyNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, companySpaceName);
 
             // apply the uifacets aspect - icon, title and description props
-            Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
+            Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(3);
             uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-default");
             uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, companySpaceName);
-            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, "The company root space");
-            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, companySpaceDescription);
+            nodeService.addAspect(companyNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
             
             // apply the auditable aspect - created and modified date
-            Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(5);
+            Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(2);
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
             auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
             auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-            nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+            nodeService.addAspect(companyNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+            
+            // now create the glossary system folder under the company space
+//            qname = Repository.createValidQName(glossaryFolderName);
+//            assocRef = nodeService.createNode(companyNodeRef, 
+//                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+//                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+//                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
+//            
+//            NodeRef glossaryNodeRef = assocRef.getChildRef();
+//
+//            // set the name property on the node
+//            nodeService.setProperty(glossaryNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, glossaryFolderName);
+//
+//            // apply the uifacets aspect - icon, title and description props
+//            uiFacetsProps = new HashMap<QName, Serializable>(2);
+//            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
+//            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, glossaryFolderName);
+//            nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+//            
+//            // apply the auditable aspect - created and modified date
+//            auditProps = new HashMap<QName, Serializable>(2);
+//            now = new Date( Calendar.getInstance().getTimeInMillis() );
+//            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
+//            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+//            nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+            
+//            // now create the templates system folder under the glossary folder
+//            qname = Repository.createValidQName(templatesFolderName);
+//            assocRef = nodeService.createNode(glossaryNodeRef, 
+//                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+//                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+//                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
+//            
+//            NodeRef templatesNodeRef = assocRef.getChildRef();
+//
+//            // set the name property on the node
+//            nodeService.setProperty(templatesNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, templatesFolderName);
+//
+//            // apply the uifacets aspect - icon, title and description props
+//            uiFacetsProps = new HashMap<QName, Serializable>(2);
+//            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
+//            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, templatesFolderName);
+//            nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+//            
+//            // apply the auditable aspect - created and modified date
+//            auditProps = new HashMap<QName, Serializable>(2);
+//            now = new Date( Calendar.getInstance().getTimeInMillis() );
+//            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
+//            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+//            nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
             
             // commit the transaction
             tx.commit();
             
             if (logger.isDebugEnabled())
-            logger.debug("Created company root space with id: " + companySpaceId);
+               logger.debug("Created company root space with id: " + companySpaceId);
          }
-         catch (Exception e)
-         {
-            // rollback the transaction
-            try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-            throw new AlfrescoRuntimeException("Failed to create company root space", e);
-         }
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new AlfrescoRuntimeException("Failed to initialise ", e);
       }
       
       // make sure the current user has the company space set as it's home space
-      Application.getCurrentUser(event.getServletContext()).setHomeSpaceId(companySpaceId);
+      Application.getCurrentUser(servletContext).setHomeSpaceId(companySpaceId);
       
       if (logger.isDebugEnabled())
-         logger.debug("Server is running in portal server: " + Application.inPortalServer(event.getServletContext()));
+         logger.debug("Server is running in portal server: " + Application.inPortalServer(servletContext));
    }
 
    /**

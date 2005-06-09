@@ -38,7 +38,7 @@ public class MimeTypeConverter extends DateTimeConverter
       if (value instanceof String)
       {
          MimetypeMap mimetypeMap = (MimetypeMap)FacesContextUtils.
-               getRequiredWebApplicationContext(context).getBean(Repository.MIMETYPE_MAP);
+               getRequiredWebApplicationContext(context).getBean(Repository.BEAN_MIMETYPE_MAP);
          
          result = mimetypeMap.getDisplaysByMimetype().get(value.toString());
       }

@@ -177,12 +177,8 @@
          <value>#{BrowseBean}</value>
       </managed-property>
       <managed-property>
-         <property-name>contentService</property-name>
-         <value>#{contentService}</value>
-      </managed-property>
-      <managed-property>
          <property-name>ruleService</property-name>
-         <value>#{RuleService}</value>
+         <value>#{ruleService}</value>
       </managed-property>
    </managed-bean>
    

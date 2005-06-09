@@ -643,6 +643,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                 catch (IndexerException e)
                 {
                     isPrepared = false;
+                    throw new IndexerException("Failed to prepare: requires rollback", e);
                 }
             }
         }

@@ -92,12 +92,15 @@ public class DictionaryBootstrap
 
     // Content type constants
     public static final QName TYPE_QNAME_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "content");
- 
+
     // expected application types
     public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "folder");
     public static final QName ASSOC_QNAME_CONTAINS = QName.createQName(NamespaceService.ALFRESCO_URI, "contains");
     public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ALFRESCO_URI, "file");
 
+    // system folder type
+    public static final QName TYPE_QNAME_SYTEM_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "systemfolder");
+    
     /**
      * Rule types and aspects
      */

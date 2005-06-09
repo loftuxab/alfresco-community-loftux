@@ -16,14 +16,13 @@
          <mode>servlet</mode>
          <error-page>/jsp/error.jsp</error-page>
       </server>
-      <!--
       <repository>
          <store-name>SpacesStore</store-name>
-         <company-root-path>/Company Home</company-root-path>
+         <company-root-name>Company Home</company-root-name>
+         <company-root-description>The company root space</company-root-description>
          <glossary-folder-name>Glossary</glossary-folder-name>
          <templates-folder-name>Templates</templates-folder-name>
       </repository>
-      -->
    </config>
    
    <config evaluator="node-type" condition="content">

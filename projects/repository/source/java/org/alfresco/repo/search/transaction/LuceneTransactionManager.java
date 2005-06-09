@@ -51,7 +51,7 @@ public class LuceneTransactionManager extends HibernateTransactionManager
         catch (IndexerException e)
         {
             doRollback(status);
-            throw new LuceneTransactionException("Lucene index transaction failed to prepare");
+            throw new LuceneTransactionException("Lucene index transaction failed to prepare", e);
         }
         try
         {
@@ -60,7 +60,7 @@ public class LuceneTransactionManager extends HibernateTransactionManager
         catch (TransactionException e)
         {
             luceneIndexerAndSearcherFactory.rollback();
-            throw new LuceneTransactionException("Failed transaction manager commit");
+            throw new LuceneTransactionException("Failed transaction manager commit", e);
         }
 
         // If the followiung commit fails it willclean up

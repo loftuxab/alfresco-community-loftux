@@ -325,7 +325,7 @@ public class CheckinCheckoutBean
       try
       {
          // create the node ref, then our node representation
-         NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+         NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
          node = new Node(ref, this.nodeService);
          
          // create content URL to the content download servlet with ID and expected filename
@@ -343,7 +343,7 @@ public class CheckinCheckoutBean
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
       }
       
       return node;
@@ -363,7 +363,7 @@ public class CheckinCheckoutBean
       {
          try
          {
-            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+            tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             if (logger.isDebugEnabled())
@@ -379,7 +379,8 @@ public class CheckinCheckoutBean
             if (getCopyLocation().equals(COPYLOCATION_OTHER) && this.selectedSpaceId != null)
             {
                // checkout to a arbituary parent Space 
-               NodeRef destRef = new NodeRef(Repository.getStoreRef(), this.selectedSpaceId);
+               NodeRef destRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), 
+                     this.selectedSpaceId);
                
                // TODO: The destination assoc type qname should come from the child assoc ref.
                ChildAssocRef childAssocRef = this.nodeService.getPrimaryParent(destRef);
@@ -537,7 +538,7 @@ public class CheckinCheckoutBean
       {
          try
          {
-            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+            tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             if (logger.isDebugEnabled())
@@ -669,7 +670,7 @@ public class CheckinCheckoutBean
       {
          try
          {
-            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+            tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             if (logger.isDebugEnabled())
@@ -759,7 +760,7 @@ public class CheckinCheckoutBean
       {
          try
          {
-            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+            tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
             
             if (logger.isDebugEnabled())

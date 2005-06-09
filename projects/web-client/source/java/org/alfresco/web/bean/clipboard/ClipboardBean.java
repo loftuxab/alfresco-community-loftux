@@ -20,7 +20,6 @@ import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.NavigationBean;
-import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -167,7 +166,7 @@ public class ClipboardBean
       UserTransaction tx = null;
       try
       {
-         tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
          if (index == -1)
@@ -222,7 +221,8 @@ public class ClipboardBean
     */
    private void performClipboardOperation(ClipboardItem item)
    {
-      NodeRef parentRef = new NodeRef(Repository.getStoreRef(), this.navigator.getCurrentNodeId());
+      NodeRef parentRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), 
+            this.navigator.getCurrentNodeId());
       
       // TODO: should we use primary parent here?
       //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
@@ -268,7 +268,7 @@ public class ClipboardBean
    {
       try
       {
-         NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+         NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
          
          // check for duplicates first
          ClipboardItem item = new ClipboardItem(new Node(ref, this.nodeService), mode);
@@ -291,7 +291,7 @@ public class ClipboardBean
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
       }
    }
    

@@ -18,7 +18,6 @@ import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.web.bean.RepoUtils;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
@@ -53,7 +52,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          String selectedNodeId = value.substring(0, separatorIndex);
          boolean isParent = Boolean.parseBoolean(value.substring(separatorIndex + 1));
          NodeService service = getNodeService(context);
-         NodeRef ref = new NodeRef(Repository.getStoreRef(), selectedNodeId);
+         NodeRef ref = new NodeRef(Repository.getStoreRef(context), selectedNodeId);
          
          UINodeDescendants.NodeSelectedEvent event = new UINodeDescendants.NodeSelectedEvent(component, ref, isParent); 
          component.queueEvent(event);
@@ -87,7 +86,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          UserTransaction tx = null;
          try
          {
-            tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+            tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
             tx.begin();
                
             // TODO: need a comparator to sort node refs (based on childref qname)
@@ -189,7 +188,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
       if (ellipses == false)
       {
          // label is the name of the child node assoc
-         String name = RepoUtils.getNameForNode(getNodeService(context), childRef.getChildRef());
+         String name = Repository.getNameForNode(getNodeService(context), childRef.getChildRef());
          buf.append(Utils.encode(name));
       }
       else
@@ -227,7 +226,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
     */
    private static NodeService getNodeService(FacesContext context)
    {
-      NodeService service = (NodeService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean(Repository.NODE_SERVICE);
+      NodeService service = (NodeService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean(Repository.BEAN_NODE_SERVICE);
       if (service == null)
       {
          throw new IllegalStateException("Unable to obtain NodeService bean reference.");

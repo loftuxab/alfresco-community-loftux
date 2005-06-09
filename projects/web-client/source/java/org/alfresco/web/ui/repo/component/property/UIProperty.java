@@ -16,9 +16,9 @@ import javax.faces.el.ValueBinding;
 import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.DataDictionary;
 import org.alfresco.web.bean.repository.Node;
-import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.converter.XMLDateConverter;
 import org.apache.log4j.Logger;
@@ -76,7 +76,7 @@ public class UIProperty extends UIPanel implements NamingContainer
          String propertyName = (String)getName();
    
          DataDictionary dd = (DataDictionary)FacesContextUtils.getRequiredWebApplicationContext(
-               context).getBean(Repository.DATA_DICTIONARY);
+               context).getBean(Application.BEAN_DATA_DICTIONARY);
          PropertyDefinition propDef = dd.getPropertyDefinition(node, propertyName);
          
          if (propDef == null)

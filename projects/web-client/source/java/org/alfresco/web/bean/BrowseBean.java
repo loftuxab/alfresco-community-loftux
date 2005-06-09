@@ -340,19 +340,20 @@ public class BrowseBean implements IContextListener
       UserTransaction tx = null;
       try
       {
-         tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+         FacesContext context = FacesContext.getCurrentInstance();
+         tx = Repository.getUserTransaction(context);
          tx.begin();
          
          NodeRef parentRef;
          if (parentNodeId == null)
          {
             // no specific parent node specified - use the root node
-            parentRef = this.nodeService.getRootNode(Repository.getStoreRef());
+            parentRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
          }
          else
          {
             // build a NodeRef for the specified Id and our store
-            parentRef = new NodeRef(Repository.getStoreRef(), parentNodeId);
+            parentRef = new NodeRef(Repository.getStoreRef(context), parentNodeId);
          }
          
          List<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(parentRef);
@@ -389,7 +390,7 @@ public class BrowseBean implements IContextListener
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {parentNodeId}) );
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {parentNodeId}) );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
@@ -417,12 +418,14 @@ public class BrowseBean implements IContextListener
       UserTransaction tx = null;
       try
       {
-         tx = RepoUtils.getUserTransaction(FacesContext.getCurrentInstance());
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
          if (logger.isDebugEnabled())
             logger.debug("Searching using path: " + query);
-         ResultSet results = this.searchService.query(Repository.getStoreRef(), "lucene", query, null, null);
+         ResultSet results = this.searchService.query(
+               Repository.getStoreRef(FacesContext.getCurrentInstance()), 
+               "lucene", query, null, null);
          if (logger.isDebugEnabled())
             logger.debug("Search results returned: " + results.length());
          
@@ -478,10 +481,10 @@ public class BrowseBean implements IContextListener
    private void setupDataBindingProperties(MapNode node)
    {
       // special properties to be used by the value binding components on the page
-      node.put("locked", RepoUtils.isNodeLocked(node, this.lockService));
+      node.put("locked", Repository.isNodeLocked(node, this.lockService));
       node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));
       node.put("url", DownloadContentServlet.generateURL(node.getNodeRef(), node.getName()));
-      node.put("fileTypeImage", RepoUtils.getFileTypeImage(node));
+      node.put("fileTypeImage", Repository.getFileTypeImage(node));
    }
 
    /**
@@ -497,7 +500,7 @@ public class BrowseBean implements IContextListener
       String query;
       
       // the QName for the well known "name" attribute
-      String nameAttr = RepoUtils.escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "name"));
+      String nameAttr = Repository.escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "name"));
       
       // match against content text
       String contentQuery;
@@ -607,14 +610,14 @@ public class BrowseBean implements IContextListener
       {
          try
          {
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
             
             // refresh UI based on node selection
             refreshUI(ref, link);
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
          }
       }
    }
@@ -666,7 +669,7 @@ public class BrowseBean implements IContextListener
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
       }
    }
    
@@ -690,7 +693,7 @@ public class BrowseBean implements IContextListener
          try
          {
             // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
             Node node = new Node(ref, this.nodeService);
             
             // prepare a node for the action context
@@ -698,7 +701,7 @@ public class BrowseBean implements IContextListener
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
          }
       }
       else
@@ -730,7 +733,7 @@ public class BrowseBean implements IContextListener
          try
          {
             // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
             Node node = new Node(ref, this.nodeService);
             
             // store the URL to for downloading the content
@@ -742,7 +745,7 @@ public class BrowseBean implements IContextListener
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(RepoUtils.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
          }
       }
       else
@@ -874,7 +877,7 @@ public class BrowseBean implements IContextListener
       // get the current breadcrumb location and append a new handler to it
       // our handler know the ID of the selected node and the display label for it
       List<IBreadcrumbHandler> location = this.navigator.getLocation();
-      String name = RepoUtils.getNameForNode(this.nodeService, ref);
+      String name = Repository.getNameForNode(this.nodeService, ref);
       location.add(new BrowseBreadcrumbHandler(ref.getId(), name));
       
       // set the current node Id ready for page refresh

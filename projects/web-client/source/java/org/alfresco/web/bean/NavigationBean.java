@@ -39,7 +39,8 @@ public class NavigationBean
    {
       // kick off the breadcrumb path and our root node Id
       List<IBreadcrumbHandler> elements = new ArrayList(1);
-      elements.add(new NavigationBreadcrumbHandler(Application.COMPANY_SPACE_NAME));
+      elements.add(new NavigationBreadcrumbHandler(
+            Application.getCompanyRootName(FacesContext.getCurrentInstance())));
       setLocation(elements);
       setCurrentNodeId(Application.getCurrentUser(
             FacesContext.getCurrentInstance()).getHomeSpaceId());
@@ -166,7 +167,8 @@ public class NavigationBean
     */
    public Map<String, Object> getNodeProperties()
    {
-      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
+      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), 
+            this.currentNodeId);
       Node node = new Node(nodeRef, this.nodeService);
       this.nodeProperties = node.getProperties();
       
