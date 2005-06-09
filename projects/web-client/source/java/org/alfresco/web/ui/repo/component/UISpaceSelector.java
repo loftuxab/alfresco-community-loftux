@@ -440,11 +440,7 @@ public class UISpaceSelector extends UIInput
       buf.append('>');
       
       // label is the name of the child node assoc
-      // TODO: get the NAME attribute here!
-      NodeRef childNodeRef = new NodeRef(id);
-      Node childNode = new Node(childNodeRef, getNodeService(context));
-      name = childNode.getName();
-      
+      // TODO: get the NAME attribute here!      
       buf.append(Utils.encode(name));
       
       buf.append("</a>");
