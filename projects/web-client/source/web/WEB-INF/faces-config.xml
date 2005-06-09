@@ -184,6 +184,27 @@
    
    <managed-bean>
       <description>
+         The bean that backs up the New User Wizard
+      </description>
+      <managed-bean-name>NewUserWizard</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.wizard.NewUserWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{indexingNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the Checkin and Checkout pages.
       </description>
       <managed-bean-name>CheckinCheckoutBean</managed-bean-name>
@@ -352,6 +373,10 @@
          <from-outcome>manageRules</from-outcome>
          <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>manageUsers</from-outcome>
+         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
@@ -423,6 +448,14 @@
       <navigation-case>
          <from-outcome>createRule</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/users.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>createUser</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -591,5 +624,30 @@
          <to-view-id>/jsp/wizard/new-rule/condition.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
-      
+   
+   <!-- navigation rules for the New User wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-user/*</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>person-properties</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>user-properties</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/user-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
 </faces-config>

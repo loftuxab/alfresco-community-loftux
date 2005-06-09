@@ -138,6 +138,14 @@ a.small:hover
    padding: 2px;
 }
 
+.summary
+{
+   color: #495F69;
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 11px;
+   padding-left: 8px;
+}
+
 a.headbarLink
 {
    color: #495F69;

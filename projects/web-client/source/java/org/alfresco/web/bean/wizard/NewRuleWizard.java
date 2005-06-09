@@ -275,13 +275,9 @@ public class NewRuleWizard extends AbstractWizardBean
     */
    public String getSummary()
    {
-      StringBuilder builder = new StringBuilder();
-      builder.append("Name: ").append(this.title).append("<br/>");
-      builder.append("Description: ").append(this.description).append("<br/>");
-      builder.append("Condition: ").append(this.condition).append("<br/>");
-      builder.append("Action: ").append(this.action).append("<br/>");
-      
-      return builder.toString();
+      return buildSummary(
+            new String[] {"Name: ", "Description", "Condition", "Action"},
+            new String[] {this.title, this.description, this.condition, this.action});
    }
    
    /**

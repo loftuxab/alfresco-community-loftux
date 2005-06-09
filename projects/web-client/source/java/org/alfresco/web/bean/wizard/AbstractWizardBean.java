@@ -232,5 +232,36 @@ public abstract class AbstractWizardBean
    public void setBrowseBean(BrowseBean browseBean)
    {
       this.browseBean = browseBean;
-   }  
+   }
+   
+   /**
+    * Build summary table from the specified list of Labels and Values
+    * 
+    * @param labels     Array of labels to display
+    * @param values     Array of values to display
+    * 
+    * @return summary table HTML
+    */
+   protected String buildSummary(String[] labels, String[] values)
+   {
+      if (labels == null || values == null || labels.length != values.length)
+      {
+         throw new IllegalArgumentException("Labels and Values passed to summary must be valid and of equal length.");
+      }
+      
+      StringBuilder buf = new StringBuilder(256);
+      
+      buf.append("<table cellspacing=2 cellpadding=2 border=0 class='summary'>");
+      for (int i=0; i<labels.length; i++)
+      {
+         buf.append("<tr><td><b>");
+         buf.append(labels[i]);
+         buf.append(":</b></td><td>");
+         buf.append(values[i]);
+         buf.append("</td></tr>");
+      }
+      buf.append("</table>");
+      
+      return buf.toString();
+   }
 }

@@ -9,32 +9,16 @@
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
-
+   
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
-
-<script language="JavaScript1.2">
-   function checkButtonState()
-   {
-      if (document.getElementById("edit-doc-properties:file-name").value.length == 0 ||
-          document.getElementById("edit-doc-properties:title").value.length == 0)
-      {
-         document.getElementById("edit-doc-properties:ok-button").disabled = true;
-      }
-      else
-      {
-         document.getElementById("edit-doc-properties:ok-button").disabled = false;
-      }
-   }
-</script>
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
-   <h:form id="edit-doc-properties">
+   <h:form id="users">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -68,17 +52,30 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
-                           <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
+                           <td width="34">
+                              <h:graphicImage id="wizard-logo" url="/images/icons/people_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
-                              <div class="mainTitle">Modify Properties of '<h:outputText value="#{BrowseBean.document.properties.title}" />'</div>
-                              <div class="mainSubText">Use this page to modify the document properties then click OK.</div>
+                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainTitle">Manage Users</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.manageusers_description}" /></div>
+                           </td>
+                           <td bgcolor="#495F69" width=1></td>
+                           <td width=110 style="padding-left:2px">
+                              <%-- Current object actions --%>
+                              <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
+                              <a:actionLink value="#{msg.create_user}" image="/images/icons/invite.gif" padding="4" action="createUser" actionListener="#{NewUserWizard.startWizard}" />
+                           </td>
+                           <td bgcolor="#495F69" width=1></td>
+                           <td width=110 style="padding-left:2px">
+                              <%-- View mode settings --%>
+                              <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
+                              <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" selectedImage="/images/icons/Details.gif" value="0">
+                                 <a:listItem value="0" label="Users Details" />
+                              </a:modeList>
                            </td>
                         </tr>
                      </table>
-                     
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_6.gif)" width="4"></td>
                </tr>
@@ -97,48 +94,7 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Document Properties</td>
-                                 </tr>
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td>File&nbsp;Name:</td>
-                                    <td width="90%">
-                                       <h:inputText id="file-name" value="#{EditDocPropsDialog.fileName}" size="35" maxlength="1024" readonly="true"
-                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Content&nbsp;Type:</td>
-                                    <td>
-                                       <h:selectOneMenu value="#{EditDocPropsDialog.contentType}">
-                                          <f:selectItems value="#{EditDocPropsDialog.contentTypes}" />
-                                       </h:selectOneMenu>&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Title:</td>
-                                    <td>
-                                       <h:inputText id="title" value="#{EditDocPropsDialog.title}" size="35" maxlength="1024"
-                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Description:</td>
-                                    <td>
-                                       <h:inputText value="#{EditDocPropsDialog.description}" size="35" maxlength="1024" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Author:</td>
-                                    <td>
-                                       <h:inputText value="#{EditDocPropsDialog.author}" size="35" maxlength="1024" />
-                                    </td>
-                                 </tr>
-                              </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                              <br/>A List of Users
                            </td>
                            
                            <td valign="top">
@@ -146,12 +102,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="OK" action="#{EditDocPropsDialog.finish}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Cancel" action="#{EditDocPropsDialog.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

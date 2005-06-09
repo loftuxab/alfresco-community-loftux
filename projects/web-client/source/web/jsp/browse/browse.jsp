@@ -89,6 +89,8 @@
                                     <a:actionLink value="#{msg.paste_all}" image="/images/icons/paste.gif" actionListener="#{ClipboardBean.pasteAll}" id="link8" />
                                     <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{NewSpaceWizard.startWizard}" id="link9" />
                                     <a:actionLink value="#{msg.manage_rules}" image="/images/icons/space_small.gif" action="manageRules" id="link10" />
+                                    <%-- TODO: add evaluator based on "admin" role, add correct icon --%>
+                                    <a:actionLink value="#{msg.manage_users}" image="/images/icons/invite.gif" action="manageUsers" id="link11" />
                                  </a:menu>
                               </td>
                            </a:panel>
@@ -119,7 +121,7 @@
                            
                            <td bgcolor="#495F69" width=1></td>
                            <td width=110>
-                              <%-- Details View settings --%>
+                              <%-- View mode settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" selectedImage="/images/icons/Details.gif"
                                     value="#{BrowseBean.browseViewMode}" actionListener="#{BrowseBean.viewModeChanged}">

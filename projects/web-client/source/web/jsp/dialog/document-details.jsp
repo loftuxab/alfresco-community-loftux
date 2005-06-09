@@ -56,7 +56,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
-                              <h:outputText value="#{BrowseBean.actionSpace.name}" styleClass="mainSubTitle"/><br/>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
                               <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.properties.title}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>
                            </td>

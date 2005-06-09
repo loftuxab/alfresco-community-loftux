@@ -500,13 +500,9 @@ public class AddContentWizard extends AbstractWizardBean
     */
    public String getSummary()
    {
-      StringBuilder builder = new StringBuilder();
-      builder.append("File Name: ").append(this.fileName).append("<br/>");
-      builder.append("Content Type: ").append(this.contentType).append("<br/>");
-      builder.append("Title: ").append(this.title).append("<br/>");
-      builder.append("Description: ").append(this.description).append("<br/>");
-      builder.append("Author: ").append(this.author).append("<br/>");
-      return builder.toString();
+      return buildSummary(
+            new String[] {"File Name", "Content Type", "Title", "Description", "Author"},
+            new String[] {this.fileName, this.contentType, this.title, this.description, this.author});
    }
    
    /**

@@ -396,16 +396,9 @@ public class NewSpaceWizard extends AbstractWizardBean
     */
    public String getSummary()
    {
-      StringBuilder builder = new StringBuilder();
-      builder.append("Name: ").append(this.name).append("<br/>");
-      builder.append("Description: ").append(this.description).append("<br/>");
-      builder.append("Create Type: ").append(this.createFrom).append("<br/>");
-      builder.append("Space Type: ").append(this.spaceType).append("<br/>");
-      builder.append("icon: ").append(this.icon).append("<br/>");
-      builder.append("Save As Template: ").append(this.saveAsTemplate).append("<br/>");
-      builder.append("Template Name: ").append(this.templateName).append("<br/>");
-      
-      return builder.toString();
+      return buildSummary(
+            new String[] {"Name: ", "Description", "Create Type", "Space Type", "Icon", "Save As Template", "Template Name"},
+            new String[] {this.name, this.description, this.createFrom, this.spaceType, this.icon, Boolean.toString(this.saveAsTemplate), this.templateName});
    }
    
    /**
