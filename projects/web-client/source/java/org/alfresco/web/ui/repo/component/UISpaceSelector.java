@@ -286,7 +286,12 @@ public class UISpaceSelector extends UIInput
                         buf.append("<tr><td><input type='radio' name='")
                            .append(clientId).append(OPTION).append("' value='")
                            .append(childId).append("'/></td><td>");
-                        renderNodeLink(context, childId, childRef.getQName().getLocalName(), buf);
+                        
+                        // get the name for the child (rather than association name)
+                        NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(context), childId);
+                        Node childNode = new Node(childNodeRef, getNodeService(context));
+                        
+                        renderNodeLink(context, childId, childNode.getName(), buf);
                         buf.append("</td></tr>");
                      }
                   }
@@ -438,9 +443,7 @@ public class UISpaceSelector extends UIInput
             .append(attrs.get("nodeStyleClass"));
       }
       buf.append('>');
-      
-      // label is the name of the child node assoc
-      // TODO: get the NAME attribute here!      
+
       buf.append(Utils.encode(name));
       
       buf.append("</a>");
