@@ -34,6 +34,11 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
      * The display label
      */
     private String displayLabel;
+	
+	/**
+	 * Indicates whether it is mandatory for the parameter to be set
+	 */
+	private boolean isMandatory = false;
 
     /**
      * Constructor
@@ -44,12 +49,14 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
      */
     public ParameterDefinitionImpl(
             String name, 
-            ParameterType type, 
+            ParameterType type,
+            boolean isMandatory,
             String displayLabel)
     {
         this.name = name;
         this.type = type;
         this.displayLabel = displayLabel;
+		this.isMandatory = isMandatory;
     }
     
     /**
@@ -67,6 +74,14 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     {
         return this.type;
     }
+	
+	/**
+	 * @see org.alfresco.repo.rule.ParameterDefinition#isMandatory()
+	 */
+	public boolean isMandatory() 
+	{
+		return this.isMandatory;
+	}
 
     /**
      * @see org.alfresco.repo.rule.ParameterDefinition#getDisplayLabel()
@@ -75,5 +90,4 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     {
         return this.displayLabel;
     }
-
 }

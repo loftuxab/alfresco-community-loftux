@@ -24,7 +24,7 @@
 					This will add a feature to the matched content.			
 				</description>
 				<parameters>
-					<parameter name="aspect-name" type="QNAME"/>
+					<parameter name="aspect-name" type="QNAME" mandatory='true'/>
 				</parameters>
 				<executor>org.alfresco.repo.rule.impl.action.AddFeaturesActionExecutor</executor>
 			</action-definition>
@@ -97,14 +97,19 @@
 				<description>
 					The rule is applied to all content that has a specific category.
 				</description>
-			</condition-definition>
-			<condition-definition name="contains-text">
+			</condition-definition>-->
+			<condition-definition name="match-text">
 				<title>Content which contains specific text in its name</title>	
 				<description>
 					The rule is applied to all content that has specific text in its name.
 				</description>
-			</condition-definition>
-			-->
+				<parameters>
+					<parameter name="text" type="STRING" mandatory="true"/>
+					<!-- operation can take the values: CONTAINS, BEGINS, ENDS, EXACT (CONTAINS is default) -->
+					<parameter name="operation" type="STRING" mandatory="false"/> 
+				</parameters>
+				<evaluator>org.alfresco.repo.rule.impl.condition.MatchTextEvaluator</evaluator>
+			</condition-definition>			
 		</condition-definitions>
 	</config>
 	

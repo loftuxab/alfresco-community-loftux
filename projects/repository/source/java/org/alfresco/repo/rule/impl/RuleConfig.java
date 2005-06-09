@@ -18,8 +18,11 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.repo.rule.ParameterDefinition;
 import org.alfresco.repo.rule.ParameterType;
 import org.alfresco.repo.rule.RuleServiceException;
+import org.alfresco.repo.value.ValueConverter;
 
 /**
+ * Rule configuration implementation.
+ * 
  * @author Roy Wetherall
  */
 /*package*/ class RuleConfig
@@ -57,6 +60,7 @@ import org.alfresco.repo.rule.RuleServiceException;
     private static final String CA_DISPLAY_LABEL = "display-label";
     private static final String CE_EVALUTOR = "evaluator";    
     private static final String CE_EXECUTOR = "executor";
+	private static final String CA_MANDATORY = "mandatory";
 
     /**
      * Error messages
@@ -100,8 +104,9 @@ import org.alfresco.repo.rule.RuleServiceException;
     }
 
     /**
+     * Get the condition definitions
      * 
-     * @return
+     * @return	the condition definitions
      */
     public Collection<RuleConditionDefinitionImpl> getConditionDefinitions()
     {
@@ -109,9 +114,10 @@ import org.alfresco.repo.rule.RuleServiceException;
     }
     
     /**
+     * Get a rule condition by name
      * 
-     * @param name
-     * @return
+     * @param name	the name
+     * @return		the rule condition
      */
     public RuleConditionDefinitionImpl getConditionDefinition(String name)
     {
@@ -119,8 +125,9 @@ import org.alfresco.repo.rule.RuleServiceException;
     }
 
     /**
+     * Gets the action definitions
      * 
-     * @return
+     * @return	the aciton definitions
      */
     public Collection<RuleActionDefinitionImpl> getActionDefinitions()
     {
@@ -128,9 +135,10 @@ import org.alfresco.repo.rule.RuleServiceException;
     }
     
     /**
+     * Get an action definition by name
      * 
-     * @param name
-     * @return
+     * @param name	the name
+     * @return		the action definition
      */
     public RuleActionDefinitionImpl getActionDefinition(String name)
     {
@@ -200,7 +208,7 @@ import org.alfresco.repo.rule.RuleServiceException;
     }
     
     /**
-     * 
+     * Initialise the action definitions from the rule config
      */
     private void initActionDefinitions()
     {
@@ -232,7 +240,7 @@ import org.alfresco.repo.rule.RuleServiceException;
     }
     
     /**
-     * 
+     * Initialise the condition definitions from the rule config
      */
     private void initConditionDefinitions()
     {
@@ -265,9 +273,10 @@ import org.alfresco.repo.rule.RuleServiceException;
     }
     
     /**
+     * Initialise the item definition from the config 
      * 
-     * @param itemDefinitionData
-     * @param ruleItemConfig
+     * @param itemDefinitionData	the item definition
+     * @param ruleItemConfig		the rule config element
      */
     private void initItemDefintion(RuleItemDefinitionImpl itemDefinitionData, ConfigElement ruleItemConfig)
     {
@@ -285,25 +294,33 @@ import org.alfresco.repo.rule.RuleServiceException;
             }
             else if (CE_PARAMETERS.equals(configElementName) == true)
             {
+				List<ParameterDefinition> paramDefs = new ArrayList<ParameterDefinition>();
+				
                 for (ConfigElement propertyConfig : childConfig.getChildren())
                 {
-                    List<ParameterDefinition> paramDefs = new ArrayList<ParameterDefinition>();
-                    
                     if(CE_PARAMETER.equals(propertyConfig.getName()) == true)
                     {
                         String name = propertyConfig.getAttribute(CA_NAME);
                         String type = propertyConfig.getAttribute(CA_TYPE);
                         String displayLabel = propertyConfig.getAttribute(CA_DISPLAY_LABEL);
+						String isMandatoryString = propertyConfig.getAttribute(CA_MANDATORY);
+						boolean isMandatory = false;
+						if (isMandatoryString != null)
+						{
+							isMandatory = ValueConverter.booleanValue(isMandatoryString);
+						}
+						
                         paramDefs.add(
                                 new ParameterDefinitionImpl(
                                         name, 
                                         ParameterType.valueOf(type),
+                                        isMandatory,
                                         displayLabel));
                         
-                    }
-                    
-                    itemDefinitionData.setParameterDefinitions(paramDefs);
+                    }                                   
                 }
+				
+			    itemDefinitionData.setParameterDefinitions(paramDefs);
             }
         }
     }

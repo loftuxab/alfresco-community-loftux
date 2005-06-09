@@ -16,7 +16,7 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
     /**
      * The parameter values
      */
-    private Map<String, Serializable> parameterValues;
+    private Map<String, Serializable> parameterValues = new HashMap<String, Serializable>();
 
     /**
      * Constructor
@@ -36,10 +36,12 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
      */
     public RuleItemImpl(Map<String, Serializable> parameterValues)
     {     
-        
-        // TODO need to check that the parameter values being set correspond
-        // correctly to the parameter definions on the rule item defintion
-        this.parameterValues = parameterValues;
+        if (parameterValues != null)
+		{
+	        // TODO need to check that the parameter values being set correspond
+	        // correctly to the parameter definions on the rule item defintion
+	        this.parameterValues = parameterValues;
+		}
     }
 
     /**
@@ -54,14 +56,33 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
         }
         return result;
     }
-
-    /**
+	
+	/**
+	 * @see org.alfresco.repo.rule.RuleItem#getParameterValue(String)
+	 */
+	public Serializable getParameterValue(String name)
+	{
+		return this.parameterValues.get(name);
+	}
+	
+	/**
      * @see org.alfresco.repo.rule.RuleItem#setParameterValues(java.util.Map)
      */
     public void setParameterValues(Map<String, Serializable> parameterValues)
     {
-        // TODO need to check that the parameter values being set correspond
-        //      correctly to the parameter definions on the rule item defintion
-        this.parameterValues = parameterValues;
+		if (parameterValues != null)
+		{
+			// TODO need to check that the parameter values being set correspond
+			//      correctly to the parameter definions on the rule item defintion
+			this.parameterValues = parameterValues;
+		}
     }
+	
+	/**
+	 * @see org.alfresco.repo.rule.RuleItem#setParameterValue(String, Serializable)
+	 */
+	public void setParameterValue(String name, Serializable value)
+	{
+		this.parameterValues.put(name, value);
+	}
 }

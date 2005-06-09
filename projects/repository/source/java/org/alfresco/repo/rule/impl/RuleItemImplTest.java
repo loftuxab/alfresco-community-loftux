@@ -36,8 +36,8 @@ public abstract class RuleItemImplTest extends TestCase
     protected void setUp() throws Exception
     {
         // Create param defs
-        paramDefs.add(new ParameterDefinitionImpl(PARAM_1, ParameterType.STRING, PARAM_DISPLAYLABEL));
-        paramDefs.add(new ParameterDefinitionImpl(PARAM_2, ParameterType.STRING, PARAM_DISPLAYLABEL));
+        paramDefs.add(new ParameterDefinitionImpl(PARAM_1, ParameterType.STRING, false,  PARAM_DISPLAYLABEL));
+        paramDefs.add(new ParameterDefinitionImpl(PARAM_2, ParameterType.STRING, false,  PARAM_DISPLAYLABEL));
         
         // Create param values
         paramValues.put(PARAM_1, VALUE_1);
@@ -73,4 +73,18 @@ public abstract class RuleItemImplTest extends TestCase
             }
         }
     }
+	
+	public void testGetParameterValue()
+	{
+		RuleItemImpl temp = create();
+		assertNull(temp.getParameterValue("bobbins"));
+		assertEquals(VALUE_1, temp.getParameterValue(PARAM_1));
+	}
+	
+	public void testSetParameterValue()
+	{
+		RuleItemImpl temp = create();
+		temp.setParameterValue("bobbins", "value");
+		assertEquals("value", temp.getParameterValue("bobbins"));
+	}
 }

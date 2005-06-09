@@ -33,10 +33,10 @@ public abstract class RuleItemDefinitionImplTest extends TestCase
     protected void setUp() throws Exception
     {
         // Create param def lists
-        this.paramDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, PARAM1_DISPLAYNAME));
-        this.paramDefs.add(new ParameterDefinitionImpl(PARAM2_NAME, PARAM2_TYPE, PARAM2_DISPLAYNAME));        
-        this.duplicateParamDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, PARAM1_DISPLAYNAME));
-        this.duplicateParamDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, PARAM1_DISPLAYNAME));
+        this.paramDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, false, PARAM1_DISPLAYNAME));
+        this.paramDefs.add(new ParameterDefinitionImpl(PARAM2_NAME, PARAM2_TYPE, false,  PARAM2_DISPLAYNAME));        
+        this.duplicateParamDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, false,  PARAM1_DISPLAYNAME));
+        this.duplicateParamDefs.add(new ParameterDefinitionImpl(PARAM1_NAME, PARAM1_TYPE, false,  PARAM1_DISPLAYNAME));
     }
     
     public void testConstructor()

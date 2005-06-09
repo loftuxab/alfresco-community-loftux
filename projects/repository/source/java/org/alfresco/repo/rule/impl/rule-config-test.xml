@@ -22,6 +22,7 @@
 				<description>description</description>
 				<parameters>
 					<parameter name='actionPropName1' type='STRING' display-label='displayLabel'/>
+					<parameter name='actionPropName2' type='STRING' display-label='displayLabel'/>
 				</parameters>
 			</action-definition>	
 			<action-definition name="actionDefinition2">
@@ -29,6 +30,7 @@
 				<description>description</description>
 				<parameters>
 					<parameter name='actionPropName1' type='STRING' display-label='displayLabel'/>
+					<parameter name='actionPropName2' type='STRING' display-label='displayLabel'/>
 				</parameters>
 			</action-definition>				
 		</action-definitions>						

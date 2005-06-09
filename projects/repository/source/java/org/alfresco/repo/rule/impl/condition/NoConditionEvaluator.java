@@ -8,12 +8,24 @@ import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.rule.RuleCondition;
 
 /**
+ * No condition evaluator implmentation.
+ * 
  * @author Roy Wetherall
  */
 public class NoConditionEvaluator extends
         RuleConditionEvaluatorAbstractBase
 {
-
+	/**
+	 * Evaluator constants
+	 */
+	public static final String NAME = "no-condition";
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param ruleCondition		the rule condition
+	 * @param nodeService		the node service
+	 */
     public NoConditionEvaluator(RuleCondition ruleCondition, NodeService nodeService)
     {
         super(ruleCondition, nodeService);

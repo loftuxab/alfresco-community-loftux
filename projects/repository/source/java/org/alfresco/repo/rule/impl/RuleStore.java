@@ -12,6 +12,7 @@ import java.util.Map;
 import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentWriter;
+import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -69,12 +70,25 @@ import org.alfresco.repo.rule.RuleType;
         // TODO need to register interest in move as this would also effect the cache
     }
     
+	/**
+	 * Indicates whether the node has any rules associatied with it
+	 * 
+	 * @param nodeRef	the node reference
+	 * @return			true if it has rules associatied with it, false otherwise
+	 */
     public boolean hasRules(NodeRef nodeRef)
     {
         RuleCacheEntry ruleCacheEntry = getRuleCacheEntry(nodeRef);
         return ruleCacheEntry.hasRules();
     }
     
+	/**
+	 * Returns the rules by type for a node reference
+	 * 
+	 * @param nodeRef	the node reference
+	 * @param ruleType	the rule type
+	 * @return			the rules
+	 */
     public List<? extends Rule> getByRuleType(NodeRef nodeRef, RuleType ruleType)
     {
         RuleCacheEntry ruleCacheEntry = getRuleCacheEntry(nodeRef);
@@ -106,14 +120,15 @@ import org.alfresco.repo.rule.RuleType;
     }
     
     /**
+     * Puts a rule into the store, updating or creating the rule store node
      * 
-     * @param nodeRef
-     * @param rule
+     * @param nodeRef	the node reference
+     * @param rule		the rule
      */
     public void put(NodeRef nodeRef, RuleImpl rule)
     {
         // Write the rule to the repository
-        NodeRef configFolder = getConfigFolder(nodeRef);
+        NodeRef configFolder = getRuleFolder(nodeRef);
         if (configFolder == null)
         {
             throw new RuleServiceException("The configuration folder for the acitonable node has not been set.");
@@ -128,9 +143,10 @@ import org.alfresco.repo.rule.RuleType;
     }
     
     /**
+     * Removes a node from the store
      * 
-     * @param nodeRef
-     * @param rule
+     * @param nodeRef	the node reference
+     * @param rule		the rule
      */
     public void remove(NodeRef nodeRef, RuleImpl rule)
     {
@@ -146,8 +162,20 @@ import org.alfresco.repo.rule.RuleType;
         }
     }   
     
+	/**
+	 * Gets the cache entry for the node refernece, creating one if it doen't exist.
+	 * 
+	 * @param nodeRef	the node reference
+	 * @return			the rule cache entry
+	 */
     private RuleCacheEntry getRuleCacheEntry(NodeRef nodeRef)
     {
+		// First check that the node reference is valid
+		if (this.nodeService.exists(nodeRef) == false)
+		{
+			throw new RuleServiceException("Can not get rule cache entry since node does not exist.");
+		}
+		
         RuleCacheEntry ruleCacheEntry = this.ruleCache.get(nodeRef);
         if (ruleCacheEntry == null)
         {
@@ -158,9 +186,10 @@ import org.alfresco.repo.rule.RuleType;
     }
 
     /**
+     * Write the rule to the repository
      * 
-     * @param configFolder
-     * @param rule
+     * @param configFolder	the config folder
+     * @param rule			the rule
      */
     private void writeRule(NodeRef configFolder, RuleImpl rule)
     {
@@ -222,29 +251,48 @@ import org.alfresco.repo.rule.RuleType;
     }
 
     /**
-     * Get the node reference of the configuration folder for an actionable node.
+     * Get the node reference of the folder where the rule content nodes are stored
      * 
      * @param nodeRef       the node reference to the actionable node
      * @return              the node reference to the configuration folder
      */
-    private NodeRef getConfigFolder(NodeRef nodeRef)
+    private NodeRef getRuleFolder(NodeRef nodeRef)
     {
-        NodeRef configFolder = null;
+        NodeRef ruleFolder = null;
         
-        // Get the configurations folder
-        List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
-                                               nodeRef, 
-                                               DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
-        if (nodeAssocRefs.size() > 1)
-        {
-            throw new RuleServiceException("More than one configuration folder has been set.");
-        }
-        else if (nodeAssocRefs.size() == 1)
-        {
-            configFolder = nodeAssocRefs.get(0).getTargetRef();
-        }
-        
-        return configFolder;
+		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE) == true)
+		{
+	        // Get the configurations folder
+	        List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
+	                                               nodeRef, 
+	                                               DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
+	        if (nodeAssocRefs.size() == 0)
+	        {
+	            throw new RuleServiceException("The configuration folder has not been set for this actionable node.");
+	        }
+	        else
+	        {
+	            NodeRef configFolder = nodeAssocRefs.get(0).getTargetRef();
+				
+				List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(
+														configFolder, 
+														QName.createQName(NamespaceService.ALFRESCO_URI, "rules"));
+				if (childAssocRefs.size() == 0)
+				{
+					ruleFolder = this.nodeService.createNode(
+														configFolder,
+														DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+														QName.createQName(NamespaceService.ALFRESCO_URI, "rules"),
+														DictionaryBootstrap.TYPE_QNAME_SYTEM_FOLDER).getChildRef();
+				}
+				else
+				{
+					ruleFolder = childAssocRefs.get(0).getChildRef();
+				}
+	        }
+		}
+		
+        return ruleFolder;
     }       
     
     /**
@@ -334,7 +382,7 @@ import org.alfresco.repo.rule.RuleType;
         {
             if (this.myRules == null)
             {
-                NodeRef configFolder = getConfigFolder(this.nodeRef);
+                NodeRef configFolder = getRuleFolder(this.nodeRef);
                 if (configFolder == null)
                 {
                     this.myRules = new ArrayList<RuleImpl>();

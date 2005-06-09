@@ -61,13 +61,20 @@ public interface Rule
     public abstract List<RuleCondition> getRuleConditions();
 
     /**
+     * Add a rule condition to the rule.
+     * 
+     * @param ruleConditionDefinition	the rule condition definition
+     * @param parameterValues			the parameter values
+     * @return							the added rule condition
      */
     public abstract RuleCondition addRuleCondition(
             RuleConditionDefinition ruleConditionDefinition,
             Map<String, Serializable> parameterValues);
 
     /**
+     * Remove a rule condition
      * 
+     * @param ruleCondition		the rule condition
      */
     public abstract void removeRuleCondition(RuleCondition ruleCondition);
 
@@ -79,13 +86,20 @@ public interface Rule
     public abstract List<RuleAction> getRuleActions();
 
     /**
+     * Add a rule action to the rule.
+     * 
+     * @param ruleActionDefinition	the rule action definition
+     * @param parameterValues		the action parameters
+     * @return						the rule action
      */
     public abstract RuleAction addRuleAction(
     		RuleActionDefinition ruleActionDefinition,
     		Map<String, Serializable> parameterValues);
 
     /**
+     * Remove a rule action
      * 
+     * @param ruleAction	the rule action
      */
     public abstract void removeRuleAction(RuleAction ruleAction);
 

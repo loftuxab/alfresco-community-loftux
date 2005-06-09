@@ -280,9 +280,6 @@ import org.dom4j.io.SAXReader;
             case INT:
                 result = Integer.getInteger(valueAsString);
                 break;
-            case LIST:
-                throw new UnsupportedOperationException();
-                //break;
             default:
                 result = valueAsString;
                 break;
@@ -306,9 +303,6 @@ import org.dom4j.io.SAXReader;
             case DATE:
                 result = Long.toString(((Date)value).getTime());
                 break;
-            case LIST:
-                throw new UnsupportedOperationException();
-                //break;
             case QNAME:
             case NODE_REF:
             case INT:    

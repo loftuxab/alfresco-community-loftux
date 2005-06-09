@@ -21,20 +21,39 @@ import org.alfresco.repo.rule.impl.RuleActionDefinitionImpl;
 import org.alfresco.repo.rule.impl.RuleConditionDefinitionImpl;
 
 /**
+ * Rule type adapter abstract base class implmentation.
+ * 
  * @author Roy Wetherall
  */
 public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
 {
-    protected RuleType ruleType;
-    
+	/**
+	 * The rule type
+	 */
+	protected RuleType ruleType;
+	
+	/**
+	 * The policy component
+	 */
     protected PolicyComponent policyComponent;
     
+	/**
+	 * The rule service
+	 */
     private RuleService ruleService;
     
+	/**
+	 * The node service
+	 */
     private NodeService nodeService;
     
     /**
+     * Constructor
      * 
+     * @param ruleType			the rule type
+     * @param policyComponent	the policy component
+     * @param ruleService		the rule service
+     * @param nodeService		the node service
      */
     public RuleTypeAdapterAbstractBase(
             RuleType ruleType,
@@ -48,6 +67,13 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
         this.nodeService = nodeService;
     }
     
+	/**
+	 * Execute rules that relate to the actionable node for this type on the
+	 * actioned upon node reference.
+	 * 
+	 * @param actionableNodeRef		the actionable node reference
+	 * @param actionedUponNodeRef	the actioned upon node reference
+	 */
     protected void executeRules(
             NodeRef actionableNodeRef, 
             NodeRef actionedUponNodeRef)
@@ -61,19 +87,41 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
             for (Rule rule : rules)
             {   
                 // Get the rule conditions
-                List<RuleCondition> conds = rule.getRuleConditions();
-                // TODO assume there is one and only one condition for the rule
-                RuleCondition cond = conds.get(0);
+                List<RuleCondition> conds = rule.getRuleConditions();				
+				if (conds.size() == 0)
+				{
+					throw new RuleServiceException("No rule conditions have been specified for the rule.");
+				}
+				else if (conds.size() > 1)
+				{
+					// TODO at the moment we only support one rule condition
+					throw new RuleServiceException("Currently only one rule condition can be specified per rule.");
+				}
+				
+				// Get the single rule condition
+				RuleCondition cond = conds.get(0);
                 RuleConditionEvaluator evaluator = getConditionEvaluator(cond);
                 
                 // Get the rule acitons
                 List<RuleAction> actions = rule.getRuleActions();
-                // TODO assume there is one and only one action for the rule
+				if (actions.size() == 0)
+				{
+					throw new RuleServiceException("No rule actions have been specified for the rule.");
+				}
+				else if (actions.size() > 1)
+				{
+					// TODO at the moment we only support one rule action
+					throw new RuleServiceException("Currently only one rule action can be specified per rule.");
+				}
+				
+				// Get the single action
                 RuleAction action = actions.get(0);
                 RuleActionExecuter executor = getActionExecutor(action);
                 
+				// Evaluate the condition
                 if (evaluator.evaluate(actionableNodeRef, actionedUponNodeRef) == true)
                 {
+					// Execute the rule
                     executor.execute(actionableNodeRef, actionedUponNodeRef);
                 }
             }
@@ -81,9 +129,10 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
     }
 
     /**
+     * Get the action executor instance.
      * 
-     * @param action
-     * @return
+     * @param action	the action
+     * @return			the action executor
      */
     private RuleActionExecuter getActionExecutor(RuleAction action)
     {
@@ -99,13 +148,19 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
         }
         catch(Exception exception)
         {
-            // Error creating and initialising the adapter
+            // Error creating and initialising
             throw new RuleServiceException("Unable to initialise the rule action executor.", exception);
         }
         
         return executor;
     }
 
+	/**
+	 * Get the condition evaluator.
+	 * 
+	 * @param cond	the rule condition
+	 * @return		the rule condition evaluator
+	 */
     private RuleConditionEvaluator getConditionEvaluator(RuleCondition cond)
     {
         RuleConditionEvaluator evaluator = null;
@@ -113,14 +168,14 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
         
         try
         {
-            // Create the action evaluator
+            // Create the condition evaluator
             evaluator = (RuleConditionEvaluator)Class.forName(evaluatorString).
                     getConstructor(new Class[]{RuleCondition.class, NodeService.class}).
                     newInstance(new Object[]{cond, this.nodeService});
         }
         catch(Exception exception)
         {
-            // Error creating and initialising  adapter
+            // Error creating and initialising 
             throw new RuleServiceException("Unable to initialise the rule condition evaluator.", exception);
         }
         

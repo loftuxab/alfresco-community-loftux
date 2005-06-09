@@ -4,6 +4,8 @@
 package org.alfresco.repo.rule;
 
 /**
+ * Parameter type enum
+ * 
  * @author Roy Wetherall
  */
 public enum ParameterType
@@ -12,6 +14,5 @@ public enum ParameterType
     INT,
     DATE,
     QNAME,
-    NODE_REF,
-    LIST
+    NODE_REF
 }

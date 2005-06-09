@@ -12,11 +12,16 @@ import java.util.Map;
 import org.alfresco.config.ConfigService;
 import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.ref.qname.RegexQNamePattern;
 import org.alfresco.repo.rule.Rule;
 import org.alfresco.repo.rule.RuleActionDefinition;
 import org.alfresco.repo.rule.RuleConditionDefinition;
@@ -25,6 +30,8 @@ import org.alfresco.repo.rule.RuleServiceException;
 import org.alfresco.repo.rule.RuleType;
 import org.alfresco.repo.rule.RuleTypeAdapter;
 import org.alfresco.util.GUID;
+
+import sun.security.krb5.internal.n;
 
 /**
  * @author Roy Wetherall
@@ -234,16 +241,18 @@ public class RuleServiceImpl implements RuleService
      * @see org.alfresco.repo.rule.RuleService#makeActionable(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
     public void makeActionable(
-            NodeRef nodeRef, 
-            NodeRef configurationsNodeRef)
+            NodeRef nodeRef)
     {
-        // Check that the provided node is the correct type
-        QName className = this.nodeService.getType(configurationsNodeRef);
-        if (this.dictionaryService.isSubClass(className, DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS) == false)
-        {
-            throw new RuleServiceException("The passed configuration node reference must be a sub-tpye of 'configurations'.");
-        }
-        
+        // Get the root config node
+		NodeRef rootConfigFolder = getRootConfigNodeRef(nodeRef);
+		
+		// Create the configuraion folder
+		NodeRef configurationsNodeRef = this.nodeService.createNode(
+											rootConfigFolder,
+											DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+											QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
+											DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
+		
         // Apply the aspect and add the configurations folder
         this.nodeService.addAspect(
                 nodeRef, 
@@ -252,8 +261,39 @@ public class RuleServiceImpl implements RuleService
         this.nodeService.createAssociation(
                 nodeRef, 
                 configurationsNodeRef, 
-                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
+                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);	
     }
+
+	/**
+	 * Get the root config node reference
+	 * 
+	 * @param nodeRef	the node reference
+	 * @return			the root config node reference
+	 */
+	private NodeRef getRootConfigNodeRef(NodeRef nodeRef) 
+	{
+		// TODO maybe this should be cached ...
+		// TODO the QNames should be put in the DicitionaryBootstrap
+		
+		NodeRef rootConfigFolder = null;
+		NodeRef rootNode = this.nodeService.getRootNode(nodeRef.getStoreRef());
+		List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(
+												rootNode, 
+												QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"));
+		if (childAssocRefs.size() == 0)
+		{
+			rootConfigFolder = this.nodeService.createNode(
+												rootNode,
+												DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN,
+												QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"),
+												DictionaryBootstrap.TYPE_QNAME_SYTEM_FOLDER).getChildRef();
+		}
+		else
+		{
+			rootConfigFolder = childAssocRefs.get(0).getChildRef();
+		}
+		return rootConfigFolder;
+	}
 
     /**
      * @see org.alfresco.repo.rule.RuleService#isActionable(org.alfresco.repo.ref.NodeRef)

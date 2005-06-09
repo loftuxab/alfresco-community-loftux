@@ -64,10 +64,9 @@ public interface RuleService
 	/**
 	 * Makes a specified node Actionable.
 	 * 
-	 * @param nodeRef					the node reference
-	 * @param configurationsNodeRef 	the configurations node reference
+	 * @param nodeRef	the node reference
 	 */
-	public void makeActionable(NodeRef nodeRef, NodeRef configurationsNodeRef);
+	public void makeActionable(NodeRef nodeRef);
 	
 	/**
 	 * Indicates whether a node is actionable.

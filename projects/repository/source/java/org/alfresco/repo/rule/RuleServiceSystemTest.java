@@ -13,7 +13,9 @@ import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.repo.rule.impl.condition.MatchTextEvaluator;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.util.StopWatch;
 
 /**
@@ -54,11 +56,11 @@ public class RuleServiceSystemTest extends BaseSpringTest
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
         
         // Create the config folder
-        this.configFolder = this.nodeService.createNode(
-                this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
+        //this.configFolder = this.nodeService.createNode(
+        //        this.rootNodeRef,
+	//			QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+      //          QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+        //        DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
     }
 
     /**
@@ -70,7 +72,7 @@ public class RuleServiceSystemTest extends BaseSpringTest
      */
     public void testAddFeaturesAction()
     {
-        this.ruleService.makeActionable(this.nodeRef, this.configFolder);
+        this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
         RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
@@ -84,15 +86,82 @@ public class RuleServiceSystemTest extends BaseSpringTest
         rule.addRuleAction(action, params);
         
         this.ruleService.addRule(this.nodeRef, rule);
-        
-        NodeRef newNodeRef = this.nodeService.createNode(
+				
+		NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();        
+        assertTrue(this.nodeService.hasAspect(newNodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));   
+		
+		System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+    }   
+	
+	/**
+     * Test:
+     *          rule type:  inbound
+     *          condition:  match-text(
+     *          				text = .doc,
+     *          				operation = CONTAINS)
+     *          action:     add-features(
+     *                          aspect-name = versionable)
+     */
+	public void testContainsTextCondition()
+	{
+		this.ruleService.makeActionable(this.nodeRef);
         
-        assertTrue(this.nodeService.hasAspect(newNodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));        
-    }    
+        RuleType ruleType = this.ruleService.getRuleType("inbound");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefintion(MatchTextEvaluator.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
+        
+        Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
+		actionParams.put("aspect-name", DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);        
+        
+		Map<String, Serializable> condParams = new HashMap<String, Serializable>(1);
+		condParams.put(MatchTextEvaluator.PARAM_TEXT, ".doc");
+		
+        Rule rule = this.ruleService.createRule(ruleType);
+        rule.addRuleCondition(cond, condParams);
+        rule.addRuleAction(action, actionParams);
+        
+        this.ruleService.addRule(this.nodeRef, rule);
+		
+		// Test condition failure
+		Map<QName, Serializable> props1 = new HashMap<QName, Serializable>();
+		props1.put(DictionaryBootstrap.PROP_QNAME_NAME, "bobbins.txt");
+		NodeRef newNodeRef = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                props1).getChildRef();        
+        assertFalse(this.nodeService.hasAspect(newNodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));  
+		
+		// Test condition success
+		Map<QName, Serializable> props2 = new HashMap<QName, Serializable>();
+		props2.put(DictionaryBootstrap.PROP_QNAME_NAME, "bobbins.doc");
+		NodeRef newNodeRef2 = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                props2).getChildRef();        
+        assertTrue(this.nodeService.hasAspect(newNodeRef2, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE)); 
+		
+		try
+		{
+			// Test name not set
+			NodeRef newNodeRef3 = this.nodeService.createNode(
+	                this.nodeRef,
+	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+	                DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();        
+		}
+		catch (RuleServiceException exception)
+		{
+			// Correct since text-match is a mandatory property
+		}
+	}
     
     public void testPerformanceOfRuleExecution()
     {
@@ -111,7 +180,7 @@ public class RuleServiceSystemTest extends BaseSpringTest
         }
         sw.stop();
         
-        this.ruleService.makeActionable(this.nodeRef, this.configFolder);
+        this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
         RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");

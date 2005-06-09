@@ -6,9 +6,12 @@ package org.alfresco.repo.rule.impl;
 import java.util.List;
 
 import org.alfresco.repo.dictionary.DictionaryService;
+import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.NodeAssocRef;
+import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.rule.ParameterDefinition;
 import org.alfresco.repo.rule.Rule;
 import org.alfresco.repo.rule.RuleActionDefinition;
@@ -80,7 +83,7 @@ public class RuleServiceImplTest extends RuleBaseTest
             assertEquals("description", action.getDescription());
             List<ParameterDefinition> params = action.getParameterDefinitions();
             assertNotNull(params);
-            assertEquals(1, params.size());
+            assertEquals(2, params.size());
         }        
     }
     
@@ -110,14 +113,19 @@ public class RuleServiceImplTest extends RuleBaseTest
      */
     public void testMakeActionable()
     {
-        this.ruleService.makeActionable(this.nodeRef, this.configFolder);
+        this.ruleService.makeActionable(this.nodeRef);
         assertTrue(this.nodeService.hasAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE));
         
         List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
                                                nodeRef, 
                                                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
         assertEquals(1, nodeAssocRefs.size());
-        assertEquals(this.configFolder, nodeAssocRefs.get(0).getTargetRef());
+		
+		assertNotNull(this.nodeService.createNode(
+							this.rootNodeRef,
+							DictionaryBootstrap.ASSOC_QNAME_CHILDREN,
+							QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"),
+							DictionaryBootstrap.TYPE_QNAME_SYTEM_FOLDER));
     }
     
     /**
@@ -127,7 +135,7 @@ public class RuleServiceImplTest extends RuleBaseTest
     public void testIsActionable()
     {
         assertFalse(this.ruleService.isActionable(this.nodeRef));
-        this.ruleService.makeActionable(this.nodeRef, this.configFolder);
+        this.ruleService.makeActionable(this.nodeRef);
         assertTrue(this.ruleService.isActionable(this.nodeRef));
     }
     

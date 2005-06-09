@@ -27,6 +27,7 @@ public class ParameterDefinitionImplTest extends TestCase
         ParameterDefinitionImpl paramDef = new ParameterDefinitionImpl(
                 NAME,
                 ParameterType.STRING,
+                true,
                 DISPLAY_LABEL);
         assertNotNull(paramDef);
         return paramDef;
@@ -43,6 +44,12 @@ public class ParameterDefinitionImplTest extends TestCase
         ParameterDefinitionImpl temp = create();
         assertEquals(ParameterType.STRING, temp.getType());
     }
+	
+	public void testIsMandatory()
+	{
+		ParameterDefinitionImpl temp = create();
+		assertTrue(temp.isMandatory());
+	}
     
     public void testGetDisplayLabel()
     {

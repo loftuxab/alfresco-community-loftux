@@ -27,6 +27,15 @@ public interface ParameterDefinition
 	public ParameterType getType();
 	
 	/**
+	 * Indicates whether the parameter is mandatory or not.
+	 * <p>
+	 * If a parameter is mandatory it means that the value can not be null.
+	 * 
+	 * @return	true if the parameter is mandatory, false otherwise
+	 */
+	public boolean isMandatory();
+	
+	/**
 	 * Get the display label of the parameter.
 	 * 
 	 * @return	the parameter display label
