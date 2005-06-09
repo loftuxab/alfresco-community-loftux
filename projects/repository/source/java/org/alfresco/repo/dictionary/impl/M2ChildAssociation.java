@@ -1,8 +1,14 @@
 package org.alfresco.repo.dictionary.impl;
 
+
+/**
+ * Child Association definition.
+ * 
+ * @author David Caruana
+ *
+ */
 public class M2ChildAssociation extends M2ClassAssociation
 {
-
     private String requiredChildName = null;
     private boolean allowDuplicateChildName = true;
     
@@ -10,6 +16,7 @@ public class M2ChildAssociation extends M2ClassAssociation
     /*package*/ M2ChildAssociation()
     {
     }
+    
     
     /*package*/ M2ChildAssociation(String name)
     {
@@ -22,21 +29,22 @@ public class M2ChildAssociation extends M2ClassAssociation
         return requiredChildName;
     }
     
+    
     public void setRequiredChildName(String requiredChildName)
     {
         this.requiredChildName = requiredChildName;
     }
+    
     
     public boolean allowDuplicateChildName()
     {
         return allowDuplicateChildName;
     }
     
+    
     public void setAllowDuplicateChildName(boolean allowDuplicateChildName)
     {
         this.allowDuplicateChildName = allowDuplicateChildName;
     }
-
-
 
 }

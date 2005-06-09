@@ -1,6 +1,11 @@
 package org.alfresco.repo.dictionary.impl;
 
 
+/**
+ * Association definition.
+ * 
+ * @author David Caruana
+ */
 public class M2Association extends M2ClassAssociation
 {
         
@@ -12,6 +17,5 @@ public class M2Association extends M2ClassAssociation
     {
         super(name);
     }
-    
 
 }

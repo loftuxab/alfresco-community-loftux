@@ -1,6 +1,7 @@
 package org.alfresco.repo.service;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
@@ -29,8 +30,7 @@ import org.springframework.beans.factory.InitializingBean;
  * 
  * @author David Caruana
  * 
- * @param <I>
- *            The component interface class
+ * @param <I> The component interface class
  */
 public class StoreRedirectorProxyFactory<I> implements FactoryBean, InitializingBean
 {
@@ -94,34 +94,27 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
     public void setRedirectedStoreBindings(Map<String, I> storeBindings)
     {
         redirectedStoreBindings = new HashMap<StoreRef, I>(storeBindings.size());
-        for(String ref: storeBindings.keySet())
+        for(String ref : storeBindings.keySet())
         {
             redirectedStoreBindings.put(new StoreRef(ref), storeBindings.get(ref));
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    
+    /* (non-Javadoc)
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
     public void afterPropertiesSet() throws ServiceException
     {
         ParameterCheck.mandatory("Proxy Interface", proxyInterface);
         ParameterCheck.mandatory("Default Binding", defaultBinding);
-        // / Nothing is mandatory as it can fall back to the default
-        // implementation
-        // ParameterCheck.mandatory("Redirected Protocol Bindings",
-        // redirectedProtocolBindings);
 
         // Setup the redirector proxy
-        this.redirectorProxy = (I) Proxy
-                .newProxyInstance(proxyInterface.getClassLoader(), new Class[] { proxyInterface, StoreRedirector.class }, new RedirectorInvocationHandler());
+        this.redirectorProxy = (I) Proxy.newProxyInstance(proxyInterface.getClassLoader(), new Class[] { proxyInterface, StoreRedirector.class }, new RedirectorInvocationHandler());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    
+    /* (non-Javadoc)
      * @see org.springframework.beans.factory.FactoryBean#getObject()
      */
     public I getObject()
@@ -129,9 +122,8 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
         return redirectorProxy;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    
+    /* (non-Javadoc)
      * @see org.springframework.beans.factory.FactoryBean#getObjectType()
      */
     public Class getObjectType()
@@ -139,9 +131,8 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
         return proxyInterface;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    
+    /* (non-Javadoc)
      * @see org.springframework.beans.factory.FactoryBean#isSingleton()
      */
     public boolean isSingleton()
@@ -149,16 +140,15 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
         return true;
     }
 
+    
     /**
      * Invocation handler that redirects based on store type
      */
     /* package */class RedirectorInvocationHandler implements InvocationHandler, StoreRedirector
     {
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
-         *      java.lang.reflect.Method, java.lang.Object[])
+        
+        /* (non-Javadoc)
+         * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
          */
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
@@ -199,30 +189,22 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
             if (logger.isDebugEnabled())
                 logger.debug("Redirecting method " + method + " to binding " + binding + " based on store type " + storeRef);
 
-            // Invoke the implementation
-            return method.invoke(binding, args);
+            try
+            {
+                // Invoke the appropriate binding
+                return method.invoke(binding, args);
+            }
+            catch (InvocationTargetException e)
+            {
+                throw e.getCause();
+            }
         }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.alfresco.repo.service.ServiceDescriptor#getSupportedStores()
-         */
-        public Collection<String> getSupportedStoreProtocols()
-        {
-            return Collections.unmodifiableCollection(StoreRedirectorProxyFactory.this.redirectedProtocolBindings.keySet());
-        }
-
-        public Collection<StoreRef> getSupportedStores()
-        {
-            return Collections.unmodifiableCollection(StoreRedirectorProxyFactory.this.redirectedStoreBindings.keySet());
-        }
+        
 
         /**
          * Determine store type from array of method arguments
          * 
-         * @param args
-         *            the method arguments
+         * @param args the method arguments
          * @return the store type (or null, if one is not specified)
          */
         private StoreRef getStoreRef(Object[] args)
@@ -260,5 +242,24 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
 
             return storeRef;
         }
+        
+
+        /* (non-Javadoc)
+         * @see org.alfresco.repo.service.StoreRedirector#getSupportedStoreProtocols()
+         */
+        public Collection<String> getSupportedStoreProtocols()
+        {
+            return Collections.unmodifiableCollection(StoreRedirectorProxyFactory.this.redirectedProtocolBindings.keySet());
+        }
+
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.repo.service.StoreRedirector#getSupportedStores()
+         */
+        public Collection<StoreRef> getSupportedStores()
+        {
+            return Collections.unmodifiableCollection(StoreRedirectorProxyFactory.this.redirectedStoreBindings.keySet());
+        }
+
     }
 }

@@ -13,6 +13,8 @@ import junit.framework.TestCase;
  */
 public class QNamePatternTest extends TestCase
 {
+    private static final String TEST_NAMESPACE = "http://www.alfresco.org/QNamePatternTest";
+    
     QName check1;
     QName check2;
     QName check3;
@@ -25,13 +27,13 @@ public class QNamePatternTest extends TestCase
     public void setUp() throws Exception
     {
         check1 = QName.createQName(null, "ABC");
-        check2 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "XYZ");
-        check3 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "ABC");
+        check2 = QName.createQName(TEST_NAMESPACE, "XYZ");
+        check3 = QName.createQName(TEST_NAMESPACE, "ABC");
     }
     
     public void testSimpleQNamePattern() throws Exception
     {
-        QNamePattern pattern = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "ABC");
+        QNamePattern pattern = QName.createQName(TEST_NAMESPACE, "ABC");
         
         // check
         assertFalse("Simple match failed: " + check1, pattern.isMatch(check1));

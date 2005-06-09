@@ -228,11 +228,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      */
     protected void invokeOnCreateChildAssociation(ChildAssocRef childAssocRef)
     {
-        // TODO
-        CodeMonkey.todo("The assoc qname being passed in must be the type qname not the assoc qname");
-//        NodeServicePolicies.OnCreateChildAssociationPolicy policy = 
-//            this.onCreateChildAssociationDelegate.get(this, childAssocRef.getParentRef(), childAssocRef.getQName());
-//        policy.onCreateChildAssociation(childAssocRef);
+        NodeServicePolicies.OnCreateChildAssociationPolicy policy = 
+            this.onCreateChildAssociationDelegate.get(this, childAssocRef.getParentRef(), childAssocRef.getTypeQName());
+        policy.onCreateChildAssociation(childAssocRef);
     }
 
     /**

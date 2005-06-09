@@ -15,6 +15,12 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
 
+/**
+ * Model Definition.
+ * 
+ * @author David Caruana
+ *
+ */
 public class M2Model
 {
     private String name = null;
@@ -30,11 +36,17 @@ public class M2Model
     private List<M2Aspect> aspects = new ArrayList<M2Aspect>();
     
 
-    
     private M2Model()
     {
     }
 
+
+    /**
+     * Construct an empty model
+     * 
+     * @param name  the name of the model
+     * @return  the model
+     */
     public static M2Model createModel(String name)
     {
         M2Model model = new M2Model();
@@ -42,6 +54,13 @@ public class M2Model
         return model;
     }
 
+    
+    /**
+     * Construct a model from a dictionary xml specification
+     * 
+     * @param xml  the dictionary xml
+     * @return  the model representation of the xml
+     */
     public static M2Model createModel(InputStream xml)
     {
         try
@@ -57,6 +76,12 @@ public class M2Model
         }
     }
 
+    
+    /**
+     * Render the model to dictionary XML
+     * 
+     * @param xml  the dictionary xml representation of the model
+     */
     public void toXML(OutputStream xml)
     {
         try
@@ -73,6 +98,13 @@ public class M2Model
     }
 
     
+    /**
+     * Create a compiled form of this model
+     * 
+     * @param dictionaryDAO  dictionary DAO
+     * @param namespaceDAO  namespace DAO
+     * @return  the compiled form of the model
+     */
     /*package*/ CompiledModel compile(DictionaryDAO dictionaryDAO, NamespaceDAO namespaceDAO)
     {
         CompiledModel compiledModel = new CompiledModel(this, dictionaryDAO, namespaceDAO);
@@ -85,45 +117,54 @@ public class M2Model
         return name;
     }
     
+    
     public void setName(String name)
     {
         this.name = name;
     }
+    
     
     public String getDescription()
     {
         return description;
     }
     
+    
     public void setDescription(String description)
     {
         this.description = description;
     }
+    
     
     public String getAuthor()
     {
         return author;
     }
     
+    
     public void setAuthor(String author)
     {
         this.author = author;
     }
+    
     
     public Date getPublishedDate()
     {
         return published;
     }
     
+    
     public void setPublishedDate(Date published)
     {
         this.published = published;
     }
     
+    
     public String getVersion()
     {
         return version;
     }
+    
     
     public void setVersion(String version)
     {
@@ -139,6 +180,7 @@ public class M2Model
         return type;
     }
     
+    
     public void removeType(String name)
     {
         M2Type type = getType(name);
@@ -148,11 +190,13 @@ public class M2Model
         }
     }
     
+    
     public List<M2Type> getTypes()
     {
         return Collections.unmodifiableList(types);
     }
 
+    
     public M2Type getType(String name)
     {
         for (M2Type candidate : types)
@@ -165,6 +209,7 @@ public class M2Model
         return null;
     }
     
+    
     public M2Aspect createAspect(String name)
     {
         M2Aspect aspect = new M2Aspect();
@@ -172,6 +217,7 @@ public class M2Model
         aspects.add(aspect);
         return aspect;
     }
+    
     
     public void removeAspect(String name)
     {
@@ -182,11 +228,13 @@ public class M2Model
         }
     }
 
+    
     public List<M2Aspect> getAspects()
     {
         return Collections.unmodifiableList(aspects);
     }
 
+    
     public M2Aspect getAspect(String name)
     {
         for (M2Aspect candidate : aspects)
@@ -199,6 +247,7 @@ public class M2Model
         return null;
     }
     
+    
     public M2PropertyType createPropertyType(String name)
     {
         M2PropertyType type = new M2PropertyType();
@@ -207,6 +256,7 @@ public class M2Model
         return type;
     }
     
+
     public void removePropertyType(String name)
     {
         M2PropertyType type = getPropertyType(name);
@@ -216,11 +266,13 @@ public class M2Model
         }
     }
 
+
     public List<M2PropertyType> getPropertyTypes()
     {
         return Collections.unmodifiableList(propertyTypes);
     }
 
+    
     public M2PropertyType getPropertyType(String name)
     {
         for (M2PropertyType candidate : propertyTypes)
@@ -233,6 +285,7 @@ public class M2Model
         return null;
     }
 
+    
     public M2Namespace createNamespace(String uri, String prefix)
     {
         M2Namespace namespace = new M2Namespace();
@@ -241,6 +294,7 @@ public class M2Model
         namespaces.add(namespace);
         return namespace;
     }
+    
     
     public void removeNamespace(String uri)
     {
@@ -251,10 +305,12 @@ public class M2Model
         }
     }
 
+    
     public List<M2Namespace> getNamespaces()
     {
         return Collections.unmodifiableList(namespaces);
     }
+
 
     public M2Namespace getNamespace(String uri)
     {
@@ -268,6 +324,7 @@ public class M2Model
         return null;
     }
     
+    
     public M2Namespace createImport(String uri, String prefix)
     {
         M2Namespace namespace = new M2Namespace();
@@ -276,6 +333,7 @@ public class M2Model
         imports.add(namespace);
         return namespace;
     }
+    
     
     public void removeImport(String uri)
     {
@@ -286,11 +344,13 @@ public class M2Model
         }
     }
 
+
     public List<M2Namespace> getImports()
     {
         return Collections.unmodifiableList(imports);
     }
 
+    
     public M2Namespace getImport(String uri)
     {
         for (M2Namespace candidate : imports)

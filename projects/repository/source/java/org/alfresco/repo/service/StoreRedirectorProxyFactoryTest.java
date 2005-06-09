@@ -30,6 +30,8 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
 
         String result1 = service.defaultBinding("service1");
         assertEquals("Type1:service1", result1);
+        String result1a = service.noArgs();
+        assertEquals("Type1", result1a);
         String result2 = service.storeRef(storeRef1);
         assertEquals("Type1:" + storeRef1, result2);
         String result3 = service.storeRef(storeRef2);
@@ -58,10 +60,8 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
         // Direct store refs
         String result14 = service.storeRef(storeRef3);
         assertEquals("Type3:" + storeRef3, result14);
-
         String result15 = service.storeRef(storeRef4);
         assertEquals("Type1:" + storeRef4, result15);
-
     }
 
     public void testInvalidArgs()
@@ -71,17 +71,35 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
         NodeRef nodeRef1 = new NodeRef(storeRef1, "id");
 
         TestServiceInterface service = (TestServiceInterface) factory.getBean("service1");
-
         String result1 = service.storeRef(storeRef1);
         assertEquals("Type1:" + storeRef1, result1);
-
         String result2 = service.nodeRef(nodeRef1);
         assertEquals("Type1:" + nodeRef1, result2);
-
     }
+    
+    public void testException()
+    {
+        StoreRef storeRef1 = new StoreRef("Type1", "id");
+        NodeRef nodeRef1 = new NodeRef(storeRef1, "id");
+        TestServiceInterface service = (TestServiceInterface) factory.getBean("service1");
+        
+        try
+        {
+            service.throwException(nodeRef1);
+            fail("Service method did not throw exception");
+        }
+        catch(Exception e)
+        {
+            assertTrue(e instanceof IllegalArgumentException);
+            assertEquals(nodeRef1.toString(), e.getMessage());
+        }
+    }
+    
 
     public interface TestServiceInterface
     {
+        public String noArgs();
+        
         public String defaultBinding(String arg);
 
         public String storeRef(StoreRef ref1);
@@ -93,8 +111,11 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
         public String multiNodeRef(NodeRef ref1, NodeRef ref2);
 
         public String mixedStoreNodeRef(StoreRef ref2, NodeRef ref1);
+        
+        public void throwException(NodeRef ref1);
     }
 
+    
     public static abstract class Component implements TestServiceInterface
     {
         private String type;
@@ -102,6 +123,11 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
         private Component(String type)
         {
             this.type = type;
+        }
+        
+        public String noArgs()
+        {
+            return type;
         }
 
         public String defaultBinding(String arg)
@@ -133,6 +159,12 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
         {
             return type + ":" + ref1 + "," + ref2;
         }
+        
+        public void throwException(NodeRef ref1)
+        {
+            throw new IllegalArgumentException(ref1.toString());
+        }
+        
     }
 
     public static class Type1Component extends Component

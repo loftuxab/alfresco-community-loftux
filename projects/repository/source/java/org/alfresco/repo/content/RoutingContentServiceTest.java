@@ -31,6 +31,8 @@ public class RoutingContentServiceTest extends BaseSpringTest
 {
     private static final String SOME_CONTENT = "ABC";
         
+    private static final String TEST_NAMESPACE = "http://www.alfresco.org/test/RoutingContentServiceTest";
+    
     private ContentService contentService;
     private NodeService nodeService;
     private NodeRef rootNodeRef;
@@ -60,7 +62,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         ChildAssocRef assocRef = nodeService.createNode(
                 rootNodeRef,
                 DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
-                QName.createQName(NamespaceService.ALFRESCO_TEST_PREFIX, GUID.generate()),
+                QName.createQName(TEST_NAMESPACE, GUID.generate()),
                 DictionaryBootstrap.TYPE_QNAME_CONTENT,
                 properties);
         contentNodeRef = assocRef.getChildRef();

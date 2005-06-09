@@ -8,7 +8,7 @@ import org.alfresco.repo.ref.QName;
 
 
 /**
- * Default Read-Only Association Definition Implementation
+ * Compiled Association Definition.
  * 
  * @author David Caruana
  */
@@ -25,12 +25,11 @@ import org.alfresco.repo.ref.QName;
     
     
     /**
-     * Construct read-only Association Definition
+     * Construct
      * 
      * @param m2Association  association definition
-     * @return  the read-only definition
+     * @return  the definition
      */
-    
     /*package*/ M2AssociationDefinition(ClassDefinition classDef, M2ClassAssociation assoc, NamespacePrefixResolver resolver)
     {
         this.classDef = classDef;
@@ -43,6 +42,7 @@ import org.alfresco.repo.ref.QName;
         this.targetRoleName = QName.createQName(assoc.getTargetRoleName(), resolver);
     }
 
+    
     /*package*/ M2ClassAssociation getM2Association()
     {
         return assoc;
@@ -81,70 +81,102 @@ import org.alfresco.repo.ref.QName;
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#getTitle()
+     */
     public String getTitle()
     {
         return assoc.getTitle();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#getDescription()
+     */
     public String getDescription()
     {
         return assoc.getDescription();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#isProtected()
+     */
     public boolean isProtected()
     {
         return assoc.isProtected();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#getSourceClass()
+     */
     public ClassDefinition getSourceClass()
     {
         return classDef;
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#getSourceRoleName()
+     */
     public QName getSourceRoleName()
     {
         return sourceRoleName;
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#isSourceMandatory()
+     */
     public boolean isSourceMandatory()
     {
         return assoc.isSourceMandatory();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#isSourceMany()
+     */
     public boolean isSourceMany()
     {
         return assoc.isSourceMany();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#getTargetClass()
+     */
     public ClassDefinition getTargetClass()
     {
         return targetClass;
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#getTargetRoleName()
+     */
     public QName getTargetRoleName()
     {
         return targetRoleName;
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#isTargetMandatory()
+     */
     public boolean isTargetMandatory()
     {
         return assoc.isTargetMandatory();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.AssociationDefinition#isTargetMany()
+     */
     public boolean isTargetMany()
     {
         return assoc.isTargetMany();
     }
-
 
 }

@@ -13,17 +13,16 @@ import org.alfresco.repo.dictionary.ModelDefinition;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.QName;
 
+/**
+ * Compiled Model Definition
+ * 
+ * @author David Caruana
+ *
+ */
 public class M2ModelDefinition implements ModelDefinition
 {
-
     private QName name;
     private M2Model model;
-    
-    
-    public static ModelDefinition create(M2Model model, NamespacePrefixResolver resolver)
-    {
-        return new M2ModelDefinition(model, resolver);
-    }
     
     
     /*package*/ M2ModelDefinition(M2Model model, NamespacePrefixResolver resolver)
@@ -33,30 +32,45 @@ public class M2ModelDefinition implements ModelDefinition
     }
 
     
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ModelDefinition#getName()
+     */
     public QName getName()
     {
         return name;
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ModelDefinition#getDescription()
+     */
     public String getDescription()
     {
         return model.getDescription();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ModelDefinition#getAuthor()
+     */
     public String getAuthor()
     {
         return model.getAuthor();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ModelDefinition#getPublishedDate()
+     */
     public Date getPublishedDate()
     {
         return model.getPublishedDate();
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ModelDefinition#getVersion()
+     */
     public String getVersion()
     {
         return model.getVersion();

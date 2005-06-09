@@ -14,13 +14,12 @@ import org.alfresco.repo.ref.QName;
 
 
 /**
- * Default Read-Only Class Definition Implementation
+ * Compiled Class Definition
  * 
  * @author David Caruana
  */
 /*package*/ class M2ClassDefinition implements ClassDefinition
 {
-    
     protected M2Class m2Class;
     protected QName name;
     protected QName parentName = null;
@@ -32,7 +31,15 @@ import org.alfresco.repo.ref.QName;
     private Map<QName, AssociationDefinition> inheritedAssociations = new HashMap<QName, AssociationDefinition>();
     private Map<QName, ChildAssociationDefinition> inheritedChildAssociations = new HashMap<QName, ChildAssociationDefinition>();
     
-   
+
+    /**
+     * Construct
+     * 
+     * @param m2Class  class definition
+     * @param resolver  namepsace resolver
+     * @param modelProperties  global list of model properties
+     * @param modelAssociations  global list of model associations
+     */
     /*package*/ M2ClassDefinition(M2Class m2Class, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
     {
         this.m2Class = m2Class;
@@ -111,6 +118,7 @@ import org.alfresco.repo.ref.QName;
             propertyOverrides.put(overrideName, override);
         }
     }
+    
     
     /*package*/ void resolveDependencies(ModelQuery query)
     {

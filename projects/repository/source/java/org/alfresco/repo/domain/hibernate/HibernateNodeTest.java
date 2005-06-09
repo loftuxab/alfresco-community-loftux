@@ -30,6 +30,8 @@ import org.alfresco.util.GUID;
  */
 public class HibernateNodeTest extends BaseHibernateTest
 {
+    private static final String TEST_NAMESPACE = "http://www.alfresco.org/test/HibernateNodeTest";
+    
     private Store store;
     
     public HibernateNodeTest()
@@ -160,10 +162,10 @@ public class HibernateNodeTest extends BaseHibernateTest
         node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CMOBJECT);
         
         // add some aspects
-        QName aspect1 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "1");
-        QName aspect2 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "2");
-        QName aspect3 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "3");
-        QName aspect4 = QName.createQName(NamespaceService.ALFRESCO_TEST_URI, "4");
+        QName aspect1 = QName.createQName(TEST_NAMESPACE, "1");
+        QName aspect2 = QName.createQName(TEST_NAMESPACE, "2");
+        QName aspect3 = QName.createQName(TEST_NAMESPACE, "3");
+        QName aspect4 = QName.createQName(TEST_NAMESPACE, "4");
         Set<QName> aspects = node.getAspects();
         aspects.add(aspect1);
         aspects.add(aspect2);
@@ -251,6 +253,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         // create an association to the content
         ChildAssoc assoc1 = new ChildAssocImpl();
         assoc1.setIsPrimary(true);
+        assoc1.setTypeQName(QName.createQName(null, "type1"));
         assoc1.setQName(QName.createQName(null, "number1"));
         assoc1.buildAssociation(containerNode, contentNode);
         getSession().save(assoc1);
@@ -258,6 +261,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         // make another association between the same two parent and child nodes
         ChildAssoc assoc2 = new ChildAssocImpl();
         assoc2.setIsPrimary(true);
+        assoc2.setTypeQName(QName.createQName(null, "type1"));
         assoc2.setQName(QName.createQName(null, "number2"));
         assoc2.buildAssociation(containerNode, contentNode);
         getSession().save(assoc2);

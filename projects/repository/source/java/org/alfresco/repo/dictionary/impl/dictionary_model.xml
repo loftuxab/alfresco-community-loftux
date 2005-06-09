@@ -8,9 +8,6 @@
    <namespaces>
       <!-- Default Namespace -->
       <namespace uri="" prefix=""/>
-      <!-- Test Namespace -->
-      <!-- TODO: Remove this namespace in favour of test specific namespaces -->
-      <namespace uri="http://www.alfresco.org/test/1.0" prefix="alftest"/>
       <!-- Dictionary Namespace -->
       <namespace uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
    </namespaces>

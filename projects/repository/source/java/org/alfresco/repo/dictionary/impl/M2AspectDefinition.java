@@ -8,8 +8,9 @@ import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.QName;
 
+
 /**
- * Default Read-Only Aspect Definition Implementation
+ * Compiled Aspect Definition.
  * 
  * @author David Caruana
  */
@@ -17,11 +18,9 @@ import org.alfresco.repo.ref.QName;
     implements AspectDefinition
 {
 
-    
     /*package*/ M2AspectDefinition(M2Aspect m2Aspect, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
     {
         super(m2Aspect, resolver, modelProperties, modelAssociations);
     }
-
     
 }

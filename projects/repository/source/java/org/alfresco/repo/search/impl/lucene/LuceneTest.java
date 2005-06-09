@@ -1888,7 +1888,6 @@ public class LuceneTest extends TestCase
     {
         DynamicNamespacePrefixResolver nspr = new DynamicNamespacePrefixResolver(null);
         nspr.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-        nspr.addDynamicNamespace(NamespaceService.ALFRESCO_TEST_PREFIX, NamespaceService.ALFRESCO_TEST_URI);
         nspr.addDynamicNamespace("namespace", "namespace");
         nspr.addDynamicNamespace("test", TEST_NAMESPACE);
         nspr.addDynamicNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);

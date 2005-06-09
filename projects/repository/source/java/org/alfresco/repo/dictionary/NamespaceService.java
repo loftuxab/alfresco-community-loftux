@@ -46,16 +46,6 @@ public interface NamespaceService extends NamespacePrefixResolver
      */
     public static final String ALFRESCO_PREFIX = "alf";
 
-    /**
-     * Alfresco Test Namespace URI
-     */
-    public static final String ALFRESCO_TEST_URI = "http://www.alfresco.org/test/1.0";
-    
-    /**
-     * Alfresco Test Namespace Prefix
-     */
-    public static final String ALFRESCO_TEST_PREFIX = "alftest";
-
     
     /**
      * Gets all registered Namespace URIs

@@ -16,25 +16,42 @@ public interface NamespaceDAO extends NamespacePrefixResolver
 {
     
     /**
-     * Gets all registered URIs
-     * 
-     * @return  all registered URIs
+     * @return all registered URIs
      */
     public Collection<String> getURIs();
 
     /**
-     * Gets all registered Prefixes
-     * 
      * @return  all registered prefixes
      */
     public Collection<String> getPrefixes();
 
+    /**
+     * Add a namespace URI
+     * 
+     * @param uri the namespace uri to add
+     */
     public void addURI(String uri);
-    
+
+    /**
+     * Remove the specified URI
+     * 
+     * @param uri the uri to remove
+     */
     public void removeURI(String uri);
 
+    /**
+     * Add a namespace prefix
+     * 
+     * @param prefix the prefix
+     * @param uri the uri to prefix
+     */    
     public void addPrefix(String prefix, String uri);
 
+    /**
+     * Remove a namspace prefix
+     * 
+     * @param prefix the prefix to remove
+     */
     public void removePrefix(String prefix);
     
 }

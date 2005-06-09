@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Abstract Class Definition.
+ * 
+ * @author David Caruana
+ *
+ */
 public abstract class M2Class
 {
     private String name = null;
@@ -19,48 +25,55 @@ public abstract class M2Class
     /*package*/ M2Class()
     {
     }
-    
-    
+
     
     public String getName()
     {
         return name;
     }
+
     
     public void setName(String name)
     {
         this.name = name;
     }
 
+    
     public String getTitle()
     {
         return title;
     }
+    
     
     public void setTitle(String title)
     {
         this.title = title;
     }
     
+    
     public String getDescription()
     {
         return description;
     }
+    
     
     public void setDescription(String description)
     {
         this.description = description;
     }
 
+    
     public String getParentName()
     {
         return parentName;
     }
     
+    
     public void setParentName(String parentName)
     {
         this.parentName = parentName;
     }
+    
     
     public M2Property createProperty(String name)
     {
@@ -69,6 +82,7 @@ public abstract class M2Class
         properties.add(property);
         return property;
     }
+    
     
     public void removeProperty(String name)
     {
@@ -79,11 +93,13 @@ public abstract class M2Class
         }
     }
 
+
     public List<M2Property> getProperties()
     {
         return Collections.unmodifiableList(properties);
     }
 
+    
     public M2Property getProperty(String name)
     {
         for (M2Property candidate : properties)
@@ -96,6 +112,7 @@ public abstract class M2Class
         return null;
     }
 
+    
     public M2Association createAssociation(String name)
     {
         M2Association association = new M2Association();
@@ -104,6 +121,7 @@ public abstract class M2Class
         return association;
     }
 
+    
     public M2ChildAssociation createChildAssociation(String name)
     {
         M2ChildAssociation association = new M2ChildAssociation();
@@ -111,6 +129,7 @@ public abstract class M2Class
         associations.add(association);
         return association;
     }
+    
     
     public void removeAssociation(String name)
     {
@@ -121,11 +140,13 @@ public abstract class M2Class
         }
     }
 
+    
     public List<M2ClassAssociation> getAssociations()
     {
         return Collections.unmodifiableList(associations);
     }
 
+    
     public M2ClassAssociation getAssociation(String name)
     {
         for (M2ClassAssociation candidate : associations)
@@ -138,6 +159,7 @@ public abstract class M2Class
         return null;
     }
     
+    
     public M2PropertyOverride createPropertyOverride(String name)
     {
         M2PropertyOverride property = new M2PropertyOverride();
@@ -145,6 +167,7 @@ public abstract class M2Class
         propertyOverrides.add(property);
         return property;
     }
+    
     
     public void removePropertyOverride(String name)
     {
@@ -155,10 +178,12 @@ public abstract class M2Class
         }
     }
 
+    
     public List<M2PropertyOverride> getPropertyOverrides()
     {
         return Collections.unmodifiableList(propertyOverrides);
     }
+
 
     public M2PropertyOverride getPropertyOverride(String name)
     {

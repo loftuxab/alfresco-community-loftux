@@ -9,7 +9,7 @@ import org.alfresco.repo.ref.QName;
 
 
 /**
- * Default Read-only Property Definition implementation
+ * Compiled Property Definition
  * 
  * @author David Caruana
  */
@@ -22,7 +22,6 @@ import org.alfresco.repo.ref.QName;
     private PropertyTypeDefinition propertyType;
     
     
-    
     /*package*/ M2PropertyDefinition(ClassDefinition classDef, M2Property m2Property, NamespacePrefixResolver resolver)
     {
         this.classDef = classDef;
@@ -32,6 +31,7 @@ import org.alfresco.repo.ref.QName;
         this.name = QName.createQName(property.getName(), resolver);
         this.propertyTypeName = QName.createQName(property.getType(), resolver);
     }
+    
     
     /*package*/ M2PropertyDefinition(ClassDefinition classDef, PropertyDefinition propertyDef, M2PropertyOverride override)
     {
@@ -57,6 +57,13 @@ import org.alfresco.repo.ref.QName;
     }
     
     
+    /**
+     * Create a property definition whose values are overridden
+     * 
+     * @param propertyDef  the property definition to override
+     * @param override  the overridden values
+     * @return  the property definition
+     */
     private M2Property createOverriddenProperty(PropertyDefinition propertyDef, M2PropertyOverride override)
     {
         M2Property property = new M2Property();
@@ -98,6 +105,7 @@ import org.alfresco.repo.ref.QName;
         return name;
     }
     
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#getTitle()
      */
@@ -105,6 +113,7 @@ import org.alfresco.repo.ref.QName;
     {
         return property.getTitle();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#getDescription()
@@ -113,6 +122,7 @@ import org.alfresco.repo.ref.QName;
     {
         return property.getDescription();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#getDefaultValue()
@@ -122,6 +132,7 @@ import org.alfresco.repo.ref.QName;
         return property.getDefaultValue();
     }
 
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#getPropertyType()
      */
@@ -129,6 +140,7 @@ import org.alfresco.repo.ref.QName;
     {
         return propertyType;
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#getContainerClass()
@@ -137,6 +149,7 @@ import org.alfresco.repo.ref.QName;
     {
         return classDef;
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#isMultiValued()
@@ -146,6 +159,7 @@ import org.alfresco.repo.ref.QName;
         return property.isMultiValued();
     }
 
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#isMandatory()
      */
@@ -153,6 +167,7 @@ import org.alfresco.repo.ref.QName;
     {
         return property.isMandatory();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#isProtected()
@@ -161,6 +176,7 @@ import org.alfresco.repo.ref.QName;
     {
         return property.isProtected();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#isIndexed()
@@ -169,6 +185,7 @@ import org.alfresco.repo.ref.QName;
     {
         return property.isIndexed();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#isStoredInIndex()
@@ -177,6 +194,7 @@ import org.alfresco.repo.ref.QName;
     {
         return property.isStoredInIndex();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#isIndexedAtomically()
@@ -185,6 +203,7 @@ import org.alfresco.repo.ref.QName;
     {
         return property.isIndexedAtomically();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#isTokenisedInIndex()

@@ -23,6 +23,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
+/**
+ * Compiled representation of a model definition.
+ * 
+ * In this case, compiled means that
+ * a) all references between model items have been resolved
+ * b) inheritence of class features have been flattened
+ * c) overridden class features have been resolved
+ * 
+ * A compiled model also represents a valid model.
+ * 
+ * @author David Caruana
+ *
+ */
 /*package*/ class CompiledModel implements ModelQuery
 {
     
@@ -39,6 +52,13 @@ import org.apache.commons.logging.LogFactory;
     private Map<QName, AssociationDefinition> associations = new HashMap<QName, AssociationDefinition>();
     
     
+    /**
+     * Construct
+     * 
+     * @param model model definition 
+     * @param dictionaryDAO dictionary DAO
+     * @param namespaceDAO namespace DAO
+     */
     /*package*/ CompiledModel(M2Model model, DictionaryDAO dictionaryDAO, NamespaceDAO namespaceDAO)
     {
         try
@@ -62,12 +82,122 @@ import org.apache.commons.logging.LogFactory;
     }
 
     
+    /**
+     * @return the model definition
+     */
     /*package*/ M2Model getModel()
     {
         return model;
     }
     
     
+    /**
+     * Construct compiled definitions
+     * 
+     * @param model model definition
+     * @param dictionaryDAO dictionary DAO
+     * @param namespaceDAO namespace DAO
+     */
+    private void constructDefinitions(M2Model model, DictionaryDAO dictionaryDAO, NamespaceDAO namespaceDAO)
+    {
+        NamespacePrefixResolver localPrefixes = createLocalPrefixResolver(model, namespaceDAO);
+    
+        // Construct Model Definition
+        modelDefinition = new M2ModelDefinition(model, localPrefixes);
+        
+        // Construct Property Types
+        for (M2PropertyType propType : model.getPropertyTypes())
+        {
+            M2PropertyTypeDefinition def = new M2PropertyTypeDefinition(propType, localPrefixes);
+            if (propertyTypes.containsKey(def.getName()))
+            {
+                throw new DictionaryException("Found duplicate property type definition " + propType.getName());
+            }
+            propertyTypes.put(def.getName(), def);
+        }
+        
+        // Construct Type Definitions
+        for (M2Type type : model.getTypes())
+        {
+            M2TypeDefinition def = new M2TypeDefinition(type, localPrefixes, properties, associations);
+            if (classes.containsKey(def.getName()))
+            {
+                throw new DictionaryException("Found duplicate class definition " + type.getName() + " (a type)");
+            }
+            classes.put(def.getName(), def);
+            types.put(def.getName(), def);
+        }
+        
+        // Construct Aspect Definitions
+        for (M2Aspect aspect : model.getAspects())
+        {
+            M2AspectDefinition def = new M2AspectDefinition(aspect, localPrefixes, properties, associations);
+            if (classes.containsKey(def.getName()))
+            {
+                throw new DictionaryException("Found duplicate class definition " + aspect.getName() + " (an aspect)");
+            }
+            classes.put(def.getName(), def);
+            aspects.put(def.getName(), def);
+        }
+    }    
+    
+    
+    /**
+     * Create a local namespace prefix resolver containing the namespaces defined and imported
+     * in the model
+     * 
+     * @param model model definition
+     * @param namespaceDAO  namespace DAO
+     * @return the local namespace prefix resolver
+     */
+    private NamespacePrefixResolver createLocalPrefixResolver(M2Model model, NamespaceDAO namespaceDAO)
+    {
+        // Retrieve set of existing URIs for validation purposes
+        Collection<String> uris = namespaceDAO.getURIs();
+        
+        // Create a namespace prefix resolver based on imported and defined
+        // namespaces within the model
+        DynamicNamespacePrefixResolver prefixResolver = new DynamicNamespacePrefixResolver(null);
+        for (M2Namespace imported : model.getImports())
+        {
+            String uri = imported.getUri();
+            if (!uris.contains(uri))
+            {
+                throw new NamespaceException("URI " + uri + " cannot be imported as it is not defined (with prefix " + imported.getPrefix());
+            }
+            prefixResolver.addDynamicNamespace(imported.getPrefix(), uri);
+        }
+        for (M2Namespace defined : model.getNamespaces())
+        {
+            prefixResolver.addDynamicNamespace(defined.getPrefix(), defined.getUri());
+        }
+        return prefixResolver;
+    }
+    
+
+    /**
+     * Resolve dependencies between model items
+     * 
+     * @param query support for querying other items in model
+     */
+    private void resolveDependencies(ModelQuery query)
+    {
+        for (PropertyTypeDefinition def : propertyTypes.values())
+        {
+            ((M2PropertyTypeDefinition)def).resolveDependencies(query);
+        }
+        for (ClassDefinition def : classes.values())
+        {
+            ((M2ClassDefinition)def).resolveDependencies(query);
+        }
+    }
+        
+
+    /**
+     * Resolve class feature inheritence
+     * 
+     * @param query support for querying other items in model
+     */
     private void resolveInheritance(ModelQuery query)
     {
         // Calculate order of class processing (root to leaf)
@@ -110,144 +240,95 @@ import org.apache.commons.logging.LogFactory;
             }
         }
     }
-    
-    
-    private void resolveDependencies(ModelQuery query)
-    {
-        for (PropertyTypeDefinition def : propertyTypes.values())
-        {
-            ((M2PropertyTypeDefinition)def).resolveDependencies(query);
-        }
-        for (ClassDefinition def : classes.values())
-        {
-            ((M2ClassDefinition)def).resolveDependencies(query);
-        }
-    }
         
-
-    private void constructDefinitions(M2Model model, DictionaryDAO dictionaryDAO, NamespaceDAO namespaceDAO)
-    {
-        NamespacePrefixResolver localPrefixes = createLocalPrefixResolver(model, namespaceDAO);
     
-        // Construct Model Definition
-        modelDefinition = M2ModelDefinition.create(model, localPrefixes);
-        
-        // Construct Property Types
-        for (M2PropertyType propType : model.getPropertyTypes())
-        {
-            M2PropertyTypeDefinition def = new M2PropertyTypeDefinition(propType, localPrefixes);
-            if (propertyTypes.containsKey(def.getName()))
-            {
-                throw new DictionaryException("Found duplicate property type definition " + propType.getName());
-            }
-            propertyTypes.put(def.getName(), def);
-        }
-        
-        // Construct Type Definitions
-        for (M2Type type : model.getTypes())
-        {
-            M2TypeDefinition def = new M2TypeDefinition(type, localPrefixes, properties, associations);
-            if (classes.containsKey(def.getName()))
-            {
-                throw new DictionaryException("Found duplicate class definition " + type.getName() + " (a type)");
-            }
-            classes.put(def.getName(), def);
-            types.put(def.getName(), def);
-        }
-        
-        // Construct Aspect Definitions
-        for (M2Aspect aspect : model.getAspects())
-        {
-            M2AspectDefinition def = new M2AspectDefinition(aspect, localPrefixes, properties, associations);
-            if (classes.containsKey(def.getName()))
-            {
-                throw new DictionaryException("Found duplicate class definition " + aspect.getName() + " (an aspect)");
-            }
-            classes.put(def.getName(), def);
-            aspects.put(def.getName(), def);
-        }
-    }    
-    
-    
+    /**
+     * @return  the compiled model definition
+     */
     public ModelDefinition getModelDefinition()
     {
         return modelDefinition;
     }
     
     
-    public PropertyTypeDefinition getPropertyType(QName name)
-    {
-        return propertyTypes.get(name);
-    }
-
-
+    /**
+     * @return  the compiled property types
+     */
     public Collection<PropertyTypeDefinition> getPropertyTypes()
     {
         return propertyTypes.values();
     }
 
+
+    /**
+     * @return the compiled types
+     */
     public Collection<TypeDefinition> getTypes()
     {
         return types.values();
     }
     
+
+    /**
+     * @return the compiled aspects
+     */
     public Collection<AspectDefinition> getAspects()
     {
         return aspects.values();
     }
+
     
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.impl.ModelQuery#getPropertyType(org.alfresco.repo.ref.QName)
+     */
+    public PropertyTypeDefinition getPropertyType(QName name)
+    {
+        return propertyTypes.get(name);
+    }
+
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.impl.ModelQuery#getType(org.alfresco.repo.ref.QName)
+     */
     public TypeDefinition getType(QName name)
     {
         return types.get(name);
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.impl.ModelQuery#getAspect(org.alfresco.repo.ref.QName)
+     */
     public AspectDefinition getAspect(QName name)
     {
         return aspects.get(name);
     }
 
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.impl.ModelQuery#getClass(org.alfresco.repo.ref.QName)
+     */
     public ClassDefinition getClass(QName name)
     {
         return classes.get(name);
     }
     
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.impl.ModelQuery#getProperty(org.alfresco.repo.ref.QName)
+     */
     public PropertyDefinition getProperty(QName name)
     {
         return properties.get(name);
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.impl.ModelQuery#getAssociation(org.alfresco.repo.ref.QName)
+     */
     public AssociationDefinition getAssociation(QName name)
     {
         return associations.get(name);
     }
 
-    
-    private NamespacePrefixResolver createLocalPrefixResolver(M2Model model, NamespaceDAO namespaceDAO)
-    {
-        // Retrieve set of existing URIs for validation purposes
-        Collection<String> uris = namespaceDAO.getURIs();
-        
-        // Create a namespace prefix resolver based on imported and defined
-        // namespaces within the model
-        DynamicNamespacePrefixResolver prefixResolver = new DynamicNamespacePrefixResolver(null);
-        for (M2Namespace imported : model.getImports())
-        {
-            String uri = imported.getUri();
-            if (!uris.contains(uri))
-            {
-                throw new NamespaceException("URI " + uri + " cannot be imported as it is not defined (with prefix " + imported.getPrefix());
-            }
-            prefixResolver.addDynamicNamespace(imported.getPrefix(), uri);
-        }
-        for (M2Namespace defined : model.getNamespaces())
-        {
-            prefixResolver.addDynamicNamespace(defined.getPrefix(), defined.getUri());
-        }
-        return prefixResolver;
-    }
-
-
-    
 }

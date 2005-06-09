@@ -6,7 +6,7 @@ import org.alfresco.repo.ref.NamespacePrefixResolver;
 
 
 /**
- * Default Read-Only Association Definition Implementation
+ * Compiled Association Definition.
  * 
  * @author David Caruana
  */
@@ -14,25 +14,30 @@ import org.alfresco.repo.ref.NamespacePrefixResolver;
     implements ChildAssociationDefinition
 {
 
-    
     /**
-     * Construct read-only Association Definition
-     * 
-     * @param m2Association  association definition
-     * @return  the read-only definition
+     * Construct
+     * @param classDef  class definition
+     * @param assoc  child assocation
+     * @param resolver  namespace resolver
      */
-    
     /*package*/ M2ChildAssociationDefinition(ClassDefinition classDef, M2ChildAssociation assoc, NamespacePrefixResolver resolver)
     {
         super(classDef, assoc, resolver);
     }
 
     
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ChildAssociationDefinition#getRequiredChildName()
+     */
     public String getRequiredChildName()
     {
         return ((M2ChildAssociation)getM2Association()).getRequiredChildName();
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ChildAssociationDefinition#getDuplicateChildNamesAllowed()
+     */
     public boolean getDuplicateChildNamesAllowed()
     {
         return ((M2ChildAssociation)getM2Association()).allowDuplicateChildName();

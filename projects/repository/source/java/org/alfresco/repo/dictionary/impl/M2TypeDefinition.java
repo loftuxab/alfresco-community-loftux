@@ -14,14 +14,13 @@ import org.alfresco.repo.ref.QName;
 
 
 /**
- * Default Read-only Type Definition Implementation
+ * Compiled Type Definition
  * 
  * @author David Caruana
  */
 /*package*/ class M2TypeDefinition extends M2ClassDefinition
     implements TypeDefinition
 {
-    
     private List<QName> defaultAspectNames = new ArrayList<QName>();
     private List<AspectDefinition> defaultAspects = new ArrayList<AspectDefinition>();
     private List<AspectDefinition> inheritedDefaultAspects = new ArrayList<AspectDefinition>();
@@ -85,8 +84,8 @@ import org.alfresco.repo.ref.QName;
     }
     
 
-    /**
-     * @see M2References#createAspectDefList(Collection<? extends M2Aspect>)
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.TypeDefinition#getDefaultAspects()
      */
     public List<AspectDefinition> getDefaultAspects()
     {

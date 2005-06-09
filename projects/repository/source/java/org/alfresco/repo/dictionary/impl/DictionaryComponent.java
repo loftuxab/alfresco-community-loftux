@@ -24,10 +24,6 @@ import org.alfresco.util.ParameterCheck;
  */
 public class DictionaryComponent implements DictionaryService
 {
-
-    /**
-     * Dictionary DAO
-     */
     private DictionaryDAO dictionaryDAO;
 
 
@@ -43,16 +39,27 @@ public class DictionaryComponent implements DictionaryService
         this.dictionaryDAO = dictionaryDAO;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAllModels()
+     */
     public Collection<QName> getAllModels()
     {
         return dictionaryDAO.getModels();
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getModel(org.alfresco.repo.ref.QName)
+     */
     public ModelDefinition getModel(QName model)
     {
         return dictionaryDAO.getModel(model);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAllPropertyTypes()
+     */
     public Collection<QName> getAllPropertyTypes()
     {
         Collection<QName> propertyTypes = new ArrayList<QName>();
@@ -63,6 +70,10 @@ public class DictionaryComponent implements DictionaryService
         return propertyTypes;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getPropertyTypes(org.alfresco.repo.ref.QName)
+     */
     public Collection<QName> getPropertyTypes(QName model)
     {
         Collection<PropertyTypeDefinition> propertyTypes = dictionaryDAO.getPropertyTypes(model);
@@ -74,6 +85,10 @@ public class DictionaryComponent implements DictionaryService
         return qnames;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAllTypes()
+     */
     public Collection<QName> getAllTypes()
     {
         Collection<QName> types = new ArrayList<QName>();
@@ -84,6 +99,10 @@ public class DictionaryComponent implements DictionaryService
         return types;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getTypes(org.alfresco.repo.ref.QName)
+     */
     public Collection<QName> getTypes(QName model)
     {
         Collection<TypeDefinition> types = dictionaryDAO.getTypes(model);
@@ -95,6 +114,10 @@ public class DictionaryComponent implements DictionaryService
         return qnames;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAllAspects()
+     */
     public Collection<QName> getAllAspects()
     {
         Collection<QName> aspects = new ArrayList<QName>();
@@ -105,6 +128,10 @@ public class DictionaryComponent implements DictionaryService
         return aspects;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAspects(org.alfresco.repo.ref.QName)
+     */
     public Collection<QName> getAspects(QName model)
     {
         Collection<AspectDefinition> aspects = dictionaryDAO.getAspects(model);
@@ -116,6 +143,10 @@ public class DictionaryComponent implements DictionaryService
         return qnames;
     }
 
+
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#isSubClass(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName)
+     */
     public boolean isSubClass(QName className, QName ofClassName)
     {
         // Validate arguments
@@ -153,32 +184,54 @@ public class DictionaryComponent implements DictionaryService
     }
 
     
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getPropertyType(org.alfresco.repo.ref.QName)
+     */
     public PropertyTypeDefinition getPropertyType(QName name)
     {
         return dictionaryDAO.getPropertyType(name);
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getType(org.alfresco.repo.ref.QName)
+     */
     public TypeDefinition getType(QName name)
     {
         return dictionaryDAO.getType(name);
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAspect(org.alfresco.repo.ref.QName)
+     */
     public AspectDefinition getAspect(QName name)
     {
         return dictionaryDAO.getAspect(name);
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getClass(org.alfresco.repo.ref.QName)
+     */
     public ClassDefinition getClass(QName name)
     {
         return dictionaryDAO.getClass(name);
     }
     
     
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAnonymousType(org.alfresco.repo.ref.QName, java.util.Collection)
+     */
     public TypeDefinition getAnonymousType(QName type, Collection<QName> aspects)
     {
         return dictionaryDAO.getAnonymousType(type, aspects);
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getProperty(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName)
+     */
     public PropertyDefinition getProperty(QName className, QName propertyName)
     {
         PropertyDefinition propDef = null;
@@ -191,11 +244,19 @@ public class DictionaryComponent implements DictionaryService
         return propDef;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getProperty(org.alfresco.repo.ref.QName)
+     */
     public PropertyDefinition getProperty(QName propertyName)
     {
         return dictionaryDAO.getProperty(propertyName);
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAssociation(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName)
+     */
     public AssociationDefinition getAssociation(QName className, QName associationName)
     {
         AssociationDefinition assocDef = null;
@@ -208,6 +269,10 @@ public class DictionaryComponent implements DictionaryService
         return assocDef;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.DictionaryService#getAssociation(org.alfresco.repo.ref.QName)
+     */
     public AssociationDefinition getAssociation(QName associationName)
     {
         return dictionaryDAO.getAssociation(associationName);

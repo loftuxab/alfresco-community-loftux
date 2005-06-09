@@ -4,9 +4,9 @@ import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.ref.QName;
 
 /**
- * Provides support for creating initial set of meta-data.
- * 
- * @author David Caruana
+ * Definitions of Model items.
+ *
+ * TODO: Move this
  */
 public class DictionaryBootstrap
 {   

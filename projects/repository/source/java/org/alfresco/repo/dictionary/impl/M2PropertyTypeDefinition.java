@@ -11,9 +11,15 @@ import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.ref.QName;
 
+
+/**
+ * Compiled Property Type Definition
+ * 
+ * @author David Caruana
+ *
+ */
 /*package*/ class M2PropertyTypeDefinition implements PropertyTypeDefinition
 {
-
     private QName name;
     private M2PropertyType propertyType;
     
@@ -38,6 +44,7 @@ import org.alfresco.repo.ref.QName;
         return name;
     }
 
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyTypeDefinition#getTitle()
      */
@@ -45,6 +52,7 @@ import org.alfresco.repo.ref.QName;
     {
         return propertyType.getTitle();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyTypeDefinition#getDescription()
@@ -53,6 +61,7 @@ import org.alfresco.repo.ref.QName;
     {
         return propertyType.getDescription();
     }
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyTypeDefinition#getAnalyserClassName()
