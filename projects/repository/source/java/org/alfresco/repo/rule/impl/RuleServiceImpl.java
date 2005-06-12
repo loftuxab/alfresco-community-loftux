@@ -14,14 +14,11 @@ import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.qname.RegexQNamePattern;
 import org.alfresco.repo.rule.Rule;
 import org.alfresco.repo.rule.RuleActionDefinition;
 import org.alfresco.repo.rule.RuleConditionDefinition;
@@ -30,8 +27,6 @@ import org.alfresco.repo.rule.RuleServiceException;
 import org.alfresco.repo.rule.RuleType;
 import org.alfresco.repo.rule.RuleTypeAdapter;
 import org.alfresco.util.GUID;
-
-import sun.security.krb5.internal.n;
 
 /**
  * @author Roy Wetherall
@@ -320,7 +315,7 @@ public class RuleServiceImpl implements RuleService
         return getRules(nodeRef, true);
     }
 
-    /**
+    /**  
      * @see org.alfresco.repo.rule.RuleService#getRules(org.alfresco.repo.ref.NodeRef, boolean)
      */
     public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied)
