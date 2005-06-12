@@ -94,8 +94,8 @@
       <component-class>org.alfresco.web.ui.common.component.description.UIDescriptions</component-class>
    </component>
 
-   <!-- ==================== CONVERTERS ==================== -->
 
+   <!-- ==================== CONVERTERS ==================== -->
    <converter>
       <converter-id>org.alfresco.faces.XMLDataConverter</converter-id>
       <converter-class>org.alfresco.web.ui.common.converter.XMLDateConverter</converter-class>
@@ -105,6 +105,12 @@
       <converter-id>org.alfresco.faces.MimeTypeConverter</converter-id>
       <converter-class>org.alfresco.web.ui.common.converter.MimeTypeConverter</converter-class>
    </converter>
+   
+   <converter>
+      <converter-id>org.alfresco.faces.ByteSizeConverter</converter-id>
+      <converter-class>org.alfresco.web.ui.common.converter.ByteSizeConverter</converter-class>
+   </converter>
+   
    
    <!-- ==================== RENDERERS ==================== -->
    <render-kit>

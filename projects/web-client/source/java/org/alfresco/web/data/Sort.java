@@ -136,21 +136,21 @@ public abstract class Sort
          {
             this.comparator = new DateComparator();
          }
-         else if (returnType.equals(boolean.class))
+         else if (returnType.equals(boolean.class) || returnType.equals(Boolean.class))
          {
             this.comparator = new BooleanComparator();
          }
-         else if (returnType.equals(int.class))
+         else if (returnType.equals(int.class) || returnType.equals(Integer.class))
          {
             this.comparator = new IntegerComparator();
          }
-         else if (returnType.equals(float.class))
-         {
-            this.comparator = new FloatComparator();
-         }
-         else if (returnType.equals(long.class))
+         else if (returnType.equals(long.class) || returnType.equals(Long.class))
          {
             this.comparator = new LongComparator();
+         }
+         else if (returnType.equals(float.class) || returnType.equals(Float.class))
+         {
+            this.comparator = new FloatComparator();
          }
          else
          {

@@ -12,6 +12,8 @@
 
 <script language="javascript" type="text/javascript" src="<%=request.getContextPath()%>/scripts/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript">
+
+   <%-- Init the Tiny MCE in-line HTML editor --%>
    tinyMCE.init({
    	theme : "advanced",
    	mode : "exact",
@@ -27,7 +29,6 @@
    function saveContent(id, content)
    {
       document.forms['edit-file']['edit-file:editorOutput'].value = content;
-      //document.forms['edit-file'].submit();
    }
    
    var isIE = (document.all);

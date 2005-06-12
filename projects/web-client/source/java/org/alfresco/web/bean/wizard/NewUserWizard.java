@@ -39,6 +39,7 @@ public class NewUserWizard extends AbstractWizardBean
    /** Component references */
    private UIRichList usersRichList;
    
+   
    /**
     * Initialises the wizard
     */
@@ -222,6 +223,9 @@ public class NewUserWizard extends AbstractWizardBean
             new String[] {this.firstName + " " + this.lastName, this.userName, "********", this.homeSpaceName});
    }
    
+   /**
+    * @return the list of user Nodes to display
+    */
    public List<Node> getUsers()
    {
       return Collections.EMPTY_LIST;

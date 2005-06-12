@@ -254,10 +254,15 @@ public abstract class AbstractWizardBean
       buf.append("<table cellspacing=2 cellpadding=2 border=0 class='summary'>");
       for (int i=0; i<labels.length; i++)
       {
+         String value = values[i];
+         if (value == null)
+         {
+            value = "";
+         }
          buf.append("<tr><td><b>");
          buf.append(labels[i]);
          buf.append(":</b></td><td>");
-         buf.append(values[i]);
+         buf.append(value);
          buf.append("</td></tr>");
       }
       buf.append("</table>");

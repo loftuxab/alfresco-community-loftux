@@ -1165,6 +1165,16 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
+   
+   <tag>
+      <name>convertSize</name>
+      <tagclass>org.alfresco.web.ui.common.tag.ByteSizeConverterTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <description>
+         Allows the ByteSizeConverter to be used on a page
+      </description>
+   </tag>
 
    <tag>
       <name>dynamicDescription</name>

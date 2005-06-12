@@ -342,6 +342,16 @@
                            <h:outputText value="#{r.description}" />
                         </a:column>
                         
+                        <%-- Size for details/icons view modes --%>
+                        <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
+                           <f:facet name="header">
+                              <a:sortLink label="Size" value="size" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.size}">
+                              <a:convertSize />
+                           </h:outputText>
+                        </a:column>
+                        
                         <%-- Created Date column for details view mode --%>
                         <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
                            <f:facet name="header">
