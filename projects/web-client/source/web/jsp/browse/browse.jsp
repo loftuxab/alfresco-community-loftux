@@ -88,7 +88,9 @@
                                     </a:actionLink>
                                     <a:actionLink value="#{msg.paste_all}" image="/images/icons/paste.gif" actionListener="#{ClipboardBean.pasteAll}" id="link8" />
                                     <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{NewSpaceWizard.startWizard}" id="link9" />
-                                    <a:actionLink value="#{msg.manage_rules}" image="/images/icons/space_small.gif" action="manageRules" id="link10" />
+                                    <a:actionLink value="#{msg.manage_rules}" image="/images/icons/space_small.gif" action="manageRules" actionListener="#{BrowseBean.setupSpaceAction}" id="link10">
+                                       <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
+                                    </a:actionLink>
                                     <%-- TODO: add evaluator based on "admin" role, add correct icon --%>
                                     <a:actionLink value="#{msg.manage_users}" image="/images/icons/invite.gif" action="manageUsers" id="link11" />
                                  </a:menu>

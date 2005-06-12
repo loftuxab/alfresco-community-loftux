@@ -19,7 +19,7 @@
 	<config evaluator="string-compare" condition="Action Definitions">
 		<action-definitions>
 			<action-definition name="add-features">
-				<title>Add features to content</title>	
+				<title>Add feature to content</title>	
 				<description>
 					This will add a feature to the matched content.			
 				</description>

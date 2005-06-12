@@ -186,7 +186,13 @@ public class SystemErrorTag extends TagSupport
          }
          else
          {
-            String returnPage = errorBean.getReturnPage();
+            String returnPage = null;
+            
+            if (errorBean != null)
+            {
+               returnPage = errorBean.getReturnPage();
+            }
+            
             if (returnPage == null)
             {
                out.write("javascript:history.back();");

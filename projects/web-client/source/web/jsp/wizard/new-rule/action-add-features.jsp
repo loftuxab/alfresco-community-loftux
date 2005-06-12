@@ -102,12 +102,14 @@
                                     <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 
-
-                                 <tr><td>Add features settings defined here</td></tr>
-
-
-
+                                 <tr>
+                                    <td>Select&nbsp;required&nbsp;feature:&nbsp;</td>
+                                    <td width="90%">
+                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.feature}">
+                                          <f:selectItems value="#{NewRuleWizard.features}" />
+                                       </h:selectOneMenu>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>

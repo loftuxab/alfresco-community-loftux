@@ -49,4 +49,20 @@
       </property-sheet>
    </config>
    
+   <config evaluator="string-compare" condition="New Rule Wizard">
+      <features>
+         <feature id="compliancable" description="Compliancable"/>
+         <feature id="lockable" description="Lockable"/>
+         <feature id="transformable" description="Transformable"/>
+         <feature id="translatable" description="Translatable"/>
+         <feature id="versionable" description="Versionable"/>
+      </features>
+      <transformers>
+         <transformer id="text/html" description="HTML" />
+         <transformer id="application/pdf" description="PDF" />
+         <transformer id="text/plain" description="Text" />
+         <transformer id="text/xml" description="XML" />
+      </transformers>
+   </config>
+   
 </alfresco-config>

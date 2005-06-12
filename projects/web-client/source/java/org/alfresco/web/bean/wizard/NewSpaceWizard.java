@@ -151,8 +151,10 @@ public class NewSpaceWizard extends AbstractWizardBean
                // copy the selected space and update the name, description and icon
                NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), this.existingSpaceId);
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(context), getNavigator().getCurrentNodeId());
-               NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, null,
-                     QName.createQName(NamespaceService.ALFRESCO_URI, this.name), true);
+               NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
+                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                     QName.createQName(NamespaceService.ALFRESCO_URI, Repository.createValidQName(this.name)),
+                     true);
                // also need to set the new description and icon properties
                // TODO: remove this when the copy also copies the name
                this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
@@ -169,8 +171,10 @@ public class NewSpaceWizard extends AbstractWizardBean
                // copy the selected space and update the name, description and icon
                NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), this.templateSpaceId);
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(context), getNavigator().getCurrentNodeId());
-               NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, null,
-                     QName.createQName(NamespaceService.ALFRESCO_URI, this.name), true);
+               NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
+                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                     QName.createQName(NamespaceService.ALFRESCO_URI, Repository.createValidQName(this.name)), 
+                     true);
                // also need to set the new description and icon properties
                // TODO: remove this when the copy also copies the name
                this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_NAME, this.name);

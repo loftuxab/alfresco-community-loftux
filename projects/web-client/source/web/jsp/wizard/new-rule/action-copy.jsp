@@ -105,8 +105,8 @@
                                  <tr>
                                     <td>Required&nbsp;format:</td>
                                     <td width="100%">
-                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.format}">
-                                          <f:selectItems value="#{NewRuleWizard.formats}" />
+                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.transformer}">
+                                          <f:selectItems value="#{NewRuleWizard.transformers}" />
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>

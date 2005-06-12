@@ -112,7 +112,7 @@
                                  <tr>
                                     <td>
                                        File name pattern:&nbsp;
-                                       <h:inputText id="pattern" value="#{NewRuleWizard.conditionProperties.pattern}" 
+                                       <h:inputText id="pattern" value="#{NewRuleWizard.conditionProperties.containstext}" 
                                                     size="40" />
                                     </td>
                                  </tr>

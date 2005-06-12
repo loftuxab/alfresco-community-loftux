@@ -1,5 +1,6 @@
 package org.alfresco.web.bean.wizard;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,12 +8,24 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.ConfigService;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.rule.Rule;
 import org.alfresco.repo.rule.RuleActionDefinition;
 import org.alfresco.repo.rule.RuleConditionDefinition;
 import org.alfresco.repo.rule.RuleService;
 import org.alfresco.repo.rule.RuleType;
+import org.alfresco.repo.rule.impl.condition.MatchTextEvaluator;
+import org.alfresco.web.app.Application;
+import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
 import org.apache.log4j.Logger;
 import org.springframework.web.jsf.FacesContextUtils;
 
@@ -45,12 +58,13 @@ public class NewRuleWizard extends AbstractWizardBean
    private List<SelectItem> types;
    private List<SelectItem> conditions;
    private List<SelectItem> actions;
+   private List<SelectItem> transformers;
+   private List<SelectItem> features;
    private Map<String, String> conditionDescriptions;
    private Map<String, String> actionDescriptions;
    private Map<String, String> conditionProperties;
    private Map<String, String> actionProperties;
    
-   private List<SelectItem> formats;
    // condition and action specific lists - TEMP, picker components will be used
    private List<SelectItem> categories;
    
@@ -61,16 +75,87 @@ public class NewRuleWizard extends AbstractWizardBean
     */
    public String finish()
    {
-      if (logger.isDebugEnabled())
-         logger.debug("Finish called");
+      String outcome = FINISH_OUTCOME;
       
-      if (logger.isDebugEnabled())
+      UserTransaction tx = null;
+   
+      try
       {
-         logger.debug("condition properties: " + this.conditionProperties);
-         logger.debug("action properties: " + this.actionProperties);
+         FacesContext context = FacesContext.getCurrentInstance();
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx.begin();
+         
+         if (this.editMode)
+         {
+            // update the existing rule in the repository
+         }
+         else
+         {
+            // get hold of the space the rule will apply to and make sure
+            // it is actionable
+            Node currentSpace = browseBean.getActionSpace();
+            if (this.ruleService.isActionable(currentSpace.getNodeRef()) == false)
+            {
+               this.ruleService.makeActionable(currentSpace.getNodeRef());
+            }
+        
+            RuleType ruleType = this.ruleService.getRuleType(this.getType());
+            RuleConditionDefinition cond = this.ruleService.getConditionDefintion(this.getCondition());
+            RuleActionDefinition action = this.ruleService.getActionDefinition(this.getAction());
+        
+            // set up parameters maps for the condition and acion
+            Map<String, Serializable> conditionParams = new HashMap<String, Serializable>();
+            if (this.condition.equals("match-text"))
+            {
+               conditionParams.put(MatchTextEvaluator.PARAM_TEXT, 
+                     this.conditionProperties.get("containstext")); 
+            }
+            else if (this.condition.equals("in-category"))
+            {
+               // add category id to the condition params map
+            }
+            
+            Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
+            if (this.action.equals("add-features"))
+            {
+               // create QName representation of the chosen feature
+               // TODO: handle namespaces, for now presume it is in alfresco namespace
+               QName aspect = QName.createQName(NamespaceService.ALFRESCO_URI, 
+                     this.actionProperties.get("feature"));
+               
+               actionParams.put("aspect-name", aspect);
+            }
+            else if (this.action.equals("copy") || this.action.equals("move"))
+            {
+               // add the destination space id to the action properties
+            }
+            
+            // create the rule and add it to the space
+            Rule rule = this.ruleService.createRule(ruleType);
+            rule.addRuleCondition(cond, conditionParams);
+            rule.addRuleAction(action, actionParams);
+            this.ruleService.addRule(currentSpace.getNodeRef(), rule);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Added rule '" + this.title + "' with condition '" + 
+                            this.condition + "', action '" + this.action + 
+                            "', condition params of " +
+                            this.conditionProperties + " and action params of " + 
+                            this.actionProperties);
+         }
+         
+         // commit the transaction
+         tx.commit();
+     
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new AlfrescoRuntimeException("Failed to create new rule", e);
       }
       
-      return FINISH_OUTCOME;
+      return outcome;
    }
 
    /**
@@ -239,7 +324,7 @@ public class NewRuleWizard extends AbstractWizardBean
       this.title = null;
       this.description = null;
       this.type = "inbound";
-      this.action = "simple-workflow";
+      this.action = "add-features";
       this.condition = "no-condition";
       
       if (this.actions != null)
@@ -276,7 +361,7 @@ public class NewRuleWizard extends AbstractWizardBean
    public String getSummary()
    {
       return buildSummary(
-            new String[] {"Name: ", "Description", "Condition", "Action"},
+            new String[] {"Name", "Description", "Condition", "Action"},
             new String[] {this.title, this.description, this.condition, this.action});
    }
    
@@ -490,21 +575,80 @@ public class NewRuleWizard extends AbstractWizardBean
       return this.categories;
    }
    
-   public List<SelectItem> getFormats()
+   /**
+    * Returns the transformers that are available
+    * 
+    * @return List of SelectItem objects representing the available transformers
+    */
+   public List<SelectItem> getTransformers()
    {
-      if (this.formats == null)
+      if (this.transformers == null)
       {
-         this.formats = new ArrayList<SelectItem>();
-         // TODO: Configure the list, for now just list the ones we know we support
-         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_HTML, "HTML"));
-         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_XML, "XML"));
-         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_TEXT_PLAIN, "Plain Text"));
-         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_PDF, "PDF"));
-         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_WORD, "Microsoft Word"));
-         this.formats.add(new SelectItem(MimetypeMap.MIMETYPE_EXCEL, "Microsoft Excel"));
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config wizardCfg = svc.getConfig("New Rule Wizard");
+         if (wizardCfg != null)
+         {
+            ConfigElement transformersCfg = wizardCfg.getConfigElement("transformers");
+            if (transformersCfg != null)
+            {               
+               this.transformers = new ArrayList<SelectItem>();
+               for (ConfigElement child : transformersCfg.getChildren())
+               {
+                  this.transformers.add(new SelectItem(child.getAttribute("id"), 
+                        child.getAttribute("description")));
+               }
+            }
+            else
+            {
+               logger.warn("Could not find transformers configuration element");
+            }
+         }
+         else
+         {
+            logger.warn("Could not find New Rule Wizard configuration section");
+         }
       }
       
-      return this.formats;
+      return this.transformers;
+   }
+   
+   /**
+    * Returns the features that are available
+    * 
+    * @return List of SelectItem objects representing the available features
+    */
+   public List<SelectItem> getFeatures()
+   {
+      if (this.features == null)
+      {
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config wizardCfg = svc.getConfig("New Rule Wizard");
+         if (wizardCfg != null)
+         {
+            ConfigElement featuresCfg = wizardCfg.getConfigElement("features");
+            if (featuresCfg != null)
+            {               
+               this.features = new ArrayList<SelectItem>();
+               for (ConfigElement child : featuresCfg.getChildren())
+               {
+                  this.features.add(new SelectItem(child.getAttribute("id"), 
+                        child.getAttribute("description")));
+               }
+            }
+            else
+            {
+               logger.warn("Could not find features configuration element");
+            }
+         }
+         else
+         {
+            logger.warn("Could not find New Rule Wizard configuration section");
+         }
+      }
+      
+      return this.features;
    }
    
    /**
