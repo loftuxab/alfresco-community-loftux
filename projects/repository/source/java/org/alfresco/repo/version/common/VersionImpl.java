@@ -9,7 +9,11 @@ import java.util.Date;
 import java.util.Map;
 
 import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.repo.value.ValueConverter;
+import org.alfresco.repo.value.ValueConverter.Converter;
 import org.alfresco.repo.version.Version;
+import org.alfresco.repo.version.VersionService;
 import org.alfresco.repo.version.VersionServiceException;
 import org.alfresco.repo.version.VersionType;
 
@@ -139,5 +143,35 @@ public class VersionImpl implements Version
     public NodeRef getNodeRef()
     {
         return this.nodeRef;
+    }
+    
+    /**
+     * Static block to register the version type converters
+     */
+    static
+    {
+        ValueConverter.addConverter(
+                String.class, 
+                VersionType.class, 
+                new Converter<String, VersionType>()
+                {
+                    public VersionType convert(String source)
+                    {
+                        return VersionType.valueOf(source);
+                    }
+        
+                });
+        
+        ValueConverter.addConverter(
+                VersionType.class,
+                String.class,
+                new Converter<VersionType, String>()
+                {
+                    public String convert(VersionType source)
+                    {
+                        return source.toString();
+                    }
+        
+                });
     }
  }

@@ -111,7 +111,19 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     public boolean exists(NodeRef nodeRef)
     {
-        return dbNodeService.exists(nodeRef);
+        return dbNodeService.exists(convertNodeRef(nodeRef));
+    }
+    
+    /**
+     * Convert the incomming node ref (with the version store protocol specified)
+     * to the internal representation with the workspace protocol.
+     * 
+     * @param nodeRef   the incomming verison protocol node reference
+     * @return          the internal version node reference
+     */
+    private NodeRef convertNodeRef(NodeRef nodeRef)
+    {
+        return new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, STORE_ID), nodeRef.getId());
     }
 
     /**
@@ -192,7 +204,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     public QName getType(NodeRef nodeRef) throws InvalidNodeRefException
     {
-		return (QName)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_NODE_TYPE);
+		return (QName)this.dbNodeService.getProperty(convertNodeRef(nodeRef), PROP_QNAME_FROZEN_NODE_TYPE);
     }
     
     /**
@@ -209,7 +221,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     public boolean hasAspect(NodeRef nodeRef, QName aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
-        Set<QName> aspects = (Set<QName>)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_ASPECTS);
+        Set<QName> aspects = (Set<QName>)this.dbNodeService.getProperty(convertNodeRef(nodeRef), PROP_QNAME_FROZEN_ASPECTS);
         return aspects.contains(aspectRef);
     }
 
@@ -227,7 +239,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     public Set<QName> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        return (Set<QName>)this.dbNodeService.getProperty(nodeRef, PROP_QNAME_FROZEN_ASPECTS);
+        return (Set<QName>)this.dbNodeService.getProperty(convertNodeRef(nodeRef), PROP_QNAME_FROZEN_ASPECTS);
     }
 
     /**
@@ -239,7 +251,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
 		
         // TODO should be doing this using a path query ..
         
-        Collection<ChildAssocRef> children = this.dbNodeService.getChildAssocs(nodeRef);
+        Collection<ChildAssocRef> children = this.dbNodeService.getChildAssocs(convertNodeRef(nodeRef));
         for (ChildAssocRef child : children)
         {
             if (child.getQName().equals(CHILD_QNAME_VERSIONED_ATTRIBUTES))
@@ -264,7 +276,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     {        
         // TODO should be doing this with a search ...
         
-        Map<QName, Serializable> properties = getProperties(nodeRef);
+        Map<QName, Serializable> properties = getProperties(convertNodeRef(nodeRef));
         return properties.get(qname);			
     }
     
@@ -310,7 +322,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     public List<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        return getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+        return getChildAssocs(convertNodeRef(nodeRef), RegexQNamePattern.MATCH_ALL);
     }
 
     /**
@@ -322,7 +334,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         
         // Get the child assocs from the version store
         List<ChildAssocRef> childAssocRefs = this.dbNodeService.getChildAssocs(
-                nodeRef,
+                convertNodeRef(nodeRef),
                 CHILD_QNAME_VERSIONED_CHILD_ASSOCS);
         for (ChildAssocRef childAssocRef : childAssocRefs)
         {
@@ -401,7 +413,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         
         // Get the child assocs from the version store
         List<ChildAssocRef> childAssocRefs = this.dbNodeService.getChildAssocs(
-                sourceRef,
+                convertNodeRef(sourceRef),
                 CHILD_QNAME_VERSIONED_ASSOCS);
         for (ChildAssocRef childAssocRef : childAssocRefs)
         {

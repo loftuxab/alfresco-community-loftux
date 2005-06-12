@@ -54,13 +54,6 @@ public class RuleServiceSystemTest extends BaseSpringTest
 				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        
-        // Create the config folder
-        //this.configFolder = this.nodeService.createNode(
-        //        this.rootNodeRef,
-	//			QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-      //          QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-        //        DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
     }
 
     /**

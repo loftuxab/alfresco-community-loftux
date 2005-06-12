@@ -481,6 +481,26 @@ public class ValueConverter
     }
 
     /**
+     * Add a converter to the list of those available
+     * 
+     * @param <F>       
+     * @param <T>
+     * @param source
+     * @param destination
+     * @param converter
+     */
+    public static <F, T> void addConverter(Class<F> source, Class<T> destination, Converter<F, T> converter)
+    {
+        Map<Class, Converter> map = conversions.get(source);
+        if (map == null)
+        {
+            map = new HashMap<Class, Converter>();
+            conversions.put(source, map);
+        }
+        map.put(destination, converter);
+    }
+    
+    /**
      * Map of conversion
      */
     static Map<Class, Map<Class, Converter>> conversions = new HashMap<Class, Map<Class, Converter>>();

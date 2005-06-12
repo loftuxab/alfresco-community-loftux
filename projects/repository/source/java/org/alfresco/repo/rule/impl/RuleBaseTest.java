@@ -27,7 +27,7 @@ import org.alfresco.util.BaseSpringTest;
 /**
  * @author Roy Wetherall
  */
-public class RuleBaseTest extends BaseSpringTest
+public class RuleBaseTest extends BaseSpringTest 
 {
     /**
      * Data used in the tests

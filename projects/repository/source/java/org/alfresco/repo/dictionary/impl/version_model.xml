@@ -88,15 +88,18 @@
          
          <associations>
             <child-association name="ver:versionedAttributes">
-               <!-- TODO -->
                <target>
-                  <class>alf:base</class>
+                  <class>ver:versionedProperty</class>
                </target>
             </child-association>
             <child-association name="ver:versionedChildAssocs">
-               <!-- TODO -->
                <target>
-                  <class>alf:base</class>
+                  <class>ver:versionedChildAssoc</class>
+               </target>
+            </child-association>
+			<child-association name="ver:versionedAssocs">
+               <target>
+                  <class>ver:versionedAssoc</class>
                </target>
             </child-association>
             <association name="ver:successor">

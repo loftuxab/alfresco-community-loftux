@@ -57,7 +57,7 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
         AssociationDefinition assocDef = dictionary.getAssociation(assocTypeQName);
         if (assocDef == null)
         {
-            throw new IllegalArgumentException("Association" + assocDef + " has not been defined in the data dictionary");
+            throw new IllegalArgumentException("Association " + assocTypeQName + " has not been defined in the data dictionary");
         }
     }
 

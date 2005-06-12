@@ -27,11 +27,15 @@ import org.alfresco.repo.rule.RuleServiceException;
 import org.alfresco.repo.rule.RuleType;
 import org.alfresco.repo.rule.RuleTypeAdapter;
 import org.alfresco.util.GUID;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
- * @author Roy Wetherall
+ * 
+ * @author Roy Wetherall   
  */
-public class RuleServiceImpl implements RuleService
+public class RuleServiceImpl implements RuleService, ApplicationContextAware
 {
     /**
      * The config service
@@ -72,6 +76,11 @@ public class RuleServiceImpl implements RuleService
      * List of rule type adapters
      */
     private List<RuleTypeAdapter> adapters;
+
+    /**
+     * The application context
+     */
+    private ApplicationContext applicationContext;
     
     /**
      * Service intialization method
@@ -103,7 +112,7 @@ public class RuleServiceImpl implements RuleService
             String ruleTypeAdapter = ((RuleTypeImpl)ruleType).getRuleTypeAdapter();
             if (ruleTypeAdapter != null && ruleTypeAdapter.length() != 0)
             {
-                try
+                try 
                 {
                     // Create the rule type adapter
                     RuleTypeAdapter adapter = (RuleTypeAdapter)Class.forName(ruleTypeAdapter).
@@ -170,6 +179,15 @@ public class RuleServiceImpl implements RuleService
     public void setPolicyComponent(PolicyComponent policyComponent)
     {
         this.policyComponent = policyComponent;
+    }
+    
+    /**
+     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) 
+        throws BeansException
+    {
+        this.applicationContext = applicationContext;
     }
     
     /**

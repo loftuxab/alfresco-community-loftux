@@ -276,7 +276,12 @@ public class VersionStoreBaseTest extends BaseSpringTest
         // Check that the node reference is correct
         NodeRef nodeRef = newVersion.getNodeRef();
         assertNotNull(nodeRef);
-        assertEquals(this.lightWeightVersionStoreVersionService.getVersionStoreReference(), nodeRef.getStoreRef());
+        assertEquals(
+                VersionStoreConst.STORE_ID, 
+                nodeRef.getStoreRef().getIdentifier());
+        assertEquals(
+                VersionStoreConst.STORE_PROTOCOL, 
+                nodeRef.getStoreRef().getProtocol());
         assertNotNull(nodeRef.getId());        
         
         // TODO: How do we check the frozen attributes ??

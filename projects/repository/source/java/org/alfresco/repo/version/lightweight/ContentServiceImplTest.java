@@ -87,7 +87,8 @@ public class ContentServiceImplTest extends VersionStoreBaseTest
         // Get writer is not supported by the version content service
         try
         {
-            this.contentService.getUpdatingWriter(version.getNodeRef());
+            ContentWriter contentWriter = this.contentService.getUpdatingWriter(version.getNodeRef());
+            contentWriter.putContent("bobbins");
             fail("This operation is not supported.");
         }
         catch (Exception exception)

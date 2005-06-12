@@ -138,7 +138,8 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         if (this.dbNodeService.exists(getVersionStoreReference()) == false)
         {
             this.dbNodeService.createStore(
-					VersionStoreConst.STORE_PROTOCOL, 
+					//VersionStoreConst.STORE_PROTOCOL,
+                    StoreRef.PROTOCOL_WORKSPACE,
 					VersionStoreConst.STORE_ID);
         }
 		
@@ -157,7 +158,8 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     public StoreRef getVersionStoreReference()
     {
         return new StoreRef(
-				VersionStoreConst.STORE_PROTOCOL, 
+				//VersionStoreConst.STORE_PROTOCOL,
+                StoreRef.PROTOCOL_WORKSPACE,
 				VersionStoreConst.STORE_ID);
     }
 	
@@ -313,7 +315,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             // Create a new version history node
             ChildAssocRef childAssocRef = this.dbNodeService.createNode(
                     getRootNode(), 
-					CHILD_QNAME_VERSION_HISTORIES, 
+					DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN, 
                     CHILD_QNAME_VERSION_HISTORIES,
                     TYPE_QNAME_VERSION_HISTORY,
                     props);
@@ -736,7 +738,8 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	        }
 	        
 	        // Create and return the version object
-	        result = new VersionImpl(versionProperties, versionRef);   
+            NodeRef newNodeRef = new NodeRef(new StoreRef(STORE_PROTOCOL, STORE_ID), versionRef.getId());
+	        result = new VersionImpl(versionProperties, newNodeRef);   
 		}
 		
 		return result;

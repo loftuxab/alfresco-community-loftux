@@ -129,7 +129,7 @@ public class LockServiceImpl implements LockService
 			{
 	            // Set the current user as the lock owner
 	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER, userRef);
-	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE, lockType);
+	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE, lockType.toString());
 			}
 			finally
 			{
@@ -267,11 +267,18 @@ public class LockServiceImpl implements LockService
     public LockType getLockType(NodeRef nodeRef)
         throws AspectMissingException
     {
+        LockType result = null;
+        
         // Check for the lock aspect
         checkForLockApsect(nodeRef);
         
-        // Return the lock type enum
-        return (LockType)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE);        
+        String lockTypeString = (String)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE);
+        if (lockTypeString != null)
+        {
+            result = LockType.valueOf(lockTypeString);
+        }
+        
+        return result;
     }
     
     /**
