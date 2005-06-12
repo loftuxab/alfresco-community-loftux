@@ -27,7 +27,7 @@
          <value>admin</value>
       </managed-property>
    </managed-bean>
-      
+   
    <managed-bean>
       <description>
          The bean that backs up the New Space Wizard
@@ -113,6 +113,31 @@
       </description>
       <managed-bean-name>AddContentWizard</managed-bean-name>
       <managed-bean-class>org.alfresco.web.bean.wizard.AddContentWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{nodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>contentService</property-name>
+         <value>#{contentService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that backs up the Create Content Wizard
+      </description>
+      <managed-bean-name>CreateContentWizard</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.wizard.CreateContentWizard</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
@@ -272,7 +297,7 @@
    
    <managed-bean>
       <description>
-         The bean that holds users ClipboardBean state.
+         The bean that holds a users Clipboard state.
       </description>
       <managed-bean-name>ClipboardBean</managed-bean-name>
       <managed-bean-class>org.alfresco.web.bean.clipboard.ClipboardBean</managed-bean-class>
@@ -336,6 +361,10 @@
       <navigation-case>
          <from-outcome>addContent</from-outcome>
          <to-view-id>/jsp/wizard/add-content/upload.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>createContent</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/create.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>showDocDetails</from-outcome>
@@ -520,6 +549,23 @@
       <navigation-case>
          <from-outcome>summary</from-outcome>
          <to-view-id>/jsp/wizard/new-space/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the add in-line content wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/create-content/*</from-view-id>
+      <navigation-case>
+         <from-outcome>create</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/create.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>properties</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/summary.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

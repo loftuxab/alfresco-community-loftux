@@ -30,7 +30,7 @@
    
    function saveContent(id, content)
    {
-      document.forms['edit-file']['edit-file:editorOutput'].value = content;
+      document.forms['create-file']['create-file:editorOutput'].value = content;
    }
    
    var isIE = (document.all);
@@ -44,7 +44,7 @@
    <f:loadBundle basename="messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="edit-file">
+   <h:form id="create-file">
    
    <%-- Main outer table --%>
    <%--If the browse is IE, we can support variable IFrame height --%>
@@ -62,7 +62,7 @@
       <%-- Title bar --%>
       <tr>
          <td colspan="2">
-            <%@ include file="../parts/titlebar.jsp" %>
+            <%@ include file="../../parts/titlebar.jsp" %>
          </td>
       </tr>
       
@@ -70,14 +70,14 @@
       <tr valign="top">
          <%-- Shelf --%>
          <td>
-            <%@ include file="../parts/shelf.jsp" %>
+            <%@ include file="../../parts/shelf.jsp" %>
          </td>
          
          <%-- Work Area --%>
          <td width="100%" height="100%">
             <table cellspacing="0" cellpadding="0" width="100%" height="100%">
                <%-- Breadcrumb --%>
-               <%@ include file="../parts/breadcrumb.jsp" %>
+               <%@ include file="../../parts/breadcrumb.jsp" %>
                
                <%-- Status and Actions --%>
                <tr>
@@ -93,10 +93,8 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">'<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
-                              <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText">Current status is 'draft'.</div>
-                              <div class="mainSubText"><h:outputText value="#{msg.editfileinline_description}" /></div>
+                              <div class="mainTitle">Create New Content</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.createfile_description}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -118,50 +116,22 @@
                   <td height="100%">
                      <table cellspacing="0" cellpadding="3" border="0" width="100%" height="100%">
                         <tr>
-                           <td width="100%" valign="top">
-                              <%-- Hide the checkout info if this document is already checked out --%>
-                              <a:panel id="checkout-panel" rendered="#{CheckinCheckoutBean.document.properties.workingCopy == false}">
-                                 <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
-                                 <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                    <tr>
-                                       <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
-                                       <td><td class="mainSubText">
-                                             You may want to
-                                             <a:actionLink value="#{msg.checkout_document}" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
-                                                <f:param name="id" value="#{CheckinCheckoutBean.document.id}" />
-                                             </a:actionLink>
-                                             to prevent the possibility of other users overwriting your changes.
-                                             <br>
-                                             Note: You will lose any changes already made to this document.
-                                          </td>
-                                       </td>
-                                    </tr>
-                                 </table>
-                                 <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "yellowInner"); %>
-                              </a:panel>
-                           </td>
-                           
-                           <td valign="top" rowspan=2>
+                           <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
-                              <table cellpadding="1" cellspacing="1" border="0">
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Save" action="#{CheckinCheckoutBean.editInlineOK}" styleClass="dialogControls" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="dialogButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
-                                    </td>
-                                 </tr>
-                              </table>
+                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
+                                    value="1" disabled="true">
+                                 <a:listItem value="1" label="1. Enter Content" />
+                                 <a:listItem value="2" label="2. Properties" />
+                                 <a:listItem value="3" label="3. Summary" />
+                              </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
-                        </tr>
-                        
-                        <tr>
+                           
                            <td width="100%" valign="top" height="100%">
+                              
+                              <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
+                              
                               <%-- handle the size of the editor area based on the browser support
                                    in IE we can scale the DIV, but FireFox doesn't seem to handle it --%>
                               <script>
@@ -174,9 +144,33 @@
                                  document.write("<div id='editor' style='width:100%; height:360px'>");
                               }
                               </script>
-                                 <h:outputText value="#{CheckinCheckoutBean.documentContent}" escape="false" />
+                                 <h:outputText value="#{CreateContentWizard.content}" escape="false" />
                               </div>
-                              <h:inputHidden id="editorOutput" value="#{CheckinCheckoutBean.editorOutput}" />
+                              <h:inputHidden id="editorOutput" value="#{CreateContentWizard.content}" />
+                              
+                           </td>
+                           
+                           <td valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <table cellpadding="1" cellspacing="1" border="0">
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Next" action="#{CreateContentWizard.next}" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Finish" action="#{CreateContentWizard.finish}" styleClass="wizardButton" disabled="true" />
+                                    </td>
+                                 </tr>
+                                 <tr><td class="wizardButtonSpacing"></td></tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Cancel" action="#{CreateContentWizard.cancel}" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                         </tr>
                      </table>
