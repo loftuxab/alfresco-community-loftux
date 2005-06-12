@@ -50,9 +50,14 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public class BrowseBean implements IContextListener
 {
+   /**
+    * Default Constructor
+    */
    public BrowseBean()
    {
       UIContextService.getInstance(FacesContext.getCurrentInstance()).registerBean(this);
+      
+      // TODO: use ConfigService to get default view mode
    }
    
    
@@ -1015,7 +1020,7 @@ public class BrowseBean implements IContextListener
    private Node document;
    
    /** The current browse view mode - set to a well known IRichListRenderer name */
-   private String browseViewMode = "details";
+   private String browseViewMode = "list";
    
    /** The current browse view page size */
    private int browsePageSize = 10;
