@@ -61,6 +61,7 @@
    </context-param>
     
    <!-- Acegi security-->
+   
    <!--
    <filter>
       <filter-name>Acegi Filter Chain Proxy</filter-name> 
