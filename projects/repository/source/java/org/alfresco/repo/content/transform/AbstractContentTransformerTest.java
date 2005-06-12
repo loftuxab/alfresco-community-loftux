@@ -51,6 +51,9 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
     public void testSetUp() throws Exception
     {
         assertNotNull("MimetypeMap not present", mimetypeMap);
+        // check that the quick resources are available
+        File sourceFile = AbstractContentTransformerTest.loadQuickTestFile("txt");
+        assertNotNull(sourceFile);
     }
     
     /**

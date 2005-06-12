@@ -2,13 +2,11 @@ package org.alfresco.repo.policy;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.alfresco.repo.dictionary.ClassDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
-import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Delegate for a Class-level Policy.  Provides access to Policy Interface
@@ -84,48 +82,33 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
         }
         return factory.createList(new ClassBehaviourBinding(dictionary, classQName));
     }
-
     
     /**
-     * Gets the Policy implementation for the specified Node
+     * Gets the policy implementation for the given classes.  The single <tt>Policy</tt>
+     * will be a wrapper of multiple appropriate policies.
      * 
-     * All behaviours bound to the Node's class and aspects are aggregated.
-     * 
-     * @param nodeRef the node reference
-     * @return the collection of policies
+     * @param classQNames the class qualified names
+     * @return Returns the policy
      */
-    public P get(NodeService nodeService, NodeRef nodeRef)
+    public P get(Set<QName> classQNames)
     {
-        return factory.toPolicy(getList(nodeService, nodeRef));
+        return factory.toPolicy(getList(classQNames));
     }
 
-
     /**
-     * Gets the collection of Policy implementations for the specified Node
+     * Gets the collection of <tt>Policy</tt> implementations for the given classes
      * 
-     * All behaviours bound to the Node's class and aspects are returned.
-     * 
-     * @param nodeRef  the node reference
-     * @return the collection of policies
+     * @param classQNames the class qualified names
+     * @return Returns the collection of policies
      */
-	public Collection<P> getList(NodeService nodeService, NodeRef nodeRef)
-	{
-        CodeMonkey.issue("Separate this node from the NodeService by passing in the required info");
-        
-		Collection<P> result = new HashSet<P>();
-		
-		// Get the behaviour for the node's type
-		QName classQName = nodeService.getType(nodeRef);
-		result.addAll(getList(classQName));
-		
-		// Get the behaviour for all the aspect types
-		Collection<QName> aspectQNames = nodeService.getAspects(nodeRef);
-		for (QName aspectQName : aspectQNames) 
-		{
-			result.addAll(getList(aspectQName));
-		}
-		
-		return result;
-	}
-    
+    public Collection<P> getList(Set<QName> classQNames)
+    {
+        Collection<P> policies = new HashSet<P>();
+        for (QName classQName : classQNames)
+        {
+            P policy = factory.create(new ClassBehaviourBinding(dictionary, classQName));
+            policies.add(policy);
+        }
+        return policies;
+    }
 }

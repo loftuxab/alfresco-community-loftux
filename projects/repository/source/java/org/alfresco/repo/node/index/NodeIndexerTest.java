@@ -15,23 +15,25 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.ResultSet;
 import org.alfresco.repo.search.Searcher;
+import org.alfresco.util.perf.PerformanceMonitor;
 
 /**
- * @see org.alfresco.repo.node.index.IndexingNodeServiceImpl
+ * Checks that the indexing of the node hierarchy is working
+ * 
+ * @see org.alfresco.repo.node.index.NodeIndexer
  * 
  * @author Derek Hulley
  */
-public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
+public class NodeIndexerTest extends BaseNodeServiceTest
 {
     private Searcher searcher;
+    private static StoreRef localStoreRef;
+    private static NodeRef localRootNode;
 
-    private static StoreRef myStoreRef;
-
-    private static NodeRef myRootNode;
-
+    @Override
     protected NodeService getNodeService()
     {
-        return (NodeService) applicationContext.getBean("indexingNodeService");
+        return (NodeService) applicationContext.getBean("nodeService");
     }
     
     @Override
@@ -40,80 +42,109 @@ public class IndexingNodeServiceImplTest extends BaseNodeServiceTest
         return (ContentService) applicationContext.getBean("contentService");
     }
 
+    @Override
     protected void onSetUpInTransaction() throws Exception
     {
         super.onSetUpInTransaction();
         searcher = (Searcher) applicationContext.getBean("searcherComponent");
 
-        if (myStoreRef == null)
+        if (localStoreRef == null)
         {
-            myStoreRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_Persisted" + System.currentTimeMillis());
-            myRootNode = nodeService.getRootNode(myStoreRef);
+            localStoreRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_Persisted" + System.currentTimeMillis());
+            localRootNode = nodeService.getRootNode(localStoreRef);
         }
     }
 
     public void testCommitQueryData() throws Exception
     {
-        rootNodeRef = myRootNode;
+        rootNodeRef = localRootNode;
         Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
         setComplete();
     }
 
     public void testQuery() throws Exception
     {
-        rootNodeRef = myRootNode;
+        rootNodeRef = localRootNode;
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"" + BaseNodeServiceTest.TEST_PREFIX + ":root_p_n1\"", null, null);
         assertEquals(1, results.length());
     }
     
     public void testLikeAndContains() throws Exception
     {
-        rootNodeRef = myRootNode;
+        rootNodeRef = localRootNode;
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
         namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
    
+        PerformanceMonitor selectNodesPerf = new PerformanceMonitor(getClass().getSimpleName(), "selectNodes");
+        PerformanceMonitor selectPropertiesPerf = new PerformanceMonitor(getClass().getSimpleName(), "selectProperties");
         
+        List<ChildAssocRef> answer;
         
-        List<ChildAssocRef> 
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, '*monkey')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        selectNodesPerf.stop();
         
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, '%monkey')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        selectNodesPerf.stop();
         
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monk*')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        selectNodesPerf.stop();
         
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monk%')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        selectNodesPerf.stop();
         
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monk\\%')", null, namespacePrefixResolver, false);
         assertEquals(0, answer.size());
+        selectNodesPerf.stop();
         
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('monkey')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        selectNodesPerf.stop();
         
+        selectPropertiesPerf.start();
         List<Serializable> result =  nodeService.selectProperties(rootNodeRef, "//@*[contains('monkey')", null, namespacePrefixResolver, false);
         assertEquals(1, result.size());
+        selectPropertiesPerf.stop();
         
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('mon?ey')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        selectNodesPerf.stop();
         
+        selectPropertiesPerf.start();
         result =  nodeService.selectProperties(rootNodeRef, "//@*[contains('mon?ey')", null, namespacePrefixResolver, false);
         assertEquals(1, result.size());
+        selectPropertiesPerf.stop();
         
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('m*y')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        selectNodesPerf.stop();
         
+        selectPropertiesPerf.start();
         result =  nodeService.selectProperties(rootNodeRef, "//@*[contains('mon*')", null, namespacePrefixResolver, false);
         assertEquals(1, result.size());
+        selectPropertiesPerf.stop();
         
+        selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('*nkey')", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        selectNodesPerf.stop();
         
+        selectPropertiesPerf.start();
         result =  nodeService.selectProperties(rootNodeRef, "//@*[contains('?onkey')", null, namespacePrefixResolver, false);
         assertEquals(1, result.size());
+        selectPropertiesPerf.stop();
     }
 }

@@ -143,11 +143,11 @@
          <value>org.alfresco.repo.node.NodeService</value>
       </property>
       <property name="defaultBinding">
-         <ref bean="indexingNodeService"></ref>
+         <ref bean="dbNodeService"></ref>
       </property>
       <property name="redirectedProtocolBindings">
          <map>
-            <entry key="workspace"><ref bean="indexingNodeService"></ref></entry>
+            <entry key="workspace"><ref bean="dbNodeService"></ref></entry>
             <entry key="versionStore"><ref bean="lightWeightVersionStoreNodeService"></ref></entry>
          </map>
       </property>
@@ -203,6 +203,7 @@
    
    <!-- NodeService implemented to call a delegate and ensure that nodes get indexed -->
    <!-- TODO: To be replaced by use of callbacks using policy framework -->
+   <!--
    <bean id="indexingNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.repo.node.NodeService</value>
@@ -232,6 +233,7 @@
          </props>
       </property>
    </bean>
+   -->
 
    <bean id="mimetypeMap" class="org.alfresco.repo.content.MimetypeMap" init-method="init" >
       <constructor-arg>
@@ -392,7 +394,7 @@
    <bean id="luceneIndexerAndSearcherFactory" 
         class="org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
       <property name="nodeService">
-         <ref bean="dbNodeService"/>
+         <ref bean="nodeService"/>
       </property>
       <property name="dictionaryService">
          <ref bean="dictionaryService"/>
@@ -421,7 +423,7 @@
    <bean id="luceneCategoryService" 
         class="org.alfresco.repo.search.impl.lucene.LuceneCategoryServiceImpl">
       <property name="nodeService">
-         <ref bean="dbNodeService"/>
+         <ref bean="nodeService"/>
       </property>
       <property name="dictionaryService">
          <ref bean="dictionaryService"/>

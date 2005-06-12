@@ -8,7 +8,9 @@ import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.ref.ChildAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.Indexer;
+import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Handles the node policy callbacks to ensure that the node hierarchy is properly
@@ -17,7 +19,7 @@ import org.alfresco.repo.search.Indexer;
  * @author Derek Hulley
  */
 public class NodeIndexer
-        implements NodeServicePolicies.OnCreateStorePolicy,
+        implements NodeServicePolicies.BeforeCreateStorePolicy,
                    NodeServicePolicies.OnCreateNodePolicy,
                    NodeServicePolicies.OnUpdateNodePolicy,
                    NodeServicePolicies.OnDeleteNodePolicy,
@@ -46,38 +48,37 @@ public class NodeIndexer
      */
     private void init()
     {
+        CodeMonkey.issue("How can we be sure that the behaviour isn't hijacked?");  // TODO: Behaviour hijacking
+        
         policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateStore"),
-                this,
-                new JavaBehaviour(this, "onCreateStore"));   
+                QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateStore"),
+                DictionaryBootstrap.TYPE_QNAME_STOREROOT,
+                new JavaBehaviour(this, "beforeCreateStore"));   
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
-                DictionaryBootstrap.TYPE_QNAME_CMOBJECT,
+                this,
                 new JavaBehaviour(this, "onCreateNode"));   
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateNode"),
-                DictionaryBootstrap.TYPE_QNAME_CMOBJECT,
+                this,
                 new JavaBehaviour(this, "onUpdateNode"));   
         policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onNode"),
-                DictionaryBootstrap.TYPE_QNAME_CMOBJECT,
-                new JavaBehaviour(this, "onUpdateNode"));   
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onDeleteNode"),
+                this,
+                new JavaBehaviour(this, "onDeleteNode"));   
         policyComponent.bindAssociationBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"),
-                DictionaryBootstrap.TYPE_QNAME_FOLDER,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                this,
                 new JavaBehaviour(this, "onCreateChildAssociation"));   
         policyComponent.bindAssociationBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"),
-                DictionaryBootstrap.TYPE_QNAME_FOLDER,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
-                new JavaBehaviour(this, "onCreateChildAssociation"));   
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onDeleteChildAssociation"),
+                this,
+                new JavaBehaviour(this, "onDeleteChildAssociation"));   
     }
 
-    public void onCreateStore(NodeRef rootNodeRef)
+    public void beforeCreateStore(QName nodeTypeQName, StoreRef storeRef)
     {
-        ChildAssocRef assocRef = new ChildAssocRef(null, null, null, rootNodeRef);
-        indexer.createNode(assocRef);
+        // indexer can perform some cleanup here, if required
     }
 
     public void onCreateNode(ChildAssocRef childAssocRef)

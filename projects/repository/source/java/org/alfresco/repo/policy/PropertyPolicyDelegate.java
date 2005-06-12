@@ -1,15 +1,12 @@
 package org.alfresco.repo.policy;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
-import org.alfresco.util.debug.CodeMonkey;
 
 
 /**
@@ -49,6 +46,21 @@ public class PropertyPolicyDelegate<P extends PropertyPolicy>
         this.dictionary = dictionary;
     }
     
+    /**
+     * Ensures the validity of the given property type
+     * 
+     * @param assocTypeQName
+     * @throws IllegalArgumentException
+     */
+    private void checkPropertyType(QName propertyQName) throws IllegalArgumentException
+    {
+        PropertyDefinition propertyDef = dictionary.getProperty(propertyQName);
+        if (propertyDef == null)
+        {
+            throw new IllegalArgumentException("Property " + propertyQName + " has not been defined in the data dictionary");
+        }
+    }
+
 
     /**
      * Gets the Policy implementation for the specified Class and Propery
@@ -63,11 +75,7 @@ public class PropertyPolicyDelegate<P extends PropertyPolicy>
      */
     public P get(QName classQName, QName propertyQName)
     {
-        PropertyDefinition propertyDef = dictionary.getProperty(propertyQName);
-        if (propertyDef == null)
-        {
-            throw new IllegalArgumentException("Property " + propertyQName + " has not been defined in the data dictionary");
-        }
+        checkPropertyType(propertyQName);
         return factory.create(new ClassFeatureBehaviourBinding(dictionary, classQName, propertyQName));
     }
 
@@ -81,59 +89,39 @@ public class PropertyPolicyDelegate<P extends PropertyPolicy>
      */
     public Collection<P> getList(QName classQName, QName propertyQName)
     {
-        PropertyDefinition propertyDef = dictionary.getProperty(propertyQName);
-        if (propertyDef == null)
-        {
-            throw new IllegalArgumentException("Property " + propertyQName + " has not been defined in the data dictionary");
-        }
+        checkPropertyType(propertyQName);
         return factory.createList(new ClassFeatureBehaviourBinding(dictionary, classQName, propertyQName));
     }
 
-    
     /**
-     * Gets the Policy implementation for the specified Node and Property
+     * Gets a <tt>Policy</tt> for all the given Class and Property
      * 
-     * All behaviours bound to the Node's class and aspects are aggregated.
-     * 
-     * @param nodeRef the node reference
-     * @param propertyQName  the property qualified name
-     * @return the collection of policies
+     * @param classQNames the class qualified names
+     * @param propertyQName the property qualified name
+     * @return Return the policy
      */
-    public P get(NodeService nodeService, NodeRef nodeRef, QName propertyQName)
+    public P get(Set<QName> classQNames, QName propertyQName)
     {
-        return factory.toPolicy(getList(nodeService, nodeRef, propertyQName));
+        checkPropertyType(propertyQName);
+        return factory.toPolicy(getList(classQNames, propertyQName));
     }
-
-
+    
     /**
-     * Gets the collection of Policy implementations for the specified Node and Property
+     * Gets the <tt>Policy</tt> instances for all the given Classes and Properties
      * 
-     * All behaviours bound to the Node's class and aspects are returned.
-     * 
-     * @param nodeRef  the node reference
-     * @param propertyQName  the property qualified name
-     * @return the collection of policies
+     * @param classQNames the class qualified names
+     * @param propertyQName the property qualified name
+     * @return Return the policies
      */
-	public Collection<P> getList(NodeService nodeService, NodeRef nodeRef, QName propertyQName)
-	{
-        // TODO
-        CodeMonkey.issue("Pass in the required types rather than having a dependency on the NodeService");
-        
-		Collection<P> result = new HashSet<P>();
-		
-		// Get the behaviour for the node's type
-		QName classQName = nodeService.getType(nodeRef);
-		result.addAll(getList(classQName, propertyQName));
-		
-		// Get the behaviour for all the aspect types
-		Collection<QName> aspectQNames = nodeService.getAspects(nodeRef);
-		for (QName aspectQName : aspectQNames) 
-		{
-			result.addAll(getList(aspectQName, propertyQName));
-		}
-		
-		return result;
-	}
-    
-    
+    public Collection<P> getList(Set<QName> classQNames, QName propertyQName)
+    {
+        checkPropertyType(propertyQName);
+        Collection<P> policies = new HashSet<P>();
+        for (QName classQName : classQNames)
+        {
+            P policy = factory.create(new ClassFeatureBehaviourBinding(dictionary, classQName, propertyQName));
+            policies.add(policy);
+        }
+        return policies;
+    }
 }

@@ -2,13 +2,11 @@ package org.alfresco.repo.policy;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
-import org.alfresco.util.debug.CodeMonkey;
 
 
 /**
@@ -48,9 +46,23 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
         this.dictionary = dictionary;
     }
     
+    /**
+     * Ensures the validity of the given assoc type
+     * 
+     * @param assocTypeQName
+     * @throws IllegalArgumentException
+     */
+    private void checkAssocType(QName assocTypeQName) throws IllegalArgumentException
+    {
+        AssociationDefinition assocDef = dictionary.getAssociation(assocTypeQName);
+        if (assocDef == null)
+        {
+            throw new IllegalArgumentException("Association" + assocDef + " has not been defined in the data dictionary");
+        }
+    }
 
     /**
-     * Gets the Policy implementation for the specified Class and Propery
+     * Gets the Policy implementation for the specified Class and Association
      * 
      * When multiple behaviours are bound to the policy for the class feature, an
      * aggregate policy implementation is returned which invokes each policy
@@ -62,17 +74,13 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
      */
     public P get(QName classQName, QName assocTypeQName)
     {
-        AssociationDefinition assocDef = dictionary.getAssociation(assocTypeQName);
-        if (assocDef == null)
-        {
-            throw new IllegalArgumentException("Association" + assocDef + " has not been defined in the data dictionary");
-        }
+        checkAssocType(assocTypeQName);
         return factory.create(new ClassFeatureBehaviourBinding(dictionary, classQName, assocTypeQName));
     }
 
     
     /**
-     * Gets the collection of Policy implementations for the specified Class and Property
+     * Gets the collection of Policy implementations for the specified Class and Association
      * 
      * @param classQName  the class qualified name
      * @param assocTypeQName  the association type qualified name
@@ -80,60 +88,39 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
      */
     public Collection<P> getList(QName classQName, QName assocTypeQName)
     {
-        AssociationDefinition assocDef = dictionary.getAssociation(assocTypeQName);
-        if (assocDef == null)
-        {
-            throw new IllegalArgumentException("Association " + assocTypeQName + " has not been defined in the data dictionary");
-        }
+        checkAssocType(assocTypeQName);
         return factory.createList(new ClassFeatureBehaviourBinding(dictionary, classQName, assocTypeQName));
     }
 
-    
     /**
-     * Gets the Policy implementation for the specified Node and association type
+     * Gets a <tt>Policy</tt> for all the given Class and Association
      * 
-     * All behaviours bound to the Node's class and aspects are aggregated.
-     * 
-     * @param nodeRef the node reference
-     * @param assocTypeQName  the association type qualified name
-     * @return the collection of policies
+     * @param classQNames the class qualified names
+     * @param assocTypeQName the association type qualified name
+     * @return Return the policy
      */
-    public P get(NodeService nodeService, NodeRef nodeRef, QName assocTypeQName)
+    public P get(Set<QName> classQNames, QName assocTypeQName)
     {
-        return factory.toPolicy(getList(nodeService, nodeRef, assocTypeQName));
+        checkAssocType(assocTypeQName);
+        return factory.toPolicy(getList(classQNames, assocTypeQName));
     }
-
-
+    
     /**
-     * Gets the collection of Policy implementations for the specified Node and Property
+     * Gets the <tt>Policy</tt> instances for all the given Classes and Associations
      * 
-     * All behaviours bound to the Node's class and aspects are returned.
-     * 
-     * @param nodeRef  the node reference
-     * @param assocTypeQName  the association type qualified name
-     * @return the collection of policies
+     * @param classQNames the class qualified names
+     * @param assocTypeQName the association type qualified name
+     * @return Return the policies
      */
-	public Collection<P> getList(NodeService nodeService, NodeRef nodeRef, QName assocTypeQName)
-	{
-        // the NodeService is an issue here - we can't guarantee that the NodeService can even
-        // handle the NodeRef given
-        CodeMonkey.todo("The required information should be passed in the separate this class from NodeService"); // TODO
-        
-		Collection<P> result = new HashSet<P>();
-		
-		// Get the behaviour for the node's type
-		QName classQName = nodeService.getType(nodeRef);
-		result.addAll(getList(classQName, assocTypeQName));
-		
-		// Get the behaviour for all the aspect types
-		Collection<QName> aspectQNames = nodeService.getAspects(nodeRef);
-		for (QName aspectQName : aspectQNames) 
-		{
-			result.addAll(getList(aspectQName, assocTypeQName));
-		}
-		
-		return result;
-	}
-    
-    
+    public Collection<P> getList(Set<QName> classQNames, QName assocTypeQName)
+    {
+        checkAssocType(assocTypeQName);
+        Collection<P> policies = new HashSet<P>();
+        for (QName classQName : classQNames)
+        {
+            P policy = factory.create(new ClassFeatureBehaviourBinding(dictionary, classQName, assocTypeQName));
+            policies.add(policy);
+        }
+        return policies;
+    }
 }

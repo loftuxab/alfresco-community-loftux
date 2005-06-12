@@ -1,28 +1,28 @@
 package org.alfresco.repo.node;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.ref.QName;
-
 
 /**
  * Thrown when a reference to an <b>aspect</b> is incorrect.
  * 
  * @author Derek Hulley
  */
-public class InvalidAspectException extends RuntimeException
+public class InvalidAspectException extends AlfrescoRuntimeException
 {
     private static final long serialVersionUID = 3257290240330051893L;
 
-    private QName aspectRef;
+    private QName aspectTypeQName;
     
-    public InvalidAspectException(QName aspectRef)
+    public InvalidAspectException(QName aspectTypeQName)
     {
-        this(null, aspectRef);
+        this(null, aspectTypeQName);
     }
 
-    public InvalidAspectException(String msg, QName aspectRef)
+    public InvalidAspectException(String msg, QName aspectTypeQName)
     {
         super(msg);
-        this.aspectRef = aspectRef;
+        this.aspectTypeQName = aspectTypeQName;
     }
 
     /**
@@ -30,8 +30,8 @@ public class InvalidAspectException extends RuntimeException
      * 
      * @see org.alfresco.repo.dictionary.ClassDefinition#getProperties()
      */
-    public QName getAspectRef()
+    public QName getAspectTypeQName()
     {
-        return aspectRef;
+        return aspectTypeQName;
     }
 }

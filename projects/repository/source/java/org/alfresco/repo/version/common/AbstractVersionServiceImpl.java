@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.repo.dictionary.AssociationDefinition;
 import org.alfresco.repo.dictionary.ClassDefinition;
@@ -156,7 +157,12 @@ public abstract class AbstractVersionServiceImpl
 	 */
 	protected void invokeBeforeCreateVersion(NodeRef nodeRef)
 	{
-		this.beforeCreateVersionDelegate.get(this.nodeService, nodeRef).beforeCreateVersion(nodeRef);
+        // invoke for node type
+        QName nodeTypeQName = nodeService.getType(nodeRef);
+        this.beforeCreateVersionDelegate.get(nodeTypeQName).beforeCreateVersion(nodeRef);
+        // invoke for node aspects
+        Set<QName> nodeAspectQNames = nodeService.getAspects(nodeRef);
+		this.beforeCreateVersionDelegate.get(nodeAspectQNames).beforeCreateVersion(nodeRef);
 	}
 	
 	/**

@@ -6,6 +6,7 @@ package org.alfresco.repo.node;
 import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.ref.ChildAssocRef;
+import org.alfresco.repo.ref.NodeAssocRef;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
@@ -94,7 +95,7 @@ public interface NodeServicePolicies
 		 * 
 		 * @param nodeRef   the node reference
 		 */
-		public void beforeDeleteNodePolicy(NodeRef nodeRef);
+		public void beforeDeleteNode(NodeRef nodeRef);
 	}
 	
 	public interface OnDeleteNodePolicy extends ClassPolicy
@@ -109,18 +110,85 @@ public interface NodeServicePolicies
 		public void onDeleteNode(ChildAssocRef childAssocRef);
 	}
 	
-	// TODO
-	// onAddAspect
-	// onRemoveAspect
+    public interface BeforeAddAspectPolicy extends ClassPolicy
+    {
+        /**
+         * Called before an <b>aspect</b> is added to a node
+         * 
+         * @param nodeRef the node to which the aspect will be added
+         * @param aspectTypeQName the type of the aspect
+         */
+        public void beforeAddAspect(NodeRef nodeRef, QName aspectTypeQName);
+    }
+
+    public interface OnAddAspectPolicy extends ClassPolicy
+    {
+        /**
+         * Called after an <b>aspect</b> has been added to a node
+         * 
+         * @param nodeRef the node to which the aspect was added
+         * @param aspectTypeQName the type of the aspect
+         */
+        public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName);
+    }
+
+    public interface BeforeRemoveAspectPolicy extends ClassPolicy
+    {
+        /**
+         * Called before an <b>aspect</b> is removed from a node
+         * 
+         * @param nodeRef the node from which the aspect will be removed
+         * @param aspectTypeQName the type of the aspect
+         */
+        public void beforeRemoveAspect(NodeRef nodeRef, QName aspectTypeQName);
+    }
+
+    public interface OnRemoveAspectPolicy extends ClassPolicy
+    {
+        /**
+         * Called after an <b>aspect</b> has been removed from a node
+         * 
+         * @param nodeRef the node from which the aspect will be removed
+         * @param aspectTypeQName the type of the aspect
+         */
+        public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName);
+    }
+
+    public interface BeforeCreateChildAssociationPolicy extends AssociationPolicy
+    {
+        /**
+         * Called before a node child association is created.
+         * 
+         * @param parentNodeRef
+         * @param childNodeRef 
+         * @param assocTypeQName the type of the association
+         * @param assocQName the name of the association
+         */
+        public void beforeCreateChildAssociation(
+                NodeRef parentNodeRef,
+                NodeRef childNodeRef,
+                QName assocTypeQName,
+                QName assocQName);
+    }
     
     public interface OnCreateChildAssociationPolicy extends AssociationPolicy
     {
         /**
          * Called after a node child association has been created.
          * 
-         * @param childAssocRef     the created child association reference
+         * @param childAssocRef the child association that has been created
          */
         public void onCreateChildAssociation(ChildAssocRef childAssocRef);
+    }
+    
+    public interface BeforeDeleteChildAssociationPolicy extends AssociationPolicy
+    {
+        /**
+         * Called before a node child association is deleted.
+         * 
+         * @param childAssocRef the child association to be deleted
+         */
+        public void beforeDeleteChildAssociation(ChildAssocRef childAssocRef);
     }
     
     public interface OnDeleteChildAssociationPolicy extends AssociationPolicy
@@ -131,5 +199,30 @@ public interface NodeServicePolicies
          * @param childAssocRef the child association that has been deleted
          */
         public void onDeleteChildAssociation(ChildAssocRef childAssocRef);
+    }
+
+    public interface BeforeCreateAssociationPolicy extends AssociationPolicy
+    {
+        /**
+         * Called before a regular node association is created.
+         * 
+         * @param sourceNodeRef source of the node association
+         * @param targetNodeRef target of the node association
+         * @param assocTypeQName association type
+         */
+        public void beforeCreateAssociation(
+                NodeRef sourceNodeRef,
+                NodeRef targetNodeRef,
+                QName assocTypeQName);
+    }
+    
+    public interface BeforeDeleteAssociationPolicy extends AssociationPolicy
+    {
+        /**
+         * Called before a regular node association is deleted.
+         * 
+         * @param nodeAssocRef the regular node association to be removed
+         */
+        public void beforeDeleteAssociation(NodeAssocRef nodeAssocRef);
     }
 }

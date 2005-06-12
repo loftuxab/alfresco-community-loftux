@@ -1,6 +1,6 @@
 package org.alfresco.repo.node;
 
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.ref.QName;
 
 /**
@@ -9,7 +9,7 @@ import org.alfresco.repo.ref.QName;
  * 
  * @author Derek Hulley
  */
-public class InvalidNodeTypeException extends RuntimeException
+public class InvalidNodeTypeException extends AlfrescoRuntimeException
 {
     private static final long serialVersionUID = 3256722870754293558L;
 

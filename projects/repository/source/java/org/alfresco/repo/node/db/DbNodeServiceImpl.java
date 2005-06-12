@@ -60,7 +60,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             DictionaryService dictionaryService,
             NodeDaoService nodeDaoService)
     {
-		super(policyComponent);
+		super(policyComponent, dictionaryService);
 		
         this.dictionaryService = dictionaryService;
         this.nodeDaoService = nodeDaoService;
@@ -243,12 +243,18 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             throw new RuntimeException("No store found for parent node: " + parentRef);
         }
+        
         // create the node instance
         RealNode node = nodeDaoService.newRealNode(store, nodeTypeQName);
+        NodeRef childRef = node.getNodeRef();
         // get the parent node
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
-        // create the association
-        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocTypeQName, assocQName);
+        
+        // create the association - invoke policy behaviour
+        invokeBeforeCreateChildAssociation(parentRef, childRef, assocTypeQName, assocQName);
+        ChildAssoc childAssoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocTypeQName, assocQName);
+        ChildAssocRef childAssocRef = childAssoc.getChildAssocRef();
+        invokeOnCreateChildAssociation(childAssocRef);
         
         // get the mandatory aspects for the node type
         TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeQName);
@@ -274,14 +280,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
         
         // Invoke policy behaviour
-        ChildAssocRef childAssocRef = assoc.getChildAssocRef();
-        invokeOnCreateChildAssociation(childAssocRef);
 		invokeOnCreateNode(childAssocRef);
-        // TODO
-        CodeMonkey.issue("The parent isn't being updated - enough info is given by the assoc");
-        {
-            invokeOnUpdateNode(parentRef);
-        }
+        invokeOnUpdateNode(parentRef);
 		
 		// done
 		return childAssocRef;
@@ -309,10 +309,13 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ContainerNode newParentNode = getContainerNodeNotNull(newParentRef);
         // get the primary parent assoc
         ChildAssoc oldAssoc = nodeDaoService.getPrimaryParentAssoc(nodeToMove);
+        ChildAssocRef oldAssocRef = oldAssoc.getChildAssocRef();
         // get the old parent
         ContainerNode oldParentNode = oldAssoc.getParent();
         
         // Invoke policy behaviour
+        invokeBeforeDeleteChildAssociation(oldAssocRef);
+        invokeBeforeCreateChildAssociation(newParentRef, nodeToMoveRef, assocTypeQName, assocQName);
         invokeBeforeUpdateNode(oldParentNode.getNodeRef());    // old parent will be updated
         invokeBeforeUpdateNode(newParentRef);                  // new parent ditto
         
@@ -324,12 +327,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // invoke policy behaviour
         invokeOnCreateChildAssociation(newAssoc.getChildAssocRef());
         invokeOnDeleteChildAssociation(oldAssoc.getChildAssocRef());
-        //TODO
-        CodeMonkey.issue("Updates are really only on the associatons");
-        {
-            invokeOnUpdateNode(oldParentNode.getNodeRef());
-            invokeOnUpdateNode(newParentRef);
-        }
+        invokeOnUpdateNode(oldParentNode.getNodeRef());
+        invokeOnUpdateNode(newParentRef);
         
         // done
         return newAssoc.getChildAssocRef();
@@ -419,25 +418,26 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      */
     public void addAspect(
             NodeRef nodeRef,
-            QName aspectRef,
+            QName aspectTypeQName,
             Map<QName, Serializable> aspectProperties)
             throws InvalidNodeRefException, InvalidAspectException, PropertyException
     {
-		// Invoke policy behaviours
-		invokeBeforeUpdateNode(nodeRef);
-		
         // get the aspect
-        AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
+        AspectDefinition aspectDef = dictionaryService.getAspect(aspectTypeQName);
         if (aspectDef == null)
         {
-            throw new InvalidAspectException(aspectRef);
+            throw new InvalidAspectException(aspectTypeQName);
         }
         // check that the properties supplied are adequate for the aspect
         checkProperties(aspectDef, null, aspectProperties);
         
+        // Invoke policy behaviours
+        invokeBeforeUpdateNode(nodeRef);
+        invokeBeforeAddAspect(nodeRef, aspectTypeQName);
+        
         Node node = getNodeNotNull(nodeRef);
         // physically attach the aspect to the node
-        node.getAspects().add(aspectRef);
+        node.getAspects().add(aspectTypeQName);
         
 		if (aspectProperties != null)
 		{
@@ -449,22 +449,24 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		
 		// Invoke policy behaviours
 		invokeOnUpdateNode(nodeRef);
+        invokeOnAddAspect(nodeRef, aspectTypeQName);
     }
 
     /**
      * @see Node#getAspects()
      */
-    public void removeAspect(NodeRef nodeRef, QName aspectRef)
+    public void removeAspect(NodeRef nodeRef, QName aspectTypeQName)
             throws InvalidNodeRefException, InvalidAspectException
     {
 		// Invoke policy behaviours
 		invokeBeforeUpdateNode(nodeRef);
+        invokeBeforeRemoveAspect(nodeRef, aspectTypeQName);
 		
         // get the aspect
-        AspectDefinition aspectDef = dictionaryService.getAspect(aspectRef);
+        AspectDefinition aspectDef = dictionaryService.getAspect(aspectTypeQName);
         if (aspectDef == null)
         {
-            throw new InvalidAspectException(aspectRef);
+            throw new InvalidAspectException(aspectTypeQName);
         }
         // get the node
         Node node = getNodeNotNull(nodeRef);
@@ -479,12 +481,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         if (defaultAspects.contains(aspectDef))
         {
             throw new InvalidAspectException(
-                    "The aspect is a default for the node's type and cannot be removed: " + aspectRef,
-                    aspectRef);
+                    "The aspect is a default for the node's type and cannot be removed: " + aspectTypeQName,
+                    aspectTypeQName);
         }
         
         // remove the aspect, if present
-        boolean removed = node.getAspects().remove(aspectRef);
+        boolean removed = node.getAspects().remove(aspectTypeQName);
         // if the aspect was present, remove the associated properties
         if (removed)
         {
@@ -494,10 +496,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             {
                 nodeProperties.remove(propertyName.toString());
             }
+            
+            // Invoke policy behaviours
+            invokeOnUpdateNode(nodeRef);
+            invokeOnRemoveAspect(nodeRef, aspectTypeQName);
         }
-		
-		// Invoke policy behaviours
-		invokeOnUpdateNode(nodeRef);
     }
 
     /**
@@ -533,19 +536,21 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node node = getNodeNotNull(nodeRef);
         // get the primary parent-child relationship before it is gone
         ChildAssocRef childAssocRef = getPrimaryParent(nodeRef);
-		// get type QName as it will be unavailable after the delete
+		// get type and aspect QNames as they will be unavailable after the delete
 		QName nodeTypeQName = node.getTypeQName();
+        Set<QName> nodeAspectQNames = node.getAspects();
         // delete it
         nodeDaoService.deleteNode(node);
 		
 		// Invoke policy behaviours
-		invokeOnDeleteNode(nodeTypeQName, childAssocRef);
+		invokeOnDeleteNode(childAssocRef, nodeTypeQName, nodeAspectQNames);
     }
 
-    public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName assocTypeQName, QName qname)
+    public ChildAssocRef addChild(NodeRef parentRef, NodeRef childRef, QName assocTypeQName, QName assocQName)
     {
 		// Invoke policy behaviours
 		invokeBeforeUpdateNode(parentRef);
+        invokeBeforeCreateChildAssociation(parentRef, childRef, assocTypeQName, assocQName);
 		
         CodeMonkey.todo("Check that the child association is allowed"); // TODO
         // check that both nodes belong to the same store
@@ -563,7 +568,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // get the child node
         Node childNode = getNodeNotNull(childRef);
         // make the association
-        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, childNode, false, assocTypeQName, qname);
+        ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, childNode, false, assocTypeQName, assocQName);
 
 		// Invoke policy behaviours
         invokeOnCreateChildAssociation(assoc.getChildAssocRef());
@@ -607,20 +612,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
                 deletedRefs.add(assoc.getChildAssocRef());    // save for return value
             }
         }
-        // remove the child if the primary association was found
-        // must the child be deleted?
+        // remove the child if the primary association was a match
         if (primaryAssocRef != null)
         {
-            invokeBeforeDeleteChildAssociation(primaryAssocRef);
-            invokeBeforeDeleteNode(childRef);
-            
-            QName childNodeTypeQName = getType(childRef);
-            nodeDaoService.deleteNode(childNode);
-            deletedRefs.add(childNode.getNodeRef());    // save for return value
-            deletedRefs.add(primaryAssocRef);           // cascade deleted by the persistence layer
-
-            invokeOnDeleteChildAssociation(primaryAssocRef);
-            invokeOnDeleteNode(childNodeTypeQName, primaryAssocRef);
+            deleteNode(primaryAssocRef.getChildRef());
+            deletedRefs.add(primaryAssocRef);
+            deletedRefs.add(primaryAssocRef.getChildRef());
         }
 
 		// Invoke policy behaviours
