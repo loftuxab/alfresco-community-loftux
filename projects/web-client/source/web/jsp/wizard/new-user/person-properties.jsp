@@ -13,6 +13,22 @@
 <script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
+<script language="JavaScript1.2">
+   function updateButtonState()
+   {
+      if (document.getElementById("person-props:firstName").value.length == 0 ||
+          document.getElementById("person-props:lastName").value.length == 0 ||
+          document.getElementById("person-props:email").value.length == 0)
+      {
+         document.getElementById("person-props:next-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("person-props:next-button").disabled = false;
+      }
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -97,31 +113,49 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{NewUserWizard.stepTitle}" /></td>
+                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewUserWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr>
-                                    <td class="mainSubText"><h:outputText value="#{NewUserWizard.stepDescription}" /></td>
+                                    <td colspan="2" class="mainSubText"><h:outputText value="#{NewUserWizard.stepDescription}" /></td>
                                  </tr>
                                  
-                                 <%-- TODO: implement
-                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>How do you want to create your space?</td>
+                                    <td colspan="2" class="wizardSectionHeading">Person Properties</td>
                                  </tr>
                                  <tr>
+                                    <td>First Name:</td>
                                     <td>
-                                       <h:selectOneRadio value="#{NewUserWizard.createFrom}" layout="pageDirection">
-                                          <f:selectItem itemValue="scratch" itemLabel="From scratch" />
-                                          <f:selectItem itemValue="existing" itemLabel="Based on an existing space" />
-                                          <f:selectItem itemValue="template" itemLabel="Using a template" />
-                                       </h:selectOneRadio>
+                                       <h:inputText id="firstName" value="#{NewUserWizard.firstName}" size="35" maxlength="1024" onkeyup="updateButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
-                                 --%>
-                                 
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{NewUserWizard.stepInstructions}" /></td>
+                                    <td>Last Name:</td>
+                                    <td>
+                                       <h:inputText id="lastName" value="#{NewUserWizard.lastName}" size="35" maxlength="1024" onkeyup="updateButtonState();" />&nbsp;*
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>Email:</td>
+                                    <td>
+                                       <h:inputText id="email" value="#{NewUserWizard.email}" size="35" maxlength="1024" onkeyup="updateButtonState();" />&nbsp;*
+                                    </td>
+                                 </tr>
+                                 
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td colspan="2" class="wizardSectionHeading">Other Options</td>
+                                 </tr>
+                                 <tr>
+                                    <td>Company ID:</td>
+                                    <td>
+                                       <h:inputText value="#{NewUserWizard.companyId}" size="35" maxlength="1024" />
+                                    </td>
+                                 </tr>
+                                 
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td colspan="2"><h:outputText value="#{NewUserWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -132,13 +166,12 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewUserWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="Next" id="next-button" action="#{NewUserWizard.next}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewUserWizard.finish}" styleClass="wizardButton"
-                                                        disabled="true" />
+                                       <h:commandButton value="Finish" id="finish-button" action="#{NewUserWizard.finish}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
@@ -171,5 +204,9 @@
     </h:form>
     
 </f:view>
+
+<script>
+   updateButtonState();
+</script>
 
 </r:page>

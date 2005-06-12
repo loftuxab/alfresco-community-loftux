@@ -94,7 +94,53 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <br/>A List of Users
+                              
+                              <%-- Users List --%>
+                              <div style="padding:4px">
+                              
+                              <a:panel id="users-panel" border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea" styleClass="mainSubTitle" label="#{msg.users}">
+                              
+                              <a:richList id="users-list" binding="#{NewUserWizard.usersRichList}" viewMode="details" pageSize="10"
+                                    styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
+                                    value="#{NewUserWizard.users}" var="r" initialSortColumn="name" initialSortDescending="true">
+                                 
+                                 <%-- Primary column for details view mode --%>
+                                 <a:column primary="true" width="200" style="padding:2px;text-align:left">
+                                    <f:facet name="header">
+                                       <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
+                                    </f:facet>
+                                    <f:facet name="small-icon">
+                                    </f:facet>
+                                    <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickSpace}">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
+                                 </a:column>
+                                 
+                                 <%-- Description column for all view modes --%>
+                                 <a:column style="text-align:left">
+                                    <f:facet name="header">
+                                       <a:sortLink label="User Name" value="userName" styleClass="header"/>
+                                    </f:facet>
+                                    <h:outputText value="#{r.userName}" />
+                                 </a:column>
+                                 
+                                 <%-- Actions column --%>
+                                 <a:column actions="true" style="text-align:left">
+                                    <f:facet name="header">
+                                       <h:outputText value="#{msg.actions}"/>
+                                    </f:facet>
+                                    <a:actionLink value="#{msg.modify}" actionListener="#{ClipboardBean.cutNode}">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
+                                 </a:column>
+                                 
+                                 <a:dataPager/>
+                              </a:richList>
+                              
+                              </a:panel>
+                     
+                              <div>
+                              
                            </td>
                            
                            <td valign="top">

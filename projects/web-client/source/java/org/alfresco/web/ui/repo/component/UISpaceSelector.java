@@ -289,9 +289,8 @@ public class UISpaceSelector extends UIInput
                         
                         // get the name for the child (rather than association name)
                         NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(context), childId);
-                        Node childNode = new Node(childNodeRef, getNodeService(context));
-                        
-                        renderNodeLink(context, childId, childNode.getName(), buf);
+                        String name = Repository.getNameForNode(service, childNodeRef);
+                        renderNodeLink(context, childId, name, buf);
                         buf.append("</td></tr>");
                      }
                   }

@@ -3,6 +3,11 @@
  */
 package org.alfresco.web.bean.wizard;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,13 +27,42 @@ public class NewUserWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To add the user to this space click Finish.<br/>" +
                                                     "To review or change your selections click Back.";
 
-   private String firstName = "";
-   private String lastName = "";
-   private String userName = "";
-   private String email = "";
-   private String companyId = "";
-   private String homeSpaceName = "";
+   /** form variables */
+   private String firstName = null;
+   private String lastName = null;
+   private String userName = null;
+   private String email = null;
+   private String companyId = null;
+   private String homeSpaceName = null;
    private String homeSpaceLocation = null;
+   
+   /** Component references */
+   private UIRichList usersRichList;
+   
+   /**
+    * Initialises the wizard
+    */
+   public void init()
+   {
+      super.init();
+      
+      // reset all variables
+      this.firstName = "";
+      this.lastName = "";
+      this.userName = "";
+      this.email = "";
+      this.companyId = "";
+      this.homeSpaceName = "";
+      this.homeSpaceLocation = null;
+   }
+
+   /**
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#populate()
+    */
+   public void populate()
+   {
+      // TODO: implement for Edit mode
+   }
    
    /**
     * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getWizardDescription()
@@ -186,5 +220,138 @@ public class NewUserWizard extends AbstractWizardBean
       return buildSummary(
             new String[] {"Name", "User Name", "Password", "Home Space"},
             new String[] {this.firstName + " " + this.lastName, this.userName, "********", this.homeSpaceName});
+   }
+   
+   public List<Node> getUsers()
+   {
+      return Collections.EMPTY_LIST;
+   }
+
+   /**
+    * @return Returns the companyId.
+    */
+   public String getCompanyId()
+   {
+      return this.companyId;
+   }
+   
+   /**
+    * @param companyId The companyId to set.
+    */
+   public void setCompanyId(String companyId)
+   {
+      this.companyId = companyId;
+   }
+   
+   /**
+    * @return Returns the email.
+    */
+   public String getEmail()
+   {
+      return this.email;
+   }
+   
+   /**
+    * @param email The email to set.
+    */
+   public void setEmail(String email)
+   {
+      this.email = email;
+   }
+   
+   /**
+    * @return Returns the firstName.
+    */
+   public String getFirstName()
+   {
+      return this.firstName;
+   }
+   
+   /**
+    * @param firstName The firstName to set.
+    */
+   public void setFirstName(String firstName)
+   {
+      this.firstName = firstName;
+   }
+   
+   /**
+    * @return Returns the homeSpaceLocation.
+    */
+   public String getHomeSpaceLocation()
+   {
+      return this.homeSpaceLocation;
+   }
+   
+   /**
+    * @param homeSpaceLocation The homeSpaceLocation to set.
+    */
+   public void setHomeSpaceLocation(String homeSpaceLocation)
+   {
+      this.homeSpaceLocation = homeSpaceLocation;
+   }
+   
+   /**
+    * @return Returns the homeSpaceName.
+    */
+   public String getHomeSpaceName()
+   {
+      return this.homeSpaceName;
+   }
+   
+   /**
+    * @param homeSpaceName The homeSpaceName to set.
+    */
+   public void setHomeSpaceName(String homeSpaceName)
+   {
+      this.homeSpaceName = homeSpaceName;
+   }
+   
+   /**
+    * @return Returns the lastName.
+    */
+   public String getLastName()
+   {
+      return this.lastName;
+   }
+   
+   /**
+    * @param lastName The lastName to set.
+    */
+   public void setLastName(String lastName)
+   {
+      this.lastName = lastName;
+   }
+   
+   /**
+    * @return Returns the userName.
+    */
+   public String getUserName()
+   {
+      return this.userName;
+   }
+   
+   /**
+    * @param userName The userName to set.
+    */
+   public void setUserName(String userName)
+   {
+      this.userName = userName;
+   }
+
+   /**
+    * @return Returns the usersRichList.
+    */
+   public UIRichList getUsersRichList()
+   {
+      return this.usersRichList;
+   }
+   
+   /**
+    * @param usersRichList The usersRichList to set.
+    */
+   public void setUsersRichList(UIRichList usersRichList)
+   {
+      this.usersRichList = usersRichList;
    }
 }
