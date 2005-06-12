@@ -316,6 +316,23 @@
       </managed-property>
    </managed-bean>
    
+   <managed-bean>
+      <description>
+         The bean that holds manage content rules state
+      </description>
+      <managed-bean-name>RulesBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.RulesBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>ruleService</property-name>
+         <value>#{ruleService}</value>
+      </managed-property>
+   </managed-bean>
+   
    
    <!-- ==================== NAVIGATION ==================== -->
    <!-- navigation rules describe the navigation cases between views using the -->
@@ -610,7 +627,7 @@
          <to-view-id>/jsp/wizard/new-rule/condition-in-category.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
-         <from-outcome>contains-text</from-outcome>
+         <from-outcome>match-text</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/condition-contains-text.jsp</to-view-id>
       </navigation-case>
       <navigation-case>

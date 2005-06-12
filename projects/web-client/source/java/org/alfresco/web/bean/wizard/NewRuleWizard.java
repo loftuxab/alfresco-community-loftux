@@ -108,7 +108,7 @@ public class NewRuleWizard extends AbstractWizardBean
             if (this.condition.equals("match-text"))
             {
                conditionParams.put(MatchTextEvaluator.PARAM_TEXT, 
-                     this.conditionProperties.get("containstext")); 
+                     this.conditionProperties.get("containstext"));
             }
             else if (this.condition.equals("in-category"))
             {
@@ -132,6 +132,8 @@ public class NewRuleWizard extends AbstractWizardBean
             
             // create the rule and add it to the space
             Rule rule = this.ruleService.createRule(ruleType);
+            rule.setTitle(this.title);
+            rule.setDescription(this.description);
             rule.addRuleCondition(cond, conditionParams);
             rule.addRuleAction(action, actionParams);
             this.ruleService.addRule(currentSpace.getNodeRef(), rule);

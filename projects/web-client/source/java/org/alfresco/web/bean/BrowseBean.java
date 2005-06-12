@@ -382,6 +382,9 @@ public class BrowseBean implements IContextListener
                setupDataBindingProperties(node);
                
                this.contentNodes.add(node);
+               
+               if (logger.isDebugEnabled())
+                  logger.debug(node.getName() + " has following aspects: " + node.getAspects());
             }
             else
             {

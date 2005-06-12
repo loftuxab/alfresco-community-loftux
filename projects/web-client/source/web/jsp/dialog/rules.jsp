@@ -71,7 +71,8 @@
                               <%-- Filters --%>
                               <h:outputText style="padding-left:26px;padding-bottom:4px;" styleClass="mainSubTitle" value="#{msg.filter_contents}" /><br/>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
-                                    value="local" selectedImage="/images/icons/Details.gif">
+                                    value="#{RulesBean.viewMode}" actionListener="#{RulesBean.viewModeChanged}"
+                                    selectedImage="/images/icons/Details.gif">
                                  <a:listItem value="local" label="Local" />
                                  <a:listItem value="inherited" label="Inherited" />
                               </a:modeList>
@@ -120,7 +121,46 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <br/>A List of current rules
+                              <a:richList id="rulesList" viewMode="details" value="#{RulesBean.rules}" var="r"
+                                          styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" 
+                                          altRowStyleClass="recordSetRowAlt" width="100%" pageSize="10"
+                                          initialSortColumn="title" initialSortDescending="true">
+                        
+                                 <%-- Primary column for details view mode --%>
+                                 <a:column primary="true" width="200" style="padding:2px;text-align:left">
+                                    <f:facet name="header">
+                                       <a:sortLink label="Title" value="title" mode="case-insensitive" styleClass="header"/>
+                                    </f:facet>
+                                    <f:facet name="small-icon">
+                                       <a:actionLink value="#{r.title}" image="/images/icons/space_small.gif" actionListener="#{RulesBean.clickRule}" showLink="false">
+                                          <f:param name="id" value="#{r.id}" />
+                                       </a:actionLink>
+                                    </f:facet>
+                                    <a:actionLink value="#{r.title}" actionListener="#{RulesBean.clickRule}">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
+                                 </a:column>
+                                 
+                                 <a:column style="text-align:left">
+                                    <f:facet name="header">
+                                       <a:sortLink label="Description" value="description" styleClass="header"/>
+                                    </f:facet>
+                                    <h:outputText value="#{r.description}" />
+                                 </a:column>
+                                 
+                                 <%-- Actions column --%>
+                                 <a:column actions="true" style="text-align:left">
+                                    <f:facet name="header">
+                                       <h:outputText value="#{msg.actions}"/>
+                                    </f:facet>
+                                    <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
+                                    <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" showLink="false" styleClass="inlineAction">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
+                                 </a:column>
+                              </a:richList>
                            </td>
                            
                            <td valign="top">
