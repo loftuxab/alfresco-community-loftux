@@ -48,6 +48,14 @@ public interface ContentReader extends Content
      * @return Returns true if there is content at the URL refered to by this reader
      */
     public boolean exists();
+    
+    /**
+     * Gets the length of the content that this reader references.
+     * 
+     * @return Returns the document byte length, or <code>OL</code> if the
+     *      content doesn't {@link #exists() exist}.
+     */
+    public long getLength();
 
     /**
      * Provides low-level access to the underlying content.

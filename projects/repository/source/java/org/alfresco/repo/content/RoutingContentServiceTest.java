@@ -10,9 +10,6 @@ import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
-import org.springframework.dao.DataIntegrityViolationException;
-
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.ChildAssocRef;
@@ -21,6 +18,7 @@ import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * @see org.alfresco.repo.content.RoutingContentService
@@ -105,6 +103,12 @@ public class RoutingContentServiceTest extends BaseSpringTest
         assertNotNull("Content URL should not be null", reader.getContentUrl());
         assertNotNull("Content mimetype should not be null", reader.getMimetype());
         assertNotNull("Content encoding should not be null", reader.getEncoding());
+        
+        // check that the content length is correct
+        // - note encoding is important as we get the byte length
+        long length = SOME_CONTENT.getBytes(reader.getEncoding()).length;  // ensures correct decoding
+        long checkLength = reader.getLength();
+        assertEquals("Content length incorrect", length, checkLength);
 
         // check the content - the encoding will come into effect here
         String contentCheck = reader.getContentString();
@@ -180,6 +184,12 @@ public class RoutingContentServiceTest extends BaseSpringTest
         contentUrl = (String) nodeService.getProperty(contentNodeRef, DictionaryBootstrap.PROP_QNAME_CONTENT_URL);
         assertNotNull("Content URL not set", contentUrl);
         assertEquals("Mismatched URL between writer and node", writer.getContentUrl(), contentUrl);
+        
+        // check that the content length was set
+        Long contentLength = (Long) nodeService.getProperty(contentNodeRef, DictionaryBootstrap.PROP_QNAME_SIZE);
+        assertNotNull("Content size not set", contentLength);
+        assertEquals("Reader content length and node content length different",
+                reader.getLength(), contentLength.longValue());
     }
     
     /**

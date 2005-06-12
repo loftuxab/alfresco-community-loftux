@@ -10,6 +10,7 @@ import org.alfresco.repo.node.InvalidNodeTypeException;
 import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.ref.QName;
+import org.alfresco.repo.value.ValueConverter;
 import org.alfresco.util.TempFileProvider;
 import org.alfresco.util.debug.CodeMonkey;
 
@@ -60,10 +61,10 @@ public class RoutingContentService implements ContentService
         }
         
         // get the content URL
-        CodeMonkey.todo("Use the value object toString conversion here"); // TODO
-        String contentUrl = (String) nodeService.getProperty(
+        Object contentUrlProperty = nodeService.getProperty(
                 nodeRef,
                 DictionaryBootstrap.PROP_QNAME_CONTENT_URL);
+        String contentUrl = ValueConverter.convert(String.class, contentUrlProperty);
         // check that the URL is available
         if (contentUrl == null)
         {
@@ -131,12 +132,12 @@ public class RoutingContentService implements ContentService
             throw new InvalidNodeTypeException("The node must be an instance of type content", nodeType);
         }
         
-		  // get the plain writer
-		  ContentWriter writer = getWriter(nodeRef);
-		  // get URL that is going to be written to
+        // get the plain writer
+        ContentWriter writer = getWriter(nodeRef);
+        // get URL that is going to be written to
         String contentUrl = writer.getContentUrl();
         // need a listener to update the node when the stream closes
-        WriteStreamListener listener = new WriteStreamListener(nodeRef, contentUrl);
+        WriteStreamListener listener = new WriteStreamListener(nodeRef, writer);
         listener.setNodeService(nodeService);
         writer.addListener(listener);
         // give back to the client
@@ -190,12 +191,12 @@ public class RoutingContentService implements ContentService
     {
         private NodeService nodeService;
         private NodeRef nodeRef;
-        private String contentUrl;
+        private ContentWriter writer;
         
-        public WriteStreamListener(NodeRef nodeRef, String contentUrl)
+        public WriteStreamListener(NodeRef nodeRef, ContentWriter writer)
         {
             this.nodeRef = nodeRef;
-            this.contentUrl = contentUrl;
+            this.writer = writer;
         }
         
         public void setNodeService(NodeService nodeService)
@@ -206,11 +207,19 @@ public class RoutingContentService implements ContentService
 
         public void contentStreamClosed() throws ContentIOException
         {
-            // change the content URL property of the node we are listening to
+            // change the content URL property of the node we are listening for
+            String contentUrl = writer.getContentUrl();
             nodeService.setProperty(
                     nodeRef,
                     DictionaryBootstrap.PROP_QNAME_CONTENT_URL,
                     contentUrl);
+            // get the size of the document
+            ContentReader reader = writer.getReader();
+            long length = reader.getLength();
+            nodeService.setProperty(
+                    nodeRef,
+                    DictionaryBootstrap.PROP_QNAME_SIZE,
+                    new Long(length));
         }
     }
 }

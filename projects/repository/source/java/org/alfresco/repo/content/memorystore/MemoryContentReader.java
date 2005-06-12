@@ -47,6 +47,14 @@ public class MemoryContentReader extends AbstractContentReader
         // the content always exists
         return true;
     }
+    
+    /**
+     * @return Returns the number of bytes held in the in-memory buffer
+     */
+    public long getLength()
+    {
+        return content.length;
+    }
 
     /**
      * @return Returns a <tt>ByteArrayInputStream</tt> directly onto the

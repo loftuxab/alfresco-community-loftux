@@ -59,6 +59,18 @@ public class FileContentReader extends AbstractContentReader
     {
         return file.exists();
     }
+    
+    /**
+     * @see File#length()
+     */
+    public long getLength()
+    {
+        if (!exists())
+        {
+            return 0L;
+        }
+        return file.length();
+    }
 
     @Override
     protected InputStream getDirectInputStream() throws ContentIOException
