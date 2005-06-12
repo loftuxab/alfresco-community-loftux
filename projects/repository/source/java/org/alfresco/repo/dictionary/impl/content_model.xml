@@ -319,6 +319,18 @@
          </properties>
       </type>
    
+      <type name="alf:user">
+         <title>Temporary User Type</title>
+         <properties>
+            <property name="alf:username">
+               <type>d:text</type>
+            </property>
+            <property name="alf:password">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+      
    </types>
    
    
