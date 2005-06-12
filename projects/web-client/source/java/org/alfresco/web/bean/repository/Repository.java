@@ -29,7 +29,7 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public final class Repository
 {
-   public static final String BEAN_NODE_SERVICE = "indexingNodeService";
+   public static final String BEAN_NODE_SERVICE = "nodeService";
    public static final String BEAN_CONTENT_SERVICE = "contentService";
    public static final String BEAN_SEARCH_SERVICE = "searcherComponent";
    public static final String BEAN_DICTIONARY_SERVICE = "dictionaryService";

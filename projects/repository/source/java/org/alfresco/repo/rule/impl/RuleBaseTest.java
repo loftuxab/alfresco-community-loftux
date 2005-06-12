@@ -61,7 +61,7 @@ public class RuleBaseTest extends BaseSpringTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
-        this.nodeService = (NodeService)this.applicationContext.getBean("indexingNodeService");
+        this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
         this.contentService = (ContentService)this.applicationContext.getBean("contentService");
         
         // Sort out the required config

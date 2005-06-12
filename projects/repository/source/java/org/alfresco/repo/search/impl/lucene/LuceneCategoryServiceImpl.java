@@ -31,13 +31,13 @@ import org.alfresco.repo.search.ResultSetRow;
 public class LuceneCategoryServiceImpl implements CategoryService
 {
     private NodeService nodeService;
-    
+
     private NamespacePrefixResolver namespacePrefixResolver;
-    
+
     private DictionaryService dictionaryService;
 
     private LuceneIndexerAndSearcher indexerAndSearcher;
-    
+
     public LuceneCategoryServiceImpl()
     {
         super();
@@ -49,60 +49,68 @@ public class LuceneCategoryServiceImpl implements CategoryService
     {
         this.nodeService = nodeService;
     }
-    
+
     public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
     {
         this.namespacePrefixResolver = namespacePrefixResolver;
     }
-    
+
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
     }
-    
 
     public void setIndexerAndSearcher(LuceneIndexerAndSearcher indexerAndSearcher)
     {
         this.indexerAndSearcher = indexerAndSearcher;
     }
-    
 
     public Collection<ChildAssocRef> getChildren(NodeRef categoryRef, Mode mode, Depth depth)
     {
-        if(categoryRef == null)
+        if (categoryRef == null)
         {
-            return Collections.<ChildAssocRef>emptyList();
+            return Collections.<ChildAssocRef> emptyList();
         }
         ResultSet resultSet = null;
-        StringBuffer luceneQuery = new StringBuffer();
-
-        if (!mode.equals(Mode.ALL))
+        try
         {
-            luceneQuery.append(mode.equals(Mode.SUB_CATEGORIES) ? "-" : "").append("PATH:\"");
-            luceneQuery.append(buildXPath(nodeService.getPath(categoryRef))).append("/");
-            if (depth.equals(Depth.ANY))
-            {
-                luceneQuery.append("/");
-            }
-            luceneQuery.append("member").append("\" ");
-        }
-        
-        if(!mode.equals(Mode.MEMBERS))
-        {
-            luceneQuery.append("PATH:\"");
-            luceneQuery.append(buildXPath(nodeService.getPath(categoryRef))).append("/");
-            if (depth.equals(Depth.ANY))
-            {
-                luceneQuery.append("/");
-            }
-            luceneQuery.append("*").append("\" ");
-        }
-        
-        resultSet = indexerAndSearcher.getSearcher(categoryRef.getStoreRef(), false).query(categoryRef.getStoreRef(), "lucene", luceneQuery.toString(), null, null);
+            StringBuffer luceneQuery = new StringBuffer();
 
-        return resultSetToChildAssocCollection(resultSet);
+            if (!mode.equals(Mode.ALL))
+            {
+                luceneQuery.append(mode.equals(Mode.SUB_CATEGORIES) ? "-" : "").append("PATH:\"");
+                luceneQuery.append(buildXPath(nodeService.getPath(categoryRef))).append("/");
+                if (depth.equals(Depth.ANY))
+                {
+                    luceneQuery.append("/");
+                }
+                luceneQuery.append("member").append("\" ");
+            }
+
+            if (!mode.equals(Mode.MEMBERS))
+            {
+                luceneQuery.append("PATH:\"");
+                luceneQuery.append(buildXPath(nodeService.getPath(categoryRef))).append("/");
+                if (depth.equals(Depth.ANY))
+                {
+                    luceneQuery.append("/");
+                }
+                luceneQuery.append("*").append("\" ");
+            }
+
+            resultSet = indexerAndSearcher.getSearcher(categoryRef.getStoreRef(), false).query(categoryRef.getStoreRef(), "lucene", luceneQuery.toString(), null, null);
+
+            return resultSetToChildAssocCollection(resultSet);
+        }
+        finally
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
+        }
     }
-    
+
     private String buildXPath(Path path)
     {
         StringBuffer pathBuffer = new StringBuffer();
@@ -114,7 +122,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
                 throw new IndexerException("Confused path: " + path);
             }
             Path.ChildAssocElement cae = (Path.ChildAssocElement) element;
-            if(cae.getRef().getParentRef() != null)
+            if (cae.getRef().getParentRef() != null)
             {
                 pathBuffer.append("/");
                 pathBuffer.append(getPrefix(cae.getRef().getQName().getNamespaceURI()));
@@ -123,47 +131,47 @@ public class LuceneCategoryServiceImpl implements CategoryService
         }
         return pathBuffer.toString();
     }
-    
+
     HashMap<String, String> prefixLookup = new HashMap<String, String>();
-    
+
     private String getPrefix(String uri)
     {
         String prefix = prefixLookup.get(uri);
-        if(prefix == null)
+        if (prefix == null)
         {
-           Collection<String> prefixes = namespacePrefixResolver.getPrefixes(uri);
-           for(String first: prefixes)
-           {
-               prefix = first;
-               break;
-           }
-           
-           prefixLookup.put(uri, prefix);
+            Collection<String> prefixes = namespacePrefixResolver.getPrefixes(uri);
+            for (String first : prefixes)
+            {
+                prefix = first;
+                break;
+            }
+
+            prefixLookup.put(uri, prefix);
         }
-        if(prefix == null)
+        if (prefix == null)
         {
             return "";
         }
         else
         {
-            return prefix +":";
+            return prefix + ":";
         }
-        
+
     }
-    
 
     private Collection<ChildAssocRef> resultSetToChildAssocCollection(ResultSet resultSet)
     {
         List<ChildAssocRef> collection = new ArrayList<ChildAssocRef>();
         if (resultSet != null)
         {
-            for(ResultSetRow row: resultSet)
+            for (ResultSetRow row : resultSet)
             {
                 ChildAssocRef car = nodeService.getPrimaryParent(row.getNodeRef());
                 collection.add(car);
             }
         }
         return collection;
+        // The caller closes the result set
     }
 
     public Collection<ChildAssocRef> getCategories(StoreRef storeRef, QName attributeQName, Depth depth)
@@ -171,34 +179,56 @@ public class LuceneCategoryServiceImpl implements CategoryService
         QName qname = dictionaryService.getProperty(attributeQName).getContainerClass().getName();
         return getChildren(getCategoryRootNode(storeRef, qname), Mode.SUB_CATEGORIES, depth);
     }
-    
+
     private NodeRef getCategoryRootNode(StoreRef storeRef, QName qname)
     {
-        ResultSet resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH:\"/"+getPrefix(qname.getNamespaceURI())+qname.getLocalName()+"\"", null, null);
-        if(resultSet.length() != 1)
+        ResultSet resultSet = null;
+        try
         {
-            return null;
+            resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH:\"/" + getPrefix(qname.getNamespaceURI()) + qname.getLocalName() + "\"",
+                    null, null);
+
+            if (resultSet.length() != 1)
+            {
+                return null;
+            }
+            else
+            {
+                return resultSet.getNodeRef(0);
+            }
         }
-        else
+        finally
         {
-            return resultSet.getNodeRef(0);
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
         }
     }
-    
 
     public Collection<ChildAssocRef> getRootCategories(StoreRef storeRef)
     {
-        
-        ResultSet resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH:\"//alf:categoryRoot/*\"", null, null);
-        return resultSetToChildAssocCollection(resultSet);
+        ResultSet resultSet = null;
+        try
+        {
+            resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH:\"//alf:categoryRoot/*\"", null, null);
+            return resultSetToChildAssocCollection(resultSet);
+        }
+        finally
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
+        }
     }
 
     public Collection<QName> getCategoryAspects()
     {
         List<QName> list = new ArrayList<QName>();
-        for(QName aspect :dictionaryService.getAllAspects())
+        for (QName aspect : dictionaryService.getAllAspects())
         {
-            if(dictionaryService.isSubClass(aspect, DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE))
+            if (dictionaryService.isSubClass(aspect, DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE))
             {
                 list.add(aspect);
             }

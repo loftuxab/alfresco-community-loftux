@@ -42,7 +42,7 @@ public class RuleServiceSystemTest extends BaseSpringTest
     protected void onSetUpInTransaction() throws Exception
     {
         // Get the required services
-        this.nodeService = (NodeService)this.applicationContext.getBean("indexingNodeService");
+        this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
         this.ruleService = (RuleService)this.applicationContext.getBean("ruleService");
         
         this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());

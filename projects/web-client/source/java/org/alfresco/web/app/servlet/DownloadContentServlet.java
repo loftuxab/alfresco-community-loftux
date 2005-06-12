@@ -85,7 +85,7 @@ public class DownloadContentServlet extends HttpServlet
          //logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
          
          // get the content mimetype from the node properties
-         NodeService nodeService = (NodeService)context.getBean("indexingNodeService");
+         NodeService nodeService = (NodeService)context.getBean("nodeService");
          String mimetype = (String)nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MIME_TYPE);
          
          // fall back if unable to resolve mimetype property

@@ -521,30 +521,39 @@ public class LuceneCategoryTest extends TestCase
         Collection<ChildAssocRef>
         result = impl.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE);
         assertEquals(1, result.size());
+       
         
         result = impl.getChildren(catACBase , CategoryService.Mode.ALL, CategoryService.Depth.IMMEDIATE);
         assertEquals(3, result.size());
+       
         
         result = impl.getChildren(catACBase , CategoryService.Mode.SUB_CATEGORIES, CategoryService.Depth.IMMEDIATE);
         assertEquals(2, result.size());
         
+        
         result = impl.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.ANY);
         assertEquals(18, result.size());
         
+        
         result = impl.getChildren(catACBase , CategoryService.Mode.ALL, CategoryService.Depth.ANY);
         assertEquals(21, result.size());
+       
         
         result = impl.getChildren(catACBase , CategoryService.Mode.SUB_CATEGORIES, CategoryService.Depth.ANY);
         assertEquals(3, result.size());
         
+        
         result = impl.getRootCategories(rootNodeRef.getStoreRef());
         assertEquals(4, result.size());
         
+        
         result = impl.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "assetClass"), CategoryService.Depth.IMMEDIATE);
         assertEquals(2, result.size());
+      
         
         Collection<QName> aspects = impl.getCategoryAspects();
         assertEquals(6, aspects.size());    
+       
     }
     
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)

@@ -37,7 +37,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -66,7 +66,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -91,7 +91,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -116,7 +116,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -141,7 +141,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -166,7 +166,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -191,7 +191,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -216,7 +216,7 @@
       </managed-property>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>versionOperationsService</property-name>
@@ -237,7 +237,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>searchService</property-name>
@@ -258,7 +258,7 @@
       </managed-property>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>searchService</property-name>
@@ -283,7 +283,7 @@
       </managed-property>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{indexingNodeService}</value>
+         <value>#{nodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>nodeOperationsService</property-name>
