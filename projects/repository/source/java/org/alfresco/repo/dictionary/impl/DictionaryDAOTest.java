@@ -6,9 +6,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.node.InvalidNodeTypeException;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.namespace.QName;
 
 
 public class DictionaryDAOTest extends TestCase
@@ -68,14 +68,14 @@ public class DictionaryDAOTest extends TestCase
             boolean test = service.isSubClass(invalid, referencable);
             fail("Failed to catch invalid class parameter");
         }
-        catch(InvalidNodeTypeException e) {}
+        catch(InvalidTypeException e) {}
 
         try
         {
             boolean test = service.isSubClass(referencable, invalid);
             fail("Failed to catch invalid class parameter");
         }
-        catch(InvalidNodeTypeException e) {}
+        catch(InvalidTypeException e) {}
 
         // Test various flavours of subclassof
         boolean test1 = service.isSubClass(file, referencable);  // type vs aspect

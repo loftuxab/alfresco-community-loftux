@@ -1,7 +1,7 @@
 package org.alfresco.repo.search;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * Component API for indexing. Delegates to the real index retrieved from the
@@ -23,7 +23,7 @@ public class IndexerComponent implements Indexer
         this.indexerAndSearcherFactory = indexerAndSearcherFactory;
     }
 
-    public void createNode(ChildAssocRef relationshipRef)
+    public void createNode(ChildAssociationRef relationshipRef)
     {
         Indexer indexer = indexerAndSearcherFactory.getIndexer(
                 relationshipRef.getChildRef().getStoreRef());
@@ -36,28 +36,28 @@ public class IndexerComponent implements Indexer
         indexer.updateNode(nodeRef);
     }
 
-    public void deleteNode(ChildAssocRef relationshipRef)
+    public void deleteNode(ChildAssociationRef relationshipRef)
     {
         Indexer indexer = indexerAndSearcherFactory.getIndexer(
                 relationshipRef.getChildRef().getStoreRef());
         indexer.deleteNode(relationshipRef);
     }
 
-    public void createChildRelationship(ChildAssocRef relationshipRef)
+    public void createChildRelationship(ChildAssociationRef relationshipRef)
     {
         Indexer indexer = indexerAndSearcherFactory.getIndexer(
                 relationshipRef.getChildRef().getStoreRef());
         indexer.createChildRelationship(relationshipRef);
     }
 
-    public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef)
+    public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef, ChildAssociationRef relationshipAfterRef)
     {
         Indexer indexer = indexerAndSearcherFactory.getIndexer(
                 relationshipBeforeRef.getChildRef().getStoreRef());
         indexer.updateChildRelationship(relationshipBeforeRef, relationshipAfterRef);
     }
 
-    public void deleteChildRelationship(ChildAssocRef relationshipRef)
+    public void deleteChildRelationship(ChildAssociationRef relationshipRef)
     {
         Indexer indexer = indexerAndSearcherFactory.getIndexer(
                 relationshipRef.getChildRef().getStoreRef());

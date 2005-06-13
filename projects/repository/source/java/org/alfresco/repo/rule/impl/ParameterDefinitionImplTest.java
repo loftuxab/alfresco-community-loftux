@@ -3,7 +3,7 @@
  */
 package org.alfresco.repo.rule.impl;
 
-import org.alfresco.repo.rule.ParameterType;
+import org.alfresco.service.cmr.rule.ParameterType;
 
 import junit.framework.TestCase;
 

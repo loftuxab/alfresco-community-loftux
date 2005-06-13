@@ -8,8 +8,8 @@
 package org.alfresco.repo.search.results;
 
 import org.alfresco.repo.search.AbstractResultSetRowIterator;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.ResultSetRow;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
 
 public class ChildAssocRefResultSetRowIterator extends AbstractResultSetRowIterator
 {

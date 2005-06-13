@@ -1,6 +1,6 @@
 package org.alfresco.repo.policy;
 
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.namespace.QName;
 
 
 /**

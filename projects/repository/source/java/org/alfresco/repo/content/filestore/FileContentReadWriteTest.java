@@ -3,9 +3,9 @@ package org.alfresco.repo.content.filestore;
 import java.io.File;
 
 import org.alfresco.repo.content.AbstractContentReadWriteTest;
-import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentStore;
-import org.alfresco.repo.content.ContentWriter;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 
 /**
  * Tests that the file reader and writer work

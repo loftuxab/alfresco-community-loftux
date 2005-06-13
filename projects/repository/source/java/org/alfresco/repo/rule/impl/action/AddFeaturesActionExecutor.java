@@ -6,10 +6,10 @@ package org.alfresco.repo.rule.impl.action;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.rule.RuleAction;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.RuleAction;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Add features action executor implementation.
@@ -32,7 +32,7 @@ public class AddFeaturesActionExecutor extends RuleActionExecutorAbstractBase
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, NodeRef)
+     * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
      */
     public void execute(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {

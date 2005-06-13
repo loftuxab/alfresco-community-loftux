@@ -9,31 +9,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.content.ContentStore;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyScope;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.search.Searcher;
-import org.alfresco.repo.version.ReservedVersionNameException;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionHistory;
-import org.alfresco.repo.version.VersionService;
-import org.alfresco.repo.version.VersionServiceException;
 import org.alfresco.repo.version.common.AbstractVersionServiceImpl;
 import org.alfresco.repo.version.common.VersionHistoryImpl;
 import org.alfresco.repo.version.common.VersionImpl;
 import org.alfresco.repo.version.common.VersionUtil;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
-import org.alfresco.util.AspectMissingException;
+import org.alfresco.service.cmr.repository.AspectMissingException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.version.ReservedVersionNameException;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionHistory;
+import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.cmr.version.VersionServiceException;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * The light weight version service implementation.
@@ -63,7 +63,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     /**
      * The repository searcher
      */
-    private Searcher searcher;       
+    private SearchService searcher;       
 	
     /**
      * The generic content service
@@ -90,7 +90,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      * 
      * @param searcher  the searcher
      */
-    public void setSearcher(Searcher searcher)
+    public void setSearcher(SearchService searcher)
     {
         this.searcher = searcher; 
     }
@@ -226,8 +226,8 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         if (versionChildren == true)
         {
             // Get the children of the node
-            Collection<ChildAssocRef> children = this.dbNodeService.getChildAssocs(nodeRef);
-            for (ChildAssocRef childAssoc : children)
+            Collection<ChildAssociationRef> children = this.dbNodeService.getChildAssocs(nodeRef);
+            for (ChildAssociationRef childAssoc : children)
             {
                 // Recurse into this method to version all the children with the same version number
                 Collection<Version> childVersions = createVersion(
@@ -313,7 +313,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             props.put(PROP_QNAME_VERSIONED_NODE_ID, nodeRef.getId());
             
             // Create a new version history node
-            ChildAssocRef childAssocRef = this.dbNodeService.createNode(
+            ChildAssociationRef childAssocRef = this.dbNodeService.createNode(
                     getRootNode(), 
 					DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN, 
                     CHILD_QNAME_VERSION_HISTORIES,
@@ -391,7 +391,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     }
 
     /**
-     * @see org.alfresco.repo.version.VersionService#getVersionHistory(NodeRef)
+     * @see org.alfresco.service.cmr.version.VersionService#getVersionHistory(NodeRef)
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef)
         throws AspectMissingException
@@ -497,7 +497,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         }
         
         // Create the new version
-        ChildAssocRef childAssocRef = this.dbNodeService.createNode(
+        ChildAssociationRef childAssocRef = this.dbNodeService.createNode(
                 versionHistoryRef, 
 				CHILD_QNAME_VERSIONS,
                 CHILD_QNAME_VERSIONS,
@@ -537,9 +537,9 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	 * @param versionNodeRef
 	 * @param associations
 	 */
-	private void freezeAssociations(NodeRef versionNodeRef, Map<QName, NodeAssocRef> associations) 
+	private void freezeAssociations(NodeRef versionNodeRef, Map<QName, AssociationRef> associations) 
 	{
-		for (NodeAssocRef targetAssoc : associations.values())
+		for (AssociationRef targetAssoc : associations.values())
         {
             HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
             
@@ -560,7 +560,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             }
             
             // Create child version reference
-            ChildAssocRef newRef = this.dbNodeService.createNode(
+            ChildAssociationRef newRef = this.dbNodeService.createNode(
                     versionNodeRef,
 					CHILD_QNAME_VERSIONED_ASSOCS, 
                     CHILD_QNAME_VERSIONED_ASSOCS, 
@@ -574,11 +574,11 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	 * @param versionNodeRef
 	 * @param childAssociations
 	 */
-	private void freezeChildAssociations(NodeRef versionNodeRef, Map<QName, ChildAssocRef> childAssociations) 
+	private void freezeChildAssociations(NodeRef versionNodeRef, Map<QName, ChildAssociationRef> childAssociations) 
 	{
-		for (Map.Entry<QName, ChildAssocRef> entry : childAssociations.entrySet()) 
+		for (Map.Entry<QName, ChildAssociationRef> entry : childAssociations.entrySet()) 
 		{
-			ChildAssocRef childAssocRef = entry.getValue();
+			ChildAssociationRef childAssocRef = entry.getValue();
 			HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
             
             // Set the qname, isPrimary and nthSibling properties
@@ -601,7 +601,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             }
             
             // Create child version reference
-            ChildAssocRef newRef = this.dbNodeService.createNode(
+            ChildAssociationRef newRef = this.dbNodeService.createNode(
                     versionNodeRef,
 					CHILD_QNAME_VERSIONED_CHILD_ASSOCS,
                     CHILD_QNAME_VERSIONED_CHILD_ASSOCS, 
@@ -665,16 +665,16 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         
         while (currentVersion != null)
         {
-            NodeAssocRef preceedingVersion = null;
+            AssociationRef preceedingVersion = null;
             
             versionHistoryNodeRefs.add(0, currentVersion);
             
-            List<NodeAssocRef> preceedingVersions = this.dbNodeService.getSourceAssocs(
+            List<AssociationRef> preceedingVersions = this.dbNodeService.getSourceAssocs(
 																				currentVersion, 
 																				VersionStoreConst.ASSOC_SUCCESSOR);
             if (preceedingVersions.size() == 1)
             {
-                preceedingVersion = (NodeAssocRef)preceedingVersions.toArray()[0];
+                preceedingVersion = (AssociationRef)preceedingVersions.toArray()[0];
                 currentVersion = preceedingVersion.getSourceRef();                
             }
             else if (preceedingVersions.size() > 1)
@@ -757,8 +757,8 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         
         // TODO use the sercher to retrieve the version history node
         
-        Collection<ChildAssocRef> versionHistories = this.dbNodeService.getChildAssocs(getRootNode());
-        for (ChildAssocRef versionHistory : versionHistories)
+        Collection<ChildAssociationRef> versionHistories = this.dbNodeService.getChildAssocs(getRootNode());
+        for (ChildAssociationRef versionHistory : versionHistories)
         {
             String nodeId = (String)this.dbNodeService.getProperty(versionHistory.getChildRef(), VersionStoreConst.PROP_QNAME_VERSIONED_NODE_ID);
             if (nodeId != null && nodeId.equals(nodeRef.getId()) == true)
@@ -787,8 +787,8 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         NodeRef result = null;
         String versionLabel = (String)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_CURRENT_VERSION_LABEL);
         
-        Collection<ChildAssocRef> versions = this.dbNodeService.getChildAssocs(versionHistory);
-        for (ChildAssocRef version : versions)
+        Collection<ChildAssociationRef> versions = this.dbNodeService.getChildAssocs(versionHistory);
+        for (ChildAssociationRef version : versions)
         {
             String tempLabel = (String)this.dbNodeService.getProperty(version.getChildRef(), VersionStoreConst.PROP_QNAME_VERSION_LABEL);
             if (tempLabel != null && tempLabel.equals(versionLabel) == true)

@@ -1,7 +1,7 @@
 package org.alfresco.repo.domain;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Represents a special type of association between nodes, that of the
@@ -31,7 +31,7 @@ public interface ChildAssoc
      */
     public void removeAssociation();
     
-    public ChildAssocRef getChildAssocRef();
+    public ChildAssociationRef getChildAssocRef();
 
     public Long getId();
 

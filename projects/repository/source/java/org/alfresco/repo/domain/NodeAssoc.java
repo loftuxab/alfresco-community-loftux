@@ -1,7 +1,7 @@
 package org.alfresco.repo.domain;
 
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Represents a generic association between two nodes.  The association is named
@@ -32,7 +32,7 @@ public interface NodeAssoc
      */
     public void removeAssociation();
 
-    public NodeAssocRef getNodeAssocRef();
+    public AssociationRef getNodeAssocRef();
     
     public RealNode getSource();
 

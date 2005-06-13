@@ -11,9 +11,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.impl.lucene.LuceneIndexer;
 import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

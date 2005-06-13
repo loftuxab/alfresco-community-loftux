@@ -8,10 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;

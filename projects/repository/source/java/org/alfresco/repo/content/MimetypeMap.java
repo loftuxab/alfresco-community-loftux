@@ -11,6 +11,7 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Derek Hulley
  */
-public class MimetypeMap
+public class MimetypeMap implements MimetypeService
 {
     public static final String MIMETYPE_TEXT_PLAIN = "text/plain";
     public static final String MIMETYPE_XML = "text/xml";

@@ -6,9 +6,9 @@ package org.alfresco.repo.version.common.versionlabel;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionType;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionType;
+import org.alfresco.service.namespace.QName;
 
 /**
  * The serial version label policy.

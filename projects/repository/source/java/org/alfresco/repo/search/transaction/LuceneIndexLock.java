@@ -10,7 +10,7 @@ package org.alfresco.repo.search.transaction;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 
 public class LuceneIndexLock 
 {

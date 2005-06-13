@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionType;
 import org.alfresco.repo.version.common.VersionImpl;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionType;
 
 import junit.framework.TestCase;
 

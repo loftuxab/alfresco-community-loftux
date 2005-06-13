@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.rule.RuleCondition;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.RuleCondition;
 
 /**
  * Contains text evaluator
@@ -38,7 +38,7 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 	}
 
 	/**
-	 * @see org.alfresco.repo.rule.RuleConditionEvaluator#evaluate(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
+	 * @see org.alfresco.repo.rule.RuleConditionEvaluator#evaluate(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
 	 */
 	public boolean evaluate(
 			NodeRef actionableNodeRef,

@@ -5,8 +5,8 @@ package org.alfresco.repo.version.common;
 
 import java.util.Collection;
 
-import org.alfresco.repo.version.ReservedVersionNameException;
-import org.alfresco.repo.version.Version;
+import org.alfresco.service.cmr.version.ReservedVersionNameException;
+import org.alfresco.service.cmr.version.Version;
 
 /**
  * Helper class containing helper methods for the versioning services.

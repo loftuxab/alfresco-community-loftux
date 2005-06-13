@@ -2,19 +2,17 @@ package org.alfresco.repo.service;
 
 import java.util.Collection;
 
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 
 public interface StoreRedirector
 {
     /**
-     * Get the names of the protocols supported
-     * @return
+     * @return the names of the protocols supported
      */
     public Collection<String> getSupportedStoreProtocols();
     
     /**
-     * Get the StoreRefs of the stores suported
-     * @return
+     * @return the Store Refs of the stores supported
      */
     public Collection<StoreRef> getSupportedStores();
 }

@@ -13,9 +13,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.el.ValueBinding;
 
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.DataDictionary;
 import org.alfresco.web.bean.repository.Node;

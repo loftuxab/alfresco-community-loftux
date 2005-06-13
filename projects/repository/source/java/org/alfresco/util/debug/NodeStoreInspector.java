@@ -7,14 +7,14 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import org.alfresco.repo.node.InvalidNodeRefException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.ref.qname.RegexQNamePattern;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Debug class that has methods to inspect the contents of a node store.
@@ -104,8 +104,8 @@ public class NodeStoreInspector
 	        
 	        try
 	        {
-	            Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
-	            for (ChildAssocRef childAssocRef : childAssocRefs)
+	            Collection<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
+	            for (ChildAssociationRef childAssocRef : childAssocRefs)
 	            {
 	                builder.
 	                    append(getIndent(iIndent+1)).
@@ -124,8 +124,8 @@ public class NodeStoreInspector
 			
 			try
 	        {
-	            Collection<NodeAssocRef> assocRefs = nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
-	            for (NodeAssocRef assocRef : assocRefs)
+	            Collection<AssociationRef> assocRefs = nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+	            for (AssociationRef assocRef : assocRefs)
 	            {
 	                builder.
 	                    append(getIndent(iIndent+1)).

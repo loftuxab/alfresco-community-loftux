@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateChildAssociationPolicy;
@@ -28,23 +27,27 @@ import org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
 import org.alfresco.repo.policy.AssociationPolicyDelegate;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.ref.qname.QNamePattern;
 import org.alfresco.repo.ref.qname.RegexQNamePattern;
 import org.alfresco.repo.search.Indexer;
-import org.alfresco.repo.search.QueryParameterDefinition;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.XPathException;
+import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.QNamePattern;
 import org.jaxen.JaxenException;
 
 /**
- * Provides common functionality for {@link org.alfresco.repo.node.NodeService}
+ * Provides common functionality for {@link org.alfresco.service.cmr.repository.NodeService}
  * implementations.
  * <p>
  * Some of the overloaded simpler versions of methods are implemented by passing
@@ -63,7 +66,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     /** the component with which to index the node hierarchy (optional) */
     private Indexer indexer;
     /** the component with which to search the node hierarchy (optional) */
-    private Searcher searcher;
+    private SearchService searcher;
 	
 	/**
 	 * Policy delegates
@@ -122,7 +125,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * @param searcher the component used to search the node hierarchy.  it is optional
      *      and if not supplied will disable the node search functionality. 
      */
-    public void setSearcher(Searcher searcher)
+    public void setSearcher(SearchService searcher)
     {
         this.searcher = searcher;
     }
@@ -193,9 +196,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
 	}
 	
 	/**
-     * @see NodeServicePolicies.OnCreateNodePolicy#onCreateNode(ChildAssocRef)
+     * @see NodeServicePolicies.OnCreateNodePolicy#onCreateNode(ChildAssociationRef)
 	 */
-	protected void invokeOnCreateNode(ChildAssocRef childAssocRef)
+	protected void invokeOnCreateNode(ChildAssociationRef childAssocRef)
 	{
         NodeRef childNodeRef = childAssocRef.getChildRef();
         // get qnames to invoke against
@@ -242,10 +245,10 @@ public abstract class AbstractNodeServiceImpl implements NodeService
 	}
 	
 	/**
-     * @see NodeServicePolicies.OnDeleteNodePolicy#onDeleteNode(ChildAssocRef)
+     * @see NodeServicePolicies.OnDeleteNodePolicy#onDeleteNode(ChildAssociationRef)
 	 */
 	protected void invokeOnDeleteNode(
-            ChildAssocRef childAssocRef,
+            ChildAssociationRef childAssocRef,
             QName childNodeTypeQName,
             Set<QName> childAspectQnames)
 	{
@@ -311,9 +314,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     }
 
     /**
-     * @see NodeServicePolicies.OnCreateChildAssociationPolicy#onCreateChildAssociation(ChildAssocRef)
+     * @see NodeServicePolicies.OnCreateChildAssociationPolicy#onCreateChildAssociation(ChildAssociationRef)
      */
-    protected void invokeOnCreateChildAssociation(ChildAssocRef childAssocRef)
+    protected void invokeOnCreateChildAssociation(ChildAssociationRef childAssocRef)
     {
 		// Get the parent reference and the assoc type qName
         NodeRef parentNodeRef = childAssocRef.getParentRef();
@@ -327,9 +330,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     }
 
     /**
-     * @see NodeServicePolicies.BeforeDeleteChildAssociationPolicy#beforeDeleteChildAssociation(ChildAssocRef)
+     * @see NodeServicePolicies.BeforeDeleteChildAssociationPolicy#beforeDeleteChildAssociation(ChildAssociationRef)
      */
-    protected void invokeBeforeDeleteChildAssociation(ChildAssocRef childAssocRef)
+    protected void invokeBeforeDeleteChildAssociation(ChildAssociationRef childAssocRef)
     {
         NodeRef parentNodeRef = childAssocRef.getParentRef();
         QName assocTypeQName = childAssocRef.getTypeQName();
@@ -342,9 +345,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     }
     
     /**
-     * @see NodeServicePolicies.OnDeleteChildAssociationPolicy#onDeleteChildAssociation(ChildAssocRef)
+     * @see NodeServicePolicies.OnDeleteChildAssociationPolicy#onDeleteChildAssociation(ChildAssociationRef)
      */
-    protected void invokeOnDeleteChildAssociation(ChildAssocRef childAssocRef)
+    protected void invokeOnDeleteChildAssociation(ChildAssociationRef childAssocRef)
     {
         NodeRef parentNodeRef = childAssocRef.getParentRef();
         QName assocTypeQName = childAssocRef.getTypeQName();
@@ -373,9 +376,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     }
 
     /**
-     * @see NodeServicePolicies.BeforeDeleteAssociationPolicy#beforeDeleteAssociation(NodeAssocRef)
+     * @see NodeServicePolicies.BeforeDeleteAssociationPolicy#beforeDeleteAssociation(AssociationRef)
      */
-    protected void invokeBeforeDeleteAssociation(NodeAssocRef nodeAssocRef)
+    protected void invokeBeforeDeleteAssociation(AssociationRef nodeAssocRef)
     {
         NodeRef sourceNodeRef = nodeAssocRef.getSourceRef();
         QName assocTypeQName = nodeAssocRef.getTypeQName();
@@ -411,7 +414,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * @see RegexQNamePattern#MATCH_ALL
      * @see NodeService#getParentAssocs(NodeRef, QNamePattern)
      */
-    public List<ChildAssocRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
         return getParentAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
     }
@@ -422,12 +425,12 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * @see RegexQNamePattern#MATCH_ALL
      * @see NodeService#getChildAssocs(NodeRef, QNamePattern)
      */
-    public final List<ChildAssocRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public final List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
         return getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
     }
 
-    public List<ChildAssocRef> selectNodes(
+    public List<ChildAssociationRef> selectNodes(
             NodeRef contextNodeRef,
             String xPath,
             QueryParameterDefinition[] paramDefs,
@@ -442,14 +445,14 @@ public abstract class AbstractNodeServiceImpl implements NodeService
                 xpath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
             }
             List list = xpath.selectNodes(getPrimaryParent(contextNodeRef));
-            List<ChildAssocRef> answer = new ArrayList<ChildAssocRef>(list.size());
+            List<ChildAssociationRef> answer = new ArrayList<ChildAssociationRef>(list.size());
             for(Object o: list)
             {
-                if(!(o instanceof ChildAssocRef))
+                if(!(o instanceof ChildAssociationRef))
                 {
                     throw new XPathException("Xpath expression must only select nodes");
                 }
-                answer.add((ChildAssocRef)o);
+                answer.add((ChildAssociationRef)o);
             }
             return answer;
         }
@@ -495,7 +498,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * @return Returns true if the pattern is present, otherwise false.
      * 
      * @see #setIndexer(Indexer)
-     * @see #setSearcher(Searcher)
+     * @see #setSearcher(SearchService)
      */
     public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern)
     {
@@ -542,7 +545,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * @return Returns true if the pattern is present, otherwise false.
      * 
      * @see #setIndexer(Indexer)
-     * @see #setSearcher(Searcher)
+     * @see #setSearcher(SearchService)
      */
     public boolean like(NodeRef nodeRef, QName propertyQName, String sqlLikePattern)
     {
@@ -606,7 +609,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         return indexer;
     }
 
-    protected Searcher getSearcher()
+    protected SearchService getSearcher()
     {
         return searcher;
     }

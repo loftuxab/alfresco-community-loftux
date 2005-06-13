@@ -11,19 +11,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.search.AbstractResultSet;
-import org.alfresco.repo.search.ResultSetRow;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.search.ResultSetRow;
 
 public class ChildAssocRefResultSet extends AbstractResultSet
 {
-    private List<ChildAssocRef> cars;
+    private List<ChildAssociationRef> cars;
     NodeService nodeService;
     
-    public ChildAssocRefResultSet(NodeService nodeService, List<ChildAssocRef> cars, Path[] propertyPaths)
+    public ChildAssocRefResultSet(NodeService nodeService, List<ChildAssociationRef> cars, Path[] propertyPaths)
     {
         super(propertyPaths);
         this.nodeService = nodeService;
@@ -34,7 +34,7 @@ public class ChildAssocRefResultSet extends AbstractResultSet
     {
         super(propertyPaths);
         this.nodeService = nodeService;
-        List<ChildAssocRef> cars = new ArrayList<ChildAssocRef>(nodeRefs.size());
+        List<ChildAssociationRef> cars = new ArrayList<ChildAssociationRef>(nodeRefs.size());
         for(NodeRef nodeRef : nodeRefs)
         {
             if(resolveAllParents)
@@ -59,7 +59,7 @@ public class ChildAssocRefResultSet extends AbstractResultSet
         return cars.get(n).getChildRef();
     }
     
-    public ChildAssocRef getChildAssocRef(int n)
+    public ChildAssociationRef getChildAssocRef(int n)
     {
         return cars.get(n);
     }

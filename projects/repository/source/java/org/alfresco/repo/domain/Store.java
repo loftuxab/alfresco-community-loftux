@@ -1,7 +1,7 @@
 package org.alfresco.repo.domain;
 
 import org.alfresco.repo.domain.StoreKey;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 
 /**
  * Represents a store entity

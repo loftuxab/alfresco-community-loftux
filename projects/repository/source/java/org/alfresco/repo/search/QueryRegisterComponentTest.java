@@ -9,9 +9,9 @@ package org.alfresco.repo.search;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

@@ -6,29 +6,29 @@ package org.alfresco.repo.version.operations.impl;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.lock.LockService;
-import org.alfresco.repo.lock.LockType;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.node.operations.NodeOperationsService;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.version.VersionService;
-import org.alfresco.repo.version.operations.VersionOperationsService;
-import org.alfresco.repo.version.operations.VersionOperationsServiceException;
-import org.alfresco.util.AspectMissingException;
+import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.coci.CheckOutCheckInServiceException;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockType;
+import org.alfresco.service.cmr.repository.AspectMissingException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Version opertaions service implementation
  * 
  * @author Roy Wetherall
  */
-public class VersionOperationsServiceImpl implements VersionOperationsService 
+public class VersionOperationsServiceImpl implements CheckOutCheckInService 
 {
 	/**
 	 * Error messages
@@ -55,7 +55,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	/**
 	 * The node operations service
 	 */
-	private NodeOperationsService nodeOperationsService;
+	private CopyService nodeOperationsService;
 	
 	/**
 	 * Policy component
@@ -98,7 +98,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	 * @param nodeOperationsService  the node operations service
 	 */
 	public void setNodeOperationsService(
-			NodeOperationsService nodeOperationsService) 
+			CopyService nodeOperationsService) 
 	{
 		this.nodeOperationsService = nodeOperationsService;
 	}
@@ -140,7 +140,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	}
 	
 	/**
-	 * @see org.alfresco.repo.version.operations.VersionOperationsService#checkout(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName)
+	 * @see org.alfresco.service.cmr.coci.CheckOutCheckInService#checkout(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, org.alfresco.service.namespace.QName)
 	 */
 	public NodeRef checkout(
 			NodeRef nodeRef, 
@@ -183,12 +183,12 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	}
 
 	/**
-	 * @see org.alfresco.repo.version.operations.VersionOperationsService#checkout(org.alfresco.repo.ref.NodeRef)
+	 * @see org.alfresco.service.cmr.coci.CheckOutCheckInService#checkout(org.alfresco.service.cmr.repository.NodeRef)
 	 */
 	public NodeRef checkout(NodeRef nodeRef) 
 	{
 		// Find the primary parent in order to determine where to put the copy
-		ChildAssocRef childAssocRef = this.nodeService.getPrimaryParent(nodeRef);
+		ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(nodeRef);
 		
 		// Checkout the working copy to the same destination
 		return checkout(nodeRef, childAssocRef.getParentRef(), childAssocRef.getTypeQName(), childAssocRef.getQName());		
@@ -229,7 +229,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 			if(nodeRef == null)
 			{
 				// Error since the origional node can not be found
-				throw new VersionOperationsServiceException(ERR_BAD_COPY);							
+				throw new CheckOutCheckInServiceException(ERR_BAD_COPY);							
 			}
 			
             // Release the lock
@@ -266,7 +266,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	}
 
 	/**
-	 * @see org.alfresco.repo.version.operations.VersionOperationsService#checkin(org.alfresco.repo.ref.NodeRef, Map, java.lang.String)
+	 * @see org.alfresco.service.cmr.coci.CheckOutCheckInService#checkin(org.alfresco.service.cmr.repository.NodeRef, Map, java.lang.String)
 	 */
 	public NodeRef checkin(
 			NodeRef workingCopyNodeRef,
@@ -277,7 +277,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	}
 
 	/**
-	 * @see org.alfresco.repo.version.operations.VersionOperationsService#checkin(org.alfresco.repo.ref.NodeRef, Map)
+	 * @see org.alfresco.service.cmr.coci.CheckOutCheckInService#checkin(org.alfresco.service.cmr.repository.NodeRef, Map)
 	 */
 	public NodeRef checkin(
 			NodeRef workingCopyNodeRef,
@@ -287,7 +287,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 	}
 
 	/**
-	 * @see org.alfresco.repo.version.operations.VersionOperationsService#cancelCheckout(org.alfresco.repo.ref.NodeRef)
+	 * @see org.alfresco.service.cmr.coci.CheckOutCheckInService#cancelCheckout(org.alfresco.service.cmr.repository.NodeRef)
 	 */
 	public NodeRef cancelCheckout(NodeRef workingCopyNodeRef) 
 	{
@@ -308,7 +308,7 @@ public class VersionOperationsServiceImpl implements VersionOperationsService
 			if (nodeRef == null)
 			{
 				// Error since the origional node can not be found
-				throw new VersionOperationsServiceException(ERR_BAD_COPY);
+				throw new CheckOutCheckInServiceException(ERR_BAD_COPY);
 			}
 			
 			// TODO Need to get the current user reference

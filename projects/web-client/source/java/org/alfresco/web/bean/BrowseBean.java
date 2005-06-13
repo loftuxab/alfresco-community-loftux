@@ -15,17 +15,17 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.lock.LockService;
-import org.alfresco.repo.node.InvalidNodeRefException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.ResultSetRow;
-import org.alfresco.repo.search.Searcher;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
@@ -83,7 +83,7 @@ public class BrowseBean implements IContextListener
    /**
     * @return Returns the Searcher service.
     */
-   public Searcher getSearchService()
+   public SearchService getSearchService()
    {
       return this.searchService;
    }
@@ -91,7 +91,7 @@ public class BrowseBean implements IContextListener
    /**
     * @param searchService The Searcher to set.
     */
-   public void setSearchService(Searcher searchService)
+   public void setSearchService(SearchService searchService)
    {
       this.searchService = searchService;
    }
@@ -361,10 +361,10 @@ public class BrowseBean implements IContextListener
             parentRef = new NodeRef(Repository.getStoreRef(context), parentNodeId);
          }
          
-         List<ChildAssocRef> childRefs = this.nodeService.getChildAssocs(parentRef);
+         List<ChildAssociationRef> childRefs = this.nodeService.getChildAssocs(parentRef);
          this.containerNodes = new ArrayList<Node>(childRefs.size());
          this.contentNodes = new ArrayList<Node>(childRefs.size());
-         for (ChildAssocRef ref: childRefs)
+         for (ChildAssociationRef ref: childRefs)
          {
             // create our Node representation from the NodeRef
             NodeRef nodeRef = ref.getChildRef();
@@ -651,7 +651,7 @@ public class BrowseBean implements IContextListener
          // user can either select a descendant of a node display on the page which means we
          // must add the it's parent and itself to the breadcrumb
          List<IBreadcrumbHandler> location = this.navigator.getLocation();
-         ChildAssocRef parentAssocRef = nodeService.getPrimaryParent(nodeRef);
+         ChildAssociationRef parentAssocRef = nodeService.getPrimaryParent(nodeRef);
          
          if (logger.isDebugEnabled())
          {
@@ -1000,7 +1000,7 @@ public class BrowseBean implements IContextListener
    private NodeService nodeService;
    
    /** The SearchService to be used by the bean */
-   private Searcher searchService;
+   private SearchService searchService;
    
    /** The LockService to be used by the bean */
    private LockService lockService;

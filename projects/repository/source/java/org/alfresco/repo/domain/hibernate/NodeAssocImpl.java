@@ -3,8 +3,8 @@ package org.alfresco.repo.domain.hibernate;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.RealNode;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Hibernate-specific implementation of the generic node association
@@ -18,7 +18,7 @@ public class NodeAssocImpl implements NodeAssoc
     private Node target;
     private String typeNamespaceUri;
     private String typeLocalName;
-    private NodeAssocRef nodeAssocRef;
+    private AssociationRef nodeAssocRef;
 
     public NodeAssocImpl()
     {
@@ -42,11 +42,11 @@ public class NodeAssocImpl implements NodeAssoc
         this.getTarget().getSourceNodeAssocs().remove(this);
     }
     
-    public synchronized NodeAssocRef getNodeAssocRef()
+    public synchronized AssociationRef getNodeAssocRef()
     {
         if (nodeAssocRef == null)
         {
-            nodeAssocRef = new NodeAssocRef(getSource().getNodeRef(),
+            nodeAssocRef = new AssociationRef(getSource().getNodeRef(),
                     QName.createQName(getTypeNamespaceUri(), getTypeLocalName()),
                     getTarget().getNodeRef());
         }

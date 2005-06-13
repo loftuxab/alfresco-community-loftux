@@ -20,28 +20,28 @@ import java.util.Set;
 import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.content.NoTransformerException;
-import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.dictionary.TypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.IndexerException;
-import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.impl.lucene.fts.FTSIndexerAware;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
-import org.alfresco.repo.value.ValueConverter;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.NoTransformerException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -235,7 +235,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * Indexer Implementation
      */
 
-    public void createNode(ChildAssocRef relationshipRef) throws IndexerException
+    public void createNode(ChildAssociationRef relationshipRef) throws IndexerException
     {
         checkAbleToDoWork(false);
         try
@@ -267,7 +267,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    public void deleteNode(ChildAssocRef relationshipRef) throws IndexerException
+    public void deleteNode(ChildAssociationRef relationshipRef) throws IndexerException
     {
         checkAbleToDoWork(false);
         try
@@ -281,7 +281,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    public void createChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
+    public void createChildRelationship(ChildAssociationRef relationshipRef) throws IndexerException
     {
         checkAbleToDoWork(false);
         try
@@ -297,7 +297,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef) throws IndexerException
+    public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef, ChildAssociationRef relationshipAfterRef) throws IndexerException
     {
         checkAbleToDoWork(false);
         try
@@ -316,7 +316,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    public void deleteChildRelationship(ChildAssocRef relationshipRef) throws IndexerException
+    public void deleteChildRelationship(ChildAssociationRef relationshipRef) throws IndexerException
     {
         checkAbleToDoWork(false);
         try
@@ -841,9 +841,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private List<Document> createDocuments(NodeRef nodeRef, boolean isNew)
     {
-        Map<ChildAssocRef, Counter> nodeCounts = getNodeCounts(nodeRef);
+        Map<ChildAssociationRef, Counter> nodeCounts = getNodeCounts(nodeRef);
         List<Document> docs = new ArrayList<Document>();
-        ChildAssocRef qNameRef = null;
+        ChildAssociationRef qNameRef = null;
         Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
 
         Collection<Path> directPaths = nodeService.getPaths(nodeRef, false);
@@ -963,7 +963,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // xdoc.add(new Field("PARENT", parentBuffer.toString(), true, true,
             // true));
 
-            ChildAssocRef primary = nodeService.getPrimaryParent(nodeRef);
+            ChildAssociationRef primary = nodeService.getPrimaryParent(nodeRef);
             xdoc.add(new Field("PRIMARYPARENT", primary.getParentRef().getId(), true, true, false));
             xdoc.add(new Field("TYPE", nodeService.getType(nodeRef).toString(), true, true, false));
             for (QName classRef : nodeService.getAspects(nodeRef))
@@ -1025,7 +1025,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return parentBuffer.toString();
     }
 
-    private ChildAssocRef getLastRefOrNull(Path path)
+    private ChildAssociationRef getLastRefOrNull(Path path)
     {
         if (path.last() instanceof Path.ChildAssocElement)
         {
@@ -1091,12 +1091,12 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return isAtomic;
     }
 
-    private Map<ChildAssocRef, Counter> getNodeCounts(NodeRef nodeRef)
+    private Map<ChildAssociationRef, Counter> getNodeCounts(NodeRef nodeRef)
     {
-        Map<ChildAssocRef, Counter> nodeCounts = new HashMap<ChildAssocRef, Counter>(5);
-        List<ChildAssocRef> parentAssocs = nodeService.getParentAssocs(nodeRef);
+        Map<ChildAssociationRef, Counter> nodeCounts = new HashMap<ChildAssociationRef, Counter>(5);
+        List<ChildAssociationRef> parentAssocs = nodeService.getParentAssocs(nodeRef);
         // count the number of times the association is duplicated
-        for (ChildAssocRef assoc : parentAssocs)
+        for (ChildAssociationRef assoc : parentAssocs)
         {
             Counter counter = nodeCounts.get(assoc);
             if (counter == null)
@@ -1135,7 +1135,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                     {
                                         Path.ChildAssocElement cae = (Path.ChildAssocElement) path.get(1);
                                         boolean isFakeRoot = true;
-                                        for(ChildAssocRef car : nodeService.getParentAssocs(cae.getRef().getChildRef()))
+                                        for(ChildAssociationRef car : nodeService.getParentAssocs(cae.getRef().getChildRef()))
                                         {
                                             if(cae.getRef().equals(car))
                                             {
@@ -1166,8 +1166,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             if (pair.getFirst().last() instanceof Path.ChildAssocElement)
             {
                 Path.ChildAssocElement cae = (Path.ChildAssocElement) pair.getFirst().last();
-                ChildAssocRef assocRef = cae.getRef();
-                pair.getFirst().append(new Path.ChildAssocElement(new ChildAssocRef(assocRef.getTypeQName(), assocRef.getChildRef(), QName.createQName("member"), nodeRef)));
+                ChildAssociationRef assocRef = cae.getRef();
+                pair.getFirst().append(new Path.ChildAssocElement(new ChildAssociationRef(assocRef.getTypeQName(), assocRef.getChildRef(), QName.createQName("member"), nodeRef)));
             }
         }
 

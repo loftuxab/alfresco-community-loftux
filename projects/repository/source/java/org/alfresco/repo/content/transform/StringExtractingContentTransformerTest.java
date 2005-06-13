@@ -2,9 +2,9 @@ package org.alfresco.repo.content.transform;
 
 import java.io.File;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.content.filestore.FileContentWriter;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.util.TempFileProvider;
 
 /**

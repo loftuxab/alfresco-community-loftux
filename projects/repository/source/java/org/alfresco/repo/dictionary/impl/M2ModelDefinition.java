@@ -9,9 +9,9 @@ package org.alfresco.repo.dictionary.impl;
 
 import java.util.Date;
 
-import org.alfresco.repo.dictionary.ModelDefinition;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Compiled Model Definition

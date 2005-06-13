@@ -3,7 +3,7 @@ package org.alfresco.web.ui.common.component.description;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 

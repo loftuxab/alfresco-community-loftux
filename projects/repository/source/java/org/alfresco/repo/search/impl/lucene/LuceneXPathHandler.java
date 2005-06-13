@@ -9,8 +9,6 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.util.ArrayList;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
 import org.alfresco.repo.search.impl.lucene.analysis.PathTokenFilter;
 import org.alfresco.repo.search.impl.lucene.query.AbsoluteStructuredFieldPosition;
 import org.alfresco.repo.search.impl.lucene.query.DescendantAndSelfStructuredFieldPosition;
@@ -18,6 +16,8 @@ import org.alfresco.repo.search.impl.lucene.query.PathQuery;
 import org.alfresco.repo.search.impl.lucene.query.RelativeStructuredFieldPosition;
 import org.alfresco.repo.search.impl.lucene.query.SelfAxisStructuredFieldPosition;
 import org.alfresco.repo.search.impl.lucene.query.StructuredFieldPosition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.saxpath.Axis;
 import org.saxpath.Operator;
 import org.saxpath.SAXPathException;

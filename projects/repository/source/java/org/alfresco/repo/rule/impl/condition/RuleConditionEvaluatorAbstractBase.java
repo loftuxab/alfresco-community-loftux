@@ -7,12 +7,12 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.rule.ParameterDefinition;
-import org.alfresco.repo.rule.RuleCondition;
-import org.alfresco.repo.rule.RuleConditionDefinition;
 import org.alfresco.repo.rule.RuleConditionEvaluator;
-import org.alfresco.repo.rule.RuleServiceException;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.RuleCondition;
+import org.alfresco.service.cmr.rule.RuleConditionDefinition;
+import org.alfresco.service.cmr.rule.RuleServiceException;
 
 /**
  * Rule condition evaluator abstract base implementation.

@@ -2,11 +2,11 @@ package org.alfresco.repo.dictionary.impl;
 
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.AssociationDefinition;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 
 
 /**

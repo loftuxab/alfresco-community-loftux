@@ -2,7 +2,7 @@ package org.alfresco.repo.dictionary.impl;
 
 import java.util.Collection;
 
-import org.alfresco.repo.ref.NamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 
 
 /**

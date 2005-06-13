@@ -3,11 +3,11 @@
  */
 package org.alfresco.repo.version.lightweight;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.version.Version;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.version.Version;
 
 /**
  * Tests for retrieving frozen content from a verioned node

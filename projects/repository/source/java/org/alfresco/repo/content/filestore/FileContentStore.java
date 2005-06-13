@@ -7,10 +7,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.alfresco.repo.content.ContentIOException;
-import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.content.ContentStore;
-import org.alfresco.repo.content.ContentWriter;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

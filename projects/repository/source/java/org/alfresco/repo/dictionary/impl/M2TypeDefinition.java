@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.AssociationDefinition;
-import org.alfresco.repo.dictionary.DictionaryException;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.TypeDefinition;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryException;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 
 
 /**

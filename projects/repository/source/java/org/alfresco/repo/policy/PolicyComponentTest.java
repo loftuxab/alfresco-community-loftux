@@ -12,7 +12,7 @@ import org.alfresco.repo.dictionary.impl.DictionaryDAOImpl;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.NamespaceDAO;
 import org.alfresco.repo.dictionary.impl.NamespaceDAOImpl;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.namespace.QName;
 
 
 public class PolicyComponentTest extends TestCase

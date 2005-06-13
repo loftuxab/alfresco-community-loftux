@@ -10,28 +10,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.AssociationDefinition;
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.TypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.InvalidNodeTypeException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.node.operations.NodeOperationsService;
-import org.alfresco.repo.node.operations.NodeOperationsServiceException;
 import org.alfresco.repo.node.operations.NodeOperationsServicePolicies;
 import org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyNodePolicy;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.CopyServiceException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.debug.CodeMonkey;
 
 /**
@@ -39,7 +39,7 @@ import org.alfresco.util.debug.CodeMonkey;
  * 
  * @author Roy Wetherall
  */
-public class NodeOperationsServiceImpl implements NodeOperationsService
+public class NodeOperationsServiceImpl implements CopyService
 {
     /**
      * The node service
@@ -136,7 +136,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
             TypeDefinition typeDef = dictionaryService.getType(sourceTypeRef);
             if (typeDef == null)
             {
-                throw new InvalidNodeTypeException(sourceTypeRef);
+                throw new InvalidTypeException(sourceTypeRef);
             }
             
             // Establish the scope of the copy
@@ -151,7 +151,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
             }
             
 			// Create the new node
-            ChildAssocRef destinationChildAssocRef = this.nodeService.createNode(
+            ChildAssociationRef destinationChildAssocRef = this.nodeService.createNode(
                     destinationParent, 
                     destinationAssocTypeQName,
                     destinationQName,
@@ -254,16 +254,16 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
             {
                 if (assocDef.isChild() == true)
                 {
-                    List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(sourceNodeRef, assocDef.getName());
-                    for (ChildAssocRef childAssocRef : childAssocRefs) 
+                    List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(sourceNodeRef, assocDef.getName());
+                    for (ChildAssociationRef childAssocRef : childAssocRefs) 
                     {
                         copyDetails.addChildAssociation(classDefinition.getName(), assocDef.getName(), childAssocRef);
                     }
                 }
                 else
                 {
-                    List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(sourceNodeRef, assocDef.getName());
-                    for (NodeAssocRef nodeAssocRef : nodeAssocRefs) 
+                    List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(sourceNodeRef, assocDef.getName());
+                    for (AssociationRef nodeAssocRef : nodeAssocRefs) 
                     {
                         copyDetails.addAssociation(classDefinition.getName(), assocDef.getName(), nodeAssocRef);
                     }
@@ -347,7 +347,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 			if (this.nodeService.hasAspect(destinationNodeRef, aspect) == false)
 			{
 				// Error since the aspect has not been added to the destination node (should never happen)
-				throw new NodeOperationsServiceException("The aspect has not been added to the destination node.");
+				throw new CopyServiceException("The aspect has not been added to the destination node.");
 			}
 			
 			copyChildAssociations(aspect, destinationNodeRef, copyDetails, copyChildren);
@@ -364,10 +364,10 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 */
 	private void copyTargetAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails) 
 	{
-		Map<QName, NodeAssocRef> nodeAssocRefs = copyDetails.getAssociations(classRef);
+		Map<QName, AssociationRef> nodeAssocRefs = copyDetails.getAssociations(classRef);
 		if (nodeAssocRefs != null)
 		{
-			for (Map.Entry<QName, NodeAssocRef> entry : nodeAssocRefs.entrySet()) 
+			for (Map.Entry<QName, AssociationRef> entry : nodeAssocRefs.entrySet()) 
 			{
 				// TODO Currently the order of child associations is not preserved during copy
 				
@@ -392,15 +392,15 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 	 */
 	private void copyChildAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
 	{
-		Map<QName, ChildAssocRef> childAssocs = copyDetails.getChildAssociations(classRef);
+		Map<QName, ChildAssociationRef> childAssocs = copyDetails.getChildAssociations(classRef);
 		if (childAssocs != null)
 		{
-			for (Map.Entry<QName, ChildAssocRef> entry : childAssocs.entrySet()) 
+			for (Map.Entry<QName, ChildAssociationRef> entry : childAssocs.entrySet()) 
 			{
 				// TODO Currently the order of child associations is not preserved during copy
                 CodeMonkey.todo("A List should be used instead of map so that order is preserved");
 				
-                ChildAssocRef assocRef = entry.getValue();
+                ChildAssociationRef assocRef = entry.getValue();
 				if (copyChildren == true)
 				{
 					if (entry.getValue().isPrimary() == true)
@@ -460,7 +460,7 @@ public class NodeOperationsServiceImpl implements NodeOperationsService
 		if (this.nodeService.getType(sourceNodeRef).equals(this.nodeService.getType(destinationNodeRef)) == false)
 		{
 			// Error - can not copy objects that are of different types
-			throw new NodeOperationsServiceException("The source and destination node must be the same type.");
+			throw new CopyServiceException("The source and destination node must be the same type.");
 		}
 		
 		// Get the copy details

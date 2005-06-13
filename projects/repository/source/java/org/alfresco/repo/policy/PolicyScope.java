@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Policy scope.  
@@ -113,7 +113,7 @@ public class PolicyScope extends AspectDetails
 	 * @param qname
 	 * @param childAssocRef
 	 */
-	public void addChildAssociation(QName classRef, QName qname, ChildAssocRef childAssocRef) 
+	public void addChildAssociation(QName classRef, QName qname, ChildAssociationRef childAssocRef) 
 	{
 		if (classRef.equals(this.classRef) == true)
 		{
@@ -159,9 +159,9 @@ public class PolicyScope extends AspectDetails
 	 * @param classRef
 	 * @return
 	 */
-	public Map<QName, ChildAssocRef> getChildAssociations(QName classRef) 
+	public Map<QName, ChildAssociationRef> getChildAssociations(QName classRef) 
 	{
-		Map<QName, ChildAssocRef> result = null;
+		Map<QName, ChildAssociationRef> result = null;
 		if (classRef.equals(this.classRef) == true)
 		{
 			result = getChildAssociations();
@@ -185,7 +185,7 @@ public class PolicyScope extends AspectDetails
 	 * @param qname
 	 * @param nodeAssocRef
 	 */
-	public void addAssociation(QName classRef, QName qname, NodeAssocRef nodeAssocRef)
+	public void addAssociation(QName classRef, QName qname, AssociationRef nodeAssocRef)
 	{
 		if (classRef.equals(this.classRef) == true)
 		{
@@ -231,9 +231,9 @@ public class PolicyScope extends AspectDetails
 	 * @param classRef
 	 * @return
 	 */
-	public Map<QName, NodeAssocRef> getAssociations(QName classRef) 
+	public Map<QName, AssociationRef> getAssociations(QName classRef) 
 	{
-		Map<QName, NodeAssocRef> result = null;
+		Map<QName, AssociationRef> result = null;
 		if (classRef.equals(this.classRef) == true)
 		{
 			result = getAssociations();
@@ -301,12 +301,12 @@ public class PolicyScope extends AspectDetails
 	/**
 	 * The child associations that should be copied
 	 */
-	protected Map<QName, ChildAssocRef> childAssocs = new HashMap<QName, ChildAssocRef>();
+	protected Map<QName, ChildAssociationRef> childAssocs = new HashMap<QName, ChildAssociationRef>();
 	
 	/**
 	 * The target associations that should be copied
 	 */
-	protected Map<QName, NodeAssocRef> targetAssocs = new HashMap<QName, NodeAssocRef>();
+	protected Map<QName, AssociationRef> targetAssocs = new HashMap<QName, AssociationRef>();
 	
 	/**
 	 * The class ref of the aspect
@@ -360,7 +360,7 @@ public class PolicyScope extends AspectDetails
 	 * @param qname			the qualified name of the association
 	 * @param childAssocRef the child association reference
 	 */
-	protected void addChildAssociation(QName qname, ChildAssocRef childAssocRef) 
+	protected void addChildAssociation(QName qname, ChildAssociationRef childAssocRef) 
 	{
 		this.childAssocs.put(qname, childAssocRef);
 	}
@@ -380,7 +380,7 @@ public class PolicyScope extends AspectDetails
 	 * 
 	 * @return  map containing the child associations to be copied
 	 */
-	public Map<QName, ChildAssocRef> getChildAssociations() 
+	public Map<QName, ChildAssociationRef> getChildAssociations() 
 	{
 		return this.childAssocs;
 	}
@@ -391,7 +391,7 @@ public class PolicyScope extends AspectDetails
 	 * @param qname			the qualified name of the association
 	 * @param nodeAssocRef	the association reference
 	 */
-	protected void addAssociation(QName qname, NodeAssocRef nodeAssocRef)
+	protected void addAssociation(QName qname, AssociationRef nodeAssocRef)
 	{
 		this.targetAssocs.put(qname, nodeAssocRef);
 	}
@@ -411,7 +411,7 @@ public class PolicyScope extends AspectDetails
 	 * 
 	 * @return  a map conatining the associations to be copied
 	 */
-	public Map<QName, NodeAssocRef> getAssociations() 
+	public Map<QName, AssociationRef> getAssociations() 
 	{
 		return this.targetAssocs;
 	}	

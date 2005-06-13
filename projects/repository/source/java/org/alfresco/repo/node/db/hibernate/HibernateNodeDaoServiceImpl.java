@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.TypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.ContainerNode;
@@ -21,9 +19,11 @@ import org.alfresco.repo.domain.hibernate.NodeAssocImpl;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
 import org.alfresco.repo.domain.hibernate.RealNodeImpl;
 import org.alfresco.repo.domain.hibernate.StoreImpl;
-import org.alfresco.repo.node.InvalidNodeTypeException;
 import org.alfresco.repo.node.db.NodeDaoService;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
 import org.hibernate.ObjectDeletedException;
 import org.hibernate.Query;
@@ -99,12 +99,12 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return store;
     }
 
-    public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidNodeTypeException
+    public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidTypeException
     {
         TypeDefinition typeDef = dictionaryService.getType(nodeTypeQName);
         if (typeDef == null)
         {
-            throw new InvalidNodeTypeException(nodeTypeQName);
+            throw new InvalidTypeException(nodeTypeQName);
         }
         boolean allowedChildren = typeDef.getChildAssociations().size() > 0;
         // build a concrete node based on a bootstrap type

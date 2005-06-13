@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.alfresco.repo.ref.NamespaceException;
+import org.alfresco.service.namespace.NamespaceException;
 
 /**
  * Simple in-memory namespace DAO 

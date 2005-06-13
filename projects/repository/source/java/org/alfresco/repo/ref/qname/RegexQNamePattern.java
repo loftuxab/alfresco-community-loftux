@@ -3,10 +3,11 @@ package org.alfresco.repo.ref.qname;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.QNamePattern;
 
 /**
- * Provides matching between {@link org.alfresco.repo.ref.QName qnames} using
+ * Provides matching between {@link org.alfresco.service.namespace.QName qnames} using
  * regular expression matching.
  * <p>
  * A simple {@link #MATCH_ALL convenience} pattern matcher is also provided that

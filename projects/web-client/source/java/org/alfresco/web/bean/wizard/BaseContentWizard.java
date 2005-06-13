@@ -14,14 +14,16 @@ import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.MimetypeService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.log4j.Logger;
@@ -102,7 +104,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             
             // create the node to represent the node
             String assocName = Repository.createValidQName(this.fileName);
-            ChildAssocRef assocRef = this.nodeService.createNode(
+            ChildAssociationRef assocRef = this.nodeService.createNode(
                   containerNodeRef,
                   DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
@@ -320,12 +322,11 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       if (this.contentTypes == null)
       {
          this.contentTypes = new ArrayList<SelectItem>(80);
-         MimetypeMap mimetypeMap = (MimetypeMap)FacesContextUtils.
-            getRequiredWebApplicationContext(FacesContext.getCurrentInstance()).
-            getBean(Repository.BEAN_MIMETYPE_MAP);
+         ServiceRegistry registry = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
+         MimetypeService mimetypeService = registry.getMimetypeService();
          
          // get the mime type display names
-         Map<String, String> mimeTypes = mimetypeMap.getDisplaysByMimetype();
+         Map<String, String> mimeTypes = mimetypeService.getDisplaysByMimetype();
          for (String mimeType : mimeTypes.keySet())
          {
             this.contentTypes.add(new SelectItem(mimeType, mimeTypes.get(mimeType)));

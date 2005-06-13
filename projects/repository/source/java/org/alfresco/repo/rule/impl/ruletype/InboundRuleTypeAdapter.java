@@ -3,14 +3,14 @@
  */
 package org.alfresco.repo.rule.impl.ruletype;
 
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.rule.RuleService;
-import org.alfresco.repo.rule.RuleType;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.service.cmr.rule.RuleType;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Inbound rule type adapter class.
@@ -52,7 +52,7 @@ public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
 	 * 
 	 * @param childAssocRef		the child association reference created
 	 */
-    public void onCreateChildAssociation(ChildAssocRef childAssocRef)
+    public void onCreateChildAssociation(ChildAssociationRef childAssocRef)
     {
         executeRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());
     }

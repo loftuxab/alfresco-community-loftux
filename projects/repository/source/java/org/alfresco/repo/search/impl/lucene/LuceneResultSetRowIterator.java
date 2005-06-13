@@ -4,7 +4,7 @@
 package org.alfresco.repo.search.impl.lucene;
 
 import org.alfresco.repo.search.AbstractResultSetRowIterator;
-import org.alfresco.repo.search.ResultSetRow;
+import org.alfresco.service.cmr.search.ResultSetRow;
 
 /**
  * Iterate over the rows in a LuceneResultSet

@@ -5,19 +5,19 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Model;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionService;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
 public class VersionStoreBaseTest extends BaseSpringTest 

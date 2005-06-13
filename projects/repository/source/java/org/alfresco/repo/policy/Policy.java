@@ -1,6 +1,6 @@
 package org.alfresco.repo.policy;
 
-import org.alfresco.repo.dictionary.NamespaceService;
+import org.alfresco.service.namespace.NamespaceService;
 
 /**
  * Marker interface for representing a Policy.

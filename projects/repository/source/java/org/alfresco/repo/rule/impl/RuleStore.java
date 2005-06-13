@@ -9,19 +9,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.rule.Rule;
-import org.alfresco.repo.rule.RuleServiceException;
-import org.alfresco.repo.rule.RuleType;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleServiceException;
+import org.alfresco.service.cmr.rule.RuleType;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 
 /**
@@ -235,8 +235,8 @@ import org.alfresco.repo.rule.RuleType;
         // TODO need to cope with any folder structure containing rule content
         
         List<RuleImpl> rules = new ArrayList<RuleImpl>();
-        List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(configFolder);
-        for (ChildAssocRef childAssocRef : childAssocRefs)
+        List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(configFolder);
+        for (ChildAssociationRef childAssocRef : childAssocRefs)
         {
             NodeRef nodeRef = childAssocRef.getChildRef();
             ContentReader contentReader = this.contentService.getReader(nodeRef);
@@ -263,7 +263,7 @@ import org.alfresco.repo.rule.RuleType;
 		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE) == true)
 		{
 	        // Get the configurations folder
-	        List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
+	        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
 	                                               nodeRef, 
 	                                               DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
 	        if (nodeAssocRefs.size() == 0)
@@ -274,7 +274,7 @@ import org.alfresco.repo.rule.RuleType;
 	        {
 	            NodeRef configFolder = nodeAssocRefs.get(0).getTargetRef();
 				
-				List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(
+				List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(
 														configFolder, 
 														QName.createQName(NamespaceService.ALFRESCO_URI, "rules"));
 				if (childAssocRefs.size() == 0)

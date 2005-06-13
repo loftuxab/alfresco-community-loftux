@@ -4,13 +4,19 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.filestore.FileContentStore;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.content.transform.ContentTransformerRegistry;
-import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.InvalidNodeTypeException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.value.ValueConverter;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentStreamListener;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.NoTransformerException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.TempFileProvider;
 import org.alfresco.util.debug.CodeMonkey;
 
@@ -57,7 +63,7 @@ public class RoutingContentService implements ContentService
         QName nodeType = nodeService.getType(nodeRef);
         if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
         {
-            throw new InvalidNodeTypeException("The node must be an instance of type content", nodeType);
+            throw new InvalidTypeException("The node must be an instance of type content", nodeType);
         }
         
         // get the content URL
@@ -97,7 +103,7 @@ public class RoutingContentService implements ContentService
         QName nodeType = nodeService.getType(nodeRef);
         if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
         {
-            throw new InvalidNodeTypeException("The node must be an instance of type content", nodeType);
+            throw new InvalidTypeException("The node must be an instance of type content", nodeType);
         }
         
         CodeMonkey.todo("Choose the store to write to at runtime");  // TODO
@@ -129,7 +135,7 @@ public class RoutingContentService implements ContentService
         QName nodeType = nodeService.getType(nodeRef);
         if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
         {
-            throw new InvalidNodeTypeException("The node must be an instance of type content", nodeType);
+            throw new InvalidTypeException("The node must be an instance of type content", nodeType);
         }
         
         // get the plain writer

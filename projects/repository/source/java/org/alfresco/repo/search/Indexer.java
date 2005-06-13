@@ -7,8 +7,8 @@
  */
 package org.alfresco.repo.search;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * This interface abstracts how indexing is used from within the node service
@@ -29,7 +29,7 @@ public interface Indexer
      * 
      * @param relationshipRef
      */
-    public void createNode(ChildAssocRef relationshipRef);
+    public void createNode(ChildAssociationRef relationshipRef);
 
     /**
      * Update an index entry due to property changes on a node. There are no
@@ -47,7 +47,7 @@ public interface Indexer
      * 
      * @param relationshipRef
      */
-    public void deleteNode(ChildAssocRef relationshipRef);
+    public void deleteNode(ChildAssociationRef relationshipRef);
 
     /**
      * Create a refernce link between a parent and child. Implies only
@@ -55,7 +55,7 @@ public interface Indexer
      * 
      * @param relationshipRef
      */
-    public void createChildRelationship(ChildAssocRef relationshipRef);
+    public void createChildRelationship(ChildAssociationRef relationshipRef);
 
     /**
      * Alter the relationship between parent and child nodes in the index.
@@ -74,7 +74,7 @@ public interface Indexer
      * @param relationshipBeforeRef
      * @param relationshipAfterRef
      */
-    public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef);
+    public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef, ChildAssociationRef relationshipAfterRef);
 
     /**
      * Delete a relationship between a parent and child.
@@ -89,7 +89,7 @@ public interface Indexer
      * 
      * @param relationshipRef
      */
-    public void deleteChildRelationship(ChildAssocRef relationshipRef);
+    public void deleteChildRelationship(ChildAssociationRef relationshipRef);
     
     
 

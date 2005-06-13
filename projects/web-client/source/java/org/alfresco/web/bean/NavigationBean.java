@@ -16,12 +16,12 @@ import javax.faces.event.ActionEvent;
 import org.apache.log4j.Logger;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.node.InvalidNodeRefException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.search.Searcher;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
@@ -69,7 +69,7 @@ public class NavigationBean
    /**
     * @return Returns the searchService.
     */
-   public Searcher getSearchService()
+   public SearchService getSearchService()
    {
       return searchService;
    }
@@ -77,7 +77,7 @@ public class NavigationBean
    /**
     * @param searchService The searchService to set.
     */
-   public void setSearchService(Searcher searchService)
+   public void setSearchService(SearchService searchService)
    {
       this.searchService = searchService;
    }
@@ -272,7 +272,7 @@ public class NavigationBean
    private NodeService nodeService;
    
    /** The SearchService to be used by the bean */
-   private Searcher searchService;
+   private SearchService searchService;
    
    /** Node we are currently in the context of */
    private String currentNodeId;

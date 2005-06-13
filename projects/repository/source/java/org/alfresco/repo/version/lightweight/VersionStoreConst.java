@@ -3,9 +3,9 @@
  */
 package org.alfresco.repo.version.lightweight;
 
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionService;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * interface conating the constants used by the light weight 

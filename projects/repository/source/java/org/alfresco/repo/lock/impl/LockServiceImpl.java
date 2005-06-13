@@ -9,22 +9,22 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.lock.LockService;
-import org.alfresco.repo.lock.LockStatus;
-import org.alfresco.repo.lock.LockType;
-import org.alfresco.repo.lock.NodeLockedException;
-import org.alfresco.repo.lock.UnableToAquireLockException;
-import org.alfresco.repo.lock.UnableToReleaseLockException;
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.util.AspectMissingException;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockStatus;
+import org.alfresco.service.cmr.lock.LockType;
+import org.alfresco.service.cmr.lock.NodeLockedException;
+import org.alfresco.service.cmr.lock.UnableToAquireLockException;
+import org.alfresco.service.cmr.lock.UnableToReleaseLockException;
+import org.alfresco.service.cmr.repository.AspectMissingException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.debug.CodeMonkey;
 
 /**
@@ -102,7 +102,7 @@ public class LockServiceImpl implements LockService
     }
     
     /**
-     * @see org.alfresco.repo.lock.LockService#lock(org.alfresco.repo.ref.NodeRef, java.lang.String, LockType)
+     * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, LockType)
      */
     public synchronized void lock(NodeRef nodeRef, String userRef, LockType lockType)
         throws UnableToAquireLockException, AspectMissingException
@@ -139,7 +139,7 @@ public class LockServiceImpl implements LockService
     }
 
     /**
-     * @see org.alfresco.repo.lock.LockService#lock(org.alfresco.repo.ref.NodeRef, java.lang.String, LockType, boolean)
+     * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, LockType, boolean)
      */
     public synchronized void lock(NodeRef nodeRef, String userRef, LockType lockType, boolean lockChildren)
         throws UnableToAquireLockException, AspectMissingException
@@ -148,8 +148,8 @@ public class LockServiceImpl implements LockService
         
         if (lockChildren == true)
         {
-            Collection<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
-            for (ChildAssocRef childAssocRef : childAssocRefs)
+            Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
+            for (ChildAssociationRef childAssocRef : childAssocRefs)
             {
                 lock(childAssocRef.getChildRef(), userRef, lockType, lockChildren);
             }
@@ -157,7 +157,7 @@ public class LockServiceImpl implements LockService
     }
 
     /**
-     * @see org.alfresco.repo.lock.LockService#lock(java.util.Collection, java.lang.String, LockType)
+     * @see org.alfresco.service.cmr.lock.LockService#lock(java.util.Collection, java.lang.String, LockType)
      */
     public synchronized void lock(Collection<NodeRef> nodeRefs, String userRef, LockType lockType)
         throws UnableToAquireLockException, AspectMissingException
@@ -170,7 +170,7 @@ public class LockServiceImpl implements LockService
     }
 
     /**
-     * @see org.alfresco.repo.lock.LockService#unlock(NodeRef, String)
+     * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String)
      */
     public synchronized void unlock(NodeRef nodeRef, String userRef)
         throws UnableToReleaseLockException, AspectMissingException
@@ -201,7 +201,7 @@ public class LockServiceImpl implements LockService
     }
 
     /**
-     * @see org.alfresco.repo.lock.LockService#unlock(NodeRef, String, boolean)
+     * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String, boolean)
      */
     public synchronized void unlock(NodeRef nodeRef, String userRef, boolean unlockChildren)
         throws UnableToReleaseLockException, AspectMissingException
@@ -212,8 +212,8 @@ public class LockServiceImpl implements LockService
         if (unlockChildren == true)
         {
             // Get the children and unlock them
-            Collection<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
-            for (ChildAssocRef childAssocRef : childAssocRefs)
+            Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
+            for (ChildAssociationRef childAssocRef : childAssocRefs)
             {
                 unlock(childAssocRef.getChildRef(), userRef, unlockChildren);
             }
@@ -233,7 +233,7 @@ public class LockServiceImpl implements LockService
     }
     
     /**
-     * @see org.alfresco.repo.lock.LockService#getLockStatus(NodeRef, String)
+     * @see org.alfresco.service.cmr.lock.LockService#getLockStatus(NodeRef, String)
      */
     public LockStatus getLockStatus(NodeRef nodeRef, String userRef)
         throws AspectMissingException

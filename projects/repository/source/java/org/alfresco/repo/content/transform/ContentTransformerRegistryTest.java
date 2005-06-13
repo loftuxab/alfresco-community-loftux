@@ -3,11 +3,11 @@ package org.alfresco.repo.content.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.filestore.FileContentReader;
 import org.alfresco.repo.content.filestore.FileContentWriter;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.util.TempFileProvider;
 
 /**

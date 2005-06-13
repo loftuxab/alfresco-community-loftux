@@ -1,7 +1,7 @@
 package org.alfresco.repo.dictionary.impl;
 
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Definitions of Model items.

@@ -5,8 +5,8 @@ package org.alfresco.repo.node.operations;
 
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.PolicyScope;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * @author Roy Wetherall

@@ -2,10 +2,14 @@ package org.alfresco.repo.content;
 
 import java.util.List;
 
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
+
 /**
  * Provides low-level retrieval of content
- * {@link org.alfresco.repo.content.ContentReader readers} and
- * {@link org.alfresco.repo.content.ContentWriter writers}.
+ * {@link org.alfresco.service.cmr.repository.ContentReader readers} and
+ * {@link org.alfresco.service.cmr.repository.ContentWriter writers}.
  * <p>
  * Implementations of this interface should be soley responsible for
  * providing persistence and retrieval of the content against a

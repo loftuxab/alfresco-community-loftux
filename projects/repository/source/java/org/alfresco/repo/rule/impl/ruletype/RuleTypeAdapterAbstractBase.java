@@ -5,20 +5,20 @@ package org.alfresco.repo.rule.impl.ruletype;
 
 import java.util.List;
 
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.rule.Rule;
-import org.alfresco.repo.rule.RuleAction;
 import org.alfresco.repo.rule.RuleActionExecuter;
-import org.alfresco.repo.rule.RuleCondition;
 import org.alfresco.repo.rule.RuleConditionEvaluator;
-import org.alfresco.repo.rule.RuleService;
-import org.alfresco.repo.rule.RuleServiceException;
-import org.alfresco.repo.rule.RuleType;
 import org.alfresco.repo.rule.RuleTypeAdapter;
 import org.alfresco.repo.rule.impl.RuleActionDefinitionImpl;
 import org.alfresco.repo.rule.impl.RuleConditionDefinitionImpl;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleAction;
+import org.alfresco.service.cmr.rule.RuleCondition;
+import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.service.cmr.rule.RuleServiceException;
+import org.alfresco.service.cmr.rule.RuleType;
 
 /**
  * Rule type adapter abstract base class implmentation.

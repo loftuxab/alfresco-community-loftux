@@ -1,8 +1,8 @@
 package org.alfresco.repo.policy;
 
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.namespace.QName;
 
 
 /**

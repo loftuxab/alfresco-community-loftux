@@ -11,11 +11,11 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.AbstractResultSetRow;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.namespace.QName;
 import org.apache.lucene.document.Document;
 
 /**
@@ -81,12 +81,12 @@ public class LuceneResultSetRow extends AbstractResultSetRow
         return QName.createQName(qname);
     }
 
-    public ChildAssocRef getChildAssocRef()
+    public ChildAssociationRef getChildAssocRef()
     {
         String primaryParent = getDocument().getField("PRIMARYPARENT").stringValue();
         NodeRef childNodeRef = getNodeRef();
         NodeRef paretnNodeRef = new NodeRef(childNodeRef.getStoreRef(), primaryParent);
-        return new ChildAssocRef(ASSOC_TYPE_QNAME, paretnNodeRef, getQName(), childNodeRef);
+        return new ChildAssociationRef(ASSOC_TYPE_QNAME, paretnNodeRef, getQName(), childNodeRef);
     }
 
 }

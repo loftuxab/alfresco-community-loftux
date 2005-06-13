@@ -5,8 +5,8 @@ package org.alfresco.repo.rule.impl;
 
 import java.io.Serializable;
 
-import org.alfresco.repo.rule.ParameterDefinition;
-import org.alfresco.repo.rule.ParameterType;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 
 /**
  * Parameter definition implementation class.
@@ -60,7 +60,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     }
     
     /**
-     * @see org.alfresco.repo.rule.ParameterDefinition#getName()
+     * @see org.alfresco.service.cmr.rule.ParameterDefinition#getName()
      */
     public String getName()
     {
@@ -68,7 +68,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     }
 
     /**
-     * @see org.alfresco.repo.rule.ParameterDefinition#getType()
+     * @see org.alfresco.service.cmr.rule.ParameterDefinition#getType()
      */
     public ParameterType getType()
     {
@@ -76,7 +76,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     }
 	
 	/**
-	 * @see org.alfresco.repo.rule.ParameterDefinition#isMandatory()
+	 * @see org.alfresco.service.cmr.rule.ParameterDefinition#isMandatory()
 	 */
 	public boolean isMandatory() 
 	{
@@ -84,7 +84,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
 	}
 
     /**
-     * @see org.alfresco.repo.rule.ParameterDefinition#getDisplayLabel()
+     * @see org.alfresco.service.cmr.rule.ParameterDefinition#getDisplayLabel()
      */
     public String getDisplayLabel()
     {

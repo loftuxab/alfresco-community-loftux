@@ -1,11 +1,15 @@
 package org.alfresco.repo.search;
 
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.QueryParameter;
+import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.QName;
 
 /**
- * Component API for searching.  Delegates to the real {@link org.alfresco.repo.search.Searcher searcher}
+ * Component API for searching.  Delegates to the real {@link org.alfresco.service.cmr.search.SearchService searcher}
  * from the {@link #indexerAndSearcherFactory}.
  * 
  * Transactional support is free.
@@ -28,7 +32,7 @@ public class SearcherComponent extends AbstractSearcherComponent
             Path[] queryOptions,
             QueryParameterDefinition[] queryParameterDefinitions)
     {
-        Searcher searcher = indexerAndSearcherFactory.getSearcher(store, false);
+        SearchService searcher = indexerAndSearcherFactory.getSearcher(store, false);
         return searcher.query(store, language, query, queryOptions, queryParameterDefinitions);
     }
 

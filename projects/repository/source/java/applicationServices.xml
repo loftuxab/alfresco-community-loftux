@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+
+   <!-- Alfresco Services -->
+
+   <alias alias="alf:serviceregistry" name="serviceRegistry"/>
+   
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:serviceregistry"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.ServiceRegistry</value>
+      </property>
+      <property name="description">
+         <value>Service Registry</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:namespace" name="namespaceService"/>
+   
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:namespace"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.namespace.NamespaceService</value>
+      </property>
+      <property name="description">
+         <value>Namespace Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:transaction" name="userTransaction"/>
+   
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:transaction"/>
+      </property>
+      <property name="interface">
+         <value>javax.transaction.UserTransaction</value>
+      </property>
+      <property name="description">
+         <value>User Transaction</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:dictionary" name="dictionaryService"/>
+   
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:dictionary"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.dictionary.DictionaryService</value>
+      </property>
+      <property name="description">
+         <value>Dictionary Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:node" name="nodeService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:node"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.repository.NodeService</value>
+      </property>
+      <property name="description">
+         <value>Node Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:content" name="contentService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:content"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.repository.ContentService</value>
+      </property>
+      <property name="description">
+         <value>Content Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:mimetype" name="mimetypeMap"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:mimetype"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.repository.MimetypeService</value>
+      </property>
+      <property name="description">
+         <value>Mime Type Service</value>
+      </property>
+   </bean>
+   
+   <alias alias="alf:search" name="searcherComponent"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:search"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.search.SearchService</value>
+      </property>
+      <property name="description">
+         <value>Search Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:category" name="categoryService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:category"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.search.CategoryService</value>
+      </property>
+      <property name="description">
+         <value>Category Service</value>
+      </property>
+   </bean>
+   
+   <alias alias="alf:copy" name="nodeOperationsService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:copy"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.repository.CopyService</value>
+      </property>
+      <property name="description">
+         <value>Copy Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:lock" name="lockService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:lock"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.lock.LockService</value>
+      </property>
+      <property name="description">
+         <value>Lock Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:version" name="lightWeightVersionStoreVersionService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:version"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.version.VersionService</value>
+      </property>
+      <property name="description">
+         <value>Version Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:checkoutcheckin" name="versionOperationsService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:checkoutcheckin"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.coci.CheckOutCheckInService</value>
+      </property>
+      <property name="description">
+         <value>Checkout / Checkin Service</value>
+      </property>
+   </bean>
+
+   <alias alias="alf:rule" name="ruleService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <idref bean="alf:rule"/>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.rule.RuleService</value>
+      </property>
+      <property name="description">
+         <value>Rule Service</value>
+      </property>
+   </bean>
+
+</beans>

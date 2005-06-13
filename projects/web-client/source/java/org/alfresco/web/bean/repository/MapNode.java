@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 
 /**
  * Lighweight client side representation of a node held in the repository, which

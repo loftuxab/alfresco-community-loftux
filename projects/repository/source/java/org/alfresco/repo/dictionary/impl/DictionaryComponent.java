@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.AssociationDefinition;
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.ModelDefinition;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.dictionary.TypeDefinition;
-import org.alfresco.repo.node.InvalidNodeTypeException;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
 
 
@@ -155,12 +155,12 @@ public class DictionaryComponent implements DictionaryService
         ClassDefinition classDef = getClass(className);
         if (classDef == null)
         {
-            throw new InvalidNodeTypeException(className);
+            throw new InvalidTypeException(className);
         }
         ClassDefinition ofClassDef = getClass(ofClassName);
         if (ofClassDef == null)
         {
-            throw new InvalidNodeTypeException(ofClassName);
+            throw new InvalidTypeException(ofClassName);
         }
         
         // Only check if both ends are either a type or an aspect

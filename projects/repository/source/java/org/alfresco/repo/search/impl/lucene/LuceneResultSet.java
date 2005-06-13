@@ -6,15 +6,15 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.io.IOException;
 
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.AbstractResultSet;
-import org.alfresco.repo.search.ResultSetRow;
 import org.alfresco.repo.search.ResultSetRowIterator;
 import org.alfresco.repo.search.SearcherException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSetRow;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Searcher;
@@ -141,7 +141,7 @@ public class LuceneResultSet extends AbstractResultSet
         }
     }
 
-    public ChildAssocRef getChildAssocRef(int n)
+    public ChildAssociationRef getChildAssocRef(int n)
     {
        return getRow(n).getChildAssocRef();
     }

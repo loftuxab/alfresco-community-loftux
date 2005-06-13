@@ -9,32 +9,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.impl.DictionaryComponent;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
-import org.alfresco.repo.ref.EntityRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.QueryParameterDefImpl;
-import org.alfresco.repo.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.InvalidAspectException;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.repository.AssociationExistsException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.CyclicChildRelationshipException;
+import org.alfresco.service.cmr.repository.EntityRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.PropertyException;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.CodeMonkey;
 import org.hibernate.Session;
 
 /**
- * Provides a base set of tests of the various {@link org.alfresco.repo.node.NodeService}
+ * Provides a base set of tests of the various {@link org.alfresco.service.cmr.repository.NodeService}
  * implementations.
  * <p>
  * To test a specific incarnation of the service, the methods {@link #getStoreService()} and
@@ -142,12 +148,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      * 
      * @return Returns a map <code>ChildAssocRef</code> instances keyed by qualified assoc name
      */
-    protected Map<QName, ChildAssocRef> buildNodeGraph() throws Exception
+    protected Map<QName, ChildAssociationRef> buildNodeGraph() throws Exception
     {
         String ns = BaseNodeServiceTest.NAMESPACE;
         QName qname = null;
-        ChildAssocRef assoc = null;
-        Map<QName, ChildAssocRef> ret = new HashMap<QName, ChildAssocRef>(13);
+        ChildAssociationRef assoc = null;
+        Map<QName, ChildAssociationRef> ret = new HashMap<QName, ChildAssociationRef>(13);
         
         // LEVEL 0
 
@@ -286,7 +292,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testCreateNode() throws Exception
     {
-        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName("pathA"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER);
@@ -299,7 +305,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
 
     public void testGetType() throws Exception
     {
-        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName("pathA"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER);
@@ -336,7 +342,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testAspects() throws Exception
     {
         // create a regular base node
-        ChildAssocRef assocRef = nodeService.createNode(
+        ChildAssociationRef assocRef = nodeService.createNode(
                 rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName(BaseNodeServiceTest.NAMESPACE, "test-container"),
@@ -401,7 +407,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testCreateNodeNoProperties() throws Exception
     {
         // flush to ensure that the pure JDBC query will work
-        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName("path1"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER);
@@ -418,7 +424,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     {
         try
         {
-            ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+            ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
                     ASSOC_TYPE_QNAME,
                     QName.createQName("MyContentNode"),
                     TYPE_QNAME_TEST_CONTENT);
@@ -434,7 +440,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
         
         // create node for real
-        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName("MyContent"),
                 TYPE_QNAME_TEST_CONTENT,
@@ -458,7 +464,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testDelete() throws Exception
     {
-        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName("path1"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER);
@@ -500,7 +506,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         {
             // expected
         }
-        ChildAssocRef assocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName("pathA"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER);
@@ -517,13 +523,13 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testRemoveChildByRef() throws Exception
     {
-        ChildAssocRef pathARef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef pathARef = nodeService.createNode(rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName("pathA"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER);
         NodeRef nodeRef = pathARef.getChildRef();
-        ChildAssocRef pathBRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME, QName.createQName("pathB"));
-        ChildAssocRef pathCRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME, QName.createQName("pathC"));
+        ChildAssociationRef pathBRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME, QName.createQName("pathB"));
+        ChildAssociationRef pathCRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME, QName.createQName("pathC"));
         // delete all the associations
         Collection<EntityRef> deletedRefs = nodeService.removeChild(rootNodeRef, nodeRef);
         assertTrue("Primary child not deleted", deletedRefs.contains(nodeRef));
@@ -590,58 +596,58 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testGetParentAssocs() throws Exception
     {
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        ChildAssocRef n3pn6Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n3_p_n6"));
-        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n7"));
-        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
-        ChildAssocRef n7n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n7_n8"));
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
+        ChildAssociationRef n3pn6Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n3_p_n6"));
+        ChildAssociationRef n5pn7Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n7"));
+        ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
+        ChildAssociationRef n7n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n7_n8"));
         // get a child node's parents
         NodeRef n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8")).getChildRef();
-        List<ChildAssocRef> parentAssocs = nodeService.getParentAssocs(n8Ref);
+        List<ChildAssociationRef> parentAssocs = nodeService.getParentAssocs(n8Ref);
         assertEquals("Incorrect number of parents", 2, parentAssocs.size());
         assertTrue("Expected assoc not found", parentAssocs.contains(n6pn8Ref));
         assertTrue("Expected assoc not found", parentAssocs.contains(n7n8Ref));
         
         // check that we can retrieve the primary parent
-        ChildAssocRef primaryParentAssocCheck = nodeService.getPrimaryParent(n8Ref);
+        ChildAssociationRef primaryParentAssocCheck = nodeService.getPrimaryParent(n8Ref);
         assertEquals("Primary parent assoc not retrieved", n6pn8Ref, primaryParentAssocCheck);
         
         // check that the root node returns a null primary parent
-        ChildAssocRef rootNodePrimaryAssoc = nodeService.getPrimaryParent(rootNodeRef);
+        ChildAssociationRef rootNodePrimaryAssoc = nodeService.getPrimaryParent(rootNodeRef);
         assertNull("Expected null primary parent for root node", rootNodePrimaryAssoc.getParentRef());
     }
     
     public void testGetChildAssocs() throws Exception
     {
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         NodeRef n1Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE,"root_p_n1")).getChildRef();
         
         // get the parent node's children
-        Collection<ChildAssocRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
+        Collection<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
         assertEquals("Incorrect number of children", 2, childAssocRefs.size());
     }
     
     public void testMoveNode() throws Exception
     {
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
-        ChildAssocRef n5pn7Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n7"));
-        ChildAssocRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
+        ChildAssociationRef n5pn7Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n7"));
+        ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
         NodeRef n5Ref = n5pn7Ref.getParentRef();
         NodeRef n6Ref = n6pn8Ref.getParentRef();
         NodeRef n8Ref = n6pn8Ref.getChildRef();
         // move n8 to n5
-        ChildAssocRef assocRef = nodeService.moveNode(
+        ChildAssociationRef assocRef = nodeService.moveNode(
                 n8Ref,
                 n5Ref,
                 ASSOC_TYPE_QNAME,
                 QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n8"));
         // check that n6 is no longer the parent
-        List<ChildAssocRef> n6ChildRefs = nodeService.getChildAssocs(
+        List<ChildAssociationRef> n6ChildRefs = nodeService.getChildAssocs(
                 n6Ref,
                 QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
         assertEquals("Primary child assoc is still present", 0, n6ChildRefs.size());
         // check that n5 is the parent
-        ChildAssocRef checkRef = nodeService.getPrimaryParent(n8Ref);
+        ChildAssociationRef checkRef = nodeService.getPrimaryParent(n8Ref);
         assertEquals("Primary assoc incorrent", assocRef, checkRef);
     }
     
@@ -650,13 +656,13 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      * 
      * @return Returns an array of [source real NodeRef][target reference NodeRef][assoc name String]
      */
-    private NodeAssocRef createAssociation() throws Exception
+    private AssociationRef createAssociation() throws Exception
     {
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         fillProperties(TYPE_QNAME_TEST_CONTENT, properties);
         fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
         
-        ChildAssocRef childAssocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef childAssocRef = nodeService.createNode(rootNodeRef,
                 ASSOC_TYPE_QNAME,
                 QName.createQName(null, "N1"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER);
@@ -669,14 +675,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         NodeRef targetRef = childAssocRef.getChildRef();
         
         QName qname = QName.createQName("next");
-        NodeAssocRef assocRef = nodeService.createAssociation(sourceRef, targetRef, qname);
+        AssociationRef assocRef = nodeService.createAssociation(sourceRef, targetRef, qname);
         // done
         return assocRef;
     }
     
     public void testCreateAssociation() throws Exception
     {
-        NodeAssocRef assocRef = createAssociation();
+        AssociationRef assocRef = createAssociation();
         NodeRef sourceRef = assocRef.getSourceRef();
         NodeRef targetRef = assocRef.getTargetRef();
         QName qname = assocRef.getTypeQName();
@@ -704,7 +710,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testRemoveAssociation() throws Exception
     {
-        NodeAssocRef assocRef = createAssociation();
+        AssociationRef assocRef = createAssociation();
         NodeRef sourceRef = assocRef.getSourceRef();
         NodeRef targetRef = assocRef.getTargetRef();
         QName qname = assocRef.getTypeQName();
@@ -716,24 +722,24 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testGetTargetAssocs() throws Exception
     {
-        NodeAssocRef assocRef = createAssociation();
+        AssociationRef assocRef = createAssociation();
         NodeRef sourceRef = assocRef.getSourceRef();
         NodeRef targetRef = assocRef.getTargetRef();
         QName qname = assocRef.getTypeQName();
         // get the target assocs
-        List<NodeAssocRef> targetAssocs = nodeService.getTargetAssocs(sourceRef, qname);
+        List<AssociationRef> targetAssocs = nodeService.getTargetAssocs(sourceRef, qname);
         assertEquals("Incorrect number of targets", 1, targetAssocs.size());
         assertTrue("Target not found", targetAssocs.contains(assocRef));
     }
     
     public void testGetSourceAssocs() throws Exception
     {
-        NodeAssocRef assocRef = createAssociation();
+        AssociationRef assocRef = createAssociation();
         NodeRef sourceRef = assocRef.getSourceRef();
         NodeRef targetRef = assocRef.getTargetRef();
         QName qname = assocRef.getTypeQName();
         // get the source assocs
-        List<NodeAssocRef> sourceAssocs = nodeService.getSourceAssocs(targetRef, qname);
+        List<AssociationRef> sourceAssocs = nodeService.getSourceAssocs(targetRef, qname);
         assertEquals("Incorrect number of source assocs", 1, sourceAssocs.size());
         assertTrue("Source not found", sourceAssocs.contains(assocRef));
     }
@@ -743,7 +749,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     public void testGetPath() throws Exception
     {
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         NodeRef n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE,"n6_p_n8")).getChildRef();
 
         // get the primary node path for n8
@@ -758,7 +764,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     public void testGetPaths() throws Exception
     {
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         NodeRef n6Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n3_p_n6")).getChildRef();
         NodeRef n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8")).getChildRef();
         
@@ -780,7 +786,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             {
                 assertTrue("Path element of incorrect type", element instanceof Path.ChildAssocElement);
                 Path.ChildAssocElement childAssocElement = (Path.ChildAssocElement) element;
-                ChildAssocRef ref = childAssocElement.getRef();
+                ChildAssociationRef ref = childAssocElement.getRef();
                 if (childAssocElement != path.first())
                 {
                     // for all but the first element, the parent and assoc qname must be set
@@ -815,7 +821,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testNodeXPath() throws Exception
     {
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         QName qname = QName.createQName(BaseNodeServiceTest.NAMESPACE, "n2_p_n4");
         
         NodeServiceXPath xpath;
@@ -826,52 +832,52 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         
         xpath = new NodeServiceXPath("//.[@test:animal='monkey']", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(1, list.size());
       
         
         xpath = new NodeServiceXPath("*", nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(2, list.size());
         
         xpath = new NodeServiceXPath("*/*", nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(4, list.size());
         
         xpath = new NodeServiceXPath("*/*/*", nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(3, list.size());
         
         xpath = new NodeServiceXPath("*/*/*/*", nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(2, list.size());
         
         xpath = new NodeServiceXPath("*/*/*/*/..", nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(2, list.size());
         
         xpath = new NodeServiceXPath("*//.", nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(11, list.size());
         
         xpath = new NodeServiceXPath("test:root_p_n1", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath("*//.[@test:animal]", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath("*//.[@test:animal='monkey']", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath("//.[@test:animal='monkey']", nodeService, namespacePrefixResolver, null, false);
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         QueryParameterDefImpl paramDef = new QueryParameterDefImpl(
@@ -879,7 +885,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT), true, "monkey");
         xpath = new NodeServiceXPath("//.[@test:animal=$test:test]", nodeService, namespacePrefixResolver, new QueryParameterDefinition[]{paramDef}, false);
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX,   BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssocRef(null, null, null, rootNodeRef));
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath(".", nodeService, namespacePrefixResolver, null, false);
@@ -915,12 +921,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testSelectAPI() throws Exception
     {
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         
-        List<ChildAssocRef> answer =  nodeService.selectNodes(rootNodeRef, "/test:root_p_n1/test:n1_p_n3/*", null, namespacePrefixResolver, false);
+        List<ChildAssociationRef> answer =  nodeService.selectNodes(rootNodeRef, "/test:root_p_n1/test:n1_p_n3/*", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         
         //List<ChildAssocRef> 
@@ -933,12 +939,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testLikeAndContains() throws Exception
     {
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         
-        List<ChildAssocRef> answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monkey')", null, namespacePrefixResolver, false);
+        List<ChildAssociationRef> answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monkey')", null, namespacePrefixResolver, false);
         assertEquals(0, answer.size());
         
         answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('monkey')", null, namespacePrefixResolver, false);

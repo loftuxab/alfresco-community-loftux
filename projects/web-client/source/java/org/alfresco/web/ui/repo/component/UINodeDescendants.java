@@ -11,7 +11,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import javax.faces.event.ActionEvent;
 
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * @author Kevin Roast

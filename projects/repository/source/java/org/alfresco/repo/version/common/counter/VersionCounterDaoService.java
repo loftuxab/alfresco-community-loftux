@@ -3,7 +3,7 @@
  */
 package org.alfresco.repo.version.common.counter;
 
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 
 /**
  * Version counter DAO service interface.

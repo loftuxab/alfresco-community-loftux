@@ -10,9 +10,11 @@ package org.alfresco.repo.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
 
 public abstract class AbstractResultSet implements ResultSet
 {
@@ -52,9 +54,9 @@ public abstract class AbstractResultSet implements ResultSet
         return nodeRefs;
     }
 
-    public List<ChildAssocRef> getChildAssocRefs()
+    public List<ChildAssociationRef> getChildAssocRefs()
     {
-        ArrayList<ChildAssocRef> cars = new ArrayList<ChildAssocRef>(length());
+        ArrayList<ChildAssociationRef> cars = new ArrayList<ChildAssociationRef>(length());
         for(ResultSetRow row: this)
         {
             cars.add(row.getChildAssocRef());

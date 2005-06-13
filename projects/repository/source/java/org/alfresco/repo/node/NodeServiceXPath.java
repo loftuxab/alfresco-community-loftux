@@ -11,12 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 import org.jaxen.BaseXPath;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -154,7 +155,7 @@ public class NodeServiceXPath extends BaseXPath
             {
                 return false;
             }
-            ChildAssocRef car = (ChildAssocRef)nodes.get(0);
+            ChildAssociationRef car = (ChildAssociationRef)nodes.get(0);
             String patternValue = StringFunction.evaluate(pattern, nav);
             QName qname = QName.createQName(nav.getAttributeNamespaceUri(attribute), nav.getAttributeName(attribute));
             DocumentNavigator dNav = (DocumentNavigator)nav;
@@ -188,7 +189,7 @@ public class NodeServiceXPath extends BaseXPath
             if(nav.isElement(nodes.get(0)))
             {
                 qname = null; // should use all attributes and full text index
-                nodeRef = ((ChildAssocRef)nodes.get(0)).getChildRef();
+                nodeRef = ((ChildAssociationRef)nodes.get(0)).getChildRef();
             }
             else if(nav.isAttribute(nodes.get(0)))
             {   

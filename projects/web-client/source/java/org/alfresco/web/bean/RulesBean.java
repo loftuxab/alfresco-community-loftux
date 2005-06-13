@@ -1,21 +1,14 @@
 package org.alfresco.web.bean;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
-import org.alfresco.repo.node.InvalidNodeRefException;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.rule.Rule;
-import org.alfresco.repo.rule.RuleService;
-import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.ui.common.Utils;
+import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIModeList;
-import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 import org.apache.log4j.Logger;
 
 /**

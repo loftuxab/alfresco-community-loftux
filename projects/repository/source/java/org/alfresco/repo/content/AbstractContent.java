@@ -1,5 +1,6 @@
 package org.alfresco.repo.content;
 
+import org.alfresco.service.cmr.repository.Content;
 import org.springframework.util.Assert;
 
 /**

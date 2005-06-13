@@ -9,11 +9,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionServiceException;
-import org.alfresco.repo.version.VersionType;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionServiceException;
+import org.alfresco.service.cmr.version.VersionType;
 
 import junit.framework.TestCase;
 

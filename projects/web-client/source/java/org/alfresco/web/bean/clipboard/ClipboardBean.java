@@ -13,11 +13,11 @@ import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.InvalidNodeRefException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.node.operations.NodeOperationsService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.repository.Node;
@@ -55,7 +55,7 @@ public class ClipboardBean
    /**
     * @return Returns the NodeOperationsService.
     */
-   public NodeOperationsService getNodeOperationsService()
+   public CopyService getNodeOperationsService()
    {
       return this.nodeOperationsService;
    }
@@ -63,7 +63,7 @@ public class ClipboardBean
    /**
     * @param nodeOperationsService   The NodeOperationsService to set.
     */
-   public void setNodeOperationsService(NodeOperationsService nodeOperationsService)
+   public void setNodeOperationsService(CopyService nodeOperationsService)
    {
       this.nodeOperationsService = nodeOperationsService;
    }
@@ -227,7 +227,7 @@ public class ClipboardBean
       // TODO: should we use primary parent here?
       //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
       //       It's naff backend design if we need to pass childassocref around everywhere...!
-      ChildAssocRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
+      ChildAssociationRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
       
       if (item.Mode == ClipboardStatus.COPY)
       {
@@ -305,7 +305,7 @@ public class ClipboardBean
    private NodeService nodeService;
    
    /** The NodeOperationsService to be used by the bean */
-   private NodeOperationsService nodeOperationsService;
+   private CopyService nodeOperationsService;
    
    /** The NavigationBean reference */
    private NavigationBean navigator;

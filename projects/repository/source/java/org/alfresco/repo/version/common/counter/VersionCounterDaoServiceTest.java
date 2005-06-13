@@ -5,7 +5,7 @@ package org.alfresco.repo.version.common.counter;
 
 import javax.sql.DataSource;
 
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseSpringTest;
 
 /**

@@ -3,11 +3,11 @@ package org.alfresco.web.bean.repository;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Lighweight client side representation of the repository data dictionary. 

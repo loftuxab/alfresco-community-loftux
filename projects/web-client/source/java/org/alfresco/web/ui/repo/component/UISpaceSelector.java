@@ -19,9 +19,9 @@ import javax.faces.event.FacesEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -262,7 +262,7 @@ public class UISpaceSelector extends UIInput
                   String id = null;
                   if (this.navigationId.equals(Application.getCurrentUser(context).getHomeSpaceId()) == false)
                   {
-                     ChildAssocRef parentRef = service.getPrimaryParent(new NodeRef(Repository.getStoreRef(context), this.navigationId));
+                     ChildAssociationRef parentRef = service.getPrimaryParent(new NodeRef(Repository.getStoreRef(context), this.navigationId));
                      id = parentRef.getParentRef().getId();
                   }
                   // render a link to the parent node
@@ -275,10 +275,10 @@ public class UISpaceSelector extends UIInput
                {
                   NodeRef nodeRef = new NodeRef(Repository.getStoreRef(context), this.navigationId);
                   
-                  List<ChildAssocRef> childRefs = service.getChildAssocs(nodeRef);
+                  List<ChildAssociationRef> childRefs = service.getChildAssocs(nodeRef);
                   for (int index=0; index<childRefs.size(); index++)
                   {
-                     ChildAssocRef childRef = childRefs.get(index);
+                     ChildAssociationRef childRef = childRefs.get(index);
                      if (service.getType(childRef.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
                      {
                         // render each space found
@@ -459,7 +459,7 @@ public class UISpaceSelector extends UIInput
     */
    private static NodeService getNodeService(FacesContext context)
    {
-      NodeService service = (NodeService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean(Repository.BEAN_NODE_SERVICE);
+      NodeService service = Repository.getServiceRegistry(context).getNodeService();
       if (service == null)
       {
          throw new IllegalStateException("Unable to obtain NodeService bean reference.");

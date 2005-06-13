@@ -1,13 +1,14 @@
 package org.alfresco.repo.ref.qname;
 
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.QNamePattern;
 
 import junit.framework.TestCase;
 
 /**
  * Tests the various implementations of the
- * {@link org.alfresco.repo.ref.qname.QNamePattern}.
+ * {@link org.alfresco.service.namespace.QNamePattern}.
  * 
  * @author Derek Hulley
  */

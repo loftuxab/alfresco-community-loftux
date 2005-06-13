@@ -1,15 +1,15 @@
 package org.alfresco.repo.node.index;
 
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.Indexer;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.debug.CodeMonkey;
 
 /**
@@ -81,7 +81,7 @@ public class NodeIndexer
         // indexer can perform some cleanup here, if required
     }
 
-    public void onCreateNode(ChildAssocRef childAssocRef)
+    public void onCreateNode(ChildAssociationRef childAssocRef)
     {
         indexer.createNode(childAssocRef);
     }
@@ -91,17 +91,17 @@ public class NodeIndexer
         indexer.updateNode(nodeRef);
     }
 
-    public void onDeleteNode(ChildAssocRef childAssocRef)
+    public void onDeleteNode(ChildAssociationRef childAssocRef)
     {
         indexer.deleteNode(childAssocRef);
     }
 
-    public void onCreateChildAssociation(ChildAssocRef childAssocRef)
+    public void onCreateChildAssociation(ChildAssociationRef childAssocRef)
     {
         indexer.createChildRelationship(childAssocRef);
     }
 
-    public void onDeleteChildAssociation(ChildAssocRef childAssocRef)
+    public void onDeleteChildAssociation(ChildAssociationRef childAssocRef)
     {
         indexer.deleteChildRelationship(childAssocRef);
     }

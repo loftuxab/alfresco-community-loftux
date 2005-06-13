@@ -10,9 +10,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.rule.ParameterDefinition;
-import org.alfresco.repo.rule.RuleItemDefinition;
-import org.alfresco.repo.rule.RuleServiceException;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.RuleItemDefinition;
+import org.alfresco.service.cmr.rule.RuleServiceException;
 
 /**
  * Rule item implementation class
@@ -64,7 +64,7 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleItemDefinition#getName()
+     * @see org.alfresco.service.cmr.rule.RuleItemDefinition#getName()
      */
     public String getName()
     {
@@ -82,7 +82,7 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleItemDefinition#getTitle()
+     * @see org.alfresco.service.cmr.rule.RuleItemDefinition#getTitle()
      */
     public String getTitle()
     {
@@ -100,7 +100,7 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleItemDefinition#getDescription()
+     * @see org.alfresco.service.cmr.rule.RuleItemDefinition#getDescription()
      */
     public String getDescription()
     {
@@ -154,7 +154,7 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleItemDefinition#getParameterDefinitions()
+     * @see org.alfresco.service.cmr.rule.RuleItemDefinition#getParameterDefinitions()
      */
     public List<ParameterDefinition> getParameterDefinitions()
     {
@@ -162,7 +162,7 @@ public abstract class RuleItemDefinitionImpl implements RuleItemDefinition, Seri
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleItemDefinition#getParameterDefintion(java.lang.String)
+     * @see org.alfresco.service.cmr.rule.RuleItemDefinition#getParameterDefintion(java.lang.String)
      */
     public ParameterDefinition getParameterDefintion(String name)
     {

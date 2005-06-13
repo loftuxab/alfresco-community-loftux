@@ -7,9 +7,9 @@
  */
 package org.alfresco.repo.dictionary.impl;
 
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 
 
 /**

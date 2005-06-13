@@ -10,10 +10,10 @@ import net.sf.joott.uno.DocumentConverter;
 import net.sf.joott.uno.DocumentFormat;
 import net.sf.joott.uno.UnoConnection;
 
-import org.alfresco.repo.content.ContentIOException;
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.util.TempFileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

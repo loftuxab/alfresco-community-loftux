@@ -3,7 +3,7 @@ package org.alfresco.repo.domain.hibernate;
 import org.alfresco.repo.domain.RealNode;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 
 /**
  * @author Derek Hulley

@@ -5,6 +5,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.DateTimeConverter;
 
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.web.bean.repository.Repository;
 import org.springframework.web.jsf.FacesContextUtils;
 
@@ -37,10 +38,8 @@ public class MimeTypeConverter extends DateTimeConverter
       
       if (value instanceof String)
       {
-         MimetypeMap mimetypeMap = (MimetypeMap)FacesContextUtils.
-               getRequiredWebApplicationContext(context).getBean(Repository.BEAN_MIMETYPE_MAP);
-         
-         result = mimetypeMap.getDisplaysByMimetype().get(value.toString());
+         MimetypeService mimetypeService = Repository.getServiceRegistry(context).getMimetypeService();
+         result = mimetypeService.getDisplaysByMimetype().get(value.toString());
       }
       
       return result;

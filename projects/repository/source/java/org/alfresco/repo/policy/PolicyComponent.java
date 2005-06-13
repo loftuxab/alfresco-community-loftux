@@ -2,7 +2,7 @@ package org.alfresco.repo.policy;
 
 import java.util.Collection;
 
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.namespace.QName;
 
 
 /**

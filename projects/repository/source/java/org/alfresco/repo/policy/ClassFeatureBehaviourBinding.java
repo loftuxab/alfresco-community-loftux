@@ -1,8 +1,8 @@
 package org.alfresco.repo.policy;
 
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.namespace.QName;
 
 
 /**
@@ -21,7 +21,14 @@ import org.alfresco.repo.ref.QName;
     private static final QName ALL_FEATURES = QName.createQName("", "*");
 
 
-
+    /**
+     * Construct.
+     * 
+     * @param dictionary  the dictionary service
+     * @param classQName  the Class qualified name
+     * @param featureQName  the Class feature (property or association) qualifed name
+     * @param activeFeatureQName  the currently active feature QName
+     */
     private ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classQName, QName featureQName, QName activeFeatureQName)
     {
         super(dictionary, classQName);
@@ -78,11 +85,6 @@ import org.alfresco.repo.ref.QName;
         return generalisedBinding;
     }
     
-    public QName getFeatureQName()
-    {
-        return activeFeatureQName;
-    }
-
     @Override
     public boolean equals(Object obj)
     {

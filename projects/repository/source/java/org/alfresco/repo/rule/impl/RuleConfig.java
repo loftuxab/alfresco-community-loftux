@@ -15,10 +15,10 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
-import org.alfresco.repo.rule.ParameterDefinition;
-import org.alfresco.repo.rule.ParameterType;
-import org.alfresco.repo.rule.RuleServiceException;
-import org.alfresco.repo.value.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
+import org.alfresco.service.cmr.rule.RuleServiceException;
 
 /**
  * Rule configuration implementation.

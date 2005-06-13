@@ -15,26 +15,26 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Aspect;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.M2Property;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.search.CategoryService;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.Searcher;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.CategoryService;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -79,7 +79,7 @@ public class LuceneCategoryTest extends TestCase
     private NodeRef catROne;
     private NodeRef catRTwo;
     private NodeRef catRThree;
-    private Searcher searcher;
+    private SearchService searcher;
     private LuceneIndexerAndSearcher indexerAndSearcher;
 
     private CategoryService categoryService;
@@ -102,7 +102,7 @@ public class LuceneCategoryTest extends TestCase
         dictionaryService = (DictionaryService)ctx.getBean("dictionaryService");
         luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
         dictionaryDAO = (DictionaryDAO) ctx.getBean("dictionaryDAO");
-        searcher = (Searcher) ctx.getBean("searcherComponent");
+        searcher = (SearchService) ctx.getBean("searcherComponent");
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
         categoryService = (CategoryService) ctx.getBean("categoryService");
         
@@ -300,34 +300,34 @@ public class LuceneCategoryTest extends TestCase
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.clearIndex();
-        indexer.createNode(new ChildAssocRef(null, null, null, rootNodeRef));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}one"), n1));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}three"), n3));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}four"), n4));
+        indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}one"), n1));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}three"), n3));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}four"), n4));
         
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}categoryContainer"), catContainer));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catContainer, QName.createQName("{cat}categoryRoot"), catRoot));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catRoot, QName.createQName(TEST_NAMESPACE, "AssetClass"), catACBase));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catACBase, QName.createQName(TEST_NAMESPACE, "Fixed"), catACOne));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catACBase, QName.createQName(TEST_NAMESPACE, "Equity"), catACTwo));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catACTwo, QName.createQName(TEST_NAMESPACE, "SpecialEquity"), catACThree));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}categoryContainer"), catContainer));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catContainer, QName.createQName("{cat}categoryRoot"), catRoot));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRoot, QName.createQName(TEST_NAMESPACE, "AssetClass"), catACBase));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catACBase, QName.createQName(TEST_NAMESPACE, "Fixed"), catACOne));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catACBase, QName.createQName(TEST_NAMESPACE, "Equity"), catACTwo));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catACTwo, QName.createQName(TEST_NAMESPACE, "SpecialEquity"), catACThree));
         
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catRoot, QName.createQName(TEST_NAMESPACE, "Region"), catRBase));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catRBase, QName.createQName(TEST_NAMESPACE, "Europe"), catROne));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catRBase, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), catRTwo));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, catRTwo, QName.createQName(TEST_NAMESPACE, "US"), catRThree));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRoot, QName.createQName(TEST_NAMESPACE, "Region"), catRBase));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRBase, QName.createQName(TEST_NAMESPACE, "Europe"), catROne));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRBase, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), catRTwo));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRTwo, QName.createQName(TEST_NAMESPACE, "US"), catRThree));
         
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}five"), n5));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}six"), n6));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}seven"), n7));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}eight"), n8));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}nine"), n9));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}ten"), n10));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}eleven"), n11));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}twelve"), n12));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n12, QName.createQName("{namespace}thirteen"), n13));
-        indexer.createNode(new ChildAssocRef(ASSOC_TYPE_QNAME, n13, QName.createQName("{namespace}fourteen"), n14));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}five"), n5));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}six"), n6));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}seven"), n7));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}eight"), n8));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}nine"), n9));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}ten"), n10));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}eleven"), n11));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}twelve"), n12));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n12, QName.createQName("{namespace}thirteen"), n13));
+        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n13, QName.createQName("{namespace}fourteen"), n14));
         indexer.prepare();
         indexer.commit();
     }
@@ -518,7 +518,7 @@ public class LuceneCategoryTest extends TestCase
         impl.setIndexerAndSearcher(indexerAndSearcher);
         impl.setDictionaryService(dictionaryService);
         
-        Collection<ChildAssocRef>
+        Collection<ChildAssociationRef>
         result = impl.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE);
         assertEquals(1, result.size());
        

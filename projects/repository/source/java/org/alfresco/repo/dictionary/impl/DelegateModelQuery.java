@@ -1,12 +1,12 @@
 package org.alfresco.repo.dictionary.impl;
 
-import org.alfresco.repo.dictionary.AspectDefinition;
-import org.alfresco.repo.dictionary.AssociationDefinition;
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.dictionary.TypeDefinition;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Model query that delegates its search if itself cannot find the model

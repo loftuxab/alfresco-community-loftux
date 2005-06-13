@@ -7,11 +7,11 @@
  */
 package org.alfresco.repo.search.impl.lucene;
 
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.search.Searcher;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 
-public interface LuceneSearcher extends Searcher, Lockable
+public interface LuceneSearcher extends SearchService, Lockable
 {
    public boolean indexExists();
    public void setNodeService(NodeService nodeService);

@@ -7,18 +7,18 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionType;
-import org.alfresco.repo.version.operations.VersionOperationsService;
+import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionType;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.NodeStoreInspector;
 
@@ -33,7 +33,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 	 * Services used by the tests
 	 */
 	private NodeService nodeService;
-	private VersionOperationsService versionOperationsService;
+	private CheckOutCheckInService versionOperationsService;
 	private ContentService contentService;
 	
 	/**
@@ -62,7 +62,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 	{
 		// Set the services
 		this.nodeService = (NodeService)this.applicationContext.getBean("dbNodeService");
-		this.versionOperationsService = (VersionOperationsService)this.applicationContext.getBean("versionOperationsService");
+		this.versionOperationsService = (CheckOutCheckInService)this.applicationContext.getBean("versionOperationsService");
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
 		
 		// Create the store and get the root node reference
@@ -74,7 +74,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
         bagOfProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
         bagOfProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
         
-		ChildAssocRef childAssocRef = this.nodeService.createNode(
+		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
 				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
 				QName.createQName("{test}test"),

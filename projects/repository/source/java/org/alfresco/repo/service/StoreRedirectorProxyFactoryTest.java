@@ -1,7 +1,7 @@
 package org.alfresco.repo.service;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

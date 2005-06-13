@@ -11,11 +11,16 @@ import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.NoTransformerException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -57,7 +62,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(7);
         properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
         properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
-        ChildAssocRef assocRef = nodeService.createNode(
+        ChildAssociationRef assocRef = nodeService.createNode(
                 rootNodeRef,
                 DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
                 QName.createQName(TEST_NAMESPACE, GUID.generate()),

@@ -3,7 +3,7 @@
  */
 package org.alfresco.repo.rule.impl;
 
-import org.alfresco.repo.rule.RuleType;
+import org.alfresco.service.cmr.rule.RuleType;
 
 /**
  * Rule type implementation class.
@@ -36,7 +36,7 @@ public class RuleTypeImpl implements RuleType
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleType#getName()
+     * @see org.alfresco.service.cmr.rule.RuleType#getName()
      */
     public String getName()
     {
@@ -54,7 +54,7 @@ public class RuleTypeImpl implements RuleType
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleType#getDisplayLabel()
+     * @see org.alfresco.service.cmr.rule.RuleType#getDisplayLabel()
      */
     public String getDisplayLabel()
     {

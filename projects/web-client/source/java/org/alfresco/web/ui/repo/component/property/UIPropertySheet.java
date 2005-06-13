@@ -11,7 +11,7 @@ import javax.faces.el.ValueBinding;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.config.PropertySheetConfigElement;
 import org.alfresco.web.config.PropertySheetConfigElement.PropertyConfig;

@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.rule.Rule;
-import org.alfresco.repo.rule.RuleAction;
-import org.alfresco.repo.rule.RuleActionDefinition;
-import org.alfresco.repo.rule.RuleCondition;
-import org.alfresco.repo.rule.RuleConditionDefinition;
-import org.alfresco.repo.rule.RuleServiceException;
-import org.alfresco.repo.rule.RuleType;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleAction;
+import org.alfresco.service.cmr.rule.RuleActionDefinition;
+import org.alfresco.service.cmr.rule.RuleCondition;
+import org.alfresco.service.cmr.rule.RuleConditionDefinition;
+import org.alfresco.service.cmr.rule.RuleServiceException;
+import org.alfresco.service.cmr.rule.RuleType;
 
 /**
  * Rule implementation class.
@@ -93,7 +93,7 @@ public class RuleImpl implements Serializable, Rule
 	}
 	
     /**
-     * @see org.alfresco.repo.rule.Rule#getId()
+     * @see org.alfresco.service.cmr.rule.Rule#getId()
      */
     public String getId()
     {
@@ -101,7 +101,7 @@ public class RuleImpl implements Serializable, Rule
     }
     
 	/**
-     * @see org.alfresco.repo.rule.Rule#getRuleType()
+     * @see org.alfresco.service.cmr.rule.Rule#getRuleType()
      */
 	public RuleType getRuleType()
 	{
@@ -109,7 +109,7 @@ public class RuleImpl implements Serializable, Rule
 	}
 	
 	/**
-     * @see org.alfresco.repo.rule.Rule#getTitle()
+     * @see org.alfresco.service.cmr.rule.Rule#getTitle()
      */
 	public String getTitle()
 	{
@@ -117,7 +117,7 @@ public class RuleImpl implements Serializable, Rule
 	}
 	
 	/**
-     * @see org.alfresco.repo.rule.Rule#setTitle(java.lang.String)
+     * @see org.alfresco.service.cmr.rule.Rule#setTitle(java.lang.String)
      */
 	public void setTitle(String title)
 	{
@@ -125,7 +125,7 @@ public class RuleImpl implements Serializable, Rule
 	}
 	
 	/**
-     * @see org.alfresco.repo.rule.Rule#getDescription()
+     * @see org.alfresco.service.cmr.rule.Rule#getDescription()
      */
 	public String getDescription()
 	{
@@ -133,7 +133,7 @@ public class RuleImpl implements Serializable, Rule
 	}
 	
 	/**
-     * @see org.alfresco.repo.rule.Rule#setDescription(java.lang.String)
+     * @see org.alfresco.service.cmr.rule.Rule#setDescription(java.lang.String)
      */
 	public void setDescription(String description)
 	{
@@ -141,7 +141,7 @@ public class RuleImpl implements Serializable, Rule
 	}
 	
 	/**
-     * @see org.alfresco.repo.rule.Rule#getRuleConditions()
+     * @see org.alfresco.service.cmr.rule.Rule#getRuleConditions()
      */
 	public List<RuleCondition> getRuleConditions()
 	{
@@ -149,7 +149,7 @@ public class RuleImpl implements Serializable, Rule
 	}	
     
     /**
-     * @see org.alfresco.repo.rule.Rule#addRuleCondition(org.alfresco.repo.rule.RuleConditionDefinition, java.util.Map)
+     * @see org.alfresco.service.cmr.rule.Rule#addRuleCondition(org.alfresco.service.cmr.rule.RuleConditionDefinition, java.util.Map)
      */
     public RuleCondition addRuleCondition(
             RuleConditionDefinition ruleConditionDefinition,
@@ -168,7 +168,7 @@ public class RuleImpl implements Serializable, Rule
     }
         
     /**
-     * @see org.alfresco.repo.rule.Rule#removeRuleCondition(org.alfresco.repo.rule.RuleCondition)
+     * @see org.alfresco.service.cmr.rule.Rule#removeRuleCondition(org.alfresco.service.cmr.rule.RuleCondition)
      */
     public void removeRuleCondition(RuleCondition ruleCondition)
     {
@@ -177,7 +177,7 @@ public class RuleImpl implements Serializable, Rule
     }
     
     /**
-     * @see org.alfresco.repo.rule.Rule#getRuleActions()
+     * @see org.alfresco.service.cmr.rule.Rule#getRuleActions()
      */
     public List<RuleAction> getRuleActions()
     {
@@ -185,7 +185,7 @@ public class RuleImpl implements Serializable, Rule
     }
 	
 	/**
-     * @see org.alfresco.repo.rule.Rule#addRuleAction(org.alfresco.repo.rule.RuleActionDefinition, java.util.Map)
+     * @see org.alfresco.service.cmr.rule.Rule#addRuleAction(org.alfresco.service.cmr.rule.RuleActionDefinition, java.util.Map)
      */
 	public RuleAction addRuleAction(
 			RuleActionDefinition ruleActionDefinition,
@@ -204,7 +204,7 @@ public class RuleImpl implements Serializable, Rule
 	}
 		
 	/**
-     * @see org.alfresco.repo.rule.Rule#removeRuleAction(org.alfresco.repo.rule.RuleAction)
+     * @see org.alfresco.service.cmr.rule.Rule#removeRuleAction(org.alfresco.service.cmr.rule.RuleAction)
      */
 	public void removeRuleAction(RuleAction ruleAction)
 	{

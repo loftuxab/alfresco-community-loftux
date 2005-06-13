@@ -12,9 +12,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.namespace.QName;
 
 public abstract class AbstractResultSetRow implements ResultSetRow
 {

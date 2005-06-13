@@ -3,8 +3,8 @@ package org.alfresco.repo.domain.hibernate;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.ContainerNode;
 import org.alfresco.repo.domain.Node;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * @author Derek Hulley
@@ -19,7 +19,7 @@ public class ChildAssocImpl implements ChildAssoc
     private String namespaceUri;
     private String localName;
     private boolean isPrimary;
-    private ChildAssocRef childAssocRef;
+    private ChildAssociationRef childAssocRef;
 
     public void buildAssociation(ContainerNode parentNode, Node childNode)
     {
@@ -39,11 +39,11 @@ public class ChildAssocImpl implements ChildAssoc
         this.getChild().getParentAssocs().remove(this);
     }
     
-    public synchronized ChildAssocRef getChildAssocRef()
+    public synchronized ChildAssociationRef getChildAssocRef()
     {
         if (childAssocRef == null)
         {
-            childAssocRef = new ChildAssocRef(
+            childAssocRef = new ChildAssociationRef(
                     getTypeQName(),
                     getParent().getNodeRef(),
                     getQName(),

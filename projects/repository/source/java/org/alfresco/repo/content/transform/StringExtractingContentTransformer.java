@@ -1,8 +1,8 @@
 package org.alfresco.repo.content.transform;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

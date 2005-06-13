@@ -10,17 +10,17 @@ package org.alfresco.repo.search.results;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.AbstractResultSetRow;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.ResultSetRow;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.namespace.QName;
 
 public class DetachedResultSetRow extends AbstractResultSetRow
 {
-    private ChildAssocRef car;
+    private ChildAssociationRef car;
     private Map<Path, Serializable> properties;
     
     public DetachedResultSetRow(ResultSet resultSet, ResultSetRow row)
@@ -50,7 +50,7 @@ public class DetachedResultSetRow extends AbstractResultSetRow
         return properties;
     }
 
-    public ChildAssocRef getChildAssocRef()
+    public ChildAssociationRef getChildAssocRef()
     {
         return car;
     }

@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionDoesNotExistException;
-import org.alfresco.repo.version.VersionHistory;
-import org.alfresco.repo.version.VersionServiceException;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionDoesNotExistException;
+import org.alfresco.service.cmr.version.VersionHistory;
+import org.alfresco.service.cmr.version.VersionServiceException;
 
 /**
  * Version History implementation. 

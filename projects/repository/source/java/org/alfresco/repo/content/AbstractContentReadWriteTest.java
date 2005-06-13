@@ -9,14 +9,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
+
 import junit.framework.TestCase;
 
 /**
  * Abstract base class that provides a set of tests for implementations
  * of the content readers and writers.
  * 
- * @see org.alfresco.repo.content.ContentReader
- * @see org.alfresco.repo.content.ContentWriter
+ * @see org.alfresco.service.cmr.repository.ContentReader
+ * @see org.alfresco.service.cmr.repository.ContentWriter
  * 
  * @author Derek Hulley
  */

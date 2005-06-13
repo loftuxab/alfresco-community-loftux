@@ -3,8 +3,8 @@
  */
 package org.alfresco.repo.rule.impl;
 
-import org.alfresco.repo.rule.RuleCondition;
-import org.alfresco.repo.rule.RuleConditionDefinition;
+import org.alfresco.service.cmr.rule.RuleCondition;
+import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 
 /**
  * @author Roy Wetherall

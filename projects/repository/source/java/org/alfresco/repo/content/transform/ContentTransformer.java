@@ -1,8 +1,8 @@
 package org.alfresco.repo.content.transform;
 
-import org.alfresco.repo.content.ContentIOException;
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentWriter;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 
 /**
  * Interface for class that allow content transformation from one mimetype to another.
@@ -45,7 +45,7 @@ public interface ContentTransformer
      * to {@link #getReliability(String, String)}.
      * <p>
      * The source and target mimetypes <b>must</b> be available on the
-     * {@link org.alfresco.repo.content.Content#getMimetype()} methods of
+     * {@link org.alfresco.service.cmr.repository.Content#getMimetype()} methods of
      * both the reader and the writer.
      * 
      * @param reader the source of the content

@@ -2,9 +2,9 @@ package org.alfresco.repo.version.lightweight;
 
 import java.util.Collection;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionHistory;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionHistory;
 
 /**
  * LightWeightVersionService test class.

@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.alfresco.repo.dictionary.DictionaryException;
+import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;

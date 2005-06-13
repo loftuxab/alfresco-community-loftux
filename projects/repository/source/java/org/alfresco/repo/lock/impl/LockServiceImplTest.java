@@ -7,16 +7,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.lock.LockService;
-import org.alfresco.repo.lock.LockStatus;
-import org.alfresco.repo.lock.LockType;
-import org.alfresco.repo.lock.UnableToAquireLockException;
-import org.alfresco.repo.lock.UnableToReleaseLockException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.util.AspectMissingException;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockStatus;
+import org.alfresco.service.cmr.lock.LockType;
+import org.alfresco.service.cmr.lock.UnableToAquireLockException;
+import org.alfresco.service.cmr.lock.UnableToReleaseLockException;
+import org.alfresco.service.cmr.repository.AspectMissingException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
 /**

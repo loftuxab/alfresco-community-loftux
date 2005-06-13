@@ -7,11 +7,11 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.search.impl.lucene.analysis.PathAnalyser;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.namespace.QName;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;

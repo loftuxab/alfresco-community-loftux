@@ -4,17 +4,17 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.node.BaseNodeServiceTest;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.Searcher;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.perf.PerformanceMonitor;
 
 /**
@@ -26,7 +26,7 @@ import org.alfresco.util.perf.PerformanceMonitor;
  */
 public class NodeIndexerTest extends BaseNodeServiceTest
 {
-    private Searcher searcher;
+    private SearchService searcher;
     private static StoreRef localStoreRef;
     private static NodeRef localRootNode;
 
@@ -46,7 +46,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
     protected void onSetUpInTransaction() throws Exception
     {
         super.onSetUpInTransaction();
-        searcher = (Searcher) applicationContext.getBean("searcherComponent");
+        searcher = (SearchService) applicationContext.getBean("searcherComponent");
 
         if (localStoreRef == null)
         {
@@ -58,7 +58,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
     public void testCommitQueryData() throws Exception
     {
         rootNodeRef = localRootNode;
-        Map<QName, ChildAssocRef> assocRefs = buildNodeGraph();
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         setComplete();
     }
 
@@ -80,7 +80,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
         PerformanceMonitor selectNodesPerf = new PerformanceMonitor(getClass().getSimpleName(), "selectNodes");
         PerformanceMonitor selectPropertiesPerf = new PerformanceMonitor(getClass().getSimpleName(), "selectProperties");
         
-        List<ChildAssocRef> answer;
+        List<ChildAssociationRef> answer;
         
         selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, '*monkey')", null, namespacePrefixResolver, false);

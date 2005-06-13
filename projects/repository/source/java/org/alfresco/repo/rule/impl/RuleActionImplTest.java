@@ -3,8 +3,8 @@
  */
 package org.alfresco.repo.rule.impl;
 
-import org.alfresco.repo.rule.RuleAction;
-import org.alfresco.repo.rule.RuleActionDefinition;
+import org.alfresco.service.cmr.rule.RuleAction;
+import org.alfresco.service.cmr.rule.RuleActionDefinition;
 
 /**
  * @author Roy Wetherall

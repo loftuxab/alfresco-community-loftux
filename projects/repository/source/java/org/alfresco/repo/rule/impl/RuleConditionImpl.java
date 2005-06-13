@@ -6,8 +6,8 @@ package org.alfresco.repo.rule.impl;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.rule.RuleCondition;
-import org.alfresco.repo.rule.RuleConditionDefinition;
+import org.alfresco.service.cmr.rule.RuleCondition;
+import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 
 /**
  * @author Roy Wetherall
@@ -45,7 +45,7 @@ public class RuleConditionImpl extends RuleItemImpl implements Serializable,
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleCondition#getRuleConditionDefinition()
+     * @see org.alfresco.service.cmr.rule.RuleCondition#getRuleConditionDefinition()
      */
     public RuleConditionDefinition getRuleConditionDefinition()
     {

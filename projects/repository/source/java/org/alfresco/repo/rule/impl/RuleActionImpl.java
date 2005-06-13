@@ -6,8 +6,8 @@ package org.alfresco.repo.rule.impl;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.rule.RuleAction;
-import org.alfresco.repo.rule.RuleActionDefinition;
+import org.alfresco.service.cmr.rule.RuleAction;
+import org.alfresco.service.cmr.rule.RuleActionDefinition;
 
 /**
  * @author Roy Wetherall
@@ -50,7 +50,7 @@ public class RuleActionImpl extends RuleItemImpl implements Serializable,
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleAction#getRuleActionDefinition()
+     * @see org.alfresco.service.cmr.rule.RuleAction#getRuleActionDefinition()
      */
     public RuleActionDefinition getRuleActionDefinition()
     {

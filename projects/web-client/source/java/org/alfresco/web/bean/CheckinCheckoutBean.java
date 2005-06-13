@@ -16,18 +16,18 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.InvalidNodeRefException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.operations.VersionOperationsService;
+import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.Node;
@@ -80,7 +80,7 @@ public class CheckinCheckoutBean
    /**
     * @return Returns the VersionOperationsService.
     */
-   public VersionOperationsService getVersionOperationsService()
+   public CheckOutCheckInService getVersionOperationsService()
    {
       return this.versionOperationsService;
    }
@@ -88,7 +88,7 @@ public class CheckinCheckoutBean
    /**
     * @param versionOperationsService  The VersionOperationsService to set.
     */
-   public void setVersionOperationsService(VersionOperationsService versionOperationsService)
+   public void setVersionOperationsService(CheckOutCheckInService versionOperationsService)
    {
       this.versionOperationsService = versionOperationsService;
    }
@@ -383,7 +383,7 @@ public class CheckinCheckoutBean
                      this.selectedSpaceId);
                
                // TODO: The destination assoc type qname should come from the child assoc ref.
-               ChildAssocRef childAssocRef = this.nodeService.getPrimaryParent(destRef);
+               ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(destRef);
                workingCopyRef = this.versionOperationsService.checkout(node.getNodeRef(),
                      destRef, null, childAssocRef.getQName());
             }
@@ -870,7 +870,7 @@ public class CheckinCheckoutBean
    private NodeService nodeService;
    
    /** The VersionOperationsService to be used by the bean */
-   private VersionOperationsService versionOperationsService;
+   private CheckOutCheckInService versionOperationsService;
    
    /** The ContentService to be used by the bean */
    private ContentService contentService;

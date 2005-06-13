@@ -8,11 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.content.ContentWriter;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Aspect;
@@ -21,13 +16,18 @@ import org.alfresco.repo.dictionary.impl.M2ChildAssociation;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.M2Property;
 import org.alfresco.repo.dictionary.impl.M2Type;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.node.operations.NodeOperationsService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.NodeStoreInspector;
 
@@ -42,7 +42,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	 * Services used by the tests
 	 */
 	private NodeService nodeService;
-	private NodeOperationsService nodeOperationsService;
+	private CopyService nodeOperationsService;
 	private DictionaryDAO dictionaryDAO;
 	private ContentService contentService;
 	
@@ -105,7 +105,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	{
 		// Set the services
 		this.nodeService = (NodeService)this.applicationContext.getBean("dbNodeService");
-		this.nodeOperationsService = (NodeOperationsService)this.applicationContext.getBean("nodeOperationsService");
+		this.nodeOperationsService = (CopyService)this.applicationContext.getBean("nodeOperationsService");
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
 		
 		// Create the test model
@@ -116,7 +116,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		this.rootNodeRef = this.nodeService.getRootNode(storeRef);
 		
 		// Create the node used for copying
-		ChildAssocRef childAssocRef = this.nodeService.createNode(
+		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
                 TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}test"),
@@ -136,7 +136,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 				aspectProperties);
 		
 		// Add a child
-		ChildAssocRef temp3 =this.nodeService.createNode(
+		ChildAssociationRef temp3 =this.nodeService.createNode(
 				this.sourceNodeRef, 
                 TEST_CHILD_ASSOC_TYPE_QNAME, 
 				TEST_CHILD_ASSOC_QNAME, 
@@ -145,7 +145,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		this.childNodeRef = temp3.getChildRef();
 		
 		// Add a child that is primary
-		ChildAssocRef temp2 = this.nodeService.createNode(
+		ChildAssociationRef temp2 = this.nodeService.createNode(
 				rootNodeRef,
 				TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}testNonPrimaryChild"),
@@ -159,7 +159,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_QNAME2);
 		
 		// Add a target assoc
-		ChildAssocRef temp = this.nodeService.createNode(
+		ChildAssociationRef temp = this.nodeService.createNode(
 				rootNodeRef,
                 TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}testAssoc"),
@@ -174,7 +174,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
         destinationProps.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3); 
         destinationProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
         destinationProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-		ChildAssocRef temp5 = this.nodeService.createNode(
+		ChildAssociationRef temp5 = this.nodeService.createNode(
 				this.rootNodeRef,
                 TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}testDestinationNode"),
@@ -397,18 +397,18 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		assertEquals(TEST_VALUE_2, value4);
 		
 		// Check all the target associations have been copied
-		List<NodeAssocRef> destinationTargets = this.nodeService.getTargetAssocs(destinationNodeRef, TEST_ASSOC_TYPE_QNAME);
+		List<AssociationRef> destinationTargets = this.nodeService.getTargetAssocs(destinationNodeRef, TEST_ASSOC_TYPE_QNAME);
 		assertNotNull(destinationTargets);
 		assertEquals(1, destinationTargets.size());
-		NodeAssocRef nodeAssocRef = destinationTargets.get(0);
+		AssociationRef nodeAssocRef = destinationTargets.get(0);
 		assertNotNull(nodeAssocRef);
 		assertEquals(this.targetNodeRef, nodeAssocRef.getTargetRef());
 		
 		// Check all the child associations have been copied
-		List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(destinationNodeRef);
+		List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(destinationNodeRef);
 		assertNotNull(childAssocRefs);
 		assertEquals(2, childAssocRefs.size());
-		for (ChildAssocRef ref : childAssocRefs) 
+		for (ChildAssociationRef ref : childAssocRefs) 
 		{
 			if (ref.getQName().equals(TEST_CHILD_ASSOC_QNAME2) == true)
 			{

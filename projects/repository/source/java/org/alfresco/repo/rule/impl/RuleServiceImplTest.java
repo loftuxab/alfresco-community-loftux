@@ -5,19 +5,19 @@ package org.alfresco.repo.rule.impl;
 
 import java.util.List;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.rule.ParameterDefinition;
-import org.alfresco.repo.rule.Rule;
-import org.alfresco.repo.rule.RuleActionDefinition;
-import org.alfresco.repo.rule.RuleConditionDefinition;
-import org.alfresco.repo.rule.RuleService;
-import org.alfresco.repo.rule.RuleType;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleActionDefinition;
+import org.alfresco.service.cmr.rule.RuleConditionDefinition;
+import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.service.cmr.rule.RuleType;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * @author Roy Wetherall
@@ -116,7 +116,7 @@ public class RuleServiceImplTest extends RuleBaseTest
         this.ruleService.makeActionable(this.nodeRef);
         assertTrue(this.nodeService.hasAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE));
         
-        List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
+        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
                                                nodeRef, 
                                                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
         assertEquals(1, nodeAssocRefs.size());

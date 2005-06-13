@@ -6,8 +6,8 @@ package org.alfresco.repo.rule.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.repo.rule.ParameterDefinition;
-import org.alfresco.repo.rule.ParameterType;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 
 import junit.framework.TestCase;
 

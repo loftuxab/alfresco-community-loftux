@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.rule.ParameterDefinition;
-import org.alfresco.repo.rule.ParameterType;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 
 import junit.framework.TestCase;
 

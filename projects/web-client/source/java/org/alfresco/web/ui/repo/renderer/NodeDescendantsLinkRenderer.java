@@ -15,9 +15,9 @@ import javax.faces.context.FacesContext;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
@@ -99,11 +99,11 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             }
             
             // calculate the number of displayed child refs
-            List<ChildAssocRef> childRefs = service.getChildAssocs(parentRef);
-            List<ChildAssocRef> refs = new ArrayList<ChildAssocRef>(childRefs.size());
+            List<ChildAssociationRef> childRefs = service.getChildAssocs(parentRef);
+            List<ChildAssociationRef> refs = new ArrayList<ChildAssociationRef>(childRefs.size());
             for (int index=0; index<childRefs.size(); index++)
             {
-               ChildAssocRef ref = childRefs.get(index);
+               ChildAssociationRef ref = childRefs.get(index);
                if (service.getType(ref.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
                {
                   refs.add(ref);
@@ -115,7 +115,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             int maximum = refs.size() > control.getMaxChildren() ? control.getMaxChildren() : refs.size();
             for (int index=0; index<maximum; index++)
             {
-               ChildAssocRef ref = refs.get(index);
+               ChildAssociationRef ref = refs.get(index);
                if (service.getType(ref.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
                {
                   // output separator if appropriate
@@ -159,7 +159,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
     *  
     * @return HTML for a descendant link
     */
-   private String renderDescendant(FacesContext context, UINodeDescendants control, ChildAssocRef childRef, boolean ellipses)
+   private String renderDescendant(FacesContext context, UINodeDescendants control, ChildAssociationRef childRef, boolean ellipses)
    {
       StringBuilder buf = new StringBuilder(256);
       
@@ -226,7 +226,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
     */
    private static NodeService getNodeService(FacesContext context)
    {
-      NodeService service = (NodeService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean(Repository.BEAN_NODE_SERVICE);
+      NodeService service = Repository.getServiceRegistry(context).getNodeService();
       if (service == null)
       {
          throw new IllegalStateException("Unable to obtain NodeService bean reference.");

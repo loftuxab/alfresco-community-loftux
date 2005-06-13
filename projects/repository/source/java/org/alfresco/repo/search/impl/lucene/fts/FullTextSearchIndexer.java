@@ -7,7 +7,7 @@
  */
 package org.alfresco.repo.search.impl.lucene.fts;
 
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 
 
 

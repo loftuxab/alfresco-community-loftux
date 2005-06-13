@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.alfresco.repo.content.AbstractContentReader;
-import org.alfresco.repo.content.ContentIOException;
-import org.alfresco.repo.content.ContentReader;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
 
 /**
  * A reader onto <tt>byte[]</tt> instances in memory.

@@ -11,8 +11,8 @@ import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
 import org.alfresco.repo.domain.Store;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Bean containing all the persistence data representing a <b>node</b>.

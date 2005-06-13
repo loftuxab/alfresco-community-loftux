@@ -4,8 +4,8 @@ import java.io.OutputStream;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.AbstractContentWriter;
-import org.alfresco.repo.content.ContentIOException;
-import org.alfresco.repo.content.ContentReader;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
 
 /**
  * A writer onto a <tt>byte[]</tt> instance in memory.

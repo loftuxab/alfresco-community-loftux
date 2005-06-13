@@ -7,8 +7,9 @@
  */
 package org.alfresco.repo.search;
 
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 
 public interface QueryCollection
 {

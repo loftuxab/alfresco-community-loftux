@@ -4,6 +4,8 @@
 <!-- This file must be split up once the number and spread of beans increases -->
 <beans>
    
+   <import resource="applicationServices.xml"/>
+   
    <!--                    -->
    <!--  PERSISTENCE       -->
    <!--                    -->
@@ -140,7 +142,7 @@
 
    <bean id="nodeService" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
       <property name="proxyInterface">
-         <value>org.alfresco.repo.node.NodeService</value>
+         <value>org.alfresco.service.cmr.repository.NodeService</value>
       </property>
       <property name="defaultBinding">
          <ref bean="dbNodeService"></ref>
@@ -156,7 +158,7 @@
    <!-- NodeService implemented to persist to Database -->
    <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.node.NodeService</value>
+         <value>org.alfresco.service.cmr.repository.NodeService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
@@ -269,7 +271,7 @@
    
    <bean id="contentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.content.ContentService</value>
+         <value>org.alfresco.service.cmr.repository.ContentService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
@@ -334,7 +336,7 @@
    
    <bean id="searcherComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.search.Searcher</value>
+         <value>org.alfresco.service.cmr.search.SearchService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
@@ -376,7 +378,7 @@
    
    <bean id="categoryService" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
       <property name="proxyInterface">
-         <value>org.alfresco.repo.search.CategoryService</value>
+         <value>org.alfresco.service.cmr.search.CategoryService</value>
       </property>
       <property name="defaultBinding">
          <ref bean="luceneCategoryService"></ref>
@@ -448,7 +450,7 @@
    
    <bean id='lockService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.lock.LockService</value>
+         <value>org.alfresco.service.cmr.lock.LockService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
@@ -477,7 +479,7 @@
    
    <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.version.VersionService</value>
+         <value>org.alfresco.service.cmr.version.VersionService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
@@ -516,7 +518,7 @@
    
    <bean id='lightWeightVersionStoreNodeService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.node.NodeService</value>
+         <value>org.alfresco.service.cmr.repository.NodeService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
@@ -584,7 +586,7 @@
    
    <bean id="dictionaryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.dictionary.DictionaryService</value>
+         <value>org.alfresco.service.cmr.dictionary.DictionaryService</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
@@ -601,7 +603,7 @@
    
    <bean id="namespaceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" depends-on="dictionaryDAO">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.dictionary.NamespaceService</value>
+         <value>org.alfresco.service.namespace.NamespaceService</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
@@ -622,7 +624,7 @@
    
    <bean id="nodeOperationsService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.node.operations.NodeOperationsService</value>
+         <value>org.alfresco.service.cmr.repository.CopyService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
@@ -653,7 +655,7 @@
 
    <bean id="versionOperationsService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.version.operations.VersionOperationsService</value>
+         <value>org.alfresco.service.cmr.coci.CheckOutCheckInService</value>
       </property>
       <property name="transactionManager">
          <ref bean="transactionManager"/>
@@ -830,7 +832,7 @@
    
    <bean id="ruleService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.repo.rule.RuleService</value>
+         <value>org.alfresco.service.cmr.rule.RuleService</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
@@ -951,6 +953,14 @@
      </property>
   </bean>
    -->
-   
-    
+
+   <!-- Service Registry -->
+
+   <bean id="serviceRegistry" class="org.alfresco.repo.service.ServiceDescriptorRegistry">
+   </bean>
+      
+   <bean id="alfrescoService" abstract="true" class="org.alfresco.repo.service.BeanServiceDescriptor">
+      <property name="namespaceService"><ref local="namespaceService"/></property>
+   </bean>
+
 </beans>

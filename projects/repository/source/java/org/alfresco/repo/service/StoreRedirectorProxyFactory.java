@@ -9,8 +9,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.ServiceException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.ParameterCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,7 +111,7 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
         ParameterCheck.mandatory("Default Binding", defaultBinding);
 
         // Setup the redirector proxy
-        this.redirectorProxy = (I) Proxy.newProxyInstance(proxyInterface.getClassLoader(), new Class[] { proxyInterface, StoreRedirector.class }, new RedirectorInvocationHandler());
+        this.redirectorProxy = (I)Proxy.newProxyInstance(proxyInterface.getClassLoader(), new Class[] { proxyInterface, StoreRedirector.class }, new RedirectorInvocationHandler());
     }
 
     

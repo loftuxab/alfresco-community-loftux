@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.rule.RuleItem;
+import org.alfresco.service.cmr.rule.RuleItem;
 
 /**
  * Rule item instance implementation class.
@@ -45,7 +45,7 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleItem#getParameterValues()
+     * @see org.alfresco.service.cmr.rule.RuleItem#getParameterValues()
      */
     public Map<String, Serializable> getParameterValues()
     {
@@ -58,7 +58,7 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
     }
 	
 	/**
-	 * @see org.alfresco.repo.rule.RuleItem#getParameterValue(String)
+	 * @see org.alfresco.service.cmr.rule.RuleItem#getParameterValue(String)
 	 */
 	public Serializable getParameterValue(String name)
 	{
@@ -66,7 +66,7 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
 	}
 	
 	/**
-     * @see org.alfresco.repo.rule.RuleItem#setParameterValues(java.util.Map)
+     * @see org.alfresco.service.cmr.rule.RuleItem#setParameterValues(java.util.Map)
      */
     public void setParameterValues(Map<String, Serializable> parameterValues)
     {
@@ -79,7 +79,7 @@ public abstract class RuleItemImpl implements RuleItem, Serializable
     }
 	
 	/**
-	 * @see org.alfresco.repo.rule.RuleItem#setParameterValue(String, Serializable)
+	 * @see org.alfresco.service.cmr.rule.RuleItem#setParameterValue(String, Serializable)
 	 */
 	public void setParameterValue(String name, Serializable value)
 	{

@@ -7,9 +7,9 @@
  */
 package org.alfresco.repo.search.impl;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
 import org.alfresco.repo.search.Indexer;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * A no action indexer - the indexing is done automatically along with
@@ -23,7 +23,7 @@ import org.alfresco.repo.search.Indexer;
 public class NoActionIndexer implements Indexer
 {
 
-    public void createNode(ChildAssocRef relationshipRef)
+    public void createNode(ChildAssociationRef relationshipRef)
     {
         return;
     }
@@ -33,22 +33,22 @@ public class NoActionIndexer implements Indexer
         return;
     }
 
-    public void deleteNode(ChildAssocRef relationshipRef)
+    public void deleteNode(ChildAssociationRef relationshipRef)
     {
         return;
     }
 
-    public void createChildRelationship(ChildAssocRef relationshipRef)
+    public void createChildRelationship(ChildAssociationRef relationshipRef)
     {
         return;
     }
 
-    public void updateChildRelationship(ChildAssocRef relationshipBeforeRef, ChildAssocRef relationshipAfterRef)
+    public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef, ChildAssociationRef relationshipAfterRef)
     {
         return;
     }
 
-    public void deleteChildRelationship(ChildAssocRef relationshipRef)
+    public void deleteChildRelationship(ChildAssociationRef relationshipRef)
     {
         return;
     }

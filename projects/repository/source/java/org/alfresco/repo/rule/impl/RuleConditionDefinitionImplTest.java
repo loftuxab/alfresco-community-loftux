@@ -3,7 +3,7 @@
  */
 package org.alfresco.repo.rule.impl;
 
-import org.alfresco.repo.rule.RuleServiceException;
+import org.alfresco.service.cmr.rule.RuleServiceException;
 
 
 /**

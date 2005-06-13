@@ -3,8 +3,8 @@ package org.alfresco.web.bean.wizard;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.search.Searcher;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.NavigationBean;

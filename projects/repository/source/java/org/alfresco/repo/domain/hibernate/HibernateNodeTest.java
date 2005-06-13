@@ -16,8 +16,9 @@ import org.alfresco.repo.domain.NodeKey;
 import org.alfresco.repo.domain.RealNode;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseHibernateTest;
 import org.alfresco.util.GUID;
 

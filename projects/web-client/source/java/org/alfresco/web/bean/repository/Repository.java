@@ -9,16 +9,18 @@ import javax.servlet.ServletContext;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.lock.LockService;
-import org.alfresco.repo.lock.LockStatus;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.search.ResultSetRow;
-import org.alfresco.repo.value.ValueConverter;
+import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockStatus;
+import org.alfresco.service.cmr.repository.MimetypeService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.springframework.web.jsf.FacesContextUtils;
 
@@ -29,14 +31,6 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public final class Repository
 {
-   public static final String BEAN_NODE_SERVICE = "nodeService";
-   public static final String BEAN_CONTENT_SERVICE = "contentService";
-   public static final String BEAN_SEARCH_SERVICE = "searcherComponent";
-   public static final String BEAN_DICTIONARY_SERVICE = "dictionaryService";
-   public static final String BEAN_RULE_SERVICE = "ruleService";
-   public static final String BEAN_USER_TRANSACTION = "userTransaction";
-   public static final String BEAN_MIMETYPE_MAP = "mimetypeMap";
-   
    public static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
 
    // TODO: TEMP! Replace this once we have "users" in the system!
@@ -268,8 +262,7 @@ public final class Repository
    public static String getMimeTypeForFileName(FacesContext context, String filename)
    {
       // base the mimetype from the file extension
-      MimetypeMap mimetypeMap = (MimetypeMap)FacesContextUtils.
-         getRequiredWebApplicationContext(context).getBean(BEAN_MIMETYPE_MAP);
+      MimetypeService mimetypeService = (MimetypeService)getServiceRegistry(context).getMimetypeService();
       
       // fall back if mimetype not found
       String mimetype = "text/plain";
@@ -277,7 +270,7 @@ public final class Repository
       if (extIndex != -1)
       {
          String ext = filename.substring(extIndex + 1);
-         String mt = mimetypeMap.getMimetypesByExtension().get(ext);
+         String mt = mimetypeService.getMimetypesByExtension().get(ext);
          if (mt != null)
          {
             mimetype = mt;
@@ -296,10 +289,21 @@ public final class Repository
     */
    public static UserTransaction getUserTransaction(FacesContext context)
    {
-      return (UserTransaction)FacesContextUtils.getRequiredWebApplicationContext(
-               context).getBean(BEAN_USER_TRANSACTION);
+      return getServiceRegistry(context).getUserTransaction();
    }
 
+   /**
+    * Return the Repository Service Registry
+    * 
+    * @param context Faces Context
+    * @return the Service Registry
+    */
+   public static ServiceRegistry getServiceRegistry(FacesContext context)
+   {
+       return (ServiceRegistry)FacesContextUtils.getRequiredWebApplicationContext(
+               context).getBean(ServiceRegistry.SERVICE_REGISTRY);
+   }
+   
    /**
     * Create a valid QName from the specified name
     * 

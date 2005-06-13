@@ -3,7 +3,7 @@ package org.alfresco.repo.content;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.search.Searcher;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.util.debug.CodeMonkey;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -36,11 +36,11 @@ public class ContentStoreCleanupJob implements Job
         ContentStore contentStore = (ContentStore) contentStoreObj;
         // extract the search to use
         Object searcherObj = context.getJobDetail().getJobDataMap().get("searcher");
-        if (searcherObj == null || !(searcherObj instanceof Searcher))
+        if (searcherObj == null || !(searcherObj instanceof SearchService))
         {
             throw new AlfrescoRuntimeException("Job data must contain valid 'searcher' reference");
         }
-        Searcher searcher = (Searcher) searcherObj;
+        SearchService searcher = (SearchService) searcherObj;
         
         // get all URLs in the store
         List<String> contentUrls = contentStore.listUrls();

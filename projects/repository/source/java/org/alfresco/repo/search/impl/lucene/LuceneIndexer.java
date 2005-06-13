@@ -8,11 +8,11 @@
 package org.alfresco.repo.search.impl.lucene;
 
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.search.Indexer;
 import org.alfresco.repo.search.impl.lucene.fts.FTSIndexerAware;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.NodeService;
 
 public interface LuceneIndexer extends Indexer, Lockable
 {

@@ -7,12 +7,13 @@
  */
 package org.alfresco.repo.search;
 
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.PropertyDefinition;
-import org.alfresco.repo.dictionary.PropertyTypeDefinition;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
 
@@ -90,13 +91,11 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
             }
 
             PropertyDefinition propDef = null;
-//            TODO: DC: This will be re-visited when notion of property is encapsulated
-//                  For now default to text property type
-//            Element propDefElement = element.element(PROPERTY_QNAME.getName());
-//            if (propDefElement != null)
-//            {
-//                propDef = dictionaryService.getProperty(QName.createQName(propDefElement.getText(), nspr));
-//            }
+            Element propDefElement = element.element(PROPERTY_QNAME.getName());
+            if (propDefElement != null)
+            {
+                propDef = dictionaryService.getProperty(QName.createQName(propDefElement.getText(), nspr));
+            }
 
             PropertyTypeDefinition typeDef = null;
             Element typeDefElement = element.element(PROPERTY_TYPE_QNAME.getName());

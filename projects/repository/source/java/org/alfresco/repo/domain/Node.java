@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Specific instances of nodes are unique, but may share GUIDs across stores.

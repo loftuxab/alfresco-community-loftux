@@ -6,8 +6,11 @@ package org.alfresco.repo.lock;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.util.AspectMissingException;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockStatus;
+import org.alfresco.service.cmr.lock.NodeLockedException;
+import org.alfresco.service.cmr.repository.AspectMissingException;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * Lock service interceptor used to call the lock service and determine

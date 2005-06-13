@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
 import org.alfresco.repo.search.AbstractResultSet;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.ResultSetRow;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
 
 public class DetachedResultSet extends AbstractResultSet
 {
@@ -51,7 +51,7 @@ public class DetachedResultSet extends AbstractResultSet
        return rows.iterator();
     }
 
-    public ChildAssocRef getChildAssocRef(int n)
+    public ChildAssociationRef getChildAssocRef(int n)
     {
         return rows.get(n).getChildAssocRef();
     }

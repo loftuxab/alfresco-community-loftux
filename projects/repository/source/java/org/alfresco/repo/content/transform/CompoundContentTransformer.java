@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.LinkedList;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.content.ContentIOException;
-import org.alfresco.repo.content.ContentReader;
-import org.alfresco.repo.content.ContentWriter;
 import org.alfresco.repo.content.filestore.FileContentWriter;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.util.TempFileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

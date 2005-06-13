@@ -10,22 +10,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.config.ConfigService;
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.rule.Rule;
-import org.alfresco.repo.rule.RuleActionDefinition;
-import org.alfresco.repo.rule.RuleConditionDefinition;
-import org.alfresco.repo.rule.RuleService;
-import org.alfresco.repo.rule.RuleServiceException;
-import org.alfresco.repo.rule.RuleType;
 import org.alfresco.repo.rule.RuleTypeAdapter;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleActionDefinition;
+import org.alfresco.service.cmr.rule.RuleConditionDefinition;
+import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.service.cmr.rule.RuleServiceException;
+import org.alfresco.service.cmr.rule.RuleType;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -290,8 +290,8 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 		
 		NodeRef rootConfigFolder = null;
 		NodeRef rootNode = this.nodeService.getRootNode(nodeRef.getStoreRef());
-		List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(
-												rootNode, 
+		List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(
+							  					rootNode, 
 												QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"));
 		if (childAssocRefs.size() == 0)
 		{

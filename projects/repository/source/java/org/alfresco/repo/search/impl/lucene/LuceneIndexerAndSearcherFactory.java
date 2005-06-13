@@ -13,11 +13,6 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.alfresco.repo.content.ContentService;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.StoreRef;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.SearcherException;
@@ -25,6 +20,11 @@ import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
 import org.alfresco.repo.search.transaction.SimpleTransaction;
 import org.alfresco.repo.search.transaction.SimpleTransactionManager;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.GUID;
 
 /**

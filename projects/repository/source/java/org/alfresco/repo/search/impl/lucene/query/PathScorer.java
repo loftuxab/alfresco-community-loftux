@@ -10,8 +10,8 @@ package org.alfresco.repo.search.impl.lucene.query;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.search.impl.lucene.query.LeafScorer.Counter;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;

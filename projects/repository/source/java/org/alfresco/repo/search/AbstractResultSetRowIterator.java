@@ -3,6 +3,9 @@
  */
 package org.alfresco.repo.search;
 
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
+
 
 /**
  * Iterate over the rows in a ResultSet

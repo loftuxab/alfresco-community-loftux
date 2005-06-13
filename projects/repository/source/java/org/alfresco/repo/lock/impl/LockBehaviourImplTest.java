@@ -8,15 +8,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.lock.LockService;
-import org.alfresco.repo.lock.LockType;
-import org.alfresco.repo.lock.NodeLockedException;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.version.VersionService;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockType;
+import org.alfresco.service.cmr.lock.NodeLockedException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
 /**
@@ -254,7 +254,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 	public void testNodeServiceLockBehaviour()
 	{
 		// Check that we can create a new node and set of it properties when no lock is present
-		ChildAssocRef childAssocRef = this.nodeService.createNode(
+		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				this.nodeRef, 
 				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
 				QName.createQName("{test}nodeServiceLockTest"),
@@ -263,7 +263,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		
 		// Lets lock the parent node and check that whether we can still create a new node
 		this.lockService.lock(this.nodeRef, GOOD_USER, LockType.WRITE_LOCK);
-		ChildAssocRef childAssocRef2 = this.nodeService.createNode(
+		ChildAssociationRef childAssocRef2 = this.nodeService.createNode(
 				this.nodeRef, 
 				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,				
 				QName.createQName("{test}nodeServiceLockTest"),

@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
 import org.alfresco.repo.ref.qname.RegexQNamePattern;
-import org.alfresco.repo.version.Version;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.namespace.QName;
 
 /**
  * @author Roy Wetherall
@@ -126,12 +126,12 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
     {
         // Create a new versionable node
         NodeRef versionableNode = createNewVersionableNode();
-        Collection<ChildAssocRef> origionalChildren = this.dbNodeService.getChildAssocs(versionableNode);
+        Collection<ChildAssociationRef> origionalChildren = this.dbNodeService.getChildAssocs(versionableNode);
         assertNotNull(origionalChildren);
         
         // Store the origional children in a map for easy navigation later
-        HashMap<String, ChildAssocRef> origionalChildAssocRefs = new HashMap<String, ChildAssocRef>();
-        for (ChildAssocRef ref : origionalChildren)
+        HashMap<String, ChildAssociationRef> origionalChildAssocRefs = new HashMap<String, ChildAssociationRef>();
+        for (ChildAssociationRef ref : origionalChildren)
         {
             origionalChildAssocRefs.put(ref.getChildRef().getId(), ref);
         }
@@ -143,13 +143,13 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.dbNodeService, this.lightWeightVersionStoreVersionService.getVersionStoreReference()));
         
         // Get the children of the versioned node
-        Collection<ChildAssocRef> versionedChildren = this.lightWeightVersionStoreNodeService.getChildAssocs(version.getNodeRef());
+        Collection<ChildAssociationRef> versionedChildren = this.lightWeightVersionStoreNodeService.getChildAssocs(version.getNodeRef());
         assertNotNull(versionedChildren);
         assertEquals(origionalChildren.size(), versionedChildren.size());
         
-        for (ChildAssocRef versionedChildRef : versionedChildren)
+        for (ChildAssociationRef versionedChildRef : versionedChildren)
         {
-            ChildAssocRef origChildAssocRef = origionalChildAssocRefs.get(versionedChildRef.getChildRef().getId());
+            ChildAssociationRef origChildAssocRef = origionalChildAssocRefs.get(versionedChildRef.getChildRef().getId());
             assertNotNull(origChildAssocRef);
                         
             assertEquals(
@@ -173,14 +173,14 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         NodeRef versionableNode = createNewVersionableNode();
         
         // Store the current details of the target associations
-        List<NodeAssocRef> origAssocs = this.dbNodeService.getTargetAssocs(
+        List<AssociationRef> origAssocs = this.dbNodeService.getTargetAssocs(
                 versionableNode,
                 RegexQNamePattern.MATCH_ALL);
         
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
 
-        List<NodeAssocRef> assocs = this.lightWeightVersionStoreNodeService.getTargetAssocs(
+        List<AssociationRef> assocs = this.lightWeightVersionStoreNodeService.getTargetAssocs(
                 version.getNodeRef(), 
                 RegexQNamePattern.MATCH_ALL);
         assertNotNull(assocs);

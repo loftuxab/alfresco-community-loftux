@@ -13,14 +13,14 @@ import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.operations.NodeOperationsService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.search.Searcher;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -48,8 +48,8 @@ public class NewSpaceWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To close this wizard and create your space click Finish.";
    
    // new space wizard specific properties
-   private Searcher searchService;
-   private NodeOperationsService nodeOperationsService;
+   private SearchService searchService;
+   private CopyService nodeOperationsService;
    private String createFrom;
    private String spaceType;
    private String existingSpaceId;
@@ -111,7 +111,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                }
                
                String qname = Repository.createValidQName(this.name);
-               ChildAssocRef assocRef = this.nodeService.createNode(
+               ChildAssociationRef assocRef = this.nodeService.createNode(
                      parentNodeRef,
                      DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                      QName.createQName(NamespaceService.ALFRESCO_URI, qname),
@@ -203,7 +203,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                      "/" + actNs + ":" + 
                      Repository.createValidQName(Application.getTemplatesFolderName(FacesContext.getCurrentInstance()));
                
-               List<ChildAssocRef> templateNodeList = this.nodeService.selectNodes(
+               List<ChildAssociationRef> templateNodeList = this.nodeService.selectNodes(
                      this.nodeService.getRootNode(Repository.getStoreRef(context)),
                      xpath, null, namespacePrefixResolver, false);
                if (templateNodeList.size() == 1)
@@ -430,11 +430,11 @@ public class NewSpaceWizard extends AbstractWizardBean
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-         List<ChildAssocRef> results = this.nodeService.selectNodes(rootNodeRef, xpath, null, resolver, false);
+         List<ChildAssociationRef> results = this.nodeService.selectNodes(rootNodeRef, xpath, null, resolver, false);
          
          if (results.size() > 0)
          {
-            for (ChildAssocRef assocRef : results)
+            for (ChildAssociationRef assocRef : results)
             {
                Node childNode = new Node(assocRef.getChildRef(), this.nodeService);
                this.templates.add(new SelectItem(childNode.getId(), childNode.getName()));
@@ -448,7 +448,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    /**
     * @return Returns the searchService.
     */
-   public Searcher getSearchService()
+   public SearchService getSearchService()
    {
       return searchService;
    }
@@ -456,7 +456,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    /**
     * @param searchService The searchService to set.
     */
-   public void setSearchService(Searcher searchService)
+   public void setSearchService(SearchService searchService)
    {
       this.searchService = searchService;
    }
@@ -464,7 +464,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    /**
     * @return Returns the NodeOperationsService.
     */
-   public NodeOperationsService getNodeOperationsService()
+   public CopyService getNodeOperationsService()
    {
       return this.nodeOperationsService;
    }
@@ -472,7 +472,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    /**
     * @param nodeOperationsService   The NodeOperationsService to set.
     */
-   public void setNodeOperationsService(NodeOperationsService nodeOperationsService)
+   public void setNodeOperationsService(CopyService nodeOperationsService)
    {
       this.nodeOperationsService = nodeOperationsService;
    }

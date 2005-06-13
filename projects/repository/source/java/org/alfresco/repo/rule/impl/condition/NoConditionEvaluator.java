@@ -3,9 +3,9 @@
  */
 package org.alfresco.repo.rule.impl.condition;
 
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.rule.RuleCondition;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.RuleCondition;
 
 /**
  * No condition evaluator implmentation.
@@ -32,7 +32,7 @@ public class NoConditionEvaluator extends
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleConditionEvaluator#evaluate(org.alfresco.repo.ref.NodeRef, NodeRef)
+     * @see org.alfresco.repo.rule.RuleConditionEvaluator#evaluate(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
      */
     public boolean evaluate(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {

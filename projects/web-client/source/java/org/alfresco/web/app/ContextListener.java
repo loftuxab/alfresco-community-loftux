@@ -15,16 +15,17 @@ import javax.servlet.http.HttpSessionListener;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.NamespaceService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.DynamicNamespacePrefixResolver;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.Searcher;
+import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
@@ -49,8 +50,9 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       // make sure that the spaces store in the repository exists
       ServletContext servletContext = event.getServletContext();
       WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-      NodeService nodeService = (NodeService)ctx.getBean(Repository.BEAN_NODE_SERVICE);
-      Searcher searchService = (Searcher)ctx.getBean(Repository.BEAN_SEARCH_SERVICE);
+      ServiceRegistry registry = (ServiceRegistry)ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
+      NodeService nodeService = registry.getNodeService();
+      SearchService searchService = registry.getSearchService();
 
       String repoStoreName = Application.getRepositoryStoreName(servletContext);
       if (repoStoreName == null)
@@ -63,7 +65,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       String companySpaceId = null;
       try
       {
-         tx = (UserTransaction)ctx.getBean(Repository.BEAN_USER_TRANSACTION);
+         tx = registry.getUserTransaction();
          tx.begin();
          
          if (nodeService.exists(Repository.getStoreRef(servletContext)) == false)
@@ -97,7 +99,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          String xpath = NamespaceService.ALFRESCO_PREFIX + ":" + Repository.createValidQName(companySpaceName);
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-         List<ChildAssocRef> nodes = nodeService.selectNodes(nodeService.getRootNode(
+         List<ChildAssociationRef> nodes = nodeService.selectNodes(nodeService.getRootNode(
                Repository.getStoreRef(servletContext)), 
                xpath, null, resolver, false);
          if (nodes.size() > 0)
@@ -116,7 +118,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          {
             // create the folder node to represent the company home
             String qname = Repository.createValidQName(companySpaceName);
-            ChildAssocRef assocRef = nodeService.createNode(
+            ChildAssociationRef assocRef = nodeService.createNode(
                   nodeService.getRootNode(Repository.getStoreRef(servletContext)),
                   DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname),

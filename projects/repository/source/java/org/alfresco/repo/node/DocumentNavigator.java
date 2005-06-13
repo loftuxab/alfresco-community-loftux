@@ -13,12 +13,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.value.ValueConverter;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 import org.jaxen.DefaultNavigator;
 import org.jaxen.UnsupportedAxisException;
 import org.jaxen.XPath;
@@ -109,19 +110,19 @@ public class DocumentNavigator extends DefaultNavigator
     @Override
     public String getElementName(Object o)
     {
-         return ((ChildAssocRef)o).getQName().getLocalName();
+         return ((ChildAssociationRef)o).getQName().getLocalName();
     }
 
     @Override
     public String getElementNamespaceUri(Object o)
     {
-        return ((ChildAssocRef)o).getQName().getNamespaceURI();
+        return ((ChildAssociationRef)o).getQName().getNamespaceURI();
     }
 
     @Override
     public String getElementQName(Object o)
     {
-        return ((ChildAssocRef)o).getQName().toString();
+        return ((ChildAssociationRef)o).getQName().toString();
     }
 
     @Override
@@ -163,18 +164,18 @@ public class DocumentNavigator extends DefaultNavigator
     @Override
     public boolean isDocument(Object o)
     {
-       if(!(o  instanceof ChildAssocRef))
+       if(!(o  instanceof ChildAssociationRef))
        {
            return false;
        }
-       ChildAssocRef car = (ChildAssocRef)o;
+       ChildAssociationRef car = (ChildAssociationRef)o;
        return (car.getParentRef() == null) && (car.getQName() == null);
     }
 
     @Override
     public boolean isElement(Object o)
     {
-        return (o  instanceof ChildAssocRef);
+        return (o  instanceof ChildAssociationRef);
     }
 
     @Override
@@ -206,7 +207,7 @@ public class DocumentNavigator extends DefaultNavigator
     public Iterator getAttributeAxisIterator(Object o) throws UnsupportedAxisException
     {
         ArrayList<Property> properties = new ArrayList<Property>();
-        NodeRef nodeRef = ((ChildAssocRef)o).getChildRef();
+        NodeRef nodeRef = ((ChildAssociationRef)o).getChildRef();
         Map<QName, Serializable> map = nodeService.getProperties(nodeRef);       
         for(QName qName : map.keySet())
         {
@@ -223,7 +224,7 @@ public class DocumentNavigator extends DefaultNavigator
     public Iterator getChildAxisIterator(Object o) throws UnsupportedAxisException
     {
         // Iterator of ChildAxisRef
-        List<ChildAssocRef> list = nodeService.getChildAssocs(((ChildAssocRef)o).getChildRef());
+        List<ChildAssociationRef> list = nodeService.getChildAssocs(((ChildAssociationRef)o).getChildRef());
         return list.iterator();
     }
 
@@ -244,14 +245,14 @@ public class DocumentNavigator extends DefaultNavigator
 
     public Iterator getParentAxisIterator(Object o) throws UnsupportedAxisException
     {
-        ArrayList<ChildAssocRef> parents = new ArrayList<ChildAssocRef>(1);
+        ArrayList<ChildAssociationRef> parents = new ArrayList<ChildAssociationRef>(1);
         // Iterator of ??
-        ChildAssocRef contextRef = (ChildAssocRef)o;
+        ChildAssociationRef contextRef = (ChildAssociationRef)o;
         if(contextRef.getParentRef() != null)
         {
             if(followAllParentLinks)
             {
-                for(ChildAssocRef car: nodeService.getParentAssocs(contextRef.getChildRef()))
+                for(ChildAssociationRef car: nodeService.getParentAssocs(contextRef.getChildRef()))
                 {
                    parents.add(nodeService.getPrimaryParent(car.getParentRef()));
                 }
@@ -266,9 +267,9 @@ public class DocumentNavigator extends DefaultNavigator
 
     public Object getDocumentNode(Object o)
     {
-        ChildAssocRef assocRef = (ChildAssocRef) o;
+        ChildAssociationRef assocRef = (ChildAssociationRef) o;
         StoreRef storeRef = assocRef.getChildRef().getStoreRef();
-        return new ChildAssocRef(null, null, null, nodeService.getRootNode(storeRef));
+        return new ChildAssociationRef(null, null, null, nodeService.getRootNode(storeRef));
     }
 
     public Object getNode(NodeRef nodeRef)

@@ -12,16 +12,16 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.config.ConfigSource;
 import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.xml.XMLConfigService;
-import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.rule.RuleAction;
-import org.alfresco.repo.rule.RuleCondition;
-import org.alfresco.repo.rule.RuleConditionDefinition;
-import org.alfresco.repo.rule.RuleType;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.rule.RuleAction;
+import org.alfresco.service.cmr.rule.RuleCondition;
+import org.alfresco.service.cmr.rule.RuleConditionDefinition;
+import org.alfresco.service.cmr.rule.RuleType;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
 /**

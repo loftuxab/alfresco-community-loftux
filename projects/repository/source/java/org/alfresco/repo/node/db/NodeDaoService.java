@@ -8,8 +8,8 @@ import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.RealNode;
 import org.alfresco.repo.domain.Store;
-import org.alfresco.repo.node.InvalidNodeTypeException;
-import org.alfresco.repo.ref.QName;
+import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Service layer accessing persistent <b>node</b> entities directly
@@ -39,7 +39,7 @@ public interface NodeDaoService
     /**
      * Creates a unique store for the given protocol and identifier combination
      * 
-     * @param protocol a protocol, e.g. {@link org.alfresco.repo.ref.StoreRef#PROTOCOL_WORKSPACE}
+     * @param protocol a protocol, e.g. {@link org.alfresco.service.cmr.repository.StoreRef#PROTOCOL_WORKSPACE}
      * @param identifier a protocol-specific identifier
      * @return Returns the new persistent entity
      */
@@ -56,10 +56,10 @@ public interface NodeDaoService
      * @param store the store to which the node must belong
      * @param nodeTypeQName the type of the node
      * @return Returns a new real node of the given type and attached to the store
-     * @throws InvalidNodeTypeException if the node type is invalid or if the node type
+     * @throws InvalidTypeException if the node type is invalid or if the node type
      *      is not a valid real node
      */
-    public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidNodeTypeException;
+    public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidTypeException;
     
     /**
      * @param protocol the store protocol

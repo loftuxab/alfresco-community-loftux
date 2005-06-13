@@ -7,10 +7,13 @@
  */
 package org.alfresco.repo.search;
 
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
 
-public abstract class AbstractSearcherComponent implements Searcher
+public abstract class AbstractSearcherComponent implements SearchService
 {
 
     public ResultSet query(StoreRef store, String language, String query)

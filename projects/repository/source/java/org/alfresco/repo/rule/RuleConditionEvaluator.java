@@ -3,7 +3,7 @@
  */
 package org.alfresco.repo.rule;
 
-import org.alfresco.repo.ref.NodeRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * @author Roy Wetherall

@@ -9,27 +9,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.AssociationDefinition;
-import org.alfresco.repo.dictionary.ClassDefinition;
-import org.alfresco.repo.dictionary.DictionaryService;
-import org.alfresco.repo.dictionary.NamespaceService;
-import org.alfresco.repo.dictionary.PropertyDefinition;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionServiceException;
 import org.alfresco.repo.version.VersionServicePolicies;
 import org.alfresco.repo.version.VersionServicePolicies.BeforeCreateVersionPolicy;
 import org.alfresco.repo.version.VersionServicePolicies.CalculateVersionLabelPolicy;
 import org.alfresco.repo.version.VersionServicePolicies.OnCreateVersionPolicy;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionServiceException;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Abstract version service implementation.
@@ -256,16 +256,16 @@ public abstract class AbstractVersionServiceImpl
 			{
 				if (assocDef.isChild() == true)
 				{
-					List<ChildAssocRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef, assocDef.getName());
-					for (ChildAssocRef childAssocRef : childAssocRefs) 
+					List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef, assocDef.getName());
+					for (ChildAssociationRef childAssocRef : childAssocRefs) 
 					{
 						nodeDetails.addChildAssociation(classRef, assocDef.getName(), childAssocRef);
 					}
 				}
 				else
 				{
-					List<NodeAssocRef> nodeAssocRefs = this.nodeService.getTargetAssocs(nodeRef, assocDef.getName());
-					for (NodeAssocRef nodeAssocRef : nodeAssocRefs) 
+					List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(nodeRef, assocDef.getName());
+					for (AssociationRef nodeAssocRef : nodeAssocRefs) 
 					{
 						nodeDetails.addAssociation(classRef, assocDef.getName(), nodeAssocRef);
 					}

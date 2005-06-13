@@ -7,7 +7,8 @@
  */
 package org.alfresco.repo.search;
 
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.SearchService;
 
 /**
  * Interface for Indexer and Searcher Factories to implement
@@ -36,5 +37,5 @@ public interface IndexerAndSearcher
      * @return
      * @throws SearcherException
      */
-    public abstract Searcher getSearcher(StoreRef storeRef, boolean searchDelta) throws SearcherException;
+    public abstract SearchService getSearcher(StoreRef storeRef, boolean searchDelta) throws SearcherException;
 }

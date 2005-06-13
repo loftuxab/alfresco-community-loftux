@@ -14,19 +14,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.alfresco.repo.dictionary.DictionaryService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.node.NodeService;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NamespacePrefixResolver;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.search.CategoryService;
 import org.alfresco.repo.search.IndexerException;
-import org.alfresco.repo.search.ResultSet;
-import org.alfresco.repo.search.ResultSetRow;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.CategoryService;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 
 public class LuceneCategoryServiceImpl implements CategoryService
 {
@@ -65,11 +65,11 @@ public class LuceneCategoryServiceImpl implements CategoryService
         this.indexerAndSearcher = indexerAndSearcher;
     }
 
-    public Collection<ChildAssocRef> getChildren(NodeRef categoryRef, Mode mode, Depth depth)
+    public Collection<ChildAssociationRef> getChildren(NodeRef categoryRef, Mode mode, Depth depth)
     {
         if (categoryRef == null)
         {
-            return Collections.<ChildAssocRef> emptyList();
+            return Collections.<ChildAssociationRef> emptyList();
         }
         ResultSet resultSet = null;
         try
@@ -159,14 +159,14 @@ public class LuceneCategoryServiceImpl implements CategoryService
 
     }
 
-    private Collection<ChildAssocRef> resultSetToChildAssocCollection(ResultSet resultSet)
+    private Collection<ChildAssociationRef> resultSetToChildAssocCollection(ResultSet resultSet)
     {
-        List<ChildAssocRef> collection = new ArrayList<ChildAssocRef>();
+        List<ChildAssociationRef> collection = new ArrayList<ChildAssociationRef>();
         if (resultSet != null)
         {
             for (ResultSetRow row : resultSet)
             {
-                ChildAssocRef car = nodeService.getPrimaryParent(row.getNodeRef());
+                ChildAssociationRef car = nodeService.getPrimaryParent(row.getNodeRef());
                 collection.add(car);
             }
         }
@@ -174,7 +174,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         // The caller closes the result set
     }
 
-    public Collection<ChildAssocRef> getCategories(StoreRef storeRef, QName attributeQName, Depth depth)
+    public Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName attributeQName, Depth depth)
     {
         QName qname = dictionaryService.getProperty(attributeQName).getContainerClass().getName();
         return getChildren(getCategoryRootNode(storeRef, qname), Mode.SUB_CATEGORIES, depth);
@@ -206,7 +206,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         }
     }
 
-    public Collection<ChildAssocRef> getRootCategories(StoreRef storeRef)
+    public Collection<ChildAssociationRef> getRootCategories(StoreRef storeRef)
     {
         ResultSet resultSet = null;
         try

@@ -8,14 +8,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.StoreRef;
-import org.alfresco.repo.value.ValueConverter;
-import org.alfresco.repo.value.ValueConverter.Converter;
-import org.alfresco.repo.version.Version;
-import org.alfresco.repo.version.VersionService;
-import org.alfresco.repo.version.VersionServiceException;
-import org.alfresco.repo.version.VersionType;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter.Converter;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionServiceException;
+import org.alfresco.service.cmr.version.VersionType;
+
 
 /**
  * Version class implementation.

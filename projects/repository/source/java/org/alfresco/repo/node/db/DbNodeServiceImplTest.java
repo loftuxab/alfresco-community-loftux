@@ -1,8 +1,8 @@
 package org.alfresco.repo.node.db;
 
-import org.alfresco.repo.content.ContentService;
 import org.alfresco.repo.node.BaseNodeServiceTest;
-import org.alfresco.repo.node.NodeService;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeService;
 
 /**
  * @see org.alfresco.repo.node.db.DbNodeServiceImpl

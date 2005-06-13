@@ -5,10 +5,10 @@ package org.alfresco.repo.rule.impl;
 
 import java.util.List;
 
-import org.alfresco.repo.content.ContentReader;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.rule.Rule;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.rule.Rule;
 import org.springframework.util.StopWatch;
 
 /**

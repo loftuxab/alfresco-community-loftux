@@ -5,11 +5,11 @@ package org.alfresco.repo.node;
 
 import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.ClassPolicy;
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.QName;
-import org.alfresco.repo.ref.StoreRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Node service policies
@@ -63,7 +63,7 @@ public interface NodeServicePolicies
          * 
          * @param childAssocRef  the created child association reference
          */
-        public void onCreateNode(ChildAssocRef childAssocRef);
+        public void onCreateNode(ChildAssociationRef childAssocRef);
     }
 
     public interface BeforeUpdateNodePolicy extends ClassPolicy
@@ -107,7 +107,7 @@ public interface NodeServicePolicies
 		 * 
          * @param childAssocRef the primary parent-child association of the deleted node
 		 */
-		public void onDeleteNode(ChildAssocRef childAssocRef);
+		public void onDeleteNode(ChildAssociationRef childAssocRef);
 	}
 	
     public interface BeforeAddAspectPolicy extends ClassPolicy
@@ -178,7 +178,7 @@ public interface NodeServicePolicies
          * 
          * @param childAssocRef the child association that has been created
          */
-        public void onCreateChildAssociation(ChildAssocRef childAssocRef);
+        public void onCreateChildAssociation(ChildAssociationRef childAssocRef);
     }
     
     public interface BeforeDeleteChildAssociationPolicy extends AssociationPolicy
@@ -188,7 +188,7 @@ public interface NodeServicePolicies
          * 
          * @param childAssocRef the child association to be deleted
          */
-        public void beforeDeleteChildAssociation(ChildAssocRef childAssocRef);
+        public void beforeDeleteChildAssociation(ChildAssociationRef childAssocRef);
     }
     
     public interface OnDeleteChildAssociationPolicy extends AssociationPolicy
@@ -198,7 +198,7 @@ public interface NodeServicePolicies
          * 
          * @param childAssocRef the child association that has been deleted
          */
-        public void onDeleteChildAssociation(ChildAssocRef childAssocRef);
+        public void onDeleteChildAssociation(ChildAssociationRef childAssocRef);
     }
 
     public interface BeforeCreateAssociationPolicy extends AssociationPolicy
@@ -223,6 +223,6 @@ public interface NodeServicePolicies
          * 
          * @param nodeAssocRef the regular node association to be removed
          */
-        public void beforeDeleteAssociation(NodeAssocRef nodeAssocRef);
+        public void beforeDeleteAssociation(AssociationRef nodeAssocRef);
     }
 }

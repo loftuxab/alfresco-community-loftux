@@ -12,9 +12,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.alfresco.repo.ref.ChildAssocRef;
-import org.alfresco.repo.ref.NodeRef;
-import org.alfresco.repo.ref.Path;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
 
 public class EmptyResultSet implements ResultSet
 {
@@ -66,12 +68,12 @@ public class EmptyResultSet implements ResultSet
         return Collections.<NodeRef>emptyList();
     }
 
-    public List<ChildAssocRef> getChildAssocRefs()
+    public List<ChildAssociationRef> getChildAssocRefs()
     {
-        return Collections.<ChildAssocRef>emptyList();
+        return Collections.<ChildAssociationRef>emptyList();
     }
 
-    public ChildAssocRef getChildAssocRef(int n)
+    public ChildAssociationRef getChildAssocRef(int n)
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
