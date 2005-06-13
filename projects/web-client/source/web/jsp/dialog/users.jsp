@@ -64,7 +64,7 @@
                            <td width=110 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
-                              <a:actionLink value="#{msg.create_user}" image="/images/icons/invite.gif" padding="4" action="createUser" actionListener="#{NewUserWizard.startWizard}" />
+                              <a:actionLink value="#{msg.create_user}" image="/images/icons/person.gif" padding="4" action="createUser" actionListener="#{NewUserWizard.startWizard}" />
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=110 style="padding-left:2px">
@@ -107,13 +107,12 @@
                                  <%-- Primary column for details view mode --%>
                                  <a:column primary="true" width="200" style="padding:2px;text-align:left">
                                     <f:facet name="header">
-                                       <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
+                                       <a:sortLink label="Name" value="fullName" mode="case-insensitive" styleClass="header"/>
                                     </f:facet>
                                     <f:facet name="small-icon">
+                                       <h:graphicImage url="/images/icons/person.gif" />
                                     </f:facet>
-                                    <a:actionLink value="#{r.name}" actionListener="#{BrowseBean.clickSpace}">
-                                       <f:param name="id" value="#{r.id}" />
-                                    </a:actionLink>
+                                    <h:outputText value="#{r.fullName}" />
                                  </a:column>
                                  
                                  <%-- Description column for all view modes --%>
@@ -129,7 +128,7 @@
                                     <f:facet name="header">
                                        <h:outputText value="#{msg.actions}"/>
                                     </f:facet>
-                                    <a:actionLink value="#{msg.modify}" actionListener="#{ClipboardBean.cutNode}">
+                                    <a:actionLink value="#{msg.modify}" action="editUser" actionListener="#{NewUserWizard.startWizardForEdit}">
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
                                  </a:column>

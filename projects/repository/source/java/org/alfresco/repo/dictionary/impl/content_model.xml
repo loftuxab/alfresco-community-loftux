@@ -99,15 +99,19 @@
          <properties>
             <property name="alf:userName">
                <type>d:text</type>
+               <mandatory>true</mandatory>
             </property>
             <property name="alf:homeFolder">
                <type>d:text</type>
+               <mandatory>true</mandatory>
             </property>
              <property name="alf:firstName">
                <type>d:text</type>
+               <mandatory>true</mandatory>
             </property>
             <property name="alf:lastName">
                <type>d:text</type>
+               <mandatory>true</mandatory>
             </property>
             <property name="alf:middleName">
                <type>d:text</type>

@@ -3,10 +3,30 @@
  */
 package org.alfresco.web.bean.wizard;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.transaction.UserTransaction;
+
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.apache.log4j.Logger;
 
@@ -18,8 +38,10 @@ public class NewUserWizard extends AbstractWizardBean
    private static Logger logger = Logger.getLogger(NewUserWizard.class);
    
    // TODO: retrieve these from the config service
-   private static final String WIZARD_TITLE = "New User Wizard";
-   private static final String WIZARD_DESC = "Use this wizard to add a user to the repository.";
+   private static final String WIZARD_TITLE_NEW = "New User Wizard";
+   private static final String WIZARD_DESC_NEW = "Use this wizard to add a user to the repository.";
+   private static final String WIZARD_TITLE_EDIT = "Edit User Wizard";
+   private static final String WIZARD_DESC_EDIT = "Use this wizard to modify a user in the repository.";
    private static final String STEP1_TITLE = "Step One - Person Properties";
    private static final String STEP1_DESCRIPTION = "Enter information about this person.";
    private static final String STEP2_TITLE = "Step Two - User Properties";
@@ -27,6 +49,15 @@ public class NewUserWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To add the user to this space click Finish.<br/>" +
                                                     "To review or change your selections click Back.";
 
+   private static final QName PROP_QNAME_USERNAME     = QName.createQName(NamespaceService.ALFRESCO_URI, "userName");
+   private static final QName PROP_QNAME_HOMEFOLDER   = QName.createQName(NamespaceService.ALFRESCO_URI, "homeFolder");
+   private static final QName PROP_QNAME_FIRSTNAME    = QName.createQName(NamespaceService.ALFRESCO_URI, "firstName");
+   private static final QName PROP_QNAME_LASTNAME     = QName.createQName(NamespaceService.ALFRESCO_URI, "lastName");
+   private static final QName PROP_QNAME_EMAIL        = QName.createQName(NamespaceService.ALFRESCO_URI, "email");
+   private static final QName PROP_QNAME_ORGID        = QName.createQName(NamespaceService.ALFRESCO_URI, "organizationId");
+   
+   private static final String ERROR_GENERIC = "A system error occured during the operation: {0}";
+   
    /** form variables */
    private String firstName = null;
    private String lastName = null;
@@ -38,6 +69,9 @@ public class NewUserWizard extends AbstractWizardBean
    
    /** Component references */
    private UIRichList usersRichList;
+   
+   /** action context */
+   private Node person = null;
    
    
    /**
@@ -62,7 +96,18 @@ public class NewUserWizard extends AbstractWizardBean
     */
    public void populate()
    {
-      // TODO: implement for Edit mode
+      // set values for edit mode
+      Map<String, Object> props = getPerson().getProperties();
+      
+      this.firstName = (String)props.get("firstName");
+      this.lastName = (String)props.get("lastName");
+      this.userName = (String)props.get("userName");
+      this.email = (String)props.get("email");
+      this.companyId = (String)props.get("organizationId");
+      // TODO: calculate home space name and parent space Id from homeFolderId
+      String homeFolderId = (String)props.get("homeFolder");
+      this.homeSpaceName = "";
+      this.homeSpaceLocation = null;
    }
    
    /**
@@ -70,7 +115,14 @@ public class NewUserWizard extends AbstractWizardBean
     */
    public String getWizardDescription()
    {
-      return WIZARD_DESC;
+      if (this.editMode)
+      {
+         return WIZARD_DESC_EDIT;
+      }
+      else
+      {
+         return WIZARD_DESC_NEW;
+      }
    }
 
    /**
@@ -78,7 +130,14 @@ public class NewUserWizard extends AbstractWizardBean
     */
    public String getWizardTitle()
    {
-      return WIZARD_TITLE;
+      if (this.editMode)
+      {
+         return WIZARD_TITLE_EDIT;
+      }
+      else
+      {
+         return WIZARD_TITLE_NEW;
+      }
    }
 
    /**
@@ -210,6 +269,74 @@ public class NewUserWizard extends AbstractWizardBean
    {
       String outcome = FINISH_OUTCOME;
       
+      // TODO: implement create new Person object from specified details
+      UserTransaction tx = null;
+      
+      try
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         tx = Repository.getUserTransaction(context);
+         tx.begin();
+         
+         if (this.editMode)
+         {
+            // update the existing node in the repository
+            NodeRef nodeRef = getPerson().getNodeRef();
+            
+            Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
+            props.put(PROP_QNAME_USERNAME, this.userName);
+            props.put(PROP_QNAME_FIRSTNAME, this.firstName);
+            props.put(PROP_QNAME_LASTNAME, this.lastName);
+            // TODO: this should be a PATH not an ID etc.!
+            props.put(PROP_QNAME_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
+            props.put(PROP_QNAME_EMAIL, this.email);
+            props.put(PROP_QNAME_ORGID, this.companyId);
+            this.nodeService.setProperties(nodeRef, props);
+         }
+         else
+         {
+            // get the node ref of the node that will contain the content
+            NodeRef rootNode = getNodeService().getRootNode(Repository.getStoreRef(context));
+            
+            // create properties for Person type from submitted Form data
+            Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
+            props.put(PROP_QNAME_USERNAME, this.userName);
+            props.put(PROP_QNAME_FIRSTNAME, this.firstName);
+            props.put(PROP_QNAME_LASTNAME, this.lastName);
+            // TODO: this should be a PATH not an ID etc.!
+            props.put(PROP_QNAME_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
+            props.put(PROP_QNAME_EMAIL, this.email);
+            props.put(PROP_QNAME_ORGID, this.companyId);
+            
+            // create the node to represent the Person
+            String assocName = Repository.createValidQName(this.userName);
+            this.nodeService.createNode(
+                  rootNode,
+                  DictionaryBootstrap.ASSOC_QNAME_CHILDREN,
+                  QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
+                  DictionaryBootstrap.TYPE_QNAME_PERSON,
+                  props);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Created Person node for username: " + this.userName);
+            
+            // TODO: apply appropriate aspects
+            // TODO: hook in security API - set password etc.
+         }
+         
+         // commit the transaction
+         tx.commit();
+         
+         // reset the richlist component so it rebinds to the users list
+         this.usersRichList.setValue(null);
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new AlfrescoRuntimeException("Failed to create Person", e);
+      }
+      
       return outcome;
    }
    
@@ -224,11 +351,105 @@ public class NewUserWizard extends AbstractWizardBean
    }
    
    /**
+    * Init the users screen
+    */
+   public void setupUsers(ActionEvent event)
+   {
+      if (this.usersRichList != null)
+      {
+         this.usersRichList.setValue(null);
+      }
+   }
+   
+   /**
+    * Action event called by all actions that need to setup a Person context on the 
+    * NewUserWizard bean before an action page is called. The context will be a Person Node in
+    * setPerson() which can be retrieved on the action page from NewUserWizard.getPerson().
+    */
+   public void setupUserAction(ActionEvent event)
+   {
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         if (logger.isDebugEnabled())
+            logger.debug("Setup for action, setting current Person to: " + id);
+         
+         try
+         {
+            // create the node ref, then our node representation
+            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+            Node node = new Node(ref, this.nodeService);
+            
+            // remember the Person node
+            setPerson(node);
+            
+            // clear the UI state in preparation for finishing the action and returning to the main page
+            this.usersRichList.setValue(null);
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+         }
+      }
+      else
+      {
+         setPerson(null);
+      }
+   }
+   
+   /**
+    * Action listener called when the wizard is being launched for 
+    * editing an existing node.
+    */
+   public void startWizardForEdit(ActionEvent event)
+   {
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         try
+         {
+            // create the node ref, then our node representation
+            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+            Node node = new Node(ref, this.nodeService);
+            
+            // remember the Person node
+            setPerson(node);
+            
+            // set the wizard in edit mode
+            this.editMode = true;
+            
+            // populate the wizard's default values with the current value
+            // from the node being edited
+            init();
+            populate();
+            
+            // clear the UI state in preparation for finishing the action and returning to the main page
+            this.usersRichList.setValue(null);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Started wizard : " + getWizardTitle() + " for editing");
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+         }
+      }
+      else
+      {
+         setPerson(null);
+      }
+   }
+   
+   /**
     * @return the list of user Nodes to display
     */
    public List<Node> getUsers()
    {
-      return Collections.EMPTY_LIST;
+      return queryPersonNodes();
    }
 
    /**
@@ -357,5 +578,86 @@ public class NewUserWizard extends AbstractWizardBean
    public void setUsersRichList(UIRichList usersRichList)
    {
       this.usersRichList = usersRichList;
+   }
+   
+   /**
+    * @return Returns the person context.
+    */
+   public Node getPerson()
+   {
+      return this.person;
+   }
+
+   /**
+    * @param person The person context to set.
+    */
+   public void setPerson(Node person)
+   {
+      this.person = person;
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Helper methods
+   
+   /**
+    * Query a list of Person type nodes from the repo
+    * It is currently assumed that all Person nodes exist below the Repository root node
+    * 
+    * @return List of Person node objects
+    */
+   private List<Node> queryPersonNodes()
+   {
+      List<Node> personNodes = null;
+      
+      UserTransaction tx = null;
+      try
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         tx = Repository.getUserTransaction(context);
+         tx.begin();
+         
+         NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
+         
+         // TODO: better to perform an XPath search or a get for a specific child type here?
+         List<ChildAssociationRef> childRefs = this.nodeService.getChildAssocs(rootNodeRef);
+         personNodes = new ArrayList<Node>(childRefs.size());
+         for (ChildAssociationRef ref: childRefs)
+         {
+            // create our Node representation from the NodeRef
+            NodeRef nodeRef = ref.getChildRef();
+            
+            if (this.nodeService.getType(nodeRef).equals(DictionaryBootstrap.TYPE_QNAME_PERSON))
+            {
+               // create our Node representation
+               MapNode node = new MapNode(nodeRef, this.nodeService);
+               
+               // set data binding properties
+               // this will also force initialisation of the props now during the UserTransaction
+               // it is much better for performance to do this now rather than during page bind
+               Map<String, Object> props = node.getProperties(); 
+               props.put("fullName", ((String)props.get("firstName")) + ' ' + ((String)props.get("lastName")));
+               
+               personNodes.add(node);
+            }
+         }
+         
+         // commit the transaction
+         tx.commit();
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {"root"}) );
+         personNodes = Collections.<Node>emptyList();
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+      }
+      catch (Exception err)
+      {
+         Utils.addErrorMessage( MessageFormat.format(ERROR_GENERIC, err.getMessage()), err );
+         personNodes = Collections.<Node>emptyList();
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+      }
+      
+      return personNodes;
    }
 }

@@ -361,6 +361,7 @@ public class BrowseBean implements IContextListener
             parentRef = new NodeRef(Repository.getStoreRef(context), parentNodeId);
          }
          
+         // TODO: can we improve the Get here with an API call for children of a specific type?
          List<ChildAssociationRef> childRefs = this.nodeService.getChildAssocs(parentRef);
          this.containerNodes = new ArrayList<Node>(childRefs.size());
          this.contentNodes = new ArrayList<Node>(childRefs.size());
@@ -369,27 +370,28 @@ public class BrowseBean implements IContextListener
             // create our Node representation from the NodeRef
             NodeRef nodeRef = ref.getChildRef();
             
-            // create our Node representation
-            MapNode node = new MapNode(nodeRef, this.nodeService);
+            // find it's type so we can see if it's a node we are interested in
+            QName type = this.nodeService.getType(nodeRef);
             
             // look for Space or File nodes
-            if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+            if (type.equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
             {
+               // create our Node representation
+               MapNode node = new MapNode(nodeRef, this.nodeService);
+               
                this.containerNodes.add(node);
             }
-            else if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
+            else if (type.equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
             {
+               // create our Node representation
+               MapNode node = new MapNode(nodeRef, this.nodeService);
+               
                setupDataBindingProperties(node);
                
                this.contentNodes.add(node);
                
-               if (logger.isDebugEnabled())
-                  logger.debug(node.getName() + " has following aspects: " + node.getAspects());
-            }
-            else
-            {
-               if (logger.isDebugEnabled())
-                  logger.debug("Found neither a Folder or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
+               //if (logger.isDebugEnabled())
+               //   logger.debug(node.getName() + " has following aspects: " + node.getAspects());
             }
          }
          
@@ -445,23 +447,26 @@ public class BrowseBean implements IContextListener
             for (ResultSetRow row: results)
             {
                NodeRef nodeRef = row.getNodeRef();
-               MapNode node = new MapNode(nodeRef, this.nodeService);
+               
+               // find it's type so we can see if it's a node we are interested in
+               QName type = this.nodeService.getType(nodeRef);
                
                // look for Space or File nodes
-               if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+               if (type.equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
                {
+                  // create our Node representation
+                  MapNode node = new MapNode(nodeRef, this.nodeService);
+                  
                   this.containerNodes.add(node);
                }
-               else if (node.getType().equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
+               else if (type.equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
                {
+                  // create our Node representation
+                  MapNode node = new MapNode(nodeRef, this.nodeService);
+                  
                   setupDataBindingProperties(node);
                   
                   this.contentNodes.add(node);
-               }
-               else
-               {
-                  if (logger.isDebugEnabled())
-                     logger.debug("Found neither a Space or File node:\n   " + node.getName() + "\n   " + node.getPath() + "\n   " + node.getType());
                }
             }
          }

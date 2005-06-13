@@ -97,6 +97,7 @@ public class DictionaryBootstrap
     public static final QName TYPE_QNAME_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "folder");
     public static final QName ASSOC_QNAME_CONTAINS = QName.createQName(NamespaceService.ALFRESCO_URI, "contains");
     public static final QName TYPE_QNAME_FILE = QName.createQName(NamespaceService.ALFRESCO_URI, "file");
+    public static final QName TYPE_QNAME_PERSON = QName.createQName(NamespaceService.ALFRESCO_URI, "person");
 
     // system folder type
     public static final QName TYPE_QNAME_SYTEM_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "systemfolder");

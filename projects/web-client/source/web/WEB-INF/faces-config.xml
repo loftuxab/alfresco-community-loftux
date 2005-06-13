@@ -503,6 +503,10 @@
          <from-outcome>createUser</from-outcome>
          <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>editUser</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <!-- navigation rule for the new space dialog -->

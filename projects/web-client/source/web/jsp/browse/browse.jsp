@@ -93,7 +93,7 @@
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
                                     </a:actionLink>
                                     <%-- TODO: add evaluator based on "admin" role, add correct icon --%>
-                                    <a:actionLink value="#{msg.manage_users}" image="/images/icons/invite.gif" action="manageUsers" id="link11" />
+                                    <a:actionLink value="#{msg.manage_users}" image="/images/icons/invite.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
                                  </a:menu>
                               </td>
                            </a:panel>

@@ -75,12 +75,14 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
             
             // update the modified timestamp
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_TITLE, this.title);
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MIME_TYPE, this.contentType);
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_CREATOR, this.author);
+            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(7, 1.0f);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.title);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, this.contentType);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_CREATOR, this.author);
+            this.nodeService.setProperties(nodeRef, contentProps);
          }
          else
          {
@@ -97,7 +99,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             }
 
             // create properties for content type
-            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(3);
+            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(3, 1.0f);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
             contentProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, this.contentType);
