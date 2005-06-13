@@ -107,7 +107,14 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
         for (QName classQName : classQNames)
         {
             P policy = factory.create(new ClassBehaviourBinding(dictionary, classQName));
-            policies.add(policy);
+			if (policy instanceof PolicyList)
+			{
+				policies.addAll(((PolicyList<P>)policy).getPolicies());
+			}
+			else
+			{
+				policies.add(policy);
+			}
         }
         return policies;
     }

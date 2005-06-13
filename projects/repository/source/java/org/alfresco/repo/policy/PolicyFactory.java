@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -94,17 +95,19 @@ import java.util.List;
      */
     public P toPolicy(Collection<P> policyList)
     {
-        if (policyList.size() == 0)
-        {
-            return (P)Proxy.newProxyInstance(policyClass.getClassLoader(), new Class[]{policyClass}, new NOOPHandler());
-        }
-        else if (policyList.size() == 1)
+        if (policyList.size() == 1)
         {
             return policyList.iterator().next();
         }
+        else if (policyList.size() == 0)
+        {
+            return (P)Proxy.newProxyInstance(policyClass.getClassLoader(), 
+					new Class[]{policyClass}, new NOOPHandler());
+        }
         else
         {
-            return (P)Proxy.newProxyInstance(policyClass.getClassLoader(), new Class[]{policyClass}, new MultiHandler<P>(policyList));
+            return (P)Proxy.newProxyInstance(policyClass.getClassLoader(), 
+					new Class[]{policyClass, PolicyList.class}, new MultiHandler<P>(policyList));
         }
     }
     
@@ -146,7 +149,7 @@ import java.util.List;
      *
      * @param <P>  policy interface
      */
-    private static class MultiHandler<P> implements InvocationHandler
+    private static class MultiHandler<P> implements InvocationHandler, PolicyList
     {
         private Collection<P> policyInterfaces;
        
@@ -157,7 +160,7 @@ import java.util.List;
          */
         public MultiHandler(Collection<P> policyInterfaces)
         {
-            this.policyInterfaces = policyInterfaces;
+            this.policyInterfaces = Collections.unmodifiableCollection(policyInterfaces);
         }
         
         /* (non-Javadoc)
@@ -165,6 +168,13 @@ import java.util.List;
          */
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
+			// Handle PolicyList level methods
+			if (method.getDeclaringClass().equals(PolicyList.class))
+			{
+				return method.invoke(this, args);
+			}
+			
+			// Handle Object level methods
             if (method.getName().equals("toString"))
             {
                 return toString() + ": wrapped " + policyInterfaces.size() + " policies";
@@ -193,6 +203,14 @@ import java.util.List;
                 throw e.getCause();
             }
         }
+
+		/* (non-Javadoc)
+		 * @see org.alfresco.repo.policy.PolicyList#getPolicies()
+		 */
+		public Collection getPolicies()
+		{
+			return policyInterfaces;
+		}
     }
     
 }

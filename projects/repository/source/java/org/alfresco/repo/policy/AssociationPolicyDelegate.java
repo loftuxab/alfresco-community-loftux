@@ -119,7 +119,14 @@ public class AssociationPolicyDelegate<P extends AssociationPolicy>
         for (QName classQName : classQNames)
         {
             P policy = factory.create(new ClassFeatureBehaviourBinding(dictionary, classQName, assocTypeQName));
-            policies.add(policy);
+			if (policy instanceof PolicyList)
+			{
+				policies.addAll(((PolicyList<P>)policy).getPolicies());
+			}
+			else
+			{
+				policies.add(policy);
+			}
         }
         return policies;
     }

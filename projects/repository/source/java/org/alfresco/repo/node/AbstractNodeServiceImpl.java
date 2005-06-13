@@ -2,6 +2,7 @@ package org.alfresco.repo.node;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -340,16 +341,21 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      */
     protected void invokeOnCreateChildAssociation(ChildAssocRef childAssocRef)
     {
+		// Get the parent reference and the assoc type qName
         NodeRef parentNodeRef = childAssocRef.getParentRef();
         QName assocTypeQName = childAssocRef.getTypeQName();
-        // execute policy for node type
+        
+		// Gte the type and the aspect
         QName parentNodeTypeQName = getType(parentNodeRef);
-        NodeServicePolicies.OnCreateChildAssociationPolicy policy =
-            onCreateChildAssociationDelegate.get(parentNodeTypeQName, assocTypeQName);
-        policy.onCreateChildAssociation(childAssocRef);
-        // execute policies for aspects
         Set<QName> parentAspectQNames = getAspects(parentNodeRef);
-        policy = onCreateChildAssociationDelegate.get(parentAspectQNames, assocTypeQName);
+		
+		// Combime into one set
+		Set<QName> newSet = new HashSet<QName>();
+		newSet.addAll(parentAspectQNames);
+		newSet.add(parentNodeTypeQName);
+		
+		// Execute the policy
+		NodeServicePolicies.OnCreateChildAssociationPolicy policy = onCreateChildAssociationDelegate.get(newSet, assocTypeQName);
         policy.onCreateChildAssociation(childAssocRef);
     }
 
