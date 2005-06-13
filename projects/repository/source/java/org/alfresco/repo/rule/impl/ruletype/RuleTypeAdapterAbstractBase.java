@@ -19,6 +19,7 @@ import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Rule type adapter abstract base class implmentation.
@@ -41,30 +42,31 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
 	 * The rule service
 	 */
     private RuleService ruleService;
-    
-	/**
-	 * The node service
-	 */
+
+    /**
+     * The application context
+     */
+    private ApplicationContext applicationContext;
+
     private NodeService nodeService;
     
     /**
      * Constructor
      * 
-     * @param ruleType			the rule type
-     * @param policyComponent	the policy component
-     * @param ruleService		the rule service
-     * @param nodeService		the node service
+     * @param ruleType			 the rule type
+     * @param applicationContext the applicaiton context
      */
     public RuleTypeAdapterAbstractBase(
             RuleType ruleType,
-            PolicyComponent policyComponent,
             RuleService ruleService,
-            NodeService nodeService)
+            NodeService nodeService,
+            ApplicationContext applicationContext)
     {
-        this.ruleType = ruleType;
-        this.policyComponent = policyComponent;
-        this.ruleService = ruleService; 
+        this.applicationContext = applicationContext;
         this.nodeService = nodeService;
+        this.ruleType = ruleType;
+        this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");;
+        this.ruleService = ruleService; 
     }
     
 	/**
@@ -143,8 +145,8 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
         {
             // Create the action executor
             executor = (RuleActionExecuter)Class.forName(executorString).
-                    getConstructor(new Class[]{RuleAction.class, NodeService.class}).
-                    newInstance(new Object[]{action, this.nodeService});
+                    getConstructor(new Class[]{RuleAction.class, ApplicationContext.class}).
+                    newInstance(new Object[]{action, this.applicationContext});
         }
         catch(Exception exception)
         {
@@ -170,8 +172,8 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
         {
             // Create the condition evaluator
             evaluator = (RuleConditionEvaluator)Class.forName(evaluatorString).
-                    getConstructor(new Class[]{RuleCondition.class, NodeService.class}).
-                    newInstance(new Object[]{cond, this.nodeService});
+                    getConstructor(new Class[]{RuleCondition.class, NodeService.class, ApplicationContext.class}).
+                    newInstance(new Object[]{cond, this.nodeService, this.applicationContext});
         }
         catch(Exception exception)
         {

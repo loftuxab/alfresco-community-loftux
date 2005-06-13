@@ -116,8 +116,8 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
                 {
                     // Create the rule type adapter
                     RuleTypeAdapter adapter = (RuleTypeAdapter)Class.forName(ruleTypeAdapter).
-                            getConstructor(new Class[]{RuleType.class, PolicyComponent.class, RuleService.class, NodeService.class}).
-                            newInstance(new Object[]{ruleType, this.policyComponent, this, this.nodeService});
+                            getConstructor(new Class[]{RuleType.class, RuleService.class, NodeService.class, ApplicationContext.class}).
+                            newInstance(new Object[]{ruleType, this, this.nodeService, this.applicationContext});
                     
                     // Register the adapters policy behaviour
                     adapter.registerPolicyBehaviour();
@@ -347,14 +347,6 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     public List<Rule> getRulesByRuleType(NodeRef nodeRef, RuleType ruleType)
     {
         return (List<Rule>)this.ruleStore.getByRuleType(nodeRef, ruleType);
-    }
-
-    /**
-     * @see org.alfresco.repo.rule.RuleService#previewExecutingRules(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleType, java.util.Map)
-     */
-    public List<Rule> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext)
-    {
-        throw new UnsupportedOperationException();
     }
 
     /**

@@ -5,6 +5,7 @@ package org.alfresco.repo.rule.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,8 +243,15 @@ import org.alfresco.service.namespace.QName;
             ContentReader contentReader = this.contentService.getReader(nodeRef);
             if (contentReader != null)
             {
+                // Create the rule from the XML content
                 String ruleXML = contentReader.getContentString();
                 RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleConfig, ruleXML);
+                
+                // Add the created date and modified date (they come from the auditable aspect)
+                rule.setCreatedDate((Date)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_CREATED));
+                rule.setModifiedDate((Date)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MODIFIED));
+                
+                // Add the rule to the list
                 rules.add(rule);
             }
         }

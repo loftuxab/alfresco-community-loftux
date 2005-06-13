@@ -13,11 +13,11 @@ import org.alfresco.service.namespace.QName;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Inbound rule type adapter class.
+ * Outbound rule type adapter class.
  * 
  * @author Roy Wetherall
  */
-public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
+public class OutboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
 {
     /**
      * Constructor
@@ -25,7 +25,7 @@ public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
      * @param ruleType			   the rule type
      * @param applicationContext   the application context
      */
-    public InboundRuleTypeAdapter(
+    public OutboundRuleTypeAdapter(
             RuleType ruleType,
             RuleService ruleService,
             NodeService nodeService,
@@ -40,21 +40,17 @@ public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
     public void registerPolicyBehaviour()
     {
         policyComponent.bindAssociationBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"),
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onDeleteChildAssociation"),
                 this,
-                new JavaBehaviour(this, "onCreateChildAssociation"));
-        policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
-                this,
-                new JavaBehaviour(this, "onCreateChildAssociation"));
+                new JavaBehaviour(this, "onDeleteChildAssociation"));
     }
 
 	/**
-	 * onCreateChildAssociation policy behaviour
+	 * onDeleteChildAssociation policy behaviour
 	 * 
-	 * @param childAssocRef		the child association reference created
+	 * @param childAssocRef		the child association reference deleted
 	 */
-    public void onCreateChildAssociation(ChildAssociationRef childAssocRef)
+    public void onDeleteChildAssociation(ChildAssociationRef childAssocRef)
     {
         executeRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());
     }

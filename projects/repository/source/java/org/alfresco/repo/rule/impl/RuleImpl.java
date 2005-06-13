@@ -5,6 +5,7 @@ package org.alfresco.repo.rule.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +52,16 @@ public class RuleImpl implements Serializable, Rule
 	 * The description
 	 */
 	private String description;
+    
+    /**
+     * The created date
+     */
+    private Date createdDate;
+    
+    /**
+     * The modified date
+     */
+    private Date modifiedDate;
     
     /**
      * Node ref pointing to the rule content, will be null if this is a new
@@ -124,6 +135,42 @@ public class RuleImpl implements Serializable, Rule
 		this.title = title;
 	}
 	
+    /**
+     * @see org.alfresco.repo.rule.Rule#getCreatedDate()
+     */
+    public Date getCreatedDate()
+    {
+        return this.createdDate;
+    }
+    
+    /**
+     * Set the created date
+     * 
+     * @param createdDate  the created date
+     */
+    public void setCreatedDate(Date createdDate)
+    {
+        this.createdDate = createdDate;
+    }
+
+    /**
+     * @see org.alfresco.repo.rule.Rule#getModifiedDate()
+     */
+    public Date getModifiedDate()
+    {
+        return this.modifiedDate;
+    }
+    
+    /**
+     * Set the modified date
+     * 
+     * @param modifiedDate  the modified date
+     */
+    public void setModifiedDate(Date modifiedDate)
+    {
+        this.modifiedDate = modifiedDate;
+    }
+    
 	/**
      * @see org.alfresco.service.cmr.rule.Rule#getDescription()
      */
@@ -230,6 +277,6 @@ public class RuleImpl implements Serializable, Rule
     public NodeRef getRuleContentNodeRef()
     {
         return this.ruleContentNodeRef;
-    }
+    }    
 }
 

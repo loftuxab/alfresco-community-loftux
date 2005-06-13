@@ -131,7 +131,8 @@ public interface RuleService
 	 * @param executionContext	the execution context
 	 * @return					a list of the rules that would be executed
 	 */
-	public List<Rule> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext);	
+    // TODO decide whether we need this or not
+	//public List<Rule> previewExecutingRules(NodeRef nodeRef, RuleType ruleType, Map<String, Serializable> executionContext);	
 	
 	/**
      * Helper method to create a new rule.

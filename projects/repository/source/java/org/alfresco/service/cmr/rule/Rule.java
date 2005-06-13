@@ -2,6 +2,7 @@
 package org.alfresco.service.cmr.rule;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,20 @@ public interface Rule
      * @return  the id
      */
     public abstract String getId();
+    
+    /**
+     * Get the created date
+     * 
+     * @return  the created date
+     */
+    public abstract Date getCreatedDate();
+    
+    /**
+     * Get the modified date
+     * 
+     * @return  the modified date
+     */
+    public abstract Date getModifiedDate();
 
     /**
      * Get the rule type

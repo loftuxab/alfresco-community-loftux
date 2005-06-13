@@ -10,6 +10,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Add features action executor implementation.
@@ -18,28 +19,30 @@ import org.alfresco.service.namespace.QName;
  */
 public class AddFeaturesActionExecutor extends RuleActionExecutorAbstractBase
 {
-	/**
+	private NodeService nodeService;
+
+    /**
 	 * Constructor
 	 * 
-	 * @param ruleAction	the rule action
-	 * @param nodeService	the node service
+	 * @param ruleAction	      the rule action
+	 * @param nodeService	      the node service
+     * @param applicationContext  the application context
 	 */
     public AddFeaturesActionExecutor(
-            RuleAction ruleAction, 
-            NodeService nodeService)
+            RuleAction ruleAction,
+            ApplicationContext applicationContext)
     {
-        super(ruleAction, nodeService);
+        super(ruleAction, applicationContext);
+        
+        this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
     }
 
     /**
      * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
      */
-    public void execute(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
+    public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
-		// Check the mandatory properties
-        checkMandatoryProperties();
-		
-		// Get the name of the aspec to add
+        // Get the name of the aspec to add
 		Map<String, Serializable> paramValues = this.ruleAction.getParameterValues();
         QName aspectQName = (QName)paramValues.get("aspect-name");
         

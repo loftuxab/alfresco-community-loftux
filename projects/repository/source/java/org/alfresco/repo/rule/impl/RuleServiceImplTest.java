@@ -9,7 +9,6 @@ import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.AssociationRef;
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
@@ -18,6 +17,7 @@ import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+
 
 /**
  * @author Roy Wetherall
@@ -144,10 +144,58 @@ public class RuleServiceImplTest extends RuleBaseTest
      */
     public void testCreateRule()
     {
-        RuleType ruleType = new RuleTypeImpl("testRuleType");
+        RuleType ruleType = new RuleTypeImpl("ruleType1");
         Rule newRule = this.ruleService.createRule(ruleType);
         assertNotNull(newRule);
         assertNotNull(newRule.getId());
-        assertEquals("testRuleType", newRule.getRuleType().getName());
+        assertEquals("ruleType1", newRule.getRuleType().getName());
+    }
+    
+    /**
+     * Test addRule
+     *
+     */
+    public void testAddRule()
+    {
+        this.ruleService.makeActionable(this.nodeRef);
+        
+        RuleType ruleType = new RuleTypeImpl("ruleType1");
+        Rule newRule = this.ruleService.createRule(ruleType);
+        newRule.setTitle("title");
+        newRule.setDescription("description");
+        
+        this.ruleService.addRule(this.nodeRef, newRule);
+    }
+    
+    /**
+     * Test get rules
+     */
+    public void testGetRules()
+    {
+        // Check that there are no rules associationed with the node
+        List<Rule> noRules = this.ruleService.getRules(this.nodeRef);
+        assertNotNull(noRules);
+        assertEquals(0, noRules.size());
+        
+        // Check that we still get nothing back after the details of the node
+        // have been cached in the rule store
+        List<Rule> noRulesAfterCache = this.ruleService.getRules(this.nodeRef);
+        assertNotNull(noRulesAfterCache);
+        assertEquals(0, noRulesAfterCache.size());
+        
+        // Add a rule to the node
+        testAddRule();
+        
+        // Get the rule from the rule service
+        List<Rule> rules = this.ruleService.getRules(this.nodeRef);
+        assertNotNull(rules);
+        assertEquals(1, rules.size());
+        
+        // Check the details of the rule
+        Rule rule = rules.get(0);
+        assertEquals("title", rule.getTitle());
+        assertEquals("description", rule.getDescription());
+        //assertNotNull(rule.getCreatedDate());
+        //assertNotNull(rule.getModifiedDate());
     }
 }

@@ -143,11 +143,19 @@ public class NodeOperationsServiceImpl implements CopyService
 			PolicyScope copyDetails = getCopyDetails(sourceNodeRef);
 			
             // Create collection of properties for type and mandatory aspects
+            Map<QName, Serializable> typeProps = copyDetails.getProperties(); 
             Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-            properties.putAll(copyDetails.getProperties());
+            if (typeProps != null)
+            {
+                properties.putAll(typeProps);
+            }
             for (AspectDefinition aspectDef : typeDef.getDefaultAspects())
             {
-                properties.putAll(copyDetails.getProperties(aspectDef.getName()));
+                Map<QName, Serializable> aspectProps = copyDetails.getProperties(aspectDef.getName());
+                if (aspectProps != null)
+                {
+                    properties.putAll(aspectProps);
+                }
             }
             
 			// Create the new node

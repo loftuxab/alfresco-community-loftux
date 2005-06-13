@@ -8,9 +8,10 @@
 				<display-label>Inbound</display-label>
 				<adapter>org.alfresco.repo.rule.impl.ruletype.InboundRuleTypeAdapter</adapter>
 			</rule-type>
-			<!-- <rule-type name="outbound">
+			<rule-type name="outbound">
 				<display-label>Outbound</display-label>
-			</rule-type> -->
+				<adapter>org.alfresco.repo.rule.impl.ruletype.OutboundRuleTypeAdapter</adapter>				
+			</rule-type>
 		</rule-types>
 	</config>
    
@@ -43,38 +44,61 @@
 				<description>
 					This will apply a category to the matched content.	
 				</description>
-			</action-definition>
+			</action-definition> -->
 			<action-definition name="copy">
 				<title>Create a copy of content in a given format at a specific location</title>	
 				<description>
 					This will copy the matched content to another location with a
                     specific format.
 				</description>
-			</action-definition>
+				<parameters>
+					<parameter name="destination-folder" type="NODE_REF" mandatory='true'/>
+					<parameter name="assoc-type" type="QNAME" mandatory='true'/>
+					<parameter name="assoc-name" type="QNAME" mandatory='true'/>
+					<!-- TODO <parameter name="deep-copy -->
+				</parameters>
+				<executor>org.alfresco.repo.rule.impl.action.CopyActionExecutor</executor>
+			</action-definition> 
 			<action-definition name="move">
 				<title>Move content to a specific space</title>	
 				<description>
 					This will move the matched content to another space.
 				</description>
-			</action-definition>
+				<parameters>
+					<parameter name="destination-folder" type="NODE_REF" mandatory='true'/>
+					<parameter name="assoc-type" type="QNAME" mandatory='true'/>
+					<parameter name="assoc-name" type="QNAME" mandatory='true'/>
+				</parameters>
+				<executor>org.alfresco.repo.rule.impl.action.MoveActionExecutor</executor>
+			</action-definition> <!--
 			<action-definition name="email">
 				<title>Send an email to specified users</title>	
 				<description>
 					This will send an email to a list of users when the content matches.	
 				</description>
-			</action-definition>
+			</action-definition> -->
 			<action-definition name="check-in">
 				<title>Check in content</title>	
 				<description>
 					This will check in the matched content.
 				</description>
+				<parameters>
+					<parameter name="description" type="STRING" mandatory='false'/>
+				</parameters>
+				<executor>org.alfresco.repo.rule.impl.action.CheckInActionExecutor</executor>
 			</action-definition>
 			<action-definition name="check-out">
 				<title>Check out content</title>	
 				<description>
 					This will check out the matched content.
 				</description>
-			</action-definition>	-->		
+				<parameters>
+					<parameter name="destination-folder" type="NODE_REF" mandatory='false'/>
+					<parameter name="assoc-type" type="QNAME" mandatory='false'/>
+					<parameter name="assoc-name" type="QNAME" mandatory='false'/>
+				</parameters>
+				<executor>org.alfresco.repo.rule.impl.action.CheckOutActionExecutor</executor>
+			</action-definition>	
 		</action-definitions>						
 	</config>
    

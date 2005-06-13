@@ -251,10 +251,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ContainerNode parentNode = getContainerNodeNotNull(parentRef);
         
         // create the association - invoke policy behaviour
-        invokeBeforeCreateChildAssociation(parentRef, childRef, assocTypeQName, assocQName);
+        //invokeBeforeCreateChildAssociation(parentRef, childRef, assocTypeQName, assocQName);
         ChildAssoc childAssoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocTypeQName, assocQName);
         ChildAssociationRef childAssocRef = childAssoc.getChildAssocRef();
-        invokeOnCreateChildAssociation(childAssocRef);
+        //invokeOnCreateChildAssociation(childAssocRef);
         
         // get the mandatory aspects for the node type
         TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeQName);

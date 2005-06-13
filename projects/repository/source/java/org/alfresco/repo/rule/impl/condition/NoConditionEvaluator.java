@@ -6,6 +6,7 @@ package org.alfresco.repo.rule.impl.condition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleCondition;
+import org.springframework.context.ApplicationContext;
 
 /**
  * No condition evaluator implmentation.
@@ -23,18 +24,21 @@ public class NoConditionEvaluator extends
 	/**
 	 * Constructor
 	 * 
-	 * @param ruleCondition		the rule condition
-	 * @param nodeService		the node service
+	 * @param ruleCondition		  the rule condition
+	 * @param applicationContext  the application context
 	 */
-    public NoConditionEvaluator(RuleCondition ruleCondition, NodeService nodeService)
+    public NoConditionEvaluator(
+            RuleCondition ruleCondition, 
+            NodeService nodeService,
+            ApplicationContext applicationContext)
     {
-        super(ruleCondition, nodeService);
+        super(ruleCondition, nodeService, applicationContext);
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleConditionEvaluator#evaluate(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
+     * @see org.alfresco.repo.rule.impl.condition.RuleConditionEvaluatorAbstractBase#evaluateImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
      */
-    public boolean evaluate(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
+    public boolean evaluateImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
         // Always return true
         return true;

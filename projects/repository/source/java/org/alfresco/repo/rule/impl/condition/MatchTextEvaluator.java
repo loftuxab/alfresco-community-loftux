@@ -10,6 +10,7 @@ import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleCondition;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Contains text evaluator
@@ -21,33 +22,35 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 	public final static String NAME = "match-text";
 	public final static String PARAM_TEXT = "text";
 	public final static String PARAM_OPERATION = "operation";
-	
-	public enum Operation {CONTAINS, BEGINS, ENDS, EXACT};
+    
+    public enum Operation {CONTAINS, BEGINS, ENDS, EXACT};
+    
+    //private NodeService nodeService;
 	
 	/**
 	 * Contructor 
 	 * 
-	 * @param ruleCondition		the rule condition
-	 * @param nodeService		the node service
+	 * @param ruleCondition		   the rule condition
+	 * @param applicationContext   the application context
 	 */
 	public MatchTextEvaluator(
 			RuleCondition ruleCondition,
-			NodeService nodeService) 
+            NodeService nodeService,
+			ApplicationContext applicationContext) 
 	{
-		super(ruleCondition, nodeService);
+		super(ruleCondition, nodeService, applicationContext);
+        
+        //this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
 	}
 
 	/**
-	 * @see org.alfresco.repo.rule.RuleConditionEvaluator#evaluate(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.repo.rule.impl.condition.RuleConditionEvaluatorAbstractBase#evaluateImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
 	 */
-	public boolean evaluate(
+	public boolean evaluateImpl(
 			NodeRef actionableNodeRef,
 			NodeRef actionedUponNodeRef) 
 	{
 		boolean result = false;
-		
-		// Check for the mandatory
-		checkMandatoryProperties();
 		
 		// Get the text to match against
 		String matchText = (String)this.ruleCondition.getParameterValue(PARAM_TEXT);
@@ -77,19 +80,19 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 
 	private String buildRegEx(String matchText, Operation operation) 
 	{
-		// TODO the result of this could be cached to spped things up ...
+		// TODO the result of this could be cached to speed things up ...
 		
 		String result = escapeText(matchText);
 		switch (operation) 
 		{
 			case CONTAINS:
-				result = "^.*" + matchText + ".*$";
+				result = "^.*" + result + ".*$";
 				break;
 			case BEGINS:
-				result = "^" + matchText + ".*$";
+				result = "^" + result + ".*$";
 				break;
 			case ENDS:
-				result = "^.*" + matchText + "$";
+				result = "^.*" + result + "$";
 				break;
 			default:
 				break;

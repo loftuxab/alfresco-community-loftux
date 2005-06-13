@@ -8,11 +8,12 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import org.alfresco.repo.rule.RuleActionExecuter;
-import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
 import org.alfresco.service.cmr.rule.RuleServiceException;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Rule action executor abstract base.
@@ -25,11 +26,16 @@ public abstract class RuleActionExecutorAbstractBase implements RuleActionExecut
 	 * The rule action
 	 */
     protected RuleAction ruleAction;
-	
-	/**
-	 * The node service
-	 */
-    protected NodeService nodeService;
+    
+    /**
+     * The application context
+     */
+    protected ApplicationContext applicationContext;
+    
+    /**
+     * Thread local used to prevent circular execution
+     */
+    private static ThreadLocal<Object> currentlyExecuting = new ThreadLocal<Object>();
 
 	/**
 	 * Error messages
@@ -39,23 +45,55 @@ public abstract class RuleActionExecutorAbstractBase implements RuleActionExecut
     /**
      * Constructor
      * 
-     * @param ruleAction	the rule action
-     * @param nodeService	the node service
+     * @param ruleAction	       the rule action
+     * @param applicationContext   the application context 
      */
     public RuleActionExecutorAbstractBase(
             RuleAction ruleAction,
-            NodeService nodeService)
+            ApplicationContext applicationContext)
     {
         this.ruleAction = ruleAction;
-        this.nodeService = nodeService;
+        this.applicationContext = applicationContext;
+    }    
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void execute(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
+    {
+        if (currentlyExecuting.get() == null)
+        {
+            currentlyExecuting.set(new Object());
+            try
+            {
+                // Check the mandatory properties
+                checkMandatoryProperties();
+                
+                // Execute the implementation
+                executeImpl(actionableNodeRef, actionedUponNodeRef);
+            }
+            finally
+            {
+                currentlyExecuting.set(null);
+            }
+        }
+        
     }
 	
-	/**
+    /**
+     * Execute the action implementation
+     * 
+     * @param actionableNodeRef     the actionable node
+     * @param actionedUponNodeRef   the actioned upon node
+     */
+	protected abstract void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef);
+
+    /**
 	 * Checks that all the mandatory attribtues have been set.
 	 * <p>
 	 * Raises an exception if they are not present.
 	 */
-	protected void checkMandatoryProperties()
+	private void checkMandatoryProperties()
 	{
 		Map<String, Serializable> paramValues = ruleAction.getParameterValues();
 		RuleActionDefinition actionDefinition = ruleAction.getRuleActionDefinition();
@@ -72,5 +110,5 @@ public abstract class RuleActionExecutorAbstractBase implements RuleActionExecut
 				}
 			}
 		}
-	}
+	}    
 }
