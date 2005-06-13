@@ -31,6 +31,7 @@
          <show-property name="mimetype" displayLabel="Content Type" converter="org.alfresco.faces.MimeTypeConverter" />
          <show-property name="title" displayLabel="Title" />
          <show-property name="description" displayLabel="Description" />
+         <show-property name="size" displayLabel="Size" converter="org.alfresco.faces.ByteSizeConverter" />
          <show-property name="creator" displayLabel="Author" />
       </property-sheet>
    </config>

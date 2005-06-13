@@ -106,7 +106,7 @@
                                  <tr>
                                     <td>File&nbsp;Name:</td>
                                     <td width="90%">
-                                       <h:inputText id="file-name" value="#{EditDocPropsDialog.fileName}" size="35" maxlength="1024" readonly="true"
+                                       <h:inputText id="file-name" value="#{EditDocPropsDialog.fileName}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
