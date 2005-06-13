@@ -104,7 +104,7 @@
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
                                     <td>Action:</td>
-                                    <td>
+                                    <td width="90%">
                                        <h:selectOneMenu value="#{NewRuleWizard.action}"
                                           onchange="javascript:itemSelected(this);">
                                           <f:selectItems value="#{NewRuleWizard.actions}" />

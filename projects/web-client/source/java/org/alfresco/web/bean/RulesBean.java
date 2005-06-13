@@ -42,15 +42,8 @@ public class RulesBean
     */
    public List<Rule> getRules()
    {
-      if (this.viewMode.equals("local"))
-      {
-         this.rules = this.ruleService.getRules(this.browseBean.getActionSpace().getNodeRef(), false);
-      }
-      else
-      {
-         this.rules = this.ruleService.getRules(this.browseBean.getActionSpace().getNodeRef(), true);
-      }
-      
+      // TODO: for now just get the local rules as inherited rules are not implemented yet
+      this.rules = this.ruleService.getRules(this.browseBean.getActionSpace().getNodeRef());
       return this.rules;
    }
    

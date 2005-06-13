@@ -104,7 +104,7 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>Required&nbsp;format:</td>
-                                    <td width="100%">
+                                    <td width="90%">
                                        <h:selectOneMenu value="#{NewRuleWizard.actionProperties.transformer}">
                                           <f:selectItems value="#{NewRuleWizard.transformers}" />
                                        </h:selectOneMenu>

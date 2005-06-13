@@ -11,6 +11,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -135,4 +136,9 @@ public interface ServiceRegistry
      * @return  the checkout / checkin service (or null, if one is not provided)
      */
     CheckOutCheckInService getCheckOutCheckInService();   
+    
+    /**
+     * @return  the category service (or null, if one is not provided)
+     */
+    CategoryService getCategoryService();
 }

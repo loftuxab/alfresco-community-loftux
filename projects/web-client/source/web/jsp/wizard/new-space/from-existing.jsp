@@ -117,7 +117,7 @@
                                  </tr>
                                  <tr><td class="paddingRow" /></tr>
                                  <tr>
-                                    <td>Copy existing space</td>
+                                    <td>Copy existing space [TBD]</td>
                                  </tr>
                                  <tr>
                                     <td>

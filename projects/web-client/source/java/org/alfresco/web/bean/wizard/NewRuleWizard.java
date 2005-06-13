@@ -64,9 +64,6 @@ public class NewRuleWizard extends AbstractWizardBean
    private Map<String, String> conditionProperties;
    private Map<String, String> actionProperties;
    
-   // condition and action specific lists - TEMP, picker components will be used
-   private List<SelectItem> categories;
-   
    /**
     * Deals with the finish button being pressed
     * 
@@ -128,6 +125,15 @@ public class NewRuleWizard extends AbstractWizardBean
             {
                // add the destination space id to the action properties
             }
+            else if (this.action.equals("simple-workflow"))
+            {
+            }
+            else if (this.action.equals("link-category"))
+            {
+            }
+            else if (this.action.equals("check-out"))
+            {
+            }
             
             // create the rule and add it to the space
             Rule rule = this.ruleService.createRule(ruleType);
@@ -147,7 +153,6 @@ public class NewRuleWizard extends AbstractWizardBean
          
          // commit the transaction
          tx.commit();
-     
       }
       catch (Exception e)
       {
@@ -560,20 +565,6 @@ public class NewRuleWizard extends AbstractWizardBean
    public Map<String, String> getActionProperties()
    {
       return this.actionProperties;
-   }
-   
-   // TEMP - find out from Andy how you get hold of categories - if you can!
-   public List<SelectItem> getCategories()
-   {
-      if (this.categories == null)
-      {
-         this.categories = new ArrayList<SelectItem>();
-         this.categories.add(new SelectItem("category1", "Category 1"));
-         this.categories.add(new SelectItem("category2", "Category 2"));
-         this.categories.add(new SelectItem("category3", "Category 3"));
-      }
-      
-      return this.categories;
    }
    
    /**

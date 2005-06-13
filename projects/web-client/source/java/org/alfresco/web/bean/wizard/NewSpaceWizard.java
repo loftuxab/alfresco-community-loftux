@@ -24,7 +24,6 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.ui.common.Utils;
 import org.apache.log4j.Logger;
 
 /**

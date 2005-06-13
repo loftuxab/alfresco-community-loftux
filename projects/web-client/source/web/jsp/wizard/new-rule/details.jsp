@@ -115,7 +115,7 @@
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
                                     <td>Type:</td>
-                                    <td>
+                                    <td width="90%">
                                        <h:selectOneMenu value="#{NewRuleWizard.type}">
                                           <f:selectItems value="#{NewRuleWizard.types}" />
                                        </h:selectOneMenu>

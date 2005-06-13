@@ -135,7 +135,7 @@
                                  </tr>
                                  <tr><td class="details-separator" /></tr>
                                  <tr>
-                                    <td>Copy existing space</td>
+                                    <td>Copy existing space [TBD]</td>
                                  </tr>
                                  <tr>
                                     <td>

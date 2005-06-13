@@ -16,6 +16,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
@@ -181,4 +182,11 @@ public class ServiceDescriptorRegistry
         return (CheckOutCheckInService)getService(COCI_SERVICE);
     }
     
+    /**
+     * @see org.alfresco.service.ServiceRegistry#getCheckOutCheckInService()
+     */
+    public CategoryService getCategoryService()
+    {
+        return (CategoryService)getService(CATEGORY_SERVICE);
+    }
 }
