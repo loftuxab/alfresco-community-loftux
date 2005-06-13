@@ -328,6 +328,21 @@
             <property name="alf:password">
                <type>d:text</type>
             </property>
+            <property name="alf:accountEnabled">
+               <type>d:boolean</type>
+            </property>
+            <property name="alf:accountExpiry">
+               <type>d:datetime</type>
+            </property>
+            <property name="alf:credentialsExpiry">
+               <type>d:datetime</type>
+            </property>
+            <property name="alf:accountLocked">
+               <type>d:boolean</type>
+            </property>
+            <property name="alf:salt">
+               <type>d:text</type>
+            </property>
          </properties>
       </type>
       
