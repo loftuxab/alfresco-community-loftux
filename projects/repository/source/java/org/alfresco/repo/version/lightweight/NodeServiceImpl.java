@@ -26,10 +26,11 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.PropertyException;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
-import org.apache.lucene.search.Searcher;
+
 
 /**
  * The light weight version store node service implementation.
@@ -52,7 +53,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     /**
      * The repository searcher
      */
-    private Searcher searcher;
+    private SearchService searcher;
     
     /**
      * The dictionary service
@@ -75,7 +76,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      * 
      * @param searcher  the searcher
      */
-    public void setSearcher(Searcher searcher)
+    public void setSearcher(SearchService searcher)
     {
         this.searcher = searcher; 
     }
