@@ -37,7 +37,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -49,11 +49,11 @@
       </managed-property>
       <managed-property>
          <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
+         <value>#{AlfSearchService}</value>
       </managed-property>
       <managed-property>
          <property-name>nodeOperationsService</property-name>
-         <value>#{nodeOperationsService}</value>
+         <value>#{AlfCopyService}</value>
       </managed-property>
    </managed-bean>
    
@@ -66,7 +66,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -78,7 +78,7 @@
       </managed-property>
       <managed-property>
          <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
+         <value>#{AlfSearchService}</value>
       </managed-property>
    </managed-bean>
    
@@ -91,7 +91,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -103,7 +103,7 @@
       </managed-property>
       <managed-property>
          <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
+         <value>#{AlfSearchService}</value>
       </managed-property>
    </managed-bean>
    
@@ -116,7 +116,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -128,7 +128,7 @@
       </managed-property>
       <managed-property>
          <property-name>contentService</property-name>
-         <value>#{contentService}</value>
+         <value>#{AlfContentService}</value>
       </managed-property>
    </managed-bean>
    
@@ -141,7 +141,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -153,7 +153,7 @@
       </managed-property>
       <managed-property>
          <property-name>contentService</property-name>
-         <value>#{contentService}</value>
+         <value>#{AlfContentService}</value>
       </managed-property>
    </managed-bean>
    
@@ -166,7 +166,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -178,7 +178,7 @@
       </managed-property>
       <managed-property>
          <property-name>contentService</property-name>
-         <value>#{contentService}</value>
+         <value>#{AlfContentService}</value>
       </managed-property>
    </managed-bean>
    
@@ -191,7 +191,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -203,7 +203,7 @@
       </managed-property>
       <managed-property>
          <property-name>ruleService</property-name>
-         <value>#{ruleService}</value>
+         <value>#{AlfRuleService}</value>
       </managed-property>
    </managed-bean>
    
@@ -216,7 +216,7 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -241,15 +241,15 @@
       </managed-property>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>versionOperationsService</property-name>
-         <value>#{versionOperationsService}</value>
+         <value>#{AlfCheckoutCheckinService}</value>
       </managed-property>
       <managed-property>
          <property-name>contentService</property-name>
-         <value>#{contentService}</value>
+         <value>#{AlfContentService}</value>
       </managed-property>
    </managed-bean>
    
@@ -262,11 +262,11 @@
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
+         <value>#{AlfSearchService}</value>
       </managed-property>
    </managed-bean>
    
@@ -283,15 +283,15 @@
       </managed-property>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>searchService</property-name>
-         <value>#{searcherComponent}</value>
+         <value>#{AlfSearchService}</value>
       </managed-property>
       <managed-property>
          <property-name>lockService</property-name>
-         <value>#{lockService}</value>
+         <value>#{AlfLockService}</value>
       </managed-property>
    </managed-bean>
    
@@ -308,11 +308,11 @@
       </managed-property>
       <managed-property>
          <property-name>nodeService</property-name>
-         <value>#{nodeService}</value>
+         <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>nodeOperationsService</property-name>
-         <value>#{nodeOperationsService}</value>
+         <value>#{AlfCopyService}</value>
       </managed-property>
    </managed-bean>
    
@@ -329,7 +329,7 @@
       </managed-property>
       <managed-property>
          <property-name>ruleService</property-name>
-         <value>#{ruleService}</value>
+         <value>#{AlfRuleService}</value>
       </managed-property>
    </managed-bean>
    

@@ -15,11 +15,6 @@ import org.alfresco.service.namespace.QName;
 public interface ServiceDescriptor
 {
     /**
-     * @return  the name of the service
-     */
-    public String getName();
- 
-    /**
      * @return  the qualified name of the service
      */
     public QName getQualifiedName();

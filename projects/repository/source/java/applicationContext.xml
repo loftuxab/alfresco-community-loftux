@@ -961,6 +961,7 @@
       
    <bean id="alfrescoService" abstract="true" class="org.alfresco.repo.service.BeanServiceDescriptor">
       <property name="namespaceService"><ref local="namespaceService"/></property>
+      <property name="namespace"><value>http://www.alfresco.org/1.0</value></property>
    </bean>
 
 </beans>

@@ -5,53 +5,62 @@
 
    <!-- Alfresco Services -->
 
-   <alias alias="alf:serviceregistry" name="serviceRegistry"/>
+   <alias alias="AlfServiceRegistry" name="serviceRegistry"/>
    
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:serviceregistry"/>
+         <value>ServiceRegistry</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.ServiceRegistry</value>
       </property>
       <property name="description">
-         <value>Service Registry</value>
+         <value>Repository service registry</value>
+      </property>
+      <property name="implementation">
+         <idref bean="AlfServiceRegistry"/>
       </property>
    </bean>
 
-   <alias alias="alf:namespace" name="namespaceService"/>
+   <alias alias="AlfNamespaceService" name="namespaceService"/>
    
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:namespace"/>
+         <value>NamespaceService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.namespace.NamespaceService</value>
       </property>
       <property name="description">
-         <value>Namespace Service</value>
+         <value>Namespace service</value>
+      </property>
+      <property name="implementation">
+         <idref bean="AlfNamespaceService"/>
       </property>
    </bean>
 
-   <alias alias="alf:transaction" name="userTransaction"/>
+   <alias alias="AlfUserTransaction" name="userTransaction"/>
    
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:transaction"/>
+         <value>UserTransaction</value>
       </property>
       <property name="interface">
          <value>javax.transaction.UserTransaction</value>
       </property>
       <property name="description">
-         <value>User Transaction</value>
+         <value>Repository user transaction</value>
+      </property>
+      <property name="implementation">
+         <idref bean="AlfUserTransaction"/>
       </property>
    </bean>
 
-   <alias alias="alf:dictionary" name="dictionaryService"/>
+   <alias alias="AlfDictionaryService" name="dictionaryService"/>
    
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:dictionary"/>
+         <value>DictionaryService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.dictionary.DictionaryService</value>
@@ -59,13 +68,16 @@
       <property name="description">
          <value>Dictionary Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfDictionaryService"/>
+      </property>
    </bean>
 
-   <alias alias="alf:node" name="nodeService"/>
+   <alias alias="AlfNodeService" name="nodeService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:node"/>
+         <value>NodeService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.repository.NodeService</value>
@@ -73,13 +85,16 @@
       <property name="description">
          <value>Node Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfNodeService"/>
+      </property>
    </bean>
 
-   <alias alias="alf:content" name="contentService"/>
+   <alias alias="AlfContentService" name="contentService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:content"/>
+         <value>ContentService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.repository.ContentService</value>
@@ -87,13 +102,16 @@
       <property name="description">
          <value>Content Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfContentService"/>
+      </property>
    </bean>
 
-   <alias alias="alf:mimetype" name="mimetypeMap"/>
+   <alias alias="AlfMimetypeService" name="mimetypeMap"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:mimetype"/>
+         <value>MimetypeService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.repository.MimetypeService</value>
@@ -101,13 +119,16 @@
       <property name="description">
          <value>Mime Type Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfMimetypeService"/>
+      </property>
    </bean>
    
-   <alias alias="alf:search" name="searcherComponent"/>
+   <alias alias="AlfSearchService" name="searcherComponent"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:search"/>
+         <value>SearchService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.search.SearchService</value>
@@ -115,13 +136,16 @@
       <property name="description">
          <value>Search Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfSearchService"/>
+      </property>
    </bean>
 
-   <alias alias="alf:category" name="categoryService"/>
+   <alias alias="AlfCategoryService" name="categoryService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:category"/>
+         <value>CategoryService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.search.CategoryService</value>
@@ -129,13 +153,16 @@
       <property name="description">
          <value>Category Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfCategoryService"/>
+      </property>
    </bean>
    
-   <alias alias="alf:copy" name="nodeOperationsService"/>
+   <alias alias="AlfCopyService" name="nodeOperationsService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:copy"/>
+         <value>CopyService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.repository.CopyService</value>
@@ -143,13 +170,16 @@
       <property name="description">
          <value>Copy Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfCopyService"/>
+      </property>
    </bean>
 
-   <alias alias="alf:lock" name="lockService"/>
+   <alias alias="AlfLockService" name="lockService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:lock"/>
+         <value>LockService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.lock.LockService</value>
@@ -157,13 +187,16 @@
       <property name="description">
          <value>Lock Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfLockService"/>
+      </property>
    </bean>
 
-   <alias alias="alf:version" name="lightWeightVersionStoreVersionService"/>
+   <alias alias="AlfVersionService" name="lightWeightVersionStoreVersionService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:version"/>
+         <value>VersionService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.version.VersionService</value>
@@ -171,13 +204,16 @@
       <property name="description">
          <value>Version Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfVersionService"/>
+      </property>
    </bean>
 
-   <alias alias="alf:checkoutcheckin" name="versionOperationsService"/>
+   <alias alias="AlfCheckoutCheckinService" name="versionOperationsService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:checkoutcheckin"/>
+         <value>CheckoutCheckinService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.coci.CheckOutCheckInService</value>
@@ -185,19 +221,25 @@
       <property name="description">
          <value>Checkout / Checkin Service</value>
       </property>
+      <property name="implementation">
+         <idref bean="AlfCheckoutCheckinService"/>
+      </property>
    </bean>
 
-   <alias alias="alf:rule" name="ruleService"/>
+   <alias alias="AlfRuleService" name="ruleService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="alf:rule"/>
+         <value>RuleService</value>
       </property>
       <property name="interface">
          <value>org.alfresco.service.cmr.rule.RuleService</value>
       </property>
       <property name="description">
          <value>Rule Service</value>
+      </property>
+      <property name="implementation">
+         <idref bean="AlfRuleService"/>
       </property>
    </bean>
 

@@ -2,11 +2,21 @@ package org.alfresco.repo.service;
 
 import java.util.Collection;
 
+import javax.transaction.UserTransaction;
+
 import junit.framework.TestCase;
 
 import org.alfresco.service.ServiceDescriptor;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -95,8 +105,29 @@ public class ServiceDescriptorRegistryTest extends TestCase
 
         ServiceRegistry registry = (ServiceRegistry)appContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
         assertNotNull(registry);
-        NodeService node = registry.getNodeService();
-        assertNotNull(node);
+        NodeService s1 = registry.getNodeService();
+        assertNotNull(s1);
+        CheckOutCheckInService s2 = registry.getCheckOutCheckInService();
+        assertNotNull(s2);
+        ContentService s3 = registry.getContentService();
+        assertNotNull(s3);
+        CopyService s4 = registry.getCopyService();
+        assertNotNull(s4);
+        DictionaryService s5 = registry.getDictionaryService();
+        assertNotNull(s5);
+        LockService s6 = registry.getLockService();
+        assertNotNull(s6);
+        MimetypeService s7 = registry.getMimetypeService();
+        assertNotNull(s7);
+        SearchService s8 = registry.getSearchService();
+        assertNotNull(s8);
+        UserTransaction s9 = registry.getUserTransaction();
+        assertNotNull(s9);
+        UserTransaction s10 = registry.getUserTransaction();
+        assertNotNull(s10);
+        assertFalse(s9.equals(s10));
+        VersionService s11 = registry.getVersionService();
+        assertNotNull(s11);
     }
     
     

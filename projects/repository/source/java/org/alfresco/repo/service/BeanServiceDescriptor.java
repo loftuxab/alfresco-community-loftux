@@ -1,9 +1,9 @@
 package org.alfresco.repo.service;
 
 import java.util.Collection;
-import java.util.Properties;
 
 import org.alfresco.service.ServiceDescriptor;
+import org.alfresco.service.ServiceException;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -28,8 +28,8 @@ public class BeanServiceDescriptor
     // Namespace Service
     private NamespaceService namespaceService = null;
     
-    // Namespace Prefixes
-    private Properties namespacePrefixes = null; 
+    // Namespace
+    private String namespace = null; 
     
     // Service Name
     private String name = null;
@@ -40,6 +40,9 @@ public class BeanServiceDescriptor
 
     // Service Description
     private String description = null;
+    
+    // Service Implementation Name
+    private String implementationName = null;
     
     
     /* (non-Javadoc)
@@ -61,13 +64,13 @@ public class BeanServiceDescriptor
     }
     
     /**
-     * Sets the namespaces that this factory will use to resolve names
+     * Sets the service namespace
      * 
-     * @param namespacePrefixes  the namespace prefixes
+     * @param namespace  the namespace
      */
-    public void setNamespacePrefixes(Properties namespacePrefixes)
+    public void setNamespace(String namespace)
     {
-        this.namespacePrefixes = namespacePrefixes;
+        this.namespace = namespace;
     }
     
     /**
@@ -94,6 +97,14 @@ public class BeanServiceDescriptor
         this.description = description;
     }
     
+    /**
+     * Sets the service implementation
+     */
+    public void setImplementation(String implementationName)
+    {
+        this.implementationName = implementationName;
+    }
+    
     /* (non-Javadoc)
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
@@ -101,21 +112,20 @@ public class BeanServiceDescriptor
         throws Exception
     {
         ParameterCheck.mandatory("Namespace Service", namespaceService);
-        ParameterCheck.mandatory("Service Name", name);
-        ParameterCheck.mandatory("Service Interface", serviceInterface);
+        ParameterCheck.mandatory("Name", name);
+        ParameterCheck.mandatory("Interface", serviceInterface);
+        ParameterCheck.mandatory("Implementation", implementationName);
 
-        // TODO: Construct local namespace prefix resolver
-
+        if (namespace != null)
+        {
+            if (!namespaceService.getURIs().contains(namespace))
+            {
+                throw new ServiceException("Namespace URI " + namespace + " is not defined for service " + name);
+            }
+        }
+        
         // Create QName version of service name
-        qName = QName.createQName(name, namespaceService);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.service.ServiceDescriptor#getName()
-     */
-    public String getName()
-    {
-        return name;
+        qName = QName.createQName((namespace == null) ? NamespaceService.DEFAULT_URI : namespace, name);
     }
     
     /* (non-Javadoc)
@@ -148,7 +158,7 @@ public class BeanServiceDescriptor
     public Collection<String> getSupportedStoreProtocols()
     {
         Collection<String> stores = null;
-        Object implementation = beanFactory.getBean(name);
+        Object implementation = beanFactory.getBean(implementationName);
         if (implementation instanceof StoreRedirector)
         {
             stores = ((StoreRedirector)implementation).getSupportedStoreProtocols();
@@ -162,7 +172,7 @@ public class BeanServiceDescriptor
     public Collection<StoreRef> getSupportedStores()
     {
         Collection<StoreRef> stores = null;
-        Object implementation = beanFactory.getBean(name);
+        Object implementation = beanFactory.getBean(implementationName);
         if (implementation instanceof StoreRedirector)
         {
             stores = ((StoreRedirector)implementation).getSupportedStores();
@@ -170,5 +180,12 @@ public class BeanServiceDescriptor
         return stores;
     }
 
-    
+    /**
+     * @return  the implementation bean name
+     */
+    /*package*/ String getImplementation()
+    {
+        return implementationName;
+    }
+   
 }

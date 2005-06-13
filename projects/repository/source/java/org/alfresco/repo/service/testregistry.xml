@@ -29,18 +29,14 @@
       
    <bean id="alfrescoService" abstract="true" class="org.alfresco.repo.service.BeanServiceDescriptor">
       <property name="namespaceService"><ref bean="namespaceService"/></property>
-      <property name="namespacePrefixes">
-         <props>
-            <prop key="test">http://www.alfresco.org/test/serviceregistrytest</prop>
-         </props>
-      </property>
+      <property name="namespace"><value>http://www.alfresco.org/test/serviceregistrytest</value></property>
    </bean>
 
-   <alias alias="test:service1" name="test1Component"/>
+   <alias alias="test_service1" name="test1Component"/>
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="test:service1"/>
+         <value>service1</value>
       </property>
       <property name="interface">
          <value>org.alfresco.repo.service.ServiceDescriptorRegistryTest$TestServiceInterface</value>
@@ -48,13 +44,15 @@
       <property name="description">
          <value>Test Service 1</value>
       </property>
+      <property name="implementation">
+         <idref bean="test_service1"/>
+      </property>
    </bean>
-
 
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="test:service2"/>
+         <idref bean="service2"/>
       </property>
       <property name="interface">
          <value>org.alfresco.repo.service.ServiceDescriptorRegistryTest$TestServiceInterface</value>
@@ -62,14 +60,17 @@
       <property name="description">
          <value>Test Service 2</value>
       </property>
+      <property name="implementation">
+         <idref bean="test_service2"/>
+      </property>
    </bean>
 
-   <alias alias="test:service2" name="test2Component"/>
+   <alias alias="test_service2" name="test2Component"/>
 
 
    <bean parent="alfrescoService">
       <property name="name">
-         <idref bean="test:service3"/>
+         <idref bean="service3"/>
       </property>
       <property name="interface">
          <value>org.alfresco.repo.service.StoreRedirectorProxyFactoryTest$TestServiceInterface</value>
@@ -77,9 +78,12 @@
       <property name="description">
          <value>Test Service 3</value>
       </property>
+      <property name="implementation">
+         <idref bean="test_service3"/>
+      </property>
    </bean>
 
-   <alias alias="test:service3" name="service1"/>
+   <alias alias="test_service3" name="service1"/>
 
    
    <bean id="test1Component" class="org.alfresco.repo.service.ServiceDescriptorRegistryTest$Test1Component">

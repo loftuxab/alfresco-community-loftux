@@ -28,23 +28,23 @@ import org.alfresco.service.namespace.QName;
 public interface ServiceRegistry
 {
     // Service Registry
-    static final String SERVICE_REGISTRY = "alf:serviceregistry";
+    static final String SERVICE_REGISTRY = "AlfServiceRegistry";
     
     // Core Services
-    static final QName USER_TRANSACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "transaction");
-    static final QName REGISTRY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "serviceregistry");
-    static final QName NAMESPACE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "namespace");
-    static final QName DICTIONARY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "dictionary");
-    static final QName NODE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "node");
-    static final QName CONTENT_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "content");
-    static final QName MIMETYPE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "mimetype");
-    static final QName SEARCH_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "search");
-    static final QName CATEGORY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "category");
-    static final QName COPY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "copy");
-    static final QName LOCK_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "lock");
-    static final QName VERSION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "version");
-    static final QName COCI_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "checkoutcheckin");
-    static final QName RULE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "rule");
+    static final QName USER_TRANSACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "UserTransaction");
+    static final QName REGISTRY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ServiceRegistry");
+    static final QName NAMESPACE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NamespaceService");
+    static final QName DICTIONARY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "DictionaryService");
+    static final QName NODE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NodeService");
+    static final QName CONTENT_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ContentService");
+    static final QName MIMETYPE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "MimetypeService");
+    static final QName SEARCH_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "SearchService");
+    static final QName CATEGORY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CategoryService");
+    static final QName COPY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CopyService");
+    static final QName LOCK_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "LockService");
+    static final QName VERSION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "VersionService");
+    static final QName COCI_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CheckoutCheckinService");
+    static final QName RULE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "RuleService");
 
     
     /**

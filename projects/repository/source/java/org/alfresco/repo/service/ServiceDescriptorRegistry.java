@@ -39,7 +39,7 @@ public class ServiceDescriptorRegistry
     private BeanFactory beanFactory = null;
 
     // Service Descriptor map
-    private Map<QName, ServiceDescriptor> descriptors = new HashMap<QName, ServiceDescriptor>();
+    private Map<QName, BeanServiceDescriptor> descriptors = new HashMap<QName, BeanServiceDescriptor>();
 
 
     /* (non-Javadoc)
@@ -47,10 +47,10 @@ public class ServiceDescriptorRegistry
      */
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
     {
-        Map beans = beanFactory.getBeansOfType(ServiceDescriptor.class);
+        Map beans = beanFactory.getBeansOfType(BeanServiceDescriptor.class);
         for (Object bean : beans.values())
         {
-            ServiceDescriptor descriptor = (ServiceDescriptor)bean;
+            BeanServiceDescriptor descriptor = (BeanServiceDescriptor)bean;
             descriptors.put(descriptor.getQualifiedName(), descriptor);
         }
     }
@@ -93,10 +93,10 @@ public class ServiceDescriptorRegistry
     public Object getService(QName service)
     {
         Object serviceBean = null;
-        ServiceDescriptor descriptor = descriptors.get(service);
+        BeanServiceDescriptor descriptor = descriptors.get(service);
         if (descriptor != null)
         {
-            serviceBean = beanFactory.getBean(descriptor.getName()); 
+            serviceBean = beanFactory.getBean(descriptor.getImplementation()); 
         }
         return serviceBean;
     }
