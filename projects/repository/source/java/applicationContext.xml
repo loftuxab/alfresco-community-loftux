@@ -851,6 +851,9 @@
 			</property>
 			<property name="policyComponent">
 				<ref bean="policyComponent"/>
+			</property>			
+			<property name="serviceRegistry">
+				<ref bean="serviceRegistry"/>
 			</property>
          </bean>
       </property>

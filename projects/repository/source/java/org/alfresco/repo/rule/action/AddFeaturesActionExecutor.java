@@ -6,11 +6,11 @@ package org.alfresco.repo.rule.action;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Add features action executor implementation.
@@ -22,20 +22,16 @@ public class AddFeaturesActionExecutor extends RuleActionExecutorAbstractBase
 	private NodeService nodeService;
 
     /**
-	 * Constructor
-	 * 
-	 * @param ruleAction	      the rule action
-	 * @param nodeService	      the node service
-     * @param applicationContext  the application context
-	 */
-    public AddFeaturesActionExecutor(
-            RuleAction ruleAction,
-            ApplicationContext applicationContext)
-    {
-        super(ruleAction, applicationContext);
-        
-        this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
-    }
+     * Constructor
+     * 
+     * @param ruleAction
+     * @param serviceRegistry
+     */
+    public AddFeaturesActionExecutor(RuleAction ruleAction, ServiceRegistry serviceRegistry) 
+	{
+		super(ruleAction, serviceRegistry);		
+		this.nodeService = serviceRegistry.getNodeService();
+	}
 
     /**
      * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, NodeRef)

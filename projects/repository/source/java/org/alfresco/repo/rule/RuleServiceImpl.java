@@ -3,15 +3,14 @@
  */
 package org.alfresco.repo.rule;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -26,15 +25,12 @@ import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * 
  * @author Roy Wetherall   
  */
-public class RuleServiceImpl implements RuleService, ApplicationContextAware
+public class RuleServiceImpl implements RuleService
 {
     /**
      * The config service
@@ -55,6 +51,11 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
      * The dictionary service
      */
     private DictionaryService dictionaryService;
+	
+	/**
+	 * The service registry
+	 */
+	private ServiceRegistry serviceRegistry;
     
     /**
      * The policy component
@@ -75,11 +76,6 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
      * List of rule type adapters
      */
     private List<RuleTypeAdapter> adapters;
-
-    /**
-     * The application context
-     */
-    private ApplicationContext applicationContext;
     
     /**
      * Service intialization method
@@ -115,8 +111,8 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
                 {
                     // Create the rule type adapter
                     RuleTypeAdapter adapter = (RuleTypeAdapter)Class.forName(ruleTypeAdapter).
-                            getConstructor(new Class[]{RuleType.class, RuleService.class, NodeService.class, ApplicationContext.class}).
-                            newInstance(new Object[]{ruleType, this, this.nodeService, this.applicationContext});
+                            getConstructor(new Class[]{RuleType.class, RuleService.class, PolicyComponent.class, ServiceRegistry.class}).
+                            newInstance(new Object[]{ruleType, this, this.policyComponent, this.serviceRegistry});
                     
                     // Register the adapters policy behaviour
                     adapter.registerPolicyBehaviour();
@@ -169,6 +165,16 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     {
         this.dictionaryService = dictionaryService;
     }
+	
+	/**
+	 * Set the service registry
+	 * 
+	 * @param serviceRegistry	the service registry
+	 */
+	public void setServiceRegistry(ServiceRegistry serviceRegistry) 
+	{
+		this.serviceRegistry = serviceRegistry;
+	}
     
     /**
      * Sets the policy component
@@ -178,15 +184,6 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     public void setPolicyComponent(PolicyComponent policyComponent)
     {
         this.policyComponent = policyComponent;
-    }
-    
-    /**
-     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
-     */
-    public void setApplicationContext(ApplicationContext applicationContext) 
-        throws BeansException
-    {
-        this.applicationContext = applicationContext;
     }
     
     /**

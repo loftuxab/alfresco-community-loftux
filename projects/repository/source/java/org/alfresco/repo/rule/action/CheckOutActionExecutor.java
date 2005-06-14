@@ -3,11 +3,11 @@
  */
 package org.alfresco.repo.rule.action;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Check out action executor
@@ -27,18 +27,16 @@ public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
     private CheckOutCheckInService cociService;
     
     /**
-     * Constructor 
+     * Constructor
      * 
      * @param ruleAction
-     * @param applicationContext
+     * @param serviceRegistry
      */
-    public CheckOutActionExecutor(RuleAction ruleAction,
-            ApplicationContext applicationContext)
-    {
-        super(ruleAction, applicationContext);
-        
-        this.cociService = (CheckOutCheckInService)applicationContext.getBean("versionOperationsService");
-    }
+    public CheckOutActionExecutor(RuleAction ruleAction, ServiceRegistry serviceRegistry) 
+	{
+		super(ruleAction, serviceRegistry);		
+		this.cociService = serviceRegistry.getCheckOutCheckInService();
+	}
 
     /**
      * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)

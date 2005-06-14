@@ -8,13 +8,12 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import org.alfresco.repo.rule.RuleConditionEvaluator;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleServiceException;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Rule condition evaluator abstract base implementation.
@@ -39,16 +38,6 @@ public abstract class RuleConditionEvaluatorAbstractBase implements RuleConditio
 	private static final String ERR_MAND_PROP = "A value for the mandatory property {0} has not been set on the rule condition {1}";
 
     /**
-     * The node service
-     */
-    protected NodeService nodeService;
-    
-    /**
-     * The application context
-     */
-    protected ApplicationContext applicationContext;
-
-    /**
      * Constructor
      * 
      * @param ruleCondition		   the rule condition
@@ -56,12 +45,9 @@ public abstract class RuleConditionEvaluatorAbstractBase implements RuleConditio
      */
     public RuleConditionEvaluatorAbstractBase(
             RuleCondition ruleCondition, 
-            NodeService nodeService,
-            ApplicationContext applicationContext)
+            ServiceRegistry serviceRegistry)
     {
         this.ruleCondition = ruleCondition;
-        this.nodeService = nodeService;
-        this.applicationContext = applicationContext;
     }
     
     /**

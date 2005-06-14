@@ -3,11 +3,11 @@
  */
 package org.alfresco.repo.rule.action;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Copy action executor.
@@ -27,19 +27,19 @@ public class MoveActionExecutor extends RuleActionExecutorAbstractBase
      * Node service
      */
     private NodeService nodeService;
-        
-    /**
-     * Constructor 
-     * 
-     * @param ruleAction            the rule action
-     * @param applicationContext    the application context
-     */
-    public MoveActionExecutor(RuleAction ruleAction, ApplicationContext applicationContext)
-    {        
-        super(ruleAction, applicationContext);
-        
-        this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
-    }
+     
+	/**
+	 * Constructor 
+	 * 
+	 * @param ruleAction
+	 * @param serviceRegistry
+	 */
+	public MoveActionExecutor(RuleAction ruleAction, ServiceRegistry serviceRegistry) 
+	{
+		super(ruleAction, serviceRegistry);
+		
+		this.nodeService = serviceRegistry.getNodeService();
+	}
 
     /**
      * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)

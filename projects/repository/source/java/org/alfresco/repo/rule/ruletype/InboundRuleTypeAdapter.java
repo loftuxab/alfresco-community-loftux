@@ -4,13 +4,13 @@
 package org.alfresco.repo.rule.ruletype;
 
 import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Inbound rule type adapter class.
@@ -19,22 +19,19 @@ import org.springframework.context.ApplicationContext;
  */
 public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
 {
-    /**
-     * Constructor
-     * 
-     * @param ruleType			   the rule type
-     * @param applicationContext   the application context
-     */
-    public InboundRuleTypeAdapter(
-            RuleType ruleType,
-            RuleService ruleService,
-            NodeService nodeService,
-            ApplicationContext applicationContext)
-    {
-        super(ruleType, ruleService, nodeService, applicationContext);
-    }
+	/**
+	 * Constructor
+	 *  
+	 * @param ruleType
+	 * @param policyComponent
+	 * @param serviceRegistry
+	 */
+    public InboundRuleTypeAdapter(RuleType ruleType, RuleService ruleService, PolicyComponent policyComponent, ServiceRegistry serviceRegistry) 
+	{
+		super(ruleType, ruleService, policyComponent, serviceRegistry);
+	}
 
-    /**
+	/**
      * @see org.alfresco.repo.rule.RuleTypeAdapter#registerPolicyBehaviour()
      */
     public void registerPolicyBehaviour()

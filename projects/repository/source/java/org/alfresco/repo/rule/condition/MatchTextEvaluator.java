@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleCondition;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Contains text evaluator
@@ -25,22 +25,13 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
     
     public enum Operation {CONTAINS, BEGINS, ENDS, EXACT};
     
-    //private NodeService nodeService;
+    private NodeService nodeService;
 	
-	/**
-	 * Contructor 
-	 * 
-	 * @param ruleCondition		   the rule condition
-	 * @param applicationContext   the application context
-	 */
-	public MatchTextEvaluator(
-			RuleCondition ruleCondition,
-            NodeService nodeService,
-			ApplicationContext applicationContext) 
+	public MatchTextEvaluator(RuleCondition ruleCondition, ServiceRegistry serviceRegistry) 
 	{
-		super(ruleCondition, nodeService, applicationContext);
-        
-        //this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
+		super(ruleCondition, serviceRegistry);
+		
+		this.nodeService = serviceRegistry.getNodeService();
 	}
 
 	/**

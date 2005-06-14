@@ -8,12 +8,12 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import org.alfresco.repo.rule.RuleActionExecuter;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
 import org.alfresco.service.cmr.rule.RuleServiceException;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Rule action executor abstract base.
@@ -28,11 +28,6 @@ public abstract class RuleActionExecutorAbstractBase implements RuleActionExecut
     protected RuleAction ruleAction;
     
     /**
-     * The application context
-     */
-    protected ApplicationContext applicationContext;
-    
-    /**
      * Thread local used to prevent circular execution
      */
     private static ThreadLocal<Object> currentlyExecuting = new ThreadLocal<Object>();
@@ -45,15 +40,14 @@ public abstract class RuleActionExecutorAbstractBase implements RuleActionExecut
     /**
      * Constructor
      * 
-     * @param ruleAction	       the rule action
-     * @param applicationContext   the application context 
+     * @param ruleAction
+     * @param serviceRegistry
      */
     public RuleActionExecutorAbstractBase(
             RuleAction ruleAction,
-            ApplicationContext applicationContext)
+            ServiceRegistry serviceRegistry)
     {
         this.ruleAction = ruleAction;
-        this.applicationContext = applicationContext;
     }    
     
     /**

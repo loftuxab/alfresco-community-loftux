@@ -8,12 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.version.Version;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Check in action executor
@@ -36,20 +36,17 @@ public class CheckInActionExecutor extends RuleActionExecutorAbstractBase
     private CheckOutCheckInService cociService;
     
     /**
-     * Constructor 
+     * Constructor
      * 
      * @param ruleAction
-     * @param applicationContext
+     * @param serviceRegistry
      */
-    public CheckInActionExecutor(
-            RuleAction ruleAction,
-            ApplicationContext applicationContext)
-    {
-        super(ruleAction, applicationContext);
-        
-        this.nodeService = (NodeService)applicationContext.getBean("nodeService");
-        this.cociService = (CheckOutCheckInService)applicationContext.getBean("versionOperationsService");
-    }
+    public CheckInActionExecutor(RuleAction ruleAction, ServiceRegistry serviceRegistry) 
+	{
+		super(ruleAction, serviceRegistry);		
+		this.nodeService = serviceRegistry.getNodeService();
+		this.cociService = serviceRegistry.getCheckOutCheckInService();
+	}
 
     /**
      * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)

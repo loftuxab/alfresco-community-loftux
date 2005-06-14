@@ -3,11 +3,11 @@
  */
 package org.alfresco.repo.rule.action;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Copy action executor.
@@ -29,19 +29,17 @@ public class CopyActionExecutor extends RuleActionExecutorAbstractBase
      */
     private CopyService copyService;
     
-    
-    /**
-     * Constructor 
-     * 
-     * @param ruleAction            the rule action
-     * @param applicationContext    the application context
-     */
-    public CopyActionExecutor(RuleAction ruleAction, ApplicationContext applicationContext)
-    {        
-        super(ruleAction, applicationContext);
-        
-        this.copyService = (CopyService)this.applicationContext.getBean("nodeOperationsService");
-    }
+	/**
+	 * Constructor
+	 * 
+	 * @param ruleAction
+	 * @param serviceRegistry
+	 */
+	public CopyActionExecutor(RuleAction ruleAction, ServiceRegistry serviceRegistry) 
+	{
+		super(ruleAction, serviceRegistry);		
+		this.copyService = serviceRegistry.getCopyService();
+	}
 
     /**
      * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)

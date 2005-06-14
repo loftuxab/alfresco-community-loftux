@@ -11,15 +11,14 @@ import org.alfresco.repo.rule.RuleActionExecuter;
 import org.alfresco.repo.rule.RuleConditionDefinitionImpl;
 import org.alfresco.repo.rule.RuleConditionEvaluator;
 import org.alfresco.repo.rule.RuleTypeAdapter;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Rule type adapter abstract base class implmentation.
@@ -39,33 +38,31 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
     protected PolicyComponent policyComponent;
     
 	/**
+	 * Service registry
+	 */
+	protected ServiceRegistry serviceRegistry;
+	
+	/**
 	 * The rule service
 	 */
     private RuleService ruleService;
 
-    /**
-     * The application context
-     */
-    private ApplicationContext applicationContext;
-
-    private NodeService nodeService;
     
     /**
      * Constructor
      * 
-     * @param ruleType			 the rule type
-     * @param applicationContext the applicaiton context
+     * @param ruleType			the rule type
+     * @param serviceRegistry	the service registry
      */
     public RuleTypeAdapterAbstractBase(
-            RuleType ruleType,
-            RuleService ruleService,
-            NodeService nodeService,
-            ApplicationContext applicationContext)
+			RuleType ruleType, 
+			RuleService ruleService,
+			PolicyComponent policyComponent,
+			ServiceRegistry serviceRegistry)
     {
-        this.applicationContext = applicationContext;
-        this.nodeService = nodeService;
         this.ruleType = ruleType;
-        this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");;
+        this.policyComponent = policyComponent;
+		this.serviceRegistry = serviceRegistry;
         this.ruleService = ruleService; 
     }
     
@@ -145,8 +142,8 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
         {
             // Create the action executor
             executor = (RuleActionExecuter)Class.forName(executorString).
-                    getConstructor(new Class[]{RuleAction.class, ApplicationContext.class}).
-                    newInstance(new Object[]{action, this.applicationContext});
+                    getConstructor(new Class[]{RuleAction.class, ServiceRegistry.class}).
+                    newInstance(new Object[]{action, this.serviceRegistry});
         }
         catch(Exception exception)
         {
@@ -172,8 +169,8 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
         {
             // Create the condition evaluator
             evaluator = (RuleConditionEvaluator)Class.forName(evaluatorString).
-                    getConstructor(new Class[]{RuleCondition.class, NodeService.class, ApplicationContext.class}).
-                    newInstance(new Object[]{cond, this.nodeService, this.applicationContext});
+                    getConstructor(new Class[]{RuleCondition.class, ServiceRegistry.class}).
+                    newInstance(new Object[]{cond, this.serviceRegistry});
         }
         catch(Exception exception)
         {
