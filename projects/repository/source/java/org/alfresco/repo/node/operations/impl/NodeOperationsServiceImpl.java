@@ -6,6 +6,7 @@ package org.alfresco.repo.node.operations.impl;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.ParameterCheck;
 
 /**
  * Node operations service implmentation.
@@ -119,65 +121,79 @@ public class NodeOperationsServiceImpl implements CopyService
 		NodeRef destinationNodeRef = null;
         
         // Check that all the passed values are not null
-        if (sourceNodeRef != null && 
-            destinationParent != null && 
-			destinationQName != null)
+        ParameterCheck.mandatory("Source Node", sourceNodeRef);
+        ParameterCheck.mandatory("Destination Parent", destinationParent);
+        ParameterCheck.mandatory("Destination Association Name", destinationQName);
+
+        if (sourceNodeRef.getStoreRef().equals(destinationParent.getStoreRef()) == false)
         {
-            if (sourceNodeRef.getStoreRef().equals(destinationParent.getStoreRef()) == false)
-            {
-                // TODO We need to create a new node in the other store with the same id as the source
+            // TODO We need to create a new node in the other store with the same id as the source
 
-                // Error - since at the moment we do not support cross store copying
-                throw new UnsupportedOperationException("Copying nodes across stores is not currently supported.");
-            }
-
-            // Extract Type Definition
-			QName sourceTypeRef = this.nodeService.getType(sourceNodeRef);
-            TypeDefinition typeDef = dictionaryService.getType(sourceTypeRef);
-            if (typeDef == null)
-            {
-                throw new InvalidTypeException(sourceTypeRef);
-            }
-            
-            // Establish the scope of the copy
-			PolicyScope copyDetails = getCopyDetails(sourceNodeRef);
-			
-            // Create collection of properties for type and mandatory aspects
-            Map<QName, Serializable> typeProps = copyDetails.getProperties(); 
-            Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-            if (typeProps != null)
-            {
-                properties.putAll(typeProps);
-            }
-            for (AspectDefinition aspectDef : typeDef.getDefaultAspects())
-            {
-                Map<QName, Serializable> aspectProps = copyDetails.getProperties(aspectDef.getName());
-                if (aspectProps != null)
-                {
-                    properties.putAll(aspectProps);
-                }
-            }
-            
-			// Create the new node
-            ChildAssociationRef destinationChildAssocRef = this.nodeService.createNode(
-                    destinationParent, 
-                    destinationAssocTypeQName,
-                    destinationQName,
-                    sourceTypeRef,
-                    properties);
-            destinationNodeRef = destinationChildAssocRef.getChildRef();
-			
-			//	Apply the copy aspect to the new node	
-			Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
-			copyProperties.put(DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE, sourceNodeRef);
-			this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM, copyProperties);
-			
-			// Copy the aspects 
-			copyAspects(destinationNodeRef, copyDetails);
-			
-			// Copy the associations
-			copyAssociations(destinationNodeRef, copyDetails, copyChildren);
+            // Error - since at the moment we do not support cross store copying
+            throw new UnsupportedOperationException("Copying nodes across stores is not currently supported.");
         }
+
+        // Recursively copy node
+        Set<NodeRef> copiedChildren = new HashSet<NodeRef>();
+        return recursiveCopy(sourceNodeRef, destinationParent, destinationAssocTypeQName, destinationQName, copyChildren, copiedChildren);
+    }
+    
+    
+    private NodeRef recursiveCopy(
+              NodeRef sourceNodeRef,
+              NodeRef destinationParent, 
+              QName destinationAssocTypeQName,
+              QName destinationQName, 
+              boolean copyChildren,
+              Set<NodeRef> copiedChildren)
+    {
+        // Extract Type Definition
+		QName sourceTypeRef = this.nodeService.getType(sourceNodeRef);
+        TypeDefinition typeDef = dictionaryService.getType(sourceTypeRef);
+        if (typeDef == null)
+        {
+            throw new InvalidTypeException(sourceTypeRef);
+        }
+        
+        // Establish the scope of the copy
+		PolicyScope copyDetails = getCopyDetails(sourceNodeRef);
+		
+        // Create collection of properties for type and mandatory aspects
+        Map<QName, Serializable> typeProps = copyDetails.getProperties(); 
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        if (typeProps != null)
+        {
+            properties.putAll(typeProps);
+        }
+        for (AspectDefinition aspectDef : typeDef.getDefaultAspects())
+        {
+            Map<QName, Serializable> aspectProps = copyDetails.getProperties(aspectDef.getName());
+            if (aspectProps != null)
+            {
+                properties.putAll(aspectProps);
+            }
+        }
+        
+		// Create the new node
+        ChildAssociationRef destinationChildAssocRef = this.nodeService.createNode(
+                destinationParent, 
+                destinationAssocTypeQName,
+                destinationQName,
+                sourceTypeRef,
+                properties);
+        NodeRef destinationNodeRef = destinationChildAssocRef.getChildRef();
+        copiedChildren.add(destinationNodeRef);
+		
+		//	Apply the copy aspect to the new node	
+		Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
+		copyProperties.put(DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE, sourceNodeRef);
+		this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM, copyProperties);
+		
+		// Copy the aspects 
+		copyAspects(destinationNodeRef, copyDetails);
+		
+		// Copy the associations
+		copyAssociations(destinationNodeRef, copyDetails, copyChildren, copiedChildren);
         
         return destinationNodeRef;
     }
@@ -346,11 +362,12 @@ public class NodeOperationsServiceImpl implements CopyService
 	 * @param destinationNodeRef	the destination node reference
 	 * @param copyDetails			the copy details
 	 * @param copyChildren			indicates whether the primary children are copied or not
+     * @param copiedChildren        set of children already copied
 	 */
-	private void copyAssociations(NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
+	private void copyAssociations(NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren, Set<NodeRef> copiedChildren)
 	{
 		QName classRef = this.nodeService.getType(destinationNodeRef);
-		copyChildAssociations(classRef, destinationNodeRef, copyDetails, copyChildren);
+		copyChildAssociations(classRef, destinationNodeRef, copyDetails, copyChildren, copiedChildren);
 		copyTargetAssociations(classRef, destinationNodeRef, copyDetails);
 		
 		Set<QName> apects = copyDetails.getAspects();
@@ -362,7 +379,7 @@ public class NodeOperationsServiceImpl implements CopyService
 				throw new CopyServiceException("The aspect has not been added to the destination node.");
 			}
 			
-			copyChildAssociations(aspect, destinationNodeRef, copyDetails, copyChildren);
+			copyChildAssociations(aspect, destinationNodeRef, copyDetails, copyChildren, copiedChildren);
 			copyTargetAssociations(aspect, destinationNodeRef, copyDetails);
 		}
 	}
@@ -399,7 +416,7 @@ public class NodeOperationsServiceImpl implements CopyService
 	 * @param copyDetails			the copy details
 	 * @param copyChildren			indicates whether to copy the primary children
 	 */
-	private void copyChildAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
+	private void copyChildAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren, Set<NodeRef> copiedChildren)
 	{
 		List<ChildAssociationRef> childAssocs = copyDetails.getChildAssociations(classRef);
 		if (childAssocs != null)
@@ -410,13 +427,18 @@ public class NodeOperationsServiceImpl implements CopyService
 				{
 					if (childAssoc.isPrimary() == true)
 					{
-						// Copy the child
-						NodeRef childCopy = copy(
-                                childAssoc.getChildRef(), 
-								destinationNodeRef, 
-                                childAssoc.getTypeQName(), 
-                                childAssoc.getQName(),
-								copyChildren);
+                        // Do not recurse further, if we've already copied the child
+                        if (copiedChildren.contains(childAssoc.getChildRef()) == false)
+                        {
+    						// Copy the child
+    						NodeRef childCopy = recursiveCopy(
+                                    childAssoc.getChildRef(), 
+    								destinationNodeRef, 
+                                    childAssoc.getTypeQName(), 
+                                    childAssoc.getQName(),
+    								copyChildren,
+                                    copiedChildren);
+                        }
 					}
 					else
 					{
@@ -474,7 +496,7 @@ public class NodeOperationsServiceImpl implements CopyService
 		// Copy over the top of the destination node
 		copyProperties(destinationNodeRef, copyDetails);
 		copyAspects(destinationNodeRef, copyDetails);
-		copyAssociations(destinationNodeRef, copyDetails, false);
+		copyAssociations(destinationNodeRef, copyDetails, false, null);
     }
 	
 	/**

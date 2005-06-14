@@ -134,6 +134,8 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 				this.sourceNodeRef, 
 				TEST_ASPECT_QNAME, 
 				aspectProperties);
+        
+        this.nodeService.addAspect(sourceNodeRef, DictionaryBootstrap.ASPECT_QNAME_TITLED, null);
 		
 		// Add a child
 		ChildAssociationRef temp3 =this.nodeService.createNode(
