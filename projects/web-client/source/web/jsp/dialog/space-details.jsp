@@ -96,16 +96,61 @@
                                  <h:messages styleClass="errorMessage" />
                               </a:panel>
                               <br/>
-                              <a:panel label="Preferences" id="preferences-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                              <a:panel label="Rules" id="rules-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea"
+                                       action="manageRules" linkTooltip="Modify" linkIcon="/images/icons/Change_details.gif">
+                                 <a:richList id="rulesList" viewMode="details" value="#{RulesBean.rules}" var="r"
+                                          styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" 
+                                          altRowStyleClass="recordSetRowAlt" width="100%" pageSize="10"
+                                          initialSortColumn="title" initialSortDescending="true">
+                        
+                                    <%-- Primary column for details view mode --%>
+                                    <a:column id="col1" primary="true" width="200" style="padding:2px;text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="Title" value="title" mode="case-insensitive" styleClass="header"/>
+                                       </f:facet>
+                                       <h:outputText id="title" value="#{r.title}" />
+                                    </a:column>
+                                    
+                                    <%-- Description columns --%>
+                                    <a:column id="col2" style="text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="Description" value="description" styleClass="header"/>
+                                       </f:facet>
+                                       <h:outputText id="description" value="#{r.description}" />
+                                    </a:column>
+                                    
+                                    <%-- Created Date column for details view mode --%>
+                                    <a:column id="col3" style="text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="Created Date" value="createdDate" styleClass="header"/>
+                                       </f:facet>
+                                       <h:outputText id="createddate" value="#{r.createdDate}">
+                                          <a:convertXMLDate dateStyle="long" />
+                                       </h:outputText>
+                                    </a:column>
+                                    
+                                    <%-- Modified Date column for details/icons view modes --%>
+                                    <a:column id="col4" style="text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="Modified Date" value="modifiedDate" styleClass="header"/>
+                                       </f:facet>
+                                       <h:outputText id="modifieddate" value="#{r.modifiedDate}">
+                                          <a:convertXMLDate dateStyle="long" />
+                                       </h:outputText>
+                                    </a:column>
+              
+                                 </a:richList>
                               </a:panel>
                               <br/>
-                              <a:panel label="Rules" id="rules-panel" progressive="true" expanded="false"
+                              <a:panel label="Preferences" id="preferences-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                                 <div>[TBD]</div>
                               </a:panel>
                               <br/>
                               <a:panel label="Space Members" id="members-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                                 <div>[TBD]</div>
                               </a:panel>
                               <br/>
                            </td>

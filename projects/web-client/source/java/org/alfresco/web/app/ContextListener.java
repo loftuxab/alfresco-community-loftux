@@ -144,61 +144,67 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
             nodeService.addAspect(companyNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
             
-            // now create the glossary system folder under the company space
-//            qname = Repository.createValidQName(glossaryFolderName);
-//            assocRef = nodeService.createNode(companyNodeRef, 
-//                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-//                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
-//                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
-//            
-//            NodeRef glossaryNodeRef = assocRef.getChildRef();
-//
-//            // set the name property on the node
-//            nodeService.setProperty(glossaryNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, glossaryFolderName);
-//
-//            // apply the uifacets aspect - icon, title and description props
-//            uiFacetsProps = new HashMap<QName, Serializable>(2);
-//            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
-//            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, glossaryFolderName);
-//            nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
-//            
-//            // apply the auditable aspect - created and modified date
-//            auditProps = new HashMap<QName, Serializable>(2);
-//            now = new Date( Calendar.getInstance().getTimeInMillis() );
-//            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
-//            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-//            nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+            if (logger.isDebugEnabled())
+               logger.debug("Created company root space with id: " + companySpaceId);
             
-//            // now create the templates system folder under the glossary folder
-//            qname = Repository.createValidQName(templatesFolderName);
-//            assocRef = nodeService.createNode(glossaryNodeRef, 
-//                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-//                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
-//                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
-//            
-//            NodeRef templatesNodeRef = assocRef.getChildRef();
-//
-//            // set the name property on the node
-//            nodeService.setProperty(templatesNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, templatesFolderName);
-//
-//            // apply the uifacets aspect - icon, title and description props
-//            uiFacetsProps = new HashMap<QName, Serializable>(2);
-//            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
-//            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, templatesFolderName);
-//            nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
-//            
-//            // apply the auditable aspect - created and modified date
-//            auditProps = new HashMap<QName, Serializable>(2);
-//            now = new Date( Calendar.getInstance().getTimeInMillis() );
-//            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
-//            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-//            nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+            // now create the glossary system folder under the company space
+            qname = Repository.createValidQName(glossaryFolderName);
+            assocRef = nodeService.createNode(companyNodeRef, 
+                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
+            
+            NodeRef glossaryNodeRef = assocRef.getChildRef();
+
+            // set the name property on the node
+            nodeService.setProperty(glossaryNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, glossaryFolderName);
+
+            // apply the uifacets aspect - icon, title and description props
+            uiFacetsProps = new HashMap<QName, Serializable>(2);
+            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
+            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, glossaryFolderName);
+            nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+            
+            // apply the auditable aspect - created and modified date
+            auditProps = new HashMap<QName, Serializable>(2);
+            now = new Date( Calendar.getInstance().getTimeInMillis() );
+            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
+            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+            nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Created 'Glossary' space");
+            
+            // now create the templates system folder under the glossary folder
+            qname = Repository.createValidQName(templatesFolderName);
+            assocRef = nodeService.createNode(glossaryNodeRef, 
+                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
+            
+            NodeRef templatesNodeRef = assocRef.getChildRef();
+
+            // set the name property on the node
+            nodeService.setProperty(templatesNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, templatesFolderName);
+
+            // apply the uifacets aspect - icon, title and description props
+            uiFacetsProps = new HashMap<QName, Serializable>(2);
+            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
+            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, templatesFolderName);
+            nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+            
+            // apply the auditable aspect - created and modified date
+            auditProps = new HashMap<QName, Serializable>(2);
+            now = new Date( Calendar.getInstance().getTimeInMillis() );
+            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
+            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+            nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Created 'Templates' space");
             
             // commit the transaction
             tx.commit();
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Created company root space with id: " + companySpaceId);
          }
       }
       catch (Exception e)

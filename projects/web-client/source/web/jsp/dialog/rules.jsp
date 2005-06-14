@@ -141,11 +141,32 @@
                                     </a:actionLink>
                                  </a:column>
                                  
+                                 <%-- Description column --%>
                                  <a:column style="text-align:left">
                                     <f:facet name="header">
                                        <a:sortLink label="Description" value="description" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.description}" />
+                                 </a:column>
+                                 
+                                 <%-- Created Date column for details view mode --%>
+                                 <a:column style="text-align:left">
+                                    <f:facet name="header">
+                                       <a:sortLink label="Created Date" value="createdDate" styleClass="header"/>
+                                    </f:facet>
+                                    <h:outputText value="#{r.createdDate}">
+                                       <a:convertXMLDate dateStyle="long" />
+                                    </h:outputText>
+                                 </a:column>
+                                 
+                                 <%-- Modified Date column for details/icons view modes --%>
+                                 <a:column style="text-align:left">
+                                    <f:facet name="header">
+                                       <a:sortLink label="Modified Date" value="modifiedDate" styleClass="header"/>
+                                    </f:facet>
+                                    <h:outputText value="#{r.modifiedDate}">
+                                       <a:convertXMLDate dateStyle="long" />
+                                    </h:outputText>
                                  </a:column>
                                  
                                  <%-- Actions column --%>
