@@ -82,7 +82,7 @@ public class MapNode extends Node implements Map<String, Object>
          props.put("id", this.getId());
          props.put("type", this.getType());
          props.put("name", this.getName());
-         props.put("path", this.getPath());
+         //props.put("path", this.getPath());   // expensive! do we need this?
          props.put("nodeRef", this.getNodeRef());
          
          propsInitialised = true;

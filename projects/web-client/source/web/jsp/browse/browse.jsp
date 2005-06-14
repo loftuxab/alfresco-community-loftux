@@ -231,6 +231,14 @@
                            <h:outputText value="#{r.description}" />
                         </a:column>
                         
+                        <%-- Path column for search mode in details view mode --%>
+                        <a:column style="text-align:left" rendered="#{NavigationBean.searchText != null && BrowseBean.browseViewMode == 'details'}">
+                           <f:facet name="header">
+                              <a:sortLink label="Path" value="displayPath" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.displayPath}" />
+                        </a:column>
+                        
                         <%-- Created Date column for details view mode --%>
                         <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
                            <f:facet name="header">
@@ -341,6 +349,14 @@
                               <a:sortLink label="Description" value="description" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.description}" />
+                        </a:column>
+                        
+                        <%-- Path column for search mode in details view mode --%>
+                        <a:column style="text-align:left" rendered="#{NavigationBean.searchText != null && BrowseBean.browseViewMode == 'details'}">
+                           <f:facet name="header">
+                              <a:sortLink label="Path" value="displayPath" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.displayPath}" />
                         </a:column>
                         
                         <%-- Size for details/icons view modes --%>

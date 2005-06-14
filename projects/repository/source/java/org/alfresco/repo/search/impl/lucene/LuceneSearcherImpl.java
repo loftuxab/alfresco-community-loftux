@@ -282,7 +282,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
 
         if (missing.size() > 0)
         {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder(128);
             buffer.append("The query is missing values for the following parameters: ");
             for (QName qName : missing)
             {
@@ -325,8 +325,8 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
 
         Map<QName, ListIterator<Serializable>> iteratorMap = new HashMap<QName, ListIterator<Serializable>>();
 
-        List<QName> missing = new ArrayList<QName>();
-        StringBuffer buffer = new StringBuffer(unparameterised);
+        List<QName> missing = new ArrayList<QName>(1);
+        StringBuilder buffer = new StringBuilder(unparameterised);
         int index = 0;
         while ((index = buffer.indexOf("${", index)) != -1)
         {
@@ -368,7 +368,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         }
         if (missing.size() > 0)
         {
-            StringBuffer error = new StringBuffer();
+            StringBuilder error = new StringBuilder();
             error.append("The query uses the following parameters which are not defined: ");
             for (QName qName : missing)
             {

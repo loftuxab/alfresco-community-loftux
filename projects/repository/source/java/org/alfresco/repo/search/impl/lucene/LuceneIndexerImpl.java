@@ -1000,8 +1000,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private String getParentString(Path path)
     {
-        StringBuilder parentBuffer = new StringBuilder();
-        ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>();
+        StringBuilder parentBuffer = new StringBuilder(128);
+        ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>(8);
         for (Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
         {
             Path.Element element = elit.next();
@@ -1015,7 +1015,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         for (NodeRef ref : parentsInDepthOrderStartingWithSelf)
         {
-            if (parentBuffer.length() > 0)
+            if (parentBuffer.length() != 0)
             {
                 parentBuffer.append(" ");
             }

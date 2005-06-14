@@ -72,8 +72,8 @@ import java.util.List;
      */
     public Collection<P> createList(B binding)
     {
-        List<P> policyInterfaces = new ArrayList<P>();
         Collection<BehaviourDefinition> behaviourDefs = index.find(binding);
+        List<P> policyInterfaces = new ArrayList<P>(behaviourDefs.size());
         for (BehaviourDefinition behaviourDef : behaviourDefs)
         {
             PolicyDefinition policyDef = behaviourDef.getPolicyDefinition();

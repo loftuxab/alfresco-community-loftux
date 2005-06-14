@@ -13,6 +13,11 @@ td,tr,p,div
 	color: #495F69;
 }
 
+th
+{
+   vertical-align: top;
+}
+
 p.status
 {
    margin:0px;

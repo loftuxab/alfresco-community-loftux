@@ -16,6 +16,7 @@ import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.ResultSetRow;
@@ -200,6 +201,40 @@ public final class Repository
       }
       
       return locked;
+   }
+   
+   /**
+    * Return the human readable form of the specified node Path
+    * 
+    * @param path    Path to extract readable form from, excluding the final element
+    * 
+    * @return human readable form of the Path excluding the final element
+    */
+   public static String getDisplayPath(Path path)
+   {
+      StringBuilder buf = new StringBuilder(64);
+      
+      // construct the path to this Node
+      for (int i=0; i<path.size()-1; i++)
+      {
+         // the element string will contain namespace info we don't want to display
+         String elementString = path.get(i).getElementString();
+         
+         if (elementString.length() > 1)
+         {
+            if (elementString.charAt(0) == '{' && elementString.indexOf('}') != -1)
+            {
+               elementString = elementString.substring(elementString.indexOf('}') + 1).replace('_', ' ');
+            }
+            if (buf.length() != 1)
+            {
+               buf.append('/');
+            }
+         }
+         buf.append(elementString);
+      }
+      
+      return buf.toString();
    }
 
    /**

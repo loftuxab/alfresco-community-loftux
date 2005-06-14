@@ -74,7 +74,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         ResultSet resultSet = null;
         try
         {
-            StringBuffer luceneQuery = new StringBuffer();
+            StringBuilder luceneQuery = new StringBuilder(64);
 
             if (!mode.equals(Mode.ALL))
             {
@@ -113,7 +113,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
 
     private String buildXPath(Path path)
     {
-        StringBuffer pathBuffer = new StringBuffer();
+        StringBuilder pathBuffer = new StringBuilder(64);
         for (Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
         {
             Path.Element element = elit.next();

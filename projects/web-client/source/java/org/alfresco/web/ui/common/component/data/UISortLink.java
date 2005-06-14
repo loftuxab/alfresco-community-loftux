@@ -58,7 +58,7 @@ public class UISortLink extends UICommand
       
       // render sort link
       StringBuilder buf = new StringBuilder(256);
-      buf.append("<a href='#' onclick=\"");
+      buf.append("<nobr><a href='#' onclick=\"");
       // generate some JavaScript to set a hidden form field and submit
       // a form which request attributes that we can decode
       buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(context), getClientId(context)));
@@ -90,21 +90,21 @@ public class UISortLink extends UICommand
       {
          if (descending == true)
          {
-            buf.append("&nbsp;")
+            buf.append(" ")
                .append(Utils.buildImageTag(context, IMAGE_SORTUP, 10, 6, null));
          }
          else
          {
-            buf.append("&nbsp;")
+            buf.append(" ")
                .append(Utils.buildImageTag(context, IMAGE_SORTDOWN, 10, 6, null));
          }
       }
       else
       {
-         buf.append("&nbsp;")
+         buf.append(" ")
             .append(Utils.buildImageTag(context, IMAGE_SORTNONE, 10, 7, null));
       }
-      buf.append("</a>&nbsp;");
+      buf.append("</a></nobr>");
       
       out.write(buf.toString());
    }

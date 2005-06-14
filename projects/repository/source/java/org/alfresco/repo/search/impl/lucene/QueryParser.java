@@ -527,7 +527,7 @@ public class QueryParser implements QueryParserConstants {
    * expects to be escaped are escaped, i.e. preceded by a <code>\</code>.
    */
   public static String escape(String s) {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder(s.length());
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
       // NOTE: keep this in sync with _ESCAPED_CHAR below!

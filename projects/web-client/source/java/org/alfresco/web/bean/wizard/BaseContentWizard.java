@@ -74,8 +74,8 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             NodeRef nodeRef = currentDocument.getNodeRef();
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
             
-            // update the modified timestamp
-            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(7, 1.0f);
+            // update the modified timestamp and other content props
+            Map<QName, Serializable> contentProps = this.nodeService.getProperties(nodeRef);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.title);

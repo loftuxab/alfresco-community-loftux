@@ -511,7 +511,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
                 return false;
             }
             // build Lucene search string specific to the node
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(googleLikePattern).append(") ");
             if (propertyQName != null)
             {
@@ -564,7 +564,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             // for escape so the rest is OK)
 
             // replace the SQL-like search string with appropriate Lucene syntax
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             char previous = ' ';
             char current = ' ';
             for (int i = 0; i < sqlLikePattern.length(); i++)
@@ -583,7 +583,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             String pattern = sb.toString();
 
             // build Lucene search string specific to the node
-            sb = new StringBuffer();
+            sb = new StringBuilder();
             sb.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(pattern).append(") ");
             if (propertyQName != null)
             {

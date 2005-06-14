@@ -331,12 +331,11 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern) throws InvalidNodeRefException
     {
-        List<ChildAssociationRef> result = new ArrayList<ChildAssociationRef>();
-        
         // Get the child assocs from the version store
         List<ChildAssociationRef> childAssocRefs = this.dbNodeService.getChildAssocs(
                 convertNodeRef(nodeRef),
                 CHILD_QNAME_VERSIONED_CHILD_ASSOCS);
+        List<ChildAssociationRef> result = new ArrayList<ChildAssociationRef>(childAssocRefs.size());
         for (ChildAssociationRef childAssocRef : childAssocRefs)
         {
             // Get the child reference
@@ -410,12 +409,11 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     public List<AssociationRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
     {
-        List<AssociationRef> result = new ArrayList<AssociationRef>();
-        
         // Get the child assocs from the version store
         List<ChildAssociationRef> childAssocRefs = this.dbNodeService.getChildAssocs(
                 convertNodeRef(sourceRef),
                 CHILD_QNAME_VERSIONED_ASSOCS);
+        List<AssociationRef> result = new ArrayList<AssociationRef>(childAssocRefs.size());
         for (ChildAssociationRef childAssocRef : childAssocRefs)
         {
             // Get the assoc reference

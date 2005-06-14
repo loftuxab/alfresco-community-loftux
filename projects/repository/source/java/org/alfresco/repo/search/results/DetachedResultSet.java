@@ -20,12 +20,13 @@ import org.alfresco.service.cmr.search.ResultSetRow;
 
 public class DetachedResultSet extends AbstractResultSet
 {
-    List<ResultSetRow> rows = new ArrayList<ResultSetRow>();
+    List<ResultSetRow> rows = null;
     
     public DetachedResultSet(ResultSet resultSet, Path[] propertyPaths)
     {
         super(propertyPaths);
-        for(ResultSetRow row : resultSet)
+        rows = new ArrayList<ResultSetRow>(resultSet.length());
+        for (ResultSetRow row : resultSet)
         {
             rows.add(new DetachedResultSetRow(this, row));
         }

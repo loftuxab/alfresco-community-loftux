@@ -21,6 +21,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
@@ -457,6 +458,10 @@ public class BrowseBean implements IContextListener
                   // create our Node representation
                   MapNode node = new MapNode(nodeRef, this.nodeService);
                   
+                  // construct the path to this Node
+                  Path path = this.nodeService.getPath(nodeRef);
+                  node.getProperties().put("displayPath", Repository.getDisplayPath(path));
+                  
                   this.containerNodes.add(node);
                }
                else if (type.equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
@@ -465,6 +470,10 @@ public class BrowseBean implements IContextListener
                   MapNode node = new MapNode(nodeRef, this.nodeService);
                   
                   setupDataBindingProperties(node);
+                  
+                  // construct the path to this Node
+                  Path path = this.nodeService.getPath(nodeRef);
+                  node.getProperties().put("displayPath", Repository.getDisplayPath(path));
                   
                   this.contentNodes.add(node);
                }
