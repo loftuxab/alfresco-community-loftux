@@ -196,9 +196,19 @@ import org.dom4j.io.SAXReader;
         
         // Output the basic rule details
         builder.
-            append("<rule ").append(ATT_ID).append("='").append(rule.getId()).append("' ").append(ATT_RULE_TYPE).append("='").append(rule.getRuleType().getName()).append("'>").
-            append("<title>").append(rule.getTitle()).append("</title>").
-            append("<description>").append(rule.getDescription()).append("</description>");
+            append("<rule ").append(ATT_ID).append("='").append(rule.getId()).append("' ").append(ATT_RULE_TYPE).append("='").append(rule.getRuleType().getName()).append("'>");
+        
+		String title = rule.getTitle();
+		if (title != null)
+		{
+			builder.append("<title>").append(rule.getTitle()).append("</title>");
+		}
+		
+		String description = rule.getDescription();
+		if (description != null)
+		{
+            builder.append("<description>").append(rule.getDescription()).append("</description>");
+		}
         
         // Output the details of the conditions
         builder.append("<conditions>");

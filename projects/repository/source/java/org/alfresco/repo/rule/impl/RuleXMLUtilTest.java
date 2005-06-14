@@ -70,4 +70,18 @@ public class RuleXMLUtilTest extends RuleBaseTest
         String ruleXML = RuleXMLUtil.ruleToXML(this.rule);
         assertEquals(XML, ruleXML);
     }
+
+	/**
+	 * Test that the title and description are returned correctly when they are not set
+	 *
+	 */
+	public void testNoTitleNoDescription()
+	{
+		this.rule.setTitle(null);
+		this.rule.setDescription(null);
+		String ruleXML = RuleXMLUtil.ruleToXML(this.rule);
+		RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleConfig, ruleXML);
+		assertNull(rule.getTitle());
+		assertNull(rule.getDescription());
+	}
 }

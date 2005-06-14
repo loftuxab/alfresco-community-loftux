@@ -340,6 +340,14 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     {
         return (List<Rule>)this.ruleStore.get(nodeRef, includeInhertied);
     }
+	
+	/**
+	 * @see org.alfresco.repo.rule.RuleService#getRule(String) 
+	 */
+	public Rule getRule(NodeRef nodeRef, String ruleId) 
+	{
+		return this.ruleStore.getById(nodeRef, ruleId);
+	}
 
     /**
      * @see org.alfresco.repo.rule.RuleService#getRulesByRuleType(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleType)

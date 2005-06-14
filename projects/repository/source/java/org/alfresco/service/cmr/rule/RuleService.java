@@ -110,6 +110,15 @@ public interface RuleService
 	 * @return					a list of the rules associated with the node 
 	 */
 	public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied);
+	
+	/**
+	 * Get the rule given its id.
+	 * 
+	 * @param nodeRef	the node reference
+	 * @param ruleId	the rule id
+	 * @return			the rule corresponding ot the id
+	 */
+	public Rule getRule(NodeRef nodeRef, String ruleId);
     
     /**
      * 

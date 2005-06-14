@@ -119,6 +119,28 @@ import org.alfresco.service.namespace.QName;
         
         return result;
     }
+	
+	/**
+	 * Get the rule for a node that corresponds to the provided id.
+	 * 
+	 * @param nodeRef	the node reference
+	 * @param ruleId	the rule id
+	 * @return			the rule, null if none found
+	 */
+	public Rule getById(NodeRef nodeRef, String ruleId)
+	{
+		Rule result = null;
+		List<? extends Rule> rules = get(nodeRef, true);
+		for (Rule rule : rules) 
+		{
+			if (ruleId.equals(rule.getId()) == true)
+			{
+				result = rule;
+				break;
+			}
+		}
+		return result;
+	}
     
     /**
      * Puts a rule into the store, updating or creating the rule store node

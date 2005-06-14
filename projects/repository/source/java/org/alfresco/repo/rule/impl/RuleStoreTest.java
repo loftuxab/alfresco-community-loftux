@@ -58,6 +58,21 @@ public class RuleStoreTest extends RuleBaseTest
         RuleImpl rule = (RuleImpl)rules.get(0);
         checkRule(rule, RULE_ID);
     }
+	
+	/**
+	 * Test getById
+	 */
+	public void testGetById()
+	{
+		Rule rule1 = this.ruleStore.getById(this.nodeRef, RULE_ID);
+		assertNull(rule1);
+		
+		testPut();
+		
+		Rule rule2 = this.ruleStore.getById(this.nodeRef, RULE_ID);
+		assertNotNull(rule2);
+		assertEquals(RULE_ID, rule2.getId());
+	}
     
     /**
      * Test put
