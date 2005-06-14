@@ -1,7 +1,6 @@
 package org.alfresco.repo.domain.hibernate;
 
 import org.alfresco.repo.domain.ChildAssoc;
-import org.alfresco.repo.domain.ContainerNode;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.namespace.QName;
@@ -12,7 +11,7 @@ import org.alfresco.service.namespace.QName;
 public class ChildAssocImpl implements ChildAssoc
 {
     private Long id;
-    private ContainerNode parent;
+    private Node parent;
     private Node child;
     private String typeNamespaceUri;
     private String typeLocalName;
@@ -21,7 +20,7 @@ public class ChildAssocImpl implements ChildAssoc
     private boolean isPrimary;
     private ChildAssociationRef childAssocRef;
 
-    public void buildAssociation(ContainerNode parentNode, Node childNode)
+    public void buildAssociation(Node parentNode, Node childNode)
     {
         // add the forward associations
         this.setParent(parentNode);
@@ -79,7 +78,7 @@ public class ChildAssocImpl implements ChildAssoc
         this.id = id;
     }
 
-    public ContainerNode getParent()
+    public Node getParent()
     {
         return parent;
     }
@@ -87,7 +86,7 @@ public class ChildAssocImpl implements ChildAssoc
     /**
      * For Hibernate use
      */
-    private void setParent(ContainerNode parentNode)
+    private void setParent(Node parentNode)
     {
         this.parent = parentNode;
     }

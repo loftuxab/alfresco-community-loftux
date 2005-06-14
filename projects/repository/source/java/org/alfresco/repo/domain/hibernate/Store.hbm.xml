@@ -24,7 +24,7 @@
             name="rootNode"
             not-null="false"
             lazy="false"
-            class="org.alfresco.repo.domain.hibernate.RealNodeImpl"
+            class="org.alfresco.repo.domain.hibernate.NodeImpl"
             fetch="join" >
          <column name="root_protocol" />
          <column name="root_identifier" />

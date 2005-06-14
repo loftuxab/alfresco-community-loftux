@@ -24,7 +24,7 @@ public interface NodeAssoc
      * 
      * @see #setName(String)
      */
-    public void buildAssociation(RealNode sourceNode, Node targetNode);
+    public void buildAssociation(Node sourceNode, Node targetNode);
 
     /**
      * Performs the necessary work on the {@link #getSource()() source} and
@@ -34,7 +34,7 @@ public interface NodeAssoc
 
     public AssociationRef getNodeAssocRef();
     
-    public RealNode getSource();
+    public Node getSource();
 
     public Node getTarget();
 

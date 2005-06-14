@@ -41,6 +41,13 @@ public interface Node
      */
     public Set<NodeAssoc> getSourceNodeAssocs();
 
+    /**
+     * @return Returns all the regular associations for which this node is a source 
+     */
+    public Set<NodeAssoc> getTargetNodeAssocs();
+
+    public Set<ChildAssoc> getChildAssocs();
+
     public Set<ChildAssoc> getParentAssocs();
 
     public Map<String, Serializable> getProperties();

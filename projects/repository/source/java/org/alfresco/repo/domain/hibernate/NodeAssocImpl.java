@@ -2,7 +2,6 @@ package org.alfresco.repo.domain.hibernate;
 
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
-import org.alfresco.repo.domain.RealNode;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.namespace.QName;
 
@@ -14,7 +13,7 @@ import org.alfresco.service.namespace.QName;
 public class NodeAssocImpl implements NodeAssoc
 {
     private long id;
-    private RealNode source;
+    private Node source;
     private Node target;
     private String typeNamespaceUri;
     private String typeLocalName;
@@ -24,7 +23,7 @@ public class NodeAssocImpl implements NodeAssoc
     {
     }
 
-    public void buildAssociation(RealNode sourceNode, Node targetNode)
+    public void buildAssociation(Node sourceNode, Node targetNode)
     {
         // add the forward associations
         this.setTarget(targetNode);
@@ -77,7 +76,7 @@ public class NodeAssocImpl implements NodeAssoc
         this.id = id;
     }
 
-    public RealNode getSource()
+    public Node getSource()
     {
         return source;
     }
@@ -85,7 +84,7 @@ public class NodeAssocImpl implements NodeAssoc
     /**
      * For internal use
      */
-    private void setSource(RealNode source)
+    private void setSource(Node source)
     {
         this.source = source;
     }

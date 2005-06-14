@@ -224,7 +224,9 @@ public class DocumentNavigator extends DefaultNavigator
     public Iterator getChildAxisIterator(Object o) throws UnsupportedAxisException
     {
         // Iterator of ChildAxisRef
-        List<ChildAssociationRef> list = nodeService.getChildAssocs(((ChildAssociationRef)o).getChildRef());
+        ChildAssociationRef assocRef = (ChildAssociationRef) o;
+        NodeRef childRef = assocRef.getChildRef();
+        List<ChildAssociationRef> list = nodeService.getChildAssocs(childRef);
         return list.iterator();
     }
 

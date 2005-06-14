@@ -1,19 +1,19 @@
 package org.alfresco.repo.domain.hibernate;
 
-import org.alfresco.repo.domain.RealNode;
+import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
 import org.alfresco.service.cmr.repository.StoreRef;
 
 /**
+ * Hibernate-specific implementation of the domain entity <b>store</b>.
+ * 
  * @author Derek Hulley
  */
 public class StoreImpl implements Store
 {
 	private StoreKey key;
-//    private String protocol;
-//    private String identifier;
-    private RealNode rootNode;
+    private Node rootNode;
     private transient StoreRef storeRef;
 
     public StoreKey getKey() {
@@ -25,33 +25,12 @@ public class StoreImpl implements Store
         this.storeRef = null;
 	}
 
-//	public String getProtocol()
-//    {
-//        return protocol;
-//    }
-//
-//    public void setProtocol(String protocol)
-//    {
-//        this.protocol = protocol;
-//    }
-//
-//    public String getIdentifier()
-//    {
-//        return identifier;
-//    }
-//
-//    public synchronized void setIdentifier(String identifier)
-//    {
-//        this.identifier = identifier;
-//        this.storeRef = null;
-//    }
-//
-    public RealNode getRootNode()
+    public Node getRootNode()
     {
         return rootNode;
     }
 
-    public void setRootNode(RealNode rootNode)
+    public void setRootNode(Node rootNode)
     {
         this.rootNode = rootNode;
     }

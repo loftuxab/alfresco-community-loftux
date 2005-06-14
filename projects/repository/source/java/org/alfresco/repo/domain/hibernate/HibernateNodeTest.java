@@ -9,15 +9,12 @@ import java.util.Set;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.domain.ChildAssoc;
-import org.alfresco.repo.domain.ContainerNode;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
-import org.alfresco.repo.domain.RealNode;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseHibernateTest;
 import org.alfresco.util.GUID;
@@ -133,21 +130,6 @@ public class HibernateNodeTest extends BaseHibernateTest
         assertNotNull("Property value not present in map", propertyMap.get("{}A"));
     }
 
-    public void testSubclassing() throws Exception
-    {
-        // persist a subclass of Node
-        Node node = new ContainerNodeImpl();
-		NodeKey key = new NodeKey(store.getKey(), "AAA");
-		node.setKey(key);
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
-        Serializable id = getSession().save(node);
-        // get the node back
-        node = (Node) getSession().get(NodeImpl.class, id);
-        // check
-        assertNotNull("Persisted node not found", id);
-        assertTrue("Subtype not retrieved", node instanceof ContainerNode);
-    }
-
     /**
      * Check that aspect qnames can be added and removed from a node and that they
      * are persisted correctly 
@@ -155,7 +137,7 @@ public class HibernateNodeTest extends BaseHibernateTest
     public void testAspects() throws Exception
     {
         // make a real node
-        Node node = new RealNodeImpl();
+        Node node = new NodeImpl();
         NodeKey nodeKey = new NodeKey(store.getKey(), GUID.generate());
         node.setKey(nodeKey);
         node.setStore(store);
@@ -189,7 +171,7 @@ public class HibernateNodeTest extends BaseHibernateTest
     public void testNodeAssoc() throws Exception
     {
         // make a real node
-        RealNode sourceNode = new RealNodeImpl();
+        Node sourceNode = new NodeImpl();
         NodeKey sourceKey = new NodeKey(store.getKey(), GUID.generate());
         sourceNode.setKey(sourceKey);
         sourceNode.setStore(store);
@@ -197,7 +179,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         Serializable realNodeKey = getSession().save(sourceNode);
         
         // make a container node
-        ContainerNode targetNode = new ContainerNodeImpl();
+        Node targetNode = new NodeImpl();
         NodeKey targetKey = new NodeKey(store.getKey(), GUID.generate());
         targetNode.setKey(targetKey);
         targetNode.setStore(store);
@@ -221,13 +203,13 @@ public class HibernateNodeTest extends BaseHibernateTest
         getSession().clear();
         
         // reload the source
-        sourceNode = (RealNode) getSession().get(RealNodeImpl.class, sourceKey);
+        sourceNode = (Node) getSession().get(NodeImpl.class, sourceKey);
         assertNotNull("Source node not found", sourceNode);
         // check that the associations are present
         assertEquals("Expected exactly 2 target assocs", 2, sourceNode.getTargetNodeAssocs().size());
         
         // reload the target
-        targetNode = (ContainerNode) getSession().get(NodeImpl.class, targetKey);
+        targetNode = (Node) getSession().get(NodeImpl.class, targetKey);
         assertNotNull("Target node not found", targetNode);
         // check that the associations are present
         assertEquals("Expected exactly 2 source assocs", 2, targetNode.getSourceNodeAssocs().size());
@@ -236,7 +218,7 @@ public class HibernateNodeTest extends BaseHibernateTest
     public void testChildAssoc() throws Exception
     {
         // make a content node
-        Node contentNode = new RealNodeImpl();
+        Node contentNode = new NodeImpl();
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
 		contentNode.setKey(key);
         contentNode.setStore(store);
@@ -244,7 +226,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         Serializable contentNodeKey = getSession().save(contentNode);
 
         // make a container node
-        ContainerNode containerNode = new ContainerNodeImpl();
+        Node containerNode = new NodeImpl();
 		key = new NodeKey(store.getKey(), GUID.generate());
 		containerNode.setKey(key);
         containerNode.setStore(store);
@@ -269,7 +251,7 @@ public class HibernateNodeTest extends BaseHibernateTest
 //        flushAndClear();
 
         // reload the container
-        containerNode = (ContainerNode) getSession().get(ContainerNodeImpl.class, containerNodeKey);
+        containerNode = (Node) getSession().get(NodeImpl.class, containerNodeKey);
         assertNotNull("Node not found", containerNode);
         // check
         assertEquals("Expected exactly 2 children", 2, containerNode.getChildAssocs().size());

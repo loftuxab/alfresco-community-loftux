@@ -23,7 +23,7 @@ public interface ChildAssoc
      * @see #setName(String)
      * @see #setIsPrimary(boolean)
      */
-    public void buildAssociation(ContainerNode parentNode, Node childNode);
+    public void buildAssociation(Node parentNode, Node childNode);
     
     /**
      * Performs the necessary work on the {@link #getParent() parent} and
@@ -35,7 +35,7 @@ public interface ChildAssoc
 
     public Long getId();
 
-    public ContainerNode getParent();
+    public Node getParent();
 
     public Node getChild();
     

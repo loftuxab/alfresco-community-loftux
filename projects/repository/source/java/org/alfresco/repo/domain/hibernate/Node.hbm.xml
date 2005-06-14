@@ -12,18 +12,13 @@
          dynamic-update="false"
          dynamic-insert="false"
          select-before-update="false"
-         optimistic-lock="version"
-         discriminator-value="GENERIC" >
+         optimistic-lock="version" >
       <!-- composite PK -->
       <composite-id name="key" class="org.alfresco.repo.domain.NodeKey">
          <key-property name="protocol" length="100" />
          <key-property name="identifier" length="100" />
          <key-property name="guid" length="36"/>
       </composite-id>
-      <discriminator
-            column="auto_type"
-            type="string"
-            length="18" />
       <property name="typeNamespaceUri" column="type_namespace_uri" length="100" not-null="true" />
       <property name="typeLocalName" column="type_local_name" length="100" not-null="true" />
       <map
@@ -77,44 +72,6 @@
          </key>
          <one-to-many class="org.alfresco.repo.domain.hibernate.ChildAssocImpl" />
       </set>
-      <!-- inverse assoc to source nodeassocs -->
-      <set
-            name="sourceNodeAssocs"
-            inverse="true" 
-            cascade="delete" >
-         <key>
-            <column name="target_protocol" />
-            <column name="target_identifier" />
-            <column name="target_guid" length="36" />
-         </key>
-         <one-to-many class="org.alfresco.repo.domain.hibernate.NodeAssocImpl" />
-      </set>
-   </class>
-   
-   <subclass
-         name="org.alfresco.repo.domain.hibernate.RealNodeImpl"
-         proxy="org.alfresco.repo.domain.RealNode"
-         extends="org.alfresco.repo.domain.hibernate.NodeImpl"
-         discriminator-value="REAL" >
-      <!-- inverse assoc to target nodeassocs -->
-      <set
-            name="targetNodeAssocs"
-            inverse="true" 
-            cascade="delete" >
-         <key>
-            <column name="source_protocol" />
-            <column name="source_identifier" />
-            <column name="source_guid" length="36" />
-         </key>
-         <one-to-many class="org.alfresco.repo.domain.hibernate.NodeAssocImpl" />
-      </set>
-   </subclass>
-
-   <subclass
-         name="org.alfresco.repo.domain.hibernate.ContainerNodeImpl"
-         proxy="org.alfresco.repo.domain.ContainerNode"
-         extends="org.alfresco.repo.domain.hibernate.RealNodeImpl"
-         discriminator-value="CONTAINER" >
       <!-- inverse assoc to child childassocs -->
       <set
             name="childAssocs"
@@ -127,8 +84,32 @@
          </key>
          <one-to-many class="org.alfresco.repo.domain.hibernate.ChildAssocImpl" />
       </set>
-   </subclass>
-
+      <!-- inverse assoc to source nodeassocs -->
+      <set
+            name="sourceNodeAssocs"
+            inverse="true" 
+            cascade="delete" >
+         <key>
+            <column name="target_protocol" />
+            <column name="target_identifier" />
+            <column name="target_guid" length="36" />
+         </key>
+         <one-to-many class="org.alfresco.repo.domain.hibernate.NodeAssocImpl" />
+      </set>
+      <!-- inverse assoc to target nodeassocs -->
+      <set
+            name="targetNodeAssocs"
+            inverse="true" 
+            cascade="delete" >
+         <key>
+            <column name="source_protocol" />
+            <column name="source_identifier" />
+            <column name="source_guid" length="36" />
+         </key>
+         <one-to-many class="org.alfresco.repo.domain.hibernate.NodeAssocImpl" />
+      </set>
+   </class>
+   
    <class
          name="org.alfresco.repo.domain.hibernate.ChildAssocImpl"
          proxy="org.alfresco.repo.domain.ChildAssoc"
@@ -147,7 +128,7 @@
       <!-- forward assoc to parent node -->
       <many-to-one
             name="parent"
-            class="org.alfresco.repo.domain.hibernate.ContainerNodeImpl"
+            class="org.alfresco.repo.domain.hibernate.NodeImpl"
             not-null="true" >
          <column name="parent_protocol" />
          <column name="parent_identifier" />
@@ -179,7 +160,7 @@
       <!-- forward assoc to source node -->
       <many-to-one
             name="source"
-            class="org.alfresco.repo.domain.hibernate.RealNodeImpl"
+            class="org.alfresco.repo.domain.hibernate.NodeImpl"
             not-null="true" >
          <column name="source_protocol" />
          <column name="source_identifier" />
@@ -200,7 +181,7 @@
       select
          assoc
       from
-         org.alfresco.repo.domain.hibernate.RealNodeImpl as source
+         org.alfresco.repo.domain.hibernate.NodeImpl as source
          join source.targetNodeAssocs as assoc
          join assoc.target as target
       where
@@ -218,7 +199,7 @@
       select
          target
       from
-         org.alfresco.repo.domain.hibernate.RealNodeImpl as source
+         org.alfresco.repo.domain.hibernate.NodeImpl as source
          join source.targetNodeAssocs as assoc
          join assoc.target as target
       where

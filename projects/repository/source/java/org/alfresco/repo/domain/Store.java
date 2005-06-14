@@ -25,12 +25,12 @@ public interface Store
     /**
      * @return Returns the root of the store
      */
-    public RealNode getRootNode();
+    public Node getRootNode();
     
     /**
      * @param rootNode mandatory association to the root of the store
      */
-    public void setRootNode(RealNode rootNode);
+    public void setRootNode(Node rootNode);
     
     /**
      * Convenience method to access the reference

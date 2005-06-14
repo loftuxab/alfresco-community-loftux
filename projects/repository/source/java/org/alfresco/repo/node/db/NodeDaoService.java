@@ -3,10 +3,8 @@ package org.alfresco.repo.node.db;
 import java.util.Collection;
 
 import org.alfresco.repo.domain.ChildAssoc;
-import org.alfresco.repo.domain.ContainerNode;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
-import org.alfresco.repo.domain.RealNode;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.namespace.QName;
@@ -55,11 +53,11 @@ public interface NodeDaoService
     /**
      * @param store the store to which the node must belong
      * @param nodeTypeQName the type of the node
-     * @return Returns a new real node of the given type and attached to the store
+     * @return Returns a new node of the given type and attached to the store
      * @throws InvalidTypeException if the node type is invalid or if the node type
      *      is not a valid real node
      */
-    public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidTypeException;
+    public Node newNode(Store store, QName nodeTypeQName) throws InvalidTypeException;
     
     /**
      * @param protocol the store protocol
@@ -85,7 +83,7 @@ public interface NodeDaoService
      * @see ChildAssoc
      */
     public ChildAssoc newChildAssoc(
-            ContainerNode parentNode,
+            Node parentNode,
             Node childNode,
             boolean isPrimary,
             QName assocTypeQName,
@@ -110,7 +108,7 @@ public interface NodeDaoService
      * @see NodeAssoc
      */
     public NodeAssoc newNodeAssoc(
-            RealNode sourceNode,
+            Node sourceNode,
             Node targetNode,
             QName assocTypeQName);
     
@@ -118,19 +116,19 @@ public interface NodeDaoService
      * @return Returns the node association or null if not found
      */
     public NodeAssoc getNodeAssoc(
-            RealNode sourceNode,
+            Node sourceNode,
             Node targetNode,
             QName assocTypeQName);
     
     /**
      * @return Returns the target nodes for the association
      */
-    public Collection<Node> getNodeAssocTargets(RealNode sourceNode, QName assocTypeQName);
+    public Collection<Node> getNodeAssocTargets(Node sourceNode, QName assocTypeQName);
     
     /**
      * @return Returns the source nodes for the association
      */
-    public Collection<RealNode> getNodeAssocSources(Node targetNode, QName assocTypeQName);
+    public Collection<Node> getNodeAssocSources(Node targetNode, QName assocTypeQName);
     
     /**
      * @param assoc the node association to remove

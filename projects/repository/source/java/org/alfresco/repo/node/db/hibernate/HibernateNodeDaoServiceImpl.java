@@ -6,18 +6,14 @@ import java.util.Set;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.domain.ChildAssoc;
-import org.alfresco.repo.domain.ContainerNode;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
-import org.alfresco.repo.domain.RealNode;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
 import org.alfresco.repo.domain.hibernate.ChildAssocImpl;
-import org.alfresco.repo.domain.hibernate.ContainerNodeImpl;
 import org.alfresco.repo.domain.hibernate.NodeAssocImpl;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
-import org.alfresco.repo.domain.hibernate.RealNodeImpl;
 import org.alfresco.repo.domain.hibernate.StoreImpl;
 import org.alfresco.repo.node.db.NodeDaoService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -85,7 +81,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(store);
         // create and assign a root node
-        RealNode rootNode = newRealNode(store, DictionaryBootstrap.TYPE_QNAME_STOREROOT);
+        Node rootNode = newNode(store, DictionaryBootstrap.TYPE_QNAME_STOREROOT);
         store.setRootNode(rootNode);
         // done
         return store;
@@ -99,7 +95,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return store;
     }
 
-    public RealNode newRealNode(Store store, QName nodeTypeQName) throws InvalidTypeException
+    public Node newNode(Store store, QName nodeTypeQName) throws InvalidTypeException
     {
         TypeDefinition typeDef = dictionaryService.getType(nodeTypeQName);
         if (typeDef == null)
@@ -108,15 +104,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         }
         boolean allowedChildren = typeDef.getChildAssociations().size() > 0;
         // build a concrete node based on a bootstrap type
-        RealNode node = null;
-        if (allowedChildren)
-        {
-            node = new ContainerNodeImpl();
-        }
-        else
-        {
-            node = new RealNodeImpl();
-        }
+        Node node = new NodeImpl();
         // set other required properties
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
 		node.setKey(key);
@@ -155,7 +143,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     }
     
     public ChildAssoc newChildAssoc(
-            ContainerNode parentNode,
+            Node parentNode,
             Node childNode,
             boolean isPrimary,
             QName assocTypeQName,
@@ -223,7 +211,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return primaryAssoc;
     }
 
-    public NodeAssoc newNodeAssoc(RealNode sourceNode, Node targetNode, QName assocTypeQName)
+    public NodeAssoc newNodeAssoc(Node sourceNode, Node targetNode, QName assocTypeQName)
     {
         NodeAssoc assoc = new NodeAssocImpl();
         assoc.setTypeQName(assocTypeQName);
@@ -235,7 +223,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     }
 
     public NodeAssoc getNodeAssoc(
-            final RealNode sourceNode,
+            final Node sourceNode,
             final Node targetNode,
             final QName assocTypeQName)
     {
@@ -268,7 +256,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return assoc;
     }
 
-    public Collection<Node> getNodeAssocTargets(final RealNode sourceNode, final QName assocTypeQName)
+    public Collection<Node> getNodeAssocTargets(final Node sourceNode, final QName assocTypeQName)
     {
         final NodeKey sourceKey = sourceNode.getKey();
         HibernateCallback callback = new HibernateCallback()
@@ -289,7 +277,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return queryResults;
     }
 
-    public Collection<RealNode> getNodeAssocSources(final Node targetNode, final QName assocTypeQName)
+    public Collection<Node> getNodeAssocSources(final Node targetNode, final QName assocTypeQName)
     {
         final NodeKey targetKey = targetNode.getKey();
         HibernateCallback callback = new HibernateCallback()
@@ -305,7 +293,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 return query.list();
             }
         };
-        List<RealNode> queryResults = (List) getHibernateTemplate().execute(callback);
+        List<Node> queryResults = (List) getHibernateTemplate().execute(callback);
         // done
         return queryResults;
     }
