@@ -6,11 +6,11 @@ package org.alfresco.repo.rule.impl.ruletype;
 import java.util.List;
 
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.rule.RuleActionDefinitionImpl;
 import org.alfresco.repo.rule.RuleActionExecuter;
+import org.alfresco.repo.rule.RuleConditionDefinitionImpl;
 import org.alfresco.repo.rule.RuleConditionEvaluator;
 import org.alfresco.repo.rule.RuleTypeAdapter;
-import org.alfresco.repo.rule.impl.RuleActionDefinitionImpl;
-import org.alfresco.repo.rule.impl.RuleConditionDefinitionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.Rule;
