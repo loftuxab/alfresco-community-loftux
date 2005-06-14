@@ -102,12 +102,13 @@
                                     <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 
-
-                                 <tr><td>Check in settings defined here</td></tr>
-
-
-
+                                 <tr>
+                                    <td valign="top">Version&nbsp;Notes:</td>
+                                    <td width="90%">
+                                       <h:inputTextarea value="#{NewRuleWizard.actionProperties.checkinDescription}" 
+                                                        rows="2" cols="50" />
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>

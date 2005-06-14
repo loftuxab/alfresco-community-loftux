@@ -14,7 +14,13 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.repo.rule.action.CheckInActionExecutor;
+import org.alfresco.repo.rule.action.CheckOutActionExecutor;
+import org.alfresco.repo.rule.action.CopyActionExecutor;
+import org.alfresco.repo.rule.action.MoveActionExecutor;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;
@@ -121,9 +127,33 @@ public class NewRuleWizard extends AbstractWizardBean
                
                actionParams.put("aspect-name", aspect);
             }
-            else if (this.action.equals("copy") || this.action.equals("move"))
+            else if (this.action.equals("copy"))
             {
                // add the destination space id to the action properties
+               NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                     this.actionProperties.get("destinationLocation"));
+               actionParams.put(CopyActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+               
+               // add the type and name of the association to create when the copy
+               // is performed
+               actionParams.put(CopyActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS);
+               actionParams.put(CopyActionExecutor.PARAM_ASSOC_QNAME, 
+                     QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+            }
+            else if (this.action.equals("move"))
+            {
+               // add the destination space id to the action properties
+               NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                     this.actionProperties.get("destinationLocation"));
+               actionParams.put(MoveActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+               
+               // add the type and name of the association to create when the move
+               // is performed
+               actionParams.put(MoveActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS);
+               actionParams.put(MoveActionExecutor.PARAM_ASSOC_QNAME, 
+                     QName.createQName(NamespaceService.ALFRESCO_URI, "move"));
             }
             else if (this.action.equals("simple-workflow"))
             {
@@ -133,6 +163,25 @@ public class NewRuleWizard extends AbstractWizardBean
             }
             else if (this.action.equals("check-out"))
             {
+               // specify the location the checked out working copy should go
+               // add the destination space id to the action properties
+               NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                     this.actionProperties.get("destinationLocation"));
+               
+               actionParams.put(CheckOutActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+               
+               // add the type and name of the association to create when the 
+               // check out is performed
+               actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS);
+               actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_QNAME, 
+                     QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"));
+            }
+            else if (this.action.equals("check-in"))
+            {
+               // add the description for the checkin to the action params
+               actionParams.put(CheckInActionExecutor.PARAM_DESCRIPTION, 
+                     this.actionProperties.get("checkinDescription"));
             }
             
             // create the rule and add it to the space

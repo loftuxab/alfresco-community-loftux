@@ -57,7 +57,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.properties.title}" />'</div>
+                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>
                            </td>
                            <td bgcolor="#495F69" width=1></td>

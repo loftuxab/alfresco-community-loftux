@@ -64,7 +64,7 @@
                            <td width=110 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
-                              <a:actionLink value="#{msg.create_rule}" image="/images/icons/space_small.gif" padding="4" action="createRule" actionListener="#{NewRuleWizard.startWizard}" />
+                              <a:actionLink value="#{msg.create_rule}" image="/images/icons/subscribe_small.gif" padding="4" action="createRule" actionListener="#{NewRuleWizard.startWizard}" />
                            </td>
                            <td bgcolor="#495F69" width=1></td>
                            <td width=110 style="padding-left:2px">
@@ -132,7 +132,7 @@
                                        <a:sortLink label="Title" value="title" mode="case-insensitive" styleClass="header"/>
                                     </f:facet>
                                     <f:facet name="small-icon">
-                                       <a:actionLink value="#{r.title}" image="/images/icons/space_small.gif" actionListener="#{RulesBean.clickRule}" showLink="false">
+                                       <a:actionLink value="#{r.title}" image="/images/icons/subscribe_small.gif" actionListener="#{RulesBean.clickRule}" showLink="false">
                                           <f:param name="id" value="#{r.id}" />
                                        </a:actionLink>
                                     </f:facet>
