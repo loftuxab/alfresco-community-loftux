@@ -6,11 +6,11 @@
 		<rule-types>
 			<rule-type name="inbound">
 				<display-label>Inbound</display-label>
-				<adapter>org.alfresco.repo.rule.impl.ruletype.InboundRuleTypeAdapter</adapter>
+				<adapter>org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter</adapter>
 			</rule-type>
 			<rule-type name="outbound">
 				<display-label>Outbound</display-label>
-				<adapter>org.alfresco.repo.rule.impl.ruletype.OutboundRuleTypeAdapter</adapter>				
+				<adapter>org.alfresco.repo.rule.ruletype.OutboundRuleTypeAdapter</adapter>				
 			</rule-type>
 		</rule-types>
 	</config>
@@ -27,7 +27,7 @@
 				<parameters>
 					<parameter name="aspect-name" type="QNAME" mandatory='true'/>
 				</parameters>
-				<executor>org.alfresco.repo.rule.impl.action.AddFeaturesActionExecutor</executor>
+				<executor>org.alfresco.repo.rule.action.AddFeaturesActionExecutor</executor>
 			</action-definition>
 			<!--
 			<action-definition name="simple-workflow">
@@ -57,7 +57,7 @@
 					<parameter name="assoc-name" type="QNAME" mandatory='true'/>
 					<!-- TODO <parameter name="deep-copy -->
 				</parameters>
-				<executor>org.alfresco.repo.rule.impl.action.CopyActionExecutor</executor>
+				<executor>org.alfresco.repo.rule.action.CopyActionExecutor</executor>
 			</action-definition> 
 			<action-definition name="move">
 				<title>Move content to a specific space</title>	
@@ -69,7 +69,7 @@
 					<parameter name="assoc-type" type="QNAME" mandatory='true'/>
 					<parameter name="assoc-name" type="QNAME" mandatory='true'/>
 				</parameters>
-				<executor>org.alfresco.repo.rule.impl.action.MoveActionExecutor</executor>
+				<executor>org.alfresco.repo.rule.action.MoveActionExecutor</executor>
 			</action-definition> <!--
 			<action-definition name="email">
 				<title>Send an email to specified users</title>	
@@ -85,7 +85,7 @@
 				<parameters>
 					<parameter name="description" type="STRING" mandatory='false'/>
 				</parameters>
-				<executor>org.alfresco.repo.rule.impl.action.CheckInActionExecutor</executor>
+				<executor>org.alfresco.repo.rule.action.CheckInActionExecutor</executor>
 			</action-definition>
 			<action-definition name="check-out">
 				<title>Check out content</title>	
@@ -97,7 +97,7 @@
 					<parameter name="assoc-type" type="QNAME" mandatory='false'/>
 					<parameter name="assoc-name" type="QNAME" mandatory='false'/>
 				</parameters>
-				<executor>org.alfresco.repo.rule.impl.action.CheckOutActionExecutor</executor>
+				<executor>org.alfresco.repo.rule.action.CheckOutActionExecutor</executor>
 			</action-definition>	
 		</action-definitions>						
 	</config>
@@ -113,7 +113,7 @@
                     Use this when you wish to apply an action to everything when it is 
                     added to the space.
 				</description>
-				<evaluator>org.alfresco.repo.rule.impl.condition.NoConditionEvaluator</evaluator>
+				<evaluator>org.alfresco.repo.rule.condition.NoConditionEvaluator</evaluator>
 			</condition-definition>
 			<!--
 			<condition-definition name="in-category">
@@ -132,7 +132,7 @@
 					<!-- operation can take the values: CONTAINS, BEGINS, ENDS, EXACT (CONTAINS is default) -->
 					<parameter name="operation" type="STRING" mandatory="false"/> 
 				</parameters>
-				<evaluator>org.alfresco.repo.rule.impl.condition.MatchTextEvaluator</evaluator>
+				<evaluator>org.alfresco.repo.rule.condition.MatchTextEvaluator</evaluator>
 			</condition-definition>			
 		</condition-definitions>
 	</config>

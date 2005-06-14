@@ -836,7 +836,7 @@
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
-         <bean class="org.alfresco.repo.rule.impl.RuleServiceImpl" init-method="init">
+         <bean class="org.alfresco.repo.rule.RuleServiceImpl" init-method="init">
 			<property name="configService">
 				<ref bean="repoConfigService"/>
 			</property>

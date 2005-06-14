@@ -14,7 +14,7 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.rule.impl.condition.MatchTextEvaluator;
+import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;

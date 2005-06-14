@@ -3,15 +3,6 @@ package org.alfresco.repo.rule;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.alfresco.repo.rule.impl.ParameterDefinitionImplTest;
-import org.alfresco.repo.rule.impl.RuleActionDefinitionImplTest;
-import org.alfresco.repo.rule.impl.RuleActionImplTest;
-import org.alfresco.repo.rule.impl.RuleConditionDefinitionImplTest;
-import org.alfresco.repo.rule.impl.RuleConditionImplTest;
-import org.alfresco.repo.rule.impl.RuleServiceImplTest;
-import org.alfresco.repo.rule.impl.RuleStoreTest;
-import org.alfresco.repo.rule.impl.RuleTypeImplTest;
-import org.alfresco.repo.rule.impl.RuleXMLUtilTest;
 
 /**
  * Version test suite

@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
-import org.alfresco.repo.rule.impl.action.CheckInActionExecutor;
-import org.alfresco.repo.rule.impl.action.CheckOutActionExecutor;
-import org.alfresco.repo.rule.impl.action.MoveActionExecutor;
-import org.alfresco.repo.rule.impl.condition.MatchTextEvaluator;
+import org.alfresco.repo.rule.action.CheckInActionExecutor;
+import org.alfresco.repo.rule.action.CheckOutActionExecutor;
+import org.alfresco.repo.rule.action.MoveActionExecutor;
+import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
@@ -311,6 +311,8 @@ public class RuleServiceSystemTest extends BaseSpringTest
                 this.nodeRef, 
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 QName.createQName(NamespaceService.ALFRESCO_URI, "moved"));
+		
+		// TODO check that the node has been checked out correctly
     }
     
 	/**
