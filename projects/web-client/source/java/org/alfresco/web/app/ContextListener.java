@@ -137,13 +137,6 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, companySpaceDescription);
             nodeService.addAspect(companyNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
             
-            // apply the auditable aspect - created and modified date
-            Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(2);
-            Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-            nodeService.addAspect(companyNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
-            
             if (logger.isDebugEnabled())
                logger.debug("Created company root space with id: " + companySpaceId);
             
@@ -165,13 +158,6 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, glossaryFolderName);
             nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
             
-            // apply the auditable aspect - created and modified date
-            auditProps = new HashMap<QName, Serializable>(2);
-            now = new Date( Calendar.getInstance().getTimeInMillis() );
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-            nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
-            
             if (logger.isDebugEnabled())
                logger.debug("Created 'Glossary' space");
             
@@ -192,13 +178,6 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
             uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, templatesFolderName);
             nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
-            
-            // apply the auditable aspect - created and modified date
-            auditProps = new HashMap<QName, Serializable>(2);
-            now = new Date( Calendar.getInstance().getTimeInMillis() );
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-            nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
             
             if (logger.isDebugEnabled())
                logger.debug("Created 'Templates' space");

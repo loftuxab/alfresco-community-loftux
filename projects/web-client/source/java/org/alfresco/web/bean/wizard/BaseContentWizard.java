@@ -72,11 +72,9 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             // update the existing node in the repository
             Node currentDocument = this.browseBean.getDocument();
             NodeRef nodeRef = currentDocument.getNodeRef();
-            Date now = new Date( Calendar.getInstance().getTimeInMillis() );
             
             // update the modified timestamp and other content props
             Map<QName, Serializable> contentProps = this.nodeService.getProperties(nodeRef);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.title);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
@@ -103,6 +101,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             contentProps.put(DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
             contentProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
             contentProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, this.contentType);
+            contentProps.put(DictionaryBootstrap.PROP_QNAME_CREATOR, this.author);
             
             // create the node to represent the node
             String assocName = Repository.createValidQName(this.fileName);
@@ -126,17 +125,6 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             
             if (logger.isDebugEnabled())
                logger.debug("Added titled aspect with properties: " + titledProps);
-            
-            // apply the auditable aspect - created and modified date
-            Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(5);
-            Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-            auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATOR, this.author);
-            this.nodeService.addAspect(fileNodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
-
-            if (logger.isDebugEnabled())
-               logger.debug("Added auditable aspect with properties: " + auditProps);
             
             // get a writer for the content and put the file
             ContentWriter writer = contentService.getUpdatingWriter(fileNodeRef);

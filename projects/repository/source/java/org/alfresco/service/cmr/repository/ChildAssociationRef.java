@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
-import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * This class represents a child relationship between two nodes. This

@@ -49,13 +49,7 @@ public class NewUserWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To add the user to this space click Finish.<br/>" +
                                                     "To review or change your selections click Back.";
 
-   private static final QName PROP_QNAME_USERNAME     = QName.createQName(NamespaceService.ALFRESCO_URI, "userName");
-   private static final QName PROP_QNAME_HOMEFOLDER   = QName.createQName(NamespaceService.ALFRESCO_URI, "homeFolder");
-   private static final QName PROP_QNAME_FIRSTNAME    = QName.createQName(NamespaceService.ALFRESCO_URI, "firstName");
-   private static final QName PROP_QNAME_LASTNAME     = QName.createQName(NamespaceService.ALFRESCO_URI, "lastName");
-   private static final QName PROP_QNAME_EMAIL        = QName.createQName(NamespaceService.ALFRESCO_URI, "email");
-   private static final QName PROP_QNAME_ORGID        = QName.createQName(NamespaceService.ALFRESCO_URI, "organizationId");
-   
+  
    private static final String ERROR_GENERIC = "A system error occured during the operation: {0}";
    
    /** form variables */
@@ -284,13 +278,13 @@ public class NewUserWizard extends AbstractWizardBean
             NodeRef nodeRef = getPerson().getNodeRef();
             
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
-            props.put(PROP_QNAME_USERNAME, this.userName);
-            props.put(PROP_QNAME_FIRSTNAME, this.firstName);
-            props.put(PROP_QNAME_LASTNAME, this.lastName);
+            props.put(DictionaryBootstrap.PROP_QNAME_USERNAME, this.userName);
+            props.put(DictionaryBootstrap.PROP_QNAME_FIRSTNAME, this.firstName);
+            props.put(DictionaryBootstrap.PROP_QNAME_LASTNAME, this.lastName);
             // TODO: this should be a PATH not an ID etc.!
-            props.put(PROP_QNAME_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
-            props.put(PROP_QNAME_EMAIL, this.email);
-            props.put(PROP_QNAME_ORGID, this.companyId);
+            props.put(DictionaryBootstrap.PROP_QNAME_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
+            props.put(DictionaryBootstrap.PROP_QNAME_EMAIL, this.email);
+            props.put(DictionaryBootstrap.PROP_QNAME_ORGID, this.companyId);
             this.nodeService.setProperties(nodeRef, props);
          }
          else
@@ -300,13 +294,13 @@ public class NewUserWizard extends AbstractWizardBean
             
             // create properties for Person type from submitted Form data
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
-            props.put(PROP_QNAME_USERNAME, this.userName);
-            props.put(PROP_QNAME_FIRSTNAME, this.firstName);
-            props.put(PROP_QNAME_LASTNAME, this.lastName);
+            props.put(DictionaryBootstrap.PROP_QNAME_USERNAME, this.userName);
+            props.put(DictionaryBootstrap.PROP_QNAME_FIRSTNAME, this.firstName);
+            props.put(DictionaryBootstrap.PROP_QNAME_LASTNAME, this.lastName);
             // TODO: this should be a PATH not an ID etc.!
-            props.put(PROP_QNAME_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
-            props.put(PROP_QNAME_EMAIL, this.email);
-            props.put(PROP_QNAME_ORGID, this.companyId);
+            props.put(DictionaryBootstrap.PROP_QNAME_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
+            props.put(DictionaryBootstrap.PROP_QNAME_EMAIL, this.email);
+            props.put(DictionaryBootstrap.PROP_QNAME_ORGID, this.companyId);
             
             // create the node to represent the Person
             String assocName = Repository.createValidQName(this.userName);

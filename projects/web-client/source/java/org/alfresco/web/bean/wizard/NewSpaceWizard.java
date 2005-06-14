@@ -86,7 +86,6 @@ public class NewSpaceWizard extends AbstractWizardBean
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
             
             // update the modified timestamp
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
             this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
             this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
             this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
@@ -134,16 +133,6 @@ public class NewSpaceWizard extends AbstractWizardBean
                
                if (logger.isDebugEnabled())
                   logger.debug("Added uifacets aspect with properties: " + uiFacetsProps);
-               
-               // apply the auditable aspect - created and modified date
-               Map<QName, Serializable> auditProps = new HashMap<QName, Serializable>(5);
-               Date now = new Date( Calendar.getInstance().getTimeInMillis() );
-               auditProps.put(DictionaryBootstrap.PROP_QNAME_CREATED, now);
-               auditProps.put(DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
-               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, auditProps);
-   
-               if (logger.isDebugEnabled())
-                  logger.debug("Added auditable aspect with properties: " + auditProps);
             }
             else if (this.createFrom.equals("existing"))
             {

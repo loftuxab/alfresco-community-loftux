@@ -109,6 +109,7 @@ public class JavaBehaviour implements Behaviour
     {
         private Object instance;
         private Method delegateMethod;
+        private ThreadLocal<Boolean> withinMethod = new ThreadLocal<Boolean>();
         
         /**
          * Constuct.
@@ -148,11 +149,23 @@ public class JavaBehaviour implements Behaviour
             // Delegate to designated method pointer
             try
             {
-                return delegateMethod.invoke(instance, args);
+                if (withinMethod.get() == null)
+                {
+                    withinMethod.set(Boolean.TRUE);
+                    return delegateMethod.invoke(instance, args);
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (InvocationTargetException e)
             {
                 throw e.getCause();
+            }
+            finally
+            {
+                withinMethod.remove();
             }
         }
 
