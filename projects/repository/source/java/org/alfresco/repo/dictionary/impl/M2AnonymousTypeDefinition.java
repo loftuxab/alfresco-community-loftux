@@ -123,6 +123,15 @@ import org.alfresco.service.namespace.QName;
         return Collections.unmodifiableMap(associations);
     }
 
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.ClassDefinition#isContainer()
+     */
+    public boolean isContainer()
+    {
+        return !childassociations.isEmpty();
+    }
+
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.ClassDefinition#getChildAssociations()

@@ -537,9 +537,9 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	 * @param versionNodeRef
 	 * @param associations
 	 */
-	private void freezeAssociations(NodeRef versionNodeRef, Map<QName, AssociationRef> associations) 
+	private void freezeAssociations(NodeRef versionNodeRef, List<AssociationRef> associations) 
 	{
-		for (AssociationRef targetAssoc : associations.values())
+		for (AssociationRef targetAssoc : associations)
         {
             HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
             
@@ -574,11 +574,10 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	 * @param versionNodeRef
 	 * @param childAssociations
 	 */
-	private void freezeChildAssociations(NodeRef versionNodeRef, Map<QName, ChildAssociationRef> childAssociations) 
+	private void freezeChildAssociations(NodeRef versionNodeRef, List<ChildAssociationRef> childAssociations) 
 	{
-		for (Map.Entry<QName, ChildAssociationRef> entry : childAssociations.entrySet()) 
+		for (ChildAssociationRef childAssocRef : childAssociations) 
 		{
-			ChildAssociationRef childAssocRef = entry.getValue();
 			HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
             
             // Set the qname, isPrimary and nthSibling properties

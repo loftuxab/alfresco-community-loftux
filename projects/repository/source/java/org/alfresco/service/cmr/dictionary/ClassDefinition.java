@@ -51,6 +51,11 @@ public interface ClassDefinition
     public Map<QName, AssociationDefinition> getAssociations();
     
     /**
+     * @return true => this class supports child associations
+     */
+    public boolean isContainer();
+    
+    /**
      * Fetch only child associations for which this is a source type.
      *
      * @return all child associations applicable to this type, including those

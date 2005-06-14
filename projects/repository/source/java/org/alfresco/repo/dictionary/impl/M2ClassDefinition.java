@@ -258,6 +258,14 @@ import org.alfresco.service.namespace.QName;
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.ClassDefinition#isContainer()
+     */
+    public boolean isContainer()
+    {
+        return !inheritedChildAssociations.isEmpty();
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.ClassDefinition#getChildAssociations()
      */
     public Map<QName, ChildAssociationDefinition> getChildAssociations()

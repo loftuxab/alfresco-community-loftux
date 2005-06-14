@@ -1,8 +1,5 @@
-package org.alfresco.repo.ref.qname;
+package org.alfresco.service.namespace;
 
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
-import org.alfresco.service.namespace.QNamePattern;
 
 import junit.framework.TestCase;
 

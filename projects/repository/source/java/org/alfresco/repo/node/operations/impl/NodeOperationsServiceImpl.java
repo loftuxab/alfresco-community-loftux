@@ -24,15 +24,15 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.CopyServiceException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.debug.CodeMonkey;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
  * Node operations service implmentation.
@@ -248,7 +248,7 @@ public class NodeOperationsServiceImpl implements CopyService
 		ClassDefinition classDefinition = this.dictionaryService.getClass(classRef);	
 		if (classDefinition != null)
 		{
-            // Copy the properties
+             // Copy the properties
             Map<QName,PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
             for (QName propertyName : propertyDefinitions.keySet()) 
             {
@@ -257,24 +257,28 @@ public class NodeOperationsServiceImpl implements CopyService
             }           
 
             // Copy the associations (child and target)
-            Map<QName,AssociationDefinition> assocDefs = classDefinition.getAssociations();
-            for (AssociationDefinition assocDef : assocDefs.values()) 
+            Map<QName, AssociationDefinition> assocDefs = classDefinition.getAssociations();
+
+            // TODO: Need way of getting child assocs of a given type
+            if (classDefinition.isContainer())
             {
-                if (assocDef.isChild() == true)
+                List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(sourceNodeRef);
+                for (ChildAssociationRef childAssocRef : childAssocRefs) 
                 {
-                    List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(sourceNodeRef, assocDef.getName());
-                    for (ChildAssociationRef childAssocRef : childAssocRefs) 
+                    if (assocDefs.containsKey(childAssocRef.getTypeQName()))
                     {
-                        copyDetails.addChildAssociation(classDefinition.getName(), assocDef.getName(), childAssocRef);
+                        copyDetails.addChildAssociation(classDefinition.getName(), childAssocRef);
                     }
                 }
-                else
+            }
+            
+            // TODO: Need way of getting assocs of a given type
+            List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(sourceNodeRef, RegexQNamePattern.MATCH_ALL);
+            for (AssociationRef nodeAssocRef : nodeAssocRefs) 
+            {
+                if (assocDefs.containsKey(nodeAssocRef.getTypeQName()))
                 {
-                    List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(sourceNodeRef, assocDef.getName());
-                    for (AssociationRef nodeAssocRef : nodeAssocRefs) 
-                    {
-                        copyDetails.addAssociation(classDefinition.getName(), assocDef.getName(), nodeAssocRef);
-                    }
+                    copyDetails.addAssociation(classDefinition.getName(), nodeAssocRef);
                 }
             }
 		}
@@ -372,17 +376,14 @@ public class NodeOperationsServiceImpl implements CopyService
 	 */
 	private void copyTargetAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails) 
 	{
-		Map<QName, AssociationRef> nodeAssocRefs = copyDetails.getAssociations(classRef);
+		List<AssociationRef> nodeAssocRefs = copyDetails.getAssociations(classRef);
 		if (nodeAssocRefs != null)
 		{
-			for (Map.Entry<QName, AssociationRef> entry : nodeAssocRefs.entrySet()) 
+			for (AssociationRef assocRef : nodeAssocRefs) 
 			{
-				// TODO Currently the order of child associations is not preserved during copy
-				
 				// Add the association
-				NodeRef targetRef = entry.getValue().getTargetRef();
-				this.nodeService.createAssociation(destinationNodeRef, targetRef, entry.getValue().getTypeQName());
-											
+				NodeRef targetRef = assocRef.getTargetRef();
+				this.nodeService.createAssociation(destinationNodeRef, targetRef, assocRef.getTypeQName());
 			}
 		}
 	}
@@ -400,39 +401,35 @@ public class NodeOperationsServiceImpl implements CopyService
 	 */
 	private void copyChildAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren)
 	{
-		Map<QName, ChildAssociationRef> childAssocs = copyDetails.getChildAssociations(classRef);
+		List<ChildAssociationRef> childAssocs = copyDetails.getChildAssociations(classRef);
 		if (childAssocs != null)
 		{
-			for (Map.Entry<QName, ChildAssociationRef> entry : childAssocs.entrySet()) 
+			for (ChildAssociationRef childAssoc : childAssocs) 
 			{
-				// TODO Currently the order of child associations is not preserved during copy
-                CodeMonkey.todo("A List should be used instead of map so that order is preserved");
-				
-                ChildAssociationRef assocRef = entry.getValue();
 				if (copyChildren == true)
 				{
-					if (entry.getValue().isPrimary() == true)
+					if (childAssoc.isPrimary() == true)
 					{
 						// Copy the child
 						NodeRef childCopy = copy(
-								assocRef.getChildRef(), 
+                                childAssoc.getChildRef(), 
 								destinationNodeRef, 
-                                assocRef.getTypeQName(), 
-								entry.getKey(),
+                                childAssoc.getTypeQName(), 
+                                childAssoc.getQName(),
 								copyChildren);
 					}
 					else
 					{
 						// Add the child 
-						NodeRef childRef = entry.getValue().getChildRef();
-						this.nodeService.addChild(destinationNodeRef, childRef, assocRef.getTypeQName(), entry.getKey());
+						NodeRef childRef = childAssoc.getChildRef();
+						this.nodeService.addChild(destinationNodeRef, childRef, childAssoc.getTypeQName(), childAssoc.getQName());
 					}
 				}
 				else
 				{
 					// Add the child (will not be primary reguardless of its origional state)
-					NodeRef childRef = entry.getValue().getChildRef();
-					this.nodeService.addChild(destinationNodeRef, childRef, assocRef.getTypeQName(), entry.getKey());
+					NodeRef childRef = childAssoc.getChildRef();
+					this.nodeService.addChild(destinationNodeRef, childRef, childAssoc.getTypeQName(), childAssoc.getQName());
 				}							
 			}
 		}

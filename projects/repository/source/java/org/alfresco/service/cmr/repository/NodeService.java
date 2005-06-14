@@ -273,7 +273,7 @@ public interface NodeService
      * @throws InvalidNodeRefException if the node could not be found
      * 
      * @see QName
-     * @see org.alfresco.repo.ref.qname.RegexQNamePattern#MATCH_ALL
+     * @see org.alfresco.service.namespace.RegexQNamePattern#MATCH_ALL
      */
     public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException;
@@ -299,7 +299,7 @@ public interface NodeService
      * @throws InvalidNodeRefException if the node could not be found
      * 
      * @see QName
-     * @see org.alfresco.repo.ref.qname.RegexQNamePattern#MATCH_ALL
+     * @see org.alfresco.service.namespace.RegexQNamePattern#MATCH_ALL
      */
     public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException;
@@ -348,7 +348,7 @@ public interface NodeService
      * @throws InvalidNodeRefException if the source node could not be found
      * 
      * @see QName
-     * @see org.alfresco.repo.ref.qname.RegexQNamePattern#MATCH_ALL
+     * @see org.alfresco.service.namespace.RegexQNamePattern#MATCH_ALL
      */
     public List<AssociationRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException;
@@ -364,7 +364,7 @@ public interface NodeService
      * @throws InvalidNodeRefException
      * 
      * @see QName
-     * @see org.alfresco.repo.ref.qname.RegexQNamePattern#MATCH_ALL
+     * @see org.alfresco.service.namespace.RegexQNamePattern#MATCH_ALL
      */
     public List<AssociationRef> getSourceAssocs(NodeRef targetRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException;

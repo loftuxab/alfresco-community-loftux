@@ -31,11 +31,6 @@ public class ChildAssociationRef implements EntityRef, Serializable
     private boolean isPrimary;
     private int nthSibling;
     
-    static
-    {
-        // TODO
-        CodeMonkey.todo("Add assoc type qname to the data held here");
-    }
 
     /**
      * Construct a representation of a parent --- name ----> child relationship.

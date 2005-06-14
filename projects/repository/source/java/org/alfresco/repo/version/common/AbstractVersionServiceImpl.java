@@ -30,6 +30,7 @@ import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionServiceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
  * Abstract version service implementation.
@@ -251,25 +252,15 @@ public abstract class AbstractVersionServiceImpl
 			}			
 			
 			// Copy the associations (child and target)
-			Map<QName,AssociationDefinition> assocDefs = classDefinition.getAssociations();
-			for (AssociationDefinition assocDef : assocDefs.values()) 
+			List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
+			for (ChildAssociationRef childAssocRef : childAssocRefs) 
 			{
-				if (assocDef.isChild() == true)
-				{
-					List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef, assocDef.getName());
-					for (ChildAssociationRef childAssocRef : childAssocRefs) 
-					{
-						nodeDetails.addChildAssociation(classRef, assocDef.getName(), childAssocRef);
-					}
-				}
-				else
-				{
-					List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(nodeRef, assocDef.getName());
-					for (AssociationRef nodeAssocRef : nodeAssocRefs) 
-					{
-						nodeDetails.addAssociation(classRef, assocDef.getName(), nodeAssocRef);
-					}
-				}
+				nodeDetails.addChildAssociation(classRef, childAssocRef);
+			}
+			List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+			for (AssociationRef nodeAssocRef : nodeAssocRefs) 
+			{
+				nodeDetails.addAssociation(classRef, nodeAssocRef);
 			}
 		}
 	}
