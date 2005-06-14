@@ -259,16 +259,13 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	public void testCopyToNewNode()
 	{
 		// Copy to new node without copying children
-//		NodeRef copy = this.nodeOperationsService.copy(
-//				this.sourceNodeRef,
-//				this.rootNodeRef,
-//                TEST_CHILD_ASSOC_TYPE_QNAME,
-//				QName.createQName("{test}copyAssoc"));		
-//		checkCopiedNode(this.sourceNodeRef, copy, true, true, false);
+		NodeRef copy = this.nodeOperationsService.copy(
+				this.sourceNodeRef,
+				this.rootNodeRef,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
+				QName.createQName("{test}copyAssoc"));		
+		checkCopiedNode(this.sourceNodeRef, copy, true, true, false);
 		
-        System.out.println(
-                NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
-
         // Copy to new node, copying children
 		NodeRef copy2 = this.nodeOperationsService.copy(
 				this.sourceNodeRef,
@@ -276,19 +273,15 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}copyAssoc"),
 				true);
-        
-        System.out.println(
-                NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
-        
 		checkCopiedNode(this.sourceNodeRef, copy2, true, true, true);
 		
 		// Check that a copy of a copy works correctly
-//		NodeRef copyOfCopy = this.nodeOperationsService.copy(
-//				copy,
-//				this.rootNodeRef,
-//                TEST_CHILD_ASSOC_TYPE_QNAME,
-//				QName.createQName("{test}copyOfCopy"));
-//		checkCopiedNode(copy, copyOfCopy, true, true, false);
+		NodeRef copyOfCopy = this.nodeOperationsService.copy(
+				copy,
+				this.rootNodeRef,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
+				QName.createQName("{test}copyOfCopy"));
+		checkCopiedNode(copy, copyOfCopy, true, true, false);
 		
         // TODO check copying from a versioned copy
 		// TODO check copying from a lockable copy
@@ -298,18 +291,18 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		//contentProperties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
 		//contentProperties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
 		//this.nodeService.addAspect(this.sourceNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);		
-//		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.sourceNodeRef);
-//		contentWriter.putContent(SOME_CONTENT);		
-//		NodeRef copyWithContent = this.nodeOperationsService.copy(
-//				this.sourceNodeRef,
-//				this.rootNodeRef,
-//                TEST_CHILD_ASSOC_TYPE_QNAME,
-//				QName.createQName("{test}copyWithContent"));
-//		checkCopiedNode(this.sourceNodeRef, copyWithContent, true, true, false);
-//		//assertTrue(this.nodeService.hasAspect(copyWithContent, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
-//		ContentReader contentReader = this.contentService.getReader(copyWithContent);
-//		assertNotNull(contentReader);
-//		assertEquals(SOME_CONTENT, contentReader.getContentString());
+		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.sourceNodeRef);
+		contentWriter.putContent(SOME_CONTENT);		
+		NodeRef copyWithContent = this.nodeOperationsService.copy(
+				this.sourceNodeRef,
+				this.rootNodeRef,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
+				QName.createQName("{test}copyWithContent"));
+		checkCopiedNode(this.sourceNodeRef, copyWithContent, true, true, false);
+		//assertTrue(this.nodeService.hasAspect(copyWithContent, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
+		ContentReader contentReader = this.contentService.getReader(copyWithContent);
+		assertNotNull(contentReader);
+		assertEquals(SOME_CONTENT, contentReader.getContentString());
 		
 		// TODO check copying to a different store
 		
@@ -317,7 +310,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 	}	
 	
-	public void xtestCopyToExistingNode()
+	public void testCopyToExistingNode()
 	{
 		// Copy nodes within the same store
 		this.nodeOperationsService.copy(this.sourceNodeRef, this.destinationNodeRef);
