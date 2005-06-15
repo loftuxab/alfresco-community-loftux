@@ -6,6 +6,7 @@ package org.alfresco.repo.rule.action;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
 
@@ -28,6 +29,11 @@ public class CopyActionExecutor extends RuleActionExecutorAbstractBase
      * Node operations service
      */
     private CopyService copyService;
+	
+	/**
+	 * The node service
+	 */
+	private NodeService nodeService;
     
 	/**
 	 * Constructor
@@ -39,6 +45,7 @@ public class CopyActionExecutor extends RuleActionExecutorAbstractBase
 	{
 		super(ruleAction, serviceRegistry);		
 		this.copyService = serviceRegistry.getCopyService();
+		this.nodeService = serviceRegistry.getNodeService();
 	}
 
     /**
@@ -46,19 +53,22 @@ public class CopyActionExecutor extends RuleActionExecutorAbstractBase
      */
     public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
-        NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
-        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
-        
-        // TODO get this from a parameter value
-        boolean deepCopy = false;
-        
-        this.copyService.copy(
-                actionedUponNodeRef, 
-                destinationParent,
-                destinationAssocTypeQName,
-                destinationAssocQName,
-                deepCopy);
+		if (this.nodeService.exists(actionedUponNodeRef) == true)
+		{
+	        NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+	        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
+	        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
+	        
+	        // TODO get this from a parameter value
+	        boolean deepCopy = false;
+	        
+	        this.copyService.copy(
+	                actionedUponNodeRef, 
+	                destinationParent,
+	                destinationAssocTypeQName,
+	                destinationAssocQName,
+	                deepCopy);
+		}
     }
 
 }

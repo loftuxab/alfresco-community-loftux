@@ -55,36 +55,38 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 			NodeRef actionableNodeRef,
 			NodeRef actionedUponNodeRef) 
 	{
-		// First check that the node is a sub-type of content
-		QName typeQName = this.nodeService.getType(actionedUponNodeRef);
-		if (this.dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT) == true)
+		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
-			// Get the mime type
-			String mimeType = (String)this.ruleAction.getParameterValue(PARAM_MIME_TYPE);
-			
-			// Get the details of the copy destination
-			NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-	        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
-	        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
-	        
-			// Copy the content node
-	        NodeRef copyNodeRef = this.copyService.copy(
-	                actionedUponNodeRef, 
-	                destinationParent,
-	                destinationAssocTypeQName,
-	                destinationAssocQName,
-	                false);
-			
-			// Set the mime type on the copy
-			this.nodeService.setProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE, mimeType);
-			
-			// Get the content reader and writer
-			ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef);
-			ContentWriter contentWriter = this.contentService.getUpdatingWriter(copyNodeRef);
-			
-			// Try and transform the content
-			this.contentService.transform(contentReader, contentWriter);
-		}		
+			// First check that the node is a sub-type of content
+			QName typeQName = this.nodeService.getType(actionedUponNodeRef);
+			if (this.dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT) == true)
+			{
+				// Get the mime type
+				String mimeType = (String)this.ruleAction.getParameterValue(PARAM_MIME_TYPE);
+				
+				// Get the details of the copy destination
+				NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+		        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
+		        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
+		        
+				// Copy the content node
+		        NodeRef copyNodeRef = this.copyService.copy(
+		                actionedUponNodeRef, 
+		                destinationParent,
+		                destinationAssocTypeQName,
+		                destinationAssocQName,
+		                false);
+				
+				// Set the mime type on the copy
+				this.nodeService.setProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE, mimeType);
+				
+				// Get the content reader and writer
+				ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef);
+				ContentWriter contentWriter = this.contentService.getUpdatingWriter(copyNodeRef);
+				
+				// Try and transform the content
+				this.contentService.transform(contentReader, contentWriter);
+			}	
+		}
 	}
-
 }

@@ -19,6 +19,9 @@ import org.alfresco.service.namespace.QName;
  */
 public class AddFeaturesActionExecutor extends RuleActionExecutorAbstractBase
 {
+	/**
+	 * The node service
+	 */
 	private NodeService nodeService;
 
     /**
@@ -38,14 +41,17 @@ public class AddFeaturesActionExecutor extends RuleActionExecutorAbstractBase
      */
     public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
-        // Get the name of the aspec to add
-		Map<String, Serializable> paramValues = this.ruleAction.getParameterValues();
-        QName aspectQName = (QName)paramValues.get("aspect-name");
-        
-		// TODO get the properties that should be set when the aspect is added
-		
-        // Add the aspect
-        this.nodeService.addAspect(actionedUponNodeRef, aspectQName, null);        
+		if (this.nodeService.exists(actionedUponNodeRef) == true)
+		{
+	        // Get the name of the aspec to add
+			Map<String, Serializable> paramValues = this.ruleAction.getParameterValues();
+	        QName aspectQName = (QName)paramValues.get("aspect-name");
+	        
+			// TODO get the properties that should be set when the aspect is added
+			
+	        // Add the aspect
+	        this.nodeService.addAspect(actionedUponNodeRef, aspectQName, null);
+		}
     }
 
 }

@@ -54,7 +54,8 @@ public class CheckInActionExecutor extends RuleActionExecutorAbstractBase
     public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
         // First ensure that the actionedUponNodeRef is a workingCopy
-        if (this.nodeService.hasAspect(actionedUponNodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
+        if (this.nodeService.exists(actionedUponNodeRef) == true &&
+			this.nodeService.hasAspect(actionedUponNodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
         {
             // Get the version description
             String description = (String)this.ruleAction.getParameterValue(PARAM_DESCRIPTION);

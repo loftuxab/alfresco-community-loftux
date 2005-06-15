@@ -6,6 +6,7 @@ package org.alfresco.repo.rule.action;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
 
@@ -25,6 +26,11 @@ public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
      * The version operations service
      */
     private CheckOutCheckInService cociService;
+	
+	/**
+	 * The node service
+	 */
+	private NodeService nodeService;
     
     /**
      * Constructor
@@ -36,6 +42,7 @@ public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
 	{
 		super(ruleAction, serviceRegistry);		
 		this.cociService = serviceRegistry.getCheckOutCheckInService();
+		this.nodeService = serviceRegistry.getNodeService();
 	}
 
     /**
@@ -43,25 +50,28 @@ public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
      */
     public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
-        // Get the destination details
-        NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
-        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
-        
-        if (destinationParent == null || destinationAssocTypeQName == null || destinationAssocQName == null)
-        {
-            // Check the node out to the current location
-            this.cociService.checkout(actionedUponNodeRef);
-        }
-        else
-        {
-            // Check the node out to the specified location
-            this.cociService.checkout(
-                    actionedUponNodeRef, 
-                    destinationParent, 
-                    destinationAssocTypeQName, 
-                    destinationAssocQName);
-        }
+		if (this.nodeService.exists(actionedUponNodeRef) == true)
+		{
+	        // Get the destination details
+	        NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+	        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
+	        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
+	        
+	        if (destinationParent == null || destinationAssocTypeQName == null || destinationAssocQName == null)
+	        {
+	            // Check the node out to the current location
+	            this.cociService.checkout(actionedUponNodeRef);
+	        }
+	        else
+	        {
+	            // Check the node out to the specified location
+	            this.cociService.checkout(
+	                    actionedUponNodeRef, 
+	                    destinationParent, 
+	                    destinationAssocTypeQName, 
+	                    destinationAssocQName);
+	        }
+		}
     }
 
 }

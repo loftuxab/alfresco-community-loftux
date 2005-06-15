@@ -19,18 +19,32 @@ import org.alfresco.service.cmr.rule.RuleCondition;
  */
 public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase 
 {
+	/**
+	 * Evaluator constants
+	 */
 	public final static String NAME = "match-text";
 	public final static String PARAM_TEXT = "text";
 	public final static String PARAM_OPERATION = "operation";
     
+	/**
+	 * Operations enum
+	 */
     public enum Operation {CONTAINS, BEGINS, ENDS, EXACT};
     
+	/**
+	 * The node service
+	 */
     private NodeService nodeService;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param ruleCondition		the rule condition
+	 * @param serviceRegistry	the service registry
+	 */
 	public MatchTextEvaluator(RuleCondition ruleCondition, ServiceRegistry serviceRegistry) 
 	{
-		super(ruleCondition, serviceRegistry);
-		
+		super(ruleCondition, serviceRegistry);		
 		this.nodeService = serviceRegistry.getNodeService();
 	}
 
@@ -43,32 +57,42 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 	{
 		boolean result = false;
 		
-		// Get the text to match against
-		String matchText = (String)this.ruleCondition.getParameterValue(PARAM_TEXT);
-		
-		// Get the operation to be performed
-		Operation operation = Operation.CONTAINS;
-		String stringOperation = (String)this.ruleCondition.getParameterValue(PARAM_OPERATION);
-		if (stringOperation != null)
+		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
-			operation = Operation.valueOf(stringOperation);
-		}
-		
-		// Build the reg ex
-		String regEx = buildRegEx(matchText, operation);
-		
-		// Get the name value of the node
-		String name = (String)this.nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
-		
-		// Do the match
-		if (name != null)
-		{
-			result = name.matches(regEx);
+			// Get the text to match against
+			String matchText = (String)this.ruleCondition.getParameterValue(PARAM_TEXT);
+			
+			// Get the operation to be performed
+			Operation operation = Operation.CONTAINS;
+			String stringOperation = (String)this.ruleCondition.getParameterValue(PARAM_OPERATION);
+			if (stringOperation != null)
+			{
+				operation = Operation.valueOf(stringOperation);
+			}
+			
+			// Build the reg ex
+			String regEx = buildRegEx(matchText, operation);
+			
+			// Get the name value of the node
+			String name = (String)this.nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
+			
+			// Do the match
+			if (name != null)
+			{
+				result = name.matches(regEx);
+			}
 		}
 		
 		return result;
 	}
 
+	/**
+	 * Builds the regular expressin that it used to make the match
+	 * 
+	 * @param matchText		the raw text to be matched
+	 * @param operation		the operation
+	 * @return				the regular expression string
+	 */
 	private String buildRegEx(String matchText, Operation operation) 
 	{
 		// TODO the result of this could be cached to speed things up ...
@@ -91,6 +115,12 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 		return result;
 	}
 
+	/**
+	 * Escapes the text before it is turned into a regualr expression
+	 * 
+	 * @param matchText		the raw text
+	 * @return				the escaped text
+	 */
 	private String escapeText(String matchText) 
 	{
 		StringBuilder builder = new StringBuilder(matchText.length());
@@ -106,8 +136,16 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 		return builder.toString();
 	}
 
+	/**
+	 * List of escape characters
+	 */
 	private static List<Character> ESCAPE_CHAR_LIST = null;
 	
+	/**
+	 * Get the list of escape chars
+	 * 
+	 * @return  list of excape chars
+	 */
 	private List<Character> getEscapeCharList() 
 	{
 		if (ESCAPE_CHAR_LIST == null)

@@ -67,7 +67,7 @@
 					<parameter name="assoc-type" type="QNAME" mandatory="true"/>
 					<parameter name="assoc-name" type="QNAME" mandatory="true"/>
 				</parameters>
-				<executor>org.alfresco.repo.rule.action.CopyActionExecutor</executor>
+				<executor>org.alfresco.repo.rule.action.TransformActionExecutor</executor>
 			</action-definition> 
 			<action-definition name="copy">
 				<title>Create a copy of content at a specific location</title>	

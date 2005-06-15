@@ -46,15 +46,18 @@ public class MoveActionExecutor extends RuleActionExecutorAbstractBase
      */
     public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
-        NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
-        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
-        
-        this.nodeService.moveNode(
-                actionedUponNodeRef,
-                destinationParent,
-                destinationAssocTypeQName,
-                destinationAssocQName);
+		if (this.nodeService.exists(actionedUponNodeRef) == true)
+		{
+	        NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+	        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
+	        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
+	        
+	        this.nodeService.moveNode(
+	                actionedUponNodeRef,
+	                destinationParent,
+	                destinationAssocTypeQName,
+	                destinationAssocQName);
+		}
     }
 
 }
