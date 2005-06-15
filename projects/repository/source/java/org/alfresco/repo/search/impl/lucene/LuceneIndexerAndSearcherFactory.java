@@ -190,7 +190,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         }
         catch (SystemException e)
         {
-            throw new IndexerException(e);
+            throw new IndexerException("Failed to get transaction", e);
         }
     }
 
@@ -223,15 +223,15 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                 // TODO: what to do in each case?
                 catch (IllegalStateException e)
                 {
-                    throw new IndexerException(e);
+                    throw new IndexerException("", e);
                 }
                 catch (RollbackException e)
                 {
-                    throw new IndexerException(e);
+                    throw new IndexerException("", e);
                 }
                 catch (SystemException e)
                 {
-                    throw new IndexerException(e);
+                    throw new IndexerException("", e);
                 }
             }
             LuceneIndexer indexer = indexers.get(storeRef);

@@ -42,7 +42,7 @@ public class LuceneCategoryTest extends TestCase
 {    
     public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CHILDREN;
     
-    ApplicationContext ctx;
+    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
     NodeService nodeService;
     DictionaryService dictionaryService;
     LuceneIndexLock luceneIndexLock;
@@ -96,7 +96,6 @@ public class LuceneCategoryTest extends TestCase
 
     public void setUp()
     {
-        ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
         nodeService = (NodeService)ctx.getBean("dbNodeService");
         luceneIndexLock = (LuceneIndexLock)ctx.getBean("luceneIndexLock");
         dictionaryService = (DictionaryService)ctx.getBean("dictionaryService");
@@ -299,7 +298,7 @@ public class LuceneCategoryTest extends TestCase
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
-        indexer.clearIndex();
+        //indexer.clearIndex();
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}one"), n1));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2));

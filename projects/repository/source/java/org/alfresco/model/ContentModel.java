@@ -88,6 +88,12 @@ public interface ContentModel
     static final QName PROP_EMAIL = QName.createQName(NamespaceService.ALFRESCO_URI, "email");
     static final QName PROP_ORGID = QName.createQName(NamespaceService.ALFRESCO_URI, "organizationId");
     
+    // user
+    public static final QName TYPE_USER = QName.createQName(NamespaceService.ALFRESCO_URI, "user");
+    public static final QName PROP_USER_USERNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "username");
+    public static final QName PROP_PASSWORD = QName.createQName(NamespaceService.ALFRESCO_URI, "password");
+    public static final QName PROP_SALT = QName.createQName(NamespaceService.ALFRESCO_URI, "salt");
+    
     // system folder type
     static final QName TYPE_SYTEM_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "systemfolder");
 

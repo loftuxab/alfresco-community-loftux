@@ -92,9 +92,8 @@ public class LuceneTest extends TestCase
         super();
     }
 
-    public void setUp() throws IOException
+    public void setUp() throws IOException, InterruptedException
     {
-
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         luceneIndexLock = (LuceneIndexLock) ctx.getBean("luceneIndexLock");
         dictionaryService = (DictionaryService) ctx.getBean("dictionaryService");
@@ -448,7 +447,7 @@ public class LuceneTest extends TestCase
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
 
-        indexer.clearIndex();
+        ////indexer.clearIndex();
 
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}one"), n1));
@@ -632,7 +631,7 @@ public class LuceneTest extends TestCase
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
-        indexer.clearIndex();
+        //indexer.clearIndex();
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}one"), n1));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2));
@@ -1883,7 +1882,7 @@ public class LuceneTest extends TestCase
         indexer.setContentService(contentService);
         if (clear)
         {
-            indexer.clearIndex();
+            //indexer.clearIndex();
         }
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
 

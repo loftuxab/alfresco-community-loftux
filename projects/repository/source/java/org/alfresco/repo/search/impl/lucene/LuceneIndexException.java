@@ -19,11 +19,6 @@ public class LuceneIndexException extends IndexerException
      */
     private static final long serialVersionUID = 3688505480817422645L;
 
-    public LuceneIndexException()
-    {
-        super();
-    }
-
     public LuceneIndexException(String message, Throwable cause)
     {
         super(message, cause);
@@ -32,11 +27,6 @@ public class LuceneIndexException extends IndexerException
     public LuceneIndexException(String message)
     {
         super(message);
-    }
-
-    public LuceneIndexException(Throwable cause)
-    {
-        super(cause);
     }
 
 }

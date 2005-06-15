@@ -42,6 +42,7 @@ import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -63,6 +64,8 @@ import org.apache.lucene.search.TermQuery;
  */
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
+    private static Logger s_logger = Logger.getLogger(LuceneIndexerImpl.class);
+
     private enum Action {
         INDEX, REINDEX, DELETE
     };
@@ -235,53 +238,95 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * Indexer Implementation
      */
 
-    public void createNode(ChildAssociationRef relationshipRef) throws IndexerException
+    public void createNode(ChildAssociationRef relationshipRef) throws LuceneIndexException
     {
         checkAbleToDoWork(false);
         try
         {
-            if (relationshipRef.getParentRef() != null)
+            NodeRef childRef = relationshipRef.getChildRef();
+            // If we have the root node we delete all other root nodes first
+            if ((relationshipRef.getParentRef() == null) && childRef.equals(nodeService.getRootNode(childRef.getStoreRef())))
             {
-                // reindex(relationshipRef.getParentRef());
+                addRootNodesToDeletionList();
+                s_logger.warn("Detected root node addition: deleting all nodes from the index");
             }
-            reindex(relationshipRef.getChildRef());
+            reindex(childRef);
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             setRollbackOnly();
-            throw new IndexerException(e);
+            throw new LuceneIndexException("Create node failed", e);
         }
     }
 
-    public void updateNode(NodeRef nodeRef) throws IndexerException
+    private void addRootNodesToDeletionList()
+    {
+        IndexReader mainReader = null;
+        try
+        {
+            try
+            {
+                mainReader = getReader();
+                TermDocs td = mainReader.termDocs(new Term("ISROOT", "T"));
+                while (td.next())
+                {
+                    int doc = td.doc();
+                    Document document = mainReader.document(doc);
+                    String id = document.get("ID");
+                    NodeRef ref = new NodeRef(store, id);
+                    deleteImpl(ref, false);
+                }
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Failed to delete all primary nodes", e);
+            }
+        }
+        finally
+        {
+            if (mainReader != null)
+            {
+                try
+                {
+                    mainReader.close();
+                }
+                catch (IOException e)
+                {
+                    throw new LuceneIndexException("Filed to close main reader", e);
+                }
+            }
+        }
+    }
+
+    public void updateNode(NodeRef nodeRef) throws LuceneIndexException
     {
         checkAbleToDoWork(false);
         try
         {
             reindex(nodeRef);
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             setRollbackOnly();
-            throw new IndexerException(e);
+            throw new LuceneIndexException("Update node failed", e);
         }
     }
 
-    public void deleteNode(ChildAssociationRef relationshipRef) throws IndexerException
+    public void deleteNode(ChildAssociationRef relationshipRef) throws LuceneIndexException
     {
         checkAbleToDoWork(false);
         try
         {
             delete(relationshipRef.getChildRef(), false);
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             setRollbackOnly();
-            throw new IndexerException(e);
+            throw new LuceneIndexException("Delete node failed", e);
         }
     }
 
-    public void createChildRelationship(ChildAssociationRef relationshipRef) throws IndexerException
+    public void createChildRelationship(ChildAssociationRef relationshipRef) throws LuceneIndexException
     {
         checkAbleToDoWork(false);
         try
@@ -290,14 +335,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // reindex(relationshipRef.getParentRef());
             reindex(relationshipRef.getChildRef());
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             setRollbackOnly();
-            throw new IndexerException(e);
+            throw new LuceneIndexException("Failed to create child relationship", e);
         }
     }
 
-    public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef, ChildAssociationRef relationshipAfterRef) throws IndexerException
+    public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef, ChildAssociationRef relationshipAfterRef) throws LuceneIndexException
     {
         checkAbleToDoWork(false);
         try
@@ -309,14 +354,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
             reindex(relationshipBeforeRef.getChildRef());
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             setRollbackOnly();
-            throw new IndexerException(e);
+            throw new LuceneIndexException("Failed to update child relationship", e);
         }
     }
 
-    public void deleteChildRelationship(ChildAssociationRef relationshipRef) throws IndexerException
+    public void deleteChildRelationship(ChildAssociationRef relationshipRef) throws LuceneIndexException
     {
         checkAbleToDoWork(false);
         try
@@ -328,10 +373,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
             reindex(relationshipRef.getChildRef());
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             setRollbackOnly();
-            throw new IndexerException(e);
+            throw new LuceneIndexException("Failed to delete child relationship", e);
         }
     }
 
@@ -342,18 +387,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * @param deltaId
      * @return
      */
-    public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId, String indexRootLocation)
+    public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId, String indexRootLocation) throws LuceneIndexException
     {
         LuceneIndexerImpl indexer = new LuceneIndexerImpl();
         indexer.setIndexRootLocation(indexRootLocation);
-        try
-        {
-            indexer.initialise(storeRef, deltaId, false);
-        }
-        catch (IOException e)
-        {
-            throw new IndexerException(e);
-        }
+        indexer.initialise(storeRef, deltaId, false);
         return indexer;
     }
 
@@ -365,27 +403,31 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * Commit this index
      */
 
-    public void commit()
+    public void commit() throws LuceneIndexException
     {
         switch (status)
         {
         case Status.STATUS_COMMITTING:
-            throw new IndexerException("Unable to commit: Transaction is committing");
+            throw new LuceneIndexException("Unable to commit: Transaction is committing");
         case Status.STATUS_COMMITTED:
-            throw new IndexerException("Unable to commit: Transaction is commited ");
+            throw new LuceneIndexException("Unable to commit: Transaction is commited ");
         case Status.STATUS_ROLLING_BACK:
-            throw new IndexerException("Unable to commit: Transaction is rolling back");
+            throw new LuceneIndexException("Unable to commit: Transaction is rolling back");
         case Status.STATUS_ROLLEDBACK:
-            throw new IndexerException("Unable to commit: Transaction is aleady rolled back");
+            throw new LuceneIndexException("Unable to commit: Transaction is aleady rolled back");
         case Status.STATUS_MARKED_ROLLBACK:
-            throw new IndexerException("Unable to commit: Transaction is marked for roll back");
+            throw new LuceneIndexException("Unable to commit: Transaction is marked for roll back");
         case Status.STATUS_PREPARING:
-            throw new IndexerException("Unable to commit: Transaction is preparing");
+            throw new LuceneIndexException("Unable to commit: Transaction is preparing");
         case Status.STATUS_ACTIVE:
             // special case - commit from active
             prepare();
         // drop through to do the commit;
         default:
+            if (status != Status.STATUS_PREPARED)
+            {
+                throw new LuceneIndexException("Index must be prepared to commit");
+            }
             status = Status.STATUS_COMMITTING;
             try
             {
@@ -415,12 +457,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     callBack.indexCompleted(store, remainingCount, null);
                 }
             }
-            catch (IOException e)
+            catch (LuceneIndexException e)
             {
-                e.printStackTrace();
                 // If anything goes wrong we try and do a roll back
                 rollback();
-                throw new IndexerException(e);
+                throw new LuceneIndexException("Commit failed", e);
             }
             finally
             {
@@ -431,43 +472,97 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    private void doFTSIndexCommit() throws IOException
+    private void doFTSIndexCommit() throws LuceneIndexException
     {
-        IndexReader mainReader = getReader();
-        IndexReader deltaReader = getDeltaReader();
+        IndexReader mainReader = null;
+        IndexReader deltaReader = null;
+        IndexSearcher mainSearcher = null;
+        IndexSearcher deltaSearcher = null;
 
-        IndexSearcher mainSearcher = new IndexSearcher(mainReader);
-        IndexSearcher deltaSearcher = new IndexSearcher(deltaReader);
-
-        for (Helper helper : toFTSIndex)
+        try
         {
-            BooleanQuery query = new BooleanQuery();
-            query.add(new TermQuery(new Term("ID", helper.document.getField("ID").stringValue())), true, false);
-            query.add(new TermQuery(new Term("TX", helper.document.getField("TX").stringValue())), true, false);
+            mainReader = getReader();
+            deltaReader = getDeltaReader();
+            mainSearcher = new IndexSearcher(mainReader);
+            deltaSearcher = new IndexSearcher(deltaReader);
 
-            Hits hits = mainSearcher.search(query);
-            if (hits.length() > 0)
+            for (Helper helper : toFTSIndex)
             {
-                // No change
-                for (int i = 0; i < hits.length(); i++)
+                BooleanQuery query = new BooleanQuery();
+                query.add(new TermQuery(new Term("ID", helper.document.getField("ID").stringValue())), true, false);
+                query.add(new TermQuery(new Term("TX", helper.document.getField("TX").stringValue())), true, false);
+
+                try
                 {
-                    mainReader.delete(hits.id(i));
+                    Hits hits = mainSearcher.search(query);
+                    if (hits.length() > 0)
+                    {
+                        // No change
+                        for (int i = 0; i < hits.length(); i++)
+                        {
+                            mainReader.delete(hits.id(i));
+                        }
+                    }
+                    else
+                    {
+                        hits = deltaSearcher.search(query);
+                        for (int i = 0; i < hits.length(); i++)
+                        {
+                            deltaReader.delete(hits.id(i));
+                        }
+                    }
+                }
+                catch (IOException e)
+                {
+                    throw new LuceneIndexException("Failed to delete an FTS update from the original index", e);
                 }
             }
-            else
+
+        }
+        finally
+        {
+            if (deltaSearcher != null)
             {
-                hits = deltaSearcher.search(query);
-                for (int i = 0; i < hits.length(); i++)
+                try
                 {
-                    deltaReader.delete(hits.id(i));
+                    deltaSearcher.close();
+                }
+                catch (IOException e)
+                {
+                    s_logger.warn("Failed to close delta searcher", e);
+                }
+            }
+            if (mainSearcher != null)
+            {
+                try
+                {
+                    mainSearcher.close();
+                }
+                catch (IOException e)
+                {
+                    s_logger.warn("Failed to close main searcher", e);
+                }
+            }
+            try
+            {
+                closeDeltaReader();
+            }
+            catch (LuceneIndexException e)
+            {
+                s_logger.warn("Failed to close delta reader", e);
+            }
+            if (mainReader != null)
+            {
+                try
+                {
+                    mainReader.close();
+                }
+                catch (IOException e)
+                {
+                    s_logger.warn("Failed to close main reader", e);
                 }
             }
         }
-
-        deltaSearcher.close();
-        mainSearcher.close();
-        closeDeltaReader();
-        mainReader.close();
 
         mergeDeltaIntoMain(new LinkedHashSet<Term>());
 
@@ -483,7 +578,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * 
      * @return
      */
-    public int prepare()
+    public int prepare() throws LuceneIndexException
     {
 
         switch (status)
@@ -515,10 +610,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 status = Status.STATUS_PREPARED;
                 return isModified ? XAResource.XA_OK : XAResource.XA_RDONLY;
             }
-            catch (IOException e)
+            catch (LuceneIndexException e)
             {
                 setRollbackOnly();
-                throw new IndexerException(e);
+                throw new LuceneIndexException("Index failed to prepare", e);
             }
         }
     }
@@ -548,7 +643,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * 
      */
 
-    public void rollback()
+    public void rollback() throws LuceneIndexException
     {
         switch (status)
         {
@@ -600,14 +695,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * Implementation
      */
 
-    private void reindex(NodeRef nodeRef) throws IOException
+    private void reindex(NodeRef nodeRef) throws LuceneIndexException
     {
 
         delete(nodeRef, true);
         // index(nodeRef, false);
     }
 
-    private void delete(NodeRef nodeRef, boolean forReindex) throws IOException
+    private void delete(NodeRef nodeRef, boolean forReindex) throws LuceneIndexException
     {
 
         deltaDeletes.add(new Command(nodeRef, forReindex ? Action.REINDEX : Action.DELETE));
@@ -618,7 +713,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    private void flushPending() throws IOException
+    private void flushPending() throws LuceneIndexException
     {
         Set<NodeRef> forIndex = new LinkedHashSet<NodeRef>();
         for (Command command : deltaDeletes)
@@ -638,16 +733,17 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         index(forIndex, false);
     }
 
-    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex) throws IOException
+    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex) throws LuceneIndexException
     {
         // startTimer();
         getDeltaReader();
         // outputTime("Delete "+nodeRef+" size = "+getDeltaWriter().docCount());
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
 
-        IndexReader mainReader = getReader();
+        IndexReader mainReader = null;
         try
         {
+            mainReader = getReader();
             refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader(), true));
 
             refs.addAll(deleteContainerAndBelow(nodeRef, mainReader, false));
@@ -671,11 +767,21 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         finally
         {
-            mainReader.close();
+            if (mainReader != null)
+            {
+                try
+                {
+                    mainReader.close();
+                }
+                catch (IOException e)
+                {
+                    throw new LuceneIndexException("Filed to close main reader", e);
+                }
+            }
         }
     }
 
-    private Set<NodeRef> deletePrimary(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws IOException
+    private Set<NodeRef> deletePrimary(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws LuceneIndexException
     {
 
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
@@ -683,18 +789,25 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         for (NodeRef nodeRef : nodeRefs)
         {
 
-            TermDocs td = reader.termDocs(new Term("PRIMARYPARENT", nodeRef.getId()));
-            while (td.next())
+            try
             {
-                int doc = td.doc();
-                Document document = reader.document(doc);
-                String id = document.get("ID");
-                NodeRef ref = new NodeRef(store, id);
-                refs.add(ref);
-                if (delete)
+                TermDocs td = reader.termDocs(new Term("PRIMARYPARENT", nodeRef.getId()));
+                while (td.next())
                 {
-                    reader.delete(doc);
+                    int doc = td.doc();
+                    Document document = reader.document(doc);
+                    String id = document.get("ID");
+                    NodeRef ref = new NodeRef(store, id);
+                    refs.add(ref);
+                    if (delete)
+                    {
+                        reader.delete(doc);
+                    }
                 }
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Failed to delete node by primary parent for " + nodeRef.getId(), e);
             }
         }
 
@@ -702,7 +815,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     }
 
-    private Set<NodeRef> deleteReference(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws IOException
+    private Set<NodeRef> deleteReference(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws LuceneIndexException
     {
 
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
@@ -710,18 +823,25 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         for (NodeRef nodeRef : nodeRefs)
         {
 
-            TermDocs td = reader.termDocs(new Term("PARENT", nodeRef.getId()));
-            while (td.next())
+            try
             {
-                int doc = td.doc();
-                Document document = reader.document(doc);
-                String id = document.get("ID");
-                NodeRef ref = new NodeRef(store, id);
-                refs.add(ref);
-                if (delete)
+                TermDocs td = reader.termDocs(new Term("PARENT", nodeRef.getId()));
+                while (td.next())
                 {
-                    reader.delete(doc);
+                    int doc = td.doc();
+                    Document document = reader.document(doc);
+                    String id = document.get("ID");
+                    NodeRef ref = new NodeRef(store, id);
+                    refs.add(ref);
+                    if (delete)
+                    {
+                        reader.delete(doc);
+                    }
                 }
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Failed to delete node by parent for " + nodeRef.getId(), e);
             }
         }
 
@@ -729,49 +849,47 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     }
 
-    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader, boolean delete) throws IOException
+    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader, boolean delete) throws LuceneIndexException
     {
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
 
-        if (delete)
+        try
         {
-            int count = reader.delete(new Term("ID", nodeRef.getId()));
-        }
-        refs.add(nodeRef);
-
-        TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.getId()));
-        while (td.next())
-        {
-            int doc = td.doc();
-            Document document = reader.document(doc);
-            String id = document.get("ID");
-            NodeRef ref = new NodeRef(store, id);
-            refs.add(ref);
             if (delete)
             {
-                reader.delete(doc);
+                int count = reader.delete(new Term("ID", nodeRef.getId()));
             }
+            refs.add(nodeRef);
+            TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.getId()));
+            while (td.next())
+            {
+                int doc = td.doc();
+                Document document = reader.document(doc);
+                String id = document.get("ID");
+                NodeRef ref = new NodeRef(store, id);
+                refs.add(ref);
+                if (delete)
+                {
+                    reader.delete(doc);
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            throw new LuceneIndexException("Failed to delete container and below for " + nodeRef.getId(), e);
         }
         return refs;
     }
 
-    private void index(Set<NodeRef> nodeRefs, boolean isNew) throws IOException
+    private void index(Set<NodeRef> nodeRefs, boolean isNew) throws LuceneIndexException
     {
-        // Directory temp = new RAMDirectory();
-        // IndexWriter localWriter = new IndexWriter(temp, new LuceneAnalyser(),
-        // true);
-        // IndexWriter localWriter = getDeltaWriter();
         for (NodeRef ref : nodeRefs)
         {
             index(ref, isNew);
         }
-        // localWriter.close();
-        // IndexWriter writer = getDeltaRamWriter();
-        // writer.addIndexes(new Directory[] {temp});
-        // chechAndMergeToDisk(100);
     }
 
-    private void index(NodeRef nodeRef, boolean isNew) throws IOException
+    private void index(NodeRef nodeRef, boolean isNew) throws LuceneIndexException
     {
         IndexWriter writer = getDeltaWriter();
 
@@ -783,7 +901,17 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         List<Document> docs = createDocuments(nodeRef, isNew);
         for (Document doc : docs)
         {
-            writer.addDocument(doc /* TODO: Select the language based analyser */);
+            try
+            {
+                writer.addDocument(doc /*
+                                         * TODO: Select the language based
+                                         * analyser
+                                         */);
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Failed to add document to index", e);
+            }
         }
 
     }
@@ -1044,7 +1172,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         boolean index = true;
         boolean tokenise = true;
         boolean atomic = true;
-        
+
         PropertyDefinition propertyDef = getDictionaryService().getProperty(propertyName);
         if (propertyDef != null)
         {
@@ -1054,7 +1182,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             atomic = propertyDef.isIndexedAtomically();
         }
         isAtomic &= atomic;
-        
+
         if (value != null)
         {
             // convert value to String
@@ -1135,9 +1263,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                     {
                                         Path.ChildAssocElement cae = (Path.ChildAssocElement) path.get(1);
                                         boolean isFakeRoot = true;
-                                        for(ChildAssociationRef car : nodeService.getParentAssocs(cae.getRef().getChildRef()))
+                                        for (ChildAssociationRef car : nodeService.getParentAssocs(cae.getRef().getChildRef()))
                                         {
-                                            if(cae.getRef().equals(car))
+                                            if (cae.getRef().equals(car))
                                             {
                                                 isFakeRoot = false;
                                                 break;
@@ -1222,33 +1350,20 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return false;
     }
 
-    // public void startTimer()
-    // {
-    // timer.reset();
-    // timer.start();
-    // }
-    //
-    // public void outputTime(String message)
-    // {
-    // timer.stop();
-    // System.out.println(message + " in " +
-    // format.format(timer.getDuration()));
-    // }
-
-    public void clearIndex()
+    protected void clearIndex() throws LuceneIndexException
     {
         try
         {
             super.clearIndex();
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             setRollbackOnly();
-            throw new IndexerException(e);
+            throw new LuceneIndexException("Failed to clear index", e);
         }
     }
 
-    public void updateFullTextSearch(int size)
+    public void updateFullTextSearch(int size) throws LuceneIndexException
     {
         checkAbleToDoWork(true);
         try
@@ -1260,121 +1375,172 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             booleanQuery.add(new TermQuery(new Term("FTSSTATUS", "Dirty")), false, false);
             booleanQuery.add(new TermQuery(new Term("FTSSTATUS", "New")), false, false);
 
-            Searcher searcher = getSearcher();
-            Hits hits = searcher.search(booleanQuery);
-            LuceneResultSet results = new LuceneResultSet(store, hits, searcher, nodeService, null);
             int count = 0;
-            for (ResultSetRow row : results)
+            Searcher searcher = null;
+            LuceneResultSet results = null;
+            try
             {
-                LuceneResultSetRow lrow = (LuceneResultSetRow) row;
-                Helper helper = new Helper(lrow.getNodeRef(), lrow.getDocument(), lrow.getIndex());
-                toFTSIndex.add(helper);
-                if (++count >= size)
+                searcher = getSearcher();
+                Hits hits;
+                try
                 {
-                    break;
+                    hits = searcher.search(booleanQuery);
                 }
-            }
-            count = results.length();
-            results.close();
-
-            IndexWriter writer = getDeltaWriter();
-            for (Helper helper : toFTSIndex)
-            {
-                Document document = helper.document;
-                NodeRef ref = helper.nodeRef;
-                Map<QName, Serializable> properties = nodeService.getProperties(ref);
-
-                for (QName propertyQName : properties.keySet())
+                catch (IOException e)
                 {
-                    boolean store = true;
-                    boolean index = true;
-                    boolean tokenise = true;
-                    boolean atomic = true;
-
-                    PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
-                    if (propertyDefinition != null)
-                    {
-                        index = propertyDefinition.isIndexed();
-                        store = propertyDefinition.isStoredInIndex();
-                        tokenise = propertyDefinition.isTokenisedInIndex();
-                        atomic = propertyDefinition.isIndexedAtomically();
-                    }
-
-                    Serializable value = properties.get(propertyQName);
-                    if (value != null)
-                    {
-                        // convert value to String
-                        for (String strValue : ValueConverter.getCollection(String.class, value))
-                        {
-
-                            // TODO: Need converter here
-                            // Conversion should be done in the anlyser as we
-                            // may
-                            // take
-                            // advantage of tokenisation
-
-                            // Need to add with the correct language based
-                            // analyser
-                            if (index && !atomic)
-                            {
-                                document.removeFields(propertyQName.toString());
-                                if (propertyQName.equals(contentPropertyQName))
-                                {
-                                    ContentReader reader = contentService.getReader(ref);
-                                    if (reader != null)
-                                    {
-                                        ContentWriter cwriter = contentService.getTempWriter();
-                                        cwriter.setMimetype("text/plain");
-                                        try
-                                        {
-                                            contentService.transform(reader, cwriter);
-                                            document.add(Field.Text("TEXT", new InputStreamReader(cwriter.getReader().getContentInputStream())));
-                                        }
-                                        catch (NoTransformerException e)
-                                        {
-                                            // if it does not convert we did not
-                                            // write and text
-                                        }
-                                    }
-                                }
-
-                                document.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
-                            }
-                        }
-                    }
+                    throw new LuceneIndexException("Failed to excute query to find content which needs updating in the index", e);
                 }
+                results = new LuceneResultSet(store, hits, searcher, nodeService, null);
 
-                document.removeField("FTSSTATUS");
-                document.add(new Field("FTSSTATUS", "Clean", true, true, false));
-
-                writer.addDocument(document /*
-                                             * TODO: Select the language based
-                                             * analyser
-                                             */);
-
-                // Need to do all the current id in the TX - should all be
-                // together so skip until id changes
-                if (writer.docCount() > size)
+                for (ResultSetRow row : results)
                 {
-                    String id = document.getField("ID").stringValue();
-                    if (lastId == null)
-                    {
-                        lastId = id;
-                    }
-                    if (!lastId.equals(id))
+                    LuceneResultSetRow lrow = (LuceneResultSetRow) row;
+                    Helper helper = new Helper(lrow.getNodeRef(), lrow.getDocument(), lrow.getIndex());
+                    toFTSIndex.add(helper);
+                    if (++count >= size)
                     {
                         break;
                     }
                 }
+                count = results.length();
+            }
+            finally
+            {
+                if (results != null)
+                {
+                    results.close(); // closes the searcher
+                }
+                else if (searcher != null)
+                {
+                    try
+                    {
+                        searcher.close();
+                    }
+                    catch (IOException e)
+                    {
+                        throw new LuceneIndexException("Failed to close searcher", e);
+                    }
+                }
             }
 
-            remainingCount = count - writer.docCount();
+            IndexWriter writer = null;
+            try
+            {
+                writer = getDeltaWriter();
+                for (Helper helper : toFTSIndex)
+                {
+                    Document document = helper.document;
+                    NodeRef ref = helper.nodeRef;
+                    Map<QName, Serializable> properties = nodeService.getProperties(ref);
+
+                    for (QName propertyQName : properties.keySet())
+                    {
+                        boolean store = true;
+                        boolean index = true;
+                        boolean tokenise = true;
+                        boolean atomic = true;
+
+                        PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
+                        if (propertyDefinition != null)
+                        {
+                            index = propertyDefinition.isIndexed();
+                            store = propertyDefinition.isStoredInIndex();
+                            tokenise = propertyDefinition.isTokenisedInIndex();
+                            atomic = propertyDefinition.isIndexedAtomically();
+                        }
+
+                        Serializable value = properties.get(propertyQName);
+                        if (value != null)
+                        {
+                            // convert value to String
+                            for (String strValue : ValueConverter.getCollection(String.class, value))
+                            {
+
+                                // TODO: Need converter here
+                                // Conversion should be done in the anlyser as
+                                // we
+                                // may
+                                // take
+                                // advantage of tokenisation
+
+                                // Need to add with the correct language based
+                                // analyser
+                                if (index && !atomic)
+                                {
+                                    document.removeFields(propertyQName.toString());
+                                    if (propertyQName.equals(contentPropertyQName))
+                                    {
+                                        ContentReader reader = contentService.getReader(ref);
+                                        if (reader != null)
+                                        {
+                                            ContentWriter cwriter = contentService.getTempWriter();
+                                            cwriter.setMimetype("text/plain");
+                                            try
+                                            {
+                                                contentService.transform(reader, cwriter);
+                                                document.add(Field.Text("TEXT", new InputStreamReader(cwriter.getReader().getContentInputStream())));
+                                            }
+                                            catch (NoTransformerException e)
+                                            {
+                                                // if it does not convert we did
+                                                // not
+                                                // write and text
+                                            }
+                                        }
+                                    }
+
+                                    document.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
+                                }
+                            }
+                        }
+                    }
+
+                    document.removeField("FTSSTATUS");
+                    document.add(new Field("FTSSTATUS", "Clean", true, true, false));
+
+                    try
+                    {
+                        writer.addDocument(document /*
+                                                     * TODO: Select the language
+                                                     * based analyser
+                                                     */);
+                    }
+                    catch (IOException e)
+                    {
+                        throw new LuceneIndexException("Failed to add docuement while updating fts index", e);
+                    }
+
+                    // Need to do all the current id in the TX - should all be
+                    // together so skip until id changes
+                    if (writer.docCount() > size)
+                    {
+                        String id = document.getField("ID").stringValue();
+                        if (lastId == null)
+                        {
+                            lastId = id;
+                        }
+                        if (!lastId.equals(id))
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                remainingCount = count - writer.docCount();
+            }
+            catch (LuceneIndexException e)
+            {
+                if (writer != null)
+                {
+                    closeDeltaWriter();
+                }
+            }
 
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             setRollbackOnly();
-            throw new IndexerException(e);
+            throw new LuceneIndexException("Failed FTS update", e);
         }
     }
 

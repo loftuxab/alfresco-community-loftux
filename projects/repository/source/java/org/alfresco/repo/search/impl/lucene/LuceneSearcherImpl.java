@@ -167,7 +167,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         {
             searcher.initialise(storeRef, deltaId, false);
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             throw new SearcherException(e);
         }

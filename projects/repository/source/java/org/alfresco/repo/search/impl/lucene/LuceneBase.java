@@ -12,6 +12,7 @@ import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.apache.log4j.Logger;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -31,8 +32,7 @@ import org.apache.lucene.store.FSDirectory;
  * The default file structure is
  * <ol>
  * <li><b>"base"/"protocol"/"name"/</b> for the main index
- * <li><b>"base"/"protocol"/"name"/deltas/"id"</b> for transactional
- * updates
+ * <li><b>"base"/"protocol"/"name"/deltas/"id"</b> for transactional updates
  * <li><b>"base"/"protocol"/"name"/undo/"id"</b> undo information
  * </ol>
  * 
@@ -51,23 +51,25 @@ import org.apache.lucene.store.FSDirectory;
 
 public abstract class LuceneBase implements Lockable
 {
+    private static Logger s_logger = Logger.getLogger(LuceneBase.class);
+
     /**
      * The base directory for the index (on file)
      */
 
-    private Directory baseDir;
+    private File baseDir;
 
     /**
      * The directory for deltas (on file)
      */
 
-    private Directory deltaDir;
+    private File deltaDir;
 
     /**
      * The directory for undo information (on file)
      */
 
-    private Directory undoDir;
+    private File undoDir;
 
     /**
      * The index reader for the on file delta. (This should no coexist with the
@@ -113,7 +115,9 @@ public abstract class LuceneBase implements Lockable
 
     private LuceneIndexLock luceneIndexLock;
 
-    private String indexRootLocation = null; //File.separator + "lucene-indexes";
+    private String indexRootLocation = null; // File.separator +
+
+    // "lucene-indexes";
 
     /**
      * Initiase the configuration elements of the lucene store indexers and
@@ -123,18 +127,50 @@ public abstract class LuceneBase implements Lockable
      * @param deltaId
      * @throws IOException
      */
-    protected void initialise(StoreRef store, String deltaId, boolean createMain) throws IOException
+    protected void initialise(StoreRef store, String deltaId, boolean createMain) throws LuceneIndexException
     {
         this.store = store;
         this.deltaId = deltaId;
 
         String basePath = getMainPath();
-        baseDir = initialiseFSDirectory(basePath, false, createMain);
-        if (deltaId != null)
+        baseDir = new File(basePath);
+        if (createMain)
         {
-            String deltaPath = getDeltaPath();
-            deltaDir = initialiseFSDirectory(deltaPath, true, true);
-            //undoDir = initialiseFSDirectory(basePath + File.separator + "undo" + File.separator + deltaId + File.separator, true, true);
+            getWriteLock();
+        }
+        try
+        {
+            try
+            {
+                initialiseFSDirectory(basePath, false, createMain).close();
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Failed to close directory after initialisation " + basePath);
+            }
+            if (deltaId != null)
+            {
+                String deltaPath = getDeltaPath();
+                deltaDir = new File(deltaPath);
+                try
+                {
+                    initialiseFSDirectory(deltaPath, true, true).close();
+                }
+                catch (IOException e)
+                {
+                    throw new LuceneIndexException("Failed to close directory after initialisation " + deltaPath);
+                }
+                // undoDir = initialiseFSDirectory(basePath + File.separator +
+                // "undo" + File.separator + deltaId + File.separator, true,
+                // true);
+            }
+        }
+        finally
+        {
+            if (createMain)
+            {
+                releaseWriteLock();
+            }
         }
     }
 
@@ -156,7 +192,6 @@ public abstract class LuceneBase implements Lockable
         return mainPath;
     }
 
-    
     /**
      * Utility method to find the path to the base index
      * 
@@ -164,7 +199,7 @@ public abstract class LuceneBase implements Lockable
      */
     private String getBasePath()
     {
-        if(indexRootLocation == null)
+        if (indexRootLocation == null)
         {
             throw new IndexerException("No configuration for index location");
         }
@@ -181,26 +216,33 @@ public abstract class LuceneBase implements Lockable
      * @return
      * @throws IOException
      */
-    private Directory initialiseFSDirectory(String path, boolean deleteOnExit, boolean overwrite) throws IOException
+    private Directory initialiseFSDirectory(String path, boolean deleteOnExit, boolean overwrite) throws LuceneIndexException
     {
-        File file = new File(path);
-        if (overwrite)
+        try
         {
-            //deleteDirectory(file);
-        }
-        if (!file.exists())
-        {
-            file.mkdirs();
-            if (deleteOnExit)
+            File file = new File(path);
+            if (overwrite)
             {
-                file.deleteOnExit();
+                // deleteDirectory(file);
             }
+            if (!file.exists())
+            {
+                file.mkdirs();
+                if (deleteOnExit)
+                {
+                    file.deleteOnExit();
+                }
 
-            return FSDirectory.getDirectory(file, true);
+                return FSDirectory.getDirectory(file, true);
+            }
+            else
+            {
+                return FSDirectory.getDirectory(file, overwrite);
+            }
         }
-        else
+        catch (IOException e)
         {
-            return FSDirectory.getDirectory(file, overwrite);
+            throw new LuceneIndexException("Filed to initialise lucene file directory " + path, e);
         }
     }
 
@@ -213,9 +255,16 @@ public abstract class LuceneBase implements Lockable
      * @throws IOException
      */
 
-    protected IndexSearcher getSearcher() throws IOException
+    protected IndexSearcher getSearcher() throws LuceneIndexException
     {
-        return new IndexSearcher(getMainPath());
+        try
+        {
+            return new IndexSearcher(getMainPath());
+        }
+        catch (IOException e)
+        {
+            throw new LuceneIndexException("Failed to open IndexSarcher for " + getMainPath(), e);
+        }
     }
 
     /**
@@ -225,7 +274,7 @@ public abstract class LuceneBase implements Lockable
      * @throws IOException
      */
 
-    protected IndexReader getDeltaReader() throws IOException
+    protected IndexReader getDeltaReader() throws LuceneIndexException
     {
         if (deltaReader == null)
         {
@@ -233,17 +282,38 @@ public abstract class LuceneBase implements Lockable
             // between them.
             closeDeltaWriter();
 
-            if (!IndexReader.indexExists(deltaDir))
+            if (!indexExists(deltaDir))
             {
-                // Make sure there is something we can read
-                IndexWriter writer = new IndexWriter(deltaDir, new LuceneAnalyser(dictionaryService), true);
-                writer.setUseCompoundFile(true);
-                writer.close();
+
+                try
+                {
+                    // Make sure there is something we can read
+                    IndexWriter writer = new IndexWriter(deltaDir, new LuceneAnalyser(dictionaryService), true);
+                    writer.setUseCompoundFile(true);
+                    writer.close();
+                }
+                catch (IOException e)
+                {
+                    throw new LuceneIndexException("Failed to create empty index for delta reader: " + deltaDir, e);
+                }
             }
-            deltaReader = IndexReader.open(deltaDir);
+
+            try
+            {
+                deltaReader = IndexReader.open(deltaDir);
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Failed to open delta reader: " + deltaDir, e);
+            }
 
         }
         return deltaReader;
+    }
+
+    private boolean indexExists(File dir)
+    {
+        return IndexReader.indexExists(dir);
     }
 
     /**
@@ -252,13 +322,20 @@ public abstract class LuceneBase implements Lockable
      * @throws IOException
      */
 
-    protected void closeDeltaReader() throws IOException
+    protected void closeDeltaReader() throws LuceneIndexException
     {
         if (deltaReader != null)
         {
             try
             {
-                deltaReader.close();
+                try
+                {
+                    deltaReader.close();
+                }
+                catch (IOException e)
+                {
+                    throw new LuceneIndexException("Filed to close delta reader " + deltaDir, e);
+                }
             }
             finally
             {
@@ -274,7 +351,7 @@ public abstract class LuceneBase implements Lockable
      * @return
      * @throws IOException
      */
-    protected IndexWriter getDeltaWriter() throws IOException
+    protected IndexWriter getDeltaWriter() throws LuceneIndexException
     {
         if (deltaWriter == null)
         {
@@ -289,7 +366,7 @@ public abstract class LuceneBase implements Lockable
             }
             catch (IOException e)
             {
-                throw new IndexerException(e);
+                throw new IndexerException("Failed to get delta writer for " + deltaDir, e);
             }
         }
         deltaWriter.setUseCompoundFile(true);
@@ -305,14 +382,18 @@ public abstract class LuceneBase implements Lockable
      * @throws IOException
      */
 
-    protected void closeDeltaWriter() throws IOException
+    protected void closeDeltaWriter() throws LuceneIndexException
     {
         if (deltaWriter != null)
         {
             try
             {
-                //deltaWriter.optimize();
+                // deltaWriter.optimize();
                 deltaWriter.close();
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Filed to close delta writer " + deltaDir, e);
             }
             finally
             {
@@ -328,8 +409,10 @@ public abstract class LuceneBase implements Lockable
      * 
      * @throws IOException
      */
-    protected void saveDelta() throws IOException
+    protected void saveDelta() throws LuceneIndexException
     {
+        // Only one should exist so we do not need error trapping to execute the
+        // other
         closeDeltaReader();
         closeDeltaWriter();
     }
@@ -342,7 +425,7 @@ public abstract class LuceneBase implements Lockable
      * writers @
      * @throws IOException
      */
-    protected void prepareToMergeIntoMain() throws IOException
+    protected void prepareToMergeIntoMain() throws LuceneIndexException
     {
         if (mainWriter != null)
         {
@@ -359,7 +442,7 @@ public abstract class LuceneBase implements Lockable
             getDeltaReader(); // Flush any deletes
             closeDeltaReader();
         }
-        catch (IOException e)
+        catch (LuceneIndexException e)
         {
             releaseWriteLock();
             throw e;
@@ -376,16 +459,31 @@ public abstract class LuceneBase implements Lockable
      * 
      * @throws IOException
      */
-    protected void mergeDeltaIntoMain(Set<Term> terms) throws IOException
+    protected void mergeDeltaIntoMain(Set<Term> terms) throws LuceneIndexException
     {
 
-        if (!IndexReader.indexExists(baseDir))
+        if (!indexExists(baseDir))
         {
-            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
-            mainWriter.setUseCompoundFile(true);
-            mainWriter.close();
+
+            try
+            {
+                mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
+                mainWriter.setUseCompoundFile(true);
+                mainWriter.close();
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Failed to create empty base index at " + baseDir, e);
+            }
         }
-        mainReader = IndexReader.open(baseDir);
+        try
+        {
+            mainReader = IndexReader.open(baseDir);
+        }
+        catch (IOException e)
+        {
+            throw new LuceneIndexException("Failed to create base index reader at " + baseDir, e);
+        }
         try
         {
             // Do the deletions
@@ -395,7 +493,14 @@ public abstract class LuceneBase implements Lockable
                 {
                     for (Term term : terms)
                     {
-                        mainReader.delete(term);
+                        try
+                        {
+                            mainReader.delete(term);
+                        }
+                        catch (IOException e)
+                        {
+                            throw new LuceneIndexException("Failed to delete term from main index at " + baseDir, e);
+                        }
                     }
                 }
             }
@@ -403,7 +508,14 @@ public abstract class LuceneBase implements Lockable
             {
                 try
                 {
-                    mainReader.close();
+                    try
+                    {
+                        mainReader.close();
+                    }
+                    catch (IOException e)
+                    {
+                        throw new LuceneIndexException("Failed to close from main index reader at " + baseDir, e);
+                    }
                 }
                 finally
                 {
@@ -413,7 +525,14 @@ public abstract class LuceneBase implements Lockable
 
             // Do the append
 
-            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), false);
+            try
+            {
+                mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), false);
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Failed to open main index for append at " + baseDir, e);
+            }
             mainWriter.setUseCompoundFile(true);
 
             mainWriter.minMergeDocs = 1000;
@@ -426,9 +545,15 @@ public abstract class LuceneBase implements Lockable
                 if (reader.numDocs() > 0)
                 {
                     IndexReader[] readers = new IndexReader[] { reader };
-                    Directory[] dirs = new Directory[] {deltaDir};
-                    mainWriter.addIndexes(dirs);
-                    //mainWriter.optimize();
+                    try
+                    {
+                        mainWriter.addIndexes(readers);
+                    }
+                    catch (IOException e)
+                    {
+                        throw new LuceneIndexException("Failed to merge indexes into the main index", e);
+                    }
+                    // mainWriter.optimize();
                     closeDeltaReader();
                 }
                 else
@@ -440,7 +565,14 @@ public abstract class LuceneBase implements Lockable
             {
                 try
                 {
-                    mainWriter.close();
+                    try
+                    {
+                        mainWriter.close();
+                    }
+                    catch (IOException e)
+                    {
+                        throw new LuceneIndexException("Failed to cloase main index after append at " + baseDir, e);
+                    }
                 }
                 finally
                 {
@@ -464,36 +596,37 @@ public abstract class LuceneBase implements Lockable
      * knowing of we are prepared
      * 
      */
-    protected void deleteDelta()
+    protected void deleteDelta() throws LuceneIndexException
     {
         try
         {
             // Try and close everything
+
             try
             {
                 closeDeltaReader();
             }
-            catch (IOException e)
+            catch (LuceneIndexException e)
             {
-
+                s_logger.warn(e);
             }
             try
             {
                 closeDeltaWriter();
             }
-            catch (IOException e)
+            catch (LuceneIndexException e)
             {
+                s_logger.warn(e);
+            }
 
-            }
-            try
-            {
-                deltaDir.close();
-            }
-            catch (IOException e1)
-            {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+            // try
+            // {
+            // deltaDir.close();
+            // }
+            // catch (IOException e)
+            // {
+            // s_logger.warn("Failed to close delta dir", e);
+            // }
             deltaDir = null;
 
             // Close the main stuff
@@ -505,7 +638,7 @@ public abstract class LuceneBase implements Lockable
                 }
                 catch (IOException e)
                 {
-
+                    s_logger.warn("Failed to close main reader", e);
                 }
             }
             mainReader = null;
@@ -518,18 +651,18 @@ public abstract class LuceneBase implements Lockable
                 }
                 catch (IOException e)
                 {
-
+                    s_logger.warn("Failed to close main writer", e);
                 }
             }
             mainWriter = null;
-            try
-            {
-                baseDir.close();
-            }
-            catch (IOException e)
-            {
-
-            }
+            // try
+            // {
+            // baseDir.close();
+            // }
+            // catch (IOException e)
+            // {
+            // s_logger.warn("Failed to close base dir", e);
+            // }
 
             // Delete the delta directories
             String deltaPath = getDeltaPath();
@@ -590,10 +723,36 @@ public abstract class LuceneBase implements Lockable
         getLuceneIndexLock().getReadLock(store);
     }
 
-    public void getWriteLock()
+    private int writeLockCount = 0;
+
+    public void getWriteLock() throws LuceneIndexException
     {
         getLuceneIndexLock().getWriteLock(store);
-        hasWriteLock = true;
+        writeLockCount++;
+        // Check the main index is not locked and release if it is
+        // We must have the lock
+        try
+        {
+            if (((writeLockCount == 1) && IndexReader.indexExists(baseDir) && (IndexReader.isLocked(baseDir.getPath()))))
+            {
+                Directory dir = FSDirectory.getDirectory(baseDir, false);
+                IndexReader.unlock(dir);
+                dir.close();
+                s_logger.warn("Releasing unexpected lucene index write lock for " + baseDir);
+                try
+                {
+                    throw new LuceneIndexException("Trace... ");
+                }
+                catch(LuceneIndexException e)
+                {
+                    s_logger.warn(e);
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            throw new LuceneIndexException("Write lock failed to check or clear any existing lucene locks", e);
+        }
     }
 
     public void releaseReadLock()
@@ -603,48 +762,82 @@ public abstract class LuceneBase implements Lockable
 
     public void releaseWriteLock()
     {
-        if (hasWriteLock)
+
+        if (writeLockCount > 0)
         {
             getLuceneIndexLock().releaseWriteLock(store);
+            writeLockCount--;
         }
-        hasWriteLock = false;
     }
-
-    boolean hasWriteLock = false;
 
     private DictionaryService dictionaryService;
 
     public boolean mainIndexExists()
     {
-        try
-        {
-            return IndexReader.indexExists(baseDir);
-        }
-        catch (IOException e)
-        {
-            throw new IndexerException("Failed to determine if the index exists", e);
-        }
+        return IndexReader.indexExists(baseDir);
     }
 
-    public void clearIndex() throws IOException
+    protected void clearIndex() throws LuceneIndexException
     {
         getWriteLock();
         try
         {
-            closeDeltaReader();
-            closeDeltaWriter();
+            try
+            {
+                closeDeltaReader();
+            }
+            catch (LuceneIndexException e)
+            {
+                s_logger.warn("Failed to close delta reader", e);
+            }
+            try
+            {
+                closeDeltaWriter();
+            }
+            catch (LuceneIndexException e)
+            {
+                s_logger.warn("Failed to close delta writer", e);
+            }
             if (mainWriter != null)
             {
-                mainWriter.close();
+                try
+                {
+                    mainWriter.close();
+                }
+                catch (IOException e)
+                {
+                    s_logger.warn("Failed to close main writer", e);
+                }
                 mainWriter = null;
             }
             if (mainReader != null)
             {
-                mainReader.close();
+                try
+                {
+                    mainReader.close();
+                }
+                catch (IOException e)
+                {
+                    s_logger.warn("Failed to close main reader", e);
+                }
                 mainReader = null;
             }
-            deltaDir.close();
-            baseDir.close();
+            // try
+            // {
+            // deltaDir.close();
+            // }
+            // catch (IOException e)
+            // {
+            // s_logger.warn("Failed to close delta directory", e);
+            // }
+            // try
+            // {
+            // baseDir.close();
+            // }
+            // catch (IOException e)
+            // {
+            // s_logger.warn("Failed to close base directory", e);
+            // }
             initialise(store, deltaId, true);
         }
         finally
@@ -653,22 +846,42 @@ public abstract class LuceneBase implements Lockable
         }
     }
 
-    protected IndexReader getReader() throws IOException
+    protected IndexReader getReader() throws LuceneIndexException
     {
 
-        if (!IndexReader.indexExists(baseDir))
+        getWriteLock();
+        try
         {
-            mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
-            mainWriter.setUseCompoundFile(true);
-            mainWriter.close();
-            mainWriter = null;
+            if (!indexExists(baseDir))
+            {
+                try
+                {
+                    mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
+                    mainWriter.setUseCompoundFile(true);
+                    mainWriter.close();
+                    mainWriter = null;
+                }
+                catch (IOException e)
+                {
+                    throw new LuceneIndexException("Failed to create empty main index", e);
+                }
+            }
+        }
+        finally
+        {
+            releaseWriteLock();
         }
 
-        return IndexReader.open(baseDir);
+        try
+        {
+            return IndexReader.open(baseDir);
+        }
+        catch (IOException e)
+        {
+            throw new LuceneIndexException("Failed to open main index reader", e);
+        }
 
     }
-    
- 
 
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -684,7 +897,5 @@ public abstract class LuceneBase implements Lockable
     {
         this.indexRootLocation = indexRootLocation;
     }
-    
-    
 
 }

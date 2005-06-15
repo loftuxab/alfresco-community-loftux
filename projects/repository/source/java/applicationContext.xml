@@ -883,7 +883,6 @@
    
    <!-- Authentication -->
    
-   <!--
    <bean id="authenticationManager" class="net.sf.acegisecurity.providers.ProviderManager">
       <property name="providers">
          <list>
@@ -893,72 +892,72 @@
    </bean>
    
    <bean id="daoAuthenticationProvider" class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
-      <property name="authenticationDao"><ref bean="inMemoryDaoImpl"/></property>
+      <property name="authenticationDao"><ref bean="alfDaoImpl"/></property>
+      <property name="saltSource"><ref bean="saltSource"/></property>
+      <property name="passwordEncoder"><ref bean="passwordEncoder"/></property>
    </bean>
    
-   <bean id="inMemoryDaoImpl" class="net.sf.acegisecurity.providers.dao.memory.InMemoryDaoImpl">
-      <property name="userMap">
-         <value>
-            andy=x,ROLE_AUTHENTICATED
-         </value>
+   <bean id="alfDaoImpl" class="org.alfresco.repo.security.authentication.RepositoryAuthenticationDao">
+      <property name="nodeService">
+	     <ref bean="nodeService"/>
+	  </property>
+      <property name="dictionaryService">
+		 <ref bean="dictionaryService"/>
+	  </property>
+      <property name="namespaceService">
+          <ref bean="namespaceService"/>
       </property>
-   </bean>
-   -->
-   
-   
-   <!-- HTTP -->
-
-   <!--
-   <bean id="filterChainProxy" class="net.sf.acegisecurity.util.FilterChainProxy" abstract="false" singleton="true" lazy-init="default" autowire="default" dependency-check="default">
-      <property name="filterInvocationDefinitionSource">
-         <value>.*=httpSessionContextIntegrationFilter,basicProcessingFilter,securityEnforcementFilter</value> 
-      </property>
-   </bean>
-   
-   <bean id="securityEnforcementFilter" class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
-      <property name="filterSecurityInterceptor"><ref bean="filterInvocationInterceptor"/></property>
-      <property name="authenticationEntryPoint"><ref bean="basicProcessingFilterEntryPoint"/></property>
-   </bean>
-   
-   <bean id="basicProcessingFilterEntryPoint" class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
-      <property name="realmName"><value>ACTIVITI</value></property>
-   </bean>
-   
-   <bean id="httpRequestAccessDecisionManager" class="net.sf.acegisecurity.vote.AffirmativeBased">
-      <property name="allowIfAllAbstainDecisions"><value>false</value></property>
-      <property name="decisionVoters">
-         <list>
-            <ref bean="roleVoter"/>
-         </list>
+      <property name="passwordEncoder">
+          <ref bean="passwordEncoder"/>
       </property>
    </bean>
    
+   <bean id="passwordEncoder" class="net.sf.acegisecurity.providers.encoding.ShaPasswordEncoder"></bean>
+   
+   <bean id="saltSource" class="net.sf.acegisecurity.providers.dao.salt.ReflectionSaltSource">
+      <property name="userPropertyToUse">
+          <value>getSalt</value>
+      </property>
+   </bean>
+  
+   <bean id="authenticationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.repo.security.authentication.AuthenticationService</value>
+      </property>
+      <property name="transactionManager"><ref bean="transactionManager"/></property>
+      <property name="target">
+         <bean class="org.alfresco.repo.security.authentication.AuthenticationServiceImpl">
+            <property name="authenticationManager">
+                <ref bean="authenticationManager"/>
+            </property>
+            <property name="authenticationDao">
+                <ref bean="alfDaoImpl"/>
+            </property>
+            <property name="ticketComponent">
+                <ref bean="ticketComponent"/>
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+  
+   <bean id="ticketComponent" class="org.alfresco.repo.security.authentication.InMemoryTicketComponentImpl">
+      <property name="validDuration">
+         <value>P1H</value>
+      </property>
+      <property name="ticketsExpire">
+         <value>true</value>
+      </property>
+      <property name="oneOff">
+         <value>false</value>
+      </property>
+   </bean>
+  
    <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter" abstract="false" singleton="true" lazy-init="default" autowire="default" dependency-check="default" /> 
-   
-   <bean id="filterInvocationInterceptor" class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
-      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
-      <property name="accessDecisionManager"><ref bean="httpRequestAccessDecisionManager"/></property>
-      <property name="objectDefinitionSource">
-         <value>.*=ROLE_AUTHENTICATED
-         </value>
-      </property>
-   </bean>
-             
-   <bean id="httpSessionContextIntegrationFilter" class="net.sf.acegisecurity.context.HttpSessionContextIntegrationFilter" abstract="false" singleton="true" lazy-init="default" autowire="default" dependency-check="default">
-     <property name="context">
-        <value>net.sf.acegisecurity.context.security.SecureContextImpl</value> 
-     </property>
-   </bean>
-   
-   <bean id="basicProcessingFilter" class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilter" abstract="false" singleton="true" lazy-init="default" autowire="default" dependency-check="default">
-     <property name="authenticationManager">
-        <ref local="authenticationManager" /> 
-     </property>
-     <property name="authenticationEntryPoint">
-        <ref local="basicProcessingFilterEntryPoint" /> 
-     </property>
-  </bean>
-   -->
 
    <!-- Audit -->
    
