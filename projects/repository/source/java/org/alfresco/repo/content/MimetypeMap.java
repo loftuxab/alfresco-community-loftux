@@ -65,7 +65,7 @@ public class MimetypeMap implements MimetypeService
         this.mimetypes = new ArrayList<String>(40);
         this.extensionsByMimetype = new HashMap<String, String>(59);
         this.mimetypesByExtension = new HashMap<String, String>(59);
-        this. displaysByMimetype = new HashMap<String, String>(59);
+        this.displaysByMimetype = new HashMap<String, String>(59);
         this.displaysByExtension = new HashMap<String, String>(59);
 
         Config config = configService.getConfig(CONFIG_CONDITION, new ConfigLookupContext(CONFIG_AREA));
