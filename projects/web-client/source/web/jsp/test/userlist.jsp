@@ -4,7 +4,7 @@
 
 <%@ page isELIgnored="false" %>
 
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
+
 
 <f:view>
    <%-- load a bundle of properties I18N strings here --%>

@@ -207,6 +207,17 @@ public class RichListRenderer extends BaseRenderer
          outputAttribute(out, rowStyle, "class");
          out.write('>');
          
+         // find the actions column if it exists
+         UIColumn actionsColumn = null;
+         for (int i=0; i<columns.length; i++)
+         {
+            if (columns[i].isRendered() == true && columns[i].getActions() == true)
+            {
+               actionsColumn = columns[i];
+               break;
+            }
+         }
+         
          // output each column in turn and render all children
          for (int i=0; i<columns.length; i++)
          {
@@ -234,8 +245,18 @@ public class RichListRenderer extends BaseRenderer
                
                if (column.getChildCount() != 0)
                {
+                  if (column == actionsColumn)
+                  {
+                     out.write("<nobr>");
+                  }
+                  
                   // allow child controls inside the columns to render themselves
                   Utils.encodeRecursive(context, column);
+                  
+                  if (column == actionsColumn)
+                  {
+                     out.write("</nobr>");
+                  }
                }
                
                out.write("</td>");

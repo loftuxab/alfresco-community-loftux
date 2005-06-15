@@ -7,8 +7,7 @@
 <%@ page buffer="64kb" %>
 <%@ page isELIgnored="false" %>
 
-<script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
+<r:page>
 
 <f:view>
    <%-- load a bundle of properties I18N strings here --%>
@@ -392,3 +391,5 @@
       
    </h:form>
 </f:view>
+
+</r:page>

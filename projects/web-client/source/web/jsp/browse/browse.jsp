@@ -9,9 +9,6 @@
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
-   
-<script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
 
 <f:view>
    

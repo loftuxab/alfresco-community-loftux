@@ -16,6 +16,8 @@ td,tr,p,div
 th
 {
    vertical-align: top;
+   padding-left: 1px;
+   padding-right: 1px;
 }
 
 p.status

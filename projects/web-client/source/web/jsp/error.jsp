@@ -6,8 +6,6 @@
 
 <r:page>
 
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
-
 <table cellspacing="0" cellpadding="2" width="100%">
    <tr>
       <%-- Top level toolbar and company logo area --%>

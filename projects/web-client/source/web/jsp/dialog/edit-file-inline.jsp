@@ -37,7 +37,7 @@
    var isIE = (document.all);
    
 </script>
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
+
 
 <f:view>
    

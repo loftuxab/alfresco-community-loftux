@@ -5,7 +5,7 @@
 
 <%@ page buffer="32kb" %>
 
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
+<r:page>
 
 <f:view>
    
@@ -60,3 +60,5 @@
    </h:form>
       
 </f:view>
+
+</r:page>

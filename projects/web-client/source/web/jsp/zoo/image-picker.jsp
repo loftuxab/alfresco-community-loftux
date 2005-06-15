@@ -1,10 +1,11 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
+<%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <%@ page buffer="32kb" %>
 
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
+<r:page>
 
 <f:view>
    
@@ -41,3 +42,5 @@
    
       
 </f:view>
+
+</r:page>

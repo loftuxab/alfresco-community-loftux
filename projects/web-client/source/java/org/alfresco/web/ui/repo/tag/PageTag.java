@@ -3,6 +3,7 @@ package org.alfresco.web.ui.repo.tag;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
@@ -38,12 +39,12 @@ public class PageTag extends TagSupport
     */
    public int doStartTag() throws JspException
    {
-      if (Application.inPortalServer(pageContext.getServletContext()) == false)
+      try
       {
-         try
+         Writer out = pageContext.getOut();
+         
+         if (Application.inPortalServer(pageContext.getServletContext()) == false)
          {
-            Writer out = pageContext.getOut();
-            
             out.write("<html><head><title>");
             if (this.title == null)
             {
@@ -56,10 +57,18 @@ public class PageTag extends TagSupport
             out.write("</title></head>");
             out.write("<body>\n");
          }
-         catch (IOException ioe)
-         {
-            throw new JspException(ioe.toString());
-         }
+         
+         String reqPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath();
+         out.write(SCRIPTS_1);
+         out.write(reqPath);
+         out.write(SCRIPTS_2);
+         out.write(STYLES_1);
+         out.write(reqPath);
+         out.write(STYLES_2);
+      }
+      catch (IOException ioe)
+      {
+         throw new JspException(ioe.toString());
       }
       
       return EVAL_BODY_INCLUDE;
@@ -81,4 +90,9 @@ public class PageTag extends TagSupport
       
       return super.doEndTag();
    }
+   
+   private final static String SCRIPTS_1 = "<script language=\"JavaScript1.2\" src=\"";
+   private final static String SCRIPTS_2 = "/scripts/menu.js\"></script>\n";
+   private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
+   private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
 }

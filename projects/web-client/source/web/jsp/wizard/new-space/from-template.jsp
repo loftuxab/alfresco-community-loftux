@@ -10,9 +10,6 @@
 
 <r:page>
 
-<script language="JavaScript1.2" src="<%=request.getContextPath()%>/scripts/menu.js"></script>
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/main.css" TYPE="text/css">
-
 <script language="JavaScript1.2">
    function checkButtonState(inputField)
    {
