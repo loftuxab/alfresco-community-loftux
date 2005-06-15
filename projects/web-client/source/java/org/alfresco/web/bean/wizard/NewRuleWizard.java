@@ -19,6 +19,7 @@ import org.alfresco.repo.rule.action.CheckInActionExecutor;
 import org.alfresco.repo.rule.action.CheckOutActionExecutor;
 import org.alfresco.repo.rule.action.CopyActionExecutor;
 import org.alfresco.repo.rule.action.MoveActionExecutor;
+import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
@@ -163,11 +164,11 @@ public class NewRuleWizard extends AbstractWizardBean
             }
             else if (this.action.equals("simple-workflow"))
             {
-               // add all the captured details to action params
-               /*
-               actionParams.put(WorflowExecutor.PARAM_APPROVE_NAME,
+               // add the approve step name
+               actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_STEP,
                      this.actionProperties.get("approveStepName"));
                
+               // add whether the approve step will copy or move the content
                boolean approveMove = true;
                String approveAction = this.actionProperties.get("approveAction");
                if (approveAction != null && approveAction.equals("copy"))
@@ -175,23 +176,30 @@ public class NewRuleWizard extends AbstractWizardBean
                   approveMove = false;
                }
                
+               actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_MOVE,
+                     new Boolean(approveMove));
+               
+               // add the destination folder of the content
                NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
                      this.actionProperties.get("approveDestination"));
-               actionParams.put(WorkflowExecutor.PARAM_APPROVE_DESTINATION, approveDestNodeRef);
+               actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER, 
+                     approveDestNodeRef);
                
+               // determine whether we have a reject step or not
                boolean requireReject = true;
                String rejectStepPresent = this.actionProperties.get("rejectStepPresent");
                if (rejectStepPresent != null && rejectStepPresent.equals("no"))
                {
                   requireReject = false;
                }
-               
-               // if there is a reject step capture those details too
+
                if (requireReject)
                {
-                  actionParams.put(WorflowExecutor.PARAM_REJECT_NAME,
+                  // add the reject step name
+                  actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_STEP,
                         this.actionProperties.get("rejectStepName"));
                
+                  // add whether the reject step will copy or move the content
                   boolean rejectMove = true;
                   String rejectAction = this.actionProperties.get("rejectAction");
                   if (rejectAction != null && rejectAction.equals("copy"))
@@ -199,11 +207,15 @@ public class NewRuleWizard extends AbstractWizardBean
                      rejectMove = false;
                   }
                   
+                  actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_MOVE,
+                        new Boolean(rejectMove));
+                  
+                  // add the destination folder of the content
                   NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
                         this.actionProperties.get("rejectDestination"));
-                  actionParams.put(WorkflowExecutor.PARAM_REJECT_DESTINATION, rejectDestNodeRef);
+                  actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER, 
+                        rejectDestNodeRef);
                }
-               */
             }
             else if (this.action.equals("link-category"))
             {
