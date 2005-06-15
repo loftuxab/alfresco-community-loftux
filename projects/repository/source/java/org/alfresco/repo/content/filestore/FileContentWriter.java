@@ -1,13 +1,19 @@
 package org.alfresco.repo.content.filestore;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
+import java.util.List;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.AbstractContentWriter;
+import org.alfresco.repo.content.CallbackFileChannel;
+import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentStreamListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Derek Hulley
  */
-public class FileContentWriter extends AbstractContentWriter
+public class FileContentWriter extends AbstractContentWriter implements RandomAccessContent
 {
     private static final Log logger = LogFactory.getLog(FileContentWriter.class);
     
@@ -53,8 +59,8 @@ public class FileContentWriter extends AbstractContentWriter
         return new FileContentReader(this.file);
     }
     
-   @Override
-    protected OutputStream getDirectOutputStream() throws ContentIOException
+    @Override
+    protected WritableByteChannel getDirectWritableChannel() throws ContentIOException
     {
         try
         {
@@ -63,17 +69,53 @@ public class FileContentWriter extends AbstractContentWriter
             {
                 throw new IOException("File exists - overwriting not allowed");
             }
-            FileOutputStream os = new FileOutputStream(file);
+            // create the channel
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");  // will create it
+            FileChannel channel = randomAccessFile.getChannel();
             // done
             if (logger.isDebugEnabled())
             {
-                logger.debug("Opened output stream to file: " + file);
+                logger.debug("Opened channel to file: " + file);
             }
-            return os;
+            return channel;
         }
-        catch (IOException e)
+        catch (Throwable e)
         {
-            throw new ContentIOException("Failed to open output stream to file: " + this, e);
+            throw new ContentIOException("Failed to open file channel: " + this, e);
         }
+    }
+
+    /**
+     * @param directChannel a file channel
+     */
+    @Override
+    protected WritableByteChannel getCallbackWritableChannel(
+            WritableByteChannel directChannel,
+            List<ContentStreamListener> listeners) throws ContentIOException
+    {
+        if (!(directChannel instanceof FileChannel))
+        {
+            throw new AlfrescoRuntimeException("Expected read channel to be a file channel");
+        }
+        FileChannel fileChannel = (FileChannel) directChannel;
+        // wrap it
+        FileChannel callbackChannel = new CallbackFileChannel(fileChannel, listeners);
+        // done
+        return callbackChannel;
+    }
+
+    /**
+     * @return Returns true always
+     */
+    public boolean canWrite()
+    {
+        return true;    // this is a writer
+    }
+
+    public FileChannel getChannel() throws ContentIOException
+    {
+        // go through the super classes to ensure that all concurrency conditions
+        // and listeners are satisfied
+        return (FileChannel) super.getWritableChannel();
     }
 }

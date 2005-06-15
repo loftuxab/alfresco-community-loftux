@@ -3,10 +3,12 @@ package org.alfresco.service.cmr.repository;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.WritableByteChannel;
 
 
 /**
- * Represents a handle to write specific content.
+ * Represents a handle to write specific content.  Content may only be accessed
+ * once per instance.
  * <p>
  * Implementations of this interface <b>might</b> be <code>Serializable</code>
  * but client code could should check suitability before attempting to serialize
@@ -47,42 +49,39 @@ public interface ContentWriter extends Content
     public ContentReader getReader() throws ContentIOException;
     
     /**
-     * Provides low-level access to write to repository content.
-     * <p>
-     * The stream returned to the client should remain open (subject to timeouts)
-     * until closed by the client.  All lock detection, read-only access and other
-     * concurrency issues are dealt with during this operation.  It remains
-     * possible that implementations will throw exceptions when the stream is closed.
-     * <p>
-     * The stream will notify any listeners according to the listener interface.
-     * <p>
-     * For transactional purposes, only the thread that actually performs the
-     * {@link OutputStream#write(int) write} operations needs to be engaged in
-     * a transaction.  The thread that aquires an instance of this writer will
-     * usually be the same thread that pushes the content to the repository - this
-     * is definitely true for all the <code>putXXX</code> convenience methods.
-     * There is, however, no reason why the stream could not be passed to another
-     * thread for writing.  It is up to the thread that ultimately calls
-     * {@link OutputStream#close() close} to be engaged in a transaction.
-     * <p>
-     * Care must be taken that the bytes written to the stream are properly
-     * encoded according to the {@link Content#getEncoding() encoding}
-     * property.
-     * 
-     * @return Returns a stream with which to write content
-     * @throws ContentIOException
-     */
-    public OutputStream getContentOutputStream() throws ContentIOException;
-    
-    /**
-     * Convenience method to find out if the output stream has been closed.
-     * Once closed, the output stream cannot be reused.  It is therefore safe
+     * Convenience method to find out if this writer has been closed.
+     * Once closed, the content can no longer be written to and it become possible
      * to get readers onto the written content.
      * 
      * @return Return true if the content output stream has been used and closed
      *      otherwise false.
      */
     public boolean isClosed();
+    
+    /**
+     * Provides low-level access to write to repository content.
+     * <p>
+     * The channel returned to the client should remain open (subject to timeouts)
+     * until closed by the client.  All lock detection, read-only access and other
+     * concurrency issues are dealt with during this operation.  It remains
+     * possible that implementations will throw exceptions when the channel is closed.
+     * <p>
+     * The stream will notify any listeners according to the listener interface.
+     * 
+     * @return Returns a channel with which to write content
+     * @throws ContentIOException
+     */
+    public WritableByteChannel getWritableChannel() throws ContentIOException;
+
+    /**
+     * Get a stream to write to the underlying channel.
+     * 
+     * @return Returns an output stream onto the underlying channel
+     * @throws ContentIOException
+     * 
+     * @see #getWritableChannel()
+     */
+    public OutputStream getContentOutputStream() throws ContentIOException;
     
     /**
      * Puts content to the repository
@@ -92,7 +91,7 @@ public interface ContentWriter extends Content
      * @param is the input stream from which the content will be read
      * @throws ContentIOException
      * 
-     * @see #getContentOutputStream()
+     * @see #getWritableChannel()
      */
     public void putContent(InputStream is) throws ContentIOException;
     
@@ -104,7 +103,7 @@ public interface ContentWriter extends Content
      * @param file the file to load the content from
      * @throws ContentIOException
      * 
-     * @see #getContentOutputStream()
+     * @see #getWritableChannel()
      */
     public void putContent(File file) throws ContentIOException;
     
@@ -120,7 +119,7 @@ public interface ContentWriter extends Content
      * @param content a string representation of the content
      * @throws ContentIOException
      * 
-     * @see #getContentOutputStream()
+     * @see #getWritableChannel()
      * @see String#getBytes(java.lang.String)
      */
     public void putContent(String content) throws ContentIOException;

@@ -3,10 +3,12 @@ package org.alfresco.service.cmr.repository;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.ReadableByteChannel;
 
 
 /**
- * Represents a handle to read specific content.
+ * Represents a handle to read specific content.  Content may only be accessed
+ * once per instance.
  * <p>
  * Implementations of this interface <b>might</b> be <code>Serializable</code>
  * but client code could should check suitability before attempting to serialize
@@ -59,6 +61,16 @@ public interface ContentReader extends Content
     public long getLength();
 
     /**
+     * Convenience method to find out if this reader has been closed.
+     * Once closed, the content can no longer be read.  This method could
+     * be used to wait for a particular read operation to complete, for example.
+     * 
+     * @return Return true if the content input stream has been used and closed
+     *      otherwise false.
+     */
+    public boolean isClosed();
+    
+    /**
      * Provides low-level access to the underlying content.
      * <p>
      * Once the stream is provided to a client it should remain active
@@ -67,18 +79,18 @@ public interface ContentReader extends Content
      * @return Returns a stream that can be read at will, but must be closed when completed
      * @throws ContentIOException
      */
-    public InputStream getContentInputStream() throws ContentIOException;
+    public ReadableByteChannel getReadableChannel() throws ContentIOException;
     
     /**
-     * Convenience method to find out if the input stream has been closed.
-     * Once closed, the input stream cannot be reused.  This method could
-     * be used to wait for a particular read operation to complete, for example.
+     * Get a stream to read from the underlying channel
      * 
-     * @return Return true if the content input stream has been used and closed
-     *      otherwise false.
+     * @return Returns an input stream onto the underlying channel
+     * @throws ContentIOException
+     * 
+     * @see #getReadableChannel()
      */
-    public boolean isClosed();
-    
+    public InputStream getContentInputStream() throws ContentIOException;
+
     /**
      * Gets content from the repository.
      * <p>
@@ -91,7 +103,7 @@ public interface ContentReader extends Content
      * @param os the stream to which to write the content
      * @throws ContentIOException
      * 
-     * @see #getContentInputStream()
+     * @see #getReadableChannel()
      */
     public void getContent(OutputStream os) throws ContentIOException;
     

@@ -1,6 +1,6 @@
 package org.alfresco.repo.content.memorystore;
 
-import java.io.OutputStream;
+import java.nio.channels.WritableByteChannel;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.AbstractContentWriter;
@@ -41,21 +41,17 @@ public class MemoryContentWriter extends AbstractContentWriter
         }
         return content;
     }
-    
-    /**
-     * @return Returns a <tt>ByteArrayOutputStream</tt> directly onto the
-     *      underlying {@link #content}.
-     */
-    protected OutputStream getDirectOutputStream() throws ContentIOException
-    {
-        throw new UnsupportedOperationException();
-    }
 
     /**
      * Abstract base class takes care of all considerations other than construction
      */
     @Override
     protected ContentReader createReader() throws ContentIOException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    protected WritableByteChannel getDirectWritableChannel() throws ContentIOException
     {
         throw new UnsupportedOperationException();
     }

@@ -1,7 +1,6 @@
 package org.alfresco.repo.content.memorystore;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.nio.channels.ReadableByteChannel;
 
 import org.alfresco.repo.content.AbstractContentReader;
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -56,12 +55,8 @@ public class MemoryContentReader extends AbstractContentReader
         return content.length;
     }
 
-    /**
-     * @return Returns a <tt>ByteArrayInputStream</tt> directly onto the
-     *      underlying {@link #content}.
-     */
-    protected InputStream getDirectInputStream() throws ContentIOException
+    protected ReadableByteChannel getDirectReadableChannel() throws ContentIOException
     {
-        return new ByteArrayInputStream(content);
+        throw new UnsupportedOperationException();
     }
 }

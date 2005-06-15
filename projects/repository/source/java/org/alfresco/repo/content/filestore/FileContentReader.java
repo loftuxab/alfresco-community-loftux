@@ -1,13 +1,19 @@
 package org.alfresco.repo.content.filestore;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.util.List;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.AbstractContentReader;
+import org.alfresco.repo.content.CallbackFileChannel;
+import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentStreamListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,23 +24,20 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Derek Hulley
  */
-public class FileContentReader extends AbstractContentReader
+public class FileContentReader extends AbstractContentReader implements RandomAccessContent
 {
     private static final Log logger = LogFactory.getLog(FileContentReader.class);
     
     private File file;
     
     /**
-     * @param file the file for reading and writing
+     * @param file the file for reading and writing.  This will most likely be directly
+     *      related to the content URL.
      */
     public FileContentReader(File file)
     {
         super(FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
-
-        if (file == null)
-        {
-            throw new IllegalArgumentException("File may not be null");
-        }
+        
         this.file = file;
     }
     
@@ -46,53 +49,90 @@ public class FileContentReader extends AbstractContentReader
         return file;
     }
 
-    @Override
-    protected ContentReader createReader() throws ContentIOException
-    {
-        return new FileContentReader(this.file);
-    }
-    
-    /**
-     * @see File#exists()
-     */
     public boolean exists()
     {
         return file.exists();
     }
-    
-    /**
-     * @see File#length()
-     */
+
     public long getLength()
     {
         if (!exists())
         {
             return 0L;
         }
-        return file.length();
+        else
+        {
+            return file.length();
+        }
     }
 
+    /**
+     * The URL of the write is known from the start and this method contract states
+     * that no consideration needs to be taken w.r.t. the stream state.
+     */
     @Override
-    protected InputStream getDirectInputStream() throws ContentIOException
+    protected ContentReader createReader() throws ContentIOException
+    {
+        return new FileContentReader(this.file);
+    }
+    
+    @Override
+    protected ReadableByteChannel getDirectReadableChannel() throws ContentIOException
     {
         try
         {
-            // the file must exist at this point
+            // the file must exist
             if (!file.exists())
             {
-                throw new IOException("Unable to read from non-existent file");
+                throw new IOException("File does not exist");
             }
-            FileInputStream is = new FileInputStream(file);
+            // create the channel
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");  // won't create it
+            FileChannel channel = randomAccessFile.getChannel();
             // done
             if (logger.isDebugEnabled())
             {
-                logger.debug("Opened input stream to file: " + file);
+                logger.debug("Opened channel to file: " + file);
             }
-            return is;
+            return channel;
         }
-        catch (IOException e)
+        catch (Throwable e)
         {
-            throw new ContentIOException("Failed to open input stream to file: " + this, e);
+            throw new ContentIOException("Failed to open file channel: " + this, e);
         }
+    }
+
+    /**
+     * @param directChannel a file channel
+     */
+    @Override
+    protected ReadableByteChannel getCallbackReadableChannel(
+            ReadableByteChannel directChannel,
+            List<ContentStreamListener> listeners) throws ContentIOException
+    {
+        if (!(directChannel instanceof FileChannel))
+        {
+            throw new AlfrescoRuntimeException("Expected read channel to be a file channel");
+        }
+        FileChannel fileChannel = (FileChannel) directChannel;
+        // wrap it
+        FileChannel callbackChannel = new CallbackFileChannel(fileChannel, listeners);
+        // done
+        return callbackChannel;
+    }
+
+    /**
+     * @return Returns false as this is a reader
+     */
+    public boolean canWrite()
+    {
+        return false;   // we only allow reading
+    }
+
+    public FileChannel getChannel() throws ContentIOException
+    {
+        // go through the super classes to ensure that all concurrency conditions
+        // and listeners are satisfied
+        return (FileChannel) super.getReadableChannel();
     }
 }

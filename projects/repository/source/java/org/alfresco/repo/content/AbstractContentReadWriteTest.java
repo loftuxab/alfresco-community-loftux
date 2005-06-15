@@ -7,6 +7,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.List;
 
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -394,5 +397,107 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         
         contentUrls = store.listUrls();
         assertTrue("Newly written content does not appear as a URL", contentUrls.contains(contentUrl));
+    }
+    
+    /**
+     * Tests random access writing
+     * <p>
+     * Only executes if the writer implements {@link RandomAccessContent}.
+     */
+    public void testRandomAccessWrite() throws Exception
+    {
+        ContentWriter writer = getWriter();
+        if (!(writer instanceof RandomAccessContent))
+        {
+            // not much to do here
+            return;
+        }
+        RandomAccessContent randomWriter = (RandomAccessContent) writer;
+        // check that we are allowed to write
+        assertTrue("Expected random access writing", randomWriter.canWrite());
+        
+        FileChannel fileChannel = randomWriter.getChannel();
+        assertNotNull("No channel given", fileChannel);
+        
+        // check that no other content access is allowed
+        try
+        {
+            writer.getWritableChannel();
+            fail("Second channel access allowed");
+        }
+        catch (RuntimeException e)
+        {
+            // expected
+        }
+        
+        // write some content in a random fashion (reverse order)
+        byte[] content = new byte[] {1, 2, 3};
+        for (int i = content.length - 1; i >= 0; i--)
+        {
+            ByteBuffer buffer = ByteBuffer.wrap(content, i, 1);
+            fileChannel.write(buffer, i);
+        }
+        
+        // close the channel
+        fileChannel.close();
+        assertTrue("Writer not closed", writer.isClosed());
+        
+        // check the content
+        ContentReader reader = writer.getReader();
+        ReadableByteChannel channelReader = reader.getReadableChannel();
+        ByteBuffer buffer = ByteBuffer.allocateDirect(3);
+        int count = channelReader.read(buffer);
+        assertEquals("Incorrect number of bytes read", 3, count);
+        for (int i = 0; i < content.length; i++)
+        {
+            assertEquals("Content doesn't match", content[i], buffer.get(i));
+        }
+    }
+    
+    /**
+     * Tests random access reading
+     * <p>
+     * Only executes if the reader implements {@link RandomAccessContent}.
+     */
+    public void testRandomAccessRead() throws Exception
+    {
+        ContentWriter writer = getWriter();
+        // put some content
+        String content = "ABC";
+        byte[] bytes = content.getBytes();
+        writer.putContent(content);
+        ContentReader reader = writer.getReader();
+        if (!(reader instanceof RandomAccessContent))
+        {
+            // not much to do here
+            return;
+        }
+        RandomAccessContent randomReader = (RandomAccessContent) reader;
+        // check that we are NOT allowed to write
+        assertFalse("Expected read-only random access", randomReader.canWrite());
+        
+        FileChannel fileChannel = randomReader.getChannel();
+        assertNotNull("No channel given", fileChannel);
+        
+        // check that no other content access is allowed
+        try
+        {
+            reader.getReadableChannel();
+            fail("Second channel access allowed");
+        }
+        catch (RuntimeException e)
+        {
+            // expected
+        }
+        
+        // read the content
+        ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+        int count = fileChannel.read(buffer);
+        assertEquals("Incorrect number of bytes read", bytes.length, count);
+        // transfer back to array
+        buffer.rewind();
+        buffer.get(bytes);
+        String checkContent = new String(bytes);
+        assertEquals("Content read failure", content, checkContent);
     }
 }

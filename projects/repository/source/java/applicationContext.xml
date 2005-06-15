@@ -206,40 +206,6 @@
       </constructor-arg>
    </bean>
    
-   <!-- NodeService implemented to call a delegate and ensure that nodes get indexed -->
-   <!-- TODO: To be replaced by use of callbacks using policy framework -->
-   <!--
-   <bean id="indexingNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.repo.node.NodeService</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="org.alfresco.repo.node.index.IndexingNodeServiceImpl" init-method="init">
-			<constructor-arg>
-				<ref bean="policyComponent"/>
-			</constructor-arg>
-		    <constructor-arg>
-               <ref bean="dbNodeService" />
-            </constructor-arg>
-            <constructor-arg>
-               <ref bean="indexerComponent" />
-            </constructor-arg>	
-            <constructor-arg>
-               <ref bean="searcherComponent" />
-            </constructor-arg>					
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean>
-   -->
-
    <bean id="mimetypeMap" class="org.alfresco.repo.content.MimetypeMap" init-method="init" >
       <constructor-arg>
          <ref bean="repoConfigService" />
@@ -299,6 +265,16 @@
          <props>
             <prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
          </props>
+      </property>
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
+               <constructor-arg>
+                  <value>contentService</value>
+               </constructor-arg>
+            </bean>
+         </list>
       </property>
    </bean>
       

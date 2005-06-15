@@ -6,6 +6,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +23,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.FileCopyUtils;
 
 /**
- * Implements all the convenience methods of the interface.
+ * Implements all the convenience methods of the interface.  The only methods
+ * that need to be implemented, i.e. provide low-level content access are:
+ * <ul>
+ *   <li>{@link #getDirectWritableChannel()} to write content to the repository</li>
+ * </ul>
  * 
  * @author Derek Hulley
  */
@@ -29,8 +36,7 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
     private static final Log logger = LogFactory.getLog(AbstractContentWriter.class);
     
     private List<ContentStreamListener> listeners;
-    private OutputStream outputStream;
-    private boolean streamClosed;
+    private WritableByteChannel channel;
     
     /**
      * @param contentUrl the content URL
@@ -40,16 +46,6 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
         super(contentUrl);
         
         listeners = new ArrayList<ContentStreamListener>(2);
-        streamClosed = false;   // just to document it explicitly
-        // add a stream close listener by default
-        ContentStreamListener streamCloseListener = new ContentStreamListener()
-            {
-                public void contentStreamClosed() throws ContentIOException
-                {
-                    streamClosed = true;
-                }
-            };
-        listeners.add(streamCloseListener);
     }
     
     /**
@@ -58,61 +54,47 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
      */
     public synchronized void addListener(ContentStreamListener listener)
     {
-        if (outputStream != null)
+        if (channel != null)
         {
-            throw new ContentIOException("OutputStream is already in use");
+            throw new RuntimeException("Channel is already in use");
         }
         listeners.add(listener);
-    }
-    
-    /**
-     * An automatically created listener sets the flag
-     */
-    public final boolean isClosed()
-    {
-        return streamClosed;
     }
 
     /**
      * A factory method for subclasses to implement that will ensure the proper
      * implementation of the {@link ContentWriter#getReader()} method.
      * <p>
-     * This method will only be called once the output stream for the underlying
-     * writer has been closed.  <b>It will never be called during or before the
-     * write operation</b>.
-     * <p>
      * Only the instance need be constructed.  The required mimetype, encoding, etc
      * will be copied across by this class.
+     * <p>
      *  
-     * @return Returns a reader onto the location where the content <b>was</b> written.
-     *      The instance must <b>always</b> be a new instance.
+     * @return Returns a reader onto the location referenced by this instance.
+     *      The instance must <b>always</b> be a new instance and never null.
      * @throws ContentIOException
      */
     protected abstract ContentReader createReader() throws ContentIOException;
     
     /**
-     * Manages the output stream to ensure that the reader is only returned once
-     * the output stream has been closed.
+     * Performs checks and copies required reader attributes
      */
     public final ContentReader getReader() throws ContentIOException
     {
-        // check the the stream has not been closed
-        if (!streamClosed)
+        if (!isClosed())
         {
-            return null;    // interface mandates this behaviour
+            return null;
         }
-        // it is safe to create the reader
         ContentReader reader = createReader();
         if (reader == null)
         {
-            throw new AlfrescoRuntimeException("ContentWriter failed to create post-write reader: \n" +
+            throw new AlfrescoRuntimeException("ContentReader failed to create new reader: \n" +
                     "   writer: " + this);
         }
         else if (reader.getContentUrl() == null || !reader.getContentUrl().equals(getContentUrl()))
         {
             throw new AlfrescoRuntimeException("ContentReader has different URL: \n" +
                     "   writer: " + this + "\n" +
-                    "   reader: " + reader);
+                    "   new reader: " + reader);
         }
         // copy across common attributes
         reader.setMimetype(this.getMimetype());
@@ -120,53 +102,100 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
         // done
         if (logger.isDebugEnabled())
         {
-            logger.debug("Writer spawned reader: \n" +
+            logger.debug("Writer spawned new reader: \n" +
                     "   writer: " + this + "\n" +
-                    "   reader: " + reader);
+                    "   new reader: " + reader);
         }
         return reader;
     }
 
     /**
-     * Provides low-level access to write content to the repository, allowing the stream
-     * provided to call back when closed.
-     * <p>
-     * This is the only of the content <i>writing</i> methods that needs to be implemented
-     * by derived classes.  All other methods use the <code>OutputStream</code> in
-     * their implementations.
-     * <p>
-     *  
-     * @return Returns a stream from which the content can be read
-     * @throws ContentIOException
+     * An automatically created listener sets the flag
      */
-    protected abstract OutputStream getDirectOutputStream() throws ContentIOException;
-    
-    /**
-     * Wraps the direct output stream with an output stream that provides a callback
-     * when it is closed.
-     * <p>
-     * A check is made to ensure that the output stream is only retrieved once.
-     */
-    public synchronized final OutputStream getContentOutputStream() throws ContentIOException
+    public synchronized final boolean isClosed()
     {
-        // this is a use-once object
-        if (outputStream != null)
+        if (channel != null)
         {
-            throw new ContentIOException("An output stream has already been opened");
-        }
-        
-        outputStream = getDirectOutputStream();
-        // wrap the output stream only if there are listeners present
-        if (listeners.size() > 0)
-        {
-            outputStream = new CallbackOutputStream(outputStream);
-            // it will call the close method when it gets closed
+            return !channel.isOpen();
         }
         else
         {
-            // just keep the original output stream
+            return false;
         }
-        return outputStream;
+    }
+
+    /**
+     * Provides low-level access to write content to the repository.
+     * <p>
+     * This is the only of the content <i>writing</i> methods that needs to be implemented
+     * by derived classes.  All other content access methods make use of this in their
+     * underlying implementations.
+     * 
+     * @return Returns a channel with which to write content
+     * @throws ContentIOException if the channel could not be opened
+     */
+    protected abstract WritableByteChannel getDirectWritableChannel() throws ContentIOException;
+    
+    /**
+     * Optionally override to supply an alternate callback channel.
+     *
+     * @param directChannel the result of {@link #getDirectWritableChannel()}
+     * @param listeners the listeners to call
+     * @return Returns a callback channel
+     * @throws ContentIOException
+     * 
+     * @see AbstractContentWriter.CallbackChannel
+     */
+    protected WritableByteChannel getCallbackWritableChannel(
+            WritableByteChannel directChannel,
+            List<ContentStreamListener> listeners)
+            throws ContentIOException
+    {
+        // wrap it
+        WritableByteChannel callbackChannel = new CallbackChannel(directChannel, listeners);
+        // done
+        return callbackChannel;
+    }
+
+    /**
+     * @see #getDirectWritableChannel()
+     * @see #getCallbackWritableChannel()
+     */
+    public synchronized final WritableByteChannel getWritableChannel() throws ContentIOException
+    {
+        // this is a use-once object
+        if (channel != null)
+        {
+            throw new RuntimeException("A channel has already been opened");
+        }
+        WritableByteChannel directChannel = getDirectWritableChannel();
+        channel = getCallbackWritableChannel(directChannel, listeners);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Opened channel onto content: " + this);
+        }
+        return channel;
+    }
+    
+    /**
+     * @see Channels#newOutputStream(java.nio.channels.WritableByteChannel)
+     */
+    public OutputStream getContentOutputStream() throws ContentIOException
+    {
+        try
+        {
+            WritableByteChannel channel = getWritableChannel();
+            OutputStream is = Channels.newOutputStream(channel);
+            // done
+            return is;
+        }
+        catch (Throwable e)
+        {
+            throw new ContentIOException("Failed to open stream onto channel: \n" +
+                    "   accessor: " + this,
+                    e);
+        }
     }
 
     public final void putContent(InputStream is) throws ContentIOException
@@ -231,51 +260,42 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
     }
 
     /**
-     * Inner <code>OutputStream</code> that executes the callback when the
-     * output stream is closed.  It delegates to the output stream given
-     * by {@link AbstractContentWriter#getDirectOutputStream()}.
-     * <p>
-     * The callback is made to {@link AbstractContentWriter#listeners}.
+     * Provides callbacks to the {@link ContentStreamListener listeners}.
      * 
      * @author Derek Hulley
      */
-    private class CallbackOutputStream extends OutputStream
+    private static class CallbackChannel implements WritableByteChannel
     {
         /*
          * Override most methods in order to go direct to the delegate's
          * implementations.
          */
         
-        private OutputStream delegate;
+        private WritableByteChannel delegate;
+        private List<ContentStreamListener> listeners;
         
-        public CallbackOutputStream(OutputStream delegate)
+        public CallbackChannel(WritableByteChannel delegate, List<ContentStreamListener> listeners)
         {
             this.delegate = delegate;
+            this.listeners = listeners;
+        }
+        
+        public boolean isOpen()
+        {
+            return delegate.isOpen();
+        }
+        public int write(ByteBuffer src) throws IOException
+        {
+            return delegate.write(src);
         }
         public void close() throws IOException
         {
             delegate.close();
             // call the listeners
-            for (ContentStreamListener listener : AbstractContentWriter.this.listeners)
+            for (ContentStreamListener listener : listeners)
             {
                 listener.contentStreamClosed();
             }
-        }
-        public void flush() throws IOException
-        {
-            delegate.flush();
-        }
-        public void write(int b) throws IOException
-        {
-            delegate.write(b);
-        }
-        public void write(byte[] b) throws IOException
-        {
-            delegate.write(b);
-        }
-        public void write(byte[] b, int off, int len) throws IOException
-        {
-            delegate.write(b, off, len);
         }
     }
 }

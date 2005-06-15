@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +25,7 @@ import org.springframework.util.FileCopyUtils;
  * Implements all the convenience methods of the interface.  The only methods
  * that need to be implemented, i.e. provide low-level content access are:
  * <ul>
- *   <li>{@link #getDirectInputStream()} to read content from the repository</li>
+ *   <li>{@link #getDirectReadableChannel()} to read content from the repository</li>
  * </ul>
  * 
  * @author Derek Hulley
@@ -32,8 +35,7 @@ public abstract class AbstractContentReader extends AbstractContent implements C
     private static final Log logger = LogFactory.getLog(AbstractContentReader.class);
     
     private List<ContentStreamListener> listeners;
-    private InputStream inputStream;
-    private boolean streamClosed;
+    private ReadableByteChannel channel;
     
     /**
      * @param contentUrl the content URL
@@ -43,16 +45,6 @@ public abstract class AbstractContentReader extends AbstractContent implements C
         super(contentUrl);
         
         listeners = new ArrayList<ContentStreamListener>(2);
-        streamClosed = false;     // just to be explicit
-        // add a stream close listener by default
-        ContentStreamListener streamCloseListener = new ContentStreamListener()
-            {
-                public void contentStreamClosed() throws ContentIOException
-                {
-                    streamClosed = true;
-                }
-            };
-        listeners.add(streamCloseListener);
     }
     
     /**
@@ -61,13 +53,13 @@ public abstract class AbstractContentReader extends AbstractContent implements C
      */
     public synchronized void addListener(ContentStreamListener listener)
     {
-        if (inputStream != null)
+        if (channel != null)
         {
-            throw new RuntimeException("InputStream is already in use");
+            throw new RuntimeException("Channel is already in use");
         }
         listeners.add(listener);
     }
-
+    
     /**
      * A factory method for subclasses to implement that will ensure the proper
      * implementation of the {@link ContentReader#getReader()} method.
@@ -112,45 +104,93 @@ public abstract class AbstractContentReader extends AbstractContent implements C
     }
 
     /**
+     * An automatically created listener sets the flag
+     */
+    public synchronized final boolean isClosed()
+    {
+        if (channel != null)
+        {
+            return !channel.isOpen();
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
      * Provides low-level access to read content from the repository.
      * <p>
      * This is the only of the content <i>reading</i> methods that needs to be implemented
-     * by derived classes.  All other methods use the <code>InputStream</code> in
-     * their implementations.
+     * by derived classes.  All other content access methods make use of this in their
+     * underlying implementations.
      * 
-     * @return Returns a stream from which content can be read
-     * @throws ContentIOException if the stream could not be opened or the underlying content
+     * @return Returns a channel from which content can be read
+     * @throws ContentIOException if the channel could not be opened or the underlying content
      *      has disappeared
      */
-    protected abstract InputStream getDirectInputStream() throws ContentIOException;
+    protected abstract ReadableByteChannel getDirectReadableChannel() throws ContentIOException;
 
     /**
-     * Wraps the direct input stream with an output stream that provides a callback
-     * when it is closed.
-     * <p>
-     * A check is made to ensure that the input stream is only retrieved once.
+     * Optionally override to supply an alternate callback channel.
+     *  
+     * @param directChannel the result of {@link #getDirectReadableChannel()}
+     * @param listeners the listeners to call
+     * @return Returns a channel
+     * @throws ContentIOException
+     * 
+     * @see AbstractContentReader.CallbackChannel
      */
-    public synchronized final InputStream getContentInputStream() throws ContentIOException
+    protected ReadableByteChannel getCallbackReadableChannel(
+            ReadableByteChannel directChannel,
+            List<ContentStreamListener> listeners)
+            throws ContentIOException
+    {
+        // wrap it
+        ReadableByteChannel callbackChannel = new CallbackChannel(directChannel, listeners);
+        // done
+        return callbackChannel;
+    }
+
+    /**
+     * @see #getDirectReadableChannel()
+     * @see #getCallbackReadableChannel()
+     */
+    public synchronized final ReadableByteChannel getReadableChannel() throws ContentIOException
     {
         // this is a use-once object
-        if (inputStream != null)
+        if (channel != null)
         {
-            throw new RuntimeException("An input stream has already been opened");
+            throw new RuntimeException("A channel has already been opened");
         }
-        
-        inputStream = getDirectInputStream();
-        // wrap the stream
-        InputStream callbackIs = new CallbackInputStream(inputStream);
-        // it will call the close method when it gets closed
-        return callbackIs;
+        ReadableByteChannel directChannel = getDirectReadableChannel();
+        channel = getCallbackReadableChannel(directChannel, listeners);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Opened channel onto content: " + this);
+        }
+        return channel;
     }
     
     /**
-     * An automatically created listener sets the flag
+     * @see Channels#newInputStream(java.nio.channels.ReadableByteChannel)
      */
-    public final boolean isClosed()
+    public InputStream getContentInputStream() throws ContentIOException
     {
-        return streamClosed;
+        try
+        {
+            ReadableByteChannel channel = getReadableChannel();
+            InputStream is = Channels.newInputStream(channel);
+            // done
+            return is;
+        }
+        catch (Throwable e)
+        {
+            throw new ContentIOException("Failed to open stream onto channel: \n" +
+                    "   accessor: " + this,
+                    e);
+        }
     }
 
     /**
@@ -221,47 +261,42 @@ public abstract class AbstractContentReader extends AbstractContent implements C
     }
 
     /**
-     * Inner <code>InputStream</code> that executes the callback when the
-     * input stream is closed.  It delegates to the input stream given
-     * by {@link AbstractContentReader#getDirectInputStream()}.
-     * <p>
-     * The callback is made to {@link AbstractContentReader#listeners}.
+     * Provides callbacks to the {@link ContentStreamListener listeners}.
      * 
      * @author Derek Hulley
      */
-    private class CallbackInputStream extends InputStream
+    private static class CallbackChannel implements ReadableByteChannel
     {
         /*
          * Override most methods in order to go direct to the delegate's
          * implementations.
          */
         
-        private InputStream delegate;
+        private ReadableByteChannel delegate;
+        private List<ContentStreamListener> listeners;
         
-        public CallbackInputStream(InputStream delegate)
+        public CallbackChannel(ReadableByteChannel delegate, List<ContentStreamListener> listeners)
         {
             this.delegate = delegate;
+            this.listeners = listeners;
+        }
+        
+        public boolean isOpen()
+        {
+            return delegate.isOpen();
+        }
+        public int read(ByteBuffer dst) throws IOException
+        {
+            return delegate.read(dst);
         }
         public void close() throws IOException
         {
             delegate.close();
             // call the listeners
-            for (ContentStreamListener listener : AbstractContentReader.this.listeners)
+            for (ContentStreamListener listener : listeners)
             {
                 listener.contentStreamClosed();
             }
-        }
-        public int read() throws IOException
-        {
-            return delegate.read();
-        }
-        public int read(byte[] b, int off, int len) throws IOException
-        {
-            return delegate.read(b, off, len);
-        }
-        public int read(byte[] b) throws IOException
-        {
-            return delegate.read(b);
         }
     }
 }
