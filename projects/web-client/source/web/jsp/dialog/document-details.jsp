@@ -46,7 +46,7 @@
                <%-- Status and Actions --%>
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
-                  <td bgcolor="#ECE9E1">
+                  <td bgcolor="#EEEEEE">
                   
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
@@ -86,12 +86,12 @@
                         <tr>
                            <td width="100%" valign="top">
                               <a:panel label="Preview" id="preview-panel" progressive="true"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  <a:actionLink value="#{BrowseBean.document.name}" href="#{BrowseBean.document.properties.url}" />
                               </a:panel>
                               <br/>
                               <a:panel label="Properties" id="properties-panel" progressive="true"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
                                        actionListener="#{EditDocPropsDialog.startWizardForEdit}">
                                  <r:propertySheetGrid id="document-props" value="#{BrowseBean.document}" var="documentProps" 
@@ -101,24 +101,24 @@
                               </a:panel>
                               <br/>
                               <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  Workflow options
                               </a:panel>
                               <br/>
                               <a:panel label="Categories" id="categories-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  Categories
                               </a:panel>
                               <br/>
                               <a:panel label="Version History" id="version-history-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  Version History
                               </a:panel>
                               <br/>
                            </td>
                            
                            <td valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">

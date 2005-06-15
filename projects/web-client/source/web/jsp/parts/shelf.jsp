@@ -13,7 +13,6 @@
          <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
          <td valign=top width=100%>
             
-            
             <%-- Shelf component --%>
             <%-- IMPORTANT NOTE: All inner components must be given an explicit ID! --%>
             <%--                 This is because they are wrapped in a Panel component --%>
@@ -41,7 +40,6 @@
                   </r:shelfItem>
                </r:shelfGroup>
             </r:shelf>
-            
             
          </td>
          <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>

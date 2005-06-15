@@ -83,7 +83,7 @@
                <%-- Status and Actions --%>
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
-                  <td bgcolor="#ECE9E1">
+                  <td bgcolor="#EEEEEE">
                   
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
@@ -143,7 +143,7 @@
                            </td>
                            
                            <td valign="top" rowspan=2>
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">

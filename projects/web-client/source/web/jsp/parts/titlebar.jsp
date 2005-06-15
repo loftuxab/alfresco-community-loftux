@@ -5,7 +5,8 @@
       <td width=100%>
          <table cellspacing=0 cellpadding=0 width=100%>
             <tr>
-               <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width=28 height=30></td>
+               <td><a href="http://www.alfresco.org" target="new"><img src="<%=request.getContextPath()%>/images/icons/alfresco_logo_24x24.png" width=32 height=30 alt="Alfresco" title="Alfresco" border=0 style="padding-right:4px"></a></td>
+               <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width=10 height=30></td>
                <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/titlebar_bg.gif)">
                   <%-- Toolbar --%>
                   <a:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true" value="0"
@@ -14,7 +15,7 @@
                      <a:listItem value="1" label="My Home" />
                   </a:modeList>
                </td>
-               <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width=4 height=30></td>
+               <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width=8 height=30></td>
             </tr>
          </table>
       </td>
@@ -35,11 +36,11 @@
       <td>
          <table cellspacing=0 cellpadding=0 width=100%>
             <tr>
-               <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_begin.gif" width=4 height=30></td>
+               <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_begin.gif" width=6 height=30></td>
                <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/searchbar_bg.gif)">
                   <r:simpleSearch id="search" actionListener="#{BrowseBean.search}" />
                </td>
-               <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_end.gif" width=4 height=30></td>
+               <td><img src="<%=request.getContextPath()%>/images/parts/searchbar_end.gif" width=6 height=30></td>
             </tr>
          </table>
       </td>

@@ -8,7 +8,7 @@
 
 <tr>
    <td style="background-image: url(<%=request.getContextPath()%>/images/parts/headbar_4.gif)"></td>
-   <td bgcolor="#D2CABB">
+   <td bgcolor="#8EB6E6">
       <%-- Breadcrumb component --%>
       <div style="padding-left:8px" class="headbarTitle">
          <h:outputText value="#{msg.location}"/>:&nbsp;

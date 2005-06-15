@@ -46,7 +46,7 @@
                <%-- Status and Actions --%>
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
-                  <td bgcolor="#ECE9E1">
+                  <td bgcolor="#EEEEEE">
                   
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
@@ -71,7 +71,7 @@
                               <%-- View mode settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" selectedImage="/images/icons/Details.gif" value="0">
-                                 <a:listItem value="0" label="Users Details" />
+                                 <a:listItem value="0" label="User Details" />
                               </a:modeList>
                            </td>
                         </tr>
@@ -98,7 +98,7 @@
                               <%-- Users List --%>
                               <div style="padding:4px">
                               
-                              <a:panel id="users-panel" border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea" styleClass="mainSubTitle" label="#{msg.users}">
+                              <a:panel id="users-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.users}">
                               
                               <a:richList id="users-list" binding="#{NewUserWizard.usersRichList}" viewMode="details" pageSize="10"
                                     styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
@@ -143,7 +143,7 @@
                            </td>
                            
                            <td valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">

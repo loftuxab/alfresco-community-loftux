@@ -46,7 +46,7 @@
                <%-- Status and Actions --%>
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
-                  <td bgcolor="#ECE9E1">
+                  <td bgcolor="#EEEEEE">
                   
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
@@ -86,7 +86,7 @@
                         <tr>
                            <td width="100%" valign="top">
                               <a:panel label="Properties" id="properties-panel" border="white" bgcolor="white" 
-                                       titleBorder="greyround" titleBgcolor="#eaeaea"
+                                       titleBorder="blue" titleBgcolor="#D3E6FE"
                                        progressive="true" action="editSpaceProperties" linkTooltip="Modify"
                                        actionListener="#{EditSpaceDialog.startWizardForEdit}"
                                        linkIcon="/images/icons/Change_details.gif">
@@ -97,7 +97,7 @@
                               </a:panel>
                               <br/>
                               <a:panel label="Rules" id="rules-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="manageRules" linkTooltip="Modify" linkIcon="/images/icons/Change_details.gif">
                                  <a:richList id="rulesList" viewMode="details" value="#{RulesBean.rules}" var="r"
                                           styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" 
@@ -144,19 +144,19 @@
                               </a:panel>
                               <br/>
                               <a:panel label="Preferences" id="preferences-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  <div>[TBD]</div>
                               </a:panel>
                               <br/>
                               <a:panel label="Space Members" id="members-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  <div>[TBD]</div>
                               </a:panel>
                               <br/>
                            </td>
                            
                            <td valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">

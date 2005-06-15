@@ -78,7 +78,7 @@
                <%-- Status and Actions --%>
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
-                  <td bgcolor="#ECE9E1">
+                  <td bgcolor="#EEEEEE">
                   
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
@@ -113,7 +113,7 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="20%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="3" disabled="true">
@@ -159,7 +159,7 @@
                                  <tr>
                                     <td>Choose space icon:</td>
                                     <td>
-                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                                        <a:imagePickerRadio columns="7" spacing="4" value="#{NewSpaceWizard.icon}">
                                           <a:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
                                           <a:listItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
@@ -204,7 +204,7 @@
                            </td>
                            
                            <td valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#cddbe8"); %>
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">

@@ -46,7 +46,7 @@
                <%-- Status and Actions --%>
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width=4></td>
-                  <td bgcolor="#ECE9E1">
+                  <td bgcolor="#EEEEEE">
                   
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
@@ -177,7 +177,7 @@
                   <td>
                      <div style="padding:4px">
                      
-                     <a:panel id="spaces-panel" border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
+                     <a:panel id="spaces-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.browse_spaces}">
                      
                      <%-- Spaces List --%>
                      <a:richList id="spacesList" binding="#{BrowseBean.spacesRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
@@ -300,7 +300,7 @@
                   <td>
                      <div style="padding:4px">
                      
-                     <a:panel id="content-panel" border="white" bgcolor="white" titleBorder="greyround" titleBgcolor="#eaeaea" styleClass="mainSubTitle" label="#{msg.browse_content}">
+                     <a:panel id="content-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.browse_content}">
                      
                      <%-- Content list --%>
                      <a:richList id="contentRichList" binding="#{BrowseBean.contentRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
