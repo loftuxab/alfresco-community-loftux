@@ -102,12 +102,97 @@
                                     <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 
-
-                                 <tr><td>Simple workflow settings defined here</td></tr>
-
-
-
+                                 <tr>
+                                    <td colspan="2" class="wizardSectionHeading">Approve Flow</td>
+                                 </tr>
+                                 <tr>
+                                    <td>Name&nbsp;for&nbsp;approve&nbsp;step:</td>
+                                    <td width="90%">
+                                       <h:inputText value="#{NewRuleWizard.actionProperties.approveStepName}" />
+                                    </td>
+                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr><td colspan="2">Choose whether you want to move or copy the content and also the location.</td>
+                                 <tr>
+                                    <td colspan="2">
+                                       <table cellpadding="2" cellspacing="2" border="0">
+                                          <tr>
+                                             <td valign="top">
+                                                <h:selectOneRadio value="#{NewRuleWizard.actionProperties.approveAction}">
+                                                   <f:selectItem itemValue="move" itemLabel="Move" />
+                                                   <f:selectItem itemValue="copy" itemLabel="Copy" />
+                                                </h:selectOneRadio>
+                                             </td>
+                                             <td style="padding-left:6px;"></td>
+                                             <td valign="top" style="padding-top:10px;">To:</td>
+                                             <td style="padding-left:6px;"></td>
+                                             <td style="padding-top:6px;">
+                                                <r:spaceSelector label="Click here to select the destination" 
+                                                        value="#{NewRuleWizard.actionProperties.approveDestination}" 
+                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                             </td>
+                                          </tr>
+                                       </table>
+                                    </td>
+                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td colspan="2" class="wizardSectionHeading">Reject Flow</td>
+                                 </tr>
+                                 <tr>
+                                    <td colspan="2">Do you want to provide a reject step?</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <h:selectOneRadio value="#{NewRuleWizard.actionProperties.rejectStepPresent}">
+                                          <f:selectItem itemValue="yes" itemLabel="Yes" />
+                                          <f:selectItem itemValue="no" itemLabel="No" />
+                                       </h:selectOneRadio>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td colspan="2">
+                                       <table cellpadding="0" cellspacing="0" border="0">
+                                          <tr>
+                                             <td style="padding-left:24px;"></td>
+                                             <td>
+                                                <table cellpadding="2" cellspacing="2" border="0">
+                                                   <tr>
+                                                      <td>
+                                                         Name&nbsp;for&nbsp;reject&nbsp;step:&nbsp;
+                                                         <h:inputText value="#{NewRuleWizard.actionProperties.rejectStepName}" />
+                                                      </td>
+                                                   </tr>
+                                                   <tr><td class="paddingRow"></td></tr>
+                                                   <tr><td>Choose whether you want to move or copy the content and also the location.</td>
+                                                   <tr>
+                                                      <td>
+                                                         <table cellpadding="2" cellspacing="2" border="0">
+                                                            <tr>
+                                                               <td valign="top">
+                                                                  <h:selectOneRadio value="#{NewRuleWizard.actionProperties.rejectAction}">
+                                                                     <f:selectItem itemValue="move" itemLabel="Move" />
+                                                                     <f:selectItem itemValue="copy" itemLabel="Copy" />
+                                                                  </h:selectOneRadio>
+                                                               </td>
+                                                               <td style="padding-left:6px;"></td>
+                                                               <td valign="top" style="padding-top:10px;">To:</td>
+                                                               <td style="padding-left:6px;"></td>
+                                                               <td style="padding-top:6px;">
+                                                                  <r:spaceSelector label="Click here to select the destination" 
+                                                                          value="#{NewRuleWizard.actionProperties.rejectDestination}" 
+                                                                          style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                                               </td>
+                                                            </tr>
+                                                         </table>
+                                                      </td>
+                                                   </tr>
+                                                </table>
+                                             </td>
+                                          </tr>
+                                       </table>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>

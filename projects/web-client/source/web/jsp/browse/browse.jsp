@@ -242,20 +242,20 @@
                         <%-- Created Date column for details view mode --%>
                         <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
                            <f:facet name="header">
-                              <a:sortLink label="Created Date" value="created" styleClass="header"/>
+                              <a:sortLink label="Created" value="created" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.created}">
-                              <a:convertXMLDate dateStyle="long" />
+                              <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
                            </h:outputText>
                         </a:column>
                         
                         <%-- Modified Date column for details/icons view modes --%>
                         <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
                            <f:facet name="header">
-                              <a:sortLink label="Modified Date" value="modified" styleClass="header"/>
+                              <a:sortLink label="Modified" value="modified" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.modified}">
-                              <a:convertXMLDate dateStyle="long" />
+                              <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
                            </h:outputText>
                         </a:column>
                         
@@ -372,20 +372,20 @@
                         <%-- Created Date column for details view mode --%>
                         <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
                            <f:facet name="header">
-                              <a:sortLink label="Created Date" value="created" styleClass="header"/>
+                              <a:sortLink label="Created" value="created" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.created}">
-                              <a:convertXMLDate dateStyle="long" />
+                              <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
                            </h:outputText>
                         </a:column>
                         
                         <%-- Modified Date column for details/icons view modes --%>
                         <a:column style="text-align:left" rendered="#{BrowseBean.browseViewMode == 'details' || BrowseBean.browseViewMode == 'icons'}">
                            <f:facet name="header">
-                              <a:sortLink label="Modified Date" value="modified" styleClass="header"/>
+                              <a:sortLink label="Modified" value="modified" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.modified}">
-                              <a:convertXMLDate dateStyle="long" />
+                              <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
                            </h:outputText>
                         </a:column>
                         

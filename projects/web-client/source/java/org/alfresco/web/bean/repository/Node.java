@@ -28,7 +28,7 @@ public class Node implements Serializable
    private QName type;
    private String path;
    private String id;
-   private Set aspects = null;
+   private Set<QName> aspects = null;
    private Map<String, Object> properties = new HashMap<String, Object>(7, 1.0f);
    private List<String> propertyNames = null;
    
@@ -169,7 +169,7 @@ public class Node implements Serializable
    /**
     * @return The list of aspects applied to this node
     */
-   public Set getAspects()
+   public Set<QName> getAspects()
    {
       if (this.aspects == null)
       {

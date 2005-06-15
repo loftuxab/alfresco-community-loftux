@@ -1,11 +1,12 @@
 package org.alfresco.web.bean.repository;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -19,7 +20,7 @@ import org.alfresco.service.namespace.QName;
 public class DataDictionary
 {
    private DictionaryService dictionaryService;
-   private Map<QName, ClassDefinition> types = new HashMap<QName, ClassDefinition>(6, 1.0f);
+   private Map<QName, TypeDefinition> types = new HashMap<QName, TypeDefinition>(6, 1.0f);
 
    /**
     * Constructor
@@ -32,30 +33,47 @@ public class DataDictionary
    }
    
    /**
-    * @param type The ClassRef of the type to retrive data for
-    * @return The class definition for the requested type
+    * Returns the type definition for the type represented by the given qname
+    * 
+    * @param type The qname of the type to lookup the definition for
+    * @return The type definition for the requested type
     */
-   public ClassDefinition getType(QName type)
+   public TypeDefinition getTypeDef(QName type)
    {
-      ClassDefinition classDef = types.get(type);
+      TypeDefinition typeDef = types.get(type);
       
-      if (classDef == null)
+      if (typeDef == null)
       {
-         classDef = this.dictionaryService.getClass(type);
+         typeDef = this.dictionaryService.getType(type);
          
-         if (classDef != null)
+         if (typeDef != null)
          {
-            types.put(type, classDef);
+            types.put(type, typeDef);
          }
       }
       
-      return classDef;
+      return typeDef;
    }
    
    /**
+    * Returns the type definition for the type represented by the given qname
+    * and for all the given aspects
+    * 
+    * @param type The type to retrieve the definition for 
+    * @param optionalAspects A list of aspects to retrieve the definition for 
+    * @return A unified type definition of the given type and aspects 
+    */
+   public TypeDefinition getTypeDef(QName type, Collection<QName> optionalAspects)
+   {
+      return this.dictionaryService.getAnonymousType(type, optionalAspects);
+   }
+   
+   /**
+    * Returns the property definition for the given property on the given node 
+    * 
     * @param node The node from which to get the property
     * @param property The property to find the definition for
-    * @return The property definition
+    * @return The property definition or null if the property is not known
     */
    public PropertyDefinition getPropertyDefinition(Node node, String property)
    {
@@ -63,11 +81,11 @@ public class DataDictionary
       
       PropertyDefinition propDef = null;
       
-      ClassDefinition classDef = getType(node.getType());
+      TypeDefinition typeDef = getTypeDef(node.getType(), node.getAspects());
       
-      if (classDef != null)
+      if (typeDef != null)
       {
-         Map<QName, PropertyDefinition> properties = classDef.getProperties();
+         Map<QName, PropertyDefinition> properties = typeDef.getProperties();
          propDef = properties.get(QName.createQName(NamespaceService.ALFRESCO_URI, property));
       }
       

@@ -102,12 +102,14 @@
                                     <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 
-
-                                 <tr><td>Link category settings defined here</td></tr>
-
-
-
+                                 <tr>
+                                    <td valign="top">Category:</td>
+                                    <td width="90%">
+                                       <r:categorySelector label="Click here to select a category" 
+                                                        value="#{NewRuleWizard.actionProperties.category}" 
+                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>

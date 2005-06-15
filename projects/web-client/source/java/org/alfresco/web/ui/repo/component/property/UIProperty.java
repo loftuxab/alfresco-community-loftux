@@ -21,6 +21,7 @@ import org.alfresco.web.bean.repository.DataDictionary;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.converter.XMLDateConverter;
+import org.alfresco.web.ui.repo.component.UICategorySelector;
 import org.apache.log4j.Logger;
 import org.springframework.web.jsf.FacesContextUtils;
 
@@ -81,6 +82,8 @@ public class UIProperty extends UIPanel implements NamingContainer
          
          if (propDef == null)
          {
+            logger.warn("Failed to find property definition for property '" + propertyName + "'");
+            
             // there is no definition for the node, so it may have been added to
             // the node as an additional property, so look for it in the node itself
             if (node.hasProperty(propertyName))
@@ -111,8 +114,14 @@ public class UIProperty extends UIPanel implements NamingContainer
             String displayLabel = (String)getDisplayLabel();
             if (displayLabel == null)
             {
-               // TODO: We need to retrieve the proper display label when it is available!
-               displayLabel = propDef.getName().getLocalName();
+               // try and get the repository assigned label
+               displayLabel = propDef.getTitle();
+               
+               // if the label is still null default to the local name of the property
+               if (displayLabel == null)
+               {
+                  displayLabel = propDef.getName().getLocalName();
+               }
             }
             
             // generate the label and type specific control
@@ -297,6 +306,10 @@ public class UIProperty extends UIPanel implements NamingContainer
                         propDef.getName().getLocalName() + "}");
       
       UIPropertySheet propSheet = (UIPropertySheet)this.getParent();
+      
+      PropertyTypeDefinition propTypeDef = propDef.getPropertyType();
+      QName typeName = propTypeDef.getName();
+         
       if (propSheet.getMode().equalsIgnoreCase(UIPropertySheet.VIEW_MODE))
       {
          // if we are in view mode simply output the text to the screen
@@ -306,36 +319,22 @@ public class UIProperty extends UIPanel implements NamingContainer
       else
       {
          // generate the appropriate input field 
-         PropertyTypeDefinition propTypeDef = propDef.getPropertyType();
-         QName typeName = propTypeDef.getName();
-         
-         if (typeName.equals(PropertyTypeDefinition.DATE) || typeName.equals(PropertyTypeDefinition.DATETIME))
-         {
-            control = (UIInput)context.getApplication().
-                            createComponent("javax.faces.Input");
-            control.setRendererType("javax.faces.Text");
-            
-            // add a converter for datetime types
-            XMLDateConverter conv = (XMLDateConverter)context.getApplication().
-                                      createConverter("org.alfresco.faces.XMLDataConverter");
-            conv.setDateStyle("long");
-            control.setConverter(conv);
-         }
-         else if (typeName.equals(PropertyTypeDefinition.BOOLEAN))
+         if (typeName.equals(PropertyTypeDefinition.BOOLEAN))
          {
             control = (UISelectBoolean)context.getApplication().
-                            createComponent("javax.faces.SelectBoolean");
+                  createComponent("javax.faces.SelectBoolean");
             control.setRendererType("javax.faces.Checkbox");
          }
          else if (typeName.equals(PropertyTypeDefinition.CATEGORY))
          {
-            // TODO: Handle lists of values by retrieving them from category service?
+            control = (UICategorySelector)context.getApplication().
+                  createComponent("org.alfresco.faces.CategorySelector");
          }
          else
          {
             // any other type is represented as an input text field
             control = (UIInput)context.getApplication().
-                            createComponent("javax.faces.Input");
+                  createComponent("javax.faces.Input");
             control.setRendererType("javax.faces.Text");
          }
       
@@ -355,6 +354,17 @@ public class UIProperty extends UIPanel implements NamingContainer
 //            val.setMinimum(1);
 //            control.addValidator(val);
 //         }   
+      }
+      
+      // add a converter for datetime types
+      if (typeName.equals(PropertyTypeDefinition.DATE) || typeName.equals(PropertyTypeDefinition.DATETIME))
+      {
+         XMLDateConverter conv = (XMLDateConverter)context.getApplication().
+               createConverter("org.alfresco.faces.XMLDataConverter");
+         conv.setType("both");
+         conv.setDateStyle("long");
+         conv.setTimeStyle("short");
+         control.setConverter(conv);
       }
       
       // set up the common aspects of the control

@@ -103,6 +103,15 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
+                                    <td>Required&nbsp;format:</td>
+                                    <td width="90%">
+                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.transformer}">
+                                          <f:selectItems value="#{NewRuleWizard.transformers}" />
+                                       </h:selectOneMenu>
+                                    </td>
+                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
                                     <td>Destination:</td>
                                     <td>
                                        <r:spaceSelector label="Click here to select the destination" 

@@ -114,7 +114,13 @@ public class NewRuleWizard extends AbstractWizardBean
             }
             else if (this.condition.equals("in-category"))
             {
-               // add category id to the condition params map
+               // put the selected category in the condition params
+               NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                     this.conditionProperties.get("category"));
+               
+               // TODO: **************************************************
+               //conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY, catNodeRef);
+               // **************************************************
             }
             
             Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
@@ -157,9 +163,59 @@ public class NewRuleWizard extends AbstractWizardBean
             }
             else if (this.action.equals("simple-workflow"))
             {
+               // add all the captured details to action params
+               /*
+               actionParams.put(WorflowExecutor.PARAM_APPROVE_NAME,
+                     this.actionProperties.get("approveStepName"));
+               
+               boolean approveMove = true;
+               String approveAction = this.actionProperties.get("approveAction");
+               if (approveAction != null && approveAction.equals("copy"))
+               {
+                  approveMove = false;
+               }
+               
+               NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                     this.actionProperties.get("approveDestination"));
+               actionParams.put(WorkflowExecutor.PARAM_APPROVE_DESTINATION, approveDestNodeRef);
+               
+               boolean requireReject = true;
+               String rejectStepPresent = this.actionProperties.get("rejectStepPresent");
+               if (rejectStepPresent != null && rejectStepPresent.equals("no"))
+               {
+                  requireReject = false;
+               }
+               
+               // if there is a reject step capture those details too
+               if (requireReject)
+               {
+                  actionParams.put(WorflowExecutor.PARAM_REJECT_NAME,
+                        this.actionProperties.get("rejectStepName"));
+               
+                  boolean rejectMove = true;
+                  String rejectAction = this.actionProperties.get("rejectAction");
+                  if (rejectAction != null && rejectAction.equals("copy"))
+                  {
+                     rejectMove = false;
+                  }
+                  
+                  NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                        this.actionProperties.get("rejectDestination"));
+                  actionParams.put(WorkflowExecutor.PARAM_REJECT_DESTINATION, rejectDestNodeRef);
+               }
+               */
             }
             else if (this.action.equals("link-category"))
             {
+               // put the selected category in the action params
+               NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                     this.actionProperties.get("category"));
+               
+               // TODO: **************************************************
+               
+               //actionParams.put(LinkCategoryExecutor.PARAM_CATEGORY, catNodeRef);
+               
+               // **************************************************
             }
             else if (this.action.equals("check-out"))
             {
@@ -182,6 +238,29 @@ public class NewRuleWizard extends AbstractWizardBean
                // add the description for the checkin to the action params
                actionParams.put(CheckInActionExecutor.PARAM_DESCRIPTION, 
                      this.actionProperties.get("checkinDescription"));
+            }
+            else if (this.action.equals("transform"))
+            {
+               // add the destination space id to the action properties
+               NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                     this.actionProperties.get("destinationLocation"));
+               
+               // **************************************************
+               
+//               actionParams.put(TransformActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+               
+               // add the type and name of the association to create when the copy
+               // is performed
+//               actionParams.put(TransformActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+//                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS);
+//               actionParams.put(Transform.ActionExecutor.PARAM_ASSOC_QNAME, 
+//                     QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+               
+               // add the format that the copy should end up as
+//               actionParams.put(TransformActionExecutor.PARAM_TRANSFORM_TO, 
+//                     this.actionProperties.get("transformer"));
+               
+               // **************************************************
             }
             
             // create the rule and add it to the space
@@ -408,6 +487,11 @@ public class NewRuleWizard extends AbstractWizardBean
       
       this.conditionProperties = new HashMap<String, String>(1);
       this.actionProperties = new HashMap<String, String>(3);
+      
+      // default the approve and reject actions
+      this.actionProperties.put("approveAction", "move");
+      this.actionProperties.put("rejectStepPresent", "yes");
+      this.actionProperties.put("rejectAction", "move");
    }
    
    /**
