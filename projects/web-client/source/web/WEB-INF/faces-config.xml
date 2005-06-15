@@ -333,6 +333,22 @@
       </managed-property>
    </managed-bean>
    
+   <managed-bean>
+      <description>
+         Backing bean used by the document details dialog
+      </description>
+      <managed-bean-name>DocumentDetailsBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.DocumentDetailsBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+   </managed-bean>
    
    <!-- ==================== NAVIGATION ==================== -->
    <!-- navigation rules describe the navigation cases between views using the -->

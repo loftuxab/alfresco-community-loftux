@@ -56,7 +56,7 @@
 				</description>
 			</action-definition> -->
 			<action-definition name="transform">
-				<title>Create a copy of content in a given format at a specific location</title>	
+				<title>Copy content in a given format to a specific location</title>	
 				<description>
 					This will copy the matched content to another location with a
                     specific format.
@@ -70,7 +70,7 @@
 				<executor>org.alfresco.repo.rule.action.TransformActionExecutor</executor>
 			</action-definition> 
 			<action-definition name="copy">
-				<title>Create a copy of content at a specific location</title>	
+				<title>Copy content to a specific location</title>	
 				<description>
 					This will copy the matched content to another location.
 				</description>
@@ -83,7 +83,7 @@
 				<executor>org.alfresco.repo.rule.action.CopyActionExecutor</executor>
 			</action-definition> 
 			<action-definition name="move">
-				<title>Move content to a specific space</title>	
+				<title>Move content to a specific location</title>	
 				<description>
 					This will move the matched content to another space.
 				</description>

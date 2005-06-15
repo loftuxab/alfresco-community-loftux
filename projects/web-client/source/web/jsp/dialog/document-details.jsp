@@ -54,7 +54,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainTitle">Details of '<h:outputText value="#{DocumentDetailsBean.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
@@ -84,14 +84,14 @@
                            <td width="100%" valign="top">
                               <a:panel label="Preview" id="preview-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
-                                 <a:actionLink value="#{BrowseBean.document.name}" href="#{BrowseBean.document.properties.url}" />
+                                 <a:actionLink value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" />
                               </a:panel>
                               <br/>
                               <a:panel label="Properties" id="properties-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
                                        actionListener="#{EditDocPropsDialog.startWizardForEdit}">
-                                 <r:propertySheetGrid id="document-props" value="#{BrowseBean.document}" var="documentProps" 
+                                 <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
                                  <h:messages styleClass="errorMessage" />
@@ -99,7 +99,8 @@
                               <br/>
                               <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
-                                 Workflow options
+                                 <h:outputText id="workflow-overview" value="#{DocumentDetailsBean.workflowOverviewHTML}" 
+                                               escape="false" />
                               </a:panel>
                               <br/>
                               <a:panel label="Categories" id="categories-panel" progressive="true" expanded="false"
