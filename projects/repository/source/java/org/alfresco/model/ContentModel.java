@@ -96,5 +96,14 @@ public interface ContentModel
     static final QName TYPE_CONFIGURATIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "configurations");
     static final QName TYPE_RULE_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "rulecontent");
     static final QName ASSOC_CONFIGURATIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "configurations");
+	
+	// workflow
+	static final QName ASPECT_SIMPLE_WORKFLOW = QName.createQName(NamespaceService.ALFRESCO_URI, "simpleworkflow");
+	static final QName PROP_APPROVE_STEP = QName.createQName(NamespaceService.ALFRESCO_URI, "approvestep");
+	static final QName PROP_APPROVE_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "approvefolder");
+	static final QName PROP_APPROVE_MOVE = QName.createQName(NamespaceService.ALFRESCO_URI, "approvemove");
+	static final QName PROP_REJECT_STEP = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectstep");
+	static final QName PROP_REJECT_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectfolder");
+	static final QName PROP_REJECT_MOVE = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectmove");
     
 }

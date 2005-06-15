@@ -8,11 +8,12 @@
 				<display-label>Inbound</display-label>
 				<adapter>org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter</adapter>
 			</rule-type>
-			<rule-type name="outbound">
+			<!-- commented out for technology preview release -->
+			<!-- <rule-type name="outbound">
 				<display-label>Outbound</display-label>
 				<adapter>org.alfresco.repo.rule.ruletype.OutboundRuleTypeAdapter</adapter>				
-			</rule-type>
-		</rule-types>
+			</rule-type> -->
+		</rule-types> 
 	</config>
    
     <!-- Action definitions configuration -->
@@ -28,8 +29,7 @@
 					<parameter name="aspect-name" type="QNAME" mandatory='true'/>
 				</parameters>
 				<executor>org.alfresco.repo.rule.action.AddFeaturesActionExecutor</executor>
-			</action-definition>
-			<!--
+			</action-definition>			
 			<action-definition name="simple-workflow">
 				<title>Add simple workflow to content</title>	
 				<description>
@@ -38,7 +38,17 @@
                     its next step in a workflow.  You can also give a space for
                     it to be moved to if you want a reject step.
 				</description>
+				<parameters>
+					<parameter name="approve-step" type="STRING" mandatory="false"/>
+					<parameter name="approve-folder" type="NODE_REF" mandatory="false"/>
+					<parameter name="approve-move" type="BOOLEAN" mandatory="false"/>
+					<parameter name="reject-step" type="STRING" mandatory="false"/>
+					<parameter name="reject-folder" type="NODE_REF" mandatory="false"/>
+					<parameter name="reject-move" type="BOOLEAN" mandatory="false"/>
+				</parameters>
+				<executor>org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor</executor>
 			</action-definition>
+			<!--
 			<action-definition name="link-category">
 				<title>Link content to category</title>	
 				<description>

@@ -12,6 +12,7 @@ public enum ParameterType
 {
     STRING,
     INT,
+    BOOLEAN,
     DATE,
     QNAME,
     NODE_REF

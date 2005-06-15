@@ -28,6 +28,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 /**
+ * Utility methods used by the rules store to convert rules to XML and back again.
+ * 
  * @author Roy Wetherall
  */
 /*package*/ class RuleXMLUtil
@@ -47,10 +49,11 @@ import org.dom4j.io.SAXReader;
     private static final String NODE_PARAMETER = "parameter";
     
     /**
+     * Create a rule from its XML definition
      * 
-     * @param ruleConfig
-     * @param ruleXML
-     * @return
+     * @param ruleConfig	the rule config
+     * @param ruleXML		the rule XML
+     * @return				the rule
      */
     public static RuleImpl XMLToRule(RuleConfig ruleConfig, String ruleXML)
     {
@@ -146,9 +149,11 @@ import org.dom4j.io.SAXReader;
     }
     
     /**
+     * Converts XML into a map of parameters
      * 
-     * @param itemElement
-     * @return
+     * @param ruleItemDefinition	the rule item definition
+     * @param itemElement			the item element 
+     * @return						map containing the parameters
      */
     private static Map<String, Serializable> XMLToParameters(
             RuleItemDefinition ruleItemDefinition, 
@@ -266,10 +271,11 @@ import org.dom4j.io.SAXReader;
     }
     
     /**
+     * Get the value from string
      * 
-     * @param valueAsString
-     * @param type
-     * @return
+     * @param valueAsString		the value as string
+     * @param type				the parameter type
+     * @return					the value
      */
     private static Serializable getValueFromString(
             String valueAsString, 
@@ -290,6 +296,9 @@ import org.dom4j.io.SAXReader;
             case INT:
                 result = Integer.getInteger(valueAsString);
                 break;
+            case BOOLEAN:
+				result = Boolean.valueOf(valueAsString);
+				break;
             default:
                 result = valueAsString;
                 break;
@@ -298,10 +307,11 @@ import org.dom4j.io.SAXReader;
     }
 
     /**
+     * Get the string from value
      * 
-     * @param value
-     * @param type
-     * @return
+     * @param value		the value
+     * @param type		the parameter type
+     * @return			the value as a string
      */
     private static String getStringFromValue(
             Serializable value, 
@@ -316,6 +326,7 @@ import org.dom4j.io.SAXReader;
             case QNAME:
             case NODE_REF:
             case INT:    
+            case BOOLEAN:
             default:
                 result = value.toString();
                 break;

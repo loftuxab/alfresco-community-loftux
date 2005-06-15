@@ -17,6 +17,7 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.rule.action.CheckInActionExecutor;
 import org.alfresco.repo.rule.action.CheckOutActionExecutor;
 import org.alfresco.repo.rule.action.MoveActionExecutor;
+import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
 import org.alfresco.repo.rule.action.TransformActionExecutor;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.service.ServiceRegistry;
@@ -126,10 +127,56 @@ public class RuleServiceSystemTest extends TestCase
                 ContentModel.TYPE_CONTAINER).getChildRef();        
         assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));   
 		
-		//this.transactionManager.commit(this.transactionStatus);
-		
         // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }   
+	
+	/**
+     * Test:
+     *          rule type:  inbound
+     *          condition:  no-condition
+     *          action:     simple-workflow
+     */
+    public void testSimpleWorkflowAction()
+    {
+        this.ruleService.makeActionable(this.nodeRef);
+        
+        this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
+        
+        RuleType ruleType = this.ruleService.getRuleType("inbound");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleActionDefinition action = this.ruleService.getActionDefinition(SimpleWorkflowActionExecutor.NAME);
+        
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_STEP, "approveStep");
+		params.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER, this.rootNodeRef);
+		params.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_MOVE, true);
+		params.put(SimpleWorkflowActionExecutor.PARAM_REJECT_STEP, "rejectStep");
+		params.put(SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER, this.rootNodeRef);
+		params.put(SimpleWorkflowActionExecutor.PARAM_REJECT_MOVE, false);
+        
+        Rule rule = this.ruleService.createRule(ruleType);
+        rule.addRuleCondition(cond, null);
+        rule.addRuleAction(action, params);
+        
+        this.ruleService.addRule(this.nodeRef, rule);
+				
+		NodeRef newNodeRef = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.TYPE_CONTAINER).getChildRef();        
+        
+		assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW));   
+		assertEquals("approveStep", this.nodeService.getProperty(newNodeRef, ContentModel.PROP_APPROVE_STEP));
+		assertEquals(this.rootNodeRef, this.nodeService.getProperty(newNodeRef, ContentModel.PROP_APPROVE_FOLDER));
+		assertTrue(((Boolean)this.nodeService.getProperty(newNodeRef, ContentModel.PROP_APPROVE_MOVE)).booleanValue());
+		assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW));   
+		assertEquals("rejectStep", this.nodeService.getProperty(newNodeRef, ContentModel.PROP_REJECT_STEP));
+		assertEquals(this.rootNodeRef, this.nodeService.getProperty(newNodeRef, ContentModel.PROP_REJECT_FOLDER));
+		assertFalse(((Boolean)this.nodeService.getProperty(newNodeRef, ContentModel.PROP_REJECT_MOVE)).booleanValue());
+		
+        // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+    } 
     
     /**
      * Test:
@@ -487,7 +534,8 @@ public class RuleServiceSystemTest extends TestCase
      *          action:     add-features(
      *                          aspect-name = versionable)
      */
-    public void testOutboundRuleType()
+	// TODO removed for technology preview release
+    public void xtestOutboundRuleType()
     {
         this.ruleService.makeActionable(this.nodeRef);
         
