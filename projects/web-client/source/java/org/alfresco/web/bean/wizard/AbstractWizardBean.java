@@ -251,13 +251,13 @@ public abstract class AbstractWizardBean
       
       StringBuilder buf = new StringBuilder(256);
       
-      buf.append("<table cellspacing=2 cellpadding=2 border=0 class='summary'>");
+      buf.append("<table cellspacing='4' cellpadding='2' border='0' class='summary'>");
       for (int i=0; i<labels.length; i++)
       {
          String value = values[i];
          if (value == null)
          {
-            value = "";
+            value = "&lt;not-set&gt;";
          }
          buf.append("<tr><td><b>");
          buf.append(labels[i]);

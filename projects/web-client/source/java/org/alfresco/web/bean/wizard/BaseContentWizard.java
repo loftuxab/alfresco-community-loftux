@@ -342,4 +342,19 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       
       return disabled;
    }
+   
+   /**
+    * Returns the display label for the content type currently chosen
+    * 
+    * @return The human readable version of the content type
+    */
+   protected String getSummaryContentType()
+   {
+      ServiceRegistry registry = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
+      MimetypeService mimetypeService = registry.getMimetypeService();
+         
+      // get the mime type display name
+      Map<String, String> mimeTypes = mimetypeService.getDisplaysByMimetype();
+      return mimeTypes.get(this.contentType);
+   }
 }

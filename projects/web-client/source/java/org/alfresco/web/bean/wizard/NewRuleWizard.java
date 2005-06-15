@@ -362,6 +362,7 @@ public class NewRuleWizard extends AbstractWizardBean
          case 6:
          {
             stepDesc = SUMMARY_DESCRIPTION;
+            break;
          }
          default:
          {
@@ -499,9 +500,15 @@ public class NewRuleWizard extends AbstractWizardBean
     */
    public String getSummary()
    {
+      String summaryCondition = this.ruleService.getConditionDefintion(
+            this.condition).getTitle();
+      
+      String summaryAction = this.ruleService.getActionDefinition(
+            this.action).getTitle();
+      
       return buildSummary(
             new String[] {"Name", "Description", "Condition", "Action"},
-            new String[] {this.title, this.description, this.condition, this.action});
+            new String[] {this.title, this.description, summaryCondition, summaryAction});
    }
    
    /**

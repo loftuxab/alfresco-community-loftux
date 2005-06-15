@@ -213,7 +213,7 @@ public class AddContentWizard extends BaseContentWizard
    {
       return buildSummary(
             new String[] {"File Name", "Content Type", "Title", "Description", "Author"},
-            new String[] {this.fileName, this.contentType, this.title, this.description, this.author});
+            new String[] {this.fileName, getSummaryContentType(), this.title, this.description, this.author});
    }
    
    /**

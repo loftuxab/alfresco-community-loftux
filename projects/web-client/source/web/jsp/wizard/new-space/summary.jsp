@@ -103,7 +103,6 @@
                                  <tr>
                                     <td class="mainSubText"><h:outputText value="#{NewSpaceWizard.stepDescription}" /></td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td><h:outputText value="#{NewSpaceWizard.summary}" escape="false"/></td>
                                  </tr>

@@ -388,9 +388,26 @@ public class NewSpaceWizard extends AbstractWizardBean
     */
    public String getSummary()
    {
+      String summaryCreateType = null;
+      
+      if (this.createFrom.equals("scratch"))
+      {
+         summaryCreateType = "Scratch";
+      }
+      else if (this.createFrom.equals("existing"))
+      {
+         summaryCreateType = "An existing space";
+      }
+      else if (this.createFrom.equals("template"))
+      {
+         summaryCreateType = "A template";
+      }
+      
+      String summarySaveAsTemplate = this.saveAsTemplate ? "Yes" : "No";
+      
       return buildSummary(
-            new String[] {"Name: ", "Description", "Create Type", "Space Type", "Icon", "Save As Template", "Template Name"},
-            new String[] {this.name, this.description, this.createFrom, this.spaceType, this.icon, Boolean.toString(this.saveAsTemplate), this.templateName});
+            new String[] {"Name", "Description", "Creating From", "Save As Template", "Template Name"},
+            new String[] {this.name, this.description, summaryCreateType, summarySaveAsTemplate, this.templateName});
    }
    
    /**

@@ -104,7 +104,6 @@
                                  <tr>
                                     <td class="mainSubText"><h:outputText value="#{NewRuleWizard.stepDescription}" /></td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td><h:outputText value="#{NewRuleWizard.summary}" escape="false"/></td>
                                  </tr>

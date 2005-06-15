@@ -102,7 +102,6 @@
                                  <tr>
                                     <td class="mainSubText"><h:outputText value="#{AddContentWizard.stepDescription}" /></td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td><h:outputText value="#{AddContentWizard.summary}" escape="false" /></td>
                                  </tr>

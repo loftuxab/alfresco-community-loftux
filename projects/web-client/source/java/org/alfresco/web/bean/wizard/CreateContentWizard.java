@@ -160,7 +160,7 @@ public class CreateContentWizard extends BaseContentWizard
       // TODO: show first few lines of content here?
       return buildSummary(
             new String[] {"File Name", "Content Type", "Title", "Description", "Author"},
-            new String[] {this.fileName, this.contentType, this.title, this.description, this.author});
+            new String[] {this.fileName, getSummaryContentType(), this.title, this.description, this.author});
    }
    
    /**

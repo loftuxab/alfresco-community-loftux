@@ -118,9 +118,9 @@
                                                              onclick="javascript:itemSelected(this);">
                                           <a:listItem value="container" label="Container" tooltip="Container"
                                                             image="/images/icons/space.gif" />
-                                          <a:listItem value="wiki" label="Wiki" tooltip="Wiki"
+                                          <a:listItem value="wiki" label="Wiki [TBD]" tooltip="Wiki"
                                                             image="/images/icons/wiki.gif" />
-                                          <a:listItem value="discussion" label="Discussion" tooltip="Discussion"
+                                          <a:listItem value="discussion" label="Discussion [TBD]" tooltip="Discussion"
                                                             image="/images/icons/discussion.gif" />
                                        </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
