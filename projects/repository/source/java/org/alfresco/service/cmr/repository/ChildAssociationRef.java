@@ -140,6 +140,7 @@ public class ChildAssociationRef implements EntityRef, Serializable
     /**
      * Compares:
      * <ul>
+     * <li>{@link #assocTypeQName}</li>
      * <li>{@link #parentRef}</li>
      * <li>{@link #childRef}</li>
      * <li>{@link #childQName}</li>
