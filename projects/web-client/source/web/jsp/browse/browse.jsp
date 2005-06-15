@@ -66,7 +66,7 @@
                                  <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
                                  <div class="mainSubText">There are currently 2 members of this space</div>
                               </td>
-                              <td bgcolor="#495F69" width=1></td>
+                              <td bgcolor="#465F7D" width=1></td>
                               <td width=110 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
@@ -74,11 +74,11 @@
                                  <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link2" >
                                     <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                  </a:actionLink>
-                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/file.gif" padding="4" action="addContent" actionListener="#{AddContentWizard.startWizard}" id="link3" />
-                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/arrow_expanded.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
-                                    <a:actionLink value="#{msg.create_content}" image="/images/icons/file.gif" id="link3_1" action="createContent" actionListener="#{CreateContentWizard.startWizard}" />
+                                 <a:actionLink value="#{msg.add_content}" image="/images/icons/add.gif" padding="4" action="addContent" actionListener="#{AddContentWizard.startWizard}" id="link3" />
+                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/more.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
+                                    <a:actionLink value="#{msg.create_content}" image="/images/icons/add.gif" id="link3_1" action="createContent" actionListener="#{CreateContentWizard.startWizard}" />
                                     <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" id="link4" />
-                                    <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" id="link5" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
+                                    <a:actionLink value="#{msg.change_details}" image="/images/icons/View_details.gif" id="link5" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param2" />
                                     </a:actionLink>
                                     <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" id="link6" actionListener="#{ClipboardBean.cutNode}">
@@ -114,7 +114,7 @@
                                  </div>
                                  <div class="mainSubText"><h:outputText value="#{msg.search_description}" id="msg13" /></div>
                               </td>
-                              <td bgcolor="#495F69" width=1></td>
+                              <td bgcolor="#465F7D" width=1></td>
                               <td width=110 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg14" /><br>
@@ -122,7 +122,7 @@
                               </td>
                            </a:panel>
                            
-                           <td bgcolor="#495F69" width=1></td>
+                           <td bgcolor="#465F7D" width=1></td>
                            <td width=110>
                               <%-- View mode settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
@@ -278,7 +278,7 @@
                            <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
-                           <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" showLink="false" styleClass="inlineAction" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
+                           <a:actionLink value="#{msg.change_details}" image="/images/icons/View_details.gif" showLink="false" styleClass="inlineAction" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                         </a:column>
@@ -398,7 +398,7 @@
                               <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.editFile}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
-                              <a:actionLink value="#{msg.update}" image="/images/icons/file.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
+                              <a:actionLink value="#{msg.update}" image="/images/icons/update.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                               <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.cutNode}">
@@ -419,8 +419,8 @@
                               </a:actionLink>
                            </a:booleanEvaluator>
                            <%-- More actions menu --%>
-                           <a:menu itemSpacing="4" image="/images/icons/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
-                              <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
+                           <a:menu itemSpacing="4" image="/images/icons/more.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                              <a:actionLink value="#{msg.change_details}" image="/images/icons/View_details.gif" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                               <a:booleanEvaluator value="#{r.locked == false && r.workingCopy == false}">

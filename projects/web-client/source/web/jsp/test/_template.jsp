@@ -60,12 +60,12 @@
                               <%-- Summary --%>
                               <%-- REPLACE ME: summary here --%>
                            </td>
-                           <td bgcolor="#495F69" width="1"></td>
+                           <td bgcolor="#465F7D" width="1"></td>
                            <td width="100" style="padding-left:2px">
                               <%-- Current object actions --%>
                               <%-- REPLACE ME: object actions --%>
                            </td>
-                           <td bgcolor="#495F69" width="1"></td>
+                           <td bgcolor="#465F7D" width="1"></td>
                            <td width="100">
                               <%-- Details View settings --%>
                               <%-- REPLACE ME: views --%>

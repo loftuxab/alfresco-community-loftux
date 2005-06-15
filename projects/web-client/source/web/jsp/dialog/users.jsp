@@ -60,13 +60,13 @@
                               <div class="mainTitle">Manage Users</div>
                               <div class="mainSubText"><h:outputText value="#{msg.manageusers_description}" /></div>
                            </td>
-                           <td bgcolor="#495F69" width=1></td>
+                           <td bgcolor="#465F7D" width=1></td>
                            <td width=110 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
                               <a:actionLink value="#{msg.create_user}" image="/images/icons/person.gif" padding="4" action="createUser" actionListener="#{NewUserWizard.startWizard}" />
                            </td>
-                           <td bgcolor="#495F69" width=1></td>
+                           <td bgcolor="#465F7D" width=1></td>
                            <td width=110 style="padding-left:2px">
                               <%-- View mode settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
