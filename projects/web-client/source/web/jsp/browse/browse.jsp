@@ -419,7 +419,7 @@
                               </a:actionLink>
                            </a:booleanEvaluator>
                            <%-- More actions menu --%>
-                           <a:menu id="actionsMenu2" itemSpacing="4" image="/images/icons/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
+                           <a:menu itemSpacing="4" image="/images/icons/arrow_expanded.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
                               <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
