@@ -130,7 +130,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             }
             
             // do we need to render ellipses to indicate more items than the maximum
-            if (control.getShowEllipses() == true && total > control.getMaxChildren())
+            if (control.getShowEllipses() == true && refs.size() > maximum)
             {
                out.write( separator );
                // TODO: is this the correct way to get the information we need?

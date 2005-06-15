@@ -151,13 +151,13 @@ public class UIClipboardShelfItem extends UIShelfItem
          out.write(Utils.cropEncode(item.Node.getName()));
          
          // output actions
-         out.write("</nobr></td><td align=right>");
+         out.write("</nobr></td><td align=right><nobr>");
          out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", IMAGE_REMOVE));
          out.write("&nbsp;");
          out.write(buildActionLink(ACTION_PASTE_ITEM, i, "Paste Item", IMAGE_PASTE));
          
-         // end row
-         out.write("</td></tr>");
+         // end actions cell and end row
+         out.write("</nobr></td></tr>");
       }
       
       // output general actions if any clipboard items are present

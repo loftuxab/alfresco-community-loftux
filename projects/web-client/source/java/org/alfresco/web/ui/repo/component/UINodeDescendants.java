@@ -71,7 +71,7 @@ public class UINodeDescendants extends UICommand
    // Strongly typed component property accessors
    
    /**
-    * @return the maximum number of child descendants to be displayed, default maximum is 4. 
+    * @return the maximum number of child descendants to be displayed, default maximum is 3. 
     */
    public int getMaxChildren()
    {
@@ -88,7 +88,7 @@ public class UINodeDescendants extends UICommand
       else
       {
          // return default
-         return 4;
+         return 3;
       }
    }
    
