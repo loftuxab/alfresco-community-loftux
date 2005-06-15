@@ -1,10 +1,13 @@
 /*
  * Created on 12-Apr-2005
  */
-package org.alfresco.repo.search.transaction;
+package org.alfresco.repo.transaction;
 
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory;
+import org.alfresco.repo.search.transaction.LuceneTransactionException;
+import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
@@ -27,11 +30,21 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
  * @author andyh
  * 
  */
-public class LuceneTransactionManager extends HibernateTransactionManager
+public class AlfrescoTransactionManager extends HibernateTransactionManager
 {
     private LuceneIndexerAndSearcherFactory luceneIndexerAndSearcherFactory;
+	
+	/**
+	 * The service registry
+	 */
+	private ServiceRegistry serviceRegistry;
+	
+	/**
+	 * The rule service
+	 */
+	private RuleService ruleService;
 
-    public LuceneTransactionManager()
+    public AlfrescoTransactionManager()
     {
         super();
     }
@@ -40,11 +53,26 @@ public class LuceneTransactionManager extends HibernateTransactionManager
     {
         this.luceneIndexerAndSearcherFactory = luceneIndexerAndSearcherFactory;
     }
+	
+	public void setServiceRegistry(ServiceRegistry serviceRegistry) 
+	{
+		this.serviceRegistry = serviceRegistry;
+	}
 
     protected void doCommit(DefaultTransactionStatus status) throws TransactionException
     {
         try
         {
+			// Call any pending rules
+			if (this.ruleService == null)
+			{
+				this.ruleService = (RuleService)this.serviceRegistry.getService(ServiceRegistry.RULE_SERVICE);
+			}
+			if (this.ruleService != null)
+			{
+				this.ruleService.executePendingRules();
+			}
+			
             // TODO: The following call should mark for recovery - it does not
             luceneIndexerAndSearcherFactory.prepare();
         }

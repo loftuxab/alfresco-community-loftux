@@ -59,13 +59,16 @@
    
    <!-- create a transaction manager to handle the Hibernate sessions -->
    <bean id="transactionManager" 
-      class="org.alfresco.repo.search.transaction.LuceneTransactionManager">
+      class="org.alfresco.repo.transaction.AlfrescoTransactionManager">
       <property name="sessionFactory">
          <ref local="sessionFactory"/>
       </property>
       <property name="luceneIndexerAndSearchFactory">
          <ref bean="luceneIndexerAndSearcherFactory"/>
       </property>
+	  <property name="serviceRegistry">
+		 <ref bean="serviceRegistry"/>
+	  </property>
    </bean>
    
    <!-- factory for UserTransaction instances -->
@@ -823,7 +826,7 @@
             <ref local="fileContentStoreCleanerTrigger"/>
             <ref local="contentTransformerCacheResetTrigger"/>
          </list>
-      </property>
+       </property>
    </bean>
    
    <!--                -->

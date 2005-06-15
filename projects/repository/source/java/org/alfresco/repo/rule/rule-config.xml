@@ -45,11 +45,24 @@
 					This will apply a category to the matched content.	
 				</description>
 			</action-definition> -->
-			<action-definition name="copy">
+			<action-definition name="transform">
 				<title>Create a copy of content in a given format at a specific location</title>	
 				<description>
 					This will copy the matched content to another location with a
                     specific format.
+				</description>
+				<parameters>
+					<parameter name="mime-type" type="STRING" mandatory="true"/>
+					<parameter name="destination-folder" type="NODE_REF" mandatory="true"/>
+					<parameter name="assoc-type" type="QNAME" mandatory="true"/>
+					<parameter name="assoc-name" type="QNAME" mandatory="true"/>
+				</parameters>
+				<executor>org.alfresco.repo.rule.action.CopyActionExecutor</executor>
+			</action-definition> 
+			<action-definition name="copy">
+				<title>Create a copy of content at a specific location</title>	
+				<description>
+					This will copy the matched content to another location.
 				</description>
 				<parameters>
 					<parameter name="destination-folder" type="NODE_REF" mandatory='true'/>
@@ -93,6 +106,7 @@
 					This will check out the matched content.
 				</description>
 				<parameters>
+					<!-- by default the content will be checked out to the current location -->
 					<parameter name="destination-folder" type="NODE_REF" mandatory='false'/>
 					<parameter name="assoc-type" type="QNAME" mandatory='false'/>
 					<parameter name="assoc-name" type="QNAME" mandatory='false'/>

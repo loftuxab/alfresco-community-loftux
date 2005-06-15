@@ -278,5 +278,35 @@ public class RuleImpl implements Serializable, Rule
     {
         return this.ruleContentNodeRef;
     }    
+	
+	/**
+	 * Hash code
+	 */
+	@Override
+	public int hashCode() 
+	{
+		return this.id.hashCode();
+	}
+	
+	/**
+	 * Equals
+	 */
+	@Override
+	public boolean equals(Object obj) 
+	{
+		if (this == obj)
+        {
+            return true;
+        }
+        if (obj instanceof RuleImpl)
+        {
+			RuleImpl that = (RuleImpl) obj;
+            return (this.id.equals(that.id));
+        }
+        else
+        {
+            return false;
+        }
+	}
 }
 

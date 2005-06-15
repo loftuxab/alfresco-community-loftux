@@ -8,15 +8,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.UserTransaction;
+
+import junit.framework.TestCase;
+
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.repo.rule.action.CheckInActionExecutor;
 import org.alfresco.repo.rule.action.CheckOutActionExecutor;
 import org.alfresco.repo.rule.action.MoveActionExecutor;
+import org.alfresco.repo.rule.action.TransformActionExecutor;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -28,15 +37,19 @@ import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.NodeStoreInspector;
+import org.alfresco.util.transaction.UserTransactionFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StopWatch;
 
 /**
  * @author Roy Wetherall
  */
-public class RuleServiceSystemTest extends BaseSpringTest
+public class RuleServiceSystemTest extends TestCase
 {
+	static ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+	
     private RuleService ruleService;
     private NodeService nodeService;
     private StoreRef testStoreRef;
@@ -45,6 +58,8 @@ public class RuleServiceSystemTest extends BaseSpringTest
     private NodeRef configFolder;
     private CheckOutCheckInService cociService;
     private LockService lockService;
+	private ContentService contentService;
+	private ServiceRegistry serviceRegistry;
     
     /**
      * 
@@ -53,15 +68,20 @@ public class RuleServiceSystemTest extends BaseSpringTest
     {
         super();
     }
+	
+	
     
+    //protected void onSetUpInTransaction() throws Exception
     @Override
-    protected void onSetUpInTransaction() throws Exception
+    protected void setUp() throws Exception 
     {
         // Get the required services
-        this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
-        this.ruleService = (RuleService)this.applicationContext.getBean("ruleService");
-        this.cociService = (CheckOutCheckInService)this.applicationContext.getBean("versionOperationsService");
-        this.lockService = (LockService)this.applicationContext.getBean("lockService");
+		this.serviceRegistry = (ServiceRegistry)applicationContext.getBean("serviceRegistry");
+		this.nodeService = (NodeService)applicationContext.getBean("nodeService");
+        this.ruleService = (RuleService)applicationContext.getBean("ruleService");
+        this.cociService = (CheckOutCheckInService)applicationContext.getBean("versionOperationsService");
+        this.lockService = (LockService)applicationContext.getBean("lockService");
+		this.contentService = (ContentService)applicationContext.getBean("contentService");
         
         this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
@@ -106,6 +126,8 @@ public class RuleServiceSystemTest extends BaseSpringTest
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();        
         assertTrue(this.nodeService.hasAspect(newNodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));   
+		
+		//this.transactionManager.commit(this.transactionStatus);
 		
         // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }   
@@ -168,6 +190,81 @@ public class RuleServiceSystemTest extends BaseSpringTest
         assertEquals(newNodeRef, source);
         
         // TODO test deep copy !!
+    }
+	
+	/**
+     * Test:
+     *          rule type:  inbound
+     *          condition:  no-condition()
+     *          action:     transform()
+     */
+    public void testTransformAction()
+    {
+        this.ruleService.makeActionable(this.nodeRef);
+        
+        RuleType ruleType = this.ruleService.getRuleType("inbound");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleActionDefinition action = this.ruleService.getActionDefinition(TransformActionExecutor.NAME);
+        
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+		params.put(TransformActionExecutor.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_HTML);
+        params.put(TransformActionExecutor.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
+        params.put(TransformActionExecutor.PARAM_ASSOC_TYPE_QNAME, DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN);
+        params.put(TransformActionExecutor.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+        
+        Rule rule = this.ruleService.createRule(ruleType);
+        rule.addRuleCondition(cond, null);
+        rule.addRuleAction(action, params);
+        
+        this.ruleService.addRule(this.nodeRef, rule);
+
+        Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
+        props.put(DictionaryBootstrap.PROP_QNAME_NAME, "bobbins.txt");
+		props.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+		props.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        
+		// Create the node at the root
+        NodeRef newNodeRef = this.nodeService.createNode(
+                this.rootNodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
+                DictionaryBootstrap.TYPE_QNAME_CONTENT,
+                props).getChildRef(); 
+		
+		// Set some content on the origional
+		ContentWriter contentWriter = this.contentService.getUpdatingWriter(newNodeRef);
+		contentWriter.putContent("This is some test content to be transformed from text into HTML.");
+		
+		// Move the node into the actionable node (this should fire the transformation rule
+		this.nodeService.moveNode(
+				newNodeRef, 
+				this.nodeRef, 
+				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"));
+        
+        System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+        
+        // Check that the created node is still there
+        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
+                this.nodeRef, 
+                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"));
+        assertNotNull(origRefs);
+        assertEquals(1, origRefs.size());
+        NodeRef origNodeRef = origRefs.get(0).getChildRef();
+        assertEquals(newNodeRef, origNodeRef);
+
+        // Check that the created node has been copied
+        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
+                                                    this.rootNodeRef, 
+                                                    QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+        assertNotNull(copyChildAssocRefs);
+        assertEquals(1, copyChildAssocRefs.size());
+        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
+        assertTrue(this.nodeService.hasAspect(copyNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM));
+        NodeRef source = (NodeRef)this.nodeService.getProperty(copyNodeRef, DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE);
+        assertEquals(newNodeRef, source);
+        
+        // Check the transoformed content ..
     }
 	
     /**
@@ -233,9 +330,6 @@ public class RuleServiceSystemTest extends BaseSpringTest
         RuleType ruleType = this.ruleService.getRuleType("inbound");
         RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
         RuleActionDefinition action = this.ruleService.getActionDefinition(CheckOutActionExecutor.NAME);
-        
-        //Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        //params.put(CheckInActionExecutor.PARAM_DESCRIPTION, "The version description.");
         
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, null);
@@ -436,50 +530,77 @@ public class RuleServiceSystemTest extends BaseSpringTest
      * Performance guideline test
      *
      */
-    public void testPerformanceOfRuleExecution()
+    public void vtestPerformanceOfRuleExecution()
     {
-        StopWatch sw = new StopWatch();
-        
-        // Create actionable nodes
-        sw.start("create nodes with no rule executed");
-        for (int i = 0; i < 100; i++)
-        {
-            this.nodeService.createNode(
-                    this.nodeRef,
-                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-                    DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef(); 
-            assertFalse(this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));
-        }
-        sw.stop();
-        
-        this.ruleService.makeActionable(this.nodeRef);
-        
-        RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
-        
-        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put("aspect-name", DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);        
-        
-        Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
-        
-        this.ruleService.addRule(this.nodeRef, rule);
-        
-        sw.start("create nodes with one rule run (apply versionable aspect)");
-        for (int i = 0; i < 100; i++)
-        {
-            NodeRef nodeRef = this.nodeService.createNode(
-                    this.nodeRef,
-					QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-					QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                    DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-            assertTrue(this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));
-        }
-        sw.stop();
-        
-        System.out.println(sw.prettyPrint());
+		try
+		{
+	        StopWatch sw = new StopWatch();
+	        
+	        // Create actionable nodes
+	        sw.start("create nodes with no rule executed");		
+			UserTransaction userTransaction1 = this.serviceRegistry.getUserTransaction();
+			userTransaction1.begin();
+			
+			for (int i = 0; i < 100; i++)
+	        {
+	            this.nodeService.createNode(
+	                    this.nodeRef,
+	                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+	                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+	                    DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef(); 
+	            assertFalse(this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));
+	        }
+				
+			userTransaction1.commit();
+	        sw.stop();
+	        
+	        this.ruleService.makeActionable(this.nodeRef);
+	        
+	        RuleType ruleType = this.ruleService.getRuleType("inbound");
+	        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+	        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
+	        
+	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+	        params.put("aspect-name", DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);        
+	        
+	        Rule rule = this.ruleService.createRule(ruleType);
+	        rule.addRuleCondition(cond, null);
+	        rule.addRuleAction(action, params);
+	        
+	        this.ruleService.addRule(this.nodeRef, rule);
+	        
+	        sw.start("create nodes with one rule run (apply versionable aspect)");
+			UserTransaction userTransaction2 = this.serviceRegistry.getUserTransaction();
+			userTransaction2.begin();
+			
+			NodeRef[] nodeRefs = new NodeRef[100];
+	        for (int i = 0; i < 100; i++)
+	        {
+	            NodeRef nodeRef = this.nodeService.createNode(
+	                    this.nodeRef,
+						QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+						QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+	                    DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+				nodeRefs[i] = nodeRef;
+				
+				// Check that the versionable aspect has not yet been applied
+				assertFalse(this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));
+	        }
+			
+			userTransaction2.commit();
+	        sw.stop();
+			
+			// Check that the versionable aspect has been applied to all the created nodes
+			for (NodeRef ref : nodeRefs) 
+			{
+				assertTrue(this.nodeService.hasAspect(ref, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE));
+			}
+	        
+	        System.out.println(sw.prettyPrint());
+		}
+		catch (Exception exception)
+		{
+			throw new RuntimeException(exception);
+		}
     }
 }

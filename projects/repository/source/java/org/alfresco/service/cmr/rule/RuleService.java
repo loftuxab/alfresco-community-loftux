@@ -173,4 +173,8 @@ public interface RuleService
 	 */
 	public void removeRule(NodeRef nodeRef, Rule rule);	
 	
+	public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule);
+	
+	public void executePendingRules();
+	
 }

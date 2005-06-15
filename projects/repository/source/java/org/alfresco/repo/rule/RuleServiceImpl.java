@@ -5,7 +5,9 @@ package org.alfresco.repo.rule;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
@@ -17,7 +19,9 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
+import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
@@ -76,6 +80,17 @@ public class RuleServiceImpl implements RuleService
      * List of rule type adapters
      */
     private List<RuleTypeAdapter> adapters;
+	
+	/**
+	 * Thread local set containing all the pending rules to be executed when the transaction ends
+	 */
+	private ThreadLocal<Set<PendingRuleData>> threadLocalPendingData = new ThreadLocal<Set<PendingRuleData>>();
+	
+	/**
+	 * Thread local set to the currently executing rule (this should prevent and execution loops)
+	 */
+	// TODO whta about more complex scenarios when loop can be created?
+	private ThreadLocal<Rule> threadLocalCurrenltyExecutingRule = new ThreadLocal<Rule>();
     
     /**
      * Service intialization method
@@ -379,5 +394,222 @@ public class RuleServiceImpl implements RuleService
     {
         // Remove the rule from the rule store
         this.ruleStore.remove(nodeRef, (RuleImpl)rule);
-    }     
+    }	
+	
+	/**
+	 * @see org.alfresco.repo.rule.RuleService#addRulePendingExecution(NodeRef, NodeRef, Rule)
+	 */
+	public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
+	{
+		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule);
+		Rule currentlyExecutingRule = this.threadLocalCurrenltyExecutingRule.get();
+		
+		if (currentlyExecutingRule == null || currentlyExecutingRule.equals(rule) == false)
+		{
+			Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
+			if (pendingRules == null)
+			{
+				pendingRules = new HashSet<PendingRuleData>();					
+			}
+			
+			pendingRules.add(pendingRuleData);		
+			this.threadLocalPendingData.set(pendingRules);
+		}
+	}
+
+	/**
+	 * @see org.alfresco.repo.rule.RuleService#executePendingRules()
+	 */
+	public void executePendingRules() 
+	{
+		Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
+		if (pendingRules != null)
+		{
+			PendingRuleData[] pendingRulesArr = pendingRules.toArray(new PendingRuleData[0]);
+			this.threadLocalPendingData.remove();
+			for (PendingRuleData pendingRule : pendingRulesArr) 
+			{
+				threadLocalCurrenltyExecutingRule.set(pendingRule.getRule());
+				try
+				{
+					executePendingRule(pendingRule);
+				}
+				finally
+				{
+					threadLocalCurrenltyExecutingRule.remove();
+				}
+			}
+			
+			// Run any rules that have been marked as pending during execution
+			executePendingRules();
+		}		
+	}     
+	
+	/**
+	 * Executes a pending rule
+	 * 
+	 * @param pendingRule	the pending rule data object
+	 */
+	private void executePendingRule(PendingRuleData pendingRule) 
+	{
+		NodeRef actionableNodeRef = pendingRule.getActionableNodeRef();
+		NodeRef actionedUponNodeRef = pendingRule.getActionedUponNodeRef();
+		Rule rule = pendingRule.getRule();
+		
+		// Get the rule conditions
+		List<RuleCondition> conds = rule.getRuleConditions();				
+		if (conds.size() == 0)
+		{
+			throw new RuleServiceException("No rule conditions have been specified for the rule.");
+		}
+		else if (conds.size() > 1)
+		{
+			// TODO at the moment we only support one rule condition
+			throw new RuleServiceException("Currently only one rule condition can be specified per rule.");
+		}
+		
+		// Get the single rule condition
+		RuleCondition cond = conds.get(0);
+	    RuleConditionEvaluator evaluator = getConditionEvaluator(cond);
+	      
+	    // Get the rule acitons
+	    List<RuleAction> actions = rule.getRuleActions();
+		if (actions.size() == 0)
+		{
+			throw new RuleServiceException("No rule actions have been specified for the rule.");
+		}
+		else if (actions.size() > 1)
+		{
+			// TODO at the moment we only support one rule action
+			throw new RuleServiceException("Currently only one rule action can be specified per rule.");
+		}
+			
+		// Get the single action
+	    RuleAction action = actions.get(0);
+	    RuleActionExecuter executor = getActionExecutor(action);
+	      
+		// Evaluate the condition
+	    if (evaluator.evaluate(actionableNodeRef, actionedUponNodeRef) == true)
+	    {
+			// Execute the rule
+	        executor.execute(actionableNodeRef, actionedUponNodeRef);
+	    }
+	}
+	
+	/**
+     * Get the action executor instance.
+     * 
+     * @param action	the action
+     * @return			the action executor
+     */
+    private RuleActionExecuter getActionExecutor(RuleAction action)
+    {
+        RuleActionExecuter executor = null;
+        String executorString = ((RuleActionDefinitionImpl)action.getRuleActionDefinition()).getRuleActionExecutor();
+        
+        try
+        {
+            // Create the action executor
+            executor = (RuleActionExecuter)Class.forName(executorString).
+                    getConstructor(new Class[]{RuleAction.class, ServiceRegistry.class}).
+                    newInstance(new Object[]{action, this.serviceRegistry});
+        }
+        catch(Exception exception)
+        {
+            // Error creating and initialising
+            throw new RuleServiceException("Unable to initialise the rule action executor.", exception);
+        }
+        
+        return executor;
+    }
+
+	/**
+	 * Get the condition evaluator.
+	 * 
+	 * @param cond	the rule condition
+	 * @return		the rule condition evaluator
+	 */
+    private RuleConditionEvaluator getConditionEvaluator(RuleCondition cond)
+    {
+        RuleConditionEvaluator evaluator = null;
+        String evaluatorString = ((RuleConditionDefinitionImpl)cond.getRuleConditionDefinition()).getConditionEvaluator();
+        
+        try
+        {
+            // Create the condition evaluator
+            evaluator = (RuleConditionEvaluator)Class.forName(evaluatorString).
+                    getConstructor(new Class[]{RuleCondition.class, ServiceRegistry.class}).
+                    newInstance(new Object[]{cond, this.serviceRegistry});
+        }
+        catch(Exception exception)
+        {
+            // Error creating and initialising 
+            throw new RuleServiceException("Unable to initialise the rule condition evaluator.", exception);
+        }
+        
+        return evaluator;
+    }
+
+	/**
+	 * Helper class to contain the information about a rule that is pending execution
+	 * 
+	 * @author Roy Wetherall
+	 */
+	private class PendingRuleData
+	{
+		private NodeRef actionableNodeRef;
+		private NodeRef actionedUponNodeRef;
+		private Rule rule;
+		
+		public PendingRuleData(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
+		{
+			this.actionableNodeRef = actionableNodeRef;
+			this.actionedUponNodeRef = actionedUponNodeRef;
+			this.rule = rule;
+		}
+		
+		public NodeRef getActionableNodeRef() 
+		{
+			return actionableNodeRef;
+		}
+		
+		public NodeRef getActionedUponNodeRef() 
+		{
+			return actionedUponNodeRef;
+		}
+		
+		public Rule getRule() 
+		{
+			return rule;
+		}
+		
+		@Override
+		public int hashCode() 
+		{
+			int i = actionableNodeRef.hashCode();
+			i = (i*37) + actionedUponNodeRef.hashCode();
+			i = (i*37) + rule.hashCode();
+			return i;
+		}
+		
+		@Override
+		public boolean equals(Object obj) 
+		{
+			if (this == obj)
+	        {
+	            return true;
+	        }
+	        if (obj instanceof PendingRuleData)
+	        {
+				PendingRuleData that = (PendingRuleData) obj;
+	            return (this.actionableNodeRef.equals(that.actionableNodeRef) &&
+	                    this.actionedUponNodeRef.equals(that.actionedUponNodeRef) &&
+	                    this.rule.equals(that.rule));
+	        }
+	        else
+	        {
+	            return false;
+	        }
+		}
+	}
 }
