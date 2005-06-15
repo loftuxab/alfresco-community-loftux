@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -228,7 +228,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         List<QName> list = new ArrayList<QName>();
         for (QName aspect : dictionaryService.getAllAspects())
         {
-            if (dictionaryService.isSubClass(aspect, DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE))
+            if (dictionaryService.isSubClass(aspect, ContentModel.ASPECT_CLASSIFIABLE))
             {
                 list.add(aspect);
             }

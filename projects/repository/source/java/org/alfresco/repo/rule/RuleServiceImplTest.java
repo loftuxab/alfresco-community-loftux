@@ -5,7 +5,7 @@ package org.alfresco.repo.rule;
 
 import java.util.List;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -114,18 +114,18 @@ public class RuleServiceImplTest extends RuleBaseTest
     public void testMakeActionable()
     {
         this.ruleService.makeActionable(this.nodeRef);
-        assertTrue(this.nodeService.hasAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE));
+        assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_ACTIONABLE));
         
         List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
                                                nodeRef, 
-                                               DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
+                                               ContentModel.ASSOC_CONFIGURATIONS);
         assertEquals(1, nodeAssocRefs.size());
 		
 		assertNotNull(this.nodeService.createNode(
 							this.rootNodeRef,
-							DictionaryBootstrap.ASSOC_QNAME_CHILDREN,
+							ContentModel.ASSOC_CHILDREN,
 							QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"),
-							DictionaryBootstrap.TYPE_QNAME_SYTEM_FOLDER));
+							ContentModel.TYPE_SYTEM_FOLDER));
     }
     
     /**

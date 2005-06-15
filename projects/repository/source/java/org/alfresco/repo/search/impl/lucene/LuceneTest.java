@@ -13,7 +13,7 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Aspect;
 import org.alfresco.repo.dictionary.impl.M2Model;
@@ -51,7 +51,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class LuceneTest extends TestCase
 {
-    public static final QName ASSOC_TYPE_QNAME = DictionaryBootstrap.ASSOC_QNAME_CONTAINS;
+    public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CONTAINS;
 
     static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 
@@ -115,13 +115,13 @@ public class LuceneTest extends TestCase
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
 
-        n1 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}one"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n1 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}one"), ContentModel.TYPE_CONTAINER).getChildRef();
         nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "ValueOne");
-        n2 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}two"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n2 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}two"), ContentModel.TYPE_CONTAINER).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "valueone");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "valuetwo");
 
-        n3 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}three"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n3 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}three"), ContentModel.TYPE_CONTAINER).getChildRef();
 
         ObjectOutputStream oos;
         try
@@ -170,23 +170,23 @@ public class LuceneTest extends TestCase
         nodeService.getProperties(n3);
         nodeService.getProperties(n4);
 
-        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), ContentModel.TYPE_CONTAINER).getChildRef();
        
 
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-        properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
+        properties.put(ContentModel.PROP_MIME_TYPE, "text/plain");
         // properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE,
         // "application/msword");
-        properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
-        n14 = nodeService.createNode(n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_QNAME_CONTENT, properties).getChildRef();
+        properties.put(ContentModel.PROP_ENCODING, "UTF-16");
+        n14 = nodeService.createNode(n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}fourteen"), ContentModel.TYPE_CONTENT, properties).getChildRef();
         //nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
 
         ContentWriter writer = contentService.getUpdatingWriter(n14);
@@ -1901,7 +1901,7 @@ public class LuceneTest extends TestCase
             }
 
             QName qname = QName.createQName("{namespace}a_" + i);
-            NodeRef ref = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, qname, DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+            NodeRef ref = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, qname, ContentModel.TYPE_CONTAINER).getChildRef();
             indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, qname, ref));
 
         }

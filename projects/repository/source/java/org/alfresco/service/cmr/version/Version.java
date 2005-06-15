@@ -26,16 +26,7 @@ public interface Version extends Serializable
     /**
      * Names of the system version properties
      */
-    public static final String PROP_VERSION_LABEL = "versionLabel";
-    public static final String PROP_CREATED_DATE = "createdDate";
-    public static final String PROP_VERSION_TYPE = "versionType";
     public static final String PROP_DESCRIPTION = "description";
-    public static final String PROP_VERSION_NUMBER = "versionNumber";
-    public static final String PROP_FROZEN_NODE_ID = "frozenNodeId";
-    public static final String PROP_FROZEN_NODE_TYPE = "frozenNodeType";
-    public static final String PROP_FROZEN_NODE_STORE_PROTOCOL = "frozenNodeStoreProtocol";
-    public static final String PROP_FROZEN_NODE_STORE_ID = "frozenNodeStoreId";
-    public static final String PROP_FROZEN_ASPECTS = "frozenAspects";
     
     /**
      * Helper method to get the created date from the version property data.

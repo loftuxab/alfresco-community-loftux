@@ -31,6 +31,16 @@ public interface VersionStoreConst
     public static final String STORE_ID = "lightWeightVersionStore";
    
 	
+    public static final String PROP_VERSION_LABEL = "versionLabel";
+    public static final String PROP_CREATED_DATE = "createdDate";
+    public static final String PROP_VERSION_TYPE = "versionType";
+    public static final String PROP_VERSION_NUMBER = "versionNumber";
+    public static final String PROP_FROZEN_NODE_ID = "frozenNodeId";
+    public static final String PROP_FROZEN_NODE_TYPE = "frozenNodeType";
+    public static final String PROP_FROZEN_NODE_STORE_PROTOCOL = "frozenNodeStoreProtocol";
+    public static final String PROP_FROZEN_NODE_STORE_ID = "frozenNodeStoreId";
+    public static final String PROP_FROZEN_ASPECTS = "frozenAspects";
+    
     /**
      * Version history type
      */
@@ -53,14 +63,14 @@ public interface VersionStoreConst
     /**
      * Version type properties and associations
      */
-    public static final QName PROP_QNAME_VERSION_LABEL = QName.createQName(NAMESPACE_URI, Version.PROP_VERSION_LABEL);
-    public static final QName PROP_QNAME_VERSION_NUMBER = QName.createQName(NAMESPACE_URI, Version.PROP_VERSION_NUMBER);
-    public static final QName PROP_QNAME_VERSION_CREATED_DATE = QName.createQName(NAMESPACE_URI, Version.PROP_CREATED_DATE);
-    public static final QName PROP_QNAME_FROZEN_NODE_ID = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_NODE_ID);
-    public static final QName PROP_QNAME_FROZEN_NODE_TYPE = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_NODE_TYPE);
-    public static final QName PROP_QNAME_FROZEN_NODE_STORE_PROTOCOL = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_NODE_STORE_PROTOCOL);
-    public static final QName PROP_QNAME_FROZEN_NODE_STORE_ID = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_NODE_STORE_ID);
-    public static final QName PROP_QNAME_FROZEN_ASPECTS = QName.createQName(NAMESPACE_URI, Version.PROP_FROZEN_ASPECTS);
+    public static final QName PROP_QNAME_VERSION_LABEL = QName.createQName(NAMESPACE_URI, PROP_VERSION_LABEL);
+    public static final QName PROP_QNAME_VERSION_NUMBER = QName.createQName(NAMESPACE_URI, PROP_VERSION_NUMBER);
+    public static final QName PROP_QNAME_VERSION_CREATED_DATE = QName.createQName(NAMESPACE_URI, PROP_CREATED_DATE);
+    public static final QName PROP_QNAME_FROZEN_NODE_ID = QName.createQName(NAMESPACE_URI, PROP_FROZEN_NODE_ID);
+    public static final QName PROP_QNAME_FROZEN_NODE_TYPE = QName.createQName(NAMESPACE_URI, PROP_FROZEN_NODE_TYPE);
+    public static final QName PROP_QNAME_FROZEN_NODE_STORE_PROTOCOL = QName.createQName(NAMESPACE_URI, PROP_FROZEN_NODE_STORE_PROTOCOL);
+    public static final QName PROP_QNAME_FROZEN_NODE_STORE_ID = QName.createQName(NAMESPACE_URI, PROP_FROZEN_NODE_STORE_ID);
+    public static final QName PROP_QNAME_FROZEN_ASPECTS = QName.createQName(NAMESPACE_URI, PROP_FROZEN_ASPECTS);
     public static final QName ASSOC_SUCCESSOR = QName.createQName(NAMESPACE_URI, "successor");    
     
     /**

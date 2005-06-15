@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import org.alfresco.repo.version.lightweight.VersionStoreConst;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter.Converter;
@@ -73,7 +74,7 @@ public class VersionImpl implements Version
      */
     public Date getCreatedDate()
     {
-        return (Date)this.versionProperties.get(PROP_CREATED_DATE);
+        return (Date)this.versionProperties.get(VersionStoreConst.PROP_CREATED_DATE);
     }
 
     /**
@@ -83,7 +84,7 @@ public class VersionImpl implements Version
      */
     public String getVersionLabel()
     {
-        return (String)this.versionProperties.get(PROP_VERSION_LABEL);
+        return (String)this.versionProperties.get(VersionStoreConst.PROP_VERSION_LABEL);
     }    
     
     /**
@@ -93,7 +94,7 @@ public class VersionImpl implements Version
      */
     public VersionType getVersionType()
     {
-        return (VersionType)this.versionProperties.get(PROP_VERSION_TYPE);
+        return (VersionType)this.versionProperties.get(VersionStoreConst.PROP_VERSION_TYPE);
     }
     
     /**

@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSessionListener;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -120,22 +120,22 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             String qname = Repository.createValidQName(companySpaceName);
             ChildAssociationRef assocRef = nodeService.createNode(
                   nodeService.getRootNode(Repository.getStoreRef(servletContext)),
-                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                  ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname),
-                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
+                  ContentModel.TYPE_FOLDER);
             
             NodeRef companyNodeRef = assocRef.getChildRef();
             companySpaceId = companyNodeRef.getId();
 
             // set the name property on the node
-            nodeService.setProperty(companyNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, companySpaceName);
+            nodeService.setProperty(companyNodeRef, ContentModel.PROP_NAME, companySpaceName);
 
             // apply the uifacets aspect - icon, title and description props
             Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(3);
-            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-default");
-            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, companySpaceName);
-            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, companySpaceDescription);
-            nodeService.addAspect(companyNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+            uiFacetsProps.put(ContentModel.PROP_ICON, "space-icon-default");
+            uiFacetsProps.put(ContentModel.PROP_TITLE, companySpaceName);
+            uiFacetsProps.put(ContentModel.PROP_DESCRIPTION, companySpaceDescription);
+            nodeService.addAspect(companyNodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
             
             if (logger.isDebugEnabled())
                logger.debug("Created company root space with id: " + companySpaceId);
@@ -143,20 +143,20 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             // now create the glossary system folder under the company space
             qname = Repository.createValidQName(glossaryFolderName);
             assocRef = nodeService.createNode(companyNodeRef, 
-                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                  ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname),
-                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
+                  ContentModel.TYPE_FOLDER);
             
             NodeRef glossaryNodeRef = assocRef.getChildRef();
 
             // set the name property on the node
-            nodeService.setProperty(glossaryNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, glossaryFolderName);
+            nodeService.setProperty(glossaryNodeRef, ContentModel.PROP_NAME, glossaryFolderName);
 
             // apply the uifacets aspect - icon, title and description props
             uiFacetsProps = new HashMap<QName, Serializable>(2);
-            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
-            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, glossaryFolderName);
-            nodeService.addAspect(glossaryNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+            uiFacetsProps.put(ContentModel.PROP_ICON, "space-icon-spanner");
+            uiFacetsProps.put(ContentModel.PROP_TITLE, glossaryFolderName);
+            nodeService.addAspect(glossaryNodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
             
             if (logger.isDebugEnabled())
                logger.debug("Created 'Glossary' space");
@@ -164,20 +164,20 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             // now create the templates system folder under the glossary folder
             qname = Repository.createValidQName(templatesFolderName);
             assocRef = nodeService.createNode(glossaryNodeRef, 
-                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                  ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname),
-                  DictionaryBootstrap.TYPE_QNAME_FOLDER);
+                  ContentModel.TYPE_FOLDER);
             
             NodeRef templatesNodeRef = assocRef.getChildRef();
 
             // set the name property on the node
-            nodeService.setProperty(templatesNodeRef, DictionaryBootstrap.PROP_QNAME_NAME, templatesFolderName);
+            nodeService.setProperty(templatesNodeRef, ContentModel.PROP_NAME, templatesFolderName);
 
             // apply the uifacets aspect - icon, title and description props
             uiFacetsProps = new HashMap<QName, Serializable>(2);
-            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, "space-icon-spanner");
-            uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, templatesFolderName);
-            nodeService.addAspect(templatesNodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+            uiFacetsProps.put(ContentModel.PROP_ICON, "space-icon-spanner");
+            uiFacetsProps.put(ContentModel.PROP_TITLE, templatesFolderName);
+            nodeService.addAspect(templatesNodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
             
             if (logger.isDebugEnabled())
                logger.debug("Created 'Templates' space");

@@ -12,7 +12,7 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.config.ConfigSource;
 import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.xml.XMLConfigService;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -77,26 +77,26 @@ public class RuleBaseTest extends BaseSpringTest
         // Create the node used for tests
         this.nodeRef = this.nodeService.createNode(
                 rootNodeRef,
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+				ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{test}testnode"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+                ContentModel.TYPE_CONTAINER).getChildRef();
         
         // Create the config folder
         this.configFolder = this.nodeService.createNode(
                 rootNodeRef,
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+				ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{test}configfolder"),
-                DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
+                ContentModel.TYPE_CONFIGURATIONS).getChildRef();
     }
     
     protected void makeTestNodeActionable()
     {
         // Manually make the test node actionable
-        this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE, null);
+        this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_ACTIONABLE, null);
         this.nodeService.createAssociation(
                 this.nodeRef, 
                 configFolder, 
-                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
+                ContentModel.ASSOC_CONFIGURATIONS);
     }
     
     protected RuleImpl createTestRule(String id)

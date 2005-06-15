@@ -14,7 +14,7 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.action.CheckInActionExecutor;
 import org.alfresco.repo.rule.action.CheckOutActionExecutor;
 import org.alfresco.repo.rule.action.CopyActionExecutor;
@@ -137,7 +137,7 @@ public class NewRuleWizard extends AbstractWizardBean
                // add the type and name of the association to create when the copy
                // is performed
                actionParams.put(CopyActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
-                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS);
+                     ContentModel.ASSOC_CONTAINS);
                actionParams.put(CopyActionExecutor.PARAM_ASSOC_QNAME, 
                      QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
             }
@@ -151,7 +151,7 @@ public class NewRuleWizard extends AbstractWizardBean
                // add the type and name of the association to create when the move
                // is performed
                actionParams.put(MoveActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
-                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS);
+                     ContentModel.ASSOC_CONTAINS);
                actionParams.put(MoveActionExecutor.PARAM_ASSOC_QNAME, 
                      QName.createQName(NamespaceService.ALFRESCO_URI, "move"));
             }
@@ -173,7 +173,7 @@ public class NewRuleWizard extends AbstractWizardBean
                // add the type and name of the association to create when the 
                // check out is performed
                actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
-                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS);
+                     ContentModel.ASSOC_CONTAINS);
                actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_QNAME, 
                      QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"));
             }

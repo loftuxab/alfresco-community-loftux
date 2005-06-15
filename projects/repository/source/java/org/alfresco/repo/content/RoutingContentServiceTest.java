@@ -10,7 +10,7 @@ import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -60,13 +60,13 @@ public class RoutingContentServiceTest extends BaseSpringTest
         rootNodeRef = nodeService.getRootNode(storeRef);
         // create a basic node and add the content aspect
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(7);
-        properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-16");
+        properties.put(ContentModel.PROP_MIME_TYPE, "text/plain");
+        properties.put(ContentModel.PROP_ENCODING, "UTF-16");
         ChildAssociationRef assocRef = nodeService.createNode(
                 rootNodeRef,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                ContentModel.ASSOC_CONTAINS,
                 QName.createQName(TEST_NAMESPACE, GUID.generate()),
-                DictionaryBootstrap.TYPE_QNAME_CONTENT,
+                ContentModel.TYPE_CONTENT,
                 properties);
         contentNodeRef = assocRef.getChildRef();
     }
@@ -155,7 +155,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
     public void testUpdatingWrite() throws Exception
     {
         // check that the content URL property has not been set
-        String contentUrl = (String) nodeService.getProperty(contentNodeRef, DictionaryBootstrap.PROP_QNAME_CONTENT_URL); 
+        String contentUrl = (String) nodeService.getProperty(contentNodeRef, ContentModel.PROP_CONTENT_URL); 
         assertNull("Content URL should be null", contentUrl);
         
         // before the content is written, there should not be any reader available
@@ -186,12 +186,12 @@ public class RoutingContentServiceTest extends BaseSpringTest
         assertEquals("Content fetched doesn't match that written", SOME_CONTENT, contentCheck);
 
         // check that the content URL was set
-        contentUrl = (String) nodeService.getProperty(contentNodeRef, DictionaryBootstrap.PROP_QNAME_CONTENT_URL);
+        contentUrl = (String) nodeService.getProperty(contentNodeRef, ContentModel.PROP_CONTENT_URL);
         assertNotNull("Content URL not set", contentUrl);
         assertEquals("Mismatched URL between writer and node", writer.getContentUrl(), contentUrl);
         
         // check that the content length was set
-        Long contentLength = (Long) nodeService.getProperty(contentNodeRef, DictionaryBootstrap.PROP_QNAME_SIZE);
+        Long contentLength = (Long) nodeService.getProperty(contentNodeRef, ContentModel.PROP_SIZE);
         assertNotNull("Content size not set", contentLength);
         assertEquals("Reader content length and node content length different",
                 reader.getLength(), contentLength.longValue());

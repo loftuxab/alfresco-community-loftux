@@ -98,7 +98,7 @@ public class VersionServiceImplTest extends VersionStoreBaseTest
         for (Version version : versions)
         {
             // Get the frozen id from the version
-            String frozenNodeId = (String)version.getVersionProperty(Version.PROP_FROZEN_NODE_ID);
+            String frozenNodeId = (String)version.getVersionProperty(VersionStoreConst.PROP_FROZEN_NODE_ID);
             assertNotNull("Unable to retrieve the frozen node id from the created version.", frozenNodeId);
             
             // Get the origional node ref (based on the forzen node)

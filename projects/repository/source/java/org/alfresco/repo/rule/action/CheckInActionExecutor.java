@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -54,7 +54,7 @@ public class CheckInActionExecutor extends RuleActionExecutorAbstractBase
     public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
         // First ensure that the actionedUponNodeRef is a workingCopy
-        if (this.nodeService.hasAspect(actionedUponNodeRef, DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY) == true)
+        if (this.nodeService.hasAspect(actionedUponNodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
         {
             // Get the version description
             String description = (String)this.ruleAction.getParameterValue(PARAM_DESCRIPTION);

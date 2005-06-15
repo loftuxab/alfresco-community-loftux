@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.SearcherException;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -621,7 +621,7 @@ public class LeafScorer extends Scorer
         TypeDefinition current = dictionaryService.getType(classRef);
         while (current != null)
         {
-            if (current.getName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORY))
+            if (current.getName().equals(ContentModel.TYPE_CATEGORY))
             {
                 return true;
             }
@@ -643,7 +643,7 @@ public class LeafScorer extends Scorer
         AspectDefinition current = aspDef;
         while (current != null)
         {
-            if (current.getName().equals(DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE))
+            if (current.getName().equals(ContentModel.ASPECT_CLASSIFIABLE))
             {
                 return true;
             }

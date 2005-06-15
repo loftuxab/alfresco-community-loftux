@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -57,9 +57,9 @@ public class AuditableAspectTest extends BaseSpringTest
         // Create a folder
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{alf}testfolder"),
-                DictionaryBootstrap.TYPE_QNAME_FOLDER);
+                ContentModel.TYPE_FOLDER);
 
         // Assert auditable properties exist on folder
         assertAuditableProperties(childAssocRef.getChildRef());
@@ -72,21 +72,21 @@ public class AuditableAspectTest extends BaseSpringTest
     {
         // Create a person (which doesn't have auditable capability by default)
         Map<QName, Serializable> personProps = new HashMap<QName, Serializable>();
-        personProps.put(DictionaryBootstrap.PROP_QNAME_USERNAME, "test person");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_HOMEFOLDER, "test home folder");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_FIRSTNAME, "test first name");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_LASTNAME, "test last name");
+        personProps.put(ContentModel.PROP_USERNAME, "test person");
+        personProps.put(ContentModel.PROP_HOMEFOLDER, "test home folder");
+        personProps.put(ContentModel.PROP_FIRSTNAME, "test first name");
+        personProps.put(ContentModel.PROP_LASTNAME, "test last name");
         
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{alf}testperson"),
-                DictionaryBootstrap.TYPE_QNAME_PERSON,
+                ContentModel.TYPE_PERSON,
                 personProps);
 
         // Assert the person is not auditable
         Set<QName> aspects = nodeService.getAspects(childAssocRef.getChildRef());
-        assertFalse(aspects.contains(DictionaryBootstrap.ASPECT_QNAME_AUDITABLE));
+        assertFalse(aspects.contains(ContentModel.ASPECT_AUDITABLE));
         
         System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
@@ -96,30 +96,30 @@ public class AuditableAspectTest extends BaseSpringTest
     {
         // Create a person
         Map<QName, Serializable> personProps = new HashMap<QName, Serializable>();
-        personProps.put(DictionaryBootstrap.PROP_QNAME_USERNAME, "test person");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_HOMEFOLDER, "test home folder");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_FIRSTNAME, "test first name");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_LASTNAME, "test last name");
+        personProps.put(ContentModel.PROP_USERNAME, "test person");
+        personProps.put(ContentModel.PROP_HOMEFOLDER, "test home folder");
+        personProps.put(ContentModel.PROP_FIRSTNAME, "test first name");
+        personProps.put(ContentModel.PROP_LASTNAME, "test last name");
         
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{alf}testperson"),
-                DictionaryBootstrap.TYPE_QNAME_PERSON,
+                ContentModel.TYPE_PERSON,
                 personProps);
 
         // Assert the person is not auditable
         Set<QName> aspects = nodeService.getAspects(childAssocRef.getChildRef());
-        assertFalse(aspects.contains(DictionaryBootstrap.ASPECT_QNAME_AUDITABLE));
+        assertFalse(aspects.contains(ContentModel.ASPECT_AUDITABLE));
         
         // Add auditable capability
-        nodeService.addAspect(childAssocRef.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_AUDITABLE, null);
+        nodeService.addAspect(childAssocRef.getChildRef(), ContentModel.ASPECT_AUDITABLE, null);
 
-        nodeService.addAspect(childAssocRef.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_TITLED, null);
+        nodeService.addAspect(childAssocRef.getChildRef(), ContentModel.ASPECT_TITLED, null);
         
         // Assert the person is now audiable
         aspects = nodeService.getAspects(childAssocRef.getChildRef());
-        assertTrue(aspects.contains(DictionaryBootstrap.ASPECT_QNAME_AUDITABLE));
+        assertTrue(aspects.contains(ContentModel.ASPECT_AUDITABLE));
         
         // Assert the person's auditable property
         assertAuditableProperties(childAssocRef.getChildRef());
@@ -132,20 +132,20 @@ public class AuditableAspectTest extends BaseSpringTest
     {
         // Create a person (which doesn't have auditable capability by default)
         Map<QName, Serializable> personProps = new HashMap<QName, Serializable>();
-        personProps.put(DictionaryBootstrap.PROP_QNAME_USERNAME, "test person");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_HOMEFOLDER, "test home folder");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_FIRSTNAME, "test first name ");
-        personProps.put(DictionaryBootstrap.PROP_QNAME_LASTNAME, "test last name");
+        personProps.put(ContentModel.PROP_USERNAME, "test person");
+        personProps.put(ContentModel.PROP_HOMEFOLDER, "test home folder");
+        personProps.put(ContentModel.PROP_FIRSTNAME, "test first name ");
+        personProps.put(ContentModel.PROP_LASTNAME, "test last name");
         
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{alf}testperson"),
-                DictionaryBootstrap.TYPE_QNAME_PERSON,
+                ContentModel.TYPE_PERSON,
                 personProps);
 
         // Add auditable capability
-        nodeService.addAspect(childAssocRef.getChildRef(), DictionaryBootstrap.ASPECT_QNAME_TITLED, null);
+        nodeService.addAspect(childAssocRef.getChildRef(), ContentModel.ASPECT_TITLED, null);
 
         System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
@@ -154,8 +154,8 @@ public class AuditableAspectTest extends BaseSpringTest
     private void assertAuditableProperties(NodeRef nodeRef)
     {
         Map<QName, Serializable> props = nodeService.getProperties(nodeRef);
-        assertNotNull(props.get(DictionaryBootstrap.PROP_QNAME_CREATED));
-        assertNotNull(props.get(DictionaryBootstrap.PROP_QNAME_MODIFIED));
+        assertNotNull(props.get(ContentModel.PROP_CREATED));
+        assertNotNull(props.get(ContentModel.PROP_MODIFIED));
     }
     
 }

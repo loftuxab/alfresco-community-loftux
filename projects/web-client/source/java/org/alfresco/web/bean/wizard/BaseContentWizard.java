@@ -14,8 +14,8 @@ import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -75,11 +75,11 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             
             // update the modified timestamp and other content props
             Map<QName, Serializable> contentProps = this.nodeService.getProperties(nodeRef);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.title);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, this.contentType);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_CREATOR, this.author);
+            contentProps.put(ContentModel.PROP_NAME, this.fileName);
+            contentProps.put(ContentModel.PROP_TITLE, this.title);
+            contentProps.put(ContentModel.PROP_DESCRIPTION, this.description);
+            contentProps.put(ContentModel.PROP_MIME_TYPE, this.contentType);
+            contentProps.put(ContentModel.PROP_CREATOR, this.author);
             this.nodeService.setProperties(nodeRef, contentProps);
          }
          else
@@ -98,18 +98,18 @@ public abstract class BaseContentWizard extends AbstractWizardBean
 
             // create properties for content type
             Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(3, 1.0f);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_NAME, this.fileName);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, this.contentType);
-            contentProps.put(DictionaryBootstrap.PROP_QNAME_CREATOR, this.author);
+            contentProps.put(ContentModel.PROP_NAME, this.fileName);
+            contentProps.put(ContentModel.PROP_ENCODING, "UTF-8");
+            contentProps.put(ContentModel.PROP_MIME_TYPE, this.contentType);
+            contentProps.put(ContentModel.PROP_CREATOR, this.author);
             
             // create the node to represent the node
             String assocName = Repository.createValidQName(this.fileName);
             ChildAssociationRef assocRef = this.nodeService.createNode(
                   containerNodeRef,
-                  DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                  ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
-                  DictionaryBootstrap.TYPE_QNAME_CONTENT,
+                  ContentModel.TYPE_CONTENT,
                   contentProps);
             
             NodeRef fileNodeRef = assocRef.getChildRef();
@@ -119,9 +119,9 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             
             // apply the titled aspect - title and description
             Map<QName, Serializable> titledProps = new HashMap<QName, Serializable>(5);
-            titledProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.title);
-            titledProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
-            this.nodeService.addAspect(fileNodeRef, DictionaryBootstrap.ASPECT_QNAME_TITLED, titledProps);
+            titledProps.put(ContentModel.PROP_TITLE, this.title);
+            titledProps.put(ContentModel.PROP_DESCRIPTION, this.description);
+            this.nodeService.addAspect(fileNodeRef, ContentModel.ASPECT_TITLED, titledProps);
             
             if (logger.isDebugEnabled())
                logger.debug("Added titled aspect with properties: " + titledProps);

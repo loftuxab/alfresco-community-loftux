@@ -6,7 +6,7 @@ package org.alfresco.repo.lock.impl;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.lock.LockType;
@@ -64,37 +64,37 @@ public class LockServiceImplTest extends BaseSpringTest
         // Create node 
         this.parentNode = this.nodeService.createNode(
                 rootNodeRef, 
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+				ContentModel.ASSOC_CONTAINS, 
                 QName.createQName("{}ParentNode"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.parentNode, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.parentNode, ContentModel.ASPECT_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.parentNode);
         
         // Add some children to the node
         this.childNode1 = this.nodeService.createNode(
                 this.parentNode,
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+				ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{}ChildNode1"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.childNode1, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.childNode1, ContentModel.ASPECT_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.childNode1);
         this.childNode2 = this.nodeService.createNode(
                 this.parentNode,
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+				ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{}ChildNode2"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.childNode2, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.childNode2, ContentModel.ASPECT_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.childNode2);
         
         // Create a node with no lockAspect
         this.noAspectNode = this.nodeService.createNode(
                 rootNodeRef, 
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+				ContentModel.ASSOC_CONTAINS, 
                 QName.createQName("{}noAspectNode"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
         assertNotNull(this.noAspectNode);
     }
@@ -233,7 +233,7 @@ public class LockServiceImplTest extends BaseSpringTest
         assertEquals(LockStatus.NO_LOCK, lockStatus1);
         
         // Simulate the node being locked by user1
-        this.nodeService.setProperty(this.parentNode, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER, USER_REF1);
+        this.nodeService.setProperty(this.parentNode, ContentModel.PROP_LOCK_OWNER, USER_REF1);
         
         // Check for locked status
         LockStatus lockStatus2 = this.lockService.getLockStatus(this.parentNode, USER_REF2);

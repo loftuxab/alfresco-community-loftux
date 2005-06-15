@@ -12,7 +12,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.CopyService;
@@ -236,11 +236,11 @@ public class ClipboardBean
          
          // call the node ops service to initiate the copy
          // TODO: what should the assoc QName be?
-         boolean copyChildren = (item.Node.getType().equals(DictionaryBootstrap.TYPE_QNAME_FOLDER));
+         boolean copyChildren = (item.Node.getType().equals(ContentModel.TYPE_FOLDER));
          NodeRef copyRef = this.nodeOperationsService.copy(
                item.Node.getNodeRef(),
                parentRef,
-               DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+               ContentModel.ASSOC_CONTAINS,
                assocRef.getQName(),
                copyChildren);
       }
@@ -253,7 +253,7 @@ public class ClipboardBean
          this.nodeService.moveNode(
                item.Node.getNodeRef(),
                parentRef,
-               DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+               ContentModel.ASSOC_CONTAINS,
                assocRef.getQName());
       }
    }

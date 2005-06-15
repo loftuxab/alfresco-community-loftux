@@ -16,7 +16,7 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -332,7 +332,7 @@ public class CheckinCheckoutBean
          // the myfile part will be ignored by the servlet but gives the browser a hint
          String url = DownloadContentServlet.generateURL(ref, node.getName());
          node.getProperties().put("url", url);
-         node.getProperties().put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));            
+         node.getProperties().put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));            
          
          // remember the document
          setDocument(node);
@@ -405,7 +405,7 @@ public class CheckinCheckoutBean
             {
                workingCopyName = originalName + WORKING_COPY;
             }
-            this.nodeService.setProperty(workingCopyRef, DictionaryBootstrap.PROP_QNAME_NAME, workingCopyName);
+            this.nodeService.setProperty(workingCopyRef, ContentModel.PROP_NAME, workingCopyName);
             this.nodeService.setProperty(workingCopyRef, QNAME_ORIGINALNAME, originalName);
             
             // set the working copy Node instance
@@ -622,11 +622,11 @@ public class CheckinCheckoutBean
          try
          {
             // TODO: find the working copy for this document and cancel the checkout on it
-            if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY))
+            if (node.hasAspect(ContentModel.ASPECT_WORKING_COPY))
             {
                this.versionOperationsService.cancelCheckout(node.getNodeRef());
             }
-            else if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE))
+            else if (node.hasAspect(ContentModel.ASPECT_LOCKABLE))
             {
                // TODO: is this possible? as currently only the workingcopy aspect has the copyReference
                //       attribute - this means we cannot find out where the copy is to cancel it!
@@ -682,7 +682,7 @@ public class CheckinCheckoutBean
             
             // switch the name back to the original name before checkin
             // otherwise the working copy name will get set on the original doc!
-            this.nodeService.setProperty(node.getNodeRef(), DictionaryBootstrap.PROP_QNAME_NAME, origNameProp);
+            this.nodeService.setProperty(node.getNodeRef(), ContentModel.PROP_NAME, origNameProp);
             
             // we can either checkin the content from the current working copy node
             // which would have been previously updated by the user
@@ -718,7 +718,7 @@ public class CheckinCheckoutBean
             // restore working copy name after checkin copy opp
             if (this.keepCheckedOut == true)
             {
-               this.nodeService.setProperty(node.getNodeRef(), DictionaryBootstrap.PROP_QNAME_NAME, nameProp);
+               this.nodeService.setProperty(node.getNodeRef(), ContentModel.PROP_NAME, nameProp);
             }
             
             // commit the transaction

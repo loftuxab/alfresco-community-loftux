@@ -1,10 +1,10 @@
 package org.alfresco.repo.content;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.filestore.FileContentStore;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.content.transform.ContentTransformerRegistry;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -61,7 +61,7 @@ public class RoutingContentService implements ContentService
     {
         // ensure that the node exists and is of type content
         QName nodeType = nodeService.getType(nodeRef);
-        if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
+        if (!dictionaryService.isSubClass(nodeType, ContentModel.TYPE_CONTENT))
         {
             throw new InvalidTypeException("The node must be an instance of type content", nodeType);
         }
@@ -69,7 +69,7 @@ public class RoutingContentService implements ContentService
         // get the content URL
         Object contentUrlProperty = nodeService.getProperty(
                 nodeRef,
-                DictionaryBootstrap.PROP_QNAME_CONTENT_URL);
+                ContentModel.PROP_CONTENT_URL);
         String contentUrl = ValueConverter.convert(String.class, contentUrlProperty);
         // check that the URL is available
         if (contentUrl == null)
@@ -84,12 +84,12 @@ public class RoutingContentService implements ContentService
         // get the content mimetype
         String mimetype = (String) nodeService.getProperty(
                 nodeRef,
-                DictionaryBootstrap.PROP_QNAME_MIME_TYPE);
+                ContentModel.PROP_MIME_TYPE);
         reader.setMimetype(mimetype);
         // get the content encoding
         String encoding = (String) nodeService.getProperty(
                 nodeRef,
-                DictionaryBootstrap.PROP_QNAME_ENCODING);
+                ContentModel.PROP_ENCODING);
         reader.setEncoding(encoding);
         
         // we don't listen for anything
@@ -101,7 +101,7 @@ public class RoutingContentService implements ContentService
     {
         // ensure that the node exists and is of type content
         QName nodeType = nodeService.getType(nodeRef);
-        if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
+        if (!dictionaryService.isSubClass(nodeType, ContentModel.TYPE_CONTENT))
         {
             throw new InvalidTypeException("The node must be an instance of type content", nodeType);
         }
@@ -112,12 +112,12 @@ public class RoutingContentService implements ContentService
         // get the content mimetype
         String mimetype = (String) nodeService.getProperty(
                 nodeRef,
-                DictionaryBootstrap.PROP_QNAME_MIME_TYPE);
+                ContentModel.PROP_MIME_TYPE);
         writer.setMimetype(mimetype);
         // get the content encoding
         String encoding = (String) nodeService.getProperty(
                 nodeRef,
-                DictionaryBootstrap.PROP_QNAME_ENCODING);
+                ContentModel.PROP_ENCODING);
         writer.setEncoding(encoding);
         
         // give back to the client
@@ -133,7 +133,7 @@ public class RoutingContentService implements ContentService
     {
         // ensure that the node exists and is of type content
         QName nodeType = nodeService.getType(nodeRef);
-        if (!dictionaryService.isSubClass(nodeType, DictionaryBootstrap.TYPE_QNAME_CONTENT))
+        if (!dictionaryService.isSubClass(nodeType, ContentModel.TYPE_CONTENT))
         {
             throw new InvalidTypeException("The node must be an instance of type content", nodeType);
         }
@@ -217,14 +217,14 @@ public class RoutingContentService implements ContentService
             String contentUrl = writer.getContentUrl();
             nodeService.setProperty(
                     nodeRef,
-                    DictionaryBootstrap.PROP_QNAME_CONTENT_URL,
+                    ContentModel.PROP_CONTENT_URL,
                     contentUrl);
             // get the size of the document
             ContentReader reader = writer.getReader();
             long length = reader.getLength();
             nodeService.setProperty(
                     nodeRef,
-                    DictionaryBootstrap.PROP_QNAME_SIZE,
+                    ContentModel.PROP_SIZE,
                     new Long(length));
         }
     }

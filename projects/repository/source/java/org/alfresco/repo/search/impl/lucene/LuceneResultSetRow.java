@@ -10,7 +10,7 @@ package org.alfresco.repo.search.impl.lucene;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.AbstractResultSetRow;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -26,7 +26,7 @@ import org.apache.lucene.document.Document;
  */
 public class LuceneResultSetRow extends AbstractResultSetRow
 {
-    public static final QName ASSOC_TYPE_QNAME = DictionaryBootstrap.ASSOC_QNAME_CONTAINS;
+    public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CONTAINS;
     
     /**
      * The current document - cached so we do not get it for each value

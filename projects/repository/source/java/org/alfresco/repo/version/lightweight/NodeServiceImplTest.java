@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -200,12 +200,12 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         
         boolean test1 = this.lightWeightVersionStoreNodeService.hasAspect(
                 version.getNodeRef(), 
-                DictionaryBootstrap.ASPECT_QNAME_UIFACETS);
+                ContentModel.ASPECT_UIFACETS);
         assertFalse(test1);
         
         boolean test2 = this.lightWeightVersionStoreNodeService.hasAspect(
                 version.getNodeRef(),
-                DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);
+                ContentModel.ASPECT_VERSIONABLE);
         assertTrue(test2);
     }
 
@@ -243,7 +243,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
 					dummyNodeRef,
 					null,
 					dummyQName,
-                    DictionaryBootstrap.TYPE_QNAME_CONTENT);
+                    ContentModel.TYPE_CONTENT);
 			fail("This operation is not supported.");
 		}
 		catch (UnsupportedOperationException exception)

@@ -6,7 +6,7 @@ package org.alfresco.repo.rule.condition;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -58,7 +58,7 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 		String regEx = buildRegEx(matchText, operation);
 		
 		// Get the name value of the node
-		String name = (String)this.nodeService.getProperty(actionedUponNodeRef, DictionaryBootstrap.PROP_QNAME_NAME);
+		String name = (String)this.nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
 		
 		// Do the match
 		if (name != null)

@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -228,15 +228,15 @@ import org.alfresco.service.namespace.QName;
         {
             // Set the mime type and encoding
             Map<QName, Serializable> properties = new HashMap<QName, Serializable>(2);
-            properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/xml");
-            properties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+            properties.put(ContentModel.PROP_MIME_TYPE, "text/xml");
+            properties.put(ContentModel.PROP_ENCODING, "UTF-8");
             
             // Create the rule content node
             ruleContent = this.nodeService.createNode(
                     configFolder, 
-					DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
-                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
-                    DictionaryBootstrap.TYPE_QNAME_RULE_CONTENT,
+					ContentModel.ASSOC_CONTAINS, 
+                    ContentModel.ASSOC_CONTAINS, 
+                    ContentModel.TYPE_RULE_CONTENT,
                     properties).getChildRef();
             
             // Set the ruleContent node on the rule
@@ -270,8 +270,8 @@ import org.alfresco.service.namespace.QName;
                 RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleConfig, ruleXML);
                 
                 // Add the created date and modified date (they come from the auditable aspect)
-                rule.setCreatedDate((Date)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_CREATED));
-                rule.setModifiedDate((Date)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MODIFIED));
+                rule.setCreatedDate((Date)this.nodeService.getProperty(nodeRef, ContentModel.PROP_CREATED));
+                rule.setModifiedDate((Date)this.nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED));
                 
                 // Add the rule to the list
                 rules.add(rule);
@@ -290,12 +290,12 @@ import org.alfresco.service.namespace.QName;
     {
         NodeRef ruleFolder = null;
         
-		if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE) == true)
+		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
 	        // Get the configurations folder
 	        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
 	                                               nodeRef, 
-	                                               DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
+	                                               ContentModel.ASSOC_CONFIGURATIONS);
 	        if (nodeAssocRefs.size() == 0)
 	        {
 	            throw new RuleServiceException("The configuration folder has not been set for this actionable node.");
@@ -311,9 +311,9 @@ import org.alfresco.service.namespace.QName;
 				{
 					ruleFolder = this.nodeService.createNode(
 														configFolder,
-														DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+														ContentModel.ASSOC_CONTAINS,
 														QName.createQName(NamespaceService.ALFRESCO_URI, "rules"),
-														DictionaryBootstrap.TYPE_QNAME_SYTEM_FOLDER).getChildRef();
+														ContentModel.TYPE_SYTEM_FOLDER).getChildRef();
 				}
 				else
 				{

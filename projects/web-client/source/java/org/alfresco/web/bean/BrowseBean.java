@@ -15,7 +15,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -375,14 +375,14 @@ public class BrowseBean implements IContextListener
             QName type = this.nodeService.getType(nodeRef);
             
             // look for Space or File nodes
-            if (type.equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+            if (type.equals(ContentModel.TYPE_FOLDER))
             {
                // create our Node representation
                MapNode node = new MapNode(nodeRef, this.nodeService);
                
                this.containerNodes.add(node);
             }
-            else if (type.equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
+            else if (type.equals(ContentModel.TYPE_CONTENT))
             {
                // create our Node representation
                MapNode node = new MapNode(nodeRef, this.nodeService);
@@ -453,7 +453,7 @@ public class BrowseBean implements IContextListener
                QName type = this.nodeService.getType(nodeRef);
                
                // look for Space or File nodes
-               if (type.equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+               if (type.equals(ContentModel.TYPE_FOLDER))
                {
                   // create our Node representation
                   MapNode node = new MapNode(nodeRef, this.nodeService);
@@ -464,7 +464,7 @@ public class BrowseBean implements IContextListener
                   
                   this.containerNodes.add(node);
                }
-               else if (type.equals(DictionaryBootstrap.TYPE_QNAME_CONTENT))
+               else if (type.equals(ContentModel.TYPE_CONTENT))
                {
                   // create our Node representation
                   MapNode node = new MapNode(nodeRef, this.nodeService);
@@ -504,7 +504,7 @@ public class BrowseBean implements IContextListener
    {
       // special properties to be used by the value binding components on the page
       node.put("locked", Repository.isNodeLocked(node, this.lockService));
-      node.put("workingCopy", node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));
+      node.put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));
       node.put("url", DownloadContentServlet.generateURL(node.getNodeRef(), node.getName()));
       node.put("fileTypeImage", Repository.getFileTypeImage(node));
    }

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
@@ -133,7 +133,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
         
         // invoke policies
-        invokeBeforeCreateStore(DictionaryBootstrap.TYPE_QNAME_STOREROOT, storeRef);
+        invokeBeforeCreateStore(ContentModel.TYPE_STOREROOT, storeRef);
         
         // create a new one
         store = nodeDaoService.createStore(protocol, identifier);
@@ -141,7 +141,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node rootNode = store.getRootNode();
         // assign the root aspect - this is expected of all roots, even store roots
         addAspect(rootNode.getNodeRef(),
-                DictionaryBootstrap.ASPECT_QNAME_ROOT,
+                ContentModel.ASPECT_ROOT,
                 Collections.<QName, Serializable>emptyMap());
         
         // invoke policies
@@ -923,8 +923,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // does the node have parents
         boolean hasParents = parentAssocs.size() > 0;
         // does the current node have a root aspect?
-        boolean isRoot = hasAspect(currentNodeRef, DictionaryBootstrap.ASPECT_QNAME_ROOT);
-        boolean isStoreRoot = currentNode.getTypeQName().equals(DictionaryBootstrap.TYPE_QNAME_STOREROOT);
+        boolean isRoot = hasAspect(currentNodeRef, ContentModel.ASPECT_ROOT);
+        boolean isStoreRoot = currentNode.getTypeQName().equals(ContentModel.TYPE_STOREROOT);
         
         // look for a root.  If we only want the primary root, then ignore all but the top-level root.
         if (isRoot && !(primaryOnly && hasParents))  // exclude primary search with parents present
@@ -958,7 +958,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
                 // the root node
                 // or if first beneath the root node it will make the real thing 
                 ChildAssociationRef updateAssocRef = new ChildAssociationRef(
-                       isStoreRoot ? DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN : first.getRef().getTypeQName(),
+                       isStoreRoot ? ContentModel.ASSOC_CHILDREN : first.getRef().getTypeQName(),
                        getRootNode(currentNode.getNodeRef().getStoreRef()),
                        first.getRef().getQName(),
                        first.getRef().getChildRef());

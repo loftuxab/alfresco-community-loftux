@@ -16,7 +16,7 @@ import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -278,13 +278,13 @@ public class NewUserWizard extends AbstractWizardBean
             NodeRef nodeRef = getPerson().getNodeRef();
             
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
-            props.put(DictionaryBootstrap.PROP_QNAME_USERNAME, this.userName);
-            props.put(DictionaryBootstrap.PROP_QNAME_FIRSTNAME, this.firstName);
-            props.put(DictionaryBootstrap.PROP_QNAME_LASTNAME, this.lastName);
+            props.put(ContentModel.PROP_USERNAME, this.userName);
+            props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
+            props.put(ContentModel.PROP_LASTNAME, this.lastName);
             // TODO: this should be a PATH not an ID etc.!
-            props.put(DictionaryBootstrap.PROP_QNAME_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
-            props.put(DictionaryBootstrap.PROP_QNAME_EMAIL, this.email);
-            props.put(DictionaryBootstrap.PROP_QNAME_ORGID, this.companyId);
+            props.put(ContentModel.PROP_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
+            props.put(ContentModel.PROP_EMAIL, this.email);
+            props.put(ContentModel.PROP_ORGID, this.companyId);
             this.nodeService.setProperties(nodeRef, props);
          }
          else
@@ -294,21 +294,21 @@ public class NewUserWizard extends AbstractWizardBean
             
             // create properties for Person type from submitted Form data
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
-            props.put(DictionaryBootstrap.PROP_QNAME_USERNAME, this.userName);
-            props.put(DictionaryBootstrap.PROP_QNAME_FIRSTNAME, this.firstName);
-            props.put(DictionaryBootstrap.PROP_QNAME_LASTNAME, this.lastName);
+            props.put(ContentModel.PROP_USERNAME, this.userName);
+            props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
+            props.put(ContentModel.PROP_LASTNAME, this.lastName);
             // TODO: this should be a PATH not an ID etc.!
-            props.put(DictionaryBootstrap.PROP_QNAME_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
-            props.put(DictionaryBootstrap.PROP_QNAME_EMAIL, this.email);
-            props.put(DictionaryBootstrap.PROP_QNAME_ORGID, this.companyId);
+            props.put(ContentModel.PROP_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
+            props.put(ContentModel.PROP_EMAIL, this.email);
+            props.put(ContentModel.PROP_ORGID, this.companyId);
             
             // create the node to represent the Person
             String assocName = Repository.createValidQName(this.userName);
             this.nodeService.createNode(
                   rootNode,
-                  DictionaryBootstrap.ASSOC_QNAME_CHILDREN,
+                  ContentModel.ASSOC_CHILDREN,
                   QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
-                  DictionaryBootstrap.TYPE_QNAME_PERSON,
+                  ContentModel.TYPE_PERSON,
                   props);
             
             if (logger.isDebugEnabled())
@@ -621,7 +621,7 @@ public class NewUserWizard extends AbstractWizardBean
             // create our Node representation from the NodeRef
             NodeRef nodeRef = ref.getChildRef();
             
-            if (this.nodeService.getType(nodeRef).equals(DictionaryBootstrap.TYPE_QNAME_PERSON))
+            if (this.nodeService.getType(nodeRef).equals(ContentModel.TYPE_PERSON))
             {
                // create our Node representation
                MapNode node = new MapNode(nodeRef, this.nodeService);

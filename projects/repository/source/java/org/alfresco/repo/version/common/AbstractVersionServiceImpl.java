@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -104,13 +104,13 @@ public abstract class AbstractVersionServiceImpl
 		// Register the copy behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
-				DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE,
+				ContentModel.ASPECT_VERSIONABLE,
 				new JavaBehaviour(this, "onCopy"));
 		
 		// Register the onCreateVersion behavior for the version aspect
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
-				DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE,
+				ContentModel.ASPECT_VERSIONABLE,
 				new JavaBehaviour(this, "onCreateVersion"));
     }
 	
@@ -127,7 +127,7 @@ public abstract class AbstractVersionServiceImpl
 	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Add the version aspect, but do not copy any of the properties
-		copyDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);
+		copyDetails.addAspect(ContentModel.ASPECT_VERSIONABLE);
 	}
 	
 	/**

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
@@ -77,27 +77,27 @@ public class LockServiceImpl implements LockService
         // Register the various class behaviours to enable lock checking
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateVersion"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
+				ContentModel.ASPECT_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));	
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeUpdateNode"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
+				ContentModel.ASPECT_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDeleteNode"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
+				ContentModel.ASPECT_LOCKABLE,
 				new JavaBehaviour(this, "checkForLock"));
 		
 		// Register onCopy class behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
+				ContentModel.ASPECT_LOCKABLE,
 				new JavaBehaviour(this, "onCopy"));
 		
 		// Register the onCreateVersion behavior for the version aspect
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
-				DictionaryBootstrap.ASPECT_QNAME_LOCKABLE,
+				ContentModel.ASPECT_LOCKABLE,
 				new JavaBehaviour(this, "onCreateVersion"));
     }
     
@@ -128,8 +128,8 @@ public class LockServiceImpl implements LockService
 			try
 			{
 	            // Set the current user as the lock owner
-	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER, userRef);
-	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE, lockType.toString());
+	            this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_OWNER, userRef);
+	            this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_TYPE, lockType.toString());
 			}
 			finally
 			{
@@ -190,8 +190,8 @@ public class LockServiceImpl implements LockService
 			try
 			{
 	            // Clear the lock owner
-	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER, null);
-	            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE, null);
+	            this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_OWNER, null);
+	            this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_TYPE, null);
 			}
 			finally
 			{
@@ -244,7 +244,7 @@ public class LockServiceImpl implements LockService
         LockStatus result = LockStatus.NO_LOCK;
         
         // Get the current lock owner
-        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_OWNER);
+        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
         if (currentUserRef != null && currentUserRef.length() != 0)
         {
             if (currentUserRef.equals(userRef) == true)
@@ -272,7 +272,7 @@ public class LockServiceImpl implements LockService
         // Check for the lock aspect
         checkForLockApsect(nodeRef);
         
-        String lockTypeString = (String)this.nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_LOCK_TYPE);
+        String lockTypeString = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_TYPE);
         if (lockTypeString != null)
         {
             result = LockType.valueOf(lockTypeString);
@@ -291,9 +291,9 @@ public class LockServiceImpl implements LockService
     private void checkForLockApsect(NodeRef nodeRef)
         throws AspectMissingException
     {
-        if (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE) == false)
+        if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE) == false)
         {
-            throw new AspectMissingException(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, nodeRef);
+            throw new AspectMissingException(ContentModel.ASPECT_LOCKABLE, nodeRef);
         }
     }
 	
@@ -364,7 +364,7 @@ public class LockServiceImpl implements LockService
 	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
 		// Add the lock aspect, but do not copy any of the properties
-		copyDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE);
+		copyDetails.addAspect(ContentModel.ASPECT_LOCKABLE);
 	}
 	
 	/**
@@ -385,6 +385,6 @@ public class LockServiceImpl implements LockService
 			PolicyScope nodeDetails)
 	{
 		// Add the lock aspect, but do not version the property values
-		nodeDetails.addAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE);
+		nodeDetails.addAspect(ContentModel.ASPECT_LOCKABLE);
 	}
 }

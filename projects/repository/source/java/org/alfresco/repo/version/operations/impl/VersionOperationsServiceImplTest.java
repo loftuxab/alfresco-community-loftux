@@ -7,7 +7,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
+import org.alfresco.repo.version.lightweight.VersionStoreConst;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -71,14 +72,14 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		
 		// Create the node used for tests
         Map<QName, Serializable> bagOfProps = createTypePropertyBag();
-        bagOfProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        bagOfProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+        bagOfProps.put(ContentModel.PROP_MIME_TYPE, "text/plain");
+        bagOfProps.put(ContentModel.PROP_ENCODING, "UTF-8");
         
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+				ContentModel.ASSOC_CONTAINS,
 				QName.createQName("{test}test"),
-				DictionaryBootstrap.TYPE_QNAME_CONTENT,
+				ContentModel.TYPE_CONTENT,
 				bagOfProps);
 		this.nodeRef = childAssocRef.getChildRef();
 		
@@ -89,8 +90,8 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		contentWriter.putContent(CONTENT_1);	
 		
 		// Add the lock and version aspects to the created node
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, null);
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, null);		
+		this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
+		this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);		
 	}
 	
 	/**
@@ -127,13 +128,13 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		NodeRef workingCopy = this.versionOperationsService.checkout(
 				this.nodeRef, 
 				this.rootNodeRef, 
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+				ContentModel.ASSOC_CONTAINS, 
 				QName.createQName("{test}workingCopy"));
 		assertNotNull(workingCopy);
 		
 		// Ensure that the working copy and copy aspect has been applied
-		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_QNAME_WORKING_COPY));	
-		assertTrue(this.nodeService.hasAspect(workingCopy, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM));
+		assertTrue(this.nodeService.hasAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY));	
+		assertTrue(this.nodeService.hasAspect(workingCopy, ContentModel.ASPECT_COPIEDFROM));
 		
 		// Ensure that the content has been copied correctly
 		ContentReader contentReader = this.contentService.getReader(this.nodeRef);
@@ -173,7 +174,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		tempWriter.putContent(CONTENT_2);
 		String contentUrl = tempWriter.getContentUrl();
 		Map<String, Serializable> versionProperties3 = new HashMap<String, Serializable>();
-		versionProperties3.put(Version.PROP_VERSION_TYPE, VersionType.MAJOR);
+		versionProperties3.put(VersionStoreConst.PROP_VERSION_TYPE, VersionType.MAJOR);
 		NodeRef origNodeRef = this.versionOperationsService.checkin(workingCopy3, versionProperties3, contentUrl, true);
 		assertNotNull(origNodeRef);
 		ContentReader contentReader = this.contentService.getReader(origNodeRef);

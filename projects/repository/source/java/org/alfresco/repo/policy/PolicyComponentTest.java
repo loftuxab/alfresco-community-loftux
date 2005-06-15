@@ -45,7 +45,7 @@ public class PolicyComponentTest extends TestCase
         NamespaceDAO namespaceDAO = new NamespaceDAOImpl();
         DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
         List<String> bootstrapModels = new ArrayList<String>();
-        bootstrapModels.add("org/alfresco/repo/dictionary/impl/dictionary_model.xml");
+        bootstrapModels.add("org/alfresco/repo/model/dictionary_model.xml");
         bootstrapModels.add("org/alfresco/repo/policy/policycomponenttest_model.xml");
         dictionaryDAO.setBootstrapModels(bootstrapModels);
         dictionaryDAO.bootstrap();

@@ -580,9 +580,9 @@
       </constructor-arg>
       <property name="bootstrapModels">
          <list>
-            <value>org/alfresco/repo/dictionary/impl/dictionary_model.xml</value>
-            <value>org/alfresco/repo/dictionary/impl/content_model.xml</value>
-            <value>org/alfresco/repo/dictionary/impl/version_model.xml</value>
+            <value>org/alfresco/model/dictionary_model.xml</value>
+            <value>org/alfresco/model/content_model.xml</value>
+            <value>org/alfresco/repo/version/lightweight/version_model.xml</value>
          </list>
       </property>
    </bean>

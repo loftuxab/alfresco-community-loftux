@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.repo.version.lightweight.VersionStoreConst;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;
@@ -62,10 +63,10 @@ public class VersionImplTest extends TestCase
         
         // Create the version property map
         this.versionProperties = new HashMap<String, Serializable>();
-        this.versionProperties.put(Version.PROP_VERSION_LABEL, VERSION_1);
-        this.versionProperties.put(Version.PROP_CREATED_DATE, this.createdDate);
+        this.versionProperties.put(VersionStoreConst.PROP_VERSION_LABEL, VERSION_1);
+        this.versionProperties.put(VersionStoreConst.PROP_CREATED_DATE, this.createdDate);
         this.versionProperties.put(Version.PROP_DESCRIPTION, VALUE_DESCRIPTION);
-        this.versionProperties.put(Version.PROP_VERSION_TYPE, VERSION_TYPE);
+        this.versionProperties.put(VersionStoreConst.PROP_VERSION_TYPE, VERSION_TYPE);
         this.versionProperties.put(PROP_1, VALUE_1);
         this.versionProperties.put(PROP_2, VALUE_2);
         this.versionProperties.put(PROP_3, VALUE_3);

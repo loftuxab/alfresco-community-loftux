@@ -13,7 +13,7 @@ import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -86,9 +86,9 @@ public class NewSpaceWizard extends AbstractWizardBean
             Date now = new Date( Calendar.getInstance().getTimeInMillis() );
             
             // update the modified timestamp
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
-            this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
+            this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, this.name);
+            this.nodeService.setProperty(nodeRef, ContentModel.PROP_ICON, this.icon);
+            this.nodeService.setProperty(nodeRef, ContentModel.PROP_DESCRIPTION, this.description);
          }
          else
          {
@@ -111,25 +111,25 @@ public class NewSpaceWizard extends AbstractWizardBean
                String qname = Repository.createValidQName(this.name);
                ChildAssociationRef assocRef = this.nodeService.createNode(
                      parentNodeRef,
-                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                     ContentModel.ASSOC_CONTAINS,
                      QName.createQName(NamespaceService.ALFRESCO_URI, qname),
-                     DictionaryBootstrap.TYPE_QNAME_FOLDER);
+                     ContentModel.TYPE_FOLDER);
                
                NodeRef nodeRef = assocRef.getChildRef();
                newSpaceId = nodeRef.getId();
                
                // set the name property on the node
-               this.nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
+               this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, this.name);
                
                if (logger.isDebugEnabled())
                   logger.debug("Created folder node with name: " + this.name);
 
                // apply the uifacets aspect - icon, title and description props
                Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
-               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
-               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_TITLE, this.name);
-               uiFacetsProps.put(DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
-               this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_UIFACETS, uiFacetsProps);
+               uiFacetsProps.put(ContentModel.PROP_ICON, this.icon);
+               uiFacetsProps.put(ContentModel.PROP_TITLE, this.name);
+               uiFacetsProps.put(ContentModel.PROP_DESCRIPTION, this.description);
+               this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
                
                if (logger.isDebugEnabled())
                   logger.debug("Added uifacets aspect with properties: " + uiFacetsProps);
@@ -140,14 +140,14 @@ public class NewSpaceWizard extends AbstractWizardBean
                NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), this.existingSpaceId);
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(context), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
-                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                     ContentModel.ASSOC_CONTAINS,
                      QName.createQName(NamespaceService.ALFRESCO_URI, Repository.createValidQName(this.name)),
                      true);
                // also need to set the new description and icon properties
                // TODO: remove this when the copy also copies the name
-               this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
-               this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
-               this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
+               this.nodeService.setProperty(copiedNode, ContentModel.PROP_NAME, this.name);
+               this.nodeService.setProperty(copiedNode, ContentModel.PROP_DESCRIPTION, this.description);
+               this.nodeService.setProperty(copiedNode, ContentModel.PROP_ICON, this.icon);
                
                newSpaceId = copiedNode.getId();
                   
@@ -160,14 +160,14 @@ public class NewSpaceWizard extends AbstractWizardBean
                NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), this.templateSpaceId);
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(context), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
-                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+                     ContentModel.ASSOC_CONTAINS,
                      QName.createQName(NamespaceService.ALFRESCO_URI, Repository.createValidQName(this.name)), 
                      true);
                // also need to set the new description and icon properties
                // TODO: remove this when the copy also copies the name
-               this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_NAME, this.name);
-               this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_DESCRIPTION, this.description);
-               this.nodeService.setProperty(copiedNode, DictionaryBootstrap.PROP_QNAME_ICON, this.icon);
+               this.nodeService.setProperty(copiedNode, ContentModel.PROP_NAME, this.name);
+               this.nodeService.setProperty(copiedNode, ContentModel.PROP_DESCRIPTION, this.description);
+               this.nodeService.setProperty(copiedNode, ContentModel.PROP_ICON, this.icon);
                
                newSpaceId = copiedNode.getId();
                
@@ -200,9 +200,9 @@ public class NewSpaceWizard extends AbstractWizardBean
                   NodeRef templateNode = templateNodeList.get(0).getChildRef();
                   NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), newSpaceId);
                   NodeRef templateCopyNode = this.nodeOperationsService.copy(sourceNode, templateNode, 
-                        DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+                        ContentModel.ASSOC_CONTAINS, 
                         QName.createQName(NamespaceService.ALFRESCO_URI, Repository.createValidQName(this.templateName)));
-                  this.nodeService.setProperty(templateCopyNode, DictionaryBootstrap.PROP_QNAME_NAME, this.templateName);
+                  this.nodeService.setProperty(templateCopyNode, ContentModel.PROP_NAME, this.templateName);
                }
             }
          }

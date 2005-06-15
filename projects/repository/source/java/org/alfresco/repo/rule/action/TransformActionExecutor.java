@@ -3,7 +3,7 @@
  */
 package org.alfresco.repo.rule.action;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -57,7 +57,7 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 	{
 		// First check that the node is a sub-type of content
 		QName typeQName = this.nodeService.getType(actionedUponNodeRef);
-		if (this.dictionaryService.isSubClass(typeQName, DictionaryBootstrap.TYPE_QNAME_CONTENT) == true)
+		if (this.dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT) == true)
 		{
 			// Get the mime type
 			String mimeType = (String)this.ruleAction.getParameterValue(PARAM_MIME_TYPE);
@@ -76,7 +76,7 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 	                false);
 			
 			// Set the mime type on the copy
-			this.nodeService.setProperty(copyNodeRef, DictionaryBootstrap.PROP_QNAME_MIME_TYPE, mimeType);
+			this.nodeService.setProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE, mimeType);
 			
 			// Get the content reader and writer
 			ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef);

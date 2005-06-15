@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.lock.NodeLockedException;
@@ -75,19 +75,19 @@ public class LockBehaviourImplTest extends BaseSpringTest
         // Create node 
         this.nodeRef = this.nodeService.createNode(
                 rootNodeRef, 
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+				ContentModel.ASSOC_CONTAINS, 
                 QName.createQName("{}ParentNode"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
-        this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_LOCKABLE, new HashMap<QName, Serializable>());
+        this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.nodeRef);
         
         // Create a node with no lockAspect
         this.noAspectNode = this.nodeService.createNode(
                 rootNodeRef, 
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+				ContentModel.ASSOC_CONTAINS, 
                 QName.createQName("{}noAspectNode"),
-                DictionaryBootstrap.TYPE_QNAME_CONTAINER,
+                ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
         assertNotNull(this.noAspectNode);        
     }
@@ -200,7 +200,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 	public void testVersionServiceLockBehaviour()
 	{
 		// Add the version aspect to the node
-		this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, null);
+		this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
 		
 		try
 		{
@@ -256,18 +256,18 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		// Check that we can create a new node and set of it properties when no lock is present
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				this.nodeRef, 
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+				ContentModel.ASSOC_CONTAINS,
 				QName.createQName("{test}nodeServiceLockTest"),
-				DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+				ContentModel.TYPE_CONTAINER);
 		NodeRef nodeRef = childAssocRef.getChildRef();
 		
 		// Lets lock the parent node and check that whether we can still create a new node
 		this.lockService.lock(this.nodeRef, GOOD_USER, LockType.WRITE_LOCK);
 		ChildAssociationRef childAssocRef2 = this.nodeService.createNode(
 				this.nodeRef, 
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,				
+				ContentModel.ASSOC_CONTAINS,				
 				QName.createQName("{test}nodeServiceLockTest"),
-				DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+				ContentModel.TYPE_CONTAINER);
 		NodeRef nodeRef2 = childAssocRef.getChildRef();
 		
 		// Lets check that we can do other stuff with the node since we have it locked
@@ -275,7 +275,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		Map<QName, Serializable> propMap = new HashMap<QName, Serializable>();
 		propMap.put(QName.createQName("{test}prop2"), "value2");
 		this.nodeService.setProperties(this.nodeRef, propMap);
-		this.nodeService.removeAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE);
+		this.nodeService.removeAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE);
 		// TODO there are various other calls that could be more vigirously checked
 		
 		// Lock the node as the 'bad' user
@@ -287,9 +287,9 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		{
 			this.nodeService.createNode(
 					this.nodeRef, 
-					DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+					ContentModel.ASSOC_CONTAINS,
 					QName.createQName("{test}nodeServiceLockTest"),
-					DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+					ContentModel.TYPE_CONTAINER);
 			fail("The parent is locked so a new child should not have been created.");
 		}
 		catch(NodeLockedException exception)

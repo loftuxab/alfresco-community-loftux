@@ -1,6 +1,6 @@
 package org.alfresco.repo.node.index;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -52,7 +52,7 @@ public class NodeIndexer
         
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateStore"),
-                DictionaryBootstrap.TYPE_QNAME_STOREROOT,
+                ContentModel.TYPE_STOREROOT,
                 new JavaBehaviour(this, "beforeCreateStore"));   
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),

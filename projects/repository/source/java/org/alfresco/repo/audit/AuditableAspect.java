@@ -2,7 +2,7 @@ package org.alfresco.repo.audit;
 
 import java.util.Date;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -57,17 +57,17 @@ public class AuditableAspect
         // Bind auditable behaviour to node policies
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
-                DictionaryBootstrap.ASPECT_QNAME_AUDITABLE,
+                ContentModel.ASPECT_AUDITABLE,
                 new JavaBehaviour(this, "onCreateAudit"));
         
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"),
-                DictionaryBootstrap.ASPECT_QNAME_AUDITABLE,
+                ContentModel.ASPECT_AUDITABLE,
                 new JavaBehaviour(this, "onAddAudit"));
 
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateNode"),
-                DictionaryBootstrap.ASPECT_QNAME_AUDITABLE,
+                ContentModel.ASPECT_AUDITABLE,
                 new JavaBehaviour(this, "onUpdateAudit"));
     }
     
@@ -87,7 +87,7 @@ public class AuditableAspect
 
         // Set created date
         Date now = new Date(System.currentTimeMillis());
-        nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_CREATED, now);
+        nodeService.setProperty(nodeRef, ContentModel.PROP_CREATED, now);
         
         // TODO: Set created by
     }
@@ -106,7 +106,7 @@ public class AuditableAspect
         
         // Set created date
         Date now = new Date(System.currentTimeMillis());
-        nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_CREATED, now);
+        nodeService.setProperty(nodeRef, ContentModel.PROP_CREATED, now);
         
         // TODO: Set created by
     }
@@ -124,7 +124,7 @@ public class AuditableAspect
 
         // Set updated date
         Date now = new Date(System.currentTimeMillis());
-        nodeService.setProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MODIFIED, now);
+        nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, now);
         
         // TODO: Set updated by
     }

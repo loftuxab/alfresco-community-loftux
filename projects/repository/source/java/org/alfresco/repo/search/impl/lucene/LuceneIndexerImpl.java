@@ -20,7 +20,7 @@ import java.util.Set;
 import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.impl.lucene.fts.FTSIndexerAware;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
@@ -1179,7 +1179,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         AspectDefinition current = aspDef;
         while (current != null)
         {
-            if (current.getName().equals(DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE))
+            if (current.getName().equals(ContentModel.ASPECT_CLASSIFIABLE))
             {
                 return true;
             }
@@ -1205,7 +1205,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         TypeDefinition current = typeDef;
         while (current != null)
         {
-            if (current.getName().equals(DictionaryBootstrap.TYPE_QNAME_CATEGORY))
+            if (current.getName().equals(ContentModel.TYPE_CATEGORY))
             {
                 return true;
             }

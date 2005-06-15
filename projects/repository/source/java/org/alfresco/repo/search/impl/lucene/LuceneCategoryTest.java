@@ -15,7 +15,7 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Aspect;
 import org.alfresco.repo.dictionary.impl.M2Model;
@@ -40,7 +40,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class LuceneCategoryTest extends TestCase
 {    
-    public static final QName ASSOC_TYPE_QNAME = DictionaryBootstrap.ASSOC_QNAME_CHILDREN;
+    public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CHILDREN;
     
     ApplicationContext ctx;
     NodeService nodeService;
@@ -113,23 +113,23 @@ public class LuceneCategoryTest extends TestCase
                 "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
         
-        n1 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}one"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n1 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}one"), ContentModel.TYPE_CONTAINER).getChildRef();
         nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "value-1");
-        n2 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}two"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n2 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}two"), ContentModel.TYPE_CONTAINER).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "value-1");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "value-2");
-        n3 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}three"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n4 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}four"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        n14 = nodeService.createNode(n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}fourteen"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+        n3 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}three"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n4 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}four"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n14 = nodeService.createNode(n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}fourteen"), ContentModel.TYPE_CONTAINER).getChildRef();
         
         nodeService.addChild(rootNodeRef, n8, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-0"));
         nodeService.addChild(n1, n8, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-1"));
@@ -144,24 +144,24 @@ public class LuceneCategoryTest extends TestCase
         
         // Categories
         
-        catContainer = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryContainer"), DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
-        catRoot = nodeService.createNode(catContainer, ASSOC_TYPE_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryRoot"), DictionaryBootstrap.TYPE_QNAME_CATEGORYROOT).getChildRef();
+        catContainer = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryContainer"), ContentModel.TYPE_CONTAINER).getChildRef();
+        catRoot = nodeService.createNode(catContainer, ASSOC_TYPE_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryRoot"), ContentModel.TYPE_CATEGORYROOT).getChildRef();
        
        
         
-        catRBase = nodeService.createNode(catRoot, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Region"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catROne = nodeService.createNode(catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Europe"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catRTwo = nodeService.createNode(catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catRThree = nodeService.createNode(catRTwo, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "US"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        catRBase = nodeService.createNode(catRoot, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Region"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catROne = nodeService.createNode(catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Europe"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catRTwo = nodeService.createNode(catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catRThree = nodeService.createNode(catRTwo, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "US"), ContentModel.TYPE_CATEGORY).getChildRef();
         
         nodeService.addChild(catRoot, catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "InvestmentRegion"));
         nodeService.addChild(catRoot, catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "MarketingRegion"));
         
         
-        catACBase = nodeService.createNode(catRoot, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "AssetClass"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catACOne = nodeService.createNode(catACBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Fixed"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catACTwo = nodeService.createNode(catACBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Equity"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
-        catACThree = nodeService.createNode(catACTwo, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "SpecialEquity"), DictionaryBootstrap.TYPE_QNAME_CATEGORY).getChildRef();
+        catACBase = nodeService.createNode(catRoot, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "AssetClass"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catACOne = nodeService.createNode(catACBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Fixed"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catACTwo = nodeService.createNode(catACBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Equity"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catACThree = nodeService.createNode(catACTwo, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "SpecialEquity"), ContentModel.TYPE_CATEGORY).getChildRef();
         
         
        
@@ -243,7 +243,7 @@ public class LuceneCategoryTest extends TestCase
         
         regionCategorisationQName = QName.createQName(TEST_NAMESPACE, "Region");
         M2Aspect generalCategorisation = model.createAspect("test:" + regionCategorisationQName.getLocalName());
-        generalCategorisation.setParentName("alf:" + DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE.getLocalName());
+        generalCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property genCatProp = generalCategorisation.createProperty("test:region");
         genCatProp.setIndexed(true);
         genCatProp.setIndexedAtomically(true);
@@ -255,7 +255,7 @@ public class LuceneCategoryTest extends TestCase
         
         assetClassCategorisationQName = QName.createQName(TEST_NAMESPACE, "AssetClass");
         M2Aspect assetClassCategorisation = model.createAspect("test:" + assetClassCategorisationQName.getLocalName());
-        assetClassCategorisation.setParentName("alf:" + DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE.getLocalName());
+        assetClassCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property acProp = assetClassCategorisation.createProperty("test:assetClass");
         acProp.setIndexed(true);
         acProp.setIndexedAtomically(true);
@@ -267,7 +267,7 @@ public class LuceneCategoryTest extends TestCase
         
         investmentRegionCategorisationQName = QName.createQName(TEST_NAMESPACE, "InvestmentRegion");
         M2Aspect investmentRegionCategorisation = model.createAspect("test:" + investmentRegionCategorisationQName.getLocalName());
-        investmentRegionCategorisation.setParentName("alf:" + DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE.getLocalName());
+        investmentRegionCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property irProp = investmentRegionCategorisation.createProperty("test:investmentRegion");
         irProp.setIndexed(true);
         irProp.setIndexedAtomically(true);
@@ -279,7 +279,7 @@ public class LuceneCategoryTest extends TestCase
         
         marketingRegionCategorisationQName = QName.createQName(TEST_NAMESPACE, "MarketingRegion");
         M2Aspect marketingRegionCategorisation = model.createAspect("test:" + marketingRegionCategorisationQName.getLocalName());
-        marketingRegionCategorisation.setParentName("alf:" + DictionaryBootstrap.ASPECT_QNAME_CLASSIFIABLE.getLocalName());
+        marketingRegionCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property mrProp =  marketingRegionCategorisation.createProperty("test:marketingRegion");
         mrProp.setIndexed(true);
         mrProp.setIndexedAtomically(true);

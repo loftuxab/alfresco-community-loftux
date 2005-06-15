@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
@@ -103,8 +103,8 @@ public class VersionStoreBaseTest extends BaseSpringTest
         this.nodeProperties.put(PROP_1, VALUE_1);
         this.nodeProperties.put(PROP_2, VALUE_2);
         this.nodeProperties.put(PROP_3, VALUE_3);
-        this.nodeProperties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        this.nodeProperties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+        this.nodeProperties.put(ContentModel.PROP_MIME_TYPE, "text/plain");
+        this.nodeProperties.put(ContentModel.PROP_ENCODING, "UTF-8");
         
         // Create a workspace that contains the 'live' nodes
         this.testStoreRef = this.dbNodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
@@ -136,11 +136,11 @@ public class VersionStoreBaseTest extends BaseSpringTest
         // Create node (this node has some content)
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
-                DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS, 
+                ContentModel.ASSOC_CONTAINS, 
                 QName.createQName("{test}MyVersionableNode"),
                 TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE, new HashMap<QName, Serializable>());
         
         assertNotNull(nodeRef);
         this.versionableNodes.put(nodeRef.getId(), nodeRef);
@@ -157,7 +157,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_1,
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(child1, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(child1, ContentModel.ASPECT_VERSIONABLE, new HashMap<QName, Serializable>());
         assertNotNull(child1);
         this.versionableNodes.put(child1.getId(), child1);
         NodeRef child2 = this.dbNodeService.createNode(
@@ -167,14 +167,14 @@ public class VersionStoreBaseTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_2,
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
-        this.dbNodeService.addAspect(child2, DictionaryBootstrap.ASPECT_QNAME_VERSIONABLE, new HashMap<QName, Serializable>());
+        this.dbNodeService.addAspect(child2, ContentModel.ASPECT_VERSIONABLE, new HashMap<QName, Serializable>());
         assertNotNull(child2);
         this.versionableNodes.put(child2.getId(), child2);
         
         // Create a node that can be associated with the root node
         NodeRef assocNode = this.dbNodeService.createNode(
                 rootNodeRef,
-				DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+				ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{test}MyAssocNode"),
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
@@ -228,7 +228,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
 	{
 		Version version = this.lightWeightVersionStoreVersionService.getCurrentVersion(nodeRef);		
 		SerialVersionLabelPolicy policy = new SerialVersionLabelPolicy();
-		return policy.calculateVersionLabel(DictionaryBootstrap.TYPE_QNAME_CMOBJECT, version, versionNumber, versionProperties);
+		return policy.calculateVersionLabel(ContentModel.TYPE_CMOBJECT, version, versionNumber, versionProperties);
 	}
     
     /**
@@ -247,7 +247,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
         assertEquals(
                 "The expected version number was not used.",
                 Integer.toString(expectedVersionNumber), 
-                newVersion.getVersionProperty(Version.PROP_VERSION_NUMBER));
+                newVersion.getVersionProperty(VersionStoreConst.PROP_VERSION_NUMBER));
 		assertEquals(
 				"The expected version label was not used.",
 				expectedVersionLabel,
@@ -289,7 +289,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
         // Check the node ref for the current version
         String currentVersionLabel = (String)this.dbNodeService.getProperty(
                 versionableNode,
-                DictionaryBootstrap.PROP_QNAME_CURRENT_VERSION_LABEL);
+                ContentModel.PROP_VERSION_LABEL);
         assertEquals(newVersion.getVersionLabel(), currentVersionLabel);
     }
     

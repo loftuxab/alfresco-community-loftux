@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidAspectException;
 import org.alfresco.service.cmr.repository.AssociationExistsException;
@@ -340,7 +340,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         {
             // Get the child reference
             NodeRef childRef = childAssocRef.getChildRef();
-            NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
+            NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, ContentModel.PROP_REFERENCE); 
             
             // get the qualified name of the frozen child association and filter out unwanted names
             QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_QNAME);
@@ -418,7 +418,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         {
             // Get the assoc reference
             NodeRef childRef = childAssocRef.getChildRef();
-            NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, DictionaryBootstrap.PROP_QNAME_REFERENCE); 
+            NodeRef referencedNode = (NodeRef)this.dbNodeService.getProperty(childRef, ContentModel.PROP_REFERENCE); 
             
             // get the qualified type name of the frozen child association and filter out unwanted names
             QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_TYPE_QNAME);

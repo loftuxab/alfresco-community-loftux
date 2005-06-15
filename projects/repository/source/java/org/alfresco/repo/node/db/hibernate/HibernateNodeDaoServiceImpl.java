@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
@@ -81,7 +81,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(store);
         // create and assign a root node
-        Node rootNode = newNode(store, DictionaryBootstrap.TYPE_QNAME_STOREROOT);
+        Node rootNode = newNode(store, ContentModel.TYPE_STOREROOT);
         store.setRootNode(rootNode);
         // done
         return store;

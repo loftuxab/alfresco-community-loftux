@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.faces.context.FacesContext;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -66,7 +66,7 @@ public class UISpaceSelector extends AbstractItemSelector
       List<ChildAssociationRef> spaceKids = new ArrayList<ChildAssociationRef>(); 
       for (ChildAssociationRef childRef : allKids)
       {
-         if (service.getType(childRef.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+         if (service.getType(childRef.getChildRef()).equals(ContentModel.TYPE_FOLDER))
          {
             spaceKids.add(childRef);
          }

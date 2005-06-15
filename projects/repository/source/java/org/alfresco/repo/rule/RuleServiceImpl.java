@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.alfresco.config.ConfigService;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -273,19 +273,19 @@ public class RuleServiceImpl implements RuleService
 		// Create the configuraion folder
 		NodeRef configurationsNodeRef = this.nodeService.createNode(
 											rootConfigFolder,
-											DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
+											ContentModel.ASSOC_CONTAINS,
 											QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
-											DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
+											ContentModel.TYPE_CONFIGURATIONS).getChildRef();
 		
         // Apply the aspect and add the configurations folder
         this.nodeService.addAspect(
                 nodeRef, 
-                DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE, 
+                ContentModel.ASPECT_ACTIONABLE, 
                 null);
         this.nodeService.createAssociation(
                 nodeRef, 
                 configurationsNodeRef, 
-                DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);	
+                ContentModel.ASSOC_CONFIGURATIONS);	
     }
 
 	/**
@@ -308,9 +308,9 @@ public class RuleServiceImpl implements RuleService
 		{
 			rootConfigFolder = this.nodeService.createNode(
 												rootNode,
-												DictionaryBootstrap.CHILD_ASSOC_QNAME_CHILDREN,
+												ContentModel.ASSOC_CHILDREN,
 												QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"),
-												DictionaryBootstrap.TYPE_QNAME_SYTEM_FOLDER).getChildRef();
+												ContentModel.TYPE_SYTEM_FOLDER).getChildRef();
 		}
 		else
 		{
@@ -325,7 +325,7 @@ public class RuleServiceImpl implements RuleService
     public boolean isActionable(NodeRef nodeRef)
     {
         // Determine whether a node is actionable or not
-        return (this.nodeService.hasAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE) == true);          
+        return (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true);          
     }
     
     /**

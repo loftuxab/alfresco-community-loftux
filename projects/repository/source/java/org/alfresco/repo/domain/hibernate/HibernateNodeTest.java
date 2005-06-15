@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
@@ -64,7 +64,7 @@ public class HibernateNodeTest extends BaseHibernateTest
 		NodeKey key = new NodeKey("Random Protocol", "Random Identifier", "AAA");
 		node.setKey(key);
         node.setStore(store);   // not meaningful as it contradicts the key
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+        node.setTypeQName(ContentModel.TYPE_CONTAINER);
         // persist it
 		try
 		{
@@ -112,7 +112,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         Node node = new NodeImpl();
 		NodeKey key = new NodeKey(store.getKey(), "AAA");
 		node.setKey(key);
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+        node.setTypeQName(ContentModel.TYPE_CONTAINER);
         // give it a property map
         Map<String, Serializable> propertyMap = new HashMap<String, Serializable>(5);
         propertyMap.put("{}A", "AAA");
@@ -141,7 +141,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         NodeKey nodeKey = new NodeKey(store.getKey(), GUID.generate());
         node.setKey(nodeKey);
         node.setStore(store);
-        node.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CMOBJECT);
+        node.setTypeQName(ContentModel.TYPE_CMOBJECT);
         
         // add some aspects
         QName aspect1 = QName.createQName(TEST_NAMESPACE, "1");
@@ -175,7 +175,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         NodeKey sourceKey = new NodeKey(store.getKey(), GUID.generate());
         sourceNode.setKey(sourceKey);
         sourceNode.setStore(store);
-        sourceNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CMOBJECT);
+        sourceNode.setTypeQName(ContentModel.TYPE_CMOBJECT);
         Serializable realNodeKey = getSession().save(sourceNode);
         
         // make a container node
@@ -183,7 +183,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         NodeKey targetKey = new NodeKey(store.getKey(), GUID.generate());
         targetNode.setKey(targetKey);
         targetNode.setStore(store);
-        targetNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+        targetNode.setTypeQName(ContentModel.TYPE_CONTAINER);
         Serializable containerNodeKey = getSession().save(targetNode);
         
         // create an association between them
@@ -222,7 +222,7 @@ public class HibernateNodeTest extends BaseHibernateTest
 		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
 		contentNode.setKey(key);
         contentNode.setStore(store);
-        contentNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTENT);
+        contentNode.setTypeQName(ContentModel.TYPE_CONTENT);
         Serializable contentNodeKey = getSession().save(contentNode);
 
         // make a container node
@@ -230,7 +230,7 @@ public class HibernateNodeTest extends BaseHibernateTest
 		key = new NodeKey(store.getKey(), GUID.generate());
 		containerNode.setKey(key);
         containerNode.setStore(store);
-        containerNode.setTypeQName(DictionaryBootstrap.TYPE_QNAME_CONTAINER);
+        containerNode.setTypeQName(ContentModel.TYPE_CONTAINER);
         Serializable containerNodeKey = getSession().save(containerNode);
         // create an association to the content
         ChildAssoc assoc1 = new ChildAssocImpl();

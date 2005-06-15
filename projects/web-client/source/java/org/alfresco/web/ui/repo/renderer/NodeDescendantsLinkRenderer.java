@@ -14,7 +14,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -104,7 +104,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             for (int index=0; index<childRefs.size(); index++)
             {
                ChildAssociationRef ref = childRefs.get(index);
-               if (service.getType(ref.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+               if (service.getType(ref.getChildRef()).equals(ContentModel.TYPE_FOLDER))
                {
                   refs.add(ref);
                }
@@ -116,7 +116,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             for (int index=0; index<maximum; index++)
             {
                ChildAssociationRef ref = refs.get(index);
-               if (service.getType(ref.getChildRef()).equals(DictionaryBootstrap.TYPE_QNAME_FOLDER))
+               if (service.getType(ref.getChildRef()).equals(ContentModel.TYPE_FOLDER))
                {
                   // output separator if appropriate
                   if (total > 0)

@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -86,7 +86,7 @@ public class DownloadContentServlet extends HttpServlet
          
          // get the content mimetype from the node properties
          NodeService nodeService = (NodeService)context.getBean("nodeService");
-         String mimetype = (String)nodeService.getProperty(nodeRef, DictionaryBootstrap.PROP_QNAME_MIME_TYPE);
+         String mimetype = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_MIME_TYPE);
          
          // fall back if unable to resolve mimetype property
          if (mimetype == null || mimetype.length() == 0)

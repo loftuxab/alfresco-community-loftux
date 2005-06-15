@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Aspect;
 import org.alfresco.repo.dictionary.impl.M2Association;
@@ -118,7 +118,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Create the node used for copying
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                ContentModel.ASSOC_CONTAINS,
 				QName.createQName("{test}test"),
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());
@@ -135,7 +135,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 				TEST_ASPECT_QNAME, 
 				aspectProperties);
         
-        this.nodeService.addAspect(sourceNodeRef, DictionaryBootstrap.ASPECT_QNAME_TITLED, null);
+        this.nodeService.addAspect(sourceNodeRef, ContentModel.ASPECT_TITLED, null);
 		
 		// Add a child
 		ChildAssociationRef temp3 =this.nodeService.createNode(
@@ -164,7 +164,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		// Add a target assoc
 		ChildAssociationRef temp = this.nodeService.createNode(
 				rootNodeRef,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                ContentModel.ASSOC_CONTAINS,
 				QName.createQName("{test}testAssoc"),
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());
@@ -175,11 +175,11 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		Map<QName, Serializable> destinationProps = new HashMap<QName, Serializable>();
 		destinationProps.put(PROP1_QNAME_MANDATORY, TEST_VALUE_1);			
         destinationProps.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3); 
-        destinationProps.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        destinationProps.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+        destinationProps.put(ContentModel.PROP_MIME_TYPE, "text/plain");
+        destinationProps.put(ContentModel.PROP_ENCODING, "UTF-8");
 		ChildAssociationRef temp5 = this.nodeService.createNode(
 				this.rootNodeRef,
-                DictionaryBootstrap.ASSOC_QNAME_CONTAINS,
+                ContentModel.ASSOC_CONTAINS,
 				QName.createQName("{test}testDestinationNode"),
 				TEST_TYPE_QNAME,
 				destinationProps);
@@ -197,8 +197,8 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		result.put(PROP1_QNAME_MANDATORY, TEST_VALUE_1);
 		result.put(PROP2_QNAME_OPTIONAL, TEST_VALUE_2);
         result.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3);
-        result.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-        result.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
+        result.put(ContentModel.PROP_MIME_TYPE, "text/plain");
+        result.put(ContentModel.PROP_ENCODING, "UTF-8");
 		return result;
 	}
 	
@@ -213,7 +213,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
         model.createImport(NamespaceService.ALFRESCO_URI, NamespaceService.ALFRESCO_PREFIX);
 
         M2Type testType = model.createType("test:" + TEST_TYPE_QNAME.getLocalName());
-        testType.setParentName("alf:" + DictionaryBootstrap.TYPE_QNAME_CONTENT.getLocalName());
+        testType.setParentName("alf:" + ContentModel.TYPE_CONTENT.getLocalName());
         
         M2Property prop1 = testType.createProperty("test:" + PROP1_QNAME_MANDATORY.getLocalName());
         prop1.setMandatory(true);
@@ -342,9 +342,9 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 			if (sameStore == true)
 			{
 				// Check that the copy aspect has been applied to the copy
-				boolean hasCopyAspect = this.nodeService.hasAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM);
+				boolean hasCopyAspect = this.nodeService.hasAspect(destinationNodeRef, ContentModel.ASPECT_COPIEDFROM);
 				assertTrue(hasCopyAspect);
-				NodeRef copyNodeRef = (NodeRef)this.nodeService.getProperty(destinationNodeRef, DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE);
+				NodeRef copyNodeRef = (NodeRef)this.nodeService.getProperty(destinationNodeRef, ContentModel.PROP_COPY_REFERENCE);
 				assertNotNull(copyNodeRef);
 				assertEquals(sourceNodeRef, copyNodeRef);
 			}

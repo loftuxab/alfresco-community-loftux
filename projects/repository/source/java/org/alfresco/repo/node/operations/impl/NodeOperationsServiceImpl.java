@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.operations.NodeOperationsServicePolicies;
 import org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyNodePolicy;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
@@ -104,7 +104,7 @@ public class NodeOperationsServiceImpl implements CopyService
 		// Register policy behaviours
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
-				DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM,
+				ContentModel.ASPECT_COPIEDFROM,
 				new JavaBehaviour(this, "copyAspectOnCopy"));
 	}
 	
@@ -186,8 +186,8 @@ public class NodeOperationsServiceImpl implements CopyService
 		
 		//	Apply the copy aspect to the new node	
 		Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
-		copyProperties.put(DictionaryBootstrap.PROP_QNAME_COPY_REFERENCE, sourceNodeRef);
-		this.nodeService.addAspect(destinationNodeRef, DictionaryBootstrap.ASPECT_QNAME_COPIEDFROM, copyProperties);
+		copyProperties.put(ContentModel.PROP_COPY_REFERENCE, sourceNodeRef);
+		this.nodeService.addAspect(destinationNodeRef, ContentModel.ASPECT_COPIEDFROM, copyProperties);
 		
 		// Copy the aspects 
 		copyAspects(destinationNodeRef, copyDetails);

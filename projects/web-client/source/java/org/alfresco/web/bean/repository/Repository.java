@@ -8,8 +8,8 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
@@ -83,7 +83,7 @@ public final class Repository
       String name;
       
       // try to find a display "name" property for this node
-      Object nameProp = nodeService.getProperty(ref, DictionaryBootstrap.PROP_QNAME_NAME);
+      Object nameProp = nodeService.getProperty(ref, ContentModel.PROP_NAME);
       if (nameProp != null)
       {
          name = nameProp.toString();
@@ -190,7 +190,7 @@ public final class Repository
    public static Boolean isNodeLocked(Node node, LockService lockService)
    {
       Boolean locked = Boolean.FALSE;
-      if (node.hasAspect(DictionaryBootstrap.ASPECT_QNAME_LOCKABLE))
+      if (node.hasAspect(ContentModel.ASPECT_LOCKABLE))
       {
          // TODO: replace username with real user name ref here!
          LockStatus lockStatus = lockService.getLockStatus(node.getNodeRef(), USERNAME);

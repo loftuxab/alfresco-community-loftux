@@ -5,7 +5,7 @@ package org.alfresco.repo.rule;
 
 import java.util.List;
 
-import org.alfresco.repo.dictionary.impl.DictionaryBootstrap;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
@@ -156,19 +156,19 @@ public class RuleStoreTest extends RuleBaseTest
         {
             NodeRef nodeRef = this.nodeService.createNode(
                     rootNodeRef,
-					DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-                    DictionaryBootstrap.TYPE_QNAME_CONTAINER).getChildRef();
+					ContentModel.ASSOC_CONTAINS,
+                    ContentModel.ASSOC_CONTAINS,
+                    ContentModel.TYPE_CONTAINER).getChildRef();
             NodeRef configFolder = this.nodeService.createNode(
                     rootNodeRef,
-					DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-                    DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS,
-                    DictionaryBootstrap.TYPE_QNAME_CONFIGURATIONS).getChildRef();
-            this.nodeService.addAspect(nodeRef, DictionaryBootstrap.ASPECT_QNAME_ACTIONABLE, null);
+					ContentModel.ASSOC_CONTAINS,
+                    ContentModel.ASSOC_CONTAINS,
+                    ContentModel.TYPE_CONFIGURATIONS).getChildRef();
+            this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE, null);
             this.nodeService.createAssociation(
                     nodeRef, 
                     configFolder, 
-                    DictionaryBootstrap.ASSOC_QNAME_CONFIGURATIONS);
+                    ContentModel.ASSOC_CONFIGURATIONS);
             nodes[i] = nodeRef;
         }
         sw.stop();

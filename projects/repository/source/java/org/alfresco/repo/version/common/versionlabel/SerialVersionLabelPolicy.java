@@ -6,6 +6,7 @@ package org.alfresco.repo.version.common.versionlabel;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.alfresco.repo.version.lightweight.VersionStoreConst;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.QName;
@@ -39,7 +40,7 @@ public class SerialVersionLabelPolicy
         {
             serialVersionNumber = new SerialVersionLabel(preceedingVersion.getVersionLabel());
             
-            VersionType versionType = (VersionType)versionProperties.get(Version.PROP_VERSION_TYPE);
+            VersionType versionType = (VersionType)versionProperties.get(VersionStoreConst.PROP_VERSION_TYPE);
             if (VersionType.MAJOR.equals(versionType) == true)
             {
                 serialVersionNumber.majorIncrement();
