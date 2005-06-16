@@ -4,7 +4,6 @@
 package org.alfresco.repo.transaction;
 
 import org.alfresco.repo.rule.RuleExecution;
-import org.alfresco.repo.rule.RuleRegistration;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory;
 import org.alfresco.repo.search.transaction.LuceneTransactionException;
@@ -15,13 +14,12 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
 /**
- * This Transaction Manager is intended to wrap one of the existing spring
- * transaction managers with support for transactions around the lucene index.
- * The intention is to keep this simple and avoid JTA overhead.
- * 
+ * This is simple Transaction Manager that adds support for various end-of-transaction
+ * processing.  The intention is to keep this simple and avoid JTA overhead.
+ * <p>
  * This does not have full recovery support at the moment but could have. After
  * the lucene indexer prepare we can only fail on IO errors.
- * 
+ * <p>
  * TODO: We should track required deletions and the delta to commit and then we
  * can retry database commits that went through followed by lucene index commits
  * that failed. These will be serialised so could be retied on recovery and
