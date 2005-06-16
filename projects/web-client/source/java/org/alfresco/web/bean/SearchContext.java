@@ -95,18 +95,6 @@ public final class SearchContext implements Serializable
          }
       }
       
-      // match against the "name" attribute
-      /*String nameAttrQuery;
-      if (text.indexOf(' ') != -1 ||
-          (text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"'))
-      {
-         nameAttrQuery = " +@" + nameAttr + ":\"" + safeText + "\"";
-      }
-      else
-      {
-         nameAttrQuery = " +@" + nameAttr + ":" + safeText + "*";
-      }*/
-      
       // match against CONTENT type
       String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}content\" ";
       
@@ -116,7 +104,7 @@ public final class SearchContext implements Serializable
       switch (mode)
       {
          case SearchContext.SEARCH_ALL:
-            query = nameAttrQuery + " OR " + fullTextQuery;
+            query = '(' + nameAttrQuery + ')' + " OR " + fullTextQuery;
             break;
          
          case SearchContext.SEARCH_FILE_NAMES:
@@ -124,7 +112,7 @@ public final class SearchContext implements Serializable
             break;
          
          case SearchContext.SEARCH_FILE_NAMES_CONTENTS:
-            query = "(" + fileTypeQuery + " AND " + nameAttrQuery + ") OR " + fullTextQuery;
+            query = '(' + fileTypeQuery + " AND " + nameAttrQuery + ") OR " + fullTextQuery;
             break;
          
          case SearchContext.SEARCH_SPACE_NAMES:
