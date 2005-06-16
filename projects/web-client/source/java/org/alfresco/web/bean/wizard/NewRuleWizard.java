@@ -512,7 +512,7 @@ public class NewRuleWizard extends AbstractWizardBean
     */
    public String getSummary()
    {
-      String summaryCondition = this.ruleService.getConditionDefintion(
+      String summaryCondition = this.ruleService.getConditionDefinition(
             this.condition).getTitle();
       
       String summaryAction = this.ruleService.getActionDefinition(
