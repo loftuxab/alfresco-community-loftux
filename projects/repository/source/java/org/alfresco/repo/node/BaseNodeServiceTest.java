@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.impl.DictionaryComponent;
@@ -38,6 +41,8 @@ import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.CodeMonkey;
+import org.alfresco.util.transaction.SpringAwareUserTransaction;
+import org.alfresco.util.transaction.UserTransactionFactory;
 import org.hibernate.Session;
 
 /**
@@ -75,7 +80,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
         // load the system model
         ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
-        InputStream modelStream = cl.getResourceAsStream("org/alfresco/repo/dictionary/impl/content_model.xml");
+        InputStream modelStream = cl.getResourceAsStream("org/alfresco/model/content_model.xml");
         assertNotNull(modelStream);
         M2Model model = M2Model.createModel(modelStream);
         dictionaryDao.putModel(model);
@@ -240,6 +245,15 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         
         // done
         return ret;
+    }
+    
+    protected Map<QName, ChildAssociationRef> commitNodeGraph() throws Exception
+    {
+        SpringAwareUserTransaction tx = new SpringAwareUserTransaction(transactionManager);
+        tx.begin();
+        Map<QName, ChildAssociationRef> asnwer = buildNodeGraph();
+        tx.commit();
+        return asnwer;
     }
     
     private int countNodesById(NodeRef nodeRef)
@@ -993,4 +1007,5 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('monkey')", null, namespacePrefixResolver, false);
         assertEquals(0, answer.size());
     }
+    
 }
