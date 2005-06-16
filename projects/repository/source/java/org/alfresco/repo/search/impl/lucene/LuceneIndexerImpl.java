@@ -1350,19 +1350,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return false;
     }
 
-    protected void clearIndex() throws LuceneIndexException
-    {
-        try
-        {
-            super.clearIndex();
-        }
-        catch (LuceneIndexException e)
-        {
-            setRollbackOnly();
-            throw new LuceneIndexException("Failed to clear index", e);
-        }
-    }
-
     public void updateFullTextSearch(int size) throws LuceneIndexException
     {
         checkAbleToDoWork(true);

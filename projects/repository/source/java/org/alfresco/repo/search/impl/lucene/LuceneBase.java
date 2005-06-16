@@ -461,7 +461,11 @@ public abstract class LuceneBase implements Lockable
      */
     protected void mergeDeltaIntoMain(Set<Term> terms) throws LuceneIndexException
     {
-
+        if(writeLockCount < 1)
+        {
+            throw new LuceneIndexException("Muist hold the write lock to merge");
+        }
+        
         if (!indexExists(baseDir))
         {
 
@@ -739,13 +743,10 @@ public abstract class LuceneBase implements Lockable
                 IndexReader.unlock(dir);
                 dir.close();
                 s_logger.warn("Releasing unexpected lucene index write lock for " + baseDir);
-                try
+                StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+                for (StackTraceElement el : trace)
                 {
-                    throw new LuceneIndexException("Trace... ");
-                }
-                catch(LuceneIndexException e)
-                {
-                    s_logger.warn(e);
+                    s_logger.warn(el.toString());
                 }
             }
         }
@@ -765,6 +766,19 @@ public abstract class LuceneBase implements Lockable
 
         if (writeLockCount > 0)
         {
+            try
+            {
+                if (((writeLockCount == 1) && IndexReader.indexExists(baseDir) && (IndexReader.isLocked(baseDir.getPath()))))
+                {
+                    Directory dir = FSDirectory.getDirectory(baseDir, false);
+                    IndexReader.unlock(dir);
+                    dir.close();
+                }
+            }
+            catch (IOException e)
+            {
+                throw new LuceneIndexException("Write lock failed to check or clear any existing lucene locks", e);
+            }
             getLuceneIndexLock().releaseWriteLock(store);
             writeLockCount--;
         }
@@ -777,99 +791,33 @@ public abstract class LuceneBase implements Lockable
         return IndexReader.indexExists(baseDir);
     }
 
-    protected void clearIndex() throws LuceneIndexException
-    {
-        getWriteLock();
-        try
-        {
-            try
-            {
-                closeDeltaReader();
-            }
-            catch (LuceneIndexException e)
-            {
-                s_logger.warn("Failed to close delta reader", e);
-            }
-            try
-            {
-                closeDeltaWriter();
-            }
-            catch (LuceneIndexException e)
-            {
-                s_logger.warn("Failed to close delta writer", e);
-            }
-            if (mainWriter != null)
-            {
-                try
-                {
-                    mainWriter.close();
-                }
-                catch (IOException e)
-                {
-                    s_logger.warn("Failed to close main writer", e);
-                }
-                mainWriter = null;
-            }
-            if (mainReader != null)
-            {
-                try
-                {
-                    mainReader.close();
-                }
-                catch (IOException e)
-                {
-                    s_logger.warn("Failed to close main reader", e);
-                }
-                mainReader = null;
-            }
-            // try
-            // {
-            // deltaDir.close();
-            // }
-            // catch (IOException e)
-            // {
-            // s_logger.warn("Failed to close delta directory", e);
-            // }
-            // try
-            // {
-            // baseDir.close();
-            // }
-            // catch (IOException e)
-            // {
-            // s_logger.warn("Failed to close base directory", e);
-            // }
-            initialise(store, deltaId, true);
-        }
-        finally
-        {
-            releaseWriteLock();
-        }
-    }
-
     protected IndexReader getReader() throws LuceneIndexException
     {
 
-        getWriteLock();
-        try
+        if (!indexExists(baseDir))
         {
-            if (!indexExists(baseDir))
+            getWriteLock();
+            try
             {
-                try
+                if (!indexExists(baseDir))
                 {
-                    mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
-                    mainWriter.setUseCompoundFile(true);
-                    mainWriter.close();
-                    mainWriter = null;
-                }
-                catch (IOException e)
-                {
-                    throw new LuceneIndexException("Failed to create empty main index", e);
+                    try
+                    {
+                        mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
+                        mainWriter.setUseCompoundFile(true);
+                        mainWriter.close();
+                        mainWriter = null;
+                    }
+                    catch (IOException e)
+                    {
+                        throw new LuceneIndexException("Failed to create empty main index", e);
+                    }
                 }
             }
-        }
-        finally
-        {
-            releaseWriteLock();
+            finally
+            {
+                releaseWriteLock();
+            }
         }
 
         try
