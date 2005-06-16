@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Representation of a simple path e.g.
@@ -34,9 +33,6 @@ import org.alfresco.util.debug.CodeMonkey;
  */
 public final class Path implements Iterable<Path.Element>, Serializable
 {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3905520514524328247L;
     private LinkedList<Element> elements;
     
@@ -194,12 +190,8 @@ public final class Path implements Iterable<Path.Element>, Serializable
      */
     public static class ChildAssocElement extends Element
     {
-        static
-        {
-            // TODO:
-            CodeMonkey.issue("This is carrying a ChildAssocRef and is being misused.  Fix to carry correct data");
-        }
         private static final long serialVersionUID = 3689352104636790840L;
+
         private ChildAssociationRef ref;
         
         /**
@@ -258,10 +250,8 @@ public final class Path implements Iterable<Path.Element>, Serializable
      */
     public static class AttributeElement extends Element
     {
-        /**
-         * 
-         */
         private static final long serialVersionUID = 3256727281668863544L;
+
         private QName attribute;
         private int position = -1;
         
@@ -328,9 +318,6 @@ public final class Path implements Iterable<Path.Element>, Serializable
      */
     public static class DescendentOrSelfElement extends Element
     {
-        /**
-         * 
-         */
         private static final long serialVersionUID = 3258410616875005237L;
 
         public String getElementString()
@@ -362,9 +349,6 @@ public final class Path implements Iterable<Path.Element>, Serializable
      */
     public static class SelfElement extends Element
     {
-        /**
-         * 
-         */
         private static final long serialVersionUID = 3834311739151300406L;
 
         public String getElementString()
@@ -396,9 +380,6 @@ public final class Path implements Iterable<Path.Element>, Serializable
      */
     public static class ParentElement extends Element
     {
-        /**
-         * 
-         */
         private static final long serialVersionUID = 3689915080477456179L;
 
         public String getElementString()
