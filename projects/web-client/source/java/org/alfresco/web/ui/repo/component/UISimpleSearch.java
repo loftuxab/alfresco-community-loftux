@@ -16,6 +16,7 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
+import org.alfresco.web.bean.SearchContext;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 import org.alfresco.web.ui.repo.component.property.UIPropertySheet;
@@ -55,8 +56,7 @@ public class UISimpleSearch extends UICommand
       Object values[] = (Object[])state;
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
-      this.lastSearch = (String)values[1];
-      this.searchOption = ((Integer)values[2]).intValue();
+      this.search = (SearchContext)values[1];
    }
    
    /**
@@ -67,8 +67,7 @@ public class UISimpleSearch extends UICommand
       Object values[] = new Object[3];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
-      values[1] = this.lastSearch;
-      values[2] = Integer.valueOf(this.searchOption);
+      values[1] = this.search;
       return (values);
    }
    
@@ -117,8 +116,12 @@ public class UISimpleSearch extends UICommand
       {
          // update the component parameters from the search event details
          SearchEvent searchEvent = (SearchEvent)event;
-         this.setLastSearch(searchEvent.SearchText);
-         this.setSearchMode(searchEvent.SearchMode);
+         
+         // construct the Search Context object
+         SearchContext context = new SearchContext();
+         context.setText(searchEvent.SearchText);
+         context.setMode(searchEvent.SearchMode);
+         this.search = context;
       }
       super.broadcast(event);
    }
@@ -171,19 +174,20 @@ public class UISimpleSearch extends UICommand
       String radioOption = "<tr><td class='userInputForm'><input type='radio' name='" + optionFieldName + "'";
       out.write(radioOption);
       out.write(" VALUE='0'");
-      if (getSearchMode() == 0) out.write(" CHECKED");
+      int searchMode = getSearchMode();
+      if (searchMode == 0) out.write(" CHECKED");
       out.write("><nobr>All Items</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='1'");
-      if (getSearchMode() == 1) out.write(" CHECKED");
+      if (searchMode == 1) out.write(" CHECKED");
       out.write("><nobr>File Names and Contents</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='2'");
-      if (getSearchMode() == 2) out.write(" CHECKED");
+      if (searchMode == 2) out.write(" CHECKED");
       out.write("><nobr>File Names only</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='3'");
-      if (getSearchMode() == 3) out.write(" CHECKED");
+      if (searchMode == 3) out.write(" CHECKED");
       out.write("><nobr>Space Names only</nobr></td></tr>");
       
       // close button
@@ -213,19 +217,12 @@ public class UISimpleSearch extends UICommand
       out.write("</td></tr></table>");
    }
    
-   
-   // ------------------------------------------------------------------------------
-   // Strongly typed component property accessors
-   
    /**
-    * Set the last search text value
+    * Return the current Search Context
     */
-   public void setLastSearch(String text)
+   public SearchContext getSearchContext()
    {
-      if (text != null)
-      {
-         this.lastSearch = text;
-      }
+      return this.search;
    }
    
    /**
@@ -233,20 +230,13 @@ public class UISimpleSearch extends UICommand
     */
    public String getLastSearch()
    {
-      return this.lastSearch;
-   }
-   
-   /**
-    * Set the current search mode (see constants)
-    * 
-    * @param option     Search mode option (see constants)
-    */
-   public void setSearchMode(int option)
-   {
-      // see constants below
-      if (option >= 0 && option < 4)
+      if (search != null)
       {
-         this.searchOption = option;
+         return this.search.getText();
+      }
+      else
+      {
+         return "";
       }
    }
    
@@ -255,7 +245,14 @@ public class UISimpleSearch extends UICommand
     */
    public int getSearchMode()
    {
-      return this.searchOption;
+      if (search != null)
+      {
+         return this.search.getMode();
+      }
+      else
+      {
+         return SearchContext.SEARCH_ALL;
+      }
    }
    
    
@@ -266,17 +263,8 @@ public class UISimpleSearch extends UICommand
    
    private static final String OPTION_PARAM = "_option";
    
-   /** last search string */
-   private String lastSearch = "";
-   
-   /** last used search option mode */
-   private int searchOption = SEARCH_ALL;
-   
-   /** Search mode constants */
-   public final static int SEARCH_ALL = 0;
-   public final static int SEARCH_FILE_NAMES_CONTENTS = 1;
-   public final static int SEARCH_FILE_NAMES = 2;
-   public final static int SEARCH_SPACE_NAMES = 3;
+   /** last search context used */
+   private SearchContext search = null;
    
    
    // ------------------------------------------------------------------------------

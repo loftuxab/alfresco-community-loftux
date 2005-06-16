@@ -44,7 +44,6 @@ import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.alfresco.web.ui.repo.component.UISimpleSearch;
 import org.apache.log4j.Logger;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast
@@ -238,13 +237,13 @@ public class BrowseBean implements IContextListener
       // perform the same query or search twice for every screen refresh.
       if (this.containerNodes == null)
       {
-         if (navigator.getSearchText() == null)
+         if (this.navigator.getSearchContext() == null)
          {
             queryBrowseNodes(this.navigator.getCurrentNodeId());
          }
          else
          {
-            searchBrowseNodes(this.navigator.getSearchText(), this.navigator.getSearchMode());
+            searchBrowseNodes(this.navigator.getSearchContext());
          }
       }
       List<Node> result = this.containerNodes;
@@ -263,13 +262,13 @@ public class BrowseBean implements IContextListener
       // see comment in getNodes() above for reasoning here
       if (this.contentNodes == null)
       {
-         if (navigator.getSearchText() == null)
+         if (this.navigator.getSearchContext() == null)
          {
             queryBrowseNodes(this.navigator.getCurrentNodeId());
          }
          else
          {
-            searchBrowseNodes(this.navigator.getSearchText(), this.navigator.getSearchMode());
+            searchBrowseNodes(this.navigator.getSearchContext());
          }
       }
       List<Node> result = this.contentNodes;
@@ -413,15 +412,14 @@ public class BrowseBean implements IContextListener
    }
    
    /**
-    * Search for a list of nodes using the specific search string
+    * Search for a list of nodes using the specific search context
     * 
-    * @param searchText       Search text
-    * @param searchMode       Search mode to use (see UISimpleSearch constants)
+    * @param searchContext    To use to perform the search
     */
-   private void searchBrowseNodes(String searchText, int searchMode)
+   private void searchBrowseNodes(SearchContext searchContext)
    {
       // get the searcher object and perform the search of the root node
-      String query = buildSearchQuery(searchText, searchMode);
+      String query = searchContext.buildQuery();
       
       UserTransaction tx = null;
       try
@@ -430,7 +428,7 @@ public class BrowseBean implements IContextListener
          tx.begin();
          
          if (logger.isDebugEnabled())
-            logger.debug("Searching using path: " + query);
+            logger.debug("Searching using query: " + query);
          ResultSet results = this.searchService.query(
                Repository.getStoreRef(FacesContext.getCurrentInstance()), 
                "lucene", query, null, null);
@@ -505,110 +503,26 @@ public class BrowseBean implements IContextListener
       node.put("url", DownloadContentServlet.generateURL(node.getNodeRef(), node.getName()));
       node.put("fileTypeImage", Repository.getFileTypeImage(node));
    }
-
-   /**
-    * Build the search query string
-    * 
-    * @param text    Search text
-    * @param mode    Search mode
-    * 
-    * @return prepared search query string
-    */
-   private String buildSearchQuery(String text, int mode)
-   {
-      String query;
-      
-      // the QName for the well known "name" attribute
-      String nameAttr = Repository.escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "name"));
-      
-      // match against content text
-      String contentQuery;
-      if (text.indexOf(' ') == -1 ||
-          (text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"'))
-      {
-         // simple single word text or whole phrase text search
-         contentQuery = " TEXT:\"" + Utils.remove(text, "\"") + '"';
-      }
-      else
-      {
-         // multiple word search
-         StringTokenizer t = new StringTokenizer(Utils.remove(text, "\""), " ");
-         StringBuilder buf = new StringBuilder(64);
-         buf.append('(');
-         while (t.hasMoreTokens())
-         {
-            buf.append("TEXT:\"").append(t.nextToken()).append('"');
-            if (t.hasMoreTokens())
-            {
-               buf.append(" OR ");
-            }
-         }
-         buf.append(')');
-         contentQuery = buf.toString();
-      }
-      
-      // match against the "name" attribute
-      String nameAttrQuery;
-      if (text.indexOf(' ') != -1 ||
-          (text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"'))
-      {
-         nameAttrQuery = " +@" + nameAttr + ":\"" + Utils.remove(text, "\"") + "\"";
-      }
-      else
-      {
-         nameAttrQuery = " +@" + nameAttr + ":" + text + "*";
-      }
-      
-      // match against CONTENT type
-      String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}content\"";
-      
-      // match against FOLDER type
-      String folderTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\"";
-      
-      switch (mode)
-      {
-         case UISimpleSearch.SEARCH_ALL:
-            query = "(" + nameAttrQuery + ") OR " + contentQuery;
-            break;
-         
-         case UISimpleSearch.SEARCH_FILE_NAMES:
-            query = fileTypeQuery + nameAttrQuery;
-            break;
-         
-         case UISimpleSearch.SEARCH_FILE_NAMES_CONTENTS:
-            query = "(" + fileTypeQuery + nameAttrQuery + ") OR " + contentQuery;
-            break;
-         
-         case UISimpleSearch.SEARCH_SPACE_NAMES:
-            query = folderTypeQuery + nameAttrQuery;
-            break;
-         
-         default:
-            throw new IllegalStateException("Unknown search mode specified: " + mode);
-      }
-      
-      return query;
-   }
    
    
    // ------------------------------------------------------------------------------
    // Navigation action event handlers
-
+   
    /**
-    * Action called from the Simple Search component
+    * Action called from the Simple Search component.
+    * Sets up the SearchContext object with the values from the simple search menu.
     */
    public void search(ActionEvent event)
    {
       // setup the search text string on the top-level navigation handler
       UISimpleSearch search = (UISimpleSearch)event.getComponent();
-      navigator.setSearchText(search.getLastSearch());
-      navigator.setSearchMode(search.getSearchMode());
+      this.navigator.setSearchContext(search.getSearchContext());
       
       navigateBrowseScreen();
    }
    
    /**
-    * Action calle to Close the search dialog by returning to the last view node Id
+    * Action called to Close the search dialog by returning to the last view node Id
     */
    public void closeSearch(ActionEvent event)
    {

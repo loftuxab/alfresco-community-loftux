@@ -103,37 +103,21 @@ public class NavigationBean
    }
    
    /**
-    * @return Returns the search text.
+    * @return Returns the search context object if any.
     */
-   public String getSearchText()
+   public SearchContext getSearchContext()
    {
-      return this.searchText;
+      return this.searchContext;
    }
    
    /**
-    * @param searchText    The search text to set.
+    * @param searchContext    The search context object to set or null to clear search.
     */
-   public void setSearchText(String searchText)
+   public void setSearchContext(SearchContext searchContext)
    {
-      this.searchText = searchText;
+      this.searchContext = searchContext;
       
       UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
-   }
-   
-   /**
-    * @return Returns the search Mode (see UISimpleSearch constants)
-    */
-   public int getSearchMode()
-   {
-      return searchMode;
-   }
-
-   /**
-    * @param searchMode The searchMode to set (see UISimpleSearch constants).
-    */
-   public void setSearchMode(int searchMode)
-   {
-      this.searchMode = searchMode;
    }
    
    /**
@@ -155,9 +139,9 @@ public class NavigationBean
       {
          throw new AlfrescoRuntimeException("Can not set the current node id to null");
       }
-         
+      
       this.currentNodeId = currentNodeId;
-      this.searchText = null;
+      this.searchContext = null;
       
       UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
    }
@@ -277,11 +261,8 @@ public class NavigationBean
    /** Node we are currently in the context of */
    private String currentNodeId;
    
-   /** Search text we are currently using */
-   private String searchText;
-   
-   /** Search mode we are currently using */
-   private int searchMode;
+   /** Search context object we are currently using or null for no search */
+   private SearchContext searchContext;
    
    /** bag of displayable properties for the current node */
    private Map<String, Object> nodeProperties = null;
