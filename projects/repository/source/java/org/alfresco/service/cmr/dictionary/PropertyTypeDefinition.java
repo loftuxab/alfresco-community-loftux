@@ -51,4 +51,9 @@ public interface PropertyTypeDefinition
      */
     public String getAnalyserClassName();
     
+    /**
+     * @return the equivalent java class name (or null, if not mapped) 
+     */
+    public String getJavaClassName();
+    
 }

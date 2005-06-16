@@ -19,6 +19,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -182,11 +183,20 @@ public class ServiceDescriptorRegistry
         return (CheckOutCheckInService)getService(COCI_SERVICE);
     }
     
-    /**
-     * @see org.alfresco.service.ServiceRegistry#getCheckOutCheckInService()
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getCategoryService()
      */
     public CategoryService getCategoryService()
     {
         return (CategoryService)getService(CATEGORY_SERVICE);
     }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getNamespaceService()
+     */
+    public NamespaceService getNamespaceService()
+    {
+        return (NamespaceService)getService(NAMESPACE_SERVICE);
+    }
+    
 }

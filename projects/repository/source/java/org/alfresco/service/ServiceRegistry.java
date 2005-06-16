@@ -54,7 +54,6 @@ public interface ServiceRegistry
      * @return  list of provided Services
      */
     Collection<QName> getServices();
-    
 
     /**
      * Is Service Provided?
@@ -63,7 +62,6 @@ public interface ServiceRegistry
      * @return  true => provided, false => not provided
      */
     boolean isServiceProvided(QName service);
-    
 
     /**
      * Get Service Meta Data
@@ -72,7 +70,6 @@ public interface ServiceRegistry
      * @return  the service meta data
      */
     ServiceDescriptor getServiceDescriptor(QName service);
-    
 
     /** 
      * Get Service Interface
@@ -87,12 +84,15 @@ public interface ServiceRegistry
      */
     UserTransaction getUserTransaction();
 
+    /**
+     * @return  the namespace service (or null, if one is not provided)
+     */
+    NamespaceService getNamespaceService();
     
     /**
      * @return  the node service (or null, if one is not provided)
      */
     NodeService getNodeService();
-    
 
     /**
      * @return  the content service (or null, if one is not provided)
@@ -109,18 +109,15 @@ public interface ServiceRegistry
      */
     SearchService getSearchService();
     
-
     /**
      * @return  the version service (or null, if one is not provided)
      */
     VersionService getVersionService();
     
-
     /**
      * @return  the lock service (or null, if one is not provided)
      */
     LockService getLockService();
-
 
     /**
      * @return  the dictionary service (or null, if one is not provided)

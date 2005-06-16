@@ -916,6 +916,23 @@
   
    <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter" abstract="false" singleton="true" lazy-init="default" autowire="default" dependency-check="default" /> 
 
+
+   <!-- Importer -->
+   
+   <bean id="viewImporter" class="org.alfresco.repo.importer.view.ViewImporter">
+      <property name="namespaceService"><ref bean="namespaceService"/></property>
+      <property name="dictionaryService"><ref bean="dictionaryService"/></property>
+      <property name="nodeService"><ref bean="nodeService"/></property>
+   </bean>
+
+   <bean id="importerComponent" class="org.alfresco.repo.importer.ImporterComponent">
+      <!-- For now, hard-wire the view importer -->
+      <property name="viewImporter"><ref bean="viewImporter"/></property>
+      <property name="dictionaryService"><ref bean="dictionaryService"/></property>
+      <property name="nodeService"><ref bean="nodeService"/></property>
+   </bean>
+   
+
    <!-- Audit -->
    
    <bean id="auditableAspect" class="org.alfresco.repo.audit.AuditableAspect" init-method="init">

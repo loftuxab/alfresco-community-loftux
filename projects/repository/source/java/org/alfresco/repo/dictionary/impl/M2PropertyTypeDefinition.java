@@ -7,6 +7,7 @@
  */
 package org.alfresco.repo.dictionary.impl;
 
+import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -33,6 +34,22 @@ import org.alfresco.service.namespace.QName;
 
     /*package*/ void resolveDependencies(ModelQuery query)
     {
+        // Ensure java class has been specified
+        String javaClass = propertyType.getJavaClassName();
+        if (javaClass == null)
+        {
+            throw new DictionaryException("Java class of property type " + name.toPrefixString() + " must be specified");
+        }
+        
+        // Ensure java class is valid and referencable
+        try
+        {
+            Class.forName(javaClass);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new DictionaryException("Java class " + javaClass + " of property type " + name.toPrefixString() + " is invalid", e);
+        }
     }
     
     
@@ -69,6 +86,15 @@ import org.alfresco.service.namespace.QName;
     public String getAnalyserClassName()
     {
        return propertyType.getAnalyserClassName();
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.PropertyTypeDefinition#getJavaClassName()
+     */
+    public String getJavaClassName()
+    {
+        return propertyType.getJavaClassName();
     }
     
 }

@@ -18,10 +18,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.service.cmr.dictionary.DictionaryException;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.CachingDateFormat;
+import org.alfresco.util.ParameterCheck;
 
 /**
  * Support for generic conversion between types.
@@ -49,6 +52,35 @@ import org.alfresco.util.CachingDateFormat;
  */
 public class ValueConverter
 {
+    /**
+     * General conversion methos to Object types (not it can not support
+     * conversion to primary types due the restrictions of relfection. Use the
+     * static conversion methods to primitive types.
+     * 
+     * @param propertyType - the target property type
+     * @param value - the value to be converted
+     * @return - the converted value as the correct type
+     */
+    public static Object convert(PropertyTypeDefinition propertyType, Object value)
+    {
+        ParameterCheck.mandatory("Property type definition", propertyType);
+        
+        // Convert property type to java class
+        Class javaClass = null;
+        String javaClassName = propertyType.getJavaClassName();
+        try
+        {
+            javaClass = Class.forName(javaClassName);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new DictionaryException("Java class " + javaClassName + " of property type " + propertyType.getName() + " is invalid", e);
+        }
+        
+        return convert(javaClass, value);
+    }
+    
+    
     /**
      * General conversion methos to Object types (not it can not support
      * conversion to primary types due the restrictions of relfection. Use the

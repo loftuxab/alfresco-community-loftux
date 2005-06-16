@@ -13,6 +13,7 @@ public class M2PropertyType
     private String title = null;
     private String description = null;
     private String analyserClassName = null;
+    private String javaClassName = null;
     
     
     /*package*/ M2PropertyType()
@@ -66,6 +67,18 @@ public class M2PropertyType
     public void setAnalyserClassName(String analyserClassName)
     {
         this.analyserClassName = analyserClassName;;
+    }
+
+    
+    public String getJavaClassName()
+    {
+        return javaClassName;
+    }
+    
+    
+    public void setJavaClassName(String javaClassName)
+    {
+        this.javaClassName = javaClassName;;
     }
     
 }

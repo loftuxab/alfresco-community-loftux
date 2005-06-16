@@ -1,0 +1,41 @@
+
+<!-- Note: The import will be performed relative to a specific path specified at import
+           time -->
+   
+<v:view xmlns:v="http://www.alfresco.org/repository/view/0.1" xmlns:alf="http://www.alfresco.org/1.0">
+   
+   <alf:systemfolder>
+      <alf:name>System</alf:name>
+      <alf:orderedchildren>true</alf:orderedchildren>
+      <alf:contains>
+         
+         <alf:systemfolder v:childName="alf:people">
+            <alf:auditable/>
+            <alf:name>People</alf:name>
+            <alf:creator>administrator</alf:creator>
+            <alf:contains>
+               <alf:person v:childName="alf:fredb">
+                  <alf:userName>fredb</alf:userName>
+                  <alf:firstName>Fred</alf:firstName>
+                  <alf:lastName>Bloggs</alf:lastName>
+                  <alf:homeFolder>/home/fredb</alf:homeFolder>
+               </alf:person>
+            </alf:contains>
+         </alf:systemfolder>
+         
+         <!-- note: if no explicit v:childName, take from name if one exists -->
+         <alf:cmobject>
+            <alf:translatable/>
+            <alf:name>Some Content</alf:name>
+            <alf:translations v:idref="xyz"/>
+         </alf:cmobject>
+   
+         <alf:cmobject v:id="xyz">
+            <alf:name>Translation of Some Content</alf:name>
+         </alf:cmobject>
+
+      </alf:contains>
+      
+   </alf:systemfolder>
+
+</v:view>
