@@ -203,8 +203,8 @@ public class ConcurrentNodeServiceTest extends TestCase
     public void testConcurrent() throws Exception
     {
         IndexWriter.COMMIT_LOCK_TIMEOUT = 100000;
-        int count = 5;
-        int repeats = 10;
+        int count = 20;
+        int repeats = 20;
 
         Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
         Thread runner = null;
@@ -256,13 +256,13 @@ public class ConcurrentNodeServiceTest extends TestCase
             }
             try
             {
-                System.out.println("Start " + this.getName());
+                //System.out.println("Start " + this.getName());
                 for (int i = 0; i < repeats; i++)
                 {
                     Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
-                    System.out.println(" " + this.getName() + " " + i);
+                    //System.out.println(" " + this.getName() + " " + i);
                 }
-                System.out.println("End " + this.getName());
+                //System.out.println("End " + this.getName());
             }
             catch (Exception e)
             {
