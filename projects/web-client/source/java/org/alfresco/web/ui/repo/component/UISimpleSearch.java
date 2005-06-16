@@ -89,7 +89,7 @@ public class UISimpleSearch extends UICommand
          if (searchText.length() != 0)
          {
             if (logger.isDebugEnabled())
-               logger.debug("*****Search text submitted: " + searchText);
+               logger.debug("Search text submitted: " + searchText);
             int option = -1;
             String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
             String optionStr = (String)requestMap.get(optionFieldName);
@@ -98,7 +98,7 @@ public class UISimpleSearch extends UICommand
                option = Integer.parseInt(optionStr);
             }
             if (logger.isDebugEnabled())
-               logger.debug("*****Search option submitted: " + option);
+               logger.debug("Search option submitted: " + option);
             
             // queue event so system can perform a search and update the component
             SearchEvent event = new SearchEvent(this, searchText, option);
@@ -140,12 +140,12 @@ public class UISimpleSearch extends UICommand
       
       // script for dynamic simple search menu drop-down options
       out.write("<script>");
-      out.write("function _searchDropdown() {" +
-            "if (document.getElementById('_search').style.display == 'none') {" + 
-            "   document.getElementById('_search').style.display = '';" + 
+      /*out.write("function _searchDropdown() {" +
+            "if (document.getElementById('_alfsearch').style.display == 'none') {" + 
+            "   document.getElementById('_alfsearch').style.display = '';" + 
             "} else {" + 
-            "   document.getElementById('_search').style.display = 'none';" + 
-            "} }");
+            "   document.getElementById('_alfsearch').style.display = 'none';" + 
+            "} }");*/
       out.write("function _noenter(event) {" +
             "if (event && event.keyCode == 13) {" +
             "   _searchSubmit();return false; }" +
@@ -162,12 +162,13 @@ public class UISimpleSearch extends UICommand
       
       String searchImage = Utils.buildImageTag(context, "/images/icons/search_icon.gif", 15, 15, "Go", "_searchSubmit();");
       
-      out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13, "Options", "javascript:_searchDropdown();"));
+      out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13, "Options", "javascript:_toggleMenu('_alfsearch');"));
       
       // dynamic DIV area containing search options
-      out.write("<br><div id='_search' style='position:absolute;display:none'>");
+      out.write("<br><div id='_alfsearch' style='position:absolute;display:none'" +
+                " onmouseover=\"javascript:_menuIn('_alfsearch');\"" +
+                " onmouseout=\"javascript:_menuOut('_alfsearch');\">");
       out.write("<table border=0 bgcolor='#eeeeee' style='border-top:thin solid #FFFFFF;border-left:thin solid #FFFFFF;border-right:thin solid #444444;border-bottom:thin solid #444444;' cellspacing=4 cellpadding=0>");
-      //out.write("<tr><td class='userInputForm'><nobr>What would you like to search?</nobr></td></tr>");
       
       // output each option - setting the current one to CHECKED
       String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
@@ -190,10 +191,11 @@ public class UISimpleSearch extends UICommand
       if (searchMode == 3) out.write(" CHECKED");
       out.write("><nobr>Space Names only</nobr></td></tr>");
       
-      // close button
-      out.write("<tr><td><table width=100%><tr><td>" +
-                "<input type='button' value='Close' class='dialogControls' onclick=\"document.getElementById('_search').style.display='none';\">" + 
-                "</td><td align=right>");
+      // "<input type='button' value='Close' class='dialogControls' onclick=\"document.getElementById('_alfsearch').style.display='none';\">" +
+      // row with table containing advanced search link and Search Go button 
+      out.write("<tr><td><table width=100%><tr><td>");
+      out.write("<a href='#' class='small'>Advanced Search</a>");
+      out.write("</td><td align=right>");
       out.write(searchImage);
       out.write("</td></tr></table></td></tr>");
       out.write("</table></div>");
@@ -204,7 +206,7 @@ public class UISimpleSearch extends UICommand
       out.write(getClientId(context));
       // TODO: style and class from component properties!
       out.write("' onkeypress=\"return _noenter(event)\"");
-      out.write(" type='text' maxlength='255' style='width:90px;padding-top:3px' value=\"");
+      out.write(" type='text' maxlength='255' style='width:90px;padding-top:3px;font-size:10px' value=\"");
       // output previous search text stored in this component!
       out.write(Utils.replace(getLastSearch(), "\"", "&quot;"));
       out.write("\">");

@@ -80,8 +80,8 @@ public class MapNode extends Node implements Map<String, Object>
       {
          // well known properties required as publically accessable map attributes
          props.put("id", this.getId());
-         props.put("type", this.getType());
          props.put("name", this.getName());
+         //props.put("type", this.getType());   // expensive! do we need this?
          //props.put("path", this.getPath());   // expensive! do we need this?
          props.put("nodeRef", this.getNodeRef());
          
