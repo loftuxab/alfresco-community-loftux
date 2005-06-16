@@ -3,10 +3,14 @@
  */
 package org.alfresco.repo.rule.action;
 
-import org.alfresco.service.ServiceRegistry;
+import java.util.List;
+
+import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
 
@@ -31,31 +35,36 @@ public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
 	 * The node service
 	 */
 	private NodeService nodeService;
-    
-    /**
-     * Constructor
-     * 
-     * @param ruleAction
-     * @param serviceRegistry
-     */
-    public CheckOutActionExecutor(RuleAction ruleAction, ServiceRegistry serviceRegistry) 
+	
+	public void setNodeService(NodeService nodeService) 
 	{
-		super(ruleAction, serviceRegistry);		
-		this.cociService = serviceRegistry.getCheckOutCheckInService();
-		this.nodeService = serviceRegistry.getNodeService();
+		this.nodeService = nodeService;
+	}
+	
+	public void setCociService(CheckOutCheckInService cociService) 
+	{
+		this.cociService = cociService;
+	}
+    
+	@Override
+	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
+	{
+		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, ParameterType.NODE_REF, false, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, ParameterType.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, ParameterType.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
 	}
 
     /**
-     * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
-    public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
+    public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
 		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
 	        // Get the destination details
-	        NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-	        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
-	        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
+	        NodeRef destinationParent = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+	        QName destinationAssocTypeQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
+	        QName destinationAssocQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
 	        
 	        if (destinationParent == null || destinationAssocTypeQName == null || destinationAssocQName == null)
 	        {
@@ -73,5 +82,4 @@ public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
 	        }
 		}
     }
-
 }

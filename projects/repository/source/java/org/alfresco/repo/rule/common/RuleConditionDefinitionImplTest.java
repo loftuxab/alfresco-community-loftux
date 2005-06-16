@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.alfresco.repo.rule;
+package org.alfresco.repo.rule.common;
 
 import org.alfresco.service.cmr.rule.RuleServiceException;
 
@@ -17,7 +17,7 @@ public class RuleConditionDefinitionImplTest extends RuleItemDefinitionImplTest
     private static final String CONDITION_EVALUATOR = "conditionEvaluator";
 
     /**
-     * @see org.alfresco.repo.rule.RuleItemDefinitionImplTest#create()
+     * @see org.alfresco.repo.rule.common.RuleItemDefinitionImplTest#create()
      */
     protected RuleItemDefinitionImpl create()
     {    

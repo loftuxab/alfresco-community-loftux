@@ -3,6 +3,8 @@
  */
 package org.alfresco.repo.transaction;
 
+import org.alfresco.repo.rule.RuleExecution;
+import org.alfresco.repo.rule.RuleRegistration;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory;
 import org.alfresco.repo.search.transaction.LuceneTransactionException;
@@ -70,7 +72,7 @@ public class AlfrescoTransactionManager extends HibernateTransactionManager
 			}
 			if (this.ruleService != null)
 			{
-				this.ruleService.executePendingRules();
+				((RuleExecution)this.ruleService).executePendingRules();
 			}
 			
             // TODO: The following call should mark for recovery - it does not

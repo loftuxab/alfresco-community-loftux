@@ -3,8 +3,10 @@
  */
 package org.alfresco.repo.rule.action;
 
+import java.util.List;
+
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -12,6 +14,8 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
 
@@ -31,20 +35,34 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 	private ContentService contentService;
 	private CopyService copyService;
 
-	/**
-	 * @param ruleAction
-	 * @param serviceRegistry
-	 */
-	public TransformActionExecutor(
-			RuleAction ruleAction,
-			ServiceRegistry serviceRegistry) 
+	public void setNodeService(NodeService nodeService) 
 	{
-		super(ruleAction, serviceRegistry);
-		
-		this.dictionaryService = serviceRegistry.getDictionaryService();
-		this.nodeService = serviceRegistry.getNodeService();
-		this.contentService = serviceRegistry.getContentService();		
-		this.copyService = serviceRegistry.getCopyService();
+		this.nodeService = nodeService;
+	}
+	
+	public void setDictionaryService(DictionaryService dictionaryService) 
+	{
+		this.dictionaryService = dictionaryService;
+	}
+	
+	public void setContentService(ContentService contentService) 
+	{
+		this.contentService = contentService;
+	}
+	
+	public void setCopyService(CopyService copyService) 
+	{
+		this.copyService = copyService;
+	}
+	
+
+	@Override
+	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
+	{
+		paramList.add(new ParameterDefinitionImpl(PARAM_MIME_TYPE, ParameterType.STRING, true, getParamDisplayLabel(PARAM_MIME_TYPE)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, ParameterType.NODE_REF, true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
 	}
 
 	/**
@@ -52,6 +70,7 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 	 */
 	@Override
 	protected void executeImpl(
+			RuleAction ruleAction,
 			NodeRef actionableNodeRef,
 			NodeRef actionedUponNodeRef) 
 	{
@@ -62,12 +81,12 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 			if (this.dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT) == true)
 			{
 				// Get the mime type
-				String mimeType = (String)this.ruleAction.getParameterValue(PARAM_MIME_TYPE);
+				String mimeType = (String)ruleAction.getParameterValue(PARAM_MIME_TYPE);
 				
 				// Get the details of the copy destination
-				NodeRef destinationParent = (NodeRef)this.ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-		        QName destinationAssocTypeQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
-		        QName destinationAssocQName = (QName)this.ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
+				NodeRef destinationParent = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+		        QName destinationAssocTypeQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
+		        QName destinationAssocQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
 		        
 				// Copy the content node
 		        NodeRef copyNodeRef = this.copyService.copy(

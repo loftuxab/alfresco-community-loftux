@@ -4,11 +4,14 @@
 package org.alfresco.repo.rule.action;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
 
@@ -19,32 +22,28 @@ import org.alfresco.service.namespace.QName;
  */
 public class AddFeaturesActionExecutor extends RuleActionExecutorAbstractBase
 {
+	public static final String NAME = "add-features";
+	public static final String PARAM_ASPECT_NAME = "aspect-name";
+	
 	/**
 	 * The node service
 	 */
 	private NodeService nodeService;
-
-    /**
-     * Constructor
-     * 
-     * @param ruleAction
-     * @param serviceRegistry
-     */
-    public AddFeaturesActionExecutor(RuleAction ruleAction, ServiceRegistry serviceRegistry) 
+	
+	public void setNodeService(NodeService nodeService) 
 	{
-		super(ruleAction, serviceRegistry);		
-		this.nodeService = serviceRegistry.getNodeService();
+		this.nodeService = nodeService;
 	}
 
     /**
-     * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
      */
-    public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
+    public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
 		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
 	        // Get the name of the aspec to add
-			Map<String, Serializable> paramValues = this.ruleAction.getParameterValues();
+			Map<String, Serializable> paramValues = ruleAction.getParameterValues();
 	        QName aspectQName = (QName)paramValues.get("aspect-name");
 	        
 			// TODO get the properties that should be set when the aspect is added
@@ -53,5 +52,11 @@ public class AddFeaturesActionExecutor extends RuleActionExecutorAbstractBase
 	        this.nodeService.addAspect(actionedUponNodeRef, aspectQName, null);
 		}
     }
+
+	@Override
+	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
+	{
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASPECT_NAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASPECT_NAME)));
+	}
 
 }

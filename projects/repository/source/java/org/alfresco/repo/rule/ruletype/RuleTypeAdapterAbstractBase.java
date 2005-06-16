@@ -6,8 +6,10 @@ package org.alfresco.repo.rule.ruletype;
 import java.util.List;
 
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.rule.RuleTypeAdapter;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.repo.rule.CommonResourceAbstractBase;
+import org.alfresco.repo.rule.RuleExecution;
+import org.alfresco.repo.rule.RuleRegistration;
+import org.alfresco.repo.rule.common.RuleTypeImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
@@ -18,7 +20,7 @@ import org.alfresco.service.cmr.rule.RuleType;
  * 
  * @author Roy Wetherall
  */
-public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
+public abstract class RuleTypeAdapterAbstractBase extends CommonResourceAbstractBase implements RuleTypeAdapter
 {
 	/**
 	 * The rule type
@@ -28,36 +30,48 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
 	/**
 	 * The policy component
 	 */
-    protected PolicyComponent policyComponent;
-    
-	/**
-	 * Service registry
-	 */
-	//protected ServiceRegistry serviceRegistry;
+    protected PolicyComponent policyComponent;    
 	
 	/**
 	 * The rule service
 	 */
     private RuleService ruleService;
+	
+	/**
+	 * Get the rule type
+	 */
+	public RuleType getRuleType() 
+	{
+		if (this.ruleType == null)
+		{
+			this.ruleType = new RuleTypeImpl(this.name);
+			((RuleTypeImpl)this.ruleType).setDisplayLabel(getDisplayLabel());
+		}
+		return this.ruleType;
+	}
 
-    
-    /**
-     * Constructor
-     * 
-     * @param ruleType			the rule type
-     * @param serviceRegistry	the service registry
-     */
-    public RuleTypeAdapterAbstractBase(
-			RuleType ruleType, 
-			RuleService ruleService,
-			PolicyComponent policyComponent,
-			ServiceRegistry serviceRegistry)
-    {
-        this.ruleType = ruleType;
-        this.policyComponent = policyComponent;
-	//	this.serviceRegistry = serviceRegistry;
-        this.ruleService = ruleService; 
-    }
+	public void setPolicyComponent(PolicyComponent policyComponent) 
+	{
+		this.policyComponent = policyComponent;
+	}
+	
+	public void setRuleService(RuleService ruleService) 
+	{
+		this.ruleService = ruleService;
+	}
+	
+	protected abstract String getDisplayLabel();
+	
+	public void init()
+	{
+		// Call back to rule service to register rule type
+		((RuleRegistration)this.ruleService).registerRuleType(this);
+		
+		// Register the policy bahaviour
+		registerPolicyBehaviour();
+	}
+	
+	protected abstract void registerPolicyBehaviour();
     
 	/**
 	 * Execute rules that relate to the actionable node for this type on the
@@ -78,7 +92,7 @@ public abstract class RuleTypeAdapterAbstractBase implements RuleTypeAdapter
 			
             for (Rule rule : rules)
             {   
-				this.ruleService.addRulePendingExecution(actionableNodeRef, actionedUponNodeRef, rule);
+				((RuleExecution)this.ruleService).addRulePendingExecution(actionableNodeRef, actionedUponNodeRef, rule);
             }
         }
     }

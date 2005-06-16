@@ -1,7 +1,7 @@
 /**
  * Created on May 25, 2005
  */
-package org.alfresco.repo.rule;
+package org.alfresco.repo.rule.common;
 
 import java.io.Serializable;
 import java.util.ArrayList;

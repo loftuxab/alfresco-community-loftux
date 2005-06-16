@@ -4,11 +4,7 @@
 package org.alfresco.repo.rule.ruletype;
 
 import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.rule.RuleService;
-import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -19,24 +15,14 @@ import org.alfresco.service.namespace.QName;
  */
 public class OutboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
 {
+	private static final String DISPLAY_LABEL = "outbound.display-label";
+	
 	/**
-	 * Constructor 
-	 * 
-	 * @param ruleType
-	 * @param policyComponent
-	 * @param serviceRegistry
-	 */
-    public OutboundRuleTypeAdapter(RuleType ruleType, RuleService ruleService, PolicyComponent policyComponent, ServiceRegistry serviceRegistry) 
-	{
-		super(ruleType, ruleService, policyComponent, serviceRegistry);
-	}
-
-	/**
-     * @see org.alfresco.repo.rule.RuleTypeAdapter#registerPolicyBehaviour()
+     * @see org.alfresco.repo.rule.ruletype.RuleTypeAdapter#registerPolicyBehaviour()
      */
     public void registerPolicyBehaviour()
     {
-        policyComponent.bindAssociationBehaviour(
+        this.policyComponent.bindAssociationBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onDeleteChildAssociation"),
                 this,
                 new JavaBehaviour(this, "onDeleteChildAssociation"));
@@ -51,4 +37,10 @@ public class OutboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
     {
         executeRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());
     }
+	
+	@Override
+	protected String getDisplayLabel() 
+	{
+		return this.properties.getProperty(DISPLAY_LABEL);
+	}
 }

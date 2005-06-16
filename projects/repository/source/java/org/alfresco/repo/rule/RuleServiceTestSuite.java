@@ -1,5 +1,12 @@
 package org.alfresco.repo.rule;
 
+import org.alfresco.repo.rule.common.ParameterDefinitionImplTest;
+import org.alfresco.repo.rule.common.RuleActionDefinitionImplTest;
+import org.alfresco.repo.rule.common.RuleActionImplTest;
+import org.alfresco.repo.rule.common.RuleConditionDefinitionImplTest;
+import org.alfresco.repo.rule.common.RuleConditionImplTest;
+import org.alfresco.repo.rule.common.RuleTypeImplTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

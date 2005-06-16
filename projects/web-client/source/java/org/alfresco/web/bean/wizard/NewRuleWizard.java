@@ -103,7 +103,7 @@ public class NewRuleWizard extends AbstractWizardBean
             }
         
             RuleType ruleType = this.ruleService.getRuleType(this.getType());
-            RuleConditionDefinition cond = this.ruleService.getConditionDefintion(this.getCondition());
+            RuleConditionDefinition cond = this.ruleService.getConditionDefinition(this.getCondition());
             RuleActionDefinition action = this.ruleService.getActionDefinition(this.getAction());
         
             // set up parameters maps for the condition and acion

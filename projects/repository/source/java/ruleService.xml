@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+	
+   <!-- Rules Service -->
+   
+   <bean id="ruleService" class="org.alfresco.repo.rule.RuleServiceImpl">
+		<property name="configService">
+			<ref bean="repoConfigService"/>
+		</property>
+		<property name="nodeService">
+			<ref bean="nodeService"/>
+		</property>
+		<property name="contentService">
+			<ref bean="contentService"/>
+		</property>
+		<property name="dictionaryService">
+			<ref bean="dictionaryService"/>
+		</property>
+		<property name="policyComponent">
+			<ref bean="policyComponent"/>
+		</property>			
+		<property name="serviceRegistry">
+			<ref bean="serviceRegistry"/>
+		</property>
+		<property name="ruleStore">
+			<ref bean="ruleStore"/>
+		</property>
+   </bean>
+   
+   <!-- Rule Store -->
+   
+   <bean id="ruleStore" class="org.alfresco.repo.rule.RuleStoreImpl">
+	  <property name="nodeService">
+		 <ref bean="nodeService"/>
+	  </property>
+	  <property name="contentService">
+		 <ref bean="contentService"/>
+	  </property>	
+   </bean>
+   
+   <!-- Definitions for beans that use the common resource -->
+   
+   <bean id="common-resource">
+      <property name="resource">
+		<value>org/alfresco/repo/rule/rule-config.properties</value>
+	  </property>  
+   </bean>
+   
+   <!-- Rule types -->
+   
+   <bean id="rule-type-adapter" parent="common-resource" init-method="init">
+	  <property name="ruleService">
+		<ref bean="ruleService"/>
+	  </property>					
+	  <property name="policyComponent">
+		<ref bean="policyComponent"/>
+	  </property>
+   </bean>
+   
+   <bean id="inbound" class="org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter" parent="rule-type-adapter"/>		
+   
+   <!-- Rule conditions -->
+
+   <bean id="rule-condition-evaluator" parent="common-resource" init-method="init">
+	  <property name="ruleService">
+	     <ref bean="ruleService"/>
+	  </property>
+   </bean>	
+
+   <bean id="no-condition" class="org.alfresco.repo.rule.condition.NoConditionEvaluator" parent="rule-condition-evaluator"/>
+	
+   <bean id="match-text" class="org.alfresco.repo.rule.condition.MatchTextEvaluator" parent="rule-condition-evaluator">
+	  <property name="nodeService">
+         <ref bean="nodeService"/>
+	  </property>
+   </bean>
+   
+   <!-- Rule actions -->
+   
+   <bean id="rule-condition-executor" parent="common-resource" init-method="init">
+	  <property name="ruleService">
+	     <ref bean="ruleService"/>
+	  </property>
+   </bean>
+   
+   <bean id="add-features" class="org.alfresco.repo.rule.action.AddFeaturesActionExecutor" parent="rule-condition-executor">
+	  <property name="nodeService">
+         <ref bean="nodeService"/>
+	  </property>
+   </bean>
+
+   <bean id="simple-workflow" class="org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor" parent="rule-condition-executor">
+	  <property name="nodeService">
+         <ref bean="nodeService"/>
+	  </property>
+   </bean>
+
+	<bean id="transform" class="org.alfresco.repo.rule.action.TransformActionExecutor" parent="rule-condition-executor">
+	  <property name="nodeService">
+		 <ref bean="nodeService"/>
+	  </property>
+	  <property name="dictionaryService">
+		 <ref bean="dictionaryService"/>
+	  </property>
+	  <property name="contentService">
+		 <ref bean="contentService"/>
+	  </property>
+	  <property name="copyService">
+		 <ref bean="nodeOperationsService"/>
+	  </property>	  
+	</bean>
+	
+	<bean id="copy" class="org.alfresco.repo.rule.action.CopyActionExecutor" parent="rule-condition-executor">
+	  <property name="nodeService">
+		 <ref bean="nodeService"/>
+	  </property>
+	  <property name="copyService">
+		 <ref bean="nodeOperationsService"/>
+	  </property>
+   </bean>
+	   
+	<bean id="move" class="org.alfresco.repo.rule.action.MoveActionExecutor" parent="rule-condition-executor">
+	  <property name="nodeService">
+		 <ref bean="nodeService"/>
+	  </property>
+   </bean>
+	
+	<bean id="check-in" class="org.alfresco.repo.rule.action.CheckInActionExecutor" parent="rule-condition-executor">
+	  <property name="nodeService">
+		 <ref bean="nodeService"/>
+	  </property>
+	  <property name="cociService">
+		 <ref bean="versionOperationsService"></ref>
+	  </property>
+   </bean>
+	
+	<bean id="check-out" class="org.alfresco.repo.rule.action.CheckOutActionExecutor" parent="rule-condition-executor">
+	  <property name="nodeService">
+		 <ref bean="nodeService"/>
+	  </property>
+	  <property name="cociService">
+		 <ref bean="versionOperationsService"></ref>
+	  </property>
+   </bean>
+   
+</beans>

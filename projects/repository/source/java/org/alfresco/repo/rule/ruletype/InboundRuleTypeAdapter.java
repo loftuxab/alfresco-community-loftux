@@ -4,11 +4,7 @@
 package org.alfresco.repo.rule.ruletype;
 
 import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.rule.RuleService;
-import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -19,28 +15,19 @@ import org.alfresco.service.namespace.QName;
  */
 public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
 {
-	/**
-	 * Constructor
-	 *  
-	 * @param ruleType
-	 * @param policyComponent
-	 * @param serviceRegistry
-	 */
-    public InboundRuleTypeAdapter(RuleType ruleType, RuleService ruleService, PolicyComponent policyComponent, ServiceRegistry serviceRegistry) 
-	{
-		super(ruleType, ruleService, policyComponent, serviceRegistry);
-	}
-
-	/**
-     * @see org.alfresco.repo.rule.RuleTypeAdapter#registerPolicyBehaviour()
+	public static final String NAME = "inbound";
+	private static final String DISPLAY_LABEL = "inbound.display-label";
+	
+    /**
+     * @see org.alfresco.repo.rule.ruletype.RuleTypeAdapter#registerPolicyBehaviour()
      */
     public void registerPolicyBehaviour()
     {
-        policyComponent.bindAssociationBehaviour(
+        this.policyComponent.bindAssociationBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"),
                 this,
                 new JavaBehaviour(this, "onCreateChildAssociation"));
-        policyComponent.bindClassBehaviour(
+        this.policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
                 this,
                 new JavaBehaviour(this, "onCreateChildAssociation"));
@@ -55,4 +42,10 @@ public class InboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
     {
         executeRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());
     }
+
+	@Override
+	protected String getDisplayLabel() 
+	{
+		return this.properties.getProperty(DISPLAY_LABEL);
+	}
 }

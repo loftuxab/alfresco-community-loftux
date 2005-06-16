@@ -3,8 +3,10 @@
  */
 package org.alfresco.repo.rule.condition;
 
-import org.alfresco.service.ServiceRegistry;
+import java.util.List;
+
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.RuleCondition;
 
 /**
@@ -12,33 +14,24 @@ import org.alfresco.service.cmr.rule.RuleCondition;
  * 
  * @author Roy Wetherall
  */
-public class NoConditionEvaluator extends
-        RuleConditionEvaluatorAbstractBase
+public class NoConditionEvaluator extends RuleConditionEvaluatorAbstractBase
 {
 	/**
 	 * Evaluator constants
 	 */
-	public static final String NAME = "no-condition";
+	public static final String NAME = "no-condition";	
+
 	
-	/**
-	 * Constructor 
-	 * 
-	 * @param ruleCondition
-	 * @param serviceRegistry
-	 */
-	public NoConditionEvaluator(RuleCondition ruleCondition, ServiceRegistry serviceRegistry) 
-	{
-		super(ruleCondition, serviceRegistry);
-	}
-
-
-    /**
-     * @see org.alfresco.repo.rule.condition.RuleConditionEvaluatorAbstractBase#evaluateImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
-     */
-    public boolean evaluateImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
+    public boolean evaluateImpl(RuleCondition ruleCondition, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
         // Always return true
         return true;
     }
+
+	@Override
+	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
+	{
+		// No parameters to add
+	}
 
 }

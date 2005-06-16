@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleCondition;
 
 /**
@@ -36,22 +38,23 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 	 */
     private NodeService nodeService;
 	
-	/**
-	 * Constructor
-	 * 
-	 * @param ruleCondition		the rule condition
-	 * @param serviceRegistry	the service registry
-	 */
-	public MatchTextEvaluator(RuleCondition ruleCondition, ServiceRegistry serviceRegistry) 
+	public void setNodeService(NodeService nodeService) 
 	{
-		super(ruleCondition, serviceRegistry);		
-		this.nodeService = serviceRegistry.getNodeService();
+		this.nodeService = nodeService;
+	}	
+	
+	@Override
+	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
+	{
+		paramList.add(new ParameterDefinitionImpl(PARAM_TEXT, ParameterType.STRING, true, getParamDisplayLabel(PARAM_TEXT)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_OPERATION, ParameterType.STRING, false, getParamDisplayLabel(PARAM_OPERATION)));
 	}
 
 	/**
      * @see org.alfresco.repo.rule.condition.RuleConditionEvaluatorAbstractBase#evaluateImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
 	 */
 	public boolean evaluateImpl(
+			RuleCondition ruleCondition,
 			NodeRef actionableNodeRef,
 			NodeRef actionedUponNodeRef) 
 	{
@@ -60,11 +63,11 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
 			// Get the text to match against
-			String matchText = (String)this.ruleCondition.getParameterValue(PARAM_TEXT);
+			String matchText = (String)ruleCondition.getParameterValue(PARAM_TEXT);
 			
 			// Get the operation to be performed
 			Operation operation = Operation.CONTAINS;
-			String stringOperation = (String)this.ruleCondition.getParameterValue(PARAM_OPERATION);
+			String stringOperation = (String)ruleCondition.getParameterValue(PARAM_OPERATION);
 			if (stringOperation != null)
 			{
 				operation = Operation.valueOf(stringOperation);

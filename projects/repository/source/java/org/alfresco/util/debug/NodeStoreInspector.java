@@ -101,47 +101,32 @@ public class NodeStoreInspector
 	                append("\n");
 	            
 	        }
-	        
-	        try
-	        {
-	            Collection<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
-	            for (ChildAssociationRef childAssocRef : childAssocRefs)
-	            {
-	                builder.
-	                    append(getIndent(iIndent+1)).
-	                    append("-> ").
-	                    append(childAssocRef.getQName().getLocalName()).
-	                    append("\n");
-	                
-	                builder.append(outputNode(iIndent+2, nodeService, childAssocRef.getChildRef()));
-	            }
-	        }
-	        catch (Exception exception)
-	        {
-	            // Ignore for now since this means it is not a container type
-				exception.printStackTrace();
-	        }
-			
-			try
-	        {
-	            Collection<AssociationRef> assocRefs = nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
-	            for (AssociationRef assocRef : assocRefs)
-	            {
-	                builder.
-	                    append(getIndent(iIndent+1)).
-	                    append("-> associated to ").
-	                    append(assocRef.getTargetRef().getId()).
-	                    append("\n");
-	            }
-	        }
-	        catch (Exception exception)
-	        {
-	            // Ignore for now since this means it is not a container type
-				exception.printStackTrace();
-	        }
+
+            Collection<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
+            for (ChildAssociationRef childAssocRef : childAssocRefs)
+            {
+                builder.
+                    append(getIndent(iIndent+1)).
+                    append("-> ").
+                    append(childAssocRef.getQName().getLocalName()).
+                    append("\n");
+                
+                builder.append(outputNode(iIndent+2, nodeService, childAssocRef.getChildRef()));
+            }
+
+            Collection<AssociationRef> assocRefs = nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+            for (AssociationRef assocRef : assocRefs)
+            {
+                builder.
+                    append(getIndent(iIndent+1)).
+                    append("-> associated to ").
+                    append(assocRef.getTargetRef().getId()).
+                    append("\n");
+            }
 		}
 		catch (InvalidNodeRefException invalidNode)
 		{
+			invalidNode.printStackTrace();
 		}
         
         return builder.toString();

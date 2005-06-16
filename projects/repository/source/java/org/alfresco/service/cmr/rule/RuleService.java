@@ -42,7 +42,7 @@ public interface RuleService
      * @param name the name of the condition definition
      * @return the condition definition, null if not found
      */
-    public RuleConditionDefinition getConditionDefintion(String name);
+    public RuleConditionDefinition getConditionDefinition(String name);
 
     /**
      * Get the action definitions currently defined in the repository.
@@ -126,27 +126,8 @@ public interface RuleService
      * @return
      */
     public List<Rule> getRulesByRuleType(NodeRef nodeRef, RuleType ruleType);
-
-//    // TODO decide whether we need this or not
-//    /**
-//     * Get the rules associated with an actionable node that would be executed
-//     * for a specified execution context.
-//     * <p>
-//     * An exception is raised if the actionable aspect is not present on the
-//     * passed node.
-//     * 
-//     * @param nodeRef
-//     *            the node reference
-//     * @param ruleType
-//     *            the type of rule to be executed
-//     * @param executionContext
-//     *            the execution context
-//     * @return a list of the rules that would be executed
-//     */
-//    // public List<Rule> previewExecutingRules(NodeRef nodeRef, RuleType
-//    // ruleType, Map<String, Serializable> executionContext);
-
-    /**
+	
+	/**
      * Helper method to create a new rule.
      * <p>
      * Call add rule once the details of the rule have been specified in order
@@ -159,7 +140,7 @@ public interface RuleService
 
     /**
      * Adds the details of the rule to the specified node reference.
-     * <p>
+     * <p>	
      * If the rule is already associated with the node, the details are updated
      * with those specified.
      * 
@@ -167,17 +148,5 @@ public interface RuleService
      * @param rule
      */
     public void addRule(NodeRef nodeRef, Rule rule);
-
-    /**
-     * Removes a rule associated with a node
-     * 
-     * @param nodeRef
-     * @param rule
-     */
-    public void removeRule(NodeRef nodeRef, Rule rule);
-
-    public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule);
-
-    public void executePendingRules();
 
 }

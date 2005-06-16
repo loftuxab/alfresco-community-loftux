@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.ParameterType;
@@ -19,6 +20,7 @@ import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleItem;
 import org.alfresco.service.cmr.rule.RuleItemDefinition;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.QName;
@@ -49,13 +51,12 @@ import org.dom4j.io.SAXReader;
     private static final String NODE_PARAMETER = "parameter";
     
     /**
-     * Create a rule from its XML definition
+     * Converts XML into a rule
      * 
-     * @param ruleConfig	the rule config
+     * @param ruleService	the rule service
      * @param ruleXML		the rule XML
-     * @return				the rule
      */
-    public static RuleImpl XMLToRule(RuleConfig ruleConfig, String ruleXML)
+    public static RuleImpl XMLToRule(RuleService ruleService, String ruleXML)
     {
         try
         {
@@ -72,7 +73,7 @@ import org.dom4j.io.SAXReader;
             // Get the rule type
             Attribute ruleTypeAttribtue = rootElement.attribute(ATT_RULE_TYPE);
             String ruleTypeName = ruleTypeAttribtue.getValue();
-            RuleType ruleType = ruleConfig.getRuleType(ruleTypeName);
+            RuleType ruleType = ruleService.getRuleType(ruleTypeName);
             if (ruleType == null)
             {   
                 throw new RuleServiceException(
@@ -101,7 +102,7 @@ import org.dom4j.io.SAXReader;
                 String conditionName = conditionNameAttribute.getValue();
                 
                 // Create the condition
-                RuleConditionDefinition ruleConditionDefinition = ruleConfig.getConditionDefinition(conditionName);
+                RuleConditionDefinition ruleConditionDefinition = ruleService.getConditionDefinition(conditionName);
                 if (ruleConditionDefinition == null)
                 {
                     throw new RuleServiceException(
@@ -126,7 +127,7 @@ import org.dom4j.io.SAXReader;
                 String actionName = actionNameAttribute.getValue();
                 
                 // Get the action definition
-                RuleActionDefinition ruleActionDefinition = ruleConfig.getActionDefinition(actionName);
+                RuleActionDefinition ruleActionDefinition = ruleService.getActionDefinition(actionName);
                 if (ruleActionDefinition == null)
                 {
                     throw new RuleServiceException(

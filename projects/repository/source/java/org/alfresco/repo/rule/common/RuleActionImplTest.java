@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.alfresco.repo.rule;
+package org.alfresco.repo.rule.common;
 
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
@@ -26,7 +26,7 @@ public class RuleActionImplTest extends RuleItemImplTest
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleItemImplTest#create()
+     * @see org.alfresco.repo.rule.common.RuleItemImplTest#create()
      */
     @Override
     protected RuleItemImpl create()

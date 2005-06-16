@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.alfresco.repo.rule;
+package org.alfresco.repo.rule.common;
 
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
 

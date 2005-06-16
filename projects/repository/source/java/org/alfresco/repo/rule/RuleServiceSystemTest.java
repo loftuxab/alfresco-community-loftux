@@ -40,7 +40,6 @@ import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StopWatch;
@@ -107,7 +106,7 @@ public class RuleServiceSystemTest extends TestCase
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
         RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -142,7 +141,7 @@ public class RuleServiceSystemTest extends TestCase
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
         RuleActionDefinition action = this.ruleService.getActionDefinition(SimpleWorkflowActionExecutor.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -188,7 +187,7 @@ public class RuleServiceSystemTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
         RuleActionDefinition action = this.ruleService.getActionDefinition("copy");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -250,7 +249,7 @@ public class RuleServiceSystemTest extends TestCase
 	        this.ruleService.makeActionable(this.nodeRef);
 	        
 	        RuleType ruleType = this.ruleService.getRuleType("inbound");
-	        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+	        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
 	        RuleActionDefinition action = this.ruleService.getActionDefinition(TransformActionExecutor.NAME);
 	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -330,7 +329,7 @@ public class RuleServiceSystemTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
         RuleActionDefinition action = this.ruleService.getActionDefinition("move");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -380,7 +379,7 @@ public class RuleServiceSystemTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
         RuleActionDefinition action = this.ruleService.getActionDefinition(CheckOutActionExecutor.NAME);
         
         Rule rule = this.ruleService.createRule(ruleType);
@@ -431,7 +430,7 @@ public class RuleServiceSystemTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
         RuleActionDefinition action = this.ruleService.getActionDefinition(CheckInActionExecutor.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -464,7 +463,7 @@ public class RuleServiceSystemTest extends TestCase
 		// Check that the origional is no longer locked
 		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(newNodeRef, LockService.LOCK_USER));
 		
-		System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }
     
 	/**
@@ -481,7 +480,7 @@ public class RuleServiceSystemTest extends TestCase
 		this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion(MatchTextEvaluator.NAME);
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition(MatchTextEvaluator.NAME);
         RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
         
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
@@ -554,7 +553,7 @@ public class RuleServiceSystemTest extends TestCase
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         RuleType ruleType = this.ruleService.getRuleType("outbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
         RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -616,7 +615,7 @@ public class RuleServiceSystemTest extends TestCase
 	        this.ruleService.makeActionable(this.nodeRef);
 	        
 	        RuleType ruleType = this.ruleService.getRuleType("inbound");
-	        RuleConditionDefinition cond = this.ruleService.getConditionDefintion("no-condition");
+	        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
 	        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
 	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);

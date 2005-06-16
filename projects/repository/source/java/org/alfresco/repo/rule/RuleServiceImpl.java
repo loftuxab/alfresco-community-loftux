@@ -4,14 +4,21 @@
 package org.alfresco.repo.rule;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.rule.action.RuleActionExecuter;
+import org.alfresco.repo.rule.common.RuleActionDefinitionImpl;
+import org.alfresco.repo.rule.common.RuleConditionDefinitionImpl;
+import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.repo.rule.condition.RuleConditionEvaluator;
+import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -29,13 +36,22 @@ import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
+ * Rule service implementation
  * 
  * @author Roy Wetherall   
  */
-public class RuleServiceImpl implements RuleService
+public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecution, ApplicationContextAware
 {
+	/**
+	 * The application context
+	 */
+	private ApplicationContext applicationContext;
+	
     /**
      * The config service
      */
@@ -67,19 +83,9 @@ public class RuleServiceImpl implements RuleService
     private PolicyComponent policyComponent;
     
     /**
-     * The rule config
-     */
-    private RuleConfig ruleConfiguration;
-    
-    /**
      * The rule store
      */
     private RuleStore ruleStore;
-    
-    /**
-     * List of rule type adapters
-     */
-    private List<RuleTypeAdapter> adapters;
 	
 	/**
 	 * Thread local set containing all the pending rules to be executed when the transaction ends
@@ -89,58 +95,45 @@ public class RuleServiceImpl implements RuleService
 	/**
 	 * Thread local set to the currently executing rule (this should prevent and execution loops)
 	 */
-	// TODO whta about more complex scenarios when loop can be created?
+	// TODO what about more complex scenarios when loop can be created?
 	private ThreadLocal<Rule> threadLocalCurrenltyExecutingRule = new ThreadLocal<Rule>();
-    
-    /**
-     * Service intialization method
-     */
-    public void init()
-    {
-        // Create the rule configuration and store
-        this.ruleConfiguration = new RuleConfig(this.configService);
-        this.ruleStore = new RuleStore(
-                this.nodeService, 
-                this.contentService,
-                this.ruleConfiguration);
-        
-        // Initialise the rule types
-        initRuleTypes();
-    }
 
-    /**
-     * Initialise the rule types
-     */
-    private void initRuleTypes()
-    {
-        // Register the rule type policy bahviours
-        List<RuleType> ruleTypes = getRuleTypes();
-        List<RuleTypeAdapter> adapters = new ArrayList<RuleTypeAdapter>(ruleTypes.size());
-        for (RuleType ruleType : ruleTypes)
-        {
-            // Create the rule type adapter and register policy bahaviours
-            String ruleTypeAdapter = ((RuleTypeImpl)ruleType).getRuleTypeAdapter();
-            if (ruleTypeAdapter != null && ruleTypeAdapter.length() != 0)
-            {
-                try 
-                {
-                    // Create the rule type adapter
-                    RuleTypeAdapter adapter = (RuleTypeAdapter)Class.forName(ruleTypeAdapter).
-                            getConstructor(new Class[]{RuleType.class, RuleService.class, PolicyComponent.class, ServiceRegistry.class}).
-                            newInstance(new Object[]{ruleType, this, this.policyComponent, this.serviceRegistry});
-                    
-                    // Register the adapters policy behaviour
-                    adapter.registerPolicyBehaviour();
-                }
-                catch(Exception exception)
-                {
-                    // Error creating and initialising the adapter
-                    throw new RuleServiceException("Unable to initialise the rule type adapter.", exception);
-                }
-            }
-        }
-    }       
+	/**
+	 * All the rule type currently registered
+	 */
+	private Map<String, RuleType> ruleTypes = new HashMap<String, RuleType>();
+	
+	/**
+	 * All the condition definitions currently registered
+	 */
+	private Map<String, RuleConditionDefinition> conditionDefinitions = new HashMap<String, RuleConditionDefinition>();
+	
+	/**
+	 * All the action definitions currently registered
+	 */
+	private Map<String, RuleActionDefinition> actionDefinitions = new HashMap<String, RuleActionDefinition>();       
 
+	/**
+	 * Set the application context
+	 * 
+	 * @param applicationContext	the application context
+	 */
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException 
+	{
+		this.applicationContext = applicationContext;
+	}
+	
+	/**
+	 * Set the rule store
+	 * 
+	 * @param ruleStore		the rule store
+	 */
+	public void setRuleStore(RuleStore ruleStore) 
+	{
+		this.ruleStore = ruleStore;
+		((RuleStoreImpl)this.ruleStore).setRuleService(this);
+	}
+	
     /**
      * Set the config service
      * 
@@ -206,11 +199,7 @@ public class RuleServiceImpl implements RuleService
      */
     public List<RuleType> getRuleTypes()
     {
-        // Get the rule types from the rule config
-        Collection<RuleTypeImpl> ruleTypes = this.ruleConfiguration.getRuleTypes();
-        ArrayList<RuleType> result = new ArrayList<RuleType>(ruleTypes.size());
-        result.addAll(ruleTypes);
-        return result;
+		return new ArrayList<RuleType>(this.ruleTypes.values());
     }
     
     /**
@@ -218,7 +207,7 @@ public class RuleServiceImpl implements RuleService
      */
     public RuleType getRuleType(String name)
     {
-        return this.ruleConfiguration.getRuleType(name);
+        return this.ruleTypes.get(name);
     }
 
     /**
@@ -226,19 +215,15 @@ public class RuleServiceImpl implements RuleService
      */
     public List<RuleConditionDefinition> getConditionDefinitions()
     {
-        // Get the condition defintion from the rule config
-        Collection<RuleConditionDefinitionImpl> items = this.ruleConfiguration.getConditionDefinitions();
-        ArrayList<RuleConditionDefinition> result = new ArrayList<RuleConditionDefinition>(items.size());
-        result.addAll(items);
-        return result;
+		return new ArrayList<RuleConditionDefinition>(this.conditionDefinitions.values());
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleService#getConditionDefintion(java.lang.String)
+     * @see org.alfresco.repo.rule.RuleService#getConditionDefinition(java.lang.String)
      */
-    public RuleConditionDefinition getConditionDefintion(String name)
+    public RuleConditionDefinition getConditionDefinition(String name)
     {
-        return this.ruleConfiguration.getConditionDefinition(name);
+		return this.conditionDefinitions.get(name);
     }
 
     /**
@@ -246,11 +231,7 @@ public class RuleServiceImpl implements RuleService
      */
     public List<RuleActionDefinition> getActionDefinitions()
     {
-        // Get the rule action defintions from the config
-        Collection<RuleActionDefinitionImpl> items = this.ruleConfiguration.getActionDefinitions();
-        ArrayList<RuleActionDefinition> result = new ArrayList<RuleActionDefinition>(items.size());
-        result.addAll(items);
-        return result;
+		return new ArrayList<RuleActionDefinition>(this.actionDefinitions.values());
     }
 
     /**
@@ -258,7 +239,7 @@ public class RuleServiceImpl implements RuleService
      */
     public RuleActionDefinition getActionDefinition(String name)
     {
-        return this.ruleConfiguration.getActionDefinition(name);
+		return this.actionDefinitions.get(name);
     }
 
     /**
@@ -388,7 +369,7 @@ public class RuleServiceImpl implements RuleService
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleService#removeRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleImpl)
+     * @see org.alfresco.repo.rule.RuleService#removeRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.common.RuleImpl)
      */
     public void removeRule(NodeRef nodeRef, Rule rule)
     {
@@ -460,12 +441,12 @@ public class RuleServiceImpl implements RuleService
 		List<RuleCondition> conds = rule.getRuleConditions();				
 		if (conds.size() == 0)
 		{
-			throw new RuleServiceException("No rule conditions have been specified for the rule.");
+			throw new RuleServiceException("No rule conditions have been specified for the rule:" + rule.getTitle());
 		}
 		else if (conds.size() > 1)
 		{
 			// TODO at the moment we only support one rule condition
-			throw new RuleServiceException("Currently only one rule condition can be specified per rule.");
+			throw new RuleServiceException("Currently only one rule condition can be specified per rule:" + rule.getTitle());
 		}
 		
 		// Get the single rule condition
@@ -476,12 +457,12 @@ public class RuleServiceImpl implements RuleService
 	    List<RuleAction> actions = rule.getRuleActions();
 		if (actions.size() == 0)
 		{
-			throw new RuleServiceException("No rule actions have been specified for the rule.");
+			throw new RuleServiceException("No rule actions have been specified for the rule:" + rule.getTitle());
 		}
 		else if (actions.size() > 1)
 		{
 			// TODO at the moment we only support one rule action
-			throw new RuleServiceException("Currently only one rule action can be specified per rule.");
+			throw new RuleServiceException("Currently only one rule action can be specified per rule:" + rule.getTitle());
 		}
 			
 		// Get the single action
@@ -489,10 +470,10 @@ public class RuleServiceImpl implements RuleService
 	    RuleActionExecuter executor = getActionExecutor(action);
 	      
 		// Evaluate the condition
-	    if (evaluator.evaluate(actionableNodeRef, actionedUponNodeRef) == true)
+	    if (evaluator.evaluate(cond, actionableNodeRef, actionedUponNodeRef) == true)
 	    {
 			// Execute the rule
-	        executor.execute(actionableNodeRef, actionedUponNodeRef);
+	        executor.execute(action, actionableNodeRef, actionedUponNodeRef);
 	    }
 	}
 	
@@ -504,23 +485,8 @@ public class RuleServiceImpl implements RuleService
      */
     private RuleActionExecuter getActionExecutor(RuleAction action)
     {
-        RuleActionExecuter executor = null;
         String executorString = ((RuleActionDefinitionImpl)action.getRuleActionDefinition()).getRuleActionExecutor();
-        
-        try
-        {
-            // Create the action executor
-            executor = (RuleActionExecuter)Class.forName(executorString).
-                    getConstructor(new Class[]{RuleAction.class, ServiceRegistry.class}).
-                    newInstance(new Object[]{action, this.serviceRegistry});
-        }
-        catch(Exception exception)
-        {
-            // Error creating and initialising
-            throw new RuleServiceException("Unable to initialise the rule action executor.", exception);
-        }
-        
-        return executor;
+        return (RuleActionExecuter)applicationContext.getBean(executorString);
     }
 
 	/**
@@ -531,24 +497,42 @@ public class RuleServiceImpl implements RuleService
 	 */
     private RuleConditionEvaluator getConditionEvaluator(RuleCondition cond)
     {
-        RuleConditionEvaluator evaluator = null;
         String evaluatorString = ((RuleConditionDefinitionImpl)cond.getRuleConditionDefinition()).getConditionEvaluator();
-        
-        try
-        {
-            // Create the condition evaluator
-            evaluator = (RuleConditionEvaluator)Class.forName(evaluatorString).
-                    getConstructor(new Class[]{RuleCondition.class, ServiceRegistry.class}).
-                    newInstance(new Object[]{cond, this.serviceRegistry});
-        }
-        catch(Exception exception)
-        {
-            // Error creating and initialising 
-            throw new RuleServiceException("Unable to initialise the rule condition evaluator.", exception);
-        }
-        
-        return evaluator;
+        return (RuleConditionEvaluator)this.applicationContext.getBean(evaluatorString);
     }
+	
+	/**
+	 * Register the rule type
+	 * 
+	 * @param ruleTypeAdapter  the rule type adapter
+	 */
+	public void registerRuleType(RuleTypeAdapter ruleTypeAdapter) 
+	{
+		RuleType ruleType = ruleTypeAdapter.getRuleType();
+		this.ruleTypes.put(ruleType.getName(), ruleType);
+	}
+	
+	/**
+	 * Register the condition definition
+	 * 
+	 * @param ruleConditionEvaluator  the rule condition evaluator
+	 */
+	public void registerRuleConditionEvaluator(RuleConditionEvaluator ruleConditionEvaluator) 
+	{
+		RuleConditionDefinition cond = ruleConditionEvaluator.getRuleConditionDefintion();
+		this.conditionDefinitions.put(cond.getName(), cond);
+	}
+
+	/**
+	 * Register the action executor
+	 * 
+	 * @param ruleActionExecutor	the rule action executor
+	 */
+	public void registerRuleActionExecutor(RuleActionExecuter ruleActionExecutor) 
+	{
+		RuleActionDefinition action = ruleActionExecutor.getRuleActionDefinition();
+		this.actionDefinitions.put(action.getName(), action);
+	}
 
 	/**
 	 * Helper class to contain the information about a rule that is pending execution
@@ -611,5 +595,5 @@ public class RuleServiceImpl implements RuleService
 	            return false;
 	        }
 		}
-	}
+	}	
 }

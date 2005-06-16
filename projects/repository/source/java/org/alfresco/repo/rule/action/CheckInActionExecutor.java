@@ -5,13 +5,16 @@ package org.alfresco.repo.rule.action;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.version.Version;
 
@@ -34,31 +37,28 @@ public class CheckInActionExecutor extends RuleActionExecutorAbstractBase
      * The coci service
      */
     private CheckOutCheckInService cociService;
-    
-    /**
-     * Constructor
-     * 
-     * @param ruleAction
-     * @param serviceRegistry
-     */
-    public CheckInActionExecutor(RuleAction ruleAction, ServiceRegistry serviceRegistry) 
+
+	public void setNodeService(NodeService nodeService) 
 	{
-		super(ruleAction, serviceRegistry);		
-		this.nodeService = serviceRegistry.getNodeService();
-		this.cociService = serviceRegistry.getCheckOutCheckInService();
+		this.nodeService = nodeService;
+	}
+	
+	public void setCociService(CheckOutCheckInService cociService) 
+	{
+		this.cociService = cociService;
 	}
 
     /**
-     * @see org.alfresco.repo.rule.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
-    public void executeImpl(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
+    public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
         // First ensure that the actionedUponNodeRef is a workingCopy
         if (this.nodeService.exists(actionedUponNodeRef) == true &&
 			this.nodeService.hasAspect(actionedUponNodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
         {
             // Get the version description
-            String description = (String)this.ruleAction.getParameterValue(PARAM_DESCRIPTION);
+            String description = (String)ruleAction.getParameterValue(PARAM_DESCRIPTION);
             Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(1);
             versionProperties.put(Version.PROP_DESCRIPTION, description);
             
@@ -68,5 +68,11 @@ public class CheckInActionExecutor extends RuleActionExecutorAbstractBase
             this.cociService.checkin(actionedUponNodeRef, versionProperties);
         }
     }
+
+	@Override
+	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
+	{
+		paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, ParameterType.STRING, false, getParamDisplayLabel(PARAM_DESCRIPTION)));
+	}
 
 }

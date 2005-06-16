@@ -5,6 +5,7 @@
 <beans>
    
    <import resource="applicationServices.xml"/>
+   <import resource="ruleService.xml"/>
    
    <!--                    -->
    <!--  PERSISTENCE       -->
@@ -83,6 +84,25 @@
    
    <!-- use around method calls to debug - see class comments for details -->
    <bean id="methodCallLogAdvice" class="org.alfresco.util.debug.MethodCallLogAdvice" />
+
+   <!--                        -->
+   <!-- MAIL SERVICE           -->
+   <!--                        -->
+   
+  <!-- <bean id="mailService" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+      <property name="host">
+	     <value>smtp.gmail.com</value>
+      </property>		
+	  <property name="port">
+		 <value>587</value>
+	  </property>		
+	  <property name="userName">
+		 <value>alfresco.test@gmail.com</value>
+	  </property>		
+	  <property name="password">
+		 <value>testsetup</value>
+	  </property>
+   </bean> -->
    
    <!--                        -->
    <!-- CONFIGURATION SERVICES -->
@@ -94,7 +114,6 @@
             <constructor-arg>
                <list>
                   <value>org/alfresco/repo/content/mimetype-map.xml</value>
-				  <value>org/alfresco/repo/rule/rule-config.xml</value>
                </list>
             </constructor-arg>
          </bean>
@@ -803,45 +822,7 @@
             <ref local="contentTransformerCacheResetTrigger"/>
          </list>
        </property>
-   </bean>
-   
-   <!--                -->
-   <!-- Rules Service -->
-   <!--                -->
-   
-   <bean id="ruleService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.service.cmr.rule.RuleService</value>
-      </property>
-      <property name="transactionManager"><ref bean="transactionManager"/></property>
-      <property name="target">
-         <bean class="org.alfresco.repo.rule.RuleServiceImpl" init-method="init">
-			<property name="configService">
-				<ref bean="repoConfigService"/>
-			</property>
-			<property name="nodeService">
-				<ref bean="nodeService"/>
-			</property>
-			<property name="contentService">
-				<ref bean="contentService"/>
-			</property>
-			<property name="dictionaryService">
-				<ref bean="dictionaryService"/>
-			</property>
-			<property name="policyComponent">
-				<ref bean="policyComponent"/>
-			</property>			
-			<property name="serviceRegistry">
-				<ref bean="serviceRegistry"/>
-			</property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-   </bean>
+   </bean>  
    
    <!-- Query Register Component -->
    

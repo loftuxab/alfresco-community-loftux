@@ -5,12 +5,15 @@ package org.alfresco.repo.rule.action;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
 
@@ -31,18 +34,20 @@ public class SimpleWorkflowActionExecutor extends RuleActionExecutorAbstractBase
 	
 	private NodeService nodeService;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param ruleAction		the rule action
-	 * @param serviceRegistry	the service registry
-	 */
-	public SimpleWorkflowActionExecutor(
-			RuleAction ruleAction,
-			ServiceRegistry serviceRegistry) 
+	public void setNodeService(NodeService nodeService) 
 	{
-		super(ruleAction, serviceRegistry);		
-		this.nodeService = serviceRegistry.getNodeService();
+		this.nodeService = nodeService;
+	}
+
+	@Override
+	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
+	{
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_STEP, ParameterType.STRING, false, getParamDisplayLabel(PARAM_APPROVE_STEP)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_FOLDER, ParameterType.NODE_REF, false, getParamDisplayLabel(PARAM_APPROVE_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_MOVE, ParameterType.BOOLEAN, false, getParamDisplayLabel(PARAM_APPROVE_MOVE)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_STEP, ParameterType.STRING, false, getParamDisplayLabel(PARAM_REJECT_STEP)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_FOLDER, ParameterType.NODE_REF, false, getParamDisplayLabel(PARAM_REJECT_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_MOVE, ParameterType.BOOLEAN, false, getParamDisplayLabel(PARAM_REJECT_MOVE)));		
 	}
 
 	/**
@@ -50,18 +55,19 @@ public class SimpleWorkflowActionExecutor extends RuleActionExecutorAbstractBase
 	 */
 	@Override
 	protected void executeImpl(
+			RuleAction ruleAction,
 			NodeRef actionableNodeRef,
 			NodeRef actionedUponNodeRef) 
 	{
 		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
 			// Get the parameter values
-			String approveStep = (String)this.ruleAction.getParameterValue(PARAM_APPROVE_STEP);
-			NodeRef approveFolder = (NodeRef)this.ruleAction.getParameterValue(PARAM_APPROVE_FOLDER);
-			Boolean approveMove = (Boolean)this.ruleAction.getParameterValue(PARAM_APPROVE_MOVE);
-			String rejectStep = (String)this.ruleAction.getParameterValue(PARAM_REJECT_STEP);
-			NodeRef rejectFolder = (NodeRef)this.ruleAction.getParameterValue(PARAM_REJECT_FOLDER);
-			Boolean rejectMove = (Boolean)this.ruleAction.getParameterValue(PARAM_REJECT_MOVE);
+			String approveStep = (String)ruleAction.getParameterValue(PARAM_APPROVE_STEP);
+			NodeRef approveFolder = (NodeRef)ruleAction.getParameterValue(PARAM_APPROVE_FOLDER);
+			Boolean approveMove = (Boolean)ruleAction.getParameterValue(PARAM_APPROVE_MOVE);
+			String rejectStep = (String)ruleAction.getParameterValue(PARAM_REJECT_STEP);
+			NodeRef rejectFolder = (NodeRef)ruleAction.getParameterValue(PARAM_REJECT_FOLDER);
+			Boolean rejectMove = (Boolean)ruleAction.getParameterValue(PARAM_REJECT_MOVE);
 			
 			// Set the property values
 			Map<QName, Serializable> propertyValues = new HashMap<QName, Serializable>();
@@ -76,5 +82,4 @@ public class SimpleWorkflowActionExecutor extends RuleActionExecutorAbstractBase
 			this.nodeService.addAspect(actionedUponNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW, propertyValues);
 		}
 	}
-
 }

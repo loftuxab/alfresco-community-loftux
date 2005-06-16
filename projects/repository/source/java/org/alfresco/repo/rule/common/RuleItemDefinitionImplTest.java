@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.alfresco.repo.rule;
+package org.alfresco.repo.rule.common;
 
 import java.util.ArrayList;
 import java.util.List;
