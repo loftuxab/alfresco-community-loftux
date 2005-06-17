@@ -95,6 +95,13 @@ public final class SearchContext implements Serializable
          }
       }
       
+      // match a specific PATH
+      String pathQuery = null;
+      if (location != null)
+      {
+         pathQuery = " +PATH:\"" + location + "\" ";
+      }
+      
       // match against CONTENT type
       String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}content\" ";
       
@@ -121,6 +128,12 @@ public final class SearchContext implements Serializable
          
          default:
             throw new IllegalStateException("Unknown search mode specified: " + mode);
+      }
+      
+      // match entire query against specified Space path
+      if (pathQuery != null)
+      {
+         query = pathQuery + " AND (" + query + ')';
       }
       
       return query;

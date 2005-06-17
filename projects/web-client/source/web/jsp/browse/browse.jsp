@@ -64,7 +64,7 @@
                                  <div class="mainSubText">There are currently 2 members of this space</div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
-                              <td width=110 style="padding-left:2px">
+                              <td width=100 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
                                  <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{NewSpaceDialog.startWizard}" id="link1" />
@@ -112,7 +112,7 @@
                                  <div class="mainSubText"><h:outputText value="#{msg.search_description}" id="msg13" /></div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
-                              <td width=110 style="padding-left:2px">
+                              <td width=100 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg14" /><br>
                                  <a:actionLink value="#{msg.close_search}" image="/images/icons/delete.gif" padding="4" actionListener="#{BrowseBean.closeSearch}" id="link20" />
@@ -442,7 +442,6 @@
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>
-
                
                <%-- Error Messages --%>
                <tr valign=top>

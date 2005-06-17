@@ -80,28 +80,38 @@ public class UISimpleSearch extends UICommand
       String fieldId = Utils.getActionHiddenFieldName(context, this);
       String value = (String)requestMap.get(fieldId);
       // we are clicked if the hidden field contained our client id
-      if (value != null && value.equals(this.getClientId(context)))
+      if (value != null)
       {
-         String searchText = (String)requestMap.get(getClientId(context));
-         
-         // TODO: strip or escape undesirable characters - for screen and search API
-         //searchText = searchText.replace('"', ' ');
-         if (searchText.length() != 0)
+         if (value.equals(this.getClientId(context)))
          {
-            if (logger.isDebugEnabled())
-               logger.debug("Search text submitted: " + searchText);
-            int option = -1;
-            String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
-            String optionStr = (String)requestMap.get(optionFieldName);
-            if (optionStr.length() != 0)
-            {
-               option = Integer.parseInt(optionStr);
-            }
-            if (logger.isDebugEnabled())
-               logger.debug("Search option submitted: " + option);
+            String searchText = (String)requestMap.get(getClientId(context));
             
-            // queue event so system can perform a search and update the component
-            SearchEvent event = new SearchEvent(this, searchText, option);
+            // TODO: strip or escape undesirable characters - for screen and search API
+            //searchText = searchText.replace('"', ' ');
+            if (searchText.length() != 0)
+            {
+               if (logger.isDebugEnabled())
+                  logger.debug("Search text submitted: " + searchText);
+               int option = -1;
+               String optionFieldName = getClientId(context) + NamingContainer.SEPARATOR_CHAR + OPTION_PARAM;
+               String optionStr = (String)requestMap.get(optionFieldName);
+               if (optionStr.length() != 0)
+               {
+                  option = Integer.parseInt(optionStr);
+               }
+               if (logger.isDebugEnabled())
+                  logger.debug("Search option submitted: " + option);
+               
+               // queue event so system can perform a search and update the component
+               SearchEvent event = new SearchEvent(this, searchText, option);
+               this.queueEvent(event);
+            }
+         }
+         else if (value.equals(ADVSEARCH_PARAM))
+         {
+            // found advanced search navigation action
+            // TODO: TEMP: set this outcome from a component attribute!
+            AdvancedSearchEvent event = new AdvancedSearchEvent(this, "advSearch");
             this.queueEvent(event);
          }
       }
@@ -122,8 +132,18 @@ public class UISimpleSearch extends UICommand
          context.setText(searchEvent.SearchText);
          context.setMode(searchEvent.SearchMode);
          this.search = context;
+         
+         super.broadcast(event);
       }
-      super.broadcast(event);
+      else if (event instanceof AdvancedSearchEvent)
+      {
+         // special case to navigate to the advanced search screen
+         AdvancedSearchEvent searchEvent = (AdvancedSearchEvent)event;
+         FacesContext fc = getFacesContext();
+         fc.getApplication().getNavigationHandler().handleNavigation(fc, null, searchEvent.Outcome);
+         
+         // NOTE: we don't call super() here so that our nav outcome is the one that occurs!
+      }
    }
 
    /**
@@ -140,17 +160,11 @@ public class UISimpleSearch extends UICommand
       
       // script for dynamic simple search menu drop-down options
       out.write("<script>");
-      /*out.write("function _searchDropdown() {" +
-            "if (document.getElementById('_alfsearch').style.display == 'none') {" + 
-            "   document.getElementById('_alfsearch').style.display = '';" + 
-            "} else {" + 
-            "   document.getElementById('_alfsearch').style.display = 'none';" + 
-            "} }");*/
       out.write("function _noenter(event) {" +
-            "if (event && event.keyCode == 13) {" +
-            "   _searchSubmit();return false; }" +
-            "else {" +
-            "   return true; } }");
+                "if (event && event.keyCode == 13) {" +
+                "   _searchSubmit();return false; }" +
+                "else {" +
+                "   return true; } }");
       out.write("function _searchSubmit() {");
       out.write(Utils.generateFormSubmit(context, this, Utils.getActionHiddenFieldName(context, this), getClientId(context)));
       out.write("}");
@@ -191,10 +205,12 @@ public class UISimpleSearch extends UICommand
       if (searchMode == 3) out.write(" CHECKED");
       out.write("><nobr>Space Names only</nobr></td></tr>");
       
-      // "<input type='button' value='Close' class='dialogControls' onclick=\"document.getElementById('_alfsearch').style.display='none';\">" +
       // row with table containing advanced search link and Search Go button 
       out.write("<tr><td><table width=100%><tr><td>");
-      out.write("<a href='#' class='small'>Advanced Search</a>");
+      // generate a link that will cause an action event to navigate to the advanced search screen
+      out.write("<a class='small' href='#' onclick=\"");
+      out.write(Utils.generateFormSubmit(context, this, Utils.getActionHiddenFieldName(context, this), ADVSEARCH_PARAM));
+      out.write("\">Advanced Search</a>");
       out.write("</td><td align=right>");
       out.write(searchImage);
       out.write("</td></tr></table></td></tr>");
@@ -264,6 +280,7 @@ public class UISimpleSearch extends UICommand
    private static Logger logger = Logger.getLogger(UISimpleSearch.class);
    
    private static final String OPTION_PARAM = "_option";
+   private static final String ADVSEARCH_PARAM = "_advsearch";
    
    /** last search context used */
    private SearchContext search = null;
@@ -288,5 +305,16 @@ public class UISimpleSearch extends UICommand
       
       public String SearchText;
       public int SearchMode;
+   }
+   
+   public static class AdvancedSearchEvent extends ActionEvent
+   {
+      public AdvancedSearchEvent(UIComponent component, String outcome)
+      {
+         super(component);
+         Outcome = outcome;
+      }
+      
+      public String Outcome;
    }
 }

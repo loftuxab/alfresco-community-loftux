@@ -16,7 +16,7 @@
    <f:loadBundle basename="messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="checkout-file">
+   <h:form id="advsearch">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -50,15 +50,19 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
-                           <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/CheckOut.gif" />
+                           <td width=30>
+                              <img src="<%=request.getContextPath()%>/images/icons/search_large.gif" width=28 height=28>
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Check Out '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
-                              <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText"><h:outputText value="#{msg.checkoutfile_description}" /></div>
+                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.advanced_search}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.advancedsearch_description}" /></div>
+                           </td>
+                           <td bgcolor="#465F7D" width=1></td>
+                           <td width=80 style="padding-left:2px">
+                              <%-- Current object actions --%>
+                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" /><br>
+                              <a:actionLink value="#{msg.resetall}" image="/images/icons/delete.gif" padding="4" actionListener="#{AdvancedSearchBean.reset}" />
                            </td>
                         </tr>
                      </table>
@@ -81,62 +85,77 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
-                              <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                 <tr>
-                                    <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
-                                    <td class="mainSubText">A copy of the file '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' will be made for you to work with.<br>
-                                        When you have completed your changes you need to check-in the file to allow others to view the changes.
-                                    </td>
-                                 </tr>
-                              </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "yellowInner"); %>
-                           </td>
-                           
-                           <td valign="top" rowspan=2>
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <table cellpadding="1" cellspacing="1" border="0">
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Check Out" action="#{CheckinCheckoutBean.checkoutFile}" styleClass="dialogControls" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="dialogButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
-                                    </td>
-                                 </tr>
-                              </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>
-                        </tr>
-                        
-                        <tr>
-                           <td width="100%" valign="top">
+                              
+                              <a:errors message="#{msg.error_create_space_dialog}" styleClass="errorMessage" />
+                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0">
+                                 
                                  <tr>
-                                    <td class="mainSubText">Where do you want to keep the copy of this file?</td>
+                                    <td>Look for:&nbsp;<h:inputText value="#{AdvancedSearchBean.text}" size="35" maxlength="255" />&nbsp;*</td>
+                                 </tr>
+                                 
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>Look in:</td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:selectOneRadio value="#{CheckinCheckoutBean.copyLocation}" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="In the current space" />
-                                          <f:selectItem itemValue="other" itemLabel="In the space selected:" />
+                                       <h:selectOneRadio value="#{AdvancedSearchBean.lookin}" layout="pageDirection">
+                                          <f:selectItem itemValue="all" itemLabel="All Spaces" />
+                                          <f:selectItem itemValue="other" itemLabel="Specify Space:" />
                                        </h:selectOneRadio>
+                                       <%-- TODO: just this space, or children checkbox --%>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td style="padding-left:26px">
-                                       <%-- Space selector to allow user to pick a Space --%>
-                                       <r:spaceSelector label="Click here to select a Space..."
-                                                value="#{CheckinCheckoutBean.selectedSpaceId}"
-                                                style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                       <r:spaceSelector label="Click here to select a Space..." value="#{AdvancedSearchBean.location}" style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                    </td>
+                                 </tr>
+                                 
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>Show me results for:</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <h:selectOneRadio value="#{AdvancedSearchBean.mode}" layout="pageDirection">
+                                          <f:selectItem itemValue="all" itemLabel="All Items" />
+                                          <f:selectItem itemValue="files_text" itemLabel="File names and contents" />
+                                          <f:selectItem itemValue="files" itemLabel="File names only" />
+                                          <f:selectItem itemValue="folders" itemLabel="Space names only" />
+                                       </h:selectOneRadio>
+                                    </td>
+                                 </tr>
+                                 
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>Show me results in the categories:</td>
+                                 </tr>
+                                 <tr>
+                                    <td>[TBD]</td>
+                                 </tr>
+                                 
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                           </td>
+                           
+                           <td valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
+                              <table cellpadding="1" cellspacing="1" border="0">
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Search" action="#{AdvancedSearchBean.search}" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                         </tr>
                      </table>

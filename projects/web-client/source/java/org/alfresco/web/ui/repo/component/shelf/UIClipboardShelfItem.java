@@ -105,7 +105,7 @@ public class UIClipboardShelfItem extends UIShelfItem
                
                case ACTION_PASTE_ALL:
                case ACTION_PASTE_ITEM:
-                  processActionMethod(getPasteActionListener(), clipEvent);
+                  Utils.processActionMethod(getFacesContext(), getPasteActionListener(), clipEvent);
                   break;
             }
          }
@@ -277,33 +277,6 @@ public class UIClipboardShelfItem extends UIShelfItem
       buf.append("</a>");
       
       return buf.toString();
-   }
-   
-   /**
-    * Invoke the method encapsulated by the supplied MethodBinding
-    * 
-    * @param method     MethodBinding to invoke
-    * @param event      ActionEvent to pass to the method of signature:
-    *                   public void myMethodName(ActionEvent event)
-    */
-   private void processActionMethod(MethodBinding method, ActionEvent event)
-   {
-      try
-      {
-         method.invoke(getFacesContext(), new Object[] {event});
-      }
-      catch (EvaluationException e)
-      {
-         Throwable cause = e.getCause();
-         if (cause instanceof AbortProcessingException)
-         {
-            throw (AbortProcessingException)cause;
-         }
-         else
-         {
-            throw e;
-         }
-      }   
    }
    
    

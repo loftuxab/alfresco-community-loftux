@@ -58,7 +58,7 @@
                               <div class="mainSubText"><h:outputText value="#{msg.spacedetails_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
-                           <td width=110 style="padding-left:2px">
+                           <td width=100 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" /><br>
                            </td>

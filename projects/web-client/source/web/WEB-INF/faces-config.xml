@@ -318,6 +318,23 @@
    
    <managed-bean>
       <description>
+         The bean that holds a state for the Advanced Search screen.
+      </description>
+      <managed-bean-name>AdvancedSearchBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.AdvancedSearchBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that holds manage content rules state
       </description>
       <managed-bean-name>RulesBean</managed-bean-name>
@@ -369,6 +386,24 @@
          </description>
          <from-outcome>success</from-outcome>
          <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click, finish on dialog) -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>browse</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- rule to get to the Advanced Search page from anywhere -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>advSearch</from-outcome>
+         <to-view-id>/jsp/dialog/advanced-search.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -538,15 +573,6 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>finish</from-outcome>
-         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click, finish on dialog) -->
-   <navigation-rule>
-      <from-view-id>/jsp/*</from-view-id>
-      <navigation-case>
-         <from-outcome>browse</from-outcome>
          <to-view-id>/jsp/browse/browse.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>

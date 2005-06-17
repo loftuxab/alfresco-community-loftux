@@ -13,6 +13,10 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.faces.el.EvaluationException;
+import javax.faces.el.MethodBinding;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.ActionEvent;
 
 import org.apache.log4j.Logger;
 import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
@@ -616,6 +620,34 @@ public final class Utils
       }
 
       return disabled || readOnly;
+   }
+   
+   /**
+    * Invoke the method encapsulated by the supplied MethodBinding
+    * 
+    * @param context    FacesContext
+    * @param method     MethodBinding to invoke
+    * @param event      ActionEvent to pass to the method of signature:
+    *                   public void myMethodName(ActionEvent event)
+    */
+   public static void processActionMethod(FacesContext context, MethodBinding method, ActionEvent event)
+   {
+      try
+      {
+         method.invoke(context, new Object[] {event});
+      }
+      catch (EvaluationException e)
+      {
+         Throwable cause = e.getCause();
+         if (cause instanceof AbortProcessingException)
+         {
+            throw (AbortProcessingException)cause;
+         }
+         else
+         {
+            throw e;
+         }
+      }   
    }
    
    /**

@@ -13,6 +13,7 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -217,19 +218,28 @@ public final class Repository
       // construct the path to this Node
       for (int i=0; i<path.size()-1; i++)
       {
-         // the element string will contain namespace info we don't want to display
-         String elementString = path.get(i).getElementString();
-         
-         if (elementString.length() > 1)
+         String elementString;
+         Path.Element element = path.get(i);
+         if (element instanceof Path.ChildAssocElement)
          {
-            if (elementString.charAt(0) == '{' && elementString.indexOf('}') != -1)
+            ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
+            if (elementRef.getParentRef() == null)
             {
-               elementString = elementString.substring(elementString.indexOf('}') + 1).replace('_', ' ');
+               elementString = "/";
             }
-            if (buf.length() != 1)
+            else
             {
-               buf.append('/');
+               elementString = elementRef.getQName().getLocalName().replace('_', ' ');
             }
+         }
+         else
+         {
+            elementString = element.getElementString();
+         }
+         
+         if (buf.length() > 1)
+         {
+            buf.append('/');
          }
          buf.append(elementString);
       }
@@ -304,7 +314,7 @@ public final class Repository
       int extIndex = filename.lastIndexOf('.');
       if (extIndex != -1)
       {
-         String ext = filename.substring(extIndex + 1);
+         String ext = filename.substring(extIndex + 1).toLowerCase();
          String mt = mimetypeService.getMimetypesByExtension().get(ext);
          if (mt != null)
          {
