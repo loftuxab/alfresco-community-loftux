@@ -76,7 +76,10 @@ public class SimpleWorkflowActionExecutor extends RuleActionExecutorAbstractBase
 			propertyValues.put(ContentModel.PROP_APPROVE_MOVE, approveMove.booleanValue());
 			propertyValues.put(ContentModel.PROP_REJECT_STEP, rejectStep);
 			propertyValues.put(ContentModel.PROP_REJECT_FOLDER, rejectFolder);
-			propertyValues.put(ContentModel.PROP_REJECT_MOVE, rejectMove.booleanValue());
+         if (rejectMove != null)
+         {
+            propertyValues.put(ContentModel.PROP_REJECT_MOVE, rejectMove.booleanValue());
+         }
 			
 			// Apply the simple workflow aspect to the node
 			this.nodeService.addAspect(actionedUponNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW, propertyValues);

@@ -54,13 +54,88 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Details of '<h:outputText value="#{DocumentDetailsBean.name}" />'</div>
+                              <div class="mainTitle">
+                                 Details of '<h:outputText value="#{DocumentDetailsBean.name}" />'
+                                 <h:graphicImage url="/images/icons/locked.gif" rendered="#{DocumentDetailsBean.locked == true}" />
+                              </div>
                               <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
                            <td width=100 style="padding-left:2px">
                               <%-- Current object actions --%>
-                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" /><br>
+                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" />
+                                                            
+                              <%-- checkin, checkout and undo checkout --%>
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
+                                 <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" padding="4"
+                                               actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.workingCopy == true}">
+                                 <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" padding="4"
+                                               actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkinFile">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.workingCopy == true}">
+                                 <a:actionLink value="#{msg.undocheckout}" image="/images/icons/UndoCheckOut_icon.gif" padding="4" 
+                                               actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
+                              
+                              <%-- approve and reject --%>
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.approveStepName != null}">
+                                 <a:actionLink value="#{DocumentDetailsBean.approveStepName}" image="/images/icons/forward.gif" padding="4"
+                                               actionListener="#{DocumentDetailsBean.approve}" action="browse">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.rejectStepName != null}">
+                                 <a:actionLink value="#{DocumentDetailsBean.rejectStepName}" image="/images/icons/reply.gif" padding="4"
+                                               actionListener="#{DocumentDetailsBean.reject}" action="browse">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
+                              
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.locked == true}">
+                                 <f:verbatim><br/><br/></f:verbatim>
+                              </a:booleanEvaluator>
+                              
+                              <a:menu itemSpacing="4" image="/images/icons/more.gif" menuStyleClass="moreActionsMenu"
+                                      label="More..." tooltip="More Actions for this document" style="padding-left:20px">
+                                 <%-- edit, update and cut --%>
+                                 <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false}">
+                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" padding="4" 
+                                                  actionListener="#{CheckinCheckoutBean.editFile}">
+                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                    </a:actionLink>
+                                    <a:actionLink value="#{msg.update}" image="/images/icons/update.gif" padding="4" 
+                                                  actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
+                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                    </a:actionLink>
+                                    <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" padding="4" 
+                                                  actionListener="#{ClipboardBean.cutNode}">
+                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                    </a:actionLink>
+                                    
+                                 </a:booleanEvaluator>
+                                 
+                                 <%-- copy --%>
+                                 <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" padding="4" 
+                                               actionListener="#{ClipboardBean.copyNode}">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
+                                    
+                                 <%-- delete --%>
+                                 <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
+                                    <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" padding="4"
+                                                  actionListener="#{BrowseBean.setupContentAction}" action="deleteFile">
+                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                    </a:actionLink>
+                                 </a:booleanEvaluator>
+                              </a:menu>
                            </td>
                         </tr>
                      </table>

@@ -365,6 +365,18 @@
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>lockService</property-name>
+         <value>#{AlfLockService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>versionService</property-name>
+         <value>#{AlfVersionService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>copyService</property-name>
+         <value>#{AlfCopyService}</value>
+      </managed-property>
    </managed-bean>
    
    <!-- ==================== NAVIGATION ==================== -->
@@ -529,6 +541,34 @@
       <navigation-case>
          <from-outcome>editDocProperties</from-outcome>
          <to-view-id>/jsp/dialog/edit-document-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>checkinFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkin-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>undoCheckoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/undocheckout-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>updateFile</from-outcome>
+         <to-view-id>/jsp/dialog/update-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteFile</from-outcome>
+         <to-view-id>/jsp/dialog/delete-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editFile</from-outcome>
+         <to-view-id>/jsp/dialog/edit-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editInline</from-outcome>
+         <to-view-id>/jsp/dialog/edit-file-inline.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

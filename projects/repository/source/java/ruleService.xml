@@ -44,7 +44,7 @@
    
    <bean id="common-resource">
       <property name="resource">
-		<value>org/alfresco/repo/rule/rule-config.properties</value>
+		<value>classpath:org/alfresco/repo/rule/rule-config.properties</value>
 	  </property>  
    </bean>
    
