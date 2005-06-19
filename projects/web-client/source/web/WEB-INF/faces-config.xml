@@ -522,6 +522,10 @@
          <from-outcome>manageRules</from-outcome>
          <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteSpace</from-outcome>
+         <to-view-id>/jsp/dialog/delete-space.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
