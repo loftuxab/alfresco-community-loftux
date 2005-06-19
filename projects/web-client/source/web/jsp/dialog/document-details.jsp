@@ -4,7 +4,7 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
-<%@ page buffer="32kb" %>
+<%@ page buffer="64kb" %>
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
@@ -185,7 +185,47 @@
                               <br/>
                               <a:panel label="Version History" id="version-history-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
-                                 Version History
+                                       
+                                 <a:richList id="versionHistoryList" viewMode="details" value="#{DocumentDetailsBean.versionHistory}" 
+                                             var="r" styleClass="recordSet" headerStyleClass="recordSetHeader" 
+                                             rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%" 
+                                             pageSize="10" initialSortColumn="versionLabel" initialSortDescending="false">
+                        
+                                    <%-- Primary column for details view mode --%>
+                                    <a:column id="col1" primary="true" width="100" style="padding:2px;text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="Version" value="versionLabel" mode="case-insensitive" styleClass="header"/>
+                                       </f:facet>
+                                       <a:actionLink id="label" value="#{r.versionLabel}" href="#{r.url}" />
+                                    </a:column>
+                                    
+                                    <%-- Description columns --%>
+                                    <a:column id="col2" style="text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="Author" value="author" styleClass="header"/>
+                                       </f:facet>
+                                       <h:outputText id="author" value="#{r.author}" />
+                                    </a:column>
+                                    
+                                    <%-- Created Date column for details view mode --%>
+                                    <a:column id="col3" style="text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="Date" value="versionDate" styleClass="header"/>
+                                       </f:facet>
+                                       <h:outputText id="date" value="#{r.versionDate}">
+                                          <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
+                                       </h:outputText>
+                                    </a:column>
+                                    
+                                    <%-- view the contents of the specific version --%>
+                                    <a:column id="col4" style="text-align: left">
+                                       <f:facet name="header">
+                                          <h:outputText value="#{msg.actions}"/>
+                                       </f:facet>
+                                       <a:actionLink id="view-link" value="View" href="#{r.url}" />
+                                    </a:column>
+              
+                                 </a:richList>
                               </a:panel>
                               <br/>
                            </td>

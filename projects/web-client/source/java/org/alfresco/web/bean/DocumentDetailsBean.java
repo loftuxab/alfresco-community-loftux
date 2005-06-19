@@ -1,5 +1,6 @@
 package org.alfresco.web.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,9 +14,13 @@ import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionHistory;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.app.servlet.DownloadContentServlet;
+import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.log4j.Logger;
@@ -73,7 +78,25 @@ public class DocumentDetailsBean
     */
    public List getVersionHistory()
    {
-      return null;
+      VersionHistory history = this.versionService.getVersionHistory(getDocument().getNodeRef());
+
+      List<MapNode> versions = new ArrayList<MapNode>(); 
+      
+      for (Version version : history.getAllVersions())
+      {
+         // create a map node representation of the version
+         MapNode clientVersion = new MapNode(version.getNodeRef(), this.nodeService);
+         clientVersion.put("versionLabel", version.getVersionLabel());
+         clientVersion.put("author", clientVersion.get("creator"));
+         clientVersion.put("versionDate", version.getCreatedDate());
+         clientVersion.put("url", DownloadContentServlet.generateURL(version.getNodeRef(), 
+               clientVersion.getName()));
+         
+         // add the client side version to the list
+         versions.add(clientVersion);
+      }
+      
+      return versions;
    }
    
    /**
