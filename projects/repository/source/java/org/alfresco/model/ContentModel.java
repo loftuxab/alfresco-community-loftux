@@ -105,11 +105,11 @@ public interface ContentModel
 	
 	// workflow
 	static final QName ASPECT_SIMPLE_WORKFLOW = QName.createQName(NamespaceService.ALFRESCO_URI, "simpleworkflow");
-	static final QName PROP_APPROVE_STEP = QName.createQName(NamespaceService.ALFRESCO_URI, "approvestep");
-	static final QName PROP_APPROVE_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "approvefolder");
-	static final QName PROP_APPROVE_MOVE = QName.createQName(NamespaceService.ALFRESCO_URI, "approvemove");
-	static final QName PROP_REJECT_STEP = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectstep");
-	static final QName PROP_REJECT_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectfolder");
-	static final QName PROP_REJECT_MOVE = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectmove");
+	static final QName PROP_APPROVE_STEP = QName.createQName(NamespaceService.ALFRESCO_URI, "approveStep");
+	static final QName PROP_APPROVE_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "approveFolder");
+	static final QName PROP_APPROVE_MOVE = QName.createQName(NamespaceService.ALFRESCO_URI, "approveMove");
+	static final QName PROP_REJECT_STEP = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectStep");
+	static final QName PROP_REJECT_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectFolder");
+	static final QName PROP_REJECT_MOVE = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectMove");
     
 }
