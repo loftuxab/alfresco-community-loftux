@@ -59,6 +59,16 @@ public interface ContentReader extends Content
      *      content doesn't {@link #exists() exist}.
      */
     public long getLength();
+    
+    /**
+     * Gets the time of the last modification of the underlying content.
+     * 
+     * @return Returns the last modification time using the standard <tt>long</tt>
+     *      time, or <code>0L</code> if the content doesn't {@link #exists() exist}.
+     *      
+     * @see System#currentTimeMillis()
+     */
+    public long getLastModified();
 
     /**
      * Convenience method to find out if this reader has been closed.

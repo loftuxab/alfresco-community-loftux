@@ -16,6 +16,10 @@ import org.alfresco.service.cmr.repository.ContentReader;
  */
 public class MemoryContentReader extends AbstractContentReader
 {
+    /*
+     * TODO: Wrap the content in an object containing modification time, etc 
+     */
+    
     private byte[] content;
     
     /**
@@ -53,6 +57,11 @@ public class MemoryContentReader extends AbstractContentReader
     public long getLength()
     {
         return content.length;
+    }
+
+    public long getLastModified()
+    {
+        throw new UnsupportedOperationException();
     }
 
     protected ReadableByteChannel getDirectReadableChannel() throws ContentIOException

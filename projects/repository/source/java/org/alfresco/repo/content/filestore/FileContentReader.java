@@ -54,6 +54,9 @@ public class FileContentReader extends AbstractContentReader implements RandomAc
         return file.exists();
     }
 
+    /**
+     * @see File#length()
+     */
     public long getLength()
     {
         if (!exists())
@@ -63,6 +66,21 @@ public class FileContentReader extends AbstractContentReader implements RandomAc
         else
         {
             return file.length();
+        }
+    }
+    
+    /**
+     * @see File#lastModified()
+     */
+    public long getLastModified()
+    {
+        if (!exists())
+        {
+            return 0L;
+        }
+        else
+        {
+            return file.lastModified();
         }
     }
 

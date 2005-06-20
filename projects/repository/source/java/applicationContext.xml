@@ -59,8 +59,7 @@
    </bean>
    
    <!-- create a transaction manager to handle the Hibernate sessions -->
-   <bean id="transactionManager" 
-      class="org.alfresco.repo.transaction.AlfrescoTransactionManager">
+   <bean id="transactionManager" class="org.alfresco.repo.transaction.AlfrescoTransactionManager">
       <property name="sessionFactory">
          <ref local="sessionFactory"/>
       </property>
@@ -776,6 +775,9 @@
                   </entry>
                   <entry key="searcher">
                      <ref bean="searcherComponent" />
+                  </entry>
+                  <entry key="protectHours">
+                     <value>24</value>
                   </entry>
                </map>
             </property>
