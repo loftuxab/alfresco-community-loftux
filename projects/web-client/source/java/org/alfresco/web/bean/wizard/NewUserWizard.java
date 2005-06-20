@@ -303,7 +303,7 @@ public class NewUserWizard extends AbstractWizardBean
             props.put(ContentModel.PROP_ORGID, this.companyId);
             
             // create the node to represent the Person
-            String assocName = Repository.createValidQName(this.userName);
+            String assocName = QName.createValidLocalName(this.userName);
             this.nodeService.createNode(
                   rootNode,
                   ContentModel.ASSOC_CHILDREN,

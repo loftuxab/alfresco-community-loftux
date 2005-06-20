@@ -1,9 +1,13 @@
 package org.alfresco.repo.importer.view;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import org.alfresco.repo.importer.ImporterException;
-import org.alfresco.repo.importer.ImporterProgress;
+import org.alfresco.repo.importer.Progress;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
@@ -22,19 +26,20 @@ import org.alfresco.service.namespace.QName;
     private NodeRef parentRef;
     private QName assocType;
 
-    
+
     /**
      * Construct
      * 
      * @param dictionary
+     * @param configuration
      * @param progress
      * @param elementName
      * @param parentRef
      * @param assocType
      */
-    /*package*/ ParentContext(DictionaryService dictionary, ImporterProgress progress, QName elementName, NodeRef parentRef, QName assocType)
+    /*package*/ ParentContext(DictionaryService dictionary, Properties configuration, Progress progress, QName elementName, NodeRef parentRef, QName assocType)
     {
-        super(dictionary, elementName, progress);
+        super(dictionary, elementName, configuration, progress);
         this.parentRef = parentRef;
         this.assocType = assocType;
     }
@@ -48,10 +53,16 @@ import org.alfresco.service.namespace.QName;
      */
     /*package*/ ParentContext(QName elementName, NodeContext parent, ChildAssociationDefinition childDef)
     {
-        super(parent.getDictionaryService(), elementName, parent.getImporterProgress());
+        super(parent.getDictionaryService(), elementName, parent.getConfiguration(), parent.getImporterProgress());
         
         // Ensure association is valid for node
-        TypeDefinition anonymousType = getDictionaryService().getAnonymousType(parent.getTypeDefinition().getName(), parent.getNodeAspects());
+        Set<QName> allAspects = new HashSet<QName>();
+        for (AspectDefinition typeAspect : parent.getTypeDefinition().getDefaultAspects())
+        {
+            allAspects.add(typeAspect.getName());
+        }
+        allAspects.addAll(parent.getNodeAspects());
+        TypeDefinition anonymousType = getDictionaryService().getAnonymousType(parent.getTypeDefinition().getName(), allAspects);
         Map<QName, ChildAssociationDefinition> nodeAssociations = anonymousType.getChildAssociations();
         if (nodeAssociations.containsKey(childDef.getName()) == false)
         {

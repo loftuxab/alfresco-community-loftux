@@ -15,7 +15,7 @@
             <alf:creator>administrator</alf:creator>
             <alf:contains>
                <alf:person v:childName="alf:fredb">
-                  <alf:userName>fredb</alf:userName>
+                  <alf:userName>${username}</alf:userName>
                   <alf:firstName>Fred</alf:firstName>
                   <alf:lastName>Bloggs</alf:lastName>
                   <alf:homeFolder>/home/fredb</alf:homeFolder>
@@ -32,6 +32,7 @@
    
          <alf:cmobject v:id="xyz">
             <alf:name>Translation of Some Content</alf:name>
+            <alf:creator></alf:creator>
          </alf:cmobject>
 
       </alf:contains>

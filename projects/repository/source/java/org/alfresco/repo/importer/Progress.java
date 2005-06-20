@@ -12,7 +12,7 @@ import org.alfresco.service.namespace.QName;
  * @author David Caruana
  *
  */
-public interface ImporterProgress
+public interface Progress
 {
     /**
      * Report creation of a node.

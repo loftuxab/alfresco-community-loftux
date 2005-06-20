@@ -108,7 +108,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                   parentNodeRef = new NodeRef(Repository.getStoreRef(context), nodeId);
                }
                
-               String qname = Repository.createValidQName(this.name);
+               String qname = QName.createValidLocalName(this.name);
                ChildAssociationRef assocRef = this.nodeService.createNode(
                      parentNodeRef,
                      ContentModel.ASSOC_CONTAINS,
@@ -141,7 +141,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(context), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
                      ContentModel.ASSOC_CONTAINS,
-                     QName.createQName(NamespaceService.ALFRESCO_URI, Repository.createValidQName(this.name)),
+                     QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.name)),
                      true);
                // also need to set the new description and icon properties
                // TODO: remove this when the copy also copies the name
@@ -161,7 +161,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(context), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
                      ContentModel.ASSOC_CONTAINS,
-                     QName.createQName(NamespaceService.ALFRESCO_URI, Repository.createValidQName(this.name)), 
+                     QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.name)), 
                      true);
                // also need to set the new description and icon properties
                // TODO: remove this when the copy also copies the name
@@ -185,11 +185,11 @@ public class NewSpaceWizard extends AbstractWizardBean
                
                String actNs = NamespaceService.ALFRESCO_PREFIX;
                String xpath = actNs + ":" + 
-                     Repository.createValidQName(Application.getCompanyRootName(FacesContext.getCurrentInstance())) + 
+                     QName.createValidLocalName(Application.getCompanyRootName(FacesContext.getCurrentInstance())) + 
                      "/" + actNs + ":" + 
-                     Repository.createValidQName(Application.getGlossaryFolderName(FacesContext.getCurrentInstance())) +
+                     QName.createValidLocalName(Application.getGlossaryFolderName(FacesContext.getCurrentInstance())) +
                      "/" + actNs + ":" + 
-                     Repository.createValidQName(Application.getTemplatesFolderName(FacesContext.getCurrentInstance()));
+                     QName.createValidLocalName(Application.getTemplatesFolderName(FacesContext.getCurrentInstance()));
                
                List<ChildAssociationRef> templateNodeList = this.nodeService.selectNodes(
                      this.nodeService.getRootNode(Repository.getStoreRef(context)),
@@ -201,7 +201,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                   NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), newSpaceId);
                   NodeRef templateCopyNode = this.nodeOperationsService.copy(sourceNode, templateNode, 
                         ContentModel.ASSOC_CONTAINS, 
-                        QName.createQName(NamespaceService.ALFRESCO_URI, Repository.createValidQName(this.templateName)));
+                        QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.templateName)));
                   this.nodeService.setProperty(templateCopyNode, ContentModel.PROP_NAME, this.templateName);
                }
             }
@@ -425,11 +425,11 @@ public class NewSpaceWizard extends AbstractWizardBean
          FacesContext context = FacesContext.getCurrentInstance();
          String actNs = NamespaceService.ALFRESCO_PREFIX;
          String xpath = actNs + ":" + 
-               Repository.createValidQName(Application.getCompanyRootName(context)) + 
+               QName.createValidLocalName(Application.getCompanyRootName(context)) + 
                "/" + actNs + ":" + 
-               Repository.createValidQName(Application.getGlossaryFolderName(context)) +
+               QName.createValidLocalName(Application.getGlossaryFolderName(context)) +
                "/" + actNs + ":" + 
-               Repository.createValidQName(Application.getTemplatesFolderName(context)) +
+               QName.createValidLocalName(Application.getTemplatesFolderName(context)) +
                "/*";
          
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef(context));

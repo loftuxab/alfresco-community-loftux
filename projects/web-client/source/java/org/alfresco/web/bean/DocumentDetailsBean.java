@@ -239,14 +239,14 @@ public class DocumentDetailsBean
          if (approveMove.booleanValue())
          {
             // move the document to the specified folder
-            String qname = Repository.createValidQName(getDocument().getName());
+            String qname = QName.createValidLocalName(getDocument().getName());
             this.nodeService.moveNode(getDocument().getNodeRef(), approveFolder, ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname));
          }
          else
          {
             // copy the document to the specified folder
-            String qname = Repository.createValidQName(getDocument().getName());
+            String qname = QName.createValidLocalName(getDocument().getName());
             this.copyService.copy(getDocument().getNodeRef(), approveFolder, ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname));
          }
@@ -325,14 +325,14 @@ public class DocumentDetailsBean
          if (rejectMove.booleanValue())
          {
             // move the document to the specified folder
-            String qname = Repository.createValidQName(getDocument().getName());
+            String qname = QName.createValidLocalName(getDocument().getName());
             this.nodeService.moveNode(getDocument().getNodeRef(), rejectFolder, ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname));
          }
          else
          {
             // copy the document to the specified folder
-            String qname = Repository.createValidQName(getDocument().getName());
+            String qname = QName.createValidLocalName(getDocument().getName());
             this.copyService.copy(getDocument().getNodeRef(), rejectFolder, ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname));
          }

@@ -1,6 +1,8 @@
 package org.alfresco.repo.importer.view;
 
-import org.alfresco.repo.importer.ImporterProgress;
+import java.util.Properties;
+
+import org.alfresco.repo.importer.Progress;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.namespace.QName;
 
@@ -19,8 +21,11 @@ import org.alfresco.service.namespace.QName;
     // Element Name
     private QName elementName;
     
+    // Configuration Properties
+    private Properties configuration;
+    
     // Importer Progress
-    private ImporterProgress progress;
+    private Progress progress;
     
     
     /**
@@ -30,10 +35,11 @@ import org.alfresco.service.namespace.QName;
      * @param elementName
      * @param progress
      */
-    /*package*/ ElementContext(DictionaryService dictionary, QName elementName, ImporterProgress progress)
+    /*package*/ ElementContext(DictionaryService dictionary, QName elementName, Properties configuration, Progress progress)
     {
         this.dictionary = dictionary;
         this.elementName = elementName;
+        this.configuration = configuration;
         this.progress = progress;
     }
     
@@ -48,9 +54,17 @@ import org.alfresco.service.namespace.QName;
     /**
      * @return  the importer progress
      */
-    /*package*/ ImporterProgress getImporterProgress()
+    /*package*/ Progress getImporterProgress()
     {
         return progress;
+    }
+
+    /**
+     * @return  the configuration
+     */
+    /*package*/ Properties getConfiguration()
+    {
+        return configuration;
     }
     
     /**

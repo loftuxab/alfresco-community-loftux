@@ -1,6 +1,7 @@
 package org.alfresco.repo.importer;
 
 import java.io.InputStream;
+import java.util.Properties;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -20,8 +21,9 @@ public interface Importer
      * @param inputStream  the input stream containing the xml to parse
      * @param parentRef  the parent node to place nodes into
      * @param childAssocType  the child association type to place children under
+     * @param configuration  property values used for binding property place holders in import stream
      * @param progress  progress monitor (may be null)
      */
-    public void importNodes(InputStream inputStream, NodeRef parentRef, QName childAssocType, ImporterProgress progress);
+    public void importNodes(InputStream inputStream, NodeRef parentRef, QName childAssocType, Properties configuration, Progress progress);
 
 }

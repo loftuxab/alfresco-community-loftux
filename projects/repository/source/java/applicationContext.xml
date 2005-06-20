@@ -933,8 +933,22 @@
    <bean id="importerComponent" class="org.alfresco.repo.importer.ImporterComponent">
       <!-- For now, hard-wire the view importer -->
       <property name="viewImporter"><ref bean="viewImporter"/></property>
+      <property name="namespaceService"><ref bean="namespaceService"/></property>
       <property name="dictionaryService"><ref bean="dictionaryService"/></property>
       <property name="nodeService"><ref bean="nodeService"/></property>
+   </bean>
+
+   <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap">
+      <property name="importerService"><ref bean="importerComponent"/></property>
+      <property name="namespaceService"><ref bean="namespaceService"/></property>
+      <property name="bootstrapViews">
+         <list>
+            <props>
+               <prop key="path">/</prop>
+               <prop key="location">org/alfresco/model/system_import.xml</prop>
+            </props>
+         </list>
+      </property>
    </bean>
 
    <!-- Audit -->

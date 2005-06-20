@@ -1,8 +1,11 @@
 package org.alfresco.repo.importer.view;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,7 +45,7 @@ import org.alfresco.service.namespace.QName;
      */
     /*package*/ NodeContext(QName elementName, ParentContext parentContext, TypeDefinition typeDef)
     {
-        super(parentContext.getDictionaryService(), elementName, parentContext.getImporterProgress());
+        super(parentContext.getDictionaryService(), elementName, parentContext.getConfiguration(), parentContext.getImporterProgress());
         this.parentContext = parentContext;
         this.typeDef = typeDef;
     }
@@ -89,7 +92,8 @@ import org.alfresco.service.namespace.QName;
             // Default child name to node name, if there is one
             if (nodeName != null)
             {
-                return QName.createQName(parentContext.getAssocType().getNamespaceURI(), nodeName);
+                String localName = QName.createValidLocalName(nodeName);
+                return QName.createQName(parentContext.getAssocType().getNamespaceURI(), localName);
             }
         }
         return childName;
@@ -119,7 +123,10 @@ import org.alfresco.service.namespace.QName;
         }
         else
         {
-            for (AspectDefinition aspectDef : nodeAspects.values())
+            Set<AspectDefinition> allAspects = new HashSet<AspectDefinition>();
+            allAspects.addAll(typeDef.getDefaultAspects());
+            allAspects.addAll(nodeAspects.values());
+            for (AspectDefinition aspectDef : allAspects)
             {
                 if (aspectDef.getProperties().containsKey(propDef.getName()))
                 {

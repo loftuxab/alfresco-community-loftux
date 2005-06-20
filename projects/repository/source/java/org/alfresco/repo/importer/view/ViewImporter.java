@@ -6,11 +6,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Stack;
 
 import org.alfresco.repo.importer.Importer;
 import org.alfresco.repo.importer.ImporterException;
-import org.alfresco.repo.importer.ImporterProgress;
+import org.alfresco.repo.importer.Progress;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
@@ -25,6 +26,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.StringUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -94,9 +96,9 @@ public class ViewImporter implements Importer
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.repo.importer.Importer#importNodes(java.io.InputStream, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, org.alfresco.repo.importer.ImporterProgress)
+     * @see org.alfresco.repo.importer.Importer#importNodes(java.io.InputStream, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.util.Properties, org.alfresco.repo.importer.Progress)
      */
-    public void importNodes(InputStream inputStream, NodeRef parentRef, QName childAssocType, ImporterProgress progress)
+    public void importNodes(InputStream inputStream, NodeRef parentRef, QName childAssocType, Properties configuration, Progress progress)
     {
         try
         {
@@ -112,7 +114,7 @@ public class ViewImporter implements Importer
                     {
                         if (xpp.getDepth() == 1)
                         {
-                            processRoot(xpp, parentRef, childAssocType, progress, contextStack);
+                            processRoot(xpp, parentRef, childAssocType, configuration, progress, contextStack);
                         }
                         else
                         {
@@ -202,21 +204,23 @@ public class ViewImporter implements Importer
         }
     }
 
+
     /**
-     * Process root element
+     * Process Root
      * 
      * @param xpp
      * @param parentRef
      * @param childAssocType
+     * @param configuration
      * @param progress
      * @param contextStack
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private void processRoot(XmlPullParser xpp, NodeRef parentRef, QName childAssocType, ImporterProgress progress, Stack<ElementContext> contextStack)
+    private void processRoot(XmlPullParser xpp, NodeRef parentRef, QName childAssocType, Properties configuration, Progress progress, Stack<ElementContext> contextStack)
         throws XmlPullParserException, IOException
     {
-        ParentContext parentContext = new ParentContext(dictionaryService, progress, getName(xpp), parentRef, childAssocType);
+        ParentContext parentContext = new ParentContext(dictionaryService, configuration, progress, getName(xpp), parentRef, childAssocType);
         contextStack.push(parentContext);
         
         if (logger.isDebugEnabled())
@@ -242,6 +246,7 @@ public class ViewImporter implements Importer
         String childName = xpp.getAttributeValue(NamespaceService.ALFRESCO_VIEW_URI, VIEW_CHILD_NAME_ATTR);
         if (childName != null && childName.length() > 0)
         {
+            childName = bindPlaceHolder(childName, context.getConfiguration());
             context.setChildName(QName.createQName(childName, namespaceService));
         }
             
@@ -296,6 +301,7 @@ public class ViewImporter implements Importer
         if (eventType == XmlPullParser.TEXT)
         {
             String strValue = xpp.getText();
+            strValue = bindPlaceHolder(strValue, context.getConfiguration());
             value = (Serializable)ValueConverter.convert(propDef.getPropertyType(), strValue);
             eventType = xpp.next();
         }
@@ -438,7 +444,7 @@ public class ViewImporter implements Importer
      * @param progress
      * @param childAssocRef
      */
-    private void reportNodeCreated(ImporterProgress progress, ChildAssociationRef childAssocRef)
+    private void reportNodeCreated(Progress progress, ChildAssociationRef childAssocRef)
     {
         if (progress != null)
         {
@@ -453,7 +459,7 @@ public class ViewImporter implements Importer
      * @param nodeRef
      * @param aspect
      */
-    private void reportAspectAdded(ImporterProgress progress, NodeRef nodeRef, QName aspect)
+    private void reportAspectAdded(Progress progress, NodeRef nodeRef, QName aspect)
     {
         if (progress != null)
         {
@@ -468,7 +474,7 @@ public class ViewImporter implements Importer
      * @param nodeRef
      * @param properties
      */
-    private void reportPropertySet(ImporterProgress progress, NodeRef nodeRef, Map<QName, Serializable> properties)
+    private void reportPropertySet(Progress progress, NodeRef nodeRef, Map<QName, Serializable> properties)
     {
         if (progress != null)
         {
@@ -497,6 +503,28 @@ public class ViewImporter implements Importer
         // Construct name
         String name = xpp.getName();
         return QName.createQName(uri, name);
+    }
+
+    /**
+     * Bind the specified value to the passed configuration values if it is a place holder
+     * 
+     * @param value  the value to bind
+     * @param configuration  the configuration properties to bind to
+     * @return  the bound value
+     */
+    private String bindPlaceHolder(String value, Properties configuration)
+    {
+        // TODO: replace with more efficient approach
+        String boundValue = value;
+        if (configuration != null)
+        {
+            for (Object key : configuration.keySet())
+            {
+                String stringKey = (String)key;
+                boundValue = StringUtils.replace(boundValue, "${" + stringKey + "}", configuration.getProperty(stringKey));
+            }
+        }
+        return boundValue;
     }
     
     /**

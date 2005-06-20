@@ -348,37 +348,4 @@ public final class Repository
        return (ServiceRegistry)FacesContextUtils.getRequiredWebApplicationContext(
                context).getBean(ServiceRegistry.SERVICE_REGISTRY);
    }
-   
-   /**
-    * Create a valid QName from the specified name
-    * 
-    * @param name       Name to create QName from
-    * @return valid QName
-    */
-   public static String createValidQName(String name)
-   {
-      if (name == null || name.length() == 0)
-      {
-         throw new IllegalArgumentException("Name cannot be null or empty.");
-      }
-      
-      if (name.length() > QName.MAX_LENGTH)
-      {
-         name = name.substring(0, QName.MAX_LENGTH);
-      }
-      
-      // make sure there are no spaces in the name (these are not considered invalid
-      // at the moment but things don't work if spaces are present), therefore
-      // remove this if space becomes invalid or is dealt with
-      name = name.replace(' ', '_');
-      
-      // search for any invalid QName characters
-      for (int i=0; i<QName.INVALID_CHARS.length; i++)
-      {
-         // replace if found - slow but this is a rare case
-         name = name.replace(QName.INVALID_CHARS[i], '_');
-      }
-      
-      return name;
-   }
 }

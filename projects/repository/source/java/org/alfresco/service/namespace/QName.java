@@ -27,8 +27,8 @@ public final class QName implements QNamePattern, Serializable
     private static final char NAMESPACE_PREFIX = ':';
     private static final char NAMESPACE_BEGIN = '{';
     private static final char NAMESPACE_END = '}';
-    public static final char[] INVALID_CHARS = { '/', '.' };
-    public static final int MAX_LENGTH = 100;
+    private static final char[] INVALID_CHARS = { '/', '.' };
+    private static final int MAX_LENGTH = 100;
 
     
     /**
@@ -155,6 +155,41 @@ public final class QName implements QNamePattern, Serializable
 
         // Construct QName
         return new QName(namespaceURI, localName, null);
+    }
+
+
+    /**
+     * Create a valid local name from the specified name
+     * 
+     * @param name  name to create valid local name from
+     * @return valid local name
+     */
+    public static String createValidLocalName(String name)
+    {
+        // Validate length
+        if (name == null || name.length() == 0)
+        {
+            throw new IllegalArgumentException("Local name cannot be null or empty.");
+        }
+        if (name.length() > MAX_LENGTH)
+        {
+            name = name.substring(0, MAX_LENGTH);
+        }
+
+        // make sure there are no spaces in the name (these are not considered
+        // invalid
+        // at the moment but things don't work if spaces are present), therefore
+        // remove this if space becomes invalid or is dealt with
+        name = name.replace(' ', '_');
+
+        // search for any invalid QName characters
+        for (int i = 0; i < INVALID_CHARS.length; i++)
+        {
+            // replace if found - slow but this is a rare case
+            name = name.replace(INVALID_CHARS[i], '_');
+        }
+
+        return name;
     }
 
 
@@ -291,5 +326,7 @@ public final class QName implements QNamePattern, Serializable
     {
         return (prefix == null) ? "" : prefix + NAMESPACE_PREFIX + localName;
     }
+
+
     
 }
