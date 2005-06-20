@@ -148,5 +148,12 @@ public interface RuleService
      * @param rule
      */
     public void addRule(NodeRef nodeRef, Rule rule);
-
+    
+    
+    /**
+     * Removes a rule from the given rule actionable rule
+     * 
+     * @param nodeRef  the actionable node reference
+     */
+    public void removeRule(NodeRef nodeRef, Rule rule);
 }
