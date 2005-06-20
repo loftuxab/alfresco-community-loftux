@@ -20,6 +20,7 @@ import org.alfresco.repo.rule.action.AddFeaturesActionExecutor;
 import org.alfresco.repo.rule.action.CheckInActionExecutor;
 import org.alfresco.repo.rule.action.CheckOutActionExecutor;
 import org.alfresco.repo.rule.action.CopyActionExecutor;
+import org.alfresco.repo.rule.action.LinkCategoryActionExecutor;
 import org.alfresco.repo.rule.action.MoveActionExecutor;
 import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
 import org.alfresco.repo.rule.action.TransformActionExecutor;
@@ -28,7 +29,6 @@ import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
-import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
@@ -117,13 +117,16 @@ public class NewRuleWizard extends AbstractWizardBean
             conditionParams.put(MatchTextEvaluator.NAME, 
                   this.conditionProperties.get(PROP_CONTAINS_TEXT));
          }
-//            else if (this.condition.equals(InCategoryEvaluator.NAME))
-//            {
-//               // put the selected category in the condition params
-//               NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
-//                     this.conditionProperties.get(PROP_CATEGORY));
-//               conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY, catNodeRef);
-//            }
+         else if (this.condition.equals(InCategoryEvaluator.NAME))
+         {
+            // put the selected category in the condition params
+            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.conditionProperties.get(PROP_CATEGORY));
+            conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY_VALUE, catNodeRef);
+            
+            // add the classifiable aspect
+            conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_CLASSIFIABLE);
+         }
          
          // set up parameters maps for the action
          Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
@@ -219,14 +222,18 @@ public class NewRuleWizard extends AbstractWizardBean
                      rejectDestNodeRef);
             }
          }
-//         else if (this.action.equals("link-category"))
-//         {
-//            // put the selected category in the action params
-//            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
-//                  this.actionProperties.get(PROP_DESTINATION));
-//            
-//            actionParams.put(LinkCategoryExecutor.PARAM_CATEGORY, catNodeRef);
-//         }
+         else if (this.action.equals(LinkCategoryActionExecutor.NAME))
+         {
+            // add the classifiable aspect
+            actionParams.put(LinkCategoryActionExecutor.PARAM_CATEGORY_ASPECT,
+                  ContentModel.ASPECT_CLASSIFIABLE);
+            
+            // put the selected category in the action params
+            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.actionProperties.get(PROP_CATEGORY));
+            actionParams.put(LinkCategoryActionExecutor.PARAM_CATEGORY_VALUE, 
+                  catNodeRef);
+         }
          else if (this.action.equals(CheckOutActionExecutor.NAME))
          {
             // specify the location the checked out working copy should go
@@ -285,10 +292,8 @@ public class NewRuleWizard extends AbstractWizardBean
             // update the existing rule in the repository
             rule = this.rulesBean.getCurrentRule();
             
-            // remove the existing condition and action
-//            rule.removeAllConditions();
-//            rule.removeAllActions();
-            
+            // we know there is only one condition and action
+            // so remove the first one
             rule.removeRuleCondition(rule.getRuleConditions().get(0));
             rule.removeRuleAction(rule.getRuleActions().get(0));
          }
@@ -573,11 +578,11 @@ public class NewRuleWizard extends AbstractWizardBean
          this.conditionProperties.put(PROP_CONTAINS_TEXT, 
                (String)condProps.get(MatchTextEvaluator.PARAM_TEXT));
       }
-//      else if (this.condition.equals(InCategoryEvaluator.NAME))
-//      {
-//         NodeRef catNodeRef = condProps.get("category");
-//         this.conditionProperties.put("category", catNodeRef.getId());
-//      }
+      else if (this.condition.equals(InCategoryEvaluator.NAME))
+      {
+         NodeRef catNodeRef = (NodeRef)condProps.get(InCategoryEvaluator.PARAM_CATEGORY_VALUE);
+         this.conditionProperties.put(PROP_CATEGORY, catNodeRef.getId());
+      }
       
       // populate the action property bag with the relevant values
       Map<String, Serializable> actionProps = rule.getRuleActions().get(0).getParameterValues();
@@ -624,11 +629,11 @@ public class NewRuleWizard extends AbstractWizardBean
             this.actionProperties.put(PROP_REJECT_FOLDER, rejectFolderNode.getId());
          }
       }
-//      else if (this.action.equals(LinkCategoryExecutor.NAME))
-//      {
-//         NodeRef catNodeRef = (NodeRef)actionProps.get("category");
-//         this.actionProperties.put("category", catNodeRef.getId());
-//      }
+      else if (this.action.equals(LinkCategoryActionExecutor.NAME))
+      {
+         NodeRef catNodeRef = (NodeRef)actionProps.get(LinkCategoryActionExecutor.PARAM_CATEGORY_VALUE);
+         this.actionProperties.put(PROP_CATEGORY, catNodeRef.getId());
+      }
       else if (this.action.equals(CheckOutActionExecutor.NAME))
       {
          NodeRef destNodeRef = (NodeRef)actionProps.get(CheckOutActionExecutor.PARAM_DESTINATION_FOLDER);
