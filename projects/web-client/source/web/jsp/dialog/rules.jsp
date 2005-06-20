@@ -53,18 +53,18 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
-                              <div class="mainTitle">Content Rules</div>
+                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainTitle"><h:outputText value='#{msg.content_rules}' /></div>
                               <div class="mainSubText">This view shows you all the rules to be applied to content in this space.</div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
-                           <td width=100 style="padding-left:2px">
+                           <td width="100" style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
                               <a:actionLink value="#{msg.create_rule}" image="/images/icons/subscribe_small.gif" padding="4" action="createRule" actionListener="#{NewRuleWizard.startWizard}" />
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
-                           <td width=100 style="padding-left:2px">
+                           <td width="125" style="padding-left:2px">
                               <%-- Filters --%>
                               <h:outputText style="padding-left:26px;padding-bottom:4px;" styleClass="mainSubTitle" value="#{msg.filter_contents}" /><br/>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
@@ -129,11 +129,14 @@
                                        <a:sortLink label="Title" value="title" mode="case-insensitive" styleClass="header"/>
                                     </f:facet>
                                     <f:facet name="small-icon">
-                                       <a:actionLink value="#{r.title}" image="/images/icons/subscribe_small.gif" actionListener="#{RulesBean.clickRule}" showLink="false">
+                                       <a:actionLink value="#{r.title}" image="/images/icons/subscribe_small.gif" 
+                                                     actionListener="#{NewRuleWizard.startWizardForEdit}" action="editRule"
+                                                     showLink="false">
                                           <f:param name="id" value="#{r.id}" />
                                        </a:actionLink>
                                     </f:facet>
-                                    <a:actionLink value="#{r.title}" actionListener="#{RulesBean.clickRule}">
+                                    <a:actionLink value="#{r.title}" actionListener="#{NewRuleWizard.startWizardForEdit}" 
+                                                  action="editRule">
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
                                  </a:column>
@@ -152,7 +155,7 @@
                                        <a:sortLink label="Created Date" value="createdDate" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.createdDate}">
-                                       <a:convertXMLDate dateStyle="long" />
+                                       <a:convertXMLDate type="both" dateStyle="long" timeStyle="short" />
                                     </h:outputText>
                                  </a:column>
                                  
@@ -162,7 +165,7 @@
                                        <a:sortLink label="Modified Date" value="modifiedDate" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.modifiedDate}">
-                                       <a:convertXMLDate dateStyle="long" />
+                                       <a:convertXMLDate type="both" dateStyle="long" timeStyle="short" />
                                     </h:outputText>
                                  </a:column>
                                  
@@ -171,10 +174,14 @@
                                     <f:facet name="header">
                                        <h:outputText value="#{msg.actions}"/>
                                     </f:facet>
-                                    <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction">
+                                    <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" 
+                                                  styleClass="inlineAction"
+                                                  actionListener="#{RulesBean.setupRuleAction}" action="deleteRule">
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
-                                    <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" showLink="false" styleClass="inlineAction">
+                                    <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" 
+                                                  showLink="false" styleClass="inlineAction"
+                                                  actionListener="#{NewRuleWizard.startWizardForEdit}" action="editRule">
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
                                  </a:column>

@@ -207,6 +207,10 @@
          <property-name>ruleService</property-name>
          <value>#{AlfRuleService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>rulesBean</property-name>
+         <value>#{RulesBean}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>
@@ -596,6 +600,30 @@
          <from-outcome>createRule</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/details.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>editRule</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteRule</from-outcome>
+         <to-view-id>/jsp/dialog/delete-rule.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/delete-rule.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>manageRules</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>browse</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
@@ -749,6 +777,10 @@
       <navigation-case>
          <from-outcome>move</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/action-move.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>transform</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-transform.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>email</from-outcome>

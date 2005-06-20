@@ -78,22 +78,28 @@ public class DocumentDetailsBean
     */
    public List getVersionHistory()
    {
-      VersionHistory history = this.versionService.getVersionHistory(getDocument().getNodeRef());
-
-      List<MapNode> versions = new ArrayList<MapNode>(); 
+      List<MapNode> versions = new ArrayList<MapNode>();
       
-      for (Version version : history.getAllVersions())
+      if (getDocument().hasAspect(ContentModel.ASPECT_VERSIONABLE))
       {
-         // create a map node representation of the version
-         MapNode clientVersion = new MapNode(version.getNodeRef(), this.nodeService);
-         clientVersion.put("versionLabel", version.getVersionLabel());
-         clientVersion.put("author", clientVersion.get("creator"));
-         clientVersion.put("versionDate", version.getCreatedDate());
-         clientVersion.put("url", DownloadContentServlet.generateURL(version.getNodeRef(), 
-               clientVersion.getName()));
-         
-         // add the client side version to the list
-         versions.add(clientVersion);
+         VersionHistory history = this.versionService.getVersionHistory(getDocument().getNodeRef());
+   
+         if (history != null)
+         {
+            for (Version version : history.getAllVersions())
+            {
+               // create a map node representation of the version
+               MapNode clientVersion = new MapNode(version.getNodeRef(), this.nodeService);
+               clientVersion.put("versionLabel", version.getVersionLabel());
+               clientVersion.put("author", clientVersion.get("creator"));
+               clientVersion.put("versionDate", version.getCreatedDate());
+               clientVersion.put("url", DownloadContentServlet.generateURL(version.getNodeRef(), 
+                     clientVersion.getName()));
+               
+               // add the client side version to the list
+               versions.add(clientVersion);
+            }
+         }
       }
       
       return versions;

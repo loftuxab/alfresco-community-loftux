@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
@@ -15,21 +16,26 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.rule.action.AddFeaturesActionExecutor;
 import org.alfresco.repo.rule.action.CheckInActionExecutor;
 import org.alfresco.repo.rule.action.CheckOutActionExecutor;
 import org.alfresco.repo.rule.action.CopyActionExecutor;
 import org.alfresco.repo.rule.action.MoveActionExecutor;
 import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
+import org.alfresco.repo.rule.action.TransformActionExecutor;
+import org.alfresco.repo.rule.condition.InCategoryEvaluator;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
+import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.bean.RulesBean;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.log4j.Logger;
@@ -54,6 +60,21 @@ public class NewRuleWizard extends AbstractWizardBean
    private static final String STEP5_TITLE = "Step Five - Action Settings";
    private static final String FINISH_INSTRUCTION = "To create the rule click Finish.";
    
+   // parameter names for conditions and actions
+   private static final String PROP_CONTAINS_TEXT = "containstext";
+   private static final String PROP_CATEGORY = "category";
+   private static final String PROP_FEATURE = "feature";
+   private static final String PROP_DESTINATION = "destinationLocation";
+   private static final String PROP_APPROVE_STEP_NAME = "approveStepName";
+   private static final String PROP_APPROVE_ACTION = "approveAction";
+   private static final String PROP_APPROVE_FOLDER = "approveFolder";
+   private static final String PROP_REJECT_STEP_PRESENT = "rejectStepPresent";
+   private static final String PROP_REJECT_STEP_NAME = "rejectStepName";
+   private static final String PROP_REJECT_ACTION = "rejectAction";
+   private static final String PROP_REJECT_FOLDER = "rejectFolder";
+   private static final String PROP_CHECKIN_DESC = "checkinDescription";
+   private static final String PROP_TRANSFORMER = "transformer";
+   
    // new rule wizard specific properties
    private String title;
    private String description;
@@ -61,6 +82,7 @@ public class NewRuleWizard extends AbstractWizardBean
    private String condition;
    private String action;
    private RuleService ruleService;
+   private RulesBean rulesBean;
    private List<SelectItem> types;
    private List<SelectItem> conditions;
    private List<SelectItem> actions;
@@ -88,208 +110,207 @@ public class NewRuleWizard extends AbstractWizardBean
          tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
+         // set up parameters maps for the condition
+         Map<String, Serializable> conditionParams = new HashMap<String, Serializable>();
+         if (this.condition.equals(MatchTextEvaluator.PARAM_TEXT))
+         {
+            conditionParams.put(MatchTextEvaluator.NAME, 
+                  this.conditionProperties.get(PROP_CONTAINS_TEXT));
+         }
+//            else if (this.condition.equals(InCategoryEvaluator.NAME))
+//            {
+//               // put the selected category in the condition params
+//               NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
+//                     this.conditionProperties.get(PROP_CATEGORY));
+//               conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY, catNodeRef);
+//            }
+         
+         // set up parameters maps for the action
+         Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
+         if (this.action.equals(AddFeaturesActionExecutor.NAME))
+         {
+            // create QName representation of the chosen feature
+            // TODO: handle namespaces, for now presume it is in alfresco namespace
+            QName aspect = QName.createQName(NamespaceService.ALFRESCO_URI, 
+                  this.actionProperties.get(PROP_FEATURE));
+            
+            actionParams.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, aspect);
+         }
+         else if (this.action.equals(CopyActionExecutor.NAME))
+         {
+            // add the destination space id to the action properties
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.actionProperties.get(PROP_DESTINATION));
+            actionParams.put(CopyActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+            
+            // add the type and name of the association to create when the copy
+            // is performed
+            actionParams.put(CopyActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+                  ContentModel.ASSOC_CONTAINS);
+            actionParams.put(CopyActionExecutor.PARAM_ASSOC_QNAME, 
+                  QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+         }
+         else if (this.action.equals(MoveActionExecutor.NAME))
+         {
+            // add the destination space id to the action properties
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.actionProperties.get(PROP_DESTINATION));
+            actionParams.put(MoveActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+            
+            // add the type and name of the association to create when the move
+            // is performed
+            actionParams.put(MoveActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+                  ContentModel.ASSOC_CONTAINS);
+            actionParams.put(MoveActionExecutor.PARAM_ASSOC_QNAME, 
+                  QName.createQName(NamespaceService.ALFRESCO_URI, "move"));
+         }
+         else if (this.action.equals(SimpleWorkflowActionExecutor.NAME))
+         {
+            // add the approve step name
+            actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_STEP,
+                  this.actionProperties.get(PROP_APPROVE_STEP_NAME));
+            
+            // add whether the approve step will copy or move the content
+            boolean approveMove = true;
+            String approveAction = this.actionProperties.get(PROP_APPROVE_ACTION);
+            if (approveAction != null && approveAction.equals("copy"))
+            {
+               approveMove = false;
+            }
+            
+            actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_MOVE,
+                  new Boolean(approveMove));
+            
+            // add the destination folder of the content
+            NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.actionProperties.get(PROP_APPROVE_FOLDER));
+            actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER, 
+                  approveDestNodeRef);
+            
+            // determine whether we have a reject step or not
+            boolean requireReject = true;
+            String rejectStepPresent = this.actionProperties.get(PROP_REJECT_STEP_PRESENT);
+            if (rejectStepPresent != null && rejectStepPresent.equals("no"))
+            {
+               requireReject = false;
+            }
+
+            if (requireReject)
+            {
+               // add the reject step name
+               actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_STEP,
+                     this.actionProperties.get(PROP_REJECT_STEP_NAME));
+            
+               // add whether the reject step will copy or move the content
+               boolean rejectMove = true;
+               String rejectAction = this.actionProperties.get(PROP_REJECT_ACTION);
+               if (rejectAction != null && rejectAction.equals("copy"))
+               {
+                  rejectMove = false;
+               }
+               
+               actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_MOVE,
+                     new Boolean(rejectMove));
+               
+               // add the destination folder of the content
+               NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                     this.actionProperties.get(PROP_REJECT_FOLDER));
+               actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER, 
+                     rejectDestNodeRef);
+            }
+         }
+//         else if (this.action.equals("link-category"))
+//         {
+//            // put the selected category in the action params
+//            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
+//                  this.actionProperties.get(PROP_DESTINATION));
+//            
+//            actionParams.put(LinkCategoryExecutor.PARAM_CATEGORY, catNodeRef);
+//         }
+         else if (this.action.equals(CheckOutActionExecutor.NAME))
+         {
+            // specify the location the checked out working copy should go
+            // add the destination space id to the action properties
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.actionProperties.get(PROP_DESTINATION));
+            actionParams.put(CheckOutActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+            
+            // add the type and name of the association to create when the 
+            // check out is performed
+            actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+                  ContentModel.ASSOC_CONTAINS);
+            actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_QNAME, 
+                  QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"));
+         }
+         else if (this.action.equals(CheckInActionExecutor.NAME))
+         {
+            // add the description for the checkin to the action params
+            actionParams.put(CheckInActionExecutor.PARAM_DESCRIPTION, 
+                  this.actionProperties.get(PROP_CHECKIN_DESC));
+         }
+         else if (this.action.equals(TransformActionExecutor.NAME))
+         {
+            // add the transformer to use
+            actionParams.put(TransformActionExecutor.PARAM_MIME_TYPE,
+                  this.actionProperties.get(PROP_TRANSFORMER));
+            
+            // add the destination space id to the action properties
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.actionProperties.get(PROP_DESTINATION));
+            actionParams.put(TransformActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+            
+            // add the type and name of the association to create when the copy
+            // is performed
+            actionParams.put(TransformActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+                  ContentModel.ASSOC_CONTAINS);
+            actionParams.put(TransformActionExecutor.PARAM_ASSOC_QNAME, 
+                  QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+         }
+
+         // get the definition for the selected condition and action
+         Rule rule = null;
+         RuleConditionDefinition cond = this.ruleService.getConditionDefinition(this.getCondition());
+         RuleActionDefinition action = this.ruleService.getActionDefinition(this.getAction());
+         
+         // get hold of the space the rule will apply to and make sure
+         // it is actionable
+         Node currentSpace = browseBean.getActionSpace();
+         if (this.ruleService.isActionable(currentSpace.getNodeRef()) == false)
+         {
+            this.ruleService.makeActionable(currentSpace.getNodeRef());
+         }
+
          if (this.editMode)
          {
             // update the existing rule in the repository
+            rule = this.rulesBean.getCurrentRule();
+            
+            // remove the existing condition and action
+//            rule.removeAllConditions();
+//            rule.removeAllActions();
+            
+            rule.removeRuleCondition(rule.getRuleConditions().get(0));
+            rule.removeRuleAction(rule.getRuleActions().get(0));
          }
          else
          {
-            // get hold of the space the rule will apply to and make sure
-            // it is actionable
-            Node currentSpace = browseBean.getActionSpace();
-            if (this.ruleService.isActionable(currentSpace.getNodeRef()) == false)
-            {
-               this.ruleService.makeActionable(currentSpace.getNodeRef());
-            }
-        
             RuleType ruleType = this.ruleService.getRuleType(this.getType());
-            RuleConditionDefinition cond = this.ruleService.getConditionDefinition(this.getCondition());
-            RuleActionDefinition action = this.ruleService.getActionDefinition(this.getAction());
-        
-            // set up parameters maps for the condition and acion
-            Map<String, Serializable> conditionParams = new HashMap<String, Serializable>();
-            if (this.condition.equals("match-text"))
-            {
-               conditionParams.put(MatchTextEvaluator.PARAM_TEXT, 
-                     this.conditionProperties.get("containstext"));
-            }
-            else if (this.condition.equals("in-category"))
-            {
-               // put the selected category in the condition params
-               NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
-                     this.conditionProperties.get("category"));
-               
-               // TODO: **************************************************
-               //conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY, catNodeRef);
-               // **************************************************
-            }
-            
-            Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
-            if (this.action.equals("add-features"))
-            {
-               // create QName representation of the chosen feature
-               // TODO: handle namespaces, for now presume it is in alfresco namespace
-               QName aspect = QName.createQName(NamespaceService.ALFRESCO_URI, 
-                     this.actionProperties.get("feature"));
-               
-               actionParams.put("aspect-name", aspect);
-            }
-            else if (this.action.equals("copy"))
-            {
-               // add the destination space id to the action properties
-               NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
-                     this.actionProperties.get("destinationLocation"));
-               actionParams.put(CopyActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
-               
-               // add the type and name of the association to create when the copy
-               // is performed
-               actionParams.put(CopyActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
-                     ContentModel.ASSOC_CONTAINS);
-               actionParams.put(CopyActionExecutor.PARAM_ASSOC_QNAME, 
-                     QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
-            }
-            else if (this.action.equals("move"))
-            {
-               // add the destination space id to the action properties
-               NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
-                     this.actionProperties.get("destinationLocation"));
-               actionParams.put(MoveActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
-               
-               // add the type and name of the association to create when the move
-               // is performed
-               actionParams.put(MoveActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
-                     ContentModel.ASSOC_CONTAINS);
-               actionParams.put(MoveActionExecutor.PARAM_ASSOC_QNAME, 
-                     QName.createQName(NamespaceService.ALFRESCO_URI, "move"));
-            }
-            else if (this.action.equals("simple-workflow"))
-            {
-               // add the approve step name
-               actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_STEP,
-                     this.actionProperties.get("approveStepName"));
-               
-               // add whether the approve step will copy or move the content
-               boolean approveMove = true;
-               String approveAction = this.actionProperties.get("approveAction");
-               if (approveAction != null && approveAction.equals("copy"))
-               {
-                  approveMove = false;
-               }
-               
-               actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_MOVE,
-                     new Boolean(approveMove));
-               
-               // add the destination folder of the content
-               NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
-                     this.actionProperties.get("approveDestination"));
-               actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER, 
-                     approveDestNodeRef);
-               
-               // determine whether we have a reject step or not
-               boolean requireReject = true;
-               String rejectStepPresent = this.actionProperties.get("rejectStepPresent");
-               if (rejectStepPresent != null && rejectStepPresent.equals("no"))
-               {
-                  requireReject = false;
-               }
-
-               if (requireReject)
-               {
-                  // add the reject step name
-                  actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_STEP,
-                        this.actionProperties.get("rejectStepName"));
-               
-                  // add whether the reject step will copy or move the content
-                  boolean rejectMove = true;
-                  String rejectAction = this.actionProperties.get("rejectAction");
-                  if (rejectAction != null && rejectAction.equals("copy"))
-                  {
-                     rejectMove = false;
-                  }
-                  
-                  actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_MOVE,
-                        new Boolean(rejectMove));
-                  
-                  // add the destination folder of the content
-                  NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
-                        this.actionProperties.get("rejectDestination"));
-                  actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER, 
-                        rejectDestNodeRef);
-               }
-            }
-            else if (this.action.equals("link-category"))
-            {
-               // put the selected category in the action params
-               NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
-                     this.actionProperties.get("category"));
-               
-               // TODO: **************************************************
-               
-               //actionParams.put(LinkCategoryActionExecutor.PARAM_CATEGORY, catNodeRef);
-               
-               // **************************************************
-            }
-            else if (this.action.equals("check-out"))
-            {
-               // specify the location the checked out working copy should go
-               // add the destination space id to the action properties
-               NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
-                     this.actionProperties.get("destinationLocation"));
-               
-               actionParams.put(CheckOutActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
-               
-               // add the type and name of the association to create when the 
-               // check out is performed
-               actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
-                     ContentModel.ASSOC_CONTAINS);
-               actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_QNAME, 
-                     QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"));
-            }
-            else if (this.action.equals("check-in"))
-            {
-               // add the description for the checkin to the action params
-               actionParams.put(CheckInActionExecutor.PARAM_DESCRIPTION, 
-                     this.actionProperties.get("checkinDescription"));
-            }
-            else if (this.action.equals("transform"))
-            {
-               // add the destination space id to the action properties
-               NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
-                     this.actionProperties.get("destinationLocation"));
-               
-               // **************************************************
-               
-//               actionParams.put(TransformActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
-               
-               // add the type and name of the association to create when the copy
-               // is performed
-//               actionParams.put(TransformActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
-//                     DictionaryBootstrap.CHILD_ASSOC_QNAME_CONTAINS);
-//               actionParams.put(Transform.ActionExecutor.PARAM_ASSOC_QNAME, 
-//                     QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
-               
-               // add the format that the copy should end up as
-//               actionParams.put(TransformActionExecutor.PARAM_TRANSFORM_TO, 
-//                     this.actionProperties.get("transformer"));
-               
-               // **************************************************
-            }
-            
-            // create the rule and add it to the space
-            Rule rule = this.ruleService.createRule(ruleType);
-            rule.setTitle(this.title);
-            rule.setDescription(this.description);
-            rule.addRuleCondition(cond, conditionParams);
-            rule.addRuleAction(action, actionParams);
-            this.ruleService.addRule(currentSpace.getNodeRef(), rule);
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Added rule '" + this.title + "' with condition '" + 
-                            this.condition + "', action '" + this.action + 
-                            "', condition params of " +
-                            this.conditionProperties + " and action params of " + 
-                            this.actionProperties);
+            rule = this.ruleService.createRule(ruleType);
          }
+
+         // setup the rule and add it to the space
+         rule.setTitle(this.title);
+         rule.setDescription(this.description);
+         rule.addRuleCondition(cond, conditionParams);
+         rule.addRuleAction(action, actionParams);
+         this.ruleService.addRule(currentSpace.getNodeRef(), rule);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Added rule '" + this.title + "' with condition '" + 
+                         this.condition + "', action '" + this.action + 
+                         "', condition params of " +
+                         this.conditionProperties + " and action params of " + 
+                         this.actionProperties);
          
          // commit the transaction
          tx.commit();
@@ -508,6 +529,127 @@ public class NewRuleWizard extends AbstractWizardBean
    }
    
    /**
+    * Sets the context of the rule up before performing the 
+    * standard wizard editing steps
+    *  
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#startWizardForEdit(javax.faces.event.ActionEvent)
+    */
+   public void startWizardForEdit(ActionEvent event)
+   {
+      // setup context for rule to be edited
+      this.rulesBean.setupRuleAction(event);
+      
+      // perform the usual edit processing
+      super.startWizardForEdit(event);
+   }
+
+   /**
+    * Populates the values of the backing bean ready for editing the rule
+    * 
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#populate()
+    */
+   public void populate()
+   {
+      // get hold of the current rule details
+      Rule rule = this.rulesBean.getCurrentRule();
+      
+      if (rule == null)
+      {
+         throw new AlfrescoRuntimeException("Failed to locate the current rule");
+      }
+      
+      // populate the bean with current values 
+      this.type = rule.getRuleType().getName();
+      this.title = rule.getTitle();
+      this.description = rule.getDescription();
+      // we know there is only 1 condition and action
+      this.condition = rule.getRuleConditions().get(0).getRuleConditionDefinition().getName();
+      this.action = rule.getRuleActions().get(0).getRuleActionDefinition().getName();
+      
+      // populate the condition property bag with the relevant values
+      Map<String, Serializable> condProps = rule.getRuleConditions().get(0).getParameterValues();
+      if (this.condition.equals(MatchTextEvaluator.NAME))
+      {
+         this.conditionProperties.put(PROP_CONTAINS_TEXT, 
+               (String)condProps.get(MatchTextEvaluator.PARAM_TEXT));
+      }
+//      else if (this.condition.equals(InCategoryEvaluator.NAME))
+//      {
+//         NodeRef catNodeRef = condProps.get("category");
+//         this.conditionProperties.put("category", catNodeRef.getId());
+//      }
+      
+      // populate the action property bag with the relevant values
+      Map<String, Serializable> actionProps = rule.getRuleActions().get(0).getParameterValues();
+      if (this.action.equals(AddFeaturesActionExecutor.NAME))
+      {
+         QName aspect = (QName)actionProps.get(AddFeaturesActionExecutor.PARAM_ASPECT_NAME);
+         this.actionProperties.put(PROP_FEATURE, aspect.getLocalName());
+      }
+      else if (this.action.equals(CopyActionExecutor.NAME))
+      {
+         NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecutor.PARAM_DESTINATION_FOLDER);
+         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+      }
+      else if (this.action.equals(MoveActionExecutor.NAME))
+      {
+         NodeRef destNodeRef = (NodeRef)actionProps.get(MoveActionExecutor.PARAM_DESTINATION_FOLDER);
+         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+      }
+      else if (this.action.equals(SimpleWorkflowActionExecutor.NAME))
+      {
+         String approveStep = (String)actionProps.get(SimpleWorkflowActionExecutor.PARAM_APPROVE_STEP);
+         Boolean approveMove = (Boolean)actionProps.get(SimpleWorkflowActionExecutor.PARAM_APPROVE_MOVE);
+         NodeRef approveFolderNode = (NodeRef)actionProps.get(
+               SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER);
+         
+         String rejectStep = (String)actionProps.get(SimpleWorkflowActionExecutor.PARAM_REJECT_STEP);
+         Boolean rejectMove = (Boolean)actionProps.get(SimpleWorkflowActionExecutor.PARAM_REJECT_MOVE);
+         NodeRef rejectFolderNode = (NodeRef)actionProps.get(
+               SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER);
+         
+         this.actionProperties.put(PROP_APPROVE_STEP_NAME, approveStep);
+         this.actionProperties.put(PROP_APPROVE_ACTION, approveMove ? "move" : "copy");
+         this.actionProperties.put(PROP_APPROVE_FOLDER, approveFolderNode.getId());
+         
+         if (rejectStep == null && rejectMove == null && rejectFolderNode == null)
+         {
+            this.actionProperties.put(PROP_REJECT_STEP_PRESENT, "no");
+         }
+         else
+         {
+            this.actionProperties.put(PROP_REJECT_STEP_PRESENT, "yes");
+            this.actionProperties.put(PROP_REJECT_STEP_NAME, rejectStep);
+            this.actionProperties.put(PROP_REJECT_ACTION, rejectMove ? "move" : "copy");
+            this.actionProperties.put(PROP_REJECT_FOLDER, rejectFolderNode.getId());
+         }
+      }
+//      else if (this.action.equals(LinkCategoryExecutor.NAME))
+//      {
+//         NodeRef catNodeRef = (NodeRef)actionProps.get("category");
+//         this.actionProperties.put("category", catNodeRef.getId());
+//      }
+      else if (this.action.equals(CheckOutActionExecutor.NAME))
+      {
+         NodeRef destNodeRef = (NodeRef)actionProps.get(CheckOutActionExecutor.PARAM_DESTINATION_FOLDER);
+         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+      }
+      else if (this.action.equals(CheckInActionExecutor.NAME))
+      {
+         String checkDesc = (String)actionProps.get(CheckInActionExecutor.PARAM_DESCRIPTION);
+         this.actionProperties.put(PROP_CHECKIN_DESC, checkDesc);
+      }
+      else if (this.action.equals(TransformActionExecutor.NAME))
+      {
+         String transformer = (String)actionProps.get(TransformActionExecutor.PARAM_MIME_TYPE);
+         this.actionProperties.put(PROP_TRANSFORMER, transformer);
+         
+         NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecutor.PARAM_DESTINATION_FOLDER);
+         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+      }
+   }
+
+   /**
     * @return Returns the summary data for the wizard.
     */
    public String getSummary()
@@ -609,6 +751,16 @@ public class NewRuleWizard extends AbstractWizardBean
    public void setRuleService(RuleService ruleService)
    {
       this.ruleService = ruleService;
+   }
+   
+   /**
+    * Sets the RulesBean instance to be used by the wizard in edit mode
+    * 
+    * @param rulesBean The RulesBean
+    */
+   public void setRulesBean(RulesBean rulesBean)
+   {
+      this.rulesBean = rulesBean;
    }
 
    /**

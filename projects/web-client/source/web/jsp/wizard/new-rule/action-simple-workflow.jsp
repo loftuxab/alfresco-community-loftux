@@ -125,7 +125,7 @@
                                              <td style="padding-left:6px;"></td>
                                              <td style="padding-top:6px;">
                                                 <r:spaceSelector label="Click here to select the destination" 
-                                                        value="#{NewRuleWizard.actionProperties.approveDestination}" 
+                                                        value="#{NewRuleWizard.actionProperties.approveFolder}" 
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
                                              </td>
                                           </tr>
@@ -177,7 +177,7 @@
                                                                <td style="padding-left:6px;"></td>
                                                                <td style="padding-top:6px;">
                                                                   <r:spaceSelector label="Click here to select the destination" 
-                                                                          value="#{NewRuleWizard.actionProperties.rejectDestination}" 
+                                                                          value="#{NewRuleWizard.actionProperties.rejectFolder}" 
                                                                           style="border: 1px dashed #cccccc; padding: 6px;"/>
                                                                </td>
                                                             </tr>
