@@ -382,9 +382,11 @@ public class AuthenticationTest extends TestCase
 
         // authenticate with this user details
         Authentication result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token1);
+
         // assert the user is authenticated
         assertTrue(authenticationService.getCurrentAuthentication().isAuthenticated());
         // delete the user authenticatiom object
+
         authenticationService.deleteAuthentication(rootNodeRef.getStoreRef(), token1);
 
         // create a new authentication user object
@@ -436,6 +438,16 @@ public class AuthenticationTest extends TestCase
         assertNull(authenticationService.getCurrentAuthentication());
     }
 
+    public void testPassThroughLogin()
+    {
+        UsernamePasswordAuthenticationToken token1 = new UsernamePasswordAuthenticationToken("andy", "auth1");
+        authenticationService.createAuthentication(rootNodeRef.getStoreRef(), token1);
+        
+        authenticationService.setAuthenticatedUser("andy");
+        assertTrue(authenticationService.getCurrentAuthentication().isAuthenticated());
+        assertEquals(1, authenticationService.getCurrentAuthentication().getAuthorities().length);
+    }
+    
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
     {
         DynamicNamespacePrefixResolver nspr = new DynamicNamespacePrefixResolver(null);

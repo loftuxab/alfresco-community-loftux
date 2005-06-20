@@ -108,5 +108,12 @@ public interface AuthenticationService
      *
      */
     public void clearCurrentSecurityContext();
+    
+    /**
+     * Temporary method to set the current context by user name key
+     * This is only for the preview to do pass through authentication in the CIFS integratrion
+     */
+    
+    public Authentication setAuthenticatedUser(String userName);
 }
 

@@ -14,6 +14,7 @@ import net.sf.acegisecurity.context.Context;
 import net.sf.acegisecurity.context.ContextHolder;
 import net.sf.acegisecurity.context.security.SecureContext;
 import net.sf.acegisecurity.context.security.SecureContextImpl;
+import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 import org.alfresco.service.cmr.repository.StoreRef;
 
@@ -143,5 +144,14 @@ public class AuthenticationServiceImpl implements AuthenticationService
     public void clearCurrentSecurityContext()
     {
         ContextHolder.setContext(null);
+    }
+
+    public Authentication setAuthenticatedUser(String userName)
+    {
+        RepositoryUserDetails ud = (RepositoryUserDetails)authenticationDao.loadUserByUsername(userName);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, "", ud.getAuthorities());
+        auth.setDetails(ud);
+        auth.setAuthenticated(true);
+        return setCurrrentAuthentication(auth);
     }
 }
