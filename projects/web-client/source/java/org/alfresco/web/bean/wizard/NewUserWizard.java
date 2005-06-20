@@ -17,9 +17,11 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.MapNode;
@@ -281,7 +283,7 @@ public class NewUserWizard extends AbstractWizardBean
             props.put(ContentModel.PROP_USERNAME, this.userName);
             props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
             props.put(ContentModel.PROP_LASTNAME, this.lastName);
-            // TODO: this should be a PATH not an ID etc.!
+            // TODO: should be an ID!
             props.put(ContentModel.PROP_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
             props.put(ContentModel.PROP_EMAIL, this.email);
             props.put(ContentModel.PROP_ORGID, this.companyId);
@@ -290,14 +292,15 @@ public class NewUserWizard extends AbstractWizardBean
          else
          {
             // get the node ref of the node that will contain the content
-            NodeRef rootNode = getNodeService().getRootNode(Repository.getStoreRef(context));
+            NodeRef peopleNode = getSystemPeopleFolderRef(context);
             
             // create properties for Person type from submitted Form data
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
             props.put(ContentModel.PROP_USERNAME, this.userName);
             props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
             props.put(ContentModel.PROP_LASTNAME, this.lastName);
-            // TODO: this should be a PATH not an ID etc.!
+             //TODO: should be an ID!
+            // TODO: create this Space if it does not already exist
             props.put(ContentModel.PROP_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
             props.put(ContentModel.PROP_EMAIL, this.email);
             props.put(ContentModel.PROP_ORGID, this.companyId);
@@ -305,7 +308,7 @@ public class NewUserWizard extends AbstractWizardBean
             // create the node to represent the Person
             String assocName = QName.createValidLocalName(this.userName);
             this.nodeService.createNode(
-                  rootNode,
+                  peopleNode,
                   ContentModel.ASSOC_CHILDREN,
                   QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
                   ContentModel.TYPE_PERSON,
@@ -611,10 +614,10 @@ public class NewUserWizard extends AbstractWizardBean
          tx = Repository.getUserTransaction(context);
          tx.begin();
          
-         NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
+         NodeRef peopleRef = getSystemPeopleFolderRef(context);
          
          // TODO: better to perform an XPath search or a get for a specific child type here?
-         List<ChildAssociationRef> childRefs = this.nodeService.getChildAssocs(rootNodeRef);
+         List<ChildAssociationRef> childRefs = this.nodeService.getChildAssocs(peopleRef);
          personNodes = new ArrayList<Node>(childRefs.size());
          for (ChildAssociationRef ref: childRefs)
          {
@@ -654,4 +657,39 @@ public class NewUserWizard extends AbstractWizardBean
       
       return personNodes;
    }
+   
+   /**
+    * Return a reference to the special system folder containing Person instances
+    * 
+    * @param context
+    * 
+    * @return NodeRef to Person folder
+    */
+   private NodeRef getSystemPeopleFolderRef(FacesContext context)
+   {
+      if (peopleRef == null)
+      {
+         // get a reference to the system types folder node
+         DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
+         resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+         
+         List<ChildAssociationRef> results = nodeService.selectNodes(
+               this.nodeService.getRootNode(Repository.getStoreRef(context)),
+               RepositoryAuthenticationDao.PEOPLE_FOLDER,
+               null,
+               resolver,
+               false);
+         
+         if (results.size() != 1)
+         {
+            throw new AlfrescoRuntimeException("Unable to find system types folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
+         }
+         
+         peopleRef = results.get(0).getChildRef();
+      }
+      
+      return peopleRef;
+   }
+   
+   private NodeRef peopleRef = null;
 }

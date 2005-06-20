@@ -88,7 +88,7 @@ public class AuthenticationTest extends TestCase
         QName children = ContentModel.ASSOC_CHILDREN;
         QName system = QName.createQName(NamespaceService.ALFRESCO_URI, "system");
         QName container = ContentModel.TYPE_CONTAINER;
-        QName types = QName.createQName(NamespaceService.ALFRESCO_URI, "types");
+        QName types = QName.createQName(NamespaceService.ALFRESCO_URI, "people");
 
         systemNodeRef = nodeService.createNode(rootNodeRef, children, system, container).getChildRef();
         typesNodeRef = nodeService.createNode(systemNodeRef, children, types, container).getChildRef();

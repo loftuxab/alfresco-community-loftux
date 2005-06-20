@@ -88,7 +88,7 @@
       <servlet-name>downloadContent</servlet-name>
       <servlet-class>org.alfresco.web.app.servlet.DownloadContentServlet</servlet-class>
    </servlet>
-  
+   
    <servlet-mapping>
       <servlet-name>Faces Servlet</servlet-name>
       <url-pattern>/faces/*</url-pattern>
@@ -103,9 +103,18 @@
       <servlet-name>downloadContent</servlet-name>
       <url-pattern>/download/*</url-pattern>
    </servlet-mapping>
-    
+   
+   <filter>
+      <filter-name>Authentication Filter</filter-name>
+      <filter-class>org.alfresco.web.app.servlet.AuthenticationFilter</filter-class>
+   </filter>
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+   
    <session-config>
-      <session-timeout>30</session-timeout>
+      <session-timeout>60</session-timeout>
    </session-config>
 
 </web-app>

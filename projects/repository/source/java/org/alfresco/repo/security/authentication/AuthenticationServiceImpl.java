@@ -16,6 +16,7 @@ import net.sf.acegisecurity.context.security.SecureContext;
 import net.sf.acegisecurity.context.security.SecureContextImpl;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
+import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.cmr.repository.StoreRef;
 
 public class AuthenticationServiceImpl implements AuthenticationService
@@ -33,27 +34,54 @@ public class AuthenticationServiceImpl implements AuthenticationService
 
     public void createAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException
     {
-        StoreContextHolder.setContext(storeRef);
-        authenticationDao.createUser(getUserName(authentication), getPassword(authentication));
+        try
+        {
+            StoreContextHolder.setContext(storeRef);
+            authenticationDao.createUser(getUserName(authentication), getPassword(authentication));
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
     }
 
     public void updateAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException
     {
-        StoreContextHolder.setContext(storeRef);
-        authenticationDao.updateUser(getUserName(authentication), getPassword(authentication));
+        try
+        {
+           StoreContextHolder.setContext(storeRef);
+           authenticationDao.updateUser(getUserName(authentication), getPassword(authentication));
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
     }
 
     public void deleteAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException
     {
-        StoreContextHolder.setContext(storeRef);
-        authenticationDao.deleteUser(getUserName(authentication));
+        try
+        {
+            StoreContextHolder.setContext(storeRef);
+            authenticationDao.deleteUser(getUserName(authentication));
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
     }
 
     public Authentication authenticate(StoreRef storeRef, Authentication authentication) throws AuthenticationException
     {
-        StoreContextHolder.setContext(storeRef);
-        return setCurrrentAuthentication(authenticationManager.authenticate(authentication));
-
+        try
+        {
+            StoreContextHolder.setContext(storeRef);
+            return setCurrentAuthentication(authenticationManager.authenticate(authentication));
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
     }
 
     public Authentication getCurrentAuthentication() throws AuthenticationException
@@ -66,7 +94,7 @@ public class AuthenticationServiceImpl implements AuthenticationService
         return ((SecureContext) context).getAuthentication();
     }
 
-    private Authentication setCurrrentAuthentication(Authentication authentication) throws AuthenticationException
+    private Authentication setCurrentAuthentication(Authentication authentication) throws AuthenticationException
     {
         Context context = ContextHolder.getContext();
         SecureContext sc = null;
@@ -112,17 +140,17 @@ public class AuthenticationServiceImpl implements AuthenticationService
 
     public Authentication validate(String ticket) throws AuthenticationException
     {
-        return setCurrrentAuthentication(ticketComponent.validateTicket(ticket));
+        return setCurrentAuthentication(ticketComponent.validateTicket(ticket));
     }
 
     public Authentication validate(Authentication authentication) throws AuthenticationException
     {
-        return setCurrrentAuthentication(ticketComponent.validateTicket(authentication));
+        return setCurrentAuthentication(ticketComponent.validateTicket(authentication));
     }
 
     public String getCurrentTicket()
     {
-        setCurrrentAuthentication(ticketComponent.addTicket(getCurrentAuthentication()));
+        setCurrentAuthentication(ticketComponent.addTicket(getCurrentAuthentication()));
         return ticketComponent.extractTicket(getCurrentAuthentication());
     }
 
@@ -152,6 +180,6 @@ public class AuthenticationServiceImpl implements AuthenticationService
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, "", ud.getAuthorities());
         auth.setDetails(ud);
         auth.setAuthenticated(true);
-        return setCurrrentAuthentication(auth);
+        return setCurrentAuthentication(auth);
     }
 }

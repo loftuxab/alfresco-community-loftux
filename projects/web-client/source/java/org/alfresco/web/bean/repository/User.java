@@ -1,5 +1,7 @@
 package org.alfresco.web.bean.repository;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 /**
  * Bean that represents the currently logged in user
  * 
@@ -7,18 +9,29 @@ package org.alfresco.web.bean.repository;
  */
 public class User
 {
-   private Node homeSpace;
    private String homeSpaceId;
    private String userName;
+   private String ticket;
+   private NodeRef person;
 
    /**
     * Constructor
     * 
     * @param userName constructor for the user
     */
-   public User(String userName)
+   public User(String userName, String ticket, NodeRef person)
    {
       this.userName = userName;  
+      this.ticket = ticket;
+      this.person = person;
+   }
+   
+   /**
+    * @return The user name
+    */
+   public String getUserName()
+   {
+      return this.userName;
    }
    
    /**
@@ -36,12 +49,20 @@ public class User
    {
       this.homeSpaceId = homeSpaceId;
    }
-   
+
    /**
-    * @return The user name
+    * @return Returns the ticket.
     */
-   public String getUserName()
+   public String getTicket()
    {
-      return this.userName;
+      return this.ticket;
+   }
+
+   /**
+    * @return Returns the person.
+    */
+   public NodeRef getPerson()
+   {
+      return this.person;
    }
 }

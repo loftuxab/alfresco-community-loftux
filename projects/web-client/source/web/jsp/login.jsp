@@ -1,8 +1,12 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
-<%@ page buffer="32kb" %>
+<%@ page buffer="16kb" %>
+<%@ page isELIgnored="false" %>
+<%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
 
@@ -22,7 +26,7 @@
             </td>
             <td>
                <%-- input text field, with an example of a nested validator tag --%>
-               <h:inputText id="user-name" value="#{LoginBean.name}" required="true">
+               <h:inputText id="user-name" value="#{LoginBean.username}" required="true">
                   <f:validateLength minimum="5" maximum="12" />
                </h:inputText>
          		<%-- message tag to show errors for the 'user-name' field --%>

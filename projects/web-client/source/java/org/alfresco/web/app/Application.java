@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.User;
@@ -164,7 +165,7 @@ public class Application
     */
    public static User getCurrentUser(ServletContext context)
    {
-      return getCurrentUser(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
+      return (User)context.getAttribute(AuthenticationFilter.AUTHENTICATION_USER);
    }
    
    /**
@@ -172,7 +173,7 @@ public class Application
     */
    public static User getCurrentUser(FacesContext context)
    {
-      return getCurrentUser(FacesContextUtils.getRequiredWebApplicationContext(context));
+      return (User)context.getExternalContext().getSessionMap().get(AuthenticationFilter.AUTHENTICATION_USER);
    }
    
    /**
@@ -373,26 +374,6 @@ public class Application
       }
       
       return templatesFolderName;
-   }
-   
-   /**
-    * @param context The Spring contexr
-    * @return Returns the User object representing the currently logged in user
-    */
-   private static User getCurrentUser(WebApplicationContext context)
-   {
-      // TODO: Once we have the proper repo authentication in place we will store the 
-      //       returned user object in the session ourselves so we will have to retrieve
-      //       it from there rather than Spring.
-      
-      User user = (User)context.getBean(BEAN_CURRENT_USER);
-      
-      if (user == null)
-      {
-         throw new AlfrescoRuntimeException("Failed to retrieve current user");
-      }
-      
-      return user;
    }
    
    /**

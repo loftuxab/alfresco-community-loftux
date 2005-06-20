@@ -20,11 +20,13 @@
       <managed-bean-name>LoginBean</managed-bean-name>
       <managed-bean-class>org.alfresco.web.bean.LoginBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
-      <!-- default value forced for a managed property (for now) -->
       <managed-property>
-         <property-name>name</property-name>
-         <property-class>java.lang.String</property-class>
-         <value>admin</value>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>authenticationService</property-name>
+         <value>#{authenticationService}</value>
       </managed-property>
    </managed-bean>
    

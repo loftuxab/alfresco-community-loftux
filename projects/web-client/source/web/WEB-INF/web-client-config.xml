@@ -23,6 +23,9 @@
          <glossary-folder-name>Glossary</glossary-folder-name>
          <templates-folder-name>Templates</templates-folder-name>
       </repository>
+      <admin>
+         <initial-password>admin</initial-password>
+      </admin>
    </config>
    
    <config evaluator="node-type" condition="content">
