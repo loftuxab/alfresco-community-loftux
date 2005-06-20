@@ -55,7 +55,7 @@ public class RepositoryUser extends User implements RepositoryUserDetails
         return userNodeRef;
     }
 
-    public NodeRef getPersonNOdeRef()
+    public NodeRef getPersonNodeRef()
     {
         return personNodeRef;
     }

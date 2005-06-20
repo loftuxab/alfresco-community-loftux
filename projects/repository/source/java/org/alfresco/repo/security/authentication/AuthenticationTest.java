@@ -128,7 +128,7 @@ public class AuthenticationTest extends TestCase
 
         RepositoryUserDetails andyDetails = (RepositoryUserDetails) dao.loadUserByUsername("andy");
         assertNotNull(andyDetails);
-        assertNotNull(andyDetails.getPersonNOdeRef());
+        assertNotNull(andyDetails.getPersonNodeRef());
         assertNotNull(andyDetails.getUserNodeRef());
         assertEquals("andy", andyDetails.getUsername());
         assertNotNull(andyDetails.getSalt());
@@ -143,7 +143,7 @@ public class AuthenticationTest extends TestCase
         dao.updateUser("andy", "carrot");
         RepositoryUserDetails newDetails = (RepositoryUserDetails) dao.loadUserByUsername("andy");
         assertNotNull(newDetails);
-        assertNotNull(newDetails.getPersonNOdeRef());
+        assertNotNull(newDetails.getPersonNodeRef());
         assertNotNull(newDetails.getUserNodeRef());
         assertEquals("andy", newDetails.getUsername());
         assertNotNull(newDetails.getSalt());
@@ -156,7 +156,7 @@ public class AuthenticationTest extends TestCase
 
         assertNotSame(andyDetails.getPassword(), newDetails.getPassword());
         assertNotSame(andyDetails.getSalt(), newDetails.getSalt());
-        assertEquals(andyDetails.getPersonNOdeRef(), newDetails.getPersonNOdeRef());
+        assertEquals(andyDetails.getPersonNodeRef(), newDetails.getPersonNodeRef());
         assertEquals(andyDetails.getUserNodeRef(), newDetails.getUserNodeRef());
 
         dao.deleteUser("andy");
@@ -373,19 +373,27 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationService()
     {
+        // token for user name and password pair
         UsernamePasswordAuthenticationToken token1 = new UsernamePasswordAuthenticationToken("andy", "auth1");
         UsernamePasswordAuthenticationToken token2 = new UsernamePasswordAuthenticationToken("andy", "auth2");
         UsernamePasswordAuthenticationToken token3 = new UsernamePasswordAuthenticationToken("andy", "auth3");
+        // create an authentication object e.g. the user
         authenticationService.createAuthentication(rootNodeRef.getStoreRef(), token1);
 
+        // authenticate with this user details
         Authentication result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token1);
-        assertTrue(authenticationService.getCurrrentAuthentication().isAuthenticated());
+        // assert the user is authenticated
+        assertTrue(authenticationService.getCurrentAuthentication().isAuthenticated());
+        // delete the user authenticatiom object
         authenticationService.deleteAuthentication(rootNodeRef.getStoreRef(), token1);
 
+        // create a new authentication user object
         authenticationService.createAuthentication(rootNodeRef.getStoreRef(), token2);
+        // change the password
         authenticationService.updateAuthentication(rootNodeRef.getStoreRef(), token3);
+        // authenticate again to assert password changed
         result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token3);
-        assertTrue(authenticationService.getCurrrentAuthentication().isAuthenticated());
+        assertTrue(authenticationService.getCurrentAuthentication().isAuthenticated());
 
         try
         {
@@ -406,9 +414,12 @@ public class AuthenticationTest extends TestCase
 
         }
 
+        // get the ticket that represents the current user authentication instance
         String ticket = authenticationService.getCurrentTicket();
+        // validate our ticket is still valid
         result = authenticationService.validate(ticket);
 
+        // destroy the ticket instance
         authenticationService.invalidate(ticket);
         try
         {
@@ -420,9 +431,9 @@ public class AuthenticationTest extends TestCase
 
         }
         
-        
+        // clear any context and check we are no longer authenticated
         authenticationService.clearCurrentSecurityContext();
-        assertNull(authenticationService.getCurrrentAuthentication());
+        assertNull(authenticationService.getCurrentAuthentication());
     }
 
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)

@@ -55,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService
 
     }
 
-    public Authentication getCurrrentAuthentication() throws AuthenticationException
+    public Authentication getCurrentAuthentication() throws AuthenticationException
     {
         Context context = ContextHolder.getContext();
         if ((context == null) || !(context instanceof SecureContext))
@@ -121,8 +121,8 @@ public class AuthenticationServiceImpl implements AuthenticationService
 
     public String getCurrentTicket()
     {
-        setCurrrentAuthentication(ticketComponent.addTicket(getCurrrentAuthentication()));
-        return ticketComponent.extractTicket(getCurrrentAuthentication());
+        setCurrrentAuthentication(ticketComponent.addTicket(getCurrentAuthentication()));
+        return ticketComponent.extractTicket(getCurrentAuthentication());
     }
 
     public void setAuthenticationDao(MutableAuthenticationDao authenticationDao)

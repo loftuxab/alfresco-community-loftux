@@ -38,5 +38,5 @@ public interface RepositoryUserDetails extends UserDetails
      * 
      * @return
      */
-    public NodeRef getPersonNOdeRef();
+    public NodeRef getPersonNodeRef();
 }

@@ -61,7 +61,7 @@ public interface AuthenticationService
      * @return
      * @throws AuthenticationException
      */
-    public Authentication getCurrrentAuthentication() throws AuthenticationException;
+    public Authentication getCurrentAuthentication() throws AuthenticationException;
     
     /**
      * Invalidate any ticket associated with the given authentication
