@@ -919,20 +919,18 @@
 
    <!-- Importer -->
 
-<!--   
    <bean id="viewImporter" class="org.alfresco.repo.importer.view.ViewImporter">
       <property name="namespaceService"><ref bean="namespaceService"/></property>
       <property name="dictionaryService"><ref bean="dictionaryService"/></property>
       <property name="nodeService"><ref bean="nodeService"/></property>
    </bean>
 
-   <bean id="importerComponent" class="org.alfresco.repo.importer.ImporterComponent"> -->
+   <bean id="importerComponent" class="org.alfresco.repo.importer.ImporterComponent">
       <!-- For now, hard-wire the view importer -->
-<!--      <property name="viewImporter"><ref bean="viewImporter"/></property>
+      <property name="viewImporter"><ref bean="viewImporter"/></property>
       <property name="dictionaryService"><ref bean="dictionaryService"/></property>
       <property name="nodeService"><ref bean="nodeService"/></property>
-   </bean> -->
-   
+   </bean>
 
    <!-- Audit -->
    

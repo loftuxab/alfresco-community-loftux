@@ -60,7 +60,7 @@ public class ViewImporter implements Importer
         try
         {
             // Construct Xml Pull Parser Factory
-            factory = XmlPullParserFactory.newInstance(System.getProperty(XmlPullParserFactory.PROPERTY_NAME), null);
+            factory = XmlPullParserFactory.newInstance(System.getProperty(XmlPullParserFactory.PROPERTY_NAME), this.getClass());
             factory.setNamespaceAware(true);
         }
         catch (XmlPullParserException e)
