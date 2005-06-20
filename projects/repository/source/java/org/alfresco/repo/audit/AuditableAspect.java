@@ -2,9 +2,13 @@ package org.alfresco.repo.audit;
 
 import java.util.Date;
 
+import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.repo.security.authentication.RepositoryUser;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -24,10 +28,12 @@ public class AuditableAspect
     // Logger
     private static final Log logger = LogFactory.getLog(AuditableAspect.class);
 
-    // Node Service
-    private NodeService nodeService;
+    // Unknown user, for when authentication has not occured
+    private static final String USERNAME_UNKNOWN = "unknown";
     
-    // Policy Component
+    // Dependencies
+    private NodeService nodeService;
+    private AuthenticationService authenticationService;
     private PolicyComponent policyComponent;
 
 
@@ -46,6 +52,15 @@ public class AuditableAspect
     public void setPolicyComponent(PolicyComponent policyComponent)
     {
         this.policyComponent = policyComponent;
+    }
+
+    
+    /**
+     * @param authenticationService  the authentication service
+     */
+    public void setAuthenticationService(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService; 
     }
 
     
@@ -82,14 +97,7 @@ public class AuditableAspect
         if (logger.isDebugEnabled())
             logger.debug("AuditableAspect: setting create audit properties for created node " + childAssocRef.toString());
         
-        // Get the node to perform auditing on
-        NodeRef nodeRef = childAssocRef.getChildRef();
-
-        // Set created date
-        Date now = new Date(System.currentTimeMillis());
-        nodeService.setProperty(nodeRef, ContentModel.PROP_CREATED, now);
-        
-        // TODO: Set created by
+        setCreatedProperties(childAssocRef.getChildRef());
     }
 
 
@@ -104,11 +112,7 @@ public class AuditableAspect
         if (logger.isDebugEnabled())
             logger.debug("AuditableAspect: setting create audit properties for introduced audit aspect on node " + nodeRef.toString());
         
-        // Set created date
-        Date now = new Date(System.currentTimeMillis());
-        nodeService.setProperty(nodeRef, ContentModel.PROP_CREATED, now);
-        
-        // TODO: Set created by
+        setCreatedProperties(nodeRef);
     }
     
 
@@ -122,11 +126,57 @@ public class AuditableAspect
         if (logger.isDebugEnabled())
             logger.debug("AuditableAspect: setting update audit properties for updated node " + nodeRef.toString());
 
+        setUpdatedProperties(nodeRef);
+    }
+
+
+    /**
+     * Populates the "created" set of properties
+     *  
+     * @param nodeRef
+     */
+    private void setCreatedProperties(NodeRef nodeRef)
+    {
+        // Set created date
+        Date now = new Date(System.currentTimeMillis());
+        nodeService.setProperty(nodeRef, ContentModel.PROP_CREATED, now);
+
+        // Set creator
+        nodeService.setProperty(nodeRef, ContentModel.PROP_CREATOR, getUsername());
+    }
+
+
+    /**
+     * Populates the "updated" set of properties
+     * 
+     * @param nodeRef
+     */
+    private void setUpdatedProperties(NodeRef nodeRef)
+    {
         // Set updated date
         Date now = new Date(System.currentTimeMillis());
         nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, now);
-        
-        // TODO: Set updated by
-    }
 
+        // Set modifier
+        nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIER, getUsername());
+    }
+    
+    
+    /**
+     * @return  the current username (or unknown, if unknown)
+     */
+    private String getUsername()
+    {
+        Authentication auth = authenticationService.getCurrentAuthentication();
+        if (auth != null)
+        {
+            RepositoryUser user = (RepositoryUser)auth.getPrincipal();
+            if (user != null)
+            {
+                return user.getUsername();
+            }
+        }
+        return USERNAME_UNKNOWN;
+    }
+    
 }

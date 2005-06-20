@@ -956,6 +956,7 @@
    <bean id="auditableAspect" class="org.alfresco.repo.audit.AuditableAspect" init-method="init">
       <property name="nodeService"><ref bean="nodeService"/></property>
       <property name="policyComponent"><ref bean="policyComponent"/></property>
+      <property name="authenticationService"><ref bean="authenticationService"/></property>
    </bean>
 
    <!-- Service Registry -->

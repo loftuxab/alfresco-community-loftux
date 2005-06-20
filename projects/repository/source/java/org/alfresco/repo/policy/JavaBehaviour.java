@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import org.alfresco.util.ParameterCheck;
 
@@ -30,7 +31,10 @@ public class JavaBehaviour implements Behaviour
     // Cache of interface proxies (by interface class)
     private Map<Class, Object> proxies = new HashMap<Class, Object>();
     
+    // Enable / Disable invocation of behaviour
+    private StackThreadLocal disabled = new StackThreadLocal();
 
+    
     /**
      * Construct.
      * 
@@ -62,6 +66,38 @@ public class JavaBehaviour implements Behaviour
         return (T)proxy;
     }
 
+    /**
+     * Disable the behaviour
+     */
+    public void disable()
+    {
+        Stack<Integer> stack = disabled.get();
+        stack.push(hashCode());
+    }
+
+    /**
+     * Enable the behaviour
+     */
+    public void enable()
+    {
+        Stack<Integer> stack = disabled.get();
+        if (stack.peek().equals(hashCode()) == false)
+        {
+            throw new PolicyException("Cannot enable " + this.toString() + " at this time - mismatched with disable calls");
+        }
+        stack.pop();
+    }
+
+    /**
+     * @return  is the behaviour enabled
+     */
+    public boolean isEnabled()
+    {
+        Stack<Integer> stack = disabled.get();
+        return stack.search(hashCode()) == -1;
+    }
+    
+    
 
     @Override
     public String toString()
@@ -91,11 +127,26 @@ public class JavaBehaviour implements Behaviour
         {
             Class instanceClass = instance.getClass();
             Method delegateMethod = instanceClass.getMethod(method, (Class[])policyIFMethods[0].getParameterTypes());
-            return new JavaMethodInvocationHandler(instance, delegateMethod);
+            return new JavaMethodInvocationHandler(this, delegateMethod);
         }
         catch (NoSuchMethodException e)
         {
             throw new PolicyException("Method " + method + " not found or accessible on " + instance.getClass(), e);
+        }
+    }
+    
+
+    /**
+     * Stack specific Thread Local
+     * 
+     * @author David Caruana
+     */
+    private class StackThreadLocal extends ThreadLocal<Stack<Integer>>
+    {
+        @Override
+        protected Stack<Integer> initialValue()
+        {
+            return new Stack<Integer>();
         }
     }
     
@@ -107,9 +158,8 @@ public class JavaBehaviour implements Behaviour
      */
     private static class JavaMethodInvocationHandler implements InvocationHandler
     {
-        private Object instance;
+        private JavaBehaviour behaviour;
         private Method delegateMethod;
-        private ThreadLocal<Boolean> withinMethod = new ThreadLocal<Boolean>();
         
         /**
          * Constuct.
@@ -117,9 +167,9 @@ public class JavaBehaviour implements Behaviour
          * @param instance  the object instance holding the method
          * @param delegateMethod  the method to invoke
          */
-        private JavaMethodInvocationHandler(Object instance, Method delegateMethod)
+        private JavaMethodInvocationHandler(JavaBehaviour behaviour, Method delegateMethod)
         {
-            this.instance = instance;
+            this.behaviour = behaviour;
             this.delegateMethod = delegateMethod;
         }
 
@@ -147,26 +197,23 @@ public class JavaBehaviour implements Behaviour
             }
             
             // Delegate to designated method pointer
-            try
+            if (behaviour.isEnabled())
             {
-                if (withinMethod.get() == null)
+                try
                 {
-                    withinMethod.set(Boolean.TRUE);
-                    return delegateMethod.invoke(instance, args);
+                    behaviour.disable();
+                    return delegateMethod.invoke(behaviour.instance, args);
                 }
-                else
+                catch (InvocationTargetException e)
                 {
-                    return null;
+                    throw e.getCause();
+                }
+                finally
+                {
+                    behaviour.enable();
                 }
             }
-            catch (InvocationTargetException e)
-            {
-                throw e.getCause();
-            }
-            finally
-            {
-                withinMethod.remove();
-            }
+            return null;
         }
 
         @Override
@@ -181,19 +228,19 @@ public class JavaBehaviour implements Behaviour
                 return false;
             }
             JavaMethodInvocationHandler other = (JavaMethodInvocationHandler)obj;
-            return instance.equals(other.instance) && delegateMethod.equals(other.delegateMethod);
+            return behaviour.instance.equals(other.behaviour.instance) && delegateMethod.equals(other.delegateMethod);
         }
 
         @Override
         public int hashCode()
         {
-            return 37 * instance.hashCode() + delegateMethod.hashCode();
+            return 37 * behaviour.instance.hashCode() + delegateMethod.hashCode();
         }
 
         @Override
         public String toString()
         {
-            return "JavaBehaviour[instance=" + instance.hashCode() + ", method=" + delegateMethod.toString() + "]";
+            return "JavaBehaviour[instance=" + behaviour.instance.hashCode() + ", method=" + delegateMethod.toString() + "]";
         }
     }
     
