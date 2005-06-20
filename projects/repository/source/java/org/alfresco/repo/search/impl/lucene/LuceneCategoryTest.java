@@ -30,6 +30,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -332,6 +333,23 @@ public class LuceneCategoryTest extends TestCase
     }
 
     
+    public void testMulti()
+    {
+        buildBaseIndex();
+        
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher.getIndexLocation());
+        
+        searcher.setNodeService(nodeService);
+        searcher.setDictionaryService(dictionaryService);
+        searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver(""));
+        ResultSet results;
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//*\" AND (PATH:\"/test:AssetClass/test:Equity/member\" PATH:\"/test:MarketingRegion/member\")", null, null);
+        //printPaths(results);
+        assertEquals(9, results.length());
+        results.close();
+    }
+    
     public void testBasic()
     {
         buildBaseIndex();
@@ -572,5 +590,15 @@ public class LuceneCategoryTest extends TestCase
         assertEquals(4, categoryService.getRootCategories(rootNodeRef.getStoreRef()).size());
         assertEquals(2, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "assetClass"), CategoryService.Depth.IMMEDIATE).size());
         assertEquals(6, categoryService.getCategoryAspects().size());
+    }
+    
+    private int getTotalScore(ResultSet results)
+    {
+        int totalScore = 0;
+        for(ResultSetRow row: results)
+        {
+            totalScore += row.getScore();
+        }
+        return totalScore;
     }
 }

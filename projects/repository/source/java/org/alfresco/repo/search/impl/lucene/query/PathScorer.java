@@ -33,7 +33,7 @@ public class PathScorer extends Scorer
     }
   
 
-    public static PathScorer createPathScorer(Similarity similarity, PathQuery pathQuery, IndexReader reader, Weight weight, DictionaryService dictionarySertvice) throws IOException
+    public static PathScorer createPathScorer(Similarity similarity, PathQuery pathQuery, IndexReader reader, Weight weight, DictionaryService dictionarySertvice, boolean repeat) throws IOException
     {
         Scorer selfScorer = null;
         HashMap<String, Counter> selfIds = null;
@@ -47,7 +47,7 @@ public class PathScorer extends Scorer
             if (!selfQuery.isEmpty())
             {
                selfIds = new HashMap<String, Counter>();
-               selfScorer = PathScorer.createPathScorer(similarity, selfQuery, reader, weight, dictionarySertvice);
+               selfScorer = PathScorer.createPathScorer(similarity, selfQuery, reader, weight, dictionarySertvice, repeat);
                selfIds.clear();
                while (selfScorer.next())
                {
@@ -132,7 +132,7 @@ public class PathScorer extends Scorer
         }
 
         LeafScorer ls = new LeafScorer(weight, rootLeafPositions, level0, cs, (StructuredFieldPosition[]) pathQuery.getQNameStructuredFieldPositions().toArray(new StructuredFieldPosition[] {}), nodePositions,
-                selfIds, reader, similarity, reader.norms(pathQuery.getQnameField()), dictionarySertvice);
+                selfIds, reader, similarity, reader.norms(pathQuery.getQnameField()), dictionarySertvice, repeat);
 
         return new PathScorer(similarity, ls);
     }

@@ -46,6 +46,8 @@ public class PathQuery extends Query
     private List<StructuredFieldPosition> qNameStructuredFieldPositions = new ArrayList<StructuredFieldPosition>();
 
     private DictionaryService dictionarySertvice;
+    
+    private boolean repeats = false;
 
     /**
      * The base query
@@ -232,75 +234,8 @@ public class PathQuery extends Query
          */
         public Scorer scorer(IndexReader reader) throws IOException
         {
-            return PathScorer.createPathScorer(getSimilarity(searcher), PathQuery.this, reader, this, dictionarySertvice);
+            return PathScorer.createPathScorer(getSimilarity(searcher), PathQuery.this, reader, this, dictionarySertvice, repeats);
             
-//            if ((pathStructuredFieldPositions.size() + qNameStructuredFieldPositions.size()) == 0) // optimize
-//                // zero-term
-//                // case
-//                return null;
-//
-//            Scorer selfScorer = null;
-//            if(selfWeight != null)
-//            {
-//                selfScorer = selfWeight.scorer(reader);
-//            }
-//            
-//            for (StructuredFieldPosition sfp : pathStructuredFieldPositions)
-//            {
-//                if (sfp.getTermText() != null)
-//                {
-//                    TermPositions p = reader.termPositions(new Term(pathField, sfp.getTermText()));
-//                    if (p == null)
-//                        return null;
-//                    CachingTermPositions ctp = new CachingTermPositions(p);
-//                    sfp.setCachingTermPositions(ctp);
-//                }
-//            }
-//
-//            for (StructuredFieldPosition sfp : qNameStructuredFieldPositions)
-//            {
-//                if (sfp.getTermText() != null)
-//                {
-//                    TermPositions p = reader.termPositions(new Term(qNameField, sfp.getTermText()));
-//                    if (p == null)
-//                        return null;
-//                    CachingTermPositions ctp = new CachingTermPositions(p);
-//                    sfp.setCachingTermPositions(ctp);
-//                }
-//            }
-//
-//            TermPositions rootPositions = null;
-//            if (rootTerm != null)
-//            {
-//                rootPositions = reader.termPositions(rootTerm);
-//            }
-//
-//            TermPositions tp = reader.termPositions();
-//
-//            ContainerScorer cs = null;
-//
-//            TermPositions level0 = null;
-//
-//            TermPositions nodePositions = reader.termPositions(new Term("ISNODE", "T"));
-//
-//            // StructuredFieldPosition[] test =
-//            // (StructuredFieldPosition[])structuredFieldPositions.toArray(new
-//            // StructuredFieldPosition[]{});
-//            if (pathStructuredFieldPositions.size() > 0)
-//            {
-//                TermPositions containerPositions = reader.termPositions(new Term("ISCONTAINER", "T"));
-//                cs = new ContainerScorer(this, rootPositions, (StructuredFieldPosition[]) pathStructuredFieldPositions.toArray(new StructuredFieldPosition[] {}),
-//                        containerPositions, getSimilarity(searcher), reader.norms(pathField));
-//            }
-//            else
-//            {
-//                level0 = reader.termPositions(new Term("ISROOT", "T"));
-//            }
-//
-//            LeafScorer ls = new LeafScorer(this, level0, cs, (StructuredFieldPosition[]) qNameStructuredFieldPositions.toArray(new StructuredFieldPosition[] {}), nodePositions,
-//                    selfScorer, reader, getSimilarity(searcher), reader.norms(qNameField));
-//
-//            return ls;
         }
 
         /*
@@ -380,6 +315,12 @@ public class PathQuery extends Query
     {
         return qNameStructuredFieldPositions;
     }
+
+    public void setRepeats(boolean repeats)
+    {
+        this.repeats = repeats;
+    }
+    
     
 
     

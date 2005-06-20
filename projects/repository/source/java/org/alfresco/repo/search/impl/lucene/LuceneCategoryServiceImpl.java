@@ -78,7 +78,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
 
             if (!mode.equals(Mode.ALL))
             {
-                luceneQuery.append(mode.equals(Mode.SUB_CATEGORIES) ? "-" : "").append("PATH:\"");
+                luceneQuery.append(mode.equals(Mode.SUB_CATEGORIES) ? "-" : "").append("PATH_WITH_REPEATS:\"");
                 luceneQuery.append(buildXPath(nodeService.getPath(categoryRef))).append("/");
                 if (depth.equals(Depth.ANY))
                 {
@@ -89,7 +89,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
 
             if (!mode.equals(Mode.MEMBERS))
             {
-                luceneQuery.append("PATH:\"");
+                luceneQuery.append("PATH_WITH_REPEATS:\"");
                 luceneQuery.append(buildXPath(nodeService.getPath(categoryRef))).append("/");
                 if (depth.equals(Depth.ANY))
                 {
@@ -185,7 +185,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         ResultSet resultSet = null;
         try
         {
-            resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH:\"/" + getPrefix(qname.getNamespaceURI()) + qname.getLocalName() + "\"",
+            resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH_WITH_REPEATS:\"/" + getPrefix(qname.getNamespaceURI()) + qname.getLocalName() + "\"",
                     null, null);
 
             if (resultSet.length() != 1)
@@ -211,7 +211,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         ResultSet resultSet = null;
         try
         {
-            resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH:\"//alf:categoryRoot/*\"", null, null);
+            resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH_WITH_REPEATS:\"//alf:categoryRoot/*\"", null, null);
             return resultSetToChildAssocCollection(resultSet);
         }
         finally

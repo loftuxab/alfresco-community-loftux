@@ -10,6 +10,7 @@ package org.alfresco.repo.search.impl.lucene;
 import java.util.HashSet;
 
 import org.alfresco.repo.search.SearcherException;
+import org.alfresco.repo.search.impl.lucene.query.PathQuery;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
@@ -83,7 +84,21 @@ public class LuceneQueryParser extends QueryParser
                 handler.setDictionaryService(dictionaryService);
                 reader.setXPathHandler(handler);
                 reader.parse(queryText);
-                return handler.getQuery();
+                PathQuery pathQuery = handler.getQuery();
+                pathQuery.setRepeats(false);
+                return pathQuery;
+            }
+            else if (field.equals("PATH_WITH_REPEATS"))
+            {
+                XPathReader reader = new XPathReader();
+                LuceneXPathHandler handler = new LuceneXPathHandler();
+                handler.setNamespacePrefixResolver(namespacePrefixResolver);
+                handler.setDictionaryService(dictionaryService);
+                reader.setXPathHandler(handler);
+                reader.parse(queryText);
+                PathQuery pathQuery = handler.getQuery();
+                pathQuery.setRepeats(true);
+                return pathQuery;
             }
             else if (field.equals("QNAME"))
             {

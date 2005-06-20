@@ -78,10 +78,12 @@ public class LeafScorer extends Scorer
 
     private int rootDoc;
 
+    private boolean repeat;
+
     DictionaryService dictionaryService;
 
     public LeafScorer(Weight weight, TermPositions root, TermPositions level0, ContainerScorer containerScorer, StructuredFieldPosition[] sfps, TermPositions allNodes,
-            HashMap<String, Counter> selfIds, IndexReader reader, Similarity similarity, byte[] norms, DictionaryService dictionaryService)
+            HashMap<String, Counter> selfIds, IndexReader reader, Similarity similarity, byte[] norms, DictionaryService dictionaryService, boolean repeat)
     {
         super(similarity);
         this.root = root;
@@ -101,6 +103,7 @@ public class LeafScorer extends Scorer
         this.reader = reader;
         this.level0 = level0;
         this.dictionaryService = dictionaryService;
+        this.repeat = repeat;
         try
         {
             initialise();
@@ -196,7 +199,7 @@ public class LeafScorer extends Scorer
     public boolean next() throws IOException
     {
 
-        if (countInCounter < counter)
+        if (repeat && (countInCounter < counter))
         {
             countInCounter++;
             return true;
@@ -671,7 +674,7 @@ public class LeafScorer extends Scorer
 
     public float score() throws IOException
     {
-        return 1.0f;
+        return repeat ? 1.0f : counter;
     }
 
     public boolean skipTo(int target) throws IOException
