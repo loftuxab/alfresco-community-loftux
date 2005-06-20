@@ -11,6 +11,7 @@ import org.alfresco.repo.rule.common.RuleTypeImpl;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.util.StopWatch;
 
 /**
@@ -139,7 +140,9 @@ public class RuleStoreTest extends RuleBaseTest
         
         List<? extends Rule> moreRules = this.ruleStore.get(this.nodeRef, true);
         assertNotNull(moreRules);
-        //assertEquals(0, moreRules.size());        
+        assertEquals(0, moreRules.size());       
+        
+        //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }
     
     /**

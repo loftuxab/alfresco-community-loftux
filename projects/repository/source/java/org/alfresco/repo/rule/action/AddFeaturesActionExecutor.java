@@ -36,7 +36,7 @@ public class AddFeaturesActionExecutor extends RuleActionExecutorAbstractBase
 	}
 
     /**
-     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecutor#execute(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
      */
     public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {

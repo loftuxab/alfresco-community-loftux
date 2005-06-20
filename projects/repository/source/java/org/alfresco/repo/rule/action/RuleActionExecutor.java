@@ -10,7 +10,7 @@ import org.alfresco.service.cmr.rule.RuleActionDefinition;
 /**
  * @author Roy Wetherall
  */
-public interface RuleActionExecuter
+public interface RuleActionExecutor
 {
 	public RuleActionDefinition getRuleActionDefinition();
 	

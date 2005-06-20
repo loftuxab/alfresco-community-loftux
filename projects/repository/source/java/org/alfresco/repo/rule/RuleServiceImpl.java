@@ -13,7 +13,7 @@ import java.util.Set;
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.rule.action.RuleActionExecuter;
+import org.alfresco.repo.rule.action.RuleActionExecutor;
 import org.alfresco.repo.rule.common.RuleActionDefinitionImpl;
 import org.alfresco.repo.rule.common.RuleConditionDefinitionImpl;
 import org.alfresco.repo.rule.common.RuleImpl;
@@ -95,8 +95,7 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	/**
 	 * Thread local set to the currently executing rule (this should prevent and execution loops)
 	 */
-	// TODO what about more complex scenarios when loop can be created?
-	private ThreadLocal<Rule> threadLocalCurrenltyExecutingRule = new ThreadLocal<Rule>();
+	private ThreadLocal<Set<ExecutedRuleData>> threadLocalExecutedRules = new ThreadLocal<Set<ExecutedRuleData>>();
 
 	/**
 	 * All the rule type currently registered
@@ -376,6 +375,18 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
         // Remove the rule from the rule store
         this.ruleStore.remove(nodeRef, (RuleImpl)rule);
     }	
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleService#removeAllRules(NodeRef)
+     */
+    public void removeAllRules(NodeRef nodeRef)
+    {
+        List<? extends Rule> rules = this.ruleStore.get(nodeRef, false);
+        for (Rule rule : rules)
+        {
+            this.ruleStore.remove(nodeRef, (RuleImpl)rule);
+        }
+    }
 	
 	/**
 	 * @see org.alfresco.repo.rule.RuleService#addRulePendingExecution(NodeRef, NodeRef, Rule)
@@ -383,9 +394,9 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
 	{
 		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule);
-		Rule currentlyExecutingRule = this.threadLocalCurrenltyExecutingRule.get();
+		Set<ExecutedRuleData> executedRules = this.threadLocalExecutedRules.get();
 		
-		if (currentlyExecutingRule == null || currentlyExecutingRule.equals(rule) == false)
+		if (executedRules == null || executedRules.contains(new ExecutedRuleData(actionableNodeRef, rule)) == false)
 		{
 			Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
 			if (pendingRules == null)
@@ -403,28 +414,33 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 */
 	public void executePendingRules() 
 	{
-		Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
-		if (pendingRules != null)
-		{
-			PendingRuleData[] pendingRulesArr = pendingRules.toArray(new PendingRuleData[0]);
-			this.threadLocalPendingData.remove();
-			for (PendingRuleData pendingRule : pendingRulesArr) 
-			{
-				threadLocalCurrenltyExecutingRule.set(pendingRule.getRule());
-				try
-				{
-					executePendingRule(pendingRule);
-				}
-				finally
-				{
-					threadLocalCurrenltyExecutingRule.remove();
-				}
-			}
-			
-			// Run any rules that have been marked as pending during execution
-			executePendingRules();
-		}		
+        this.threadLocalExecutedRules.set(new HashSet<ExecutedRuleData>());
+        try
+        {
+            executePendingRulesImpl();
+        }
+        finally
+        {
+            this.threadLocalExecutedRules.remove();
+        }
 	}     
+    
+    private void executePendingRulesImpl()
+    {
+        Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
+        if (pendingRules != null)
+        {
+            PendingRuleData[] pendingRulesArr = pendingRules.toArray(new PendingRuleData[0]);
+            this.threadLocalPendingData.remove();
+            for (PendingRuleData pendingRule : pendingRulesArr) 
+            {
+                executePendingRule(pendingRule);                
+            }
+            
+            // Run any rules that have been marked as pending during execution
+            executePendingRulesImpl();
+        }   
+    }
 	
 	/**
 	 * Executes a pending rule
@@ -467,11 +483,15 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 			
 		// Get the single action
 	    RuleAction action = actions.get(0);
-	    RuleActionExecuter executor = getActionExecutor(action);
+	    RuleActionExecutor executor = getActionExecutor(action);
 	      
 		// Evaluate the condition
 	    if (evaluator.evaluate(cond, actionableNodeRef, actionedUponNodeRef) == true)
 	    {
+            // Add the rule to the executed rule list (do this before this is executed to prevent rules being added to the pending list) 
+            Set<ExecutedRuleData> executedRules = this.threadLocalExecutedRules.get();
+            executedRules.add(new ExecutedRuleData(actionableNodeRef, rule));
+            
 			// Execute the rule
 	        executor.execute(action, actionableNodeRef, actionedUponNodeRef);
 	    }
@@ -483,10 +503,10 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
      * @param action	the action
      * @return			the action executor
      */
-    private RuleActionExecuter getActionExecutor(RuleAction action)
+    private RuleActionExecutor getActionExecutor(RuleAction action)
     {
         String executorString = ((RuleActionDefinitionImpl)action.getRuleActionDefinition()).getRuleActionExecutor();
-        return (RuleActionExecuter)applicationContext.getBean(executorString);
+        return (RuleActionExecutor)applicationContext.getBean(executorString);
     }
 
 	/**
@@ -528,33 +548,80 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 * 
 	 * @param ruleActionExecutor	the rule action executor
 	 */
-	public void registerRuleActionExecutor(RuleActionExecuter ruleActionExecutor) 
+	public void registerRuleActionExecutor(RuleActionExecutor ruleActionExecutor) 
 	{
 		RuleActionDefinition action = ruleActionExecutor.getRuleActionDefinition();
 		this.actionDefinitions.put(action.getName(), action);
 	}
+    
+    /**
+     * Helper class to contain the information about a rule that is executed
+     * 
+     * @author Roy Wetherall
+     */
+    private class ExecutedRuleData
+    {
+
+        protected NodeRef actionableNodeRef;
+        protected Rule rule;
+        
+        public ExecutedRuleData(NodeRef actionableNodeRef, Rule rule) 
+        {
+            this.actionableNodeRef = actionableNodeRef;
+            this.rule = rule;
+        }
+
+        public NodeRef getActionableNodeRef()
+        {
+        	return actionableNodeRef;
+        }
+
+        public Rule getRule()
+        {
+        	return rule;
+        }
+        
+        @Override
+        public int hashCode() 
+        {
+            int i = actionableNodeRef.hashCode();
+            i = (i*37) + rule.hashCode();
+            return i;
+        }
+        
+        @Override
+        public boolean equals(Object obj) 
+        {
+            if (this == obj)
+            {
+                return true;
+            }
+            if (obj instanceof ExecutedRuleData)
+            {
+                ExecutedRuleData that = (ExecutedRuleData) obj;
+                return (this.actionableNodeRef.equals(that.actionableNodeRef) &&
+                        this.rule.equals(that.rule));
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
 
 	/**
 	 * Helper class to contain the information about a rule that is pending execution
 	 * 
 	 * @author Roy Wetherall
 	 */
-	private class PendingRuleData
+	private class PendingRuleData extends ExecutedRuleData
 	{
-		private NodeRef actionableNodeRef;
 		private NodeRef actionedUponNodeRef;
-		private Rule rule;
-		
+        
 		public PendingRuleData(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
 		{
-			this.actionableNodeRef = actionableNodeRef;
+			super(actionableNodeRef, rule);
 			this.actionedUponNodeRef = actionedUponNodeRef;
-			this.rule = rule;
-		}
-		
-		public NodeRef getActionableNodeRef() 
-		{
-			return actionableNodeRef;
 		}
 		
 		public NodeRef getActionedUponNodeRef() 
@@ -562,17 +629,11 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 			return actionedUponNodeRef;
 		}
 		
-		public Rule getRule() 
-		{
-			return rule;
-		}
-		
 		@Override
 		public int hashCode() 
 		{
-			int i = actionableNodeRef.hashCode();
+			int i = super.hashCode();
 			i = (i*37) + actionedUponNodeRef.hashCode();
-			i = (i*37) + rule.hashCode();
 			return i;
 		}
 		

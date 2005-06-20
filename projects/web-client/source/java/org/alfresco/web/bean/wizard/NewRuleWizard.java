@@ -225,7 +225,7 @@ public class NewRuleWizard extends AbstractWizardBean
                
                // TODO: **************************************************
                
-               //actionParams.put(LinkCategoryExecutor.PARAM_CATEGORY, catNodeRef);
+               //actionParams.put(LinkCategoryActionExecutor.PARAM_CATEGORY, catNodeRef);
                
                // **************************************************
             }

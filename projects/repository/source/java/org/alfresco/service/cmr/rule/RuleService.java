@@ -151,9 +151,16 @@ public interface RuleService
     
     
     /**
-     * Removes a rule from the given rule actionable rule
+     * Removes a rule from the given rule actionable node
      * 
      * @param nodeRef  the actionable node reference
      */
     public void removeRule(NodeRef nodeRef, Rule rule);
+    
+    /**
+     * Removes all the rules associated with an actionable node
+     * 
+     * @param nodeRef   the actionable node reference
+     */
+    public void removeAllRules(NodeRef nodeRef);
 }

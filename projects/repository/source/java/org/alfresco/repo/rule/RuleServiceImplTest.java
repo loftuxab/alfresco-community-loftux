@@ -103,7 +103,32 @@ public class RuleServiceImplTest extends RuleBaseTest
     {
         this.ruleService.makeActionable(this.nodeRef);
         Rule newRule = createTestRule("123");
-        this.ruleService.addRule(this.nodeRef, newRule);
+        this.ruleService.addRule(this.nodeRef, newRule);        
+    }
+    
+    public void testRemoveAllRules()
+    {
+        this.ruleService.removeAllRules(this.nodeRef);
+        List<Rule> rules1 = this.ruleService.getRules(this.nodeRef);
+        assertNotNull(rules1);
+        assertEquals(0, rules1.size());
+        
+        this.ruleService.makeActionable(this.nodeRef);
+        Rule newRule = createTestRule("123");
+        this.ruleService.addRule(this.nodeRef, newRule); 
+        Rule newRule2 = createTestRule("456");
+        this.ruleService.addRule(this.nodeRef, newRule2); 
+        
+        List<Rule> rules2 = this.ruleService.getRules(this.nodeRef);
+        assertNotNull(rules2);
+        assertEquals(2, rules2.size());
+        
+        this.ruleService.removeAllRules(this.nodeRef);
+        
+        List<Rule> rules3 = this.ruleService.getRules(this.nodeRef);
+        assertNotNull(rules3);
+        assertEquals(0, rules3.size());
+        
     }
     
     /**

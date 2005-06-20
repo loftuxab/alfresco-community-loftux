@@ -3,7 +3,7 @@
  */
 package org.alfresco.repo.rule;
 
-import org.alfresco.repo.rule.action.RuleActionExecuter;
+import org.alfresco.repo.rule.action.RuleActionExecutor;
 import org.alfresco.repo.rule.condition.RuleConditionEvaluator;
 import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
 
@@ -16,5 +16,5 @@ public interface RuleRegistration
 	
 	void registerRuleConditionEvaluator(RuleConditionEvaluator ruleConditionEvaluator);
 	
-	void registerRuleActionExecutor(RuleActionExecuter ruleActionExecutor);
+	void registerRuleActionExecutor(RuleActionExecutor ruleActionExecutor);
 }

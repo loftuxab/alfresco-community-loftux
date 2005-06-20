@@ -38,18 +38,28 @@ public class CheckInActionExecutor extends RuleActionExecutorAbstractBase
      */
     private CheckOutCheckInService cociService;
 
+    /**
+     * Set node service
+     * 
+     * @param nodeService  the node service
+     */
 	public void setNodeService(NodeService nodeService) 
 	{
 		this.nodeService = nodeService;
 	}
 	
+    /**
+     * Set the checkIn checkOut service
+     * 
+     * @param cociService  the checkIn checkOut Service
+     */
 	public void setCociService(CheckOutCheckInService cociService) 
 	{
 		this.cociService = cociService;
 	}
 
     /**
-     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecutor#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
     public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {

@@ -170,7 +170,7 @@ public class RuleStoreImpl implements RuleStore
         
         // Delete the rule content from the repository
         NodeRef ruleContent = rule.getRuleContentNodeRef();
-        if (ruleContent != null && this.nodeService.exists(ruleContent) == false)
+        if (ruleContent != null && this.nodeService.exists(ruleContent) == true)
         {
             this.nodeService.deleteNode(ruleContent);
         }
@@ -254,19 +254,25 @@ public class RuleStoreImpl implements RuleStore
         for (ChildAssociationRef childAssocRef : childAssocRefs)
         {
             NodeRef nodeRef = childAssocRef.getChildRef();
-            ContentReader contentReader = this.contentService.getReader(nodeRef);
-            if (contentReader != null)
+            if(this.nodeService.exists(nodeRef) == true)
             {
-                // Create the rule from the XML content
-                String ruleXML = contentReader.getContentString();
-                RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, ruleXML);
-                
-                // Add the created date and modified date (they come from the auditable aspect)
-                rule.setCreatedDate((Date)this.nodeService.getProperty(nodeRef, ContentModel.PROP_CREATED));
-                rule.setModifiedDate((Date)this.nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED));
-                
-                // Add the rule to the list
-                rules.add(rule);
+                ContentReader contentReader = this.contentService.getReader(nodeRef);
+                if (contentReader != null)
+                {
+                    // Create the rule from the XML content
+                    String ruleXML = contentReader.getContentString();
+                    RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, ruleXML);
+                    
+                    // Set the rule content id
+                    rule.setRuleContentNodeRef(nodeRef);
+                    
+                    // Add the created date and modified date (they come from the auditable aspect)
+                    rule.setCreatedDate((Date)this.nodeService.getProperty(nodeRef, ContentModel.PROP_CREATED));
+                    rule.setModifiedDate((Date)this.nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED));
+                    
+                    // Add the rule to the list
+                    rules.add(rule);
+                }
             }
         }
         return rules;

@@ -15,7 +15,7 @@ import org.alfresco.service.cmr.rule.RuleActionDefinition;
  * 
  * @author Roy Wetherall
  */
-public abstract class RuleActionExecutorAbstractBase extends RuleItemAbstractBase implements RuleActionExecuter
+public abstract class RuleActionExecutorAbstractBase extends RuleItemAbstractBase implements RuleActionExecutor
 {
 	protected RuleActionDefinition ruleActionDefinition;
 	
@@ -38,7 +38,7 @@ public abstract class RuleActionExecutorAbstractBase extends RuleItemAbstractBas
 	}
 	
 	/**
-     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecutor#execute(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
      */
     public void execute(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {        
