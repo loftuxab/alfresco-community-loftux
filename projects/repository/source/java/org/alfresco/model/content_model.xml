@@ -390,15 +390,6 @@
          </properties>
       </aspect>
    
-      <aspect name="alf:subjectable">
-         <title>Subjectable</title>
-         <properties>
-            <property name="alf:subject">
-               <type>d:text</type>
-            </property>
-         </properties>
-      </aspect>
-   
       <aspect name="alf:inlineeditable">
          <title>Inline Editable</title>
          <properties>
@@ -462,7 +453,7 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:complianceable">
+      <aspect name="alf:compliancable">
          <title>Compliancable</title>
          <parent>alf:auditable</parent>
          <!-- TODO: Support mandatory-aspects on an aspect in the meta-model
@@ -476,6 +467,56 @@
             </property>
          </properties>
       </aspect>
+   
+      <aspect name="alf:dublincore">
+         <title>Dublin Core</title>
+         <parent>alf:titled</parent>
+         <!-- TODO: Support mandatory-aspects on an aspect in the meta-model
+         <mandatory-aspects>
+            <aspect>Auditable</aspect>
+         </mandatory-aspects>
+         -->
+         <properties>
+            <property name="alf:publisher">
+               <type>d:text</type>
+            </property>
+            <property name="alf:contributor">
+               <type>d:text</type>
+            </property>
+            <property name="alf:type">
+               <type>d:text</type>
+            </property>
+            <property name="alf:identifier">
+               <type>d:text</type>
+            </property>
+            <property name="alf:dcsource">
+               <type>d:text</type>
+            </property>
+            <property name="alf:coverage">
+               <type>d:text</type>
+            </property>
+            <property name="alf:rights">
+               <type>d:text</type>
+            </property>
+            <property name="alf:subject">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </aspect>
+   
+      <!--
+      <aspect name="alf:subjectable">
+         <title>Subjectable</title>
+         <mandatory-aspects>
+            <aspect>Auditable</aspect>
+         </mandatory-aspects>
+         <properties>
+            <property name="alf:subject">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </aspect>
+      -->
    
       <aspect name="alf:basable">
          <title>Basable</title>
