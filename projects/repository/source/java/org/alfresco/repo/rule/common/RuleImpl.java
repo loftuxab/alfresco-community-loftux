@@ -224,6 +224,14 @@ public class RuleImpl implements Serializable, Rule
     }
     
     /**
+     * @see org.alfresco.service.cmr.rule.Rule#removeAllRuleConditions()
+     */
+    public void removeAllRuleConditions()
+    {
+        this.ruleConditions.clear();
+    }
+    
+    /**
      * @see org.alfresco.service.cmr.rule.Rule#getRuleActions()
      */
     public List<RuleAction> getRuleActions()
@@ -258,6 +266,14 @@ public class RuleImpl implements Serializable, Rule
 		// Remove the rule action from the list
         this.ruleActions.remove(ruleAction);
 	}
+
+    /**
+     * @see org.alfresco.service.cmr.rule.Rule#removeAllRuleActions()
+     */
+    public void removeAllRuleActions()
+    {
+        this.ruleActions.clear();
+    }
     
     /**
      * Sets the rule content node reference.

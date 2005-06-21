@@ -48,7 +48,6 @@ import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StopWatch;
@@ -139,7 +138,6 @@ public class RuleServiceSystemTest extends TestCase
         genCatProp.setStoredInIndex(true);
         genCatProp.setTokenisedInIndex(true);
         genCatProp.setType("d:" + PropertyTypeDefinition.CATEGORY.getLocalName());        
-        //genCatProp.setType(PropertyTypeDefinition.CATEGORY.toString());
 
         // Save the mode
         dictionaryDAO.putModel(model);
@@ -642,6 +640,48 @@ public class RuleServiceSystemTest extends TestCase
 		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }
     
+    /**
+     * Test checkMandatoryProperties method
+     */
+    public void testCheckMandatoryProperties()
+    {
+        this.ruleService.makeActionable(this.nodeRef);
+        
+        RuleType ruleType = this.ruleService.getRuleType("inbound");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition(MatchTextEvaluator.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
+        
+        Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
+        actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
+        
+        Map<String, Serializable> condParams = new HashMap<String, Serializable>(1);
+        // should be setting the condition parameter here
+        
+        Rule rule = this.ruleService.createRule(ruleType);
+        rule.addRuleCondition(cond, condParams);
+        rule.addRuleAction(action, actionParams);
+        
+        this.ruleService.addRule(this.nodeRef, rule);
+        
+        try
+        {
+            // Try and create a node .. should fail since the rule is invalid
+            Map<QName, Serializable> props2 = new HashMap<QName, Serializable>();
+            props2.put(ContentModel.PROP_NAME, "bobbins.doc");
+            NodeRef newNodeRef2 = this.nodeService.createNode(
+                    this.nodeRef,
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                    ContentModel.TYPE_CMOBJECT,
+                    props2).getChildRef();
+            fail("An exception should have been thrown since a mandatory parameter was missing from the condition.");
+        }
+        catch (RuleServiceException ruleServiceException)
+        {
+            // Success since we where expecting the exception
+        }
+    }
+    
 	/**
      * Test:
      *          rule type:  inbound
@@ -662,8 +702,9 @@ public class RuleServiceSystemTest extends TestCase
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
 		actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
+        // Condition parameter's 
 		Map<String, Serializable> condParams = new HashMap<String, Serializable>(1);
-		condParams.put(MatchTextEvaluator.PARAM_TEXT, ".doc");
+		condParams.put(MatchTextEvaluator.PARAM_TEXT, ".doc");        
 		
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, condParams);
@@ -712,6 +753,60 @@ public class RuleServiceSystemTest extends TestCase
 		{
 			// Correct since text-match is a mandatory property
 		}
+        
+        // Test begins with
+        Map<String, Serializable> condParamsBegins = new HashMap<String, Serializable>(1);
+        condParamsBegins.put(MatchTextEvaluator.PARAM_TEXT, "bob*");
+        rule.removeAllRuleConditions();
+        rule.addRuleCondition(cond, condParamsBegins);
+        this.ruleService.addRule(this.nodeRef, rule);
+        Map<QName, Serializable> propsx = new HashMap<QName, Serializable>();
+        propsx.put(ContentModel.PROP_NAME, "mybobbins.doc");
+        NodeRef newNodeRefx = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.TYPE_CMOBJECT,
+                propsx).getChildRef();   
+        assertFalse(this.nodeService.hasAspect(newNodeRefx, ContentModel.ASPECT_VERSIONABLE));  
+        Map<QName, Serializable> propsy = new HashMap<QName, Serializable>();
+        propsy.put(ContentModel.PROP_NAME, "bobbins.doc");
+        NodeRef newNodeRefy = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.TYPE_CMOBJECT,
+                propsy).getChildRef();        
+        assertTrue(this.nodeService.hasAspect(
+                newNodeRefy, 
+                ContentModel.ASPECT_VERSIONABLE)); 
+        
+        // Test ends with
+        Map<String, Serializable> condParamsEnds = new HashMap<String, Serializable>(1);
+        condParamsEnds.put(MatchTextEvaluator.PARAM_TEXT, "*s.doc");
+        rule.removeAllRuleConditions();
+        rule.addRuleCondition(cond, condParamsEnds);
+        this.ruleService.addRule(this.nodeRef, rule);
+        Map<QName, Serializable> propsa = new HashMap<QName, Serializable>();
+        propsa.put(ContentModel.PROP_NAME, "bobbins.document");
+        NodeRef newNodeRefa = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.TYPE_CMOBJECT,
+                propsa).getChildRef();   
+        assertFalse(this.nodeService.hasAspect(newNodeRefa, ContentModel.ASPECT_VERSIONABLE));  
+        Map<QName, Serializable> propsb = new HashMap<QName, Serializable>();
+        propsb.put(ContentModel.PROP_NAME, "bobbins.doc");
+        NodeRef newNodeRefb = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.TYPE_CMOBJECT,
+                propsb).getChildRef();        
+        assertTrue(this.nodeService.hasAspect(
+                newNodeRefb, 
+                ContentModel.ASPECT_VERSIONABLE)); 
 	}
     
     /**

@@ -9,7 +9,9 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.RuleTypeImpl;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
+import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
@@ -102,7 +104,7 @@ public class RuleServiceImplTest extends RuleBaseTest
     public void testAddRule()
     {
         this.ruleService.makeActionable(this.nodeRef);
-        Rule newRule = createTestRule("123");
+        Rule newRule = createTestRule("123");        
         this.ruleService.addRule(this.nodeRef, newRule);        
     }
     
@@ -114,9 +116,9 @@ public class RuleServiceImplTest extends RuleBaseTest
         assertEquals(0, rules1.size());
         
         this.ruleService.makeActionable(this.nodeRef);
-        Rule newRule = createTestRule("123");
+        Rule newRule = this.ruleService.createRule(ruleType);        
         this.ruleService.addRule(this.nodeRef, newRule); 
-        Rule newRule2 = createTestRule("456");
+        Rule newRule2 = this.ruleService.createRule(ruleType);
         this.ruleService.addRule(this.nodeRef, newRule2); 
         
         List<Rule> rules2 = this.ruleService.getRules(this.nodeRef);
@@ -161,5 +163,13 @@ public class RuleServiceImplTest extends RuleBaseTest
         assertEquals("description", rule.getDescription());
         assertNotNull(rule.getCreatedDate());
         assertNotNull(rule.getModifiedDate());
+        
+        // Check that the condition action have been retireved correctly
+        List<RuleCondition> conditions = rule.getRuleConditions();
+        assertNotNull(conditions);
+        assertEquals(1, conditions.size());        
+        List<RuleAction> actions = rule.getRuleActions();
+        assertNotNull(actions);
+        assertEquals(1, actions.size());
     }
 }

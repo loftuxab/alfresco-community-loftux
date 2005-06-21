@@ -18,63 +18,63 @@ public interface Rule
      * 
      * @return  the id
      */
-    public abstract String getId();
+    String getId();
     
     /**
      * Get the created date
      * 
      * @return  the created date
      */
-    public abstract Date getCreatedDate();
+    Date getCreatedDate();
     
     /**
      * Get the modified date
      * 
      * @return  the modified date
      */
-    public abstract Date getModifiedDate();
+    Date getModifiedDate();
 
     /**
      * Get the rule type
      * 
      * @return  the rule type
      */
-    public abstract RuleType getRuleType();
+    RuleType getRuleType();
 
     /**
      * Get the title of the rule
      * 
      * @return	the title
      */
-    public abstract String getTitle();
+    String getTitle();
 
     /**
      * Set the title of the rule
      * 
      * @param title  the title
      */
-    public abstract void setTitle(String title);
+    void setTitle(String title);
 
     /**
      * Get the description of the rule
      * 
      * @return	the description of the rule
      */
-    public abstract String getDescription();
+    String getDescription();
 
     /**
      * Set the description of the rule
      * 
      * @param description  the description of the rule
      */
-    public abstract void setDescription(String description);
+    void setDescription(String description);
 
     /**
      * Get a list of rule conditions.
      * 
      * @return     the list of rule conditions
      */
-    public abstract List<RuleCondition> getRuleConditions();
+    List<RuleCondition> getRuleConditions();
 
     /**
      * Add a rule condition to the rule.
@@ -83,7 +83,7 @@ public interface Rule
      * @param parameterValues			the parameter values
      * @return							the added rule condition
      */
-    public abstract RuleCondition addRuleCondition(
+    RuleCondition addRuleCondition(
             RuleConditionDefinition ruleConditionDefinition,
             Map<String, Serializable> parameterValues);
 
@@ -92,14 +92,19 @@ public interface Rule
      * 
      * @param ruleCondition		the rule condition
      */
-    public abstract void removeRuleCondition(RuleCondition ruleCondition);
+    void removeRuleCondition(RuleCondition ruleCondition);
+    
+    /**
+     * Removes all the rule conditions from the rule   
+     */
+    void removeAllRuleConditions();
 
     /**
      * Get a list of rule actions.
      * 
      * @return      the list of rule actions
      */
-    public abstract List<RuleAction> getRuleActions();
+    List<RuleAction> getRuleActions();
 
     /**
      * Add a rule action to the rule.
@@ -108,15 +113,20 @@ public interface Rule
      * @param parameterValues		the action parameters
      * @return						the rule action
      */
-    public abstract RuleAction addRuleAction(
+    RuleAction addRuleAction(
     		RuleActionDefinition ruleActionDefinition,
     		Map<String, Serializable> parameterValues);
-
+    
     /**
      * Remove a rule action
      * 
      * @param ruleAction	the rule action
      */
-    public abstract void removeRuleAction(RuleAction ruleAction);
+    void removeRuleAction(RuleAction ruleAction);
+    
+    /**
+     * Removes all the rule actions
+     */
+    void removeAllRuleActions();
 
 }

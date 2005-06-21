@@ -37,12 +37,25 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 	 * The node service
 	 */
     private NodeService nodeService;
+    
+    /**
+     * Special star string
+     */
+    private static final String STAR = "*";
 	
+    /**
+     * Set node service
+     * 
+     * @param nodeService  the node service
+     */
 	public void setNodeService(NodeService nodeService) 
 	{
 		this.nodeService = nodeService;
 	}	
 	
+    /**
+     * Add paremeter defintions
+     */
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
@@ -66,12 +79,32 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 			String matchText = (String)ruleCondition.getParameterValue(PARAM_TEXT);
 			
 			// Get the operation to be performed
-			Operation operation = Operation.CONTAINS;
+			Operation operation = null;
 			String stringOperation = (String)ruleCondition.getParameterValue(PARAM_OPERATION);
 			if (stringOperation != null)
 			{
 				operation = Operation.valueOf(stringOperation);
 			}
+            else
+            {
+                // Check for a trailing or leading star since it implies special behaviour when no default operation is specified
+                if (matchText.startsWith(STAR) == true)
+                {
+                    // Remove the star and set the operation to endsWith
+                    operation = Operation.ENDS;
+                    matchText = matchText.substring(1);
+                }
+                else if (matchText.endsWith(STAR) == true)
+                {
+                    // Remove the star and set the operation to startsWith
+                    operation = Operation.BEGINS;
+                    matchText = matchText.substring(0, (matchText.length()-2));
+                }
+                else
+                {
+                    operation = Operation.CONTAINS;
+                }
+            }
 			
 			// Build the reg ex
 			String regEx = buildRegEx(matchText, operation);

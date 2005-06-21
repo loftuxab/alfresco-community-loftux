@@ -27,7 +27,7 @@ public abstract class RuleItemAbstractBase extends CommonResourceAbstractBase
 	/**
 	 * Error messages
 	 */
-	private static final String ERR_MAND_PROP = "A value for the mandatory property {0} has not been set on the rule item {1}";
+	private static final String ERR_MAND_PROP = "A value for the mandatory parameter {0} has not been set on the rule item {1}";
 	
 	/**
 	 * Look-up constants
@@ -104,19 +104,20 @@ public abstract class RuleItemAbstractBase extends CommonResourceAbstractBase
 	 */
 	protected void checkMandatoryProperties(RuleItem ruleItem, RuleItemDefinition ruleItemDefinition)
 	{
-		Map<String, Serializable> paramValues = ruleItem.getParameterValues();
-		for (Map.Entry<String, Serializable> entry : paramValues.entrySet()) 
-		{
-			if (entry.getValue() == null)
-			{
-				ParameterDefinition paramDef = ruleItemDefinition.getParameterDefintion(entry.getKey());
-				if (paramDef.isMandatory() == true)
-				{
-					// Error since a mandatory parameter has a null value
-					throw new RuleServiceException(
-							MessageFormat.format(ERR_MAND_PROP, new Object[]{entry.getKey(), ruleItemDefinition.getName()}));
-				}
-			}
-		}
+        List<ParameterDefinition> definitions = ruleItemDefinition.getParameterDefinitions();
+        for (ParameterDefinition definition : definitions)
+        {
+            if (definition.isMandatory() == true)
+            {
+                // Check that a value has been set for the mandatory parameter
+                if (ruleItem.getParameterValue(definition.getName()) == null)
+                {
+                    // Error since a mandatory parameter has a null value
+                   throw new RuleServiceException(
+                          MessageFormat.format(ERR_MAND_PROP, new Object[]{definition.getName(), ruleItemDefinition.getName()}));
+                }
+            }
+        }
+        
 	}
 }
