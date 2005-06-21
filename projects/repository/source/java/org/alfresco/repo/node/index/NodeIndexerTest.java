@@ -80,7 +80,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
         PerformanceMonitor selectNodesPerf = new PerformanceMonitor(getClass().getSimpleName(), "selectNodes");
         PerformanceMonitor selectPropertiesPerf = new PerformanceMonitor(getClass().getSimpleName(), "selectProperties");
         
-        List<ChildAssociationRef> answer;
+        List<NodeRef> answer;
         
         selectNodesPerf.start();
         answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, '*monkey')", null, namespacePrefixResolver, false);

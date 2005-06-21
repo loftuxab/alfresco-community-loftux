@@ -402,7 +402,7 @@ public class AuthenticationTest extends TestCase
             result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token1);
             assertNotNull(null);
         }
-        catch (BadCredentialsException e)
+        catch (AuthenticationException e)
         {
 
         }
@@ -411,7 +411,7 @@ public class AuthenticationTest extends TestCase
             result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token2);
             assertNotNull(null);
         }
-        catch (BadCredentialsException e)
+        catch (AuthenticationException e)
         {
 
         }

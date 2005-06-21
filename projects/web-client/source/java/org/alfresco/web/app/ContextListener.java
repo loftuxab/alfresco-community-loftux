@@ -99,7 +99,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          // see if the company home space is present
          String companySpaceName = Application.getCompanyRootName(servletContext);
          String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
-         List<ChildAssociationRef> nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
+         List<NodeRef> nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
          if (nodes.size() == 0)
          {
             // Construct binding values for import
@@ -134,7 +134,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
          }
          // Extract company space id
-         companySpaceId = nodes.get(0).getChildRef().getId();
+         companySpaceId = nodes.get(0).getId();
          
          // check the admin user exists, create if it doesn't
          RepositoryAuthenticationDao dao = (RepositoryAuthenticationDao)ctx.getBean("alfDaoImpl");
@@ -180,7 +180,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             
             // Create the person under the special people system folder
             // This is required to allow authenticate() to succeed during login
-            List<ChildAssociationRef> results = nodeService.selectNodes(
+            List<NodeRef> results = nodeService.selectNodes(
                   rootNodeRef, RepositoryAuthenticationDao.PEOPLE_FOLDER, null, namespaceService, false);
             if (results.size() != 1)
             {
@@ -188,7 +188,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             }
             
             nodeService.createNode(
-                  results.get(0).getChildRef(),
+                  results.get(0),
                   ContentModel.ASSOC_CHILDREN,
                   ContentModel.TYPE_PERSON,  // expecting this qname path in the authentication methods 
                   ContentModel.TYPE_PERSON,

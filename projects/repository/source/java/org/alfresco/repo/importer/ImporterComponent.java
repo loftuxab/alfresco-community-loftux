@@ -9,7 +9,6 @@ import java.util.Set;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -89,16 +88,16 @@ public class ImporterComponent
         String path = location.getPath();
         if (path != null && path.length() >0)
         {
-            List<ChildAssociationRef> childAssocRefs = nodeService.selectNodes(nodeRef, path, null, namespaceService, false);
-            if (childAssocRefs.size() == 0)
+            List<NodeRef> nodeRefs = nodeService.selectNodes(nodeRef, path, null, namespaceService, false);
+            if (nodeRefs.size() == 0)
             {
                 throw new ImporterException("Path " + path + " with node " + nodeRef + " does not exist - the path must resolve to a valid location");
             }
-            if (childAssocRefs.size() > 1)
+            if (nodeRefs.size() > 1)
             {
                 throw new ImporterException("Path " + path + " with node " + nodeRef + " found too many locations - the path must resolve to one location");
             }
-            nodeRef = childAssocRefs.get(0).getChildRef();
+            nodeRef = nodeRefs.get(0);
         }
         
         // TODO: Check Node actually exists

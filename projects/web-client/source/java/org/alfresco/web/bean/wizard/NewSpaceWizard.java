@@ -191,13 +191,13 @@ public class NewSpaceWizard extends AbstractWizardBean
                      "/" + actNs + ":" + 
                      QName.createValidLocalName(Application.getTemplatesFolderName(FacesContext.getCurrentInstance()));
                
-               List<ChildAssociationRef> templateNodeList = this.nodeService.selectNodes(
+               List<NodeRef> templateNodeList = this.nodeService.selectNodes(
                      this.nodeService.getRootNode(Repository.getStoreRef(context)),
                      xpath, null, namespacePrefixResolver, false);
                if (templateNodeList.size() == 1)
                {
                   // get the first item in the list as we from test above there is only one!
-                  NodeRef templateNode = templateNodeList.get(0).getChildRef();
+                  NodeRef templateNode = templateNodeList.get(0);
                   NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), newSpaceId);
                   NodeRef templateCopyNode = this.nodeOperationsService.copy(sourceNode, templateNode, 
                         ContentModel.ASSOC_CONTAINS, 
@@ -435,13 +435,13 @@ public class NewSpaceWizard extends AbstractWizardBean
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-         List<ChildAssociationRef> results = this.nodeService.selectNodes(rootNodeRef, xpath, null, resolver, false);
+         List<NodeRef> results = this.nodeService.selectNodes(rootNodeRef, xpath, null, resolver, false);
          
          if (results.size() > 0)
          {
-            for (ChildAssociationRef assocRef : results)
+            for (NodeRef assocRef : results)
             {
-               Node childNode = new Node(assocRef.getChildRef(), this.nodeService);
+               Node childNode = new Node(assocRef, this.nodeService);
                this.templates.add(new SelectItem(childNode.getId(), childNode.getName()));
             }
          }

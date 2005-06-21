@@ -405,7 +405,7 @@ public interface NodeService
      * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
      * @return a list of all the child assoc relationships to the selected nodes
      */
-    public List<ChildAssociationRef> selectNodes(
+    public List<NodeRef> selectNodes(
             NodeRef contextNodeRef,
             String XPath,
             QueryParameterDefinition[] parameters,
@@ -451,11 +451,13 @@ public interface NodeService
      * @param nodeRef the node to get
      * @param propertyQName the name of the property
      * @param sqlLikePattern a SQL-like pattern to search for
+     * @param includeFTS - include full textv serach matches in the like test
      * @return Returns true if the pattern could be found
      */
     public boolean like(
             NodeRef nodeRef,
             QName propertyQName,
-            String sqlLikePattern)
+            String sqlLikePattern,
+            boolean includeFTS)
             throws InvalidNodeRefException;
 }

@@ -673,7 +673,7 @@ public class NewUserWizard extends AbstractWizardBean
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
          
-         List<ChildAssociationRef> results = nodeService.selectNodes(
+         List<NodeRef> results = nodeService.selectNodes(
                this.nodeService.getRootNode(Repository.getStoreRef(context)),
                RepositoryAuthenticationDao.PEOPLE_FOLDER,
                null,
@@ -685,7 +685,7 @@ public class NewUserWizard extends AbstractWizardBean
             throw new AlfrescoRuntimeException("Unable to find system types folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
          }
          
-         peopleRef = results.get(0).getChildRef();
+         peopleRef = results.get(0);
       }
       
       return peopleRef;

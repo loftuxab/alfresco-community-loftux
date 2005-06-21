@@ -77,12 +77,12 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         PropertyTypeDefinition text = dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT);
         defs[0] = new QueryParameterDefImpl(QName.createQName("alf", "var", namespacePrefixResolver), text, true, userName);
-        List<ChildAssociationRef> results = nodeService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:person[@alf:userName = $alf:var ]", defs, namespacePrefixResolver, false);
+        List<NodeRef> results = nodeService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:person[@alf:userName = $alf:var ]", defs, namespacePrefixResolver, false);
         if(results.size() != 1)
         {
             return null;
         }
-        return results.get(0).getChildRef();
+        return results.get(0);
     }
 
     /*package for testing*/ NodeRef getUserOrNull(String userName)
@@ -91,12 +91,12 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         PropertyTypeDefinition text = dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT);
         defs[0] = new QueryParameterDefImpl(QName.createQName("alf", "var", namespacePrefixResolver), text, true, userName);
-        List<ChildAssociationRef> results = nodeService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:user[@alf:username = $alf:var ]", defs, namespacePrefixResolver, false);
+        List<NodeRef> results = nodeService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:user[@alf:username = $alf:var ]", defs, namespacePrefixResolver, false);
         if(results.size() != 1)
         {
             return null;
         }
-        return results.get(0).getChildRef();
+        return results.get(0);
     }
 
     public void createUser(String userName, String rawPassword) throws AuthenticationException

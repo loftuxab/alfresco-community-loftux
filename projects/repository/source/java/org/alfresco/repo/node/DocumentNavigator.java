@@ -279,9 +279,9 @@ public class DocumentNavigator extends DefaultNavigator
         return nodeService.getPrimaryParent(nodeRef);
     }
 
-    public Boolean like(NodeRef childRef, QName qname, String sqlLikePattern)
+    public Boolean like(NodeRef childRef, QName qname, String sqlLikePattern, boolean includeFTS)
     {
-       return nodeService.like(childRef, qname, sqlLikePattern);
+       return nodeService.like(childRef, qname, sqlLikePattern, includeFTS);
     }
     
     public Boolean contains(NodeRef childRef, QName qname, String sqlLikePattern)

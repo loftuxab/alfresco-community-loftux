@@ -198,6 +198,12 @@
             <constructor-arg>
                <ref bean="nodeDaoService" />
             </constructor-arg>
+            <property name="indexer">
+               <ref bean="indexerComponent" />
+            </property>
+             <property name="searcher">
+               <ref bean="searcherComponent" />
+            </property>
          </bean>
       </property>
       <property name="transactionAttributes">

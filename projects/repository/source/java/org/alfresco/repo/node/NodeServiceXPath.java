@@ -160,7 +160,8 @@ public class NodeServiceXPath extends BaseXPath
             QName qname = QName.createQName(nav.getAttributeNamespaceUri(attribute), nav.getAttributeName(attribute));
             DocumentNavigator dNav = (DocumentNavigator)nav;
             
-            return dNav.like(car.getChildRef(), qname, patternValue); 
+            // JSR 170 inclues full text matches
+            return dNav.like(car.getChildRef(), qname, patternValue, true); 
             
         }
     }

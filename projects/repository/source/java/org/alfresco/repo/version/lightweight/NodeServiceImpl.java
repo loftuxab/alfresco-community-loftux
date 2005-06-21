@@ -469,7 +469,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }
 
-    public List<ChildAssociationRef> selectNodes(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks)
+    public List<NodeRef> selectNodes(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks)
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
@@ -487,7 +487,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
         throw new UnsupportedOperationException();
     }
 
-    public boolean like(NodeRef nodeRef, QName property, String sqlLikePattern)
+    public boolean like(NodeRef nodeRef, QName property, String sqlLikePattern, boolean includeFTS)
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
