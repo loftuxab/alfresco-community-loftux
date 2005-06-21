@@ -232,6 +232,14 @@
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
       </managed-property>
+      <managed-property>
+         <property-name>authenticationService</property-name>
+         <value>#{authenticationService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>namespaceService</property-name>
+         <value>#{AlfNamespaceService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>
@@ -422,6 +430,15 @@
       <navigation-case>
          <from-outcome>advSearch</from-outcome>
          <to-view-id>/jsp/dialog/advanced-search.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- rule to get back to the login page from anywhere -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>logout</from-outcome>
+         <to-view-id>/jsp/login.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

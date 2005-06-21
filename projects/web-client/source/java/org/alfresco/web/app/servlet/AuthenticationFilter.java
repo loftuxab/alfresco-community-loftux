@@ -8,12 +8,14 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.User;
 
 /**
@@ -22,14 +24,13 @@ import org.alfresco.web.bean.repository.User;
 public class AuthenticationFilter implements Filter
 {
    public final static String AUTHENTICATION_USER = "_alfAuthTicket";
-   private final static String LOGIN_PAGE = "/faces/jsp/login.jsp";
    
    /**
     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
     */
    public void init(FilterConfig config) throws ServletException
    {
-      // nothing to do
+      this.context = config.getServletContext();
    }
 
    /**
@@ -40,7 +41,7 @@ public class AuthenticationFilter implements Filter
    {
       HttpServletRequest httpRequest = (HttpServletRequest)req;
       // allow the login page to proceed
-      if (httpRequest.getRequestURI().endsWith(LOGIN_PAGE) == false)
+      if (httpRequest.getRequestURI().endsWith(getLoginPage()) == false)
       {
          // examine the session for our User object
          User user = (User)httpRequest.getSession().getAttribute(AUTHENTICATION_USER);
@@ -48,7 +49,7 @@ public class AuthenticationFilter implements Filter
          {
             // no user/ticket - redirect to login page
             HttpServletResponse httpResponse = (HttpServletResponse)res; 
-            httpResponse.sendRedirect(httpRequest.getContextPath() + LOGIN_PAGE);
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/faces" + getLoginPage());
          }
          else
          {
@@ -70,4 +71,18 @@ public class AuthenticationFilter implements Filter
    {
       // nothing to do
    }
+   
+   private String getLoginPage()
+   {
+      if (this.loginPage == null)
+      {
+         this.loginPage = Application.getLoginPage(this.context);
+      }
+      
+      return this.loginPage;
+   }
+   
+   
+   private String loginPage = null;
+   private ServletContext context;
 }

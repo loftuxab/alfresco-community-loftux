@@ -11,19 +11,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.validator.ValidatorException;
 import javax.transaction.UserTransaction;
+
+import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -58,6 +67,7 @@ public class NewUserWizard extends AbstractWizardBean
    private String firstName = null;
    private String lastName = null;
    private String userName = null;
+   private String password = null;
    private String email = null;
    private String companyId = null;
    private String homeSpaceName = null;
@@ -66,8 +76,17 @@ public class NewUserWizard extends AbstractWizardBean
    /** Component references */
    private UIRichList usersRichList;
    
+   /** AuthenticationService bean reference */
+   private AuthenticationService authenticationService;
+   
+   /** NamespaceService bean reference */
+   private NamespaceService namespaceService;
+   
    /** action context */
    private Node person = null;
+   
+   /** ref to system people folder */
+   private NodeRef peopleRef = null;
    
    
    /**
@@ -81,6 +100,7 @@ public class NewUserWizard extends AbstractWizardBean
       this.firstName = "";
       this.lastName = "";
       this.userName = "";
+      this.password = "";
       this.email = "";
       this.companyId = "";
       this.homeSpaceName = "";
@@ -98,12 +118,14 @@ public class NewUserWizard extends AbstractWizardBean
       this.firstName = (String)props.get("firstName");
       this.lastName = (String)props.get("lastName");
       this.userName = (String)props.get("userName");
+      this.password = ""; 
       this.email = (String)props.get("email");
       this.companyId = (String)props.get("organizationId");
       // TODO: calculate home space name and parent space Id from homeFolderId
       String homeFolderId = (String)props.get("homeFolder");
       this.homeSpaceName = "";
-      this.homeSpaceLocation = null;
+      // TODO: this is wrong at present!
+      this.homeSpaceLocation = homeFolderId;
    }
    
    /**
@@ -279,15 +301,25 @@ public class NewUserWizard extends AbstractWizardBean
             // update the existing node in the repository
             NodeRef nodeRef = getPerson().getNodeRef();
             
-            Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
+            Map<QName, Serializable> props = this.nodeService.getProperties(nodeRef);
             props.put(ContentModel.PROP_USERNAME, this.userName);
             props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
             props.put(ContentModel.PROP_LASTNAME, this.lastName);
-            // TODO: should be an ID!
-            props.put(ContentModel.PROP_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
+            String homeSpaceId;
+            if (this.homeSpaceLocation != null && this.homeSpaceName != null && this.homeSpaceName.length() != 0)
+            {
+               homeSpaceId = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName);
+            }
+            else
+            {
+               homeSpaceId = getCompanyHomeSpace(context).getId();
+            }
+            props.put(ContentModel.PROP_HOMEFOLDER, homeSpaceId);
             props.put(ContentModel.PROP_EMAIL, this.email);
             props.put(ContentModel.PROP_ORGID, this.companyId);
             this.nodeService.setProperties(nodeRef, props);
+            
+            // TODO: allow change password - separate screen for this?
          }
          else
          {
@@ -299,9 +331,16 @@ public class NewUserWizard extends AbstractWizardBean
             props.put(ContentModel.PROP_USERNAME, this.userName);
             props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
             props.put(ContentModel.PROP_LASTNAME, this.lastName);
-             //TODO: should be an ID!
-            // TODO: create this Space if it does not already exist
-            props.put(ContentModel.PROP_HOMEFOLDER, this.homeSpaceLocation + '/' + this.homeSpaceName);
+            String homeSpaceId;
+            if (this.homeSpaceLocation != null && this.homeSpaceName != null && this.homeSpaceName.length() != 0)
+            {
+               homeSpaceId = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName);
+            }
+            else
+            {
+               homeSpaceId = getCompanyHomeSpace(context).getId();
+            }
+            props.put(ContentModel.PROP_HOMEFOLDER, homeSpaceId);
             props.put(ContentModel.PROP_EMAIL, this.email);
             props.put(ContentModel.PROP_ORGID, this.companyId);
             
@@ -310,15 +349,19 @@ public class NewUserWizard extends AbstractWizardBean
             this.nodeService.createNode(
                   peopleNode,
                   ContentModel.ASSOC_CHILDREN,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
+                  ContentModel.TYPE_PERSON,
                   ContentModel.TYPE_PERSON,
                   props);
             
             if (logger.isDebugEnabled())
                logger.debug("Created Person node for username: " + this.userName);
             
-            // TODO: apply appropriate aspects
-            // TODO: hook in security API - set password etc.
+            // create the ACEGI Authentication instance for this user
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.userName, this.password);
+            this.authenticationService.createAuthentication(Repository.getStoreRef(context), token);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Created User Authentication instance for username: " + this.userName);
          }
          
          // commit the transaction
@@ -560,6 +603,22 @@ public class NewUserWizard extends AbstractWizardBean
    {
       this.userName = userName;
    }
+   
+   /**
+    * @return Returns the password.
+    */
+   public String getPassword()
+   {
+      return this.password;
+   }
+   
+   /**
+    * @param password The password to set.
+    */
+   public void setPassword(String password)
+   {
+      this.password = password;
+   }
 
    /**
     * @return Returns the usersRichList.
@@ -591,6 +650,93 @@ public class NewUserWizard extends AbstractWizardBean
    public void setPerson(Node person)
    {
       this.person = person;
+   }
+   
+   /**
+    * @return Returns the AuthenticationService.
+    */
+   public AuthenticationService getAuthenticationService()
+   {
+      return this.authenticationService;
+   }
+   
+   /**
+    * @param authenticationService  The AuthenticationService to set.
+    */
+   public void setAuthenticationService(AuthenticationService authenticationService)
+   {
+      this.authenticationService = authenticationService;
+   }
+   
+   /**
+    * @return Returns the namespaceService.
+    */
+   public NamespaceService getNamespaceService()
+   {
+      return this.namespaceService;
+   }
+   
+   /**
+    * @param namespaceService The namespaceService to set.
+    */
+   public void setNamespaceService(NamespaceService namespaceService)
+   {
+      this.namespaceService = namespaceService;
+   }
+   
+   public boolean getEditMode()
+   {
+      return this.editMode;
+   }
+   
+   
+   // ------------------------------------------------------------------------------
+   // Validator methods 
+   
+   /**
+    * Validate password field data is acceptable 
+    */
+   public void validatePassword(FacesContext context, UIComponent component, Object value)
+      throws ValidatorException
+   {
+      String pass = (String)value;
+      if (pass.length() < 5 || pass.length() > 12)
+      {
+         String err = "Password must be between 5 and 12 characters in length.";
+         throw new ValidatorException(new FacesMessage(err));
+      }
+      
+      for (int i=0; i<pass.length(); i++)
+      {
+         if (Character.isLetterOrDigit( pass.charAt(i) ) == false)
+         {
+            String err = "Password can only contain characters or digits.";
+            throw new ValidatorException(new FacesMessage(err));
+         }
+      }
+   }
+   
+   /**
+    * Validate Username field data is acceptable 
+    */
+   public void validateUsername(FacesContext context, UIComponent component, Object value)
+      throws ValidatorException
+   {
+      String pass = (String)value;
+      if (pass.length() < 5 || pass.length() > 12)
+      {
+         String err = "Username must be between 5 and 12 characters in length.";
+         throw new ValidatorException(new FacesMessage(err));
+      }
+      
+      for (int i=0; i<pass.length(); i++)
+      {
+         if (Character.isLetterOrDigit( pass.charAt(i) ) == false)
+         {
+            String err = "Username can only contain characters or digits.";
+            throw new ValidatorException(new FacesMessage(err));
+         }
+      }
    }
    
    
@@ -691,5 +837,36 @@ public class NewUserWizard extends AbstractWizardBean
       return peopleRef;
    }
    
-   private NodeRef peopleRef = null;
+   private NodeRef getCompanyHomeSpace(FacesContext context)
+   {
+      String companySpaceName = Application.getCompanyRootName(context);
+      String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
+      
+      List<NodeRef> nodes = this.nodeService.selectNodes(
+            this.nodeService.getRootNode(Repository.getStoreRef(context)),
+            companyXPath, null, this.namespaceService, false);
+      
+      if (nodes.size() == 0)
+      {
+         throw new IllegalStateException("Unable to find company home space path: " + companySpaceName);
+      }
+      
+      return nodes.get(0);
+   }
+   
+   private String createHomeSpace(String locationId, String spaceName)
+   {
+      FacesContext fc = FacesContext.getCurrentInstance();
+      StoreRef storeRef = Repository.getStoreRef(fc);
+      
+      // TODO: implement by adding namespace resolver to Path/elements
+      //       NOTE: QName already has toPrefixString() which may be useful
+      
+      Path path = this.nodeService.getPath(new NodeRef(storeRef, locationId));
+      //this.nodeService.selectNodes(
+      //      this.nodeService.getRootNode(storeRef), "", null, this.namespaceService, false);
+      //this.nodeService.exists(new NodeRef(storeRef, locationId));
+      
+      return locationId;
+   }
 }

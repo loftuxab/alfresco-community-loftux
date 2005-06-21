@@ -28,6 +28,8 @@
                <td width=8>&nbsp;</td>
                <td><img src="<%=request.getContextPath()%>/images/icons/Help_icon.gif" width=15 height=15></td>
                <td><h:outputText value="#{msg.help}"/></td>
+               <td width=8>&nbsp;</td>
+               <td><a:actionLink value="#{msg.logout}" action="#{LoginBean.logout}" /></td>
             </tr>
          </table>
       </td>

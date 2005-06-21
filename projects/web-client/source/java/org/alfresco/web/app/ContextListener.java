@@ -1,12 +1,10 @@
 package org.alfresco.web.app;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -23,23 +21,20 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.importer.ImporterBootstrap;
-import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.repo.security.authentication.StoreContextHolder;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.QueryParameterDefinition;
-import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.bean.repository.User;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -55,6 +50,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 {
    private static Logger logger = Logger.getLogger(ContextListener.class);
    private static final String ADMIN = "admin";
+   private ServletContext servletContext;
    
    /**
     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
@@ -62,7 +58,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
    public void contextInitialized(ServletContextEvent event)
    {
       // make sure that the spaces store in the repository exists
-      ServletContext servletContext = event.getServletContext();
+      this.servletContext = event.getServletContext();
       WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
       ServiceRegistry registry = (ServiceRegistry)ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
       NodeService nodeService = registry.getNodeService();
@@ -232,6 +228,14 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
    {
       logger.info("HTTP session destroyed: " + event.getSession().getId());
       
-      // TODO: destroy user ticket here
+      User user = (User)event.getSession().getAttribute(AuthenticationFilter.AUTHENTICATION_USER);
+      if (user != null)
+      {
+         // invalidate ticket
+         WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+         AuthenticationService authService = (AuthenticationService)ctx.getBean("authenticationService");
+         authService.invalidate(user.getTicket());
+         event.getSession().removeAttribute(AuthenticationFilter.AUTHENTICATION_USER);
+      }
    }
 }

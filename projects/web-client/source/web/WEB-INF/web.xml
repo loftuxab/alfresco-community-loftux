@@ -110,7 +110,7 @@
    </filter>
    <filter-mapping>
       <filter-name>Authentication Filter</filter-name>
-      <url-pattern>/*</url-pattern>
+      <url-pattern>/faces/*</url-pattern>
    </filter-mapping>
    
    <session-config>

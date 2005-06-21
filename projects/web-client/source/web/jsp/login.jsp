@@ -16,49 +16,76 @@
    
    <h:form id="loginForm" >
    
-      <h3>Enter Login details:</h3>
-      
-      <table border=0 cellspacing=2 cellpadding=2>
-         <tr>
-            <td>
-               <%-- use an I18N message --%>
-               <h:outputText value="#{msg.username}"/>:
-            </td>
-            <td>
-               <%-- input text field, with an example of a nested validator tag --%>
-               <h:inputText id="user-name" value="#{LoginBean.username}" required="true">
-                  <f:validateLength minimum="5" maximum="12" />
-               </h:inputText>
-         		<%-- message tag to show errors for the 'user-name' field --%>
-               <h:message id="errors2" for="user-name" style="color:red; font-size:10px" />
-            </td>
-         </tr>
-         
-         <tr>
-            <td>
-               <h:outputText value="#{msg.password}"/>:
-            </td>
-            <td>
-               <%-- password text field, with an example of a validation bean method --%>
-               <%-- the validation method adds a faces message to be displayed by a message tag --%>
-               <h:inputSecret id="user-password" value="#{LoginBean.password}" validator="#{LoginBean.validatePassword}" required="true" />
-               <%-- message tag to show errors for the 'user-password' field --%>
-               <h:message id="errors1" for="user-password" style="color:red; font-size:10px" />
-            </td>
-         </tr>
-      </table>
-      
-      <p>
-      
-      <%-- command button - fires an action to a bean method for processing --%>
-      <h:commandButton id="submit" action="#{LoginBean.login}" value="Login" />
-      
-      <p>
-      
-      <%-- messages tag to show messages not handled by other specific message tags --%>
-      <%-- messages added with different FacesMessage.SEVERITY_XXXX level can be shown
-           using different classes/styles depending on the level --%>
-      <h:messages globalOnly="true" style="color:red; font-family:'New Century Schoolbook'; font-style:oblique;" />
+   <table width=100% height=98% align=center>
+      <tr width=100% align=center>
+         <td valign=middle align=center width=100%>
+            
+            <table cellspacing=0 cellpadding=0 border=0>
+            <tr><td width=7><img src='<%=request.getContextPath()%>/images/parts/white_01.gif' width=7 height=7 alt=''></td>
+            <td background='<%=request.getContextPath()%>/images/parts/white_02.gif'>
+            <img src='<%=request.getContextPath()%>/images/parts/white_02.gif' width=7 height=7 alt=''></td>
+            <td width=7><img src='<%=request.getContextPath()%>/images/parts/white_03.gif' width=7 height=7 alt=''></td>
+            </tr>
+            <tr><td background='<%=request.getContextPath()%>/images/parts/white_04.gif'>
+            <img src='<%=request.getContextPath()%>/images/parts/white_04.gif' width=7 height=7 alt=''></td><td bgcolor='white'>
+            
+            <table border=0 cellspacing=4 cellpadding=2>
+               <tr>
+                  <td colspan=2>
+                     <img src='<%=request.getContextPath()%>/images/logo/AlfrescoLogo200.png' width=200 height=58 alt="Alfresco" title="Alfresco">
+                  </td>
+               </tr>
+               
+               <tr>
+                  <td colspan=2>
+                     <h4>Enter Login details:</h4>
+                  </td>
+               </tr>
+               
+               <tr>
+                  <td>
+                     <h:outputText value="#{msg.username}"/>:
+                  </td>
+                  <td>
+                     <%-- input text field, with an example of a nested validator tag --%>
+                     <h:inputText id="user-name" value="#{LoginBean.username}" validator="#{LoginBean.validateUsername}" style="width:150px" />
+                  </td>
+               </tr>
+               
+               <tr>
+                  <td>
+                     <h:outputText value="#{msg.password}"/>:
+                  </td>
+                  <td>
+                     <%-- password text field, with an example of a validation bean method --%>
+                     <%-- the validation method adds a faces message to be displayed by a message tag --%>
+                     <h:inputSecret id="user-password" value="#{LoginBean.password}" validator="#{LoginBean.validatePassword}" style="width:150px" />
+                  </td>
+               </tr>
+               
+               <tr>
+                  <td colspan=2 align=right>
+                     <h:commandButton id="submit" action="#{LoginBean.login}" value="Login" />
+                  </td>
+               </tr>
+            </table>
+            
+            <p>
+            
+            <%-- messages tag to show messages not handled by other specific message tags --%>
+            <h:messages style="color:red; font-size:10px" layout="table" />
+            
+            </td><td background='<%=request.getContextPath()%>/images/parts/white_06.gif'>
+            <img src='<%=request.getContextPath()%>/images/parts/white_06.gif' width=7 height=7 alt=''></td></tr>
+            <tr><td width=7><img src='<%=request.getContextPath()%>/images/parts/white_07.gif' width=7 height=7 alt=''></td>
+            <td background='<%=request.getContextPath()%>/images/parts/white_08.gif'>
+            <img src='<%=request.getContextPath()%>/images/parts/white_08.gif' width=7 height=7 alt=''></td>
+            <td width=7><img src='<%=request.getContextPath()%>/images/parts/white_09.gif' width=7 height=7 alt=''></td></tr>
+            </table>
+            
+         </td>
+      </tr>
+   </table>
       
    </h:form>
 </f:view>

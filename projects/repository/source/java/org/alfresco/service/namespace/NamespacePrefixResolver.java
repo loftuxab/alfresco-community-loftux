@@ -2,7 +2,6 @@ package org.alfresco.service.namespace;
 
 import java.util.Collection;
 
-
 /**
  * The <code>NamespacePrefixResolver</code> provides a mapping between
  * namespace prefixes and namespace URIs.
@@ -11,7 +10,6 @@ import java.util.Collection;
  */
 public interface NamespacePrefixResolver
 {
-
     /**
      * Gets the namespace URI registered for the given prefix
      * 
@@ -22,7 +20,6 @@ public interface NamespacePrefixResolver
     public String getNamespaceURI(String prefix)
         throws NamespaceException;
     
-
     /**
      * Gets the registered prefixes for the given namespace URI
      * 
@@ -39,5 +36,4 @@ public interface NamespacePrefixResolver
      * @return collection of all registered namespace prefixes
      */
     Collection<String> getPrefixes();
-    
 }

@@ -12,6 +12,7 @@ public class ServerConfigElement extends ConfigElementAdapter
 {
    private String mode;
    private String errorPage;
+   private String loginPage;
    
    /**
     * Default constructor
@@ -39,6 +40,7 @@ public class ServerConfigElement extends ConfigElementAdapter
       ServerConfigElement combined = new ServerConfigElement();
       combined.setMode(((ServerConfigElement)configElement).getMode());
       combined.setErrorPage(((ServerConfigElement)configElement).getErrorPage());
+      combined.setLoginPage(((ServerConfigElement)configElement).getLoginPage());
       return combined;
    }
 
@@ -73,6 +75,22 @@ public class ServerConfigElement extends ConfigElementAdapter
    public void setErrorPage(String errorPage)
    {
       this.errorPage = errorPage;
+   }
+   
+   /**
+    * @return Returns the login Page.
+    */
+   public String getLoginPage()
+   {
+      return this.loginPage;
+   }
+   
+   /**
+    * @param loginPage The login Page to set.
+    */
+   public void setLoginPage(String loginPage)
+   {
+      this.loginPage = loginPage;
    }
    
    /**

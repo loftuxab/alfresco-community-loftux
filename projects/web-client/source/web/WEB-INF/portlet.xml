@@ -9,7 +9,7 @@
         
         <init-param>
            <name>default-view</name>
-           <value>/jsp/browse/browse.jsp</value>
+           <value>/jsp/login.jsp</value>
         </init-param>
 
         <supports>

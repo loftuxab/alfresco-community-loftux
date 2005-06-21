@@ -17,6 +17,7 @@ public class ServerElementReader implements ConfigElementReader
    public static final String ELEMENT_SERVER = "server";
    public static final String ELEMENT_MODE = "mode";
    public static final String ELEMENT_ERROR_PAGE = "error-page";
+   public static final String ELEMENT_LOGIN_PAGE = "login-page";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -50,9 +51,15 @@ public class ServerElementReader implements ConfigElementReader
          {
             configElement.setErrorPage(errorPage.getTextTrim());
          }
+         
+         // get the login page
+         Element loginPage = element.element(ELEMENT_LOGIN_PAGE);
+         if (loginPage != null)
+         {
+            configElement.setLoginPage(loginPage.getTextTrim());
+         }
       }
       
       return configElement;
    }
-
 }

@@ -161,6 +161,29 @@ public class Application
    }
    
    /**
+    * Retrieves the configured login page for the application
+    * 
+    * @param servletContext The servlet context
+    * @return The configured login page or null if the configuration is missing
+    */
+   public static String getLoginPage(ServletContext servletContext)
+   {
+      return getLoginPage(WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext));
+   }
+   
+   /**
+    * Retrieves the configured login page for the application
+    * 
+    * @param portletContext The portlet context
+    * @return
+    */
+   public static String getLoginPage(PortletContext portletContext)
+   {
+      return getLoginPage((WebApplicationContext)portletContext.getAttribute(
+            WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE));
+   }
+   
+   /**
     * @return Returns the User object representing the currently logged in user
     */
    public static User getCurrentUser(ServletContext context)
@@ -395,5 +418,26 @@ public class Application
       }
       
       return errorPage;
+   }
+   
+   /**
+    * Retrieves the configured login page for the application
+    * 
+    * @param context The Spring contexr
+    * @return The configured login page or null if the configuration is missing
+    */
+   private static String getLoginPage(WebApplicationContext context)
+   {
+      String loginPage = null;
+      
+      ConfigService svc = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
+      ServerConfigElement serverConfig = (ServerConfigElement)svc.getGlobalConfig().getConfigElement("server");
+      
+      if (serverConfig != null)
+      {
+         loginPage = serverConfig.getLoginPage();
+      }
+      
+      return loginPage;
    }
 }

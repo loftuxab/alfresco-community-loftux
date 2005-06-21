@@ -142,7 +142,9 @@ public final class Path implements Iterable<Path.Element>, Serializable
         return sb.toString();
     }
     
-    
+    /**
+     * Override equals to check equality of Path instances
+     */
     public boolean equals(Object o)
     {
         if(o == this)
@@ -157,7 +159,9 @@ public final class Path implements Iterable<Path.Element>, Serializable
         return this.elements.equals(other.elements);
     }
 
-    
+    /**
+     * Override hashCode to check hash equality of Path instances
+     */
     public int hashCode()
     {
         return elements.hashCode();
@@ -311,8 +315,6 @@ public final class Path implements Iterable<Path.Element>, Serializable
         }
     }
 
-    
-    
     /**
      * Represents the <b>//</b> or <b>/descendant-or-self::node()</b> xpath element
      */
@@ -405,6 +407,4 @@ public final class Path implements Iterable<Path.Element>, Serializable
             return "..".hashCode();
         }
     }
-
-  
 }

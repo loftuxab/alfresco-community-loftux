@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.faces.context.FacesContext;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletSession;
@@ -14,14 +16,19 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.UnavailableException;
 
+import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.web.app.Application;
+import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
+import org.alfresco.web.bean.repository.User;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.portlet.MyFacesGenericPortlet;
+import org.apache.myfaces.portlet.PortletUtil;
 
 public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
 {
@@ -160,8 +167,38 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
       }
       else
       {
-         // TODO: Add error handling around here so errors in getter's get caught!
-         super.facesRender(request, response);
+         // if we have no User object in the session then a timeout must have occured
+         // use the viewId to check that we are not already on the login page
+         String viewId = request.getParameter(VIEW_ID);
+         User user = (User)request.getPortletSession().getAttribute(AuthenticationFilter.AUTHENTICATION_USER);
+         if (user == null && (viewId == null || viewId.equals(getLoginPage(getPortletContext())) == false))
+         {
+            if (logger.isDebugEnabled())
+               logger.debug("No valid login, requesting login page. ViewId: " + viewId);
+            
+            // login page redirect
+            response.setContentType("text/html");
+            request.getPortletSession().setAttribute(PortletUtil.PORTLET_REQUEST_FLAG, "true");
+            nonFacesRequest(request, response);
+         }
+         else
+         {
+            // TODO: Add error handling around here so errors in getter's get caught!
+            super.facesRender(request, response);
+         }
       }
    }
+   
+   private String getLoginPage(PortletContext context)
+   {
+      if (this.loginPage == null)
+      {
+         this.loginPage = Application.getLoginPage(context);
+      }
+      
+      return this.loginPage;
+   }
+   
+   
+   private String loginPage = null;
 }

@@ -93,17 +93,48 @@ public class LoginBean
    // Validator methods 
    
    /**
-    * Example of a specific validation method. Could have simply used a validator
-    * tag inside the input field tag - this is just an example.
+    * Validate password field data is acceptable 
     */
    public void validatePassword(FacesContext context, UIComponent component, Object value)
       throws ValidatorException
    {
       String pass = (String)value;
-      if (pass.length() < 5)
+      if (pass.length() < 5 || pass.length() > 12)
       {
-         String err = "Password name must be a minimum of 5 characters.";
+         String err = "Password must be between 5 and 12 characters in length.";
          throw new ValidatorException(new FacesMessage(err));
+      }
+      
+      for (int i=0; i<pass.length(); i++)
+      {
+         if (Character.isLetterOrDigit( pass.charAt(i) ) == false)
+         {
+            String err = "Password can only contain characters or digits.";
+            throw new ValidatorException(new FacesMessage(err));
+         }
+      }
+   }
+   
+   /**
+    * Validate Username field data is acceptable 
+    */
+   public void validateUsername(FacesContext context, UIComponent component, Object value)
+      throws ValidatorException
+   {
+      String pass = (String)value;
+      if (pass.length() < 5 || pass.length() > 12)
+      {
+         String err = "Username must be between 5 and 12 characters in length.";
+         throw new ValidatorException(new FacesMessage(err));
+      }
+      
+      for (int i=0; i<pass.length(); i++)
+      {
+         if (Character.isLetterOrDigit( pass.charAt(i) ) == false)
+         {
+            String err = "Username can only contain characters or digits.";
+            throw new ValidatorException(new FacesMessage(err));
+         }
       }
    }
    
@@ -118,29 +149,53 @@ public class LoginBean
     */
    public String login()
    {
-      // Authenticate via the authentication service, then save the details of user in an object
-      // in the session - this is used by the servlet filter etc. on each page to check for login
-      try
+      if (this.username != null && this.password != null)
       {
-         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.username, this.password);
-         Authentication auth = this.authenticationService.authenticate(Repository.getStoreRef(FacesContext.getCurrentInstance()), token);
-         RepositoryUserDetails principal = (RepositoryUserDetails)auth.getPrincipal();
-         
-         // setup User object and Home space ID etc.
-         User user = new User(this.username, this.authenticationService.getCurrentTicket(), principal.getPersonNodeRef());
-         String homeSpaceId = (String)this.nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
-         user.setHomeSpaceId(homeSpaceId);
-         
-         Map session = FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
-         session.put(AuthenticationFilter.AUTHENTICATION_USER, user);
-         
-         return "success";
+         // Authenticate via the authentication service, then save the details of user in an object
+         // in the session - this is used by the servlet filter etc. on each page to check for login
+         try
+         {
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.username, this.password);
+            Authentication auth = this.authenticationService.authenticate(Repository.getStoreRef(FacesContext.getCurrentInstance()), token);
+            RepositoryUserDetails principal = (RepositoryUserDetails)auth.getPrincipal();
+            
+            // setup User object and Home space ID etc.
+            User user = new User(this.username, this.authenticationService.getCurrentTicket(), principal.getPersonNodeRef());
+            String homeSpaceId = (String)this.nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
+            user.setHomeSpaceId(homeSpaceId);
+            
+            Map session = FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
+            session.put(AuthenticationFilter.AUTHENTICATION_USER, user);
+            
+            return "success";
+         }
+         catch (AuthenticationException aerr)
+         {
+            Utils.addErrorMessage("Unable to login - unknown username/password.");
+            return null;
+         }
       }
-      catch (AuthenticationException aerr)
+      else
       {
-         Utils.addErrorMessage("Unable to login - unknown username/password.");
+         Utils.addErrorMessage("Must specify username and password.");
          return null;
       }
+   }
+   
+   /**
+    * Invalidate ticket and logout user
+    */
+   public String logout()
+   {
+      Map session = FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
+      User user = (User)session.get(AuthenticationFilter.AUTHENTICATION_USER);
+      if (user != null)
+      {
+         this.authenticationService.invalidate(user.getTicket());
+         session.remove(AuthenticationFilter.AUTHENTICATION_USER);
+      }
+      
+      return "logout";
    }
    
    
