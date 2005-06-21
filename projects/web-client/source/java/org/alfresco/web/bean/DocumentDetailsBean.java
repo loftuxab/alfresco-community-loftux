@@ -22,6 +22,7 @@ import org.alfresco.service.cmr.version.VersionHistory;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
@@ -29,6 +30,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.AbstractWizardBean;
 import org.alfresco.web.bean.wizard.NewRuleWizard;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.log4j.Logger;
 
 /**
@@ -405,13 +407,24 @@ public class DocumentDetailsBean
     */
    public void approve(ActionEvent event)
    {
-      if (getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW) == false)
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id == null || id.length() == 0)
+      {
+         throw new AlfrescoRuntimeException("approve called without an id");
+      }
+      
+      NodeRef docNodeRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+      Node docNode = new Node(docNodeRef, this.nodeService);
+      
+      if (docNode.hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW) == false)
       {
          throw new AlfrescoRuntimeException("You can not approve a document that is not part of a workflow");
       }
       
       // get the simple workflow aspect properties
-      Map<String, Object> props = getDocument().getProperties();
+      Map<String, Object> props = docNode.getProperties();
       
       Boolean approveMove = (Boolean)props.get(ContentModel.PROP_APPROVE_MOVE.getLocalName());
       NodeRef approveFolder = (NodeRef)props.get(ContentModel.PROP_APPROVE_FOLDER.getLocalName());
@@ -423,28 +436,34 @@ public class DocumentDetailsBean
          tx.begin();
          
          // first we need to take off the simpleworkflow aspect
-         this.nodeService.removeAspect(getDocument().getNodeRef(), ContentModel.ASPECT_SIMPLE_WORKFLOW);
+         this.nodeService.removeAspect(docNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW);
          
          if (approveMove.booleanValue())
          {
             // move the document to the specified folder
-            String qname = QName.createValidLocalName(getDocument().getName());
-            this.nodeService.moveNode(getDocument().getNodeRef(), approveFolder, ContentModel.ASSOC_CONTAINS,
+            String qname = QName.createValidLocalName(docNode.getName());
+            this.nodeService.moveNode(docNodeRef, approveFolder, ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname));
          }
          else
          {
             // copy the document to the specified folder
-            String qname = QName.createValidLocalName(getDocument().getName());
-            this.copyService.copy(getDocument().getNodeRef(), approveFolder, ContentModel.ASSOC_CONTAINS,
+            String qname = QName.createValidLocalName(docNode.getName());
+            this.copyService.copy(docNodeRef, approveFolder, ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname));
          }
          
          // commit the transaction
          tx.commit();
          
-         // reset the document node
-         getDocument().reset();
+         // if this was called via the document details dialog we need to reset the document node
+         if (getDocument() != null)
+         {
+            getDocument().reset();
+         }
+         
+         // also make sure the UI will get refreshed
+         UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
          
          if (logger.isDebugEnabled())
          {
@@ -486,13 +505,24 @@ public class DocumentDetailsBean
     */
    public void reject(ActionEvent event)
    {
-      if (getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW) == false)
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id == null || id.length() == 0)
+      {
+         throw new AlfrescoRuntimeException("reject called without an id");
+      }
+      
+      NodeRef docNodeRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+      Node docNode = new Node(docNodeRef, this.nodeService);
+      
+      if (docNode.hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW) == false)
       {
          throw new AlfrescoRuntimeException("You can not reject a document that is not part of a workflow");
       }
       
       // get the simple workflow aspect properties
-      Map<String, Object> props = getDocument().getProperties();
+      Map<String, Object> props = docNode.getProperties();
       
       String rejectStep = (String)props.get(ContentModel.PROP_REJECT_STEP.getLocalName());
       Boolean rejectMove = (Boolean)props.get(ContentModel.PROP_REJECT_MOVE.getLocalName());
@@ -510,28 +540,34 @@ public class DocumentDetailsBean
          tx.begin();
          
          // first we need to take off the simpleworkflow aspect
-         this.nodeService.removeAspect(getDocument().getNodeRef(), ContentModel.ASPECT_SIMPLE_WORKFLOW);
+         this.nodeService.removeAspect(docNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW);
          
          if (rejectMove.booleanValue())
          {
             // move the document to the specified folder
-            String qname = QName.createValidLocalName(getDocument().getName());
-            this.nodeService.moveNode(getDocument().getNodeRef(), rejectFolder, ContentModel.ASSOC_CONTAINS,
+            String qname = QName.createValidLocalName(docNode.getName());
+            this.nodeService.moveNode(docNodeRef, rejectFolder, ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname));
          }
          else
          {
             // copy the document to the specified folder
-            String qname = QName.createValidLocalName(getDocument().getName());
-            this.copyService.copy(getDocument().getNodeRef(), rejectFolder, ContentModel.ASSOC_CONTAINS,
+            String qname = QName.createValidLocalName(docNode.getName());
+            this.copyService.copy(docNodeRef, rejectFolder, ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.ALFRESCO_URI, qname));
          }
          
          // commit the transaction
          tx.commit();
          
-         // reset the document node
-         getDocument().reset();
+         // if this was called via the document details dialog we need to reset the document node
+         if (getDocument() != null)
+         {
+            getDocument().reset();
+         }
+         
+         // also make sure the UI will get refreshed
+         UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
          
          if (logger.isDebugEnabled())
          {

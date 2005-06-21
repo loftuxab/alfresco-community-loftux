@@ -185,6 +185,8 @@
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
                                  </a:column>
+                                 
+                                 <a:dataPager/>
                               </a:richList>
                            </td>
                            

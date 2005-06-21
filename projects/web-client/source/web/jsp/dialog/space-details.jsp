@@ -149,7 +149,8 @@
                                           <a:convertXMLDate dateStyle="long" />
                                        </h:outputText>
                                     </a:column>
-              
+                                    
+                                    <a:dataPager/>
                                  </a:richList>
                               </a:panel>
                               <br/>

@@ -233,6 +233,7 @@
                                        <a:actionLink id="view-link" value="View" href="#{r.url}" />
                                     </a:column>
               
+                                    <a:dataPager/>
                                  </a:richList>
                               </a:panel>
                               <a:panel label="Version History" id="no-version-history-panel" progressive="true" expanded="false"

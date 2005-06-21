@@ -430,6 +430,16 @@
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
+                              <a:booleanEvaluator value="#{r.approveStep != null}">
+                                 <a:actionLink value="#{r.approveStep}" image="/images/icons/forward.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.approve}">
+                                    <f:param name="id" value="#{r.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
+                              <a:booleanEvaluator value="#{r.rejectStep != null}">
+                                 <a:actionLink value="#{r.rejectStep}" image="/images/icons/reply.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.reject}">
+                                    <f:param name="id" value="#{r.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
                            </a:menu>
                         </a:column>
                         
