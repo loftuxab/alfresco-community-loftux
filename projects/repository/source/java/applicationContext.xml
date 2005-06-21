@@ -12,12 +12,11 @@
    <!--                    -->
    
    <!-- load common properties -->
-   <bean id="db-properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+   <bean id="repository-properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
       <property name="ignoreUnresolvablePlaceholders"><value>true</value></property>
       <property name="locations">
 	     <list>
-			<value>classpath:db.properties</value>
-			<value>classpath:mail.properties</value>
+			<value>classpath:repository.properties</value>
 		 </list>	
       </property>
    </bean>   
@@ -262,7 +261,7 @@
    
    <bean id="fileContentStore" class="org.alfresco.repo.content.filestore.FileContentStore">
       <constructor-arg>
-         <value>w:/contentstore</value>
+         <value>${dir.root}${dir.contentstore}</value>
       </constructor-arg>
    </bean>
    
@@ -418,7 +417,7 @@
          <ref bean="LuceneFullTextSearchIndexer"/>
       </property>
       <property name="indexRootLocation">
-         <value>w:/lucene-indexes</value>
+         <value>${dir.root}${dir.indexes}</value>
       </property>
       <property name="contentService">
          <ref bean="contentService"/>
