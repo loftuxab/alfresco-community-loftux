@@ -9,7 +9,7 @@
       <alf:contains>
          <alf:content>
             <alf:name>Template content</alf:name>
-            <alf:mimetype>text</alf:mimetype>
+            <alf:mimetype>text/plain</alf:mimetype>
             <alf:contentUrl>classpath:org/alfresco/model/templates/sop.txt</alf:contentUrl>
          </alf:content>
       </alf:contains>
