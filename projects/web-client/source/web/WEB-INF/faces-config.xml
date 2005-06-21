@@ -580,10 +580,26 @@
          <from-outcome>editInline</from-outcome>
          <to-view-id>/jsp/dialog/edit-file-inline.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>editSimpleWorkflow</from-outcome>
+         <to-view-id>/jsp/dialog/edit-simple-workflow.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
       <from-view-id>/jsp/dialog/edit-document-properties.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-simple-workflow.jsp</from-view-id>
       <navigation-case>
          <from-outcome>cancel</from-outcome>
          <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>

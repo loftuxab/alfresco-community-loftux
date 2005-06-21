@@ -173,9 +173,16 @@
                               </a:panel>
                               <br/>
                               <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       action="editSimpleWorkflow" linkIcon="/images/icons/Change_details.gif"
+                                       rendered="#{DocumentDetailsBean.approveStepName != null}">
                                  <h:outputText id="workflow-overview" value="#{DocumentDetailsBean.workflowOverviewHTML}" 
                                                escape="false" />
+                              </a:panel>
+                              <a:panel label="Workflow" id="no-workflow-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       rendered="#{DocumentDetailsBean.approveStepName == null}">
+                                 <h:outputText id="no-workflow-msg" value="This document is not part of any workflow." />
                               </a:panel>
                               <br/>
                               <a:panel label="Categories" id="categories-panel" progressive="true" expanded="false"
@@ -184,7 +191,8 @@
                               </a:panel>
                               <br/>
                               <a:panel label="Version History" id="version-history-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       rendered="#{DocumentDetailsBean.versionable}">
                                        
                                  <a:richList id="versionHistoryList" viewMode="details" value="#{DocumentDetailsBean.versionHistory}" 
                                              var="r" styleClass="recordSet" headerStyleClass="recordSetHeader" 
@@ -226,6 +234,11 @@
                                     </a:column>
               
                                  </a:richList>
+                              </a:panel>
+                              <a:panel label="Version History" id="no-version-history-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       rendered="#{DocumentDetailsBean.versionable == false}">
+                                 <h:outputText id="no-history-msg" value="This document has no version history." />
                               </a:panel>
                               <br/>
                            </td>

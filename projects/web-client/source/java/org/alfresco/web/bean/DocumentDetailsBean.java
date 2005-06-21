@@ -1,6 +1,8 @@
 package org.alfresco.web.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -23,6 +26,9 @@ import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.bean.wizard.AbstractWizardBean;
+import org.alfresco.web.bean.wizard.NewRuleWizard;
+import org.alfresco.web.ui.common.Utils;
 import org.apache.log4j.Logger;
 
 /**
@@ -39,6 +45,7 @@ public class DocumentDetailsBean
    private LockService lockService;
    private CopyService copyService;
    private VersionService versionService;
+   private Map<String, String> workflowProperties;
    
    /**
     * Returns the id of the current document
@@ -68,6 +75,16 @@ public class DocumentDetailsBean
    public String getUrl()
    {
       return (String)getDocument().getProperties().get("url");
+   }
+   
+   /**
+    * Determines whether the current document is versionable
+    * 
+    * @return true if the document has the versionable aspect
+    */
+   public boolean isVersionable()
+   {
+      return getDocument().hasAspect(ContentModel.ASPECT_VERSIONABLE);
    }
    
    /**
@@ -124,21 +141,27 @@ public class DocumentDetailsBean
     */
    public String getWorkflowOverviewHTML()
    {
-      String html = "This document is not part of any workflow.";
+      String html = null;
       
       if (getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW))
       {
          // get the simple workflow aspect properties
          Map<String, Object> props = getDocument().getProperties();
+
+         String approveStepName = (String)props.get(
+               ContentModel.PROP_APPROVE_STEP.getLocalName());
+         String rejectStepName = (String)props.get(
+               ContentModel.PROP_REJECT_STEP.getLocalName());
          
-         String approveStepName = (String)props.get("approvestep");
-         String rejectStepName = (String)props.get("rejectstep");
+         Boolean approveMove = (Boolean)props.get(
+               ContentModel.PROP_APPROVE_MOVE.getLocalName());
+         Boolean rejectMove = (Boolean)props.get(
+               ContentModel.PROP_REJECT_MOVE.getLocalName());
          
-         Boolean approveMove = (Boolean)props.get("approvemove");
-         Boolean rejectMove = (Boolean)props.get("rejectmove");
-         
-         NodeRef approveFolder = (NodeRef)props.get("approvefolder");
-         NodeRef rejectFolder = (NodeRef)props.get("rejectfolder");
+         NodeRef approveFolder = (NodeRef)props.get(
+               ContentModel.PROP_APPROVE_FOLDER.getLocalName());
+         NodeRef rejectFolder = (NodeRef)props.get(
+               ContentModel.PROP_REJECT_FOLDER.getLocalName());
          
          String approveFolderName = null;
          String rejectFolderName = null;
@@ -199,6 +222,165 @@ public class DocumentDetailsBean
    }
    
    /**
+    * Returns the properties for the attached workflow as a map
+    * 
+    * @return Properties of the attached workflow, null if there is no workflow
+    */
+   public Map<String, String> getWorkflowProperties()
+   {
+      if (this.workflowProperties == null && 
+          getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW))
+      {
+         // get the exisiting properties for the document
+         Map<String, Object> props = getDocument().getProperties();
+         
+         String approveStepName = (String)props.get(
+               ContentModel.PROP_APPROVE_STEP.getLocalName());
+         String rejectStepName = (String)props.get(
+               ContentModel.PROP_REJECT_STEP.getLocalName());
+         
+         Boolean approveMove = (Boolean)props.get(
+               ContentModel.PROP_APPROVE_MOVE.getLocalName());
+         Boolean rejectMove = (Boolean)props.get(
+               ContentModel.PROP_REJECT_MOVE.getLocalName());
+         
+         NodeRef approveFolder = (NodeRef)props.get(
+               ContentModel.PROP_APPROVE_FOLDER.getLocalName());
+         NodeRef rejectFolder = (NodeRef)props.get(
+               ContentModel.PROP_REJECT_FOLDER.getLocalName());
+
+         // put the workflow properties in a separate map for use by the JSP
+         this.workflowProperties = new HashMap<String, String>(6);
+         this.workflowProperties.put(NewRuleWizard.PROP_APPROVE_STEP_NAME, 
+               approveStepName);
+         this.workflowProperties.put(NewRuleWizard.PROP_APPROVE_ACTION, 
+               approveMove ? "move" : "copy");
+         this.workflowProperties.put(NewRuleWizard.PROP_APPROVE_FOLDER, 
+               approveFolder.getId());
+         
+         if (rejectStepName == null || rejectMove == null || rejectFolder == null)
+         {
+            this.workflowProperties.put(NewRuleWizard.PROP_REJECT_STEP_PRESENT, 
+                  "no");
+         }
+         else
+         {
+            this.workflowProperties.put(NewRuleWizard.PROP_REJECT_STEP_PRESENT, 
+                  "yes");
+            this.workflowProperties.put(NewRuleWizard.PROP_REJECT_STEP_NAME, 
+                  rejectStepName);
+            this.workflowProperties.put(NewRuleWizard.PROP_REJECT_ACTION, 
+                  rejectMove ? "move" : "copy");
+            this.workflowProperties.put(NewRuleWizard.PROP_REJECT_FOLDER, 
+                  rejectFolder.getId());
+         }
+      }
+      
+      return this.workflowProperties;
+   }
+   
+   /**
+    * Saves the details of the workflow stored in workflowProperties
+    * to the current document
+    *  
+    * @return The outcome string
+    */
+   public String saveWorkflow()
+   {
+      String outcome = "cancel";
+      
+      UserTransaction tx = null;
+      
+      try
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx.begin();
+         
+         // firstly retrieve all the properties for the current node
+         Map<QName, Serializable> updateProps = this.nodeService.getProperties(
+               getDocument().getNodeRef());
+         
+         // update the simple workflow properties
+         
+         // set the approve step name
+         updateProps.put(ContentModel.PROP_APPROVE_STEP,
+               this.workflowProperties.get(NewRuleWizard.PROP_APPROVE_STEP_NAME));
+         
+         // specify whether the approve step will copy or move the content
+         boolean approveMove = true;
+         String approveAction = this.workflowProperties.get(NewRuleWizard.PROP_APPROVE_ACTION);
+         if (approveAction != null && approveAction.equals("copy"))
+         {
+            approveMove = false;
+         }
+         updateProps.put(ContentModel.PROP_APPROVE_MOVE, new Boolean(approveMove));
+         
+         // create node ref representation of the destination folder
+         NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.workflowProperties.get(NewRuleWizard.PROP_APPROVE_FOLDER));
+         updateProps.put(ContentModel.PROP_APPROVE_FOLDER, approveDestNodeRef);
+         
+         // determine whether there should be a reject step
+         boolean requireReject = true;
+         String rejectStepPresent = this.workflowProperties.get(
+               NewRuleWizard.PROP_REJECT_STEP_PRESENT);
+         if (rejectStepPresent != null && rejectStepPresent.equals("no"))
+         {
+            requireReject = false;
+         }
+         
+         if (requireReject)
+         {
+            // set the reject step name
+            updateProps.put(ContentModel.PROP_REJECT_STEP,
+                  this.workflowProperties.get(NewRuleWizard.PROP_REJECT_STEP_NAME));
+         
+            // specify whether the reject step will copy or move the content
+            boolean rejectMove = true;
+            String rejectAction = this.workflowProperties.get(
+                  NewRuleWizard.PROP_REJECT_ACTION);
+            if (rejectAction != null && rejectAction.equals("copy"))
+            {
+               rejectMove = false;
+            }
+            updateProps.put(ContentModel.PROP_REJECT_MOVE, new Boolean(rejectMove));
+
+            // create node ref representation of the destination folder
+            NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+                  this.workflowProperties.get(NewRuleWizard.PROP_REJECT_FOLDER));
+            updateProps.put(ContentModel.PROP_REJECT_FOLDER, rejectDestNodeRef);
+         }
+         else
+         {
+            // set all the reject properties to null to signify there should
+            // be no reject step
+            updateProps.put(ContentModel.PROP_REJECT_STEP, null);
+            updateProps.put(ContentModel.PROP_REJECT_MOVE, null);
+            updateProps.put(ContentModel.PROP_REJECT_FOLDER, null);
+         }
+         
+         // set the properties on the node
+         this.nodeService.setProperties(getDocument().getNodeRef(), updateProps);
+         
+         // commit the transaction
+         tx.commit();
+         
+         // reset the state of the current document so it reflects the changes just made
+         getDocument().reset();
+         
+         outcome = "finish";
+      }
+      catch (Throwable e)
+      {
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new AlfrescoRuntimeException("Failed to update simple workflow", e);
+      }
+      
+      return outcome;
+   }
+   
+   /**
     * Returns the name of the approve step of the attached workflow
     * 
     * @return The name of the approve step or null if there is no workflow
@@ -209,7 +391,8 @@ public class DocumentDetailsBean
       
       if (getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW))
       {
-         approveStepName = (String)getDocument().getProperties().get("approvestep");
+         approveStepName = (String)getDocument().getProperties().get(
+               ContentModel.PROP_APPROVE_STEP.getLocalName());
       }
       
       return approveStepName; 
@@ -230,8 +413,8 @@ public class DocumentDetailsBean
       // get the simple workflow aspect properties
       Map<String, Object> props = getDocument().getProperties();
       
-      Boolean approveMove = (Boolean)props.get("approvemove");
-      NodeRef approveFolder = (NodeRef)props.get("approvefolder");
+      Boolean approveMove = (Boolean)props.get(ContentModel.PROP_APPROVE_MOVE.getLocalName());
+      NodeRef approveFolder = (NodeRef)props.get(ContentModel.PROP_APPROVE_FOLDER.getLocalName());
       
       UserTransaction tx = null;
       try
@@ -289,7 +472,8 @@ public class DocumentDetailsBean
       
       if (getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW))
       {
-         approveStepName = (String)getDocument().getProperties().get("rejectstep");
+         approveStepName = (String)getDocument().getProperties().get(
+               ContentModel.PROP_REJECT_STEP.getLocalName());
       }
       
       return approveStepName;
@@ -310,9 +494,9 @@ public class DocumentDetailsBean
       // get the simple workflow aspect properties
       Map<String, Object> props = getDocument().getProperties();
       
-      String rejectStep = (String)props.get("rejectstep");
-      Boolean rejectMove = (Boolean)props.get("rejectmove");
-      NodeRef rejectFolder = (NodeRef)props.get("rejectfolder");
+      String rejectStep = (String)props.get(ContentModel.PROP_REJECT_STEP.getLocalName());
+      Boolean rejectMove = (Boolean)props.get(ContentModel.PROP_REJECT_MOVE.getLocalName());
+      NodeRef rejectFolder = (NodeRef)props.get(ContentModel.PROP_REJECT_FOLDER.getLocalName());
       
       if (rejectStep == null && rejectMove == null && rejectFolder == null)
       {

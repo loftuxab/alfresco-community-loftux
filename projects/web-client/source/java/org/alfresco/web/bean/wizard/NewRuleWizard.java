@@ -48,6 +48,21 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public class NewRuleWizard extends AbstractWizardBean
 {
+   // parameter names for conditions and actions
+   public static final String PROP_CONTAINS_TEXT = "containstext";
+   public static final String PROP_CATEGORY = "category";
+   public static final String PROP_FEATURE = "feature";
+   public static final String PROP_DESTINATION = "destinationLocation";
+   public static final String PROP_APPROVE_STEP_NAME = "approveStepName";
+   public static final String PROP_APPROVE_ACTION = "approveAction";
+   public static final String PROP_APPROVE_FOLDER = "approveFolder";
+   public static final String PROP_REJECT_STEP_PRESENT = "rejectStepPresent";
+   public static final String PROP_REJECT_STEP_NAME = "rejectStepName";
+   public static final String PROP_REJECT_ACTION = "rejectAction";
+   public static final String PROP_REJECT_FOLDER = "rejectFolder";
+   public static final String PROP_CHECKIN_DESC = "checkinDescription";
+   public static final String PROP_TRANSFORMER = "transformer";
+   
    private static Logger logger = Logger.getLogger(NewRuleWizard.class);
    
    // TODO: retrieve these from the config service
@@ -59,21 +74,6 @@ public class NewRuleWizard extends AbstractWizardBean
    private static final String STEP4_TITLE = "Step Four - Select Action";
    private static final String STEP5_TITLE = "Step Five - Action Settings";
    private static final String FINISH_INSTRUCTION = "To create the rule click Finish.";
-   
-   // parameter names for conditions and actions
-   private static final String PROP_CONTAINS_TEXT = "containstext";
-   private static final String PROP_CATEGORY = "category";
-   private static final String PROP_FEATURE = "feature";
-   private static final String PROP_DESTINATION = "destinationLocation";
-   private static final String PROP_APPROVE_STEP_NAME = "approveStepName";
-   private static final String PROP_APPROVE_ACTION = "approveAction";
-   private static final String PROP_APPROVE_FOLDER = "approveFolder";
-   private static final String PROP_REJECT_STEP_PRESENT = "rejectStepPresent";
-   private static final String PROP_REJECT_STEP_NAME = "rejectStepName";
-   private static final String PROP_REJECT_ACTION = "rejectAction";
-   private static final String PROP_REJECT_FOLDER = "rejectFolder";
-   private static final String PROP_CHECKIN_DESC = "checkinDescription";
-   private static final String PROP_TRANSFORMER = "transformer";
    
    // new rule wizard specific properties
    private String title;
