@@ -8,7 +8,6 @@ import org.alfresco.repo.importer.Importer;
 import org.alfresco.repo.importer.ImporterException;
 import org.alfresco.repo.importer.Parser;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
-import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -89,35 +88,38 @@ public class ViewParser implements Parser
             xpp.setInput(inputStream, null);
             Stack<ElementContext> contextStack = new Stack<ElementContext>();
             
-            for (int eventType = xpp.getEventType(); eventType != XmlPullParser.END_DOCUMENT; eventType = xpp.next())
+            try
             {
-                switch (eventType)
+                for (int eventType = xpp.getEventType(); eventType != XmlPullParser.END_DOCUMENT; eventType = xpp.next())
                 {
-                    case XmlPullParser.START_TAG:
+                    switch (eventType)
                     {
-                        if (xpp.getDepth() == 1)
+                        case XmlPullParser.START_TAG:
                         {
-                            processRoot(xpp, importer, contextStack);
+                            if (xpp.getDepth() == 1)
+                            {
+                                processRoot(xpp, importer, contextStack);
+                            }
+                            else
+                            {
+                                processStartElement(xpp, contextStack);
+                            }
+                            break;
                         }
-                        else
+                        case XmlPullParser.END_TAG:
                         {
-                            processStartElement(xpp, contextStack);
+                            processEndElement(xpp, contextStack);
+                            break;
                         }
-                        break;
-                    }
-                    case XmlPullParser.END_TAG:
-                    {
-                        processEndElement(xpp, contextStack);
-                        break;
                     }
                 }
             }
+            catch(Exception e)
+            {
+                throw new ImporterException("Failed to parse view at line " + xpp.getLineNumber() + "; column " + xpp.getColumnNumber(), e);
+            }
         }
         catch(XmlPullParserException e)
-        {
-            throw new ImporterException("Failed to parse view", e);
-        }
-        catch(IOException e)
         {
             throw new ImporterException("Failed to parse view", e);
         }
@@ -154,36 +156,31 @@ public class ViewParser implements Parser
         {
             // Process children of node
             // Note: Process in the following order: aspects, properties and associations
-            AspectDefinition aspectDef = dictionaryService.getAspect(defName);
-            if (aspectDef != null)
+            Object def = ((NodeContext)context).determineDefinition(defName);
+            if (def == null)
             {
-                processAspect(xpp, aspectDef, contextStack);
-                return;
+                throw new ImporterException("Definition " + defName + " is not valid; cannot find in Repository dictionary");
             }
             
-            PropertyDefinition propDef = dictionaryService.getProperty(defName);
-            if (propDef != null)
+            if (def instanceof AspectDefinition)
             {
-                processProperty(xpp, propDef, contextStack);
+                processAspect(xpp, (AspectDefinition)def, contextStack);
                 return;
             }
-            
-            AssociationDefinition assocDef = dictionaryService.getAssociation(defName);
-            if (assocDef != null)
+            else if (def instanceof PropertyDefinition)
             {
-                if (assocDef.isChild())
-                {
-                    processStartChildAssoc(xpp, (ChildAssociationDefinition)assocDef, contextStack);
-                }
-                else
-                {
-                    // TODO: process general association
-                }
+                processProperty(xpp, (PropertyDefinition)def, contextStack);
                 return;
             }
-            
-            // Definition does not exist
-            throw new ImporterException("Definition " + defName + " has not been defined in the Repository dictionary");
+            else if (def instanceof ChildAssociationDefinition)
+            {
+                processStartChildAssoc(xpp, (ChildAssociationDefinition)def, contextStack);
+                return;
+            }
+            else
+            {
+                // TODO: general association
+            }
         }
     }
 

@@ -7,8 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.repo.importer.ImportNode;
-import org.alfresco.repo.importer.ImporterException;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
@@ -28,9 +29,11 @@ import org.alfresco.service.namespace.QName;
     private ParentContext parentContext;
     private NodeRef nodeRef;
     private TypeDefinition typeDef;
-    private Map<QName, AspectDefinition> nodeAspects = new HashMap<QName, AspectDefinition>();
     private String childName;
-    private Map<QName, Map<QName, String>> properties = new HashMap<QName, Map<QName, String>>();
+    private Map<QName, AspectDefinition> nodeAspects = new HashMap<QName, AspectDefinition>();
+    private Map<QName, ChildAssociationDefinition> nodeChildAssocs = new HashMap<QName, ChildAssociationDefinition>();
+    private Map<QName, Map<QName, String>> classProperties = new HashMap<QName, Map<QName, String>>();
+    private Map<QName, String> nodeProperties = new HashMap<QName, String>();
 
 
     /**
@@ -103,9 +106,10 @@ import org.alfresco.service.namespace.QName;
      */
     /*package*/ void addProperty(PropertyDefinition propDef, String value)
     {
-        // Ensure property is valid for node
+        // Determine appropriate slot for placing property
         ClassDefinition owningClass = null;
-        if (typeDef.getProperties().containsKey(propDef.getName()))
+        PropertyDefinition def = getDictionaryService().getProperty(typeDef.getName(), propDef.getName());
+        if (def != null)
         {
             owningClass = typeDef;
         }
@@ -116,26 +120,24 @@ import org.alfresco.service.namespace.QName;
             allAspects.addAll(nodeAspects.values());
             for (AspectDefinition aspectDef : allAspects)
             {
-                if (aspectDef.getProperties().containsKey(propDef.getName()))
+                def = getDictionaryService().getProperty(aspectDef.getName(), propDef.getName());
+                if (def != null)
                 {
                     owningClass = aspectDef;
                     break;
                 }
             }
         }
-        if (owningClass == null)
-        {
-            throw new ImporterException("Property " + propDef.getName() + " is not valid for node " + typeDef.getName());
-        }
         
         // Store property value
-        Map<QName, String> classProperties = properties.get(owningClass.getName());
-        if (classProperties == null)
+        Map<QName, String> properties = classProperties.get(owningClass.getName());
+        if (properties == null)
         {
-            classProperties = new HashMap<QName, String>();
-            properties.put(owningClass.getName(), classProperties);
+            properties = new HashMap<QName, String>();
+            classProperties.put(owningClass.getName(), properties);
         }
-        classProperties.put(propDef.getName(), value);
+        properties.put(propDef.getName(), value);
+        nodeProperties.put(propDef.getName(), value);
     }
     
     /* (non-Javadoc)
@@ -143,12 +145,12 @@ import org.alfresco.service.namespace.QName;
      */
     public Map<QName, String> getProperties(QName className)
     {
-        Map<QName, String> classProperties = properties.get(className);
-        if (classProperties == null)
+        Map<QName, String> properties = classProperties.get(className);
+        if (properties == null)
         {
-            classProperties = Collections.emptyMap();
+            properties = Collections.emptyMap();
         }
-        return classProperties; 
+        return properties; 
     }
 
     /**
@@ -167,6 +169,103 @@ import org.alfresco.service.namespace.QName;
     public Set<QName> getNodeAspects()
     {
         return nodeAspects.keySet();
+    }
+
+    /**
+     * Determine the type of definition (aspect, property, association) from the
+     * specified name
+     * 
+     * @param defName
+     * @return the dictionary definition
+     */
+    /*package*/ Object determineDefinition(QName defName)
+    {
+        Object def = determineAspect(defName);
+        if (def == null)
+        {
+            def = determineProperty(defName);
+            if (def == null)
+            {
+                def = determineAssociation(defName);
+            }
+        }
+        return def;
+    }
+    
+    /**
+     * Determine if name referes to an aspect
+     * 
+     * @param defName
+     * @return
+     */
+    private AspectDefinition determineAspect(QName defName)
+    {
+        AspectDefinition def = null;
+        if (nodeAspects.containsKey(defName) == false)
+        {
+            def = getDictionaryService().getAspect(defName);
+        }
+        return def;
+    }
+    
+    /**
+     * Determine if name refers to a property
+     * 
+     * @param defName
+     * @return
+     */
+    private PropertyDefinition determineProperty(QName defName)
+    {
+        PropertyDefinition def = null;
+        if (nodeProperties.containsKey(defName) == false)
+        {
+            def = getDictionaryService().getProperty(typeDef.getName(), defName);
+            if (def == null)
+            {
+                Set<AspectDefinition> allAspects = new HashSet<AspectDefinition>();
+                allAspects.addAll(typeDef.getDefaultAspects());
+                allAspects.addAll(nodeAspects.values());
+                for (AspectDefinition aspectDef : allAspects)
+                {
+                    def = getDictionaryService().getProperty(aspectDef.getName(), defName);
+                    if (def != null)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        return def;
+    }
+    
+    /**
+     * Determine if name referes to an association
+     * 
+     * @param defName
+     * @return
+     */
+    private AssociationDefinition determineAssociation(QName defName)
+    {
+        AssociationDefinition def = null;
+        if (nodeChildAssocs.containsKey(defName) == false)
+        {
+            def = getDictionaryService().getAssociation(typeDef.getName(), defName);
+            if (def == null)
+            {
+                Set<AspectDefinition> allAspects = new HashSet<AspectDefinition>();
+                allAspects.addAll(typeDef.getDefaultAspects());
+                allAspects.addAll(nodeAspects.values());
+                for (AspectDefinition aspectDef : allAspects)
+                {
+                    def = getDictionaryService().getAssociation(aspectDef.getName(), defName);
+                    if (def != null)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        return def;
     }
     
     /* (non-Javadoc)

@@ -2,7 +2,7 @@
 
    <!-- TODO: Replace with decent template; this is just a place holder -->
       
-   <alf:folder>
+   <alf:folder v:childName="alf:template_within_templates">
       <alf:uifacets/>
       <alf:name>A template</alf:name>
       <alf:icon>space-icon-default</alf:icon>
