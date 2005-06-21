@@ -82,6 +82,9 @@ public abstract class AbstractWizardBean
       // beans clear the state - so when we finish the wizard other beans will have been reset
       UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
       
+      // make sure the wizard is not in edit mode
+      this.editMode = false;
+      
       // initialise the wizard in case we are launching 
       // after it was navigated away from
       init();

@@ -112,9 +112,9 @@ public class NewRuleWizard extends AbstractWizardBean
          
          // set up parameters maps for the condition
          Map<String, Serializable> conditionParams = new HashMap<String, Serializable>();
-         if (this.condition.equals(MatchTextEvaluator.PARAM_TEXT))
+         if (this.condition.equals(MatchTextEvaluator.NAME))
          {
-            conditionParams.put(MatchTextEvaluator.NAME, 
+            conditionParams.put(MatchTextEvaluator.PARAM_TEXT, 
                   this.conditionProperties.get(PROP_CONTAINS_TEXT));
          }
          else if (this.condition.equals(InCategoryEvaluator.NAME))

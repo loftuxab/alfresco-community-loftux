@@ -53,12 +53,50 @@
       </property-sheet>
    </config>
    
+   <config evaluator="aspect-name" condition="compliancable">
+      <property-sheet>
+         <show-property name="removeAfter" displayLabel="Remove After" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="dublincore">
+      <property-sheet>
+         <show-property name="publisher" displayLabel="Publisher" />
+         <show-property name="contributor" displayLabel="Contributor" />
+         <show-property name="type" displayLabel="Type" />
+         <show-property name="identifier" displayLabel="Identifier" />
+         <show-property name="dcsource" displayLabel="Source" />
+         <show-property name="coverage" displayLabel="Coverage" />
+         <show-property name="rights" displayLabel="Rights" />
+         <show-property name="subject" displayLabel="Subject" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="effectivity">
+      <property-sheet>
+         <show-property name="from" displayLabel="Effective From" />
+         <show-property name="to" displayLabel="Effective To" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="summarizable">
+      <property-sheet>
+         <show-property name="summary" displayLabel="Summary" />
+      </property-sheet>
+   </config>   
+
+   <config evaluator="aspect-name" condition="versionable">
+      <property-sheet>
+         <show-property name="versionLabel" displayLabel="Version Label" />
+      </property-sheet>
+   </config>
+   
    <config evaluator="string-compare" condition="New Rule Wizard">
       <features>
          <feature id="compliancable" description="Compliancable"/>
-         <feature id="lockable" description="Lockable"/>
-         <feature id="transformable" description="Transformable"/>
-         <feature id="translatable" description="Translatable"/>
+         <feature id="dublincore" description="Dublin Core"/>
+         <feature id="effectivity" description="Effectivity"/>
+         <feature id="summarizable" description="Summarizable"/>
          <feature id="versionable" description="Versionable"/>
       </features>
       <transformers>
