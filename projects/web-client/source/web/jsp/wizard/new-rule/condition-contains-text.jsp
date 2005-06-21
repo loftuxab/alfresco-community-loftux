@@ -10,6 +10,14 @@
 
 <r:page>
 
+<script language="JavaScript1.2">
+   function checkButtonState(inputField)
+   {
+      var disabled = (inputField.value.length == 0);
+      document.getElementById("new-rule-contains-text:next-button").disabled = disabled;
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -110,7 +118,7 @@
                                     <td>
                                        File name pattern:&nbsp;
                                        <h:inputText id="pattern" value="#{NewRuleWizard.conditionProperties.containstext}" 
-                                                    size="40" />
+                                                    onkeyup="javascript:checkButtonState(this);" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
@@ -136,7 +144,9 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton id="next-button" value="Next" action="#{NewRuleWizard.next}" 
+                                                        styleClass="wizardButton" 
+                                                        disabled="#{NewRuleWizard.conditionProperties.containstext == null}" />
                                     </td>
                                  </tr>
                                  <tr>

@@ -120,7 +120,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" 
+                                                        disabled="#{NewRuleWizard.actionProperties.category == null}" />
                                     </td>
                                  </tr>
                                  <tr>

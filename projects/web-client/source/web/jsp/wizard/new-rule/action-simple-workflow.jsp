@@ -10,12 +10,57 @@
 
 <r:page>
 
+<script language="JavaScript1.2">
+   
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("new-rule-simple-workflow:approve-step-name").focus();
+      checkButtonState();
+   }
+   
+   function checkButtonState()
+   {
+      if (document.getElementById("new-rule-simple-workflow:approve-step-name").value.length == 0 ||
+          document.getElementById("new-rule-simple-workflow:client-approve-folder").value.length == 0 ||
+          rejectValid() == false)
+      {
+         document.getElementById("new-rule-simple-workflow:next-button").disabled = true;
+         document.getElementById("new-rule-simple-workflow:finish-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("new-rule-simple-workflow:next-button").disabled = false;
+         document.getElementById("new-rule-simple-workflow:finish-button").disabled = false;
+      }
+   }
+   
+   function rejectValid()
+   {
+      var result = true;
+      
+      if (document.forms['new-rule-simple-workflow']['new-rule-simple-workflow:reject-step-present'][0].checked && 
+          (document.getElementById("new-rule-simple-workflow:reject-step-name").value.length == 0 ||
+           document.getElementById("new-rule-simple-workflow:client-reject-folder").value.length == 0))
+      {
+         result = false;
+      }
+      
+      return result;
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
    <h:form id="new-rule-simple-workflow">
+   
+   <%-- add the approve and reject folder ids as hidden fields --%>
+   <h:inputHidden id="client-approve-folder" value="#{NewRuleWizard.actionProperties.approveFolder}" />
+   <h:inputHidden id="client-reject-folder" value="#{NewRuleWizard.actionProperties.rejectFolder}" />
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -105,7 +150,8 @@
                                  <tr>
                                     <td>Name&nbsp;for&nbsp;approve&nbsp;step:</td>
                                     <td width="90%">
-                                       <h:inputText value="#{NewRuleWizard.actionProperties.approveStepName}" />
+                                       <h:inputText id="approve-step-name" value="#{NewRuleWizard.actionProperties.approveStepName}" 
+                                                    onkeyup="javascript:checkButtonState();" />
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
@@ -141,7 +187,8 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:selectOneRadio value="#{NewRuleWizard.actionProperties.rejectStepPresent}">
+                                       <h:selectOneRadio id="reject-step-present" value="#{NewRuleWizard.actionProperties.rejectStepPresent}"
+                                                         onclick="javascript:checkButtonState();" >
                                           <f:selectItem itemValue="yes" itemLabel="Yes" />
                                           <f:selectItem itemValue="no" itemLabel="No" />
                                        </h:selectOneRadio>
@@ -157,7 +204,8 @@
                                                    <tr>
                                                       <td>
                                                          Name&nbsp;for&nbsp;reject&nbsp;step:&nbsp;
-                                                         <h:inputText value="#{NewRuleWizard.actionProperties.rejectStepName}" />
+                                                         <h:inputText id="reject-step-name" value="#{NewRuleWizard.actionProperties.rejectStepName}" 
+                                                                      onkeyup="javascript:checkButtonState();" />
                                                       </td>
                                                    </tr>
                                                    <tr><td class="paddingRow"></td></tr>
@@ -203,7 +251,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton id="next-button" value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" 
+                                                        disabled="true" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -213,7 +262,8 @@
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewRuleWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton id="finish-button" value="Finish" action="#{NewRuleWizard.finish}" styleClass="wizardButton" 
+                                                        disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
@@ -242,6 +292,7 @@
           </td>
        </tr>
     </table>
+    
     
     </h:form>
     

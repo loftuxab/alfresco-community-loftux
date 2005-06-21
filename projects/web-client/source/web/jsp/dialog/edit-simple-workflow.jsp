@@ -10,12 +10,55 @@
 
 <r:page>
 
+<script language="JavaScript1.2">
+   
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("edit-simple-workflow:approve-step-name").focus();
+      checkButtonState();
+   }
+   
+   function checkButtonState()
+   {
+      if (document.getElementById("edit-simple-workflow:approve-step-name").value.length == 0 ||
+          document.getElementById("edit-simple-workflow:client-approve-folder").value.length == 0 ||
+          rejectValid() == false)
+      {
+         document.getElementById("edit-simple-workflow:ok-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("edit-simple-workflow:ok-button").disabled = false;
+      }
+   }
+   
+   function rejectValid()
+   {
+      var result = true;
+      
+      if (document.forms['edit-simple-workflow']['edit-simple-workflow:reject-step-present'][0].checked && 
+          (document.getElementById("edit-simple-workflow:reject-step-name").value.length == 0 ||
+           document.getElementById("edit-simple-workflow:client-reject-folder").value.length == 0))
+      {
+         result = false;
+      }
+      
+      return result;
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
    <h:form id="edit-simple-workflow">
+   
+   <%-- add the approve and reject folder ids as hidden fields --%>
+   <h:inputHidden id="client-approve-folder" value="#{DocumentDetailsBean.workflowProperties.approveFolder}" />
+   <h:inputHidden id="client-reject-folder" value="#{DocumentDetailsBean.workflowProperties.rejectFolder}" />
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -86,7 +129,8 @@
                                  <tr>
                                     <td>Name&nbsp;for&nbsp;approve&nbsp;step:</td>
                                     <td width="90%">
-                                       <h:inputText value="#{DocumentDetailsBean.workflowProperties.approveStepName}" />
+                                       <h:inputText id="approve-step-name" value="#{DocumentDetailsBean.workflowProperties.approveStepName}" 
+                                                    onkeyup="javascript:checkButtonState();" />
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
@@ -122,7 +166,8 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:selectOneRadio value="#{DocumentDetailsBean.workflowProperties.rejectStepPresent}">
+                                       <h:selectOneRadio id="reject-step-present" value="#{DocumentDetailsBean.workflowProperties.rejectStepPresent}"
+                                                         onclick="javascript:checkButtonState();" >
                                           <f:selectItem itemValue="yes" itemLabel="Yes" />
                                           <f:selectItem itemValue="no" itemLabel="No" />
                                        </h:selectOneRadio>
@@ -138,7 +183,8 @@
                                                    <tr>
                                                       <td>
                                                          Name&nbsp;for&nbsp;reject&nbsp;step:&nbsp;
-                                                         <h:inputText value="#{DocumentDetailsBean.workflowProperties.rejectStepName}" />
+                                                         <h:inputText id="reject-step-name" value="#{DocumentDetailsBean.workflowProperties.rejectStepName}" 
+                                                                      onkeyup="javascript:checkButtonState();" />
                                                       </td>
                                                    </tr>
                                                    <tr><td class="paddingRow"></td></tr>
@@ -180,7 +226,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="OK" action="#{DocumentDetailsBean.saveWorkflow}" styleClass="wizardButton" />
+                                       <h:commandButton id="ok-button" value="OK" action="#{DocumentDetailsBean.saveWorkflow}" 
+                                                        styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>

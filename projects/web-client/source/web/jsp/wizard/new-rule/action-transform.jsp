@@ -129,7 +129,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" 
+                                                        disabled="#{NewRuleWizard.actionProperties.destinationLocation == null}" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -139,7 +140,8 @@
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewRuleWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton value="Finish" action="#{NewRuleWizard.finish}" styleClass="wizardButton" 
+                                                        disabled="#{NewRuleWizard.actionProperties.destinationLocation == null}" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
