@@ -101,7 +101,7 @@ public class RuleServiceSystemTest extends TestCase
 		this.serviceRegistry = (ServiceRegistry)applicationContext.getBean("serviceRegistry");
 		this.nodeService = (NodeService)applicationContext.getBean("nodeService");
         this.ruleService = (RuleService)applicationContext.getBean("ruleService");
-        this.cociService = (CheckOutCheckInService)applicationContext.getBean("versionOperationsService");
+        this.cociService = (CheckOutCheckInService)applicationContext.getBean("checkOutCheckInService");
         this.lockService = (LockService)applicationContext.getBean("lockService");
 		this.contentService = (ContentService)applicationContext.getBean("contentService");
         this.dictionaryDAO = (DictionaryDAO)applicationContext.getBean("dictionaryDAO");

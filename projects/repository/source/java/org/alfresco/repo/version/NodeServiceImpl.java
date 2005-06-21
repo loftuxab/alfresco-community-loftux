@@ -1,7 +1,7 @@
 /**
  * Created on Apr 5, 2005
  */
-package org.alfresco.repo.version.lightweight;
+package org.alfresco.repo.version;
 
 import java.io.Serializable;
 import java.util.ArrayList;

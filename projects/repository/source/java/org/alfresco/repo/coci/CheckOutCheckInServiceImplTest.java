@@ -1,14 +1,14 @@
 /**
  * Created on May 16, 2005
  */
-package org.alfresco.repo.version.operations.impl;
+package org.alfresco.repo.coci;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.version.lightweight.VersionStoreConst;
+import org.alfresco.repo.version.VersionStoreConst;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -28,13 +28,13 @@ import org.alfresco.util.debug.NodeStoreInspector;
  * 
  * @author Roy Wetherall
  */
-public class VersionOperationsServiceImplTest extends BaseSpringTest 
+public class CheckOutCheckInServiceImplTest extends BaseSpringTest 
 {
 	/**
 	 * Services used by the tests
 	 */
 	private NodeService nodeService;
-	private CheckOutCheckInService versionOperationsService;
+	private CheckOutCheckInService cociService;
 	private ContentService contentService;
 	
 	/**
@@ -63,7 +63,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 	{
 		// Set the services
 		this.nodeService = (NodeService)this.applicationContext.getBean("dbNodeService");
-		this.versionOperationsService = (CheckOutCheckInService)this.applicationContext.getBean("versionOperationsService");
+		this.cociService = (CheckOutCheckInService)this.applicationContext.getBean("checkOutCheckInService");
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
 		
 		// Create the store and get the root node reference
@@ -125,7 +125,7 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		// Check out the node
-		NodeRef workingCopy = this.versionOperationsService.checkout(
+		NodeRef workingCopy = this.cociService.checkout(
 				this.nodeRef, 
 				this.rootNodeRef, 
 				ContentModel.ASSOC_CONTAINS, 
@@ -142,13 +142,13 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		ContentReader contentReader2 = this.contentService.getReader(workingCopy);
 		assertNotNull(contentReader2);
 		assertEquals(
-				"The content string of the working copy should match the origioanl immediatly after checkout.", 
+				"The content string of the working copy should match the origional immediatly after checkout.", 
 				contentReader.getContentString(), 
 				contentReader2.getContentString());
 		
 		// Dump the store so we can have a look at what is going on
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		return workingCopy;
 	}
@@ -163,9 +163,9 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		// Test standard check-in
 		Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
 		versionProperties.put(Version.PROP_DESCRIPTION, "This is a test version");		
-		this.versionOperationsService.checkin(workingCopy, versionProperties);		
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		this.cociService.checkin(workingCopy, versionProperties);		
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		// Test check-in with content
         NodeRef workingCopy3 = checkout();
@@ -175,23 +175,23 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		String contentUrl = tempWriter.getContentUrl();
 		Map<String, Serializable> versionProperties3 = new HashMap<String, Serializable>();
 		versionProperties3.put(VersionStoreConst.PROP_VERSION_TYPE, VersionType.MAJOR);
-		NodeRef origNodeRef = this.versionOperationsService.checkin(workingCopy3, versionProperties3, contentUrl, true);
+		NodeRef origNodeRef = this.cociService.checkin(workingCopy3, versionProperties3, contentUrl, true);
 		assertNotNull(origNodeRef);
 		ContentReader contentReader = this.contentService.getReader(origNodeRef);
 		assertNotNull(contentReader);
 		assertEquals(CONTENT_2, contentReader.getContentString());
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
-		this.versionOperationsService.cancelCheckout(workingCopy3);
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		this.cociService.cancelCheckout(workingCopy3);
 		
 		// Test keep checked out flag
 		NodeRef workingCopy2 = checkout();		
 		Map<String, Serializable> versionProperties2 = new HashMap<String, Serializable>();
 		versionProperties2.put(Version.PROP_DESCRIPTION, "Another version test");		
-		this.versionOperationsService.checkin(workingCopy2, versionProperties2, null, true);
-		this.versionOperationsService.checkin(workingCopy2, new HashMap<String, Serializable>(), null, true);
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));		
+		this.cociService.checkin(workingCopy2, versionProperties2, null, true);
+		this.cociService.checkin(workingCopy2, new HashMap<String, Serializable>(), null, true);
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));		
 	}
 	
 	/**
@@ -202,11 +202,11 @@ public class VersionOperationsServiceImplTest extends BaseSpringTest
 		NodeRef workingCopy = checkout();
 		assertNotNull(workingCopy);
 		
-		NodeRef origNodeRef = this.versionOperationsService.cancelCheckout(workingCopy);
+		NodeRef origNodeRef = this.cociService.cancelCheckout(workingCopy);
 		assertEquals(this.nodeRef, origNodeRef);
 		
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 	}
 
 }

@@ -174,7 +174,7 @@
       <property name="redirectedProtocolBindings">
          <map>
             <entry key="workspace"><ref bean="dbNodeService"></ref></entry>
-            <entry key="versionStore"><ref bean="lightWeightVersionStoreNodeService"></ref></entry>
+            <entry key="versionStore"><ref bean="versionNodeService"></ref></entry>
          </map>
       </property>
    </bean>
@@ -483,7 +483,7 @@
    <!--                               -->
    
    
-   <bean id='lightWeightVersionStoreVersionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id='versionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.version.VersionService</value>
       </property>
@@ -491,7 +491,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.version.lightweight.VersionServiceImpl" init-method="initialise">
+         <bean class="org.alfresco.repo.version.VersionServiceImpl" init-method="initialise">
              <property name="nodeService">
 				<ref bean="nodeService" />
              </property>
@@ -522,7 +522,7 @@
       </property>
    </bean>
    
-   <bean id='lightWeightVersionStoreNodeService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id='versionNodeService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.repository.NodeService</value>
       </property>
@@ -530,7 +530,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.version.lightweight.NodeServiceImpl">
+         <bean class="org.alfresco.repo.version.NodeServiceImpl">
 			 <property name="dbNodeService">
 				<ref bean="dbNodeService" />
 			 </property>
@@ -585,7 +585,7 @@
          <list>
             <value>org/alfresco/model/dictionary_model.xml</value>
             <value>org/alfresco/model/content_model.xml</value>
-            <value>org/alfresco/repo/version/lightweight/version_model.xml</value>
+            <value>org/alfresco/repo/version/version_model.xml</value>
          </list>
       </property>
    </bean>
@@ -655,11 +655,11 @@
       </property>
    </bean> 
    
-   <!--                 -->
-   <!-- Version Operations Service  -->
-   <!--                 -->
+   <!--                           -->
+   <!-- CheckOut/CheckIn Service  -->
+   <!--                           -->
 
-   <bean id="versionOperationsService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="checkOutCheckInService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.coci.CheckOutCheckInService</value>
       </property>
@@ -667,12 +667,12 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.version.operations.impl.VersionOperationsServiceImpl" init-method="init">
+         <bean class="org.alfresco.repo.coci.CheckOutCheckInServiceImpl" init-method="init">
             <property name="nodeService">
                <ref bean="nodeService" />
             </property>
             <property name="versionService">
-               <ref bean="lightWeightVersionStoreVersionService" />
+               <ref bean="versionService" />
             </property>
             <property name="lockService">
                <ref bean="lockService" />

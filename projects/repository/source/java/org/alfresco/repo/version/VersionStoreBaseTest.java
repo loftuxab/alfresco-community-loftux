@@ -1,4 +1,4 @@
-package org.alfresco.repo.version.lightweight;
+package org.alfresco.repo.version;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -26,7 +26,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
      * Services used by the tests
      */
 	protected NodeService dbNodeService;
-    protected VersionService lightWeightVersionStoreVersionService;
+    protected VersionService versionService;
     protected VersionCounterDaoService versionCounterDaoService;
     protected ContentService contentService;
 	protected DictionaryDAO dictionaryDAO;
@@ -85,7 +85,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
     {
         // Get the services by name from the application context
         this.dbNodeService = (NodeService)applicationContext.getBean("dbNodeService");
-        this.lightWeightVersionStoreVersionService = (VersionService)applicationContext.getBean("lightWeightVersionStoreVersionService");
+        this.versionService = (VersionService)applicationContext.getBean("versionService");
         this.versionCounterDaoService = (VersionCounterDaoService)applicationContext.getBean("versionCounterDaoService");
         this.contentService = (ContentService)applicationContext.getBean("contentService");
         
@@ -118,7 +118,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
 	 */
 	private void createTestModel()
 	{
-        InputStream is = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/version/lightweight/VersionStoreBaseTest_model.xml");
+        InputStream is = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/version/VersionStoreBaseTest_model.xml");
         M2Model model = M2Model.createModel(is);
         dictionaryDAO.putModel(model);
 	}
@@ -214,7 +214,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
         long beforeVersionTime = System.currentTimeMillis();
         
         // Now lets create a new version for this node
-        Version newVersion = lightWeightVersionStoreVersionService.createVersion(versionableNode, this.versionProperties);
+        Version newVersion = versionService.createVersion(versionableNode, this.versionProperties);
         checkNewVersion(beforeVersionTime, nextVersion, nextVersionLabel, newVersion, versionableNode);
         
         // Return the new version
@@ -226,7 +226,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
 	 */
 	protected String peekNextVersionLabel(NodeRef nodeRef, int versionNumber, Map<String, Serializable> versionProperties)
 	{
-		Version version = this.lightWeightVersionStoreVersionService.getCurrentVersion(nodeRef);		
+		Version version = this.versionService.getCurrentVersion(nodeRef);		
 		SerialVersionLabelPolicy policy = new SerialVersionLabelPolicy();
 		return policy.calculateVersionLabel(ContentModel.TYPE_CMOBJECT, version, versionNumber, versionProperties);
 	}
@@ -300,7 +300,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
      */
     protected int peekNextVersionNumber()
     {
-        StoreRef lwVersionStoreRef = this.lightWeightVersionStoreVersionService.getVersionStoreReference();
+        StoreRef lwVersionStoreRef = this.versionService.getVersionStoreReference();
         return this.versionCounterDaoService.currentVersionNumber(lwVersionStoreRef) + 1; 
     }
 

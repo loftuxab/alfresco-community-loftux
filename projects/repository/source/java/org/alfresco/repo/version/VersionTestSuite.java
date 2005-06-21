@@ -4,9 +4,6 @@ import org.alfresco.repo.version.common.VersionHistoryImplTest;
 import org.alfresco.repo.version.common.VersionImplTest;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoServiceTest;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicyTest;
-import org.alfresco.repo.version.lightweight.ContentServiceImplTest;
-import org.alfresco.repo.version.lightweight.NodeServiceImplTest;
-import org.alfresco.repo.version.lightweight.VersionServiceImplTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

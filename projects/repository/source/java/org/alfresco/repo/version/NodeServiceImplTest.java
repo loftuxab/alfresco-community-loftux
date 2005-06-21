@@ -1,7 +1,7 @@
 /**
  * Created on Apr 7, 2005
  */
-package org.alfresco.repo.version.lightweight;
+package org.alfresco.repo.version;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -49,11 +49,11 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
 		super.onSetUpInTransaction();
 		
         // Get the node service by name
-        this.lightWeightVersionStoreNodeService = (NodeService)this.applicationContext.getBean("lightWeightVersionStoreNodeService");
+        this.lightWeightVersionStoreNodeService = (NodeService)this.applicationContext.getBean("versionNodeService");
         
         // Create some dummy data used during the tests
         this.dummyNodeRef = new NodeRef(
-				this.lightWeightVersionStoreVersionService.getVersionStoreReference(),
+				this.versionService.getVersionStoreReference(),
 				"dummy");
 		this.dummyQName = QName.createQName("{dummy}dummy");
     }

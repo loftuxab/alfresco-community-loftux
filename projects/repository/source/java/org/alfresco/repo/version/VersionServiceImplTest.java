@@ -1,4 +1,4 @@
-package org.alfresco.repo.version.lightweight;
+package org.alfresco.repo.version;
 
 import java.util.Collection;
 
@@ -7,7 +7,7 @@ import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionHistory;
 
 /**
- * LightWeightVersionService test class.
+ * versionService test class.
  * 
  * @author Roy Wetherall
  */
@@ -52,7 +52,7 @@ public class VersionServiceImplTest extends VersionStoreBaseTest
         long beforeVersionTime = System.currentTimeMillis();
         
         // Version the node and its children
-        Collection<Version> versions = this.lightWeightVersionStoreVersionService.createVersion(
+        Collection<Version> versions = this.versionService.createVersion(
                 versionableNode, 
                 this.versionProperties,
                 true);
@@ -76,7 +76,7 @@ public class VersionServiceImplTest extends VersionStoreBaseTest
         long beforeVersionTime = System.currentTimeMillis();
         
         // Version the list of nodes created
-        Collection<Version> versions = this.lightWeightVersionStoreVersionService.createVersion(
+        Collection<Version> versions = this.versionService.createVersion(
                 this.versionableNodes.values(),
                 this.versionProperties);
         
@@ -117,7 +117,7 @@ public class VersionServiceImplTest extends VersionStoreBaseTest
     {
         NodeRef nodeRef = createNewVersionableNode();
         
-        VersionHistory vh = this.lightWeightVersionStoreVersionService.getVersionHistory(nodeRef);
+        VersionHistory vh = this.versionService.getVersionHistory(nodeRef);
         assertNull(vh);
     }
     
@@ -147,7 +147,7 @@ public class VersionServiceImplTest extends VersionStoreBaseTest
     {
         Version createdVersion = createVersion(versionableNode);
         
-        VersionHistory vh = this.lightWeightVersionStoreVersionService.getVersionHistory(versionableNode);
+        VersionHistory vh = this.versionService.getVersionHistory(versionableNode);
         assertNotNull("The version history should not be null since we know we have versioned this node.", vh);
         
         if (parentVersion == null)

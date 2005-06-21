@@ -6,8 +6,8 @@ import java.util.HashMap;
 import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.version.VersionStoreConst;
 import org.alfresco.repo.version.common.VersionImpl;
-import org.alfresco.repo.version.lightweight.VersionStoreConst;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;

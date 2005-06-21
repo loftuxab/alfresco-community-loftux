@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.alfresco.repo.version.lightweight.VersionStoreConst;
+import org.alfresco.repo.version.VersionStoreConst;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;

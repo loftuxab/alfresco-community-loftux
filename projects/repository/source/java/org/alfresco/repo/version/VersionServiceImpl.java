@@ -1,4 +1,4 @@
-package org.alfresco.repo.version.lightweight;
+package org.alfresco.repo.version;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
 /**
- * The light weight version service implementation.
+ * The version service implementation.
  * 
  * @author Roy Wetheral
  */
@@ -138,7 +138,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         if (this.dbNodeService.exists(getVersionStoreReference()) == false)
         {
             this.dbNodeService.createStore(
-					//VersionStoreConst.STORE_PROTOCOL,
                     StoreRef.PROTOCOL_WORKSPACE,
 					VersionStoreConst.STORE_ID);
         }
@@ -350,8 +349,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		
 		// Get the node details by calling the onVersionCreate policy behaviour
 		invokeOnCreateVersion(nodeRef, versionProperties, nodeDetails);
-		
-		// TODO What do we do about ad-hoc properties and assocs ?
 		
 		// Create the new version node (child of the version history)
         NodeRef newVersionRef = createNewVersion(

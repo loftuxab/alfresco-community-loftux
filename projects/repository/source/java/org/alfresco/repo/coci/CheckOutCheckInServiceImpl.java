@@ -1,7 +1,7 @@
 /**
  * Created on May 13, 2005
  */
-package org.alfresco.repo.version.operations.impl;
+package org.alfresco.repo.coci;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -28,7 +28,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Roy Wetherall
  */
-public class VersionOperationsServiceImpl implements CheckOutCheckInService 
+public class CheckOutCheckInServiceImpl implements CheckOutCheckInService 
 {
 	/**
 	 * Error messages

@@ -1,7 +1,7 @@
 /**
  * Created on May 5, 2005
  */
-package org.alfresco.repo.version.lightweight;
+package org.alfresco.repo.version;
 
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;

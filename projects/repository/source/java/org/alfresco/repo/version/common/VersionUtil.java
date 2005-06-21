@@ -5,7 +5,7 @@ package org.alfresco.repo.version.common;
 
 import java.util.Collection;
 
-import org.alfresco.repo.version.lightweight.VersionStoreConst;
+import org.alfresco.repo.version.VersionStoreConst;
 import org.alfresco.service.cmr.version.ReservedVersionNameException;
 import org.alfresco.service.cmr.version.Version;
 

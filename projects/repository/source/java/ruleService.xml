@@ -156,7 +156,7 @@
 		 <ref bean="nodeService"/>
 	  </property>
 	  <property name="cociService">
-		 <ref bean="versionOperationsService"></ref>
+		 <ref bean="checkOutCheckInService"></ref>
 	  </property>
    </bean>
 	
@@ -165,7 +165,7 @@
 		 <ref bean="nodeService"/>
 	  </property>
 	  <property name="cociService">
-		 <ref bean="versionOperationsService"></ref>
+		 <ref bean="checkOutCheckInService"></ref>
 	  </property>
    </bean>
    

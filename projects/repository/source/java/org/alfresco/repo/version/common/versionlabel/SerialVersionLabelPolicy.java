@@ -6,7 +6,7 @@ package org.alfresco.repo.version.common.versionlabel;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.repo.version.lightweight.VersionStoreConst;
+import org.alfresco.repo.version.VersionStoreConst;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.QName;

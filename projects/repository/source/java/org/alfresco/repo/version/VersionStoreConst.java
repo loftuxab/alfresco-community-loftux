@@ -1,7 +1,7 @@
 /**
  * Created on Apr 21, 2005
  */
-package org.alfresco.repo.version.lightweight;
+package org.alfresco.repo.version;
 
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionService;
