@@ -2,31 +2,22 @@ package org.alfresco.repo.importer.view;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Stack;
 
 import org.alfresco.repo.importer.Importer;
 import org.alfresco.repo.importer.ImporterException;
-import org.alfresco.repo.importer.Progress;
+import org.alfresco.repo.importer.Parser;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.StringUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -37,10 +28,10 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * 
  * @author David Caruana
  */
-public class ViewImporter implements Importer
+public class ViewParser implements Parser
 {
     // Logger
-    private static final Log logger = LogFactory.getLog(ViewImporter.class);
+    private static final Log logger = LogFactory.getLog(ViewParser.class);
     
     // View schema elements and attributes
     private static final String VIEW_CHILD_NAME_ATTR = "childName";    
@@ -50,14 +41,13 @@ public class ViewImporter implements Importer
     
     // Supporting services
     private NamespaceService namespaceService;
-    private NodeService nodeService;
     private DictionaryService dictionaryService;
     
     
     /**
      * Construct
      */
-    public ViewImporter()
+    public ViewParser()
     {
         try
         {
@@ -69,14 +59,6 @@ public class ViewImporter implements Importer
         {
             throw new ImporterException("Failed to initialise view importer", e);
         }
-    }
-    
-    /**
-     * @param nodeService  the node service
-     */
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
     }
     
     /**
@@ -95,10 +77,11 @@ public class ViewImporter implements Importer
         this.dictionaryService = dictionaryService;
     }
 
+    
     /* (non-Javadoc)
-     * @see org.alfresco.repo.importer.Importer#importNodes(java.io.InputStream, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.util.Properties, org.alfresco.repo.importer.Progress)
+     * @see org.alfresco.repo.importer.Parser#parse(java.io.InputStream, org.alfresco.repo.importer.Importer)
      */
-    public void importNodes(InputStream inputStream, NodeRef parentRef, QName childAssocType, Properties configuration, Progress progress)
+    public void parse(InputStream inputStream, Importer importer)
     {
         try
         {
@@ -114,7 +97,7 @@ public class ViewImporter implements Importer
                     {
                         if (xpp.getDepth() == 1)
                         {
-                            processRoot(xpp, parentRef, childAssocType, configuration, progress, contextStack);
+                            processRoot(xpp, importer, contextStack);
                         }
                         else
                         {
@@ -217,10 +200,10 @@ public class ViewImporter implements Importer
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private void processRoot(XmlPullParser xpp, NodeRef parentRef, QName childAssocType, Properties configuration, Progress progress, Stack<ElementContext> contextStack)
+    private void processRoot(XmlPullParser xpp, Importer importer, Stack<ElementContext> contextStack)
         throws XmlPullParserException, IOException
     {
-        ParentContext parentContext = new ParentContext(dictionaryService, configuration, progress, getName(xpp), parentRef, childAssocType);
+        ParentContext parentContext = new ParentContext(getName(xpp), dictionaryService, importer);
         contextStack.push(parentContext);
         
         if (logger.isDebugEnabled())
@@ -246,8 +229,7 @@ public class ViewImporter implements Importer
         String childName = xpp.getAttributeValue(NamespaceService.ALFRESCO_VIEW_URI, VIEW_CHILD_NAME_ATTR);
         if (childName != null && childName.length() > 0)
         {
-            childName = bindPlaceHolder(childName, context.getConfiguration());
-            context.setChildName(QName.createQName(childName, namespaceService));
+            context.setChildName(childName);
         }
             
         contextStack.push(context);
@@ -296,13 +278,11 @@ public class ViewImporter implements Importer
         NodeContext context = (NodeContext)contextStack.peek();
         
         // Extract value
-        Serializable value = null;
+        String value = null;
         int eventType = xpp.next();
         if (eventType == XmlPullParser.TEXT)
         {
-            String strValue = xpp.getText();
-            strValue = bindPlaceHolder(strValue, context.getConfiguration());
-            value = (Serializable)ValueConverter.convert(propDef.getPropertyType(), strValue);
+            value = xpp.getText();
             eventType = xpp.next();
         }
         if (eventType != XmlPullParser.END_TAG)
@@ -333,7 +313,8 @@ public class ViewImporter implements Importer
         // Create Node
         if (context.getNodeRef() == null)
         {
-            importNode(context);
+            NodeRef nodeRef = context.getImporter().importNode(context);
+            context.setNodeRef(nodeRef);
         }
         
         // Construct Child Association Context
@@ -381,7 +362,8 @@ public class ViewImporter implements Importer
     {
         if (context.getNodeRef() == null)
         {
-            importNode(context);
+            NodeRef nodeRef = context.getImporter().importNode(context);
+            context.setNodeRef(nodeRef);
         }
     }
 
@@ -392,97 +374,6 @@ public class ViewImporter implements Importer
      */
     private void processEndChildAssoc(ParentContext context)
     {
-    }
-
-    /**
-     * Import a Node
-     * 
-     * @param context
-     */
-    private void importNode(NodeContext context)
-    {
-        NodeRef parentRef = context.getParentContext().getParentRef();
-        QName assocType = context.getParentContext().getAssocType();
-        QName childName = context.getChildName();
-        TypeDefinition nodeType = context.getTypeDefinition();
-        
-        if (childName == null)
-        {
-            throw new ImporterException("Cannot import node of type " + nodeType.getName() + " - it does not have a name");
-        }
-        
-        // Build initial map of properties
-        Map<QName, Serializable> initialProperties = new HashMap<QName, Serializable>();
-        initialProperties.putAll(context.getProperties(nodeType.getName()));
-        List<AspectDefinition> defaultAspects = nodeType.getDefaultAspects();
-        for (AspectDefinition aspect: defaultAspects)
-        {
-            initialProperties.putAll(context.getProperties(aspect.getName()));
-        }
-        
-        // Create initial node
-        ChildAssociationRef assocRef = nodeService.createNode(parentRef, assocType, childName, nodeType.getName(), initialProperties);
-        NodeRef nodeRef = assocRef.getChildRef();
-        reportNodeCreated(context.getImporterProgress(), assocRef);
-        reportPropertySet(context.getImporterProgress(), nodeRef, initialProperties);
-        
-        // Apply aspects
-        for (QName aspect : context.getNodeAspects())
-        {
-            Map<QName, Serializable> aspectProperties = context.getProperties(aspect); 
-            nodeService.addAspect(nodeRef, aspect, aspectProperties);
-            reportAspectAdded(context.getImporterProgress(), nodeRef, aspect);
-            reportPropertySet(context.getImporterProgress(), nodeRef, aspectProperties);
-        }
-        
-        context.setNodeRef(nodeRef);
-    }
-
-    /**
-     * Helper to report node created progress
-     * 
-     * @param progress
-     * @param childAssocRef
-     */
-    private void reportNodeCreated(Progress progress, ChildAssociationRef childAssocRef)
-    {
-        if (progress != null)
-        {
-            progress.nodeCreated(childAssocRef.getChildRef(), childAssocRef.getParentRef(), childAssocRef.getTypeQName(), childAssocRef.getQName());
-        }
-    }
-    
-    /**
-     * Helper to report aspect added progress
-     *  
-     * @param progress
-     * @param nodeRef
-     * @param aspect
-     */
-    private void reportAspectAdded(Progress progress, NodeRef nodeRef, QName aspect)
-    {
-        if (progress != null)
-        {
-            progress.aspectAdded(nodeRef, aspect);
-        }        
-    }
-
-    /**
-     * Helper to report property set progress
-     * 
-     * @param progress
-     * @param nodeRef
-     * @param properties
-     */
-    private void reportPropertySet(Progress progress, NodeRef nodeRef, Map<QName, Serializable> properties)
-    {
-        if (progress != null)
-        {
-            for (QName property : properties.keySet())
-            {
-                progress.propertySet(nodeRef, property, properties.get(property));
-            }
-        }
     }
 
     /**
@@ -505,28 +396,6 @@ public class ViewImporter implements Importer
         return QName.createQName(uri, name);
     }
 
-    /**
-     * Bind the specified value to the passed configuration values if it is a place holder
-     * 
-     * @param value  the value to bind
-     * @param configuration  the configuration properties to bind to
-     * @return  the bound value
-     */
-    private String bindPlaceHolder(String value, Properties configuration)
-    {
-        // TODO: replace with more efficient approach
-        String boundValue = value;
-        if (configuration != null)
-        {
-            for (Object key : configuration.keySet())
-            {
-                String stringKey = (String)key;
-                boundValue = StringUtils.replace(boundValue, "${" + stringKey + "}", configuration.getProperty(stringKey));
-            }
-        }
-        return boundValue;
-    }
-    
     /**
      * Helper to indent debug output
      * 

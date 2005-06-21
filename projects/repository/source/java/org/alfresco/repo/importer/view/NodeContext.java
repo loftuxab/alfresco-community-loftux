@@ -1,15 +1,12 @@
 package org.alfresco.repo.importer.view;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.model.ContentModel;
+import org.alfresco.repo.importer.ImportNode;
 import org.alfresco.repo.importer.ImporterException;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -26,14 +23,14 @@ import org.alfresco.service.namespace.QName;
  *
  */
 /*package*/ class NodeContext extends ElementContext
+    implements ImportNode
 {
     private ParentContext parentContext;
     private NodeRef nodeRef;
     private TypeDefinition typeDef;
     private Map<QName, AspectDefinition> nodeAspects = new HashMap<QName, AspectDefinition>();
-    private QName childName;
-    private String nodeName;
-    private Map<QName, Map<QName, Serializable>> properties = new HashMap<QName, Map<QName, Serializable>>();
+    private String childName;
+    private Map<QName, Map<QName, String>> properties = new HashMap<QName, Map<QName, String>>();
 
 
     /**
@@ -45,31 +42,31 @@ import org.alfresco.service.namespace.QName;
      */
     /*package*/ NodeContext(QName elementName, ParentContext parentContext, TypeDefinition typeDef)
     {
-        super(parentContext.getDictionaryService(), elementName, parentContext.getConfiguration(), parentContext.getImporterProgress());
+        super(elementName, parentContext.getDictionaryService(), parentContext.getImporter());
         this.parentContext = parentContext;
         this.typeDef = typeDef;
     }
     
-    /**
-     * @return  the parent context
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportNode#getParentContext()
      */
-    /*package*/ ParentContext getParentContext()
+    public ParentContext getParentContext()
     {
         return parentContext;
     }
 
-    /**
-     * @return  the type definition
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportNode#getTypeDefinition()
      */
-    /*package*/ TypeDefinition getTypeDefinition()
+    public TypeDefinition getTypeDefinition()
     {
         return typeDef;
     }
     
-    /**
-     * @return  the node ref
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportNode#getNodeRef()
      */
-    /*package*/ NodeRef getNodeRef()
+    public NodeRef getNodeRef()
     {
         return nodeRef;
     }
@@ -82,27 +79,18 @@ import org.alfresco.service.namespace.QName;
         this.nodeRef = nodeRef;
     }
     
-    /**
-     * @return  the child name
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportNode#getChildName()
      */
-    /*package*/ QName getChildName()
+    public String getChildName()
     {
-        if (childName == null)
-        {
-            // Default child name to node name, if there is one
-            if (nodeName != null)
-            {
-                String localName = QName.createValidLocalName(nodeName);
-                return QName.createQName(parentContext.getAssocType().getNamespaceURI(), localName);
-            }
-        }
         return childName;
     }
     
     /**
      * @param childName  the child name
      */
-    /*package*/ void setChildName(QName childName)
+    /*package*/ void setChildName(String childName)
     {
         this.childName = childName;
     }
@@ -113,7 +101,7 @@ import org.alfresco.service.namespace.QName;
      * @param propDef  the property definition
      * @param value  the property value
      */
-    /*package*/ void addProperty(PropertyDefinition propDef, Serializable value)
+    /*package*/ void addProperty(PropertyDefinition propDef, String value)
     {
         // Ensure property is valid for node
         ClassDefinition owningClass = null;
@@ -141,30 +129,21 @@ import org.alfresco.service.namespace.QName;
         }
         
         // Store property value
-        Map<QName, Serializable> classProperties = properties.get(owningClass.getName());
+        Map<QName, String> classProperties = properties.get(owningClass.getName());
         if (classProperties == null)
         {
-            classProperties = new HashMap<QName, Serializable>();
+            classProperties = new HashMap<QName, String>();
             properties.put(owningClass.getName(), classProperties);
         }
         classProperties.put(propDef.getName(), value);
-        
-        // Extract name, if provided
-        if (propDef.getName().equals(ContentModel.PROP_NAME))
-        {
-            nodeName = (String)value;
-        }
     }
     
-    /**
-     * Gets the properties of the node for the specified class (type or aspect)
-     * 
-     * @param className  the type or aspect
-     * @return  the properties
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportNode#getProperties(org.alfresco.service.namespace.QName)
      */
-    /*package*/ Map<QName, Serializable> getProperties(QName className)
+    public Map<QName, String> getProperties(QName className)
     {
-        Map<QName, Serializable> classProperties = properties.get(className);
+        Map<QName, String> classProperties = properties.get(className);
         if (classProperties == null)
         {
             classProperties = Collections.emptyMap();
@@ -182,10 +161,10 @@ import org.alfresco.service.namespace.QName;
         nodeAspects.put(aspect.getName(), aspect);
     }
     
-    /**
-     * @return  the aspects of this node
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportNode#getNodeAspects()
      */
-    /*package*/ Set<QName> getNodeAspects()
+    public Set<QName> getNodeAspects()
     {
         return nodeAspects.keySet();
     }

@@ -34,6 +34,12 @@
             <alf:name>Translation of Some Content</alf:name>
             <alf:creator></alf:creator>
          </alf:cmobject>
+         
+         <alf:content>
+            <alf:name>Real content</alf:name>
+            <alf:mimetype>text</alf:mimetype>
+            <alf:contentUrl>org/alfresco/repo/importer/importercomponent_testfile.txt</alf:contentUrl>
+         </alf:content>
 
       </alf:contains>
       

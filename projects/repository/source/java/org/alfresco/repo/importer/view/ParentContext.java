@@ -2,11 +2,11 @@ package org.alfresco.repo.importer.view;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
+import org.alfresco.repo.importer.ImportParent;
+import org.alfresco.repo.importer.Importer;
 import org.alfresco.repo.importer.ImporterException;
-import org.alfresco.repo.importer.Progress;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -22,6 +22,7 @@ import org.alfresco.service.namespace.QName;
  *
  */
 /*package*/ class ParentContext extends ElementContext
+    implements ImportParent
 {
     private NodeRef parentRef;
     private QName assocType;
@@ -37,11 +38,11 @@ import org.alfresco.service.namespace.QName;
      * @param parentRef
      * @param assocType
      */
-    /*package*/ ParentContext(DictionaryService dictionary, Properties configuration, Progress progress, QName elementName, NodeRef parentRef, QName assocType)
+    /*package*/ ParentContext(QName elementName, DictionaryService dictionary, Importer importer)
     {
-        super(dictionary, elementName, configuration, progress);
-        this.parentRef = parentRef;
-        this.assocType = assocType;
+        super(elementName, dictionary, importer);
+        parentRef = importer.getRootRef();
+        assocType = importer.getRootAssocType();
     }
     
     /**
@@ -53,7 +54,7 @@ import org.alfresco.service.namespace.QName;
      */
     /*package*/ ParentContext(QName elementName, NodeContext parent, ChildAssociationDefinition childDef)
     {
-        super(parent.getDictionaryService(), elementName, parent.getConfiguration(), parent.getImporterProgress());
+        super(elementName, parent.getDictionaryService(), parent.getImporter());
         
         // Ensure association is valid for node
         Set<QName> allAspects = new HashSet<QName>();
@@ -73,18 +74,18 @@ import org.alfresco.service.namespace.QName;
         assocType = childDef.getName();
     }
     
-    /**
-     * @return  the parent ref
-     */    
-    /*package*/ NodeRef getParentRef()
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportParent#getParentRef()
+     */
+    public NodeRef getParentRef()
     {
         return parentRef;
     }
     
-    /**
-     * @return  the child association type
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportParent#getAssocType()
      */
-    /*package*/ QName getAssocType()
+    public QName getAssocType()
     {
         return assocType;
     }

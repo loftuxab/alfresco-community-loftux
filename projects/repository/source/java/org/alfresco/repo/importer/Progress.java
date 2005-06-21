@@ -25,6 +25,14 @@ public interface Progress
     public void nodeCreated(NodeRef nodeRef, NodeRef parentRef, QName assocName, QName childName);
 
     /**
+     * Report creation of content
+     * 
+     * @param nodeRef  the node ref
+     * @param sourceUrl  the source location of the content
+     */
+    public void contentCreated(NodeRef nodeRef, String sourceUrl);
+    
+    /**
      * Report setting of a property
      * 
      * @param nodeRef  the node ref

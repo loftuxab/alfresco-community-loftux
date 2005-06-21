@@ -1,0 +1,18 @@
+<v:view xmlns:v="http://www.alfresco.org/repository/view/0.1" xmlns:alf="http://www.alfresco.org/1.0">
+
+   <!-- TODO: Replace with decent template; this is just a place holder -->
+      
+   <alf:folder>
+      <alf:uifacets/>
+      <alf:name>A template</alf:name>
+      <alf:icon>space-icon-default</alf:icon>
+      <alf:contains>
+         <alf:content>
+            <alf:name>Template content</alf:name>
+            <alf:mimetype>text</alf:mimetype>
+            <alf:contentUrl>classpath:org/alfresco/model/templates/sop.txt</alf:contentUrl>
+         </alf:content>
+      </alf:contains>
+   </alf:folder>
+
+</v:view>

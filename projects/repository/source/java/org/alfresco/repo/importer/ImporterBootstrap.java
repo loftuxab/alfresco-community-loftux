@@ -151,6 +151,15 @@ public class ImporterBootstrap
         }
 
         /* (non-Javadoc)
+         * @see org.alfresco.repo.importer.Progress#contentCreated(org.alfresco.service.cmr.repository.NodeRef, java.lang.String)
+         */
+        public void contentCreated(NodeRef nodeRef, String sourceUrl)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Imported content from " + sourceUrl + " into node " + nodeRef);
+        }
+
+        /* (non-Javadoc)
          * @see org.alfresco.repo.importer.Progress#propertySet(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
          */
         public void propertySet(NodeRef nodeRef, QName property, Serializable value)
@@ -167,6 +176,7 @@ public class ImporterBootstrap
             if (logger.isDebugEnabled())
                 logger.debug("Added aspect " + aspect + " to node " + nodeRef);
         }
+
     }
     
 }

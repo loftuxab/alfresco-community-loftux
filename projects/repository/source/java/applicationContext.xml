@@ -13,6 +13,7 @@
    
    <!-- load common properties -->
    <bean id="db-properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="ignoreUnresolvablePlaceholders"><value>true</value></property>
       <property name="locations">
 	     <list>
 			<value>classpath:db.properties</value>
@@ -930,18 +931,18 @@
 
    <!-- Importer -->
 
-   <bean id="viewImporter" class="org.alfresco.repo.importer.view.ViewImporter">
+   <bean id="viewParser" class="org.alfresco.repo.importer.view.ViewParser">
       <property name="namespaceService"><ref bean="namespaceService"/></property>
       <property name="dictionaryService"><ref bean="dictionaryService"/></property>
-      <property name="nodeService"><ref bean="nodeService"/></property>
    </bean>
 
    <bean id="importerComponent" class="org.alfresco.repo.importer.ImporterComponent">
-      <!-- For now, hard-wire the view importer -->
-      <property name="viewImporter"><ref bean="viewImporter"/></property>
+      <!-- For now, hard-wire the view parser -->
+      <property name="viewParser"><ref bean="viewParser"/></property>
       <property name="namespaceService"><ref bean="namespaceService"/></property>
       <property name="dictionaryService"><ref bean="dictionaryService"/></property>
       <property name="nodeService"><ref bean="nodeService"/></property>
+      <property name="contentService"><ref bean="contentService"/></property>
    </bean>
 
    <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap">
@@ -952,6 +953,10 @@
             <props>
                <prop key="path">/</prop>
                <prop key="location">org/alfresco/model/system_import.xml</prop>
+            </props>
+            <props>
+               <prop key="path">/alf:${companySpaceName}/alf:${glossaryName}/alf:${templatesName}</prop>
+               <prop key="location">org/alfresco/model/templates/spaces.xml</prop>
             </props>
          </list>
       </property>
