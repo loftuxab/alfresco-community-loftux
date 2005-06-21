@@ -1,7 +1,7 @@
 /**
  * Created on May 3, 2005
  */
-package org.alfresco.repo.lock.impl;
+package org.alfresco.repo.lock;
 
 import java.io.Serializable;
 import java.util.HashMap;

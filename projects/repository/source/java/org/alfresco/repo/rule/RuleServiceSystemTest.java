@@ -23,12 +23,14 @@ import org.alfresco.repo.dictionary.impl.M2Property;
 import org.alfresco.repo.rule.action.AddFeaturesActionExecutor;
 import org.alfresco.repo.rule.action.CheckInActionExecutor;
 import org.alfresco.repo.rule.action.CheckOutActionExecutor;
+import org.alfresco.repo.rule.action.LinkCategoryActionExecutor;
 import org.alfresco.repo.rule.action.MailActionExecutor;
 import org.alfresco.repo.rule.action.MoveActionExecutor;
 import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
 import org.alfresco.repo.rule.action.TransformActionExecutor;
 import org.alfresco.repo.rule.condition.InCategoryEvaluator;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
+import org.alfresco.repo.rule.condition.NoConditionEvaluator;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
@@ -309,6 +311,44 @@ public class RuleServiceSystemTest extends TestCase
             throw new RuntimeException(exception);
         }
     }
+    
+    /**
+     * Test:
+     *          rule type:  inbound
+     *          condition:  no-condition
+     *          action:     link-category  
+     */
+    public void testLinkCategoryAction()
+    {        
+        this.ruleService.makeActionable(this.nodeRef);
+        
+        RuleType ruleType = this.ruleService.getRuleType("inbound");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition(NoConditionEvaluator.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition(LinkCategoryActionExecutor.NAME);
+        
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(LinkCategoryActionExecutor.PARAM_CATEGORY_ASPECT, this.regionCategorisationQName);
+        params.put(LinkCategoryActionExecutor.PARAM_CATEGORY_VALUE, this.catROne); 
+        
+        Rule rule = this.ruleService.createRule(ruleType);
+        rule.addRuleCondition(cond, null);
+        rule.addRuleAction(action, params);
+        
+        this.ruleService.addRule(this.nodeRef, rule);
+                
+        // Check rule does not get fired when a node without the aspect is added
+        NodeRef newNodeRef2 = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "noAspect"),
+                ContentModel.TYPE_CONTAINER).getChildRef(); 
+        
+        // Check that the category value has been set
+        NodeRef setValue = (NodeRef)this.nodeService.getProperty(newNodeRef2, CAT_PROP_QNAME);
+        assertNotNull(setValue);
+        assertEquals(this.catROne, setValue);
+}
+        
     
     /**
      * Test:

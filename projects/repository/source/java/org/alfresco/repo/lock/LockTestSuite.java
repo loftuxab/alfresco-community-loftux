@@ -1,7 +1,5 @@
 package org.alfresco.repo.lock;
 
-import org.alfresco.repo.lock.impl.LockBehaviourImplTest;
-import org.alfresco.repo.lock.impl.LockServiceImplTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

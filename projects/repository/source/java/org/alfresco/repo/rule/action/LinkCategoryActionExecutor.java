@@ -111,7 +111,7 @@ public class LinkCategoryActionExecutor extends RuleActionExecutorAbstractBase
                 Map<QName, PropertyDefinition> propertyDefs = this.dictionaryService.getAspect(categoryAspect).getProperties();
                 for (Map.Entry<QName, PropertyDefinition> entry : propertyDefs.entrySet()) 
                 {
-                    if (PropertyTypeDefinition.CATEGORY.equals(entry.getValue().getPropertyType()) == true)
+                    if (PropertyTypeDefinition.CATEGORY.equals(entry.getValue().getPropertyType().getName()) == true)
                     {
                         // Found the category property
                         categoryProperty = entry.getKey();

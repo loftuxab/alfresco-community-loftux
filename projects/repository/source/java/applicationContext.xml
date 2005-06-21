@@ -462,7 +462,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.lock.impl.LockServiceImpl" init-method="initialise">
+         <bean class="org.alfresco.repo.lock.LockServiceImpl" init-method="initialise">
             <property name="nodeService">
                 <ref bean="nodeService" />
             </property>     
