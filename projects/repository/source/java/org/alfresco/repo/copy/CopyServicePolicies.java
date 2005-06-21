@@ -1,7 +1,7 @@
 /**
  * Created on May 10, 2005
  */
-package org.alfresco.repo.node.operations;
+package org.alfresco.repo.copy;
 
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.PolicyScope;
@@ -11,7 +11,7 @@ import org.alfresco.service.namespace.QName;
 /**
  * @author Roy Wetherall
  */
-public interface NodeOperationsServicePolicies 
+public interface CopyServicePolicies 
 {
 	/**
 	 * Policy invoked when a <b>node</b> is copied

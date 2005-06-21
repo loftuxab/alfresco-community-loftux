@@ -158,7 +158,7 @@
       </property>
    </bean>
    
-   <alias alias="AlfCopyService" name="nodeOperationsService"/>
+   <alias alias="AlfCopyService" name="copyService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
@@ -192,7 +192,7 @@
       </property>
    </bean>
 
-   <alias alias="AlfVersionService" name="lightWeightVersionStoreVersionService"/>
+   <alias alias="AlfVersionService" name="versionService"/>
 
    <bean parent="alfrescoService">
       <property name="name">
@@ -209,7 +209,7 @@
       </property>
    </bean>
 
-   <alias alias="AlfCheckoutCheckinService" name="versionOperationsService"/>
+   <alias alias="AlfCheckoutCheckinService" name="checkOutCheckInService"/>
 
    <bean parent="alfrescoService">
       <property name="name">

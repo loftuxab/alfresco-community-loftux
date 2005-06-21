@@ -132,7 +132,7 @@
 		 <ref bean="contentService"/>
 	  </property>
 	  <property name="copyService">
-		 <ref bean="nodeOperationsService"/>
+		 <ref bean="copyService"/>
 	  </property>	  
 	</bean>
 	
@@ -141,7 +141,7 @@
 		 <ref bean="nodeService"/>
 	  </property>
 	  <property name="copyService">
-		 <ref bean="nodeOperationsService"/>
+		 <ref bean="copyService"/>
 	  </property>
    </bean>
 	   

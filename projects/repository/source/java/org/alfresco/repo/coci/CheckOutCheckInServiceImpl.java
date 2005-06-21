@@ -53,9 +53,9 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	private LockService lockService;
 	
 	/**
-	 * The node operations service
+	 * The copy service
 	 */
-	private CopyService nodeOperationsService;
+	private CopyService copyService;
 	
 	/**
 	 * Policy component
@@ -93,14 +93,14 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	}
 	
 	/**
-	 * Sets the node operations service
-	 * 
-	 * @param nodeOperationsService  the node operations service
+     * Sets the copy service
+     *  
+     * @param copyService  the copy service
 	 */
-	public void setNodeOperationsService(
-			CopyService nodeOperationsService) 
+	public void setCopyService(
+			CopyService copyService) 
 	{
-		this.nodeOperationsService = nodeOperationsService;
+		this.copyService = copyService;
 	}
 	
 	/**
@@ -128,7 +128,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	/**
 	 * onCopy policy behaviour
 	 * 
-	 * @see org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyPolicy#onCopy(ClassRef, NodeRef, PolicyScope)
+	 * @see org.alfresco.repo.node.operations.CopyServicePolicies.OnCopyPolicy#onCopy(ClassRef, NodeRef, PolicyScope)
 	 * 
 	 * @param sourceClassRef  the source class reference
 	 * @param sourceNodeRef	  the source node reference
@@ -163,7 +163,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		}
 		
 		// Make the working copy
-		NodeRef workingCopy = this.nodeOperationsService.copy(
+		NodeRef workingCopy = this.copyService.copy(
 				nodeRef,
 				destinationParentNodeRef,
 				destinationAssocTypeQName,
@@ -236,7 +236,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			this.lockService.unlock(nodeRef, LockService.LOCK_USER);
 			
 			// Copy the contents of the working copy onto the origional
-			this.nodeOperationsService.copy(workingCopyNodeRef, nodeRef);
+			this.copyService.copy(workingCopyNodeRef, nodeRef);
 			
 			if (versionProperties != null)
 			{

@@ -1,7 +1,7 @@
 /**
  * Created on May 5, 2005
  */
-package org.alfresco.repo.node.operations.impl;
+package org.alfresco.repo.copy;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.node.operations.NodeOperationsServicePolicies;
-import org.alfresco.repo.node.operations.NodeOperationsServicePolicies.OnCopyNodePolicy;
+import org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -41,7 +40,7 @@ import org.alfresco.util.ParameterCheck;
  * 
  * @author Roy Wetherall
  */
-public class NodeOperationsServiceImpl implements CopyService
+public class CopyServiceImpl implements CopyService
 {
     /**
      * The node service
@@ -99,7 +98,7 @@ public class NodeOperationsServiceImpl implements CopyService
 	public void init()
 	{
 		// Register the policies
-		this.onCopyNodeDelegate = this.policyComponent.registerClassPolicy(NodeOperationsServicePolicies.OnCopyNodePolicy.class);
+		this.onCopyNodeDelegate = this.policyComponent.registerClassPolicy(CopyServicePolicies.OnCopyNodePolicy.class);
 		
 		// Register policy behaviours
 		this.policyComponent.bindClassBehaviour(
@@ -238,14 +237,14 @@ public class NodeOperationsServiceImpl implements CopyService
 	 */
 	private void invokeOnCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
 	{
-		Collection<NodeOperationsServicePolicies.OnCopyNodePolicy> policies = this.onCopyNodeDelegate.getList(sourceClassRef);
+		Collection<CopyServicePolicies.OnCopyNodePolicy> policies = this.onCopyNodeDelegate.getList(sourceClassRef);
 		if (policies.isEmpty() == true)
 		{
 			defaultOnCopy(sourceClassRef, sourceNodeRef, copyDetails);
 		}
 		else
 		{
-			for (NodeOperationsServicePolicies.OnCopyNodePolicy policy : policies) 
+			for (CopyServicePolicies.OnCopyNodePolicy policy : policies) 
 			{
 				policy.onCopyNode(sourceClassRef, sourceNodeRef, copyDetails);
 			}

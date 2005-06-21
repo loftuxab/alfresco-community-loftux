@@ -21,7 +21,6 @@ import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
-import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * Version operations service implementation unit tests
@@ -121,8 +120,8 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	 */
 	private NodeRef checkout()
 	{
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		// Check out the node
 		NodeRef workingCopy = this.cociService.checkout(

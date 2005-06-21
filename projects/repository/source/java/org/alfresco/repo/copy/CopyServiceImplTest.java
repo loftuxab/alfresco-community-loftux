@@ -1,7 +1,7 @@
 /**
  * Created on May 10, 2005
  */
-package org.alfresco.repo.node.operations.impl;
+package org.alfresco.repo.copy;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -17,11 +17,11 @@ import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.M2Property;
 import org.alfresco.repo.dictionary.impl.M2Type;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -29,14 +29,13 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
-import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * Node operations service unit tests
  * 
  * @author Roy Wetherall
  */
-public class NodeOperationsServiceImplTest extends BaseSpringTest 
+public class CopyServiceImplTest extends BaseSpringTest 
 {
 	/**
 	 * Services used by the tests
@@ -105,7 +104,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 	{
 		// Set the services
 		this.nodeService = (NodeService)this.applicationContext.getBean("dbNodeService");
-		this.nodeOperationsService = (CopyService)this.applicationContext.getBean("nodeOperationsService");
+		this.nodeOperationsService = (CopyService)this.applicationContext.getBean("copyService");
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
 		
 		// Create the test model
@@ -288,11 +287,7 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
         // TODO check copying from a versioned copy
 		// TODO check copying from a lockable copy
 		
-		// Check copying from a node with content
-		//Map<QName, Serializable>contentProperties = new HashMap<QName, Serializable>();
-		//contentProperties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE, "text/plain");
-		//contentProperties.put(DictionaryBootstrap.PROP_QNAME_ENCODING, "UTF-8");
-		//this.nodeService.addAspect(this.sourceNodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);		
+		// Check copying from a node with content	
 		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.sourceNodeRef);
 		contentWriter.putContent(SOME_CONTENT);		
 		NodeRef copyWithContent = this.nodeOperationsService.copy(
@@ -301,15 +296,14 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
                 TEST_CHILD_ASSOC_TYPE_QNAME,
 				QName.createQName("{test}copyWithContent"));
 		checkCopiedNode(this.sourceNodeRef, copyWithContent, true, true, false);
-		//assertTrue(this.nodeService.hasAspect(copyWithContent, DictionaryBootstrap.ASPECT_QNAME_CONTENT));
 		ContentReader contentReader = this.contentService.getReader(copyWithContent);
 		assertNotNull(contentReader);
 		assertEquals(SOME_CONTENT, contentReader.getContentString());
 		
 		// TODO check copying to a different store
 		
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 	}	
 	
 	public void testCopyToExistingNode()
@@ -325,8 +319,8 @@ public class NodeOperationsServiceImplTest extends BaseSpringTest
 		
 		// TODO check copying nodes between stores
 		
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 	}
 	
 	/**

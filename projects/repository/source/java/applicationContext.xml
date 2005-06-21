@@ -626,10 +626,10 @@
    </bean>
    
    <!--                 -->
-   <!-- Node Operations Service (should change to the workspace service)-->
+   <!-- Copy Service    -->
    <!--                 -->
    
-   <bean id="nodeOperationsService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="copyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.repository.CopyService</value>
       </property>
@@ -637,7 +637,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.node.operations.impl.NodeOperationsServiceImpl" init-method="init">
+         <bean class="org.alfresco.repo.copy.CopyServiceImpl" init-method="init">
             <property name="dictionaryService">
                <ref bean="dictionaryService" />
             </property>
@@ -678,8 +678,8 @@
             <property name="lockService">
                <ref bean="lockService" />
             </property>
-            <property name="nodeOperationsService">
-               <ref bean="nodeOperationsService" />
+            <property name="copyService">
+               <ref bean="copyService" />
             </property>			
             <property name="policyComponent">
                <ref bean="policyComponent" />
