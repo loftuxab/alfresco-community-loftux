@@ -99,6 +99,9 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          List<NodeRef> nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
          if (nodes.size() == 0)
          {
+            if (logger.isDebugEnabled())
+                logger.debug("Importing bootstrap data into store: " + repoStoreName + "...");
+             
             // Construct binding values for import
             String companySpaceDescription = Application.getCompanyRootDescription(servletContext);
             String glossaryFolderName = Application.getGlossaryFolderName(servletContext);
@@ -129,6 +132,9 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 
             // Find company root after import
             nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Bootstrap data imported into store: " + repoStoreName);
          }
          // Extract company space id
          companySpaceId = nodes.get(0).getId();

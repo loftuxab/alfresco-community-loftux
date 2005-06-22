@@ -103,7 +103,7 @@
                                     <td valign="top">Category:</td>
                                     <td width="90%">
                                        <r:categorySelector label="Click here to select a category" 
-                                                        value="#{NewRuleWizard.actionProperties.category}" 
+                                                        value="#{NewRuleWizard.conditionProperties.category}" 
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
                                     </td>
                                  </tr>
@@ -121,7 +121,7 @@
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" 
-                                                        disabled="#{NewRuleWizard.actionProperties.category == null}" />
+                                                        disabled="#{NewRuleWizard.conditionProperties.category == null}" />
                                     </td>
                                  </tr>
                                  <tr>

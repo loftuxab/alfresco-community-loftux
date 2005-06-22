@@ -9,6 +9,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 
 public class ImporterComponentTest extends BaseSpringTest
@@ -31,7 +32,7 @@ public class ImporterComponentTest extends BaseSpringTest
     }
 
     
-    public void testImport()
+    public void xtestImport()
     {
         InputStream test = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/importer/importercomponent_test.xml");
         TestProgress testProgress = new TestProgress();
@@ -55,7 +56,7 @@ public class ImporterComponentTest extends BaseSpringTest
         importerBootstrap.setStoreId(this.storeRef.getIdentifier());
         importerBootstrap.setConfiguration(configuration);
         importerBootstrap.bootstrap();
-        //System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
     
     

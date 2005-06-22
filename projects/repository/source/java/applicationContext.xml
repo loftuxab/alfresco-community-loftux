@@ -957,6 +957,10 @@
                <prop key="path">/alf:${companySpaceName}/alf:${glossaryName}/alf:${templatesName}</prop>
                <prop key="location">org/alfresco/model/templates/spaces.xml</prop>
             </props>
+            <props>
+               <prop key="path">/alf:categories</prop>
+               <prop key="location">org/alfresco/model/categories.xml</prop>
+            </props>
          </list>
       </property>
    </bean>

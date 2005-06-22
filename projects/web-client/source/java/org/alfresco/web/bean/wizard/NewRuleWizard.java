@@ -125,7 +125,7 @@ public class NewRuleWizard extends AbstractWizardBean
             conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY_VALUE, catNodeRef);
             
             // add the classifiable aspect
-            conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_CLASSIFIABLE);
+            conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_GEN_CLASSIFIABLE);
          }
          
          // set up parameters maps for the action
@@ -226,7 +226,7 @@ public class NewRuleWizard extends AbstractWizardBean
          {
             // add the classifiable aspect
             actionParams.put(LinkCategoryActionExecutor.PARAM_CATEGORY_ASPECT,
-                  ContentModel.ASPECT_CLASSIFIABLE);
+                  ContentModel.ASPECT_GEN_CLASSIFIABLE);
             
             // put the selected category in the action params
             NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(), 

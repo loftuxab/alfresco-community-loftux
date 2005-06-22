@@ -23,5 +23,9 @@
          </alf:folder>
       </alf:contains>
    </alf:folder>
+   
+   <alf:folder>
+      <alf:name>categories</alf:name>
+   </alf:folder>
 
 </v:view>
