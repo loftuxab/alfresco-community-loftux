@@ -119,7 +119,7 @@
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
                      <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" />
+                     <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

@@ -16,7 +16,7 @@
       <r:propertySheetGrid value="/sop.txt" var="node3">
       </r:propertySheetGrid>
 
-      <div style="color:red;"><h:messages/></div>
+      <div style="color:red;"><h:messages layout="table" /></div>
       <br/>
       <h:commandButton value="Update Properties" action="#{node3.persist}"/>
    
@@ -31,7 +31,7 @@
       <r:propertySheetGrid value="/sop.txt" var="node4" externalConfig="true">
       </r:propertySheetGrid>
    
-      <div style="color:red;"><h:messages/></div>
+      <div style="color:red;"><h:messages layout="table" /></div>
       <br/>
       <h:commandButton value="Update Properties" action="#{node4.persist}"/>
 

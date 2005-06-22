@@ -93,7 +93,7 @@
                                     <td>
                                        <%-- Error Messages --%>
                                        <%-- messages tag to show messages not handled by other specific message tags --%>
-                                       <h:messages globalOnly="true" styleClass="errorMessage" />
+                                       <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                                     <td>
                                  </tr>
                               </table>

@@ -107,15 +107,15 @@
                                       label="More..." tooltip="More Actions for this document" style="padding-left:20px">
                                  <%-- edit, update and cut --%>
                                  <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false}">
-                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" padding="4" 
+                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif"
                                                   actionListener="#{CheckinCheckoutBean.editFile}">
                                        <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                     </a:actionLink>
-                                    <a:actionLink value="#{msg.update}" image="/images/icons/update.gif" padding="4" 
+                                    <a:actionLink value="#{msg.update}" image="/images/icons/update.gif"
                                                   actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
                                        <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                     </a:actionLink>
-                                    <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" padding="4" 
+                                    <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif"
                                                   actionListener="#{ClipboardBean.cutNode}">
                                        <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                     </a:actionLink>
@@ -123,14 +123,14 @@
                                  </a:booleanEvaluator>
                                  
                                  <%-- copy --%>
-                                 <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" padding="4" 
+                                 <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif"
                                                actionListener="#{ClipboardBean.copyNode}">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                  </a:actionLink>
                                     
                                  <%-- delete --%>
                                  <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
-                                    <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" padding="4"
+                                    <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif"
                                                   actionListener="#{BrowseBean.setupContentAction}" action="deleteFile">
                                        <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                     </a:actionLink>
@@ -169,7 +169,7 @@
                                  <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
-                                 <h:messages styleClass="errorMessage" />
+                                 <h:messages styleClass="errorMessage" layout="table" />
                               </a:panel>
                               <br/>
                               <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"

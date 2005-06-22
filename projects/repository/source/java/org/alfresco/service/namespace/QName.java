@@ -27,7 +27,7 @@ public final class QName implements QNamePattern, Serializable
     private static final char NAMESPACE_PREFIX = ':';
     private static final char NAMESPACE_BEGIN = '{';
     private static final char NAMESPACE_END = '}';
-    private static final char[] INVALID_CHARS = { '/', '.' };
+    private static final char[] INVALID_CHARS = { '/', '.', '{', '}' };
     private static final int MAX_LENGTH = 100;
 
     
@@ -191,7 +191,6 @@ public final class QName implements QNamePattern, Serializable
 
         return name;
     }
-
 
     /**
      * Construct QName

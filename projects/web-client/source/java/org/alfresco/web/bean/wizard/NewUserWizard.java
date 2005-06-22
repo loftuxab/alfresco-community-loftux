@@ -306,7 +306,7 @@ public class NewUserWizard extends AbstractWizardBean
             props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
             props.put(ContentModel.PROP_LASTNAME, this.lastName);
             String homeSpaceId;
-            if (this.homeSpaceLocation != null && this.homeSpaceName != null && this.homeSpaceName.length() != 0)
+            if (this.homeSpaceLocation != null)
             {
                homeSpaceId = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName);
             }
@@ -332,7 +332,7 @@ public class NewUserWizard extends AbstractWizardBean
             props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
             props.put(ContentModel.PROP_LASTNAME, this.lastName);
             String homeSpaceId;
-            if (this.homeSpaceLocation != null && this.homeSpaceName != null && this.homeSpaceName.length() != 0)
+            if (this.homeSpaceLocation != null)
             {
                homeSpaceId = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName);
             }
@@ -856,17 +856,65 @@ public class NewUserWizard extends AbstractWizardBean
    
    private String createHomeSpace(String locationId, String spaceName)
    {
-      FacesContext fc = FacesContext.getCurrentInstance();
-      StoreRef storeRef = Repository.getStoreRef();
+      String homeSpaceId = locationId;
+      if (spaceName != null && spaceName.length() != 0)
+      {
+         StoreRef storeRef = Repository.getStoreRef();
+         
+         // TODO: implement by adding namespace resolver to Path/elements
+         //       NOTE: QName already has toPrefixString() which may be useful
+         Path path = this.nodeService.getPath(new NodeRef(storeRef, locationId));
+         StringBuilder buf = new StringBuilder(64);
+         for (int i=0; i<path.size(); i++)
+         {
+            String elementString = "";
+            Path.Element element = path.get(i);
+            if (element instanceof Path.ChildAssocElement)
+            {
+               ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
+               if (elementRef.getParentRef() != null)
+               {
+                  if (NamespaceService.ALFRESCO_URI.equals(elementRef.getQName().getNamespaceURI()))
+                  {
+                     elementString = '/' + NamespaceService.ALFRESCO_PREFIX + ':' + elementRef.getQName().getLocalName();
+                  }
+               }
+            }
+            
+            buf.append(elementString);
+         }
+         
+         List<NodeRef> nodes = this.nodeService.selectNodes(
+               this.nodeService.getRootNode(storeRef), buf.toString(), null, this.namespaceService, false);
+         if (nodes.size() != 0)
+         {
+            // found the parent, create a new Space under it with the specified name
+            String qname = QName.createValidLocalName(spaceName);
+            ChildAssociationRef assocRef = this.nodeService.createNode(
+                  nodes.get(0),
+                  ContentModel.ASSOC_CONTAINS,
+                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+                  ContentModel.TYPE_FOLDER);
+            
+            NodeRef nodeRef = assocRef.getChildRef();
+            
+            // set the name property on the node
+            this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, spaceName);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Created Home Space for with name: " + spaceName);
+            
+            // apply the uifacets aspect - icon, title and description props
+            Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
+            uiFacetsProps.put(ContentModel.PROP_ICON, "space-icon-default");
+            uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
+            this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
+            
+            // return the ID of the created space
+            homeSpaceId = nodeRef.getId();
+         }
+      }
       
-      // TODO: implement by adding namespace resolver to Path/elements
-      //       NOTE: QName already has toPrefixString() which may be useful
-      
-      Path path = this.nodeService.getPath(new NodeRef(storeRef, locationId));
-      //this.nodeService.selectNodes(
-      //      this.nodeService.getRootNode(storeRef), "", null, this.namespaceService, false);
-      //this.nodeService.exists(new NodeRef(storeRef, locationId));
-      
-      return locationId;
+      return homeSpaceId;
    }
 }

@@ -29,7 +29,7 @@
          <!-- TODO: Put the keywords in here to test the custom converter tag -->
       </r:propertySheetGrid>
    
-      <div style="color:red;"><h:messages/></div>
+      <div style="color:red;"><h:messages layout="table" /></div>
       <br/>
       <h:commandButton value="Update Properties" action="#{node.persist}"/>  
    
@@ -49,7 +49,7 @@
          <r:property value="non-existent" columns="1" />
       </r:propertySheetGrid>
 
-      <div style="color:red;"><h:messages/></div>
+      <div style="color:red;"><h:messages layout="table" /></div>
       <br/>
       <h:commandButton value="Update Properties" action="#{node2.persist}"/>
 

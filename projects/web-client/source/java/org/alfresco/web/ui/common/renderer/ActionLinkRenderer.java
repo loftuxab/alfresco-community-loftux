@@ -140,6 +140,7 @@ public class ActionLinkRenderer extends BaseRenderer
          int padding = link.getPadding();
          if (padding != 0)
          {
+            // TODO: change this to not wrap the whole table in a link - dodgy on Firefox!!
             // need the crappy "cursor:hand" embedded style for IE support
             // TODO: make this width value a property!
             buf.append("<table cellspacing=0 cellpadding=0 style=\"cursor:hand\"><tr><td width=16>");

@@ -103,7 +103,7 @@
                                  <r:propertySheetGrid id="space-props" value="#{BrowseBean.actionSpace}" var="spaceProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
-                                 <h:messages styleClass="errorMessage" />
+                                 <h:messages styleClass="errorMessage" layout="table" />
                               </a:panel>
                               <br/>
                               <a:panel label="Rules" id="rules-panel" progressive="true" expanded="false"
