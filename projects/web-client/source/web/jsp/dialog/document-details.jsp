@@ -175,7 +175,7 @@
                               <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editSimpleWorkflow" linkIcon="/images/icons/Change_details.gif"
-                                       rendered="#{DocumentDetailsBean.approveStepName != null}">
+                                       rendered="#{DocumentDetailsBean.approveStepName != null}" linkTooltip="Modify">
                                  <h:outputText id="workflow-overview" value="#{DocumentDetailsBean.workflowOverviewHTML}" 
                                                escape="false" />
                               </a:panel>
@@ -185,13 +185,15 @@
                                  <h:outputText id="no-workflow-msg" value="This document is not part of any workflow." />
                               </a:panel>
                               <br/>
-                              <a:panel label="Categories" id="categories-panel" progressive="true" expanded="false"
+                              <a:panel label="Category" id="category-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       action="editCategory" actionListener="#{DocumentDetailsBean.setupCategoryForEdit}"
+                                       linkIcon="/images/icons/Change_details.gif" linkTooltip="Change Category"
                                        rendered="#{DocumentDetailsBean.categorised}">
                                  <h:outputText id="category-overview" value="#{DocumentDetailsBean.categoriesOverviewHTML}" 
                                                escape="false" />
                               </a:panel>
-                              <a:panel label="Categories" id="no-categories-panel" progressive="true" expanded="false"
+                              <a:panel label="Category" id="no-category-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.categorised == false}">
                                  <h:outputText id="no-category-msg" value="This document is not categorised." />

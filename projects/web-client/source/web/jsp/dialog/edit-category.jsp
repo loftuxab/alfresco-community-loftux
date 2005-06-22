@@ -10,28 +10,12 @@
 
 <r:page>
 
-<script language="JavaScript1.2">
-   function checkButtonState()
-   {
-      if (document.getElementById("edit-doc-properties:file-name").value.length == 0 ||
-          document.getElementById("edit-doc-properties:title").value.length == 0)
-      {
-         document.getElementById("edit-doc-properties:ok-button").disabled = true;
-      }
-      else
-      {
-         document.getElementById("edit-doc-properties:ok-button").disabled = false;
-      }
-   }
-</script>
-
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
-   <h:form id="edit-doc-properties">
+   <h:form id="edit-category">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -65,13 +49,13 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
-                           <td width="26">
+                           <td width="35">
                               <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
-                              <div class="mainTitle">Modify Properties of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
-                              <div class="mainSubText">Use this page to modify the document properties then click OK.</div>
+                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainTitle">Modify category of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainSubText">Use this page to set the category for the document then click OK.</div>
                            </td>
                         </tr>
                      </table>
@@ -96,56 +80,16 @@
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Document Properties</td>
-                                 </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>File&nbsp;Name:</td>
+                                    <td valign="top">Category:</td>
                                     <td width="90%">
-                                       <h:inputText id="file-name" value="#{EditDocPropsDialog.properties.name}" size="35" maxlength="1024"
-                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Content&nbsp;Type:</td>
-                                    <td>
-                                       <h:selectOneMenu value="#{EditDocPropsDialog.properties.mimetype}">
-                                          <f:selectItems value="#{EditDocPropsDialog.contentTypes}" />
-                                       </h:selectOneMenu>&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Title:</td>
-                                    <td>
-                                       <h:inputText id="title" value="#{EditDocPropsDialog.properties.title}" size="35" maxlength="1024"
-                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Description:</td>
-                                    <td>
-                                       <h:inputText value="#{EditDocPropsDialog.properties.description}" size="35" maxlength="1024" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>Author:</td>
-                                    <td>
-                                       <h:inputText value="#{EditDocPropsDialog.properties.creator}" size="35" maxlength="1024" />
+                                       <r:categorySelector label="Click here to select a category" 
+                                                        value="#{DocumentDetailsBean.category}" 
+                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Other Properties</td>
-                                 </tr>
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2">
-                                       <r:propertySheetGrid id="document-props" value="#{EditDocPropsDialog.editableNode}" 
-                                                            var="editDocProps" columns="1" 
-                                                            externalConfig="true" configArea="edit-properties" />
-                                    </td>
-                                 </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
@@ -155,9 +99,10 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="OK" action="#{EditDocPropsDialog.save}" styleClass="wizardButton" />
+                                       <h:commandButton value="OK" action="#{DocumentDetailsBean.saveCategory}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
+                                 <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="Cancel" action="cancel" styleClass="wizardButton" />

@@ -13,7 +13,7 @@
    
    <config>
       <server>
-         <mode>portlet</mode>
+         <mode>servlet</mode>
          <error-page>/jsp/error.jsp</error-page>
          <login-page>/jsp/login.jsp</login-page>
       </server>
@@ -93,13 +93,14 @@
    </config>
    
    <config evaluator="string-compare" condition="New Rule Wizard">
-      <features>
-         <feature id="compliancable" description="Compliancable"/>
-         <feature id="dublincore" description="Dublin Core"/>
-         <feature id="effectivity" description="Effectivity"/>
-         <feature id="summarizable" description="Summarizable"/>
-         <feature id="versionable" description="Versionable"/>
-      </features>
+      <aspects>
+         <aspect id="generalclassifiable" description="Classifiable"/>
+         <aspect id="compliancable" description="Compliancable"/>
+         <aspect id="dublincore" description="Dublin Core"/>
+         <aspect id="effectivity" description="Effectivity"/>
+         <aspect id="summarizable" description="Summarizable"/>
+         <aspect id="versionable" description="Versionable"/>
+      </aspects>
       <transformers>
          <transformer id="text/html" description="HTML" />
          <transformer id="application/pdf" description="PDF" />

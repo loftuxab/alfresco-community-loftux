@@ -2,6 +2,7 @@ package org.alfresco.web.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionHistory;
 import org.alfresco.service.cmr.version.VersionService;
@@ -42,6 +44,7 @@ public class DocumentDetailsBean
 {
    private static Logger logger = Logger.getLogger(DocumentDetailsBean.class);
    
+   private String category;
    private BrowseBean browseBean;
    private NodeService nodeService;
    private LockService lockService;
@@ -77,6 +80,26 @@ public class DocumentDetailsBean
    public String getUrl()
    {
       return (String)getDocument().getProperties().get("url");
+   }
+   
+   /**
+    * Returns the current category for this document
+    * 
+    * @return The current category as an id
+    */
+   public String getCategory()
+   {
+      return this.category;
+   }
+   
+   /**
+    * Sets the category to be used by the current document
+    * 
+    * @param category The new category 
+    */
+   public void setCategory(String category)
+   {
+      this.category = category;
    }
    
    /**
@@ -131,7 +154,7 @@ public class DocumentDetailsBean
     */
    public boolean isCategorised()
    {
-      return getDocument().hasAspect(ContentModel.ASPECT_CLASSIFIABLE);
+      return getDocument().hasAspect(ContentModel.ASPECT_GEN_CLASSIFIABLE);
    }
    
    /**
@@ -146,15 +169,90 @@ public class DocumentDetailsBean
       
       if (isCategorised())
       {
-         // retrieve the node ref representing the category
-         // applied to this document and create HTML overview
-         Map props = getDocument().getProperties();
+         // we know for now that the general classifiable aspect only will be
+         // applied so we can retrive the categories property direclty
+         NodeRef catNode = (NodeRef)this.nodeService.getProperty(this.browseBean.getDocument().getNodeRef(), 
+               ContentModel.PROP_CATEGORIES);
          
+          if (catNode == null)
+          {
+             html = "This document does not yet have a category applied.";
+          }
+          else
+          {
+             html = "This document has the following category applied: " + 
+                   Repository.getNameForNode(this.nodeService, catNode);
+          }
       }
       
       return html;
    }
 
+   /**
+    * Event handler called to setup the category for editing
+    * 
+    * @param event The event
+    */
+   public void setupCategoryForEdit(ActionEvent event)
+   {
+      NodeRef catNode = (NodeRef)this.nodeService.getProperty(this.browseBean.getDocument().getNodeRef(), 
+               ContentModel.PROP_CATEGORIES);
+      
+      if (catNode != null)
+      {
+         this.category = catNode.getId();
+      }
+      else
+      {
+         this.category = null;
+      }
+   }
+   
+   /**
+    * Updates the category for the current document to the category stored
+    * by this.newCategory
+    *  
+    * @return The outcome
+    */
+   public String saveCategory()
+   {
+      String outcome = "cancel";
+      
+      UserTransaction tx = null;
+      
+      try
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx.begin();
+         
+         // firstly retrieve all the properties for the current node
+         Map<QName, Serializable> updateProps = this.nodeService.getProperties(
+               getDocument().getNodeRef());
+         
+         // create a node ref representation of the selected id and set the new properties
+         updateProps.put(ContentModel.PROP_CATEGORIES, new NodeRef(Repository.getStoreRef(), this.category));
+         
+         // set the properties on the node
+         this.nodeService.setProperties(getDocument().getNodeRef(), updateProps);
+         
+         // commit the transaction
+         tx.commit();
+         
+         // reset the state of the current document so it reflects the changes just made
+         getDocument().reset();
+         
+         outcome = "finish";
+      }
+      catch (Throwable e)
+      {
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new AlfrescoRuntimeException("Failed to update category", e);
+      }
+      
+      return outcome;
+   }
+   
    /**
     * Returns an overview summary of the current state of the attached
     * workflow (if any)

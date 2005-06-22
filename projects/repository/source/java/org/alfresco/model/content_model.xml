@@ -693,7 +693,7 @@
          <properties>
             <property name="alf:categories">
                <type>d:category</type>
-               <mandatory>true</mandatory>
+               <mandatory>false</mandatory>
                <multiple>true</multiple>
                <index enabled="true">
                   <atomic>true</atomic>

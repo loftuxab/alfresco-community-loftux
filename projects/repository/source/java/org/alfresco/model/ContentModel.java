@@ -61,6 +61,7 @@ public interface ContentModel
     //static final QName ASPECT_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_categorisation");
     static final QName ASPECT_GEN_CLASSIFIABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "generalclassifiable");
     static final QName TYPE_CATEGORY = QName.createQName(NamespaceService.ALFRESCO_URI, "category");
+    static final QName PROP_CATEGORIES = QName.createQName(NamespaceService.ALFRESCO_URI, "categories");
 
     // lock aspect
     public final static QName ASPECT_LOCKABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "lockable");

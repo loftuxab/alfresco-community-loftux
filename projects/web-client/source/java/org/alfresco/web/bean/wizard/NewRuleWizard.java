@@ -51,7 +51,7 @@ public class NewRuleWizard extends AbstractWizardBean
    // parameter names for conditions and actions
    public static final String PROP_CONTAINS_TEXT = "containstext";
    public static final String PROP_CATEGORY = "category";
-   public static final String PROP_FEATURE = "feature";
+   public static final String PROP_ASPECT = "aspect";
    public static final String PROP_DESTINATION = "destinationLocation";
    public static final String PROP_APPROVE_STEP_NAME = "approveStepName";
    public static final String PROP_APPROVE_ACTION = "approveAction";
@@ -87,7 +87,7 @@ public class NewRuleWizard extends AbstractWizardBean
    private List<SelectItem> conditions;
    private List<SelectItem> actions;
    private List<SelectItem> transformers;
-   private List<SelectItem> features;
+   private List<SelectItem> aspects;
    private Map<String, String> conditionDescriptions;
    private Map<String, String> actionDescriptions;
    private Map<String, String> conditionProperties;
@@ -135,7 +135,7 @@ public class NewRuleWizard extends AbstractWizardBean
             // create QName representation of the chosen feature
             // TODO: handle namespaces, for now presume it is in alfresco namespace
             QName aspect = QName.createQName(NamespaceService.ALFRESCO_URI, 
-                  this.actionProperties.get(PROP_FEATURE));
+                  this.actionProperties.get(PROP_ASPECT));
             
             actionParams.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, aspect);
          }
@@ -589,7 +589,7 @@ public class NewRuleWizard extends AbstractWizardBean
       if (this.action.equals(AddFeaturesActionExecutor.NAME))
       {
          QName aspect = (QName)actionProps.get(AddFeaturesActionExecutor.PARAM_ASPECT_NAME);
-         this.actionProperties.put(PROP_FEATURE, aspect.getLocalName());
+         this.actionProperties.put(PROP_ASPECT, aspect.getLocalName());
       }
       else if (this.action.equals(CopyActionExecutor.NAME))
       {
@@ -915,32 +915,32 @@ public class NewRuleWizard extends AbstractWizardBean
    }
    
    /**
-    * Returns the features that are available
+    * Returns the aspects that are available
     * 
-    * @return List of SelectItem objects representing the available features
+    * @return List of SelectItem objects representing the available aspects
     */
-   public List<SelectItem> getFeatures()
+   public List<SelectItem> getAspects()
    {
-      if (this.features == null)
+      if (this.aspects == null)
       {
          ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
                FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
          Config wizardCfg = svc.getConfig("New Rule Wizard");
          if (wizardCfg != null)
          {
-            ConfigElement featuresCfg = wizardCfg.getConfigElement("features");
-            if (featuresCfg != null)
+            ConfigElement aspectsCfg = wizardCfg.getConfigElement("aspects");
+            if (aspectsCfg != null)
             {               
-               this.features = new ArrayList<SelectItem>();
-               for (ConfigElement child : featuresCfg.getChildren())
+               this.aspects = new ArrayList<SelectItem>();
+               for (ConfigElement child : aspectsCfg.getChildren())
                {
-                  this.features.add(new SelectItem(child.getAttribute("id"), 
+                  this.aspects.add(new SelectItem(child.getAttribute("id"), 
                         child.getAttribute("description")));
                }
             }
             else
             {
-               logger.warn("Could not find features configuration element");
+               logger.warn("Could not find aspects configuration element");
             }
          }
          else
@@ -949,7 +949,7 @@ public class NewRuleWizard extends AbstractWizardBean
          }
       }
       
-      return this.features;
+      return this.aspects;
    }
    
    /**
