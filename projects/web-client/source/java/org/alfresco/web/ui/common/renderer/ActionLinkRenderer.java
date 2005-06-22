@@ -91,16 +91,16 @@ public class ActionLinkRenderer extends BaseRenderer
     */
    private String renderActionLink(FacesContext context, UIActionLink link)
    {
-      StringBuilder buf = new StringBuilder(256);
-      
       Map attrs = link.getAttributes();
+      StringBuilder linkBuf = new StringBuilder(256);
+      
       if (attrs.get("href") == null)
       {
-         buf.append("<a href='#' onclick=\"");
+         linkBuf.append("<a href='#' onclick=\"");
          // generate JavaScript to set a hidden form field and submit
          // a form which request attributes that we can decode
-         buf.append(Utils.generateFormSubmit(context, link, Utils.getActionHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
-         buf.append('"');
+         linkBuf.append(Utils.generateFormSubmit(context, link, Utils.getActionHiddenFieldName(context, link), link.getClientId(context), getParameterMap(link)));
+         linkBuf.append('"');
       }
       else
       {
@@ -109,47 +109,55 @@ public class ActionLinkRenderer extends BaseRenderer
          {
             href = context.getExternalContext().getRequestContextPath() + href;
          }
-         buf.append("<a href=\"")
-            .append(href)
-            .append('"');
+         linkBuf.append("<a href=\"")
+                .append(href)
+                .append('"');
          
          // TODO: support 'target' attribute?
       }
       
       if (attrs.get("style") != null)
       {
-         buf.append(" style=\"")
-            .append(attrs.get("style"))
-            .append('"');
+         linkBuf.append(" style=\"")
+                .append(attrs.get("style"))
+                .append('"');
       }
       if (attrs.get("styleClass") != null)
       {
-         buf.append(" class=")
-            .append(attrs.get("styleClass"));
+         linkBuf.append(" class=")
+                .append(attrs.get("styleClass"));
       }
       if (attrs.get("tooltip") != null)
       {
-         buf.append(" title=\"")
-            .append(Utils.encode((String)attrs.get("tooltip")))
-            .append('"');
+         linkBuf.append(" title=\"")
+                .append(Utils.encode((String)attrs.get("tooltip")))
+                .append('"');
       }
-      buf.append('>');
+      linkBuf.append('>');
       
+      StringBuilder buf = new StringBuilder(350);
       if (link.getImage() != null)
       {
          int padding = link.getPadding();
          if (padding != 0)
          {
-            // TODO: change this to not wrap the whole table in a link - dodgy on Firefox!!
-            // need the crappy "cursor:hand" embedded style for IE support
             // TODO: make this width value a property!
-            buf.append("<table cellspacing=0 cellpadding=0 style=\"cursor:hand\"><tr><td width=16>");
+            buf.append("<table cellspacing=0 cellpadding=0><tr><td width=16>");
+         }
+         
+         if (link.getShowLink() == false)
+         {
+            buf.append(linkBuf.toString());
          }
          
          // TODO: allow configuring of alignment attribute
          buf.append(Utils.buildImageTag(context, link.getImage(), (String)link.getValue(), "absmiddle"));
          
-         if (link.getShowLink() == true)
+         if (link.getShowLink() == false)
+         {
+            buf.append("</a>");
+         }
+         else
          {
             if (padding != 0)
             {
@@ -173,7 +181,9 @@ public class ActionLinkRenderer extends BaseRenderer
             }
             
             // TODO: encode label value
+            buf.append(linkBuf.toString());
             buf.append(Utils.encode(link.getValue().toString()));
+            buf.append("</a>");
             
             if (padding == 0)
             {
@@ -188,10 +198,10 @@ public class ActionLinkRenderer extends BaseRenderer
       }
       else
       {
+         buf.append(linkBuf.toString());
          buf.append(Utils.encode(link.getValue().toString()));
+         buf.append("</a>");
       }
-      
-      buf.append("</a>");
       
       return buf.toString();
    }
