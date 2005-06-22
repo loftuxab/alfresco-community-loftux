@@ -64,7 +64,7 @@ Navigate to the 'C:\alfresco' folder and run 'startup.bat'
 - when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
 - you can now try Alfresco by visiting:
 
-http://localhost:8080/web-client/faces/jsp/browse/browse.jsp
+http://localhost:8080
 
 To test the installation, you may wish to follow the tutorial, available from:
 
