@@ -20,10 +20,13 @@ public class CachingDateFormat extends SimpleDateFormat
 {
     private static final long serialVersionUID = 3258415049197565235L;
 
+    /** <pre> yyyy-MM-dd'T'HH:mm:ss </pre> */
     public static final String FORMAT_FULL_GENERIC = "yyyy-MM-dd'T'HH:mm:ss";
 
+    /** <pre> yyyy-MM-dd </pre> */
     public static final String FORMAT_DATE_GENERIC = "yyyy-MM-dd";
 
+    /** <pre> HH:mm:ss </pre> */
     public static final String FORMAT_TIME_GENERIC = "HH:mm:ss";
 
     private static ThreadLocal<SimpleDateFormat> s_localDateFormat = new ThreadLocal<SimpleDateFormat>();
@@ -111,6 +114,8 @@ public class CachingDateFormat extends SimpleDateFormat
 
     /**
      * @return Returns a thread-safe formatter for the generic date/time format
+     * 
+     * @see #FORMAT_FULL_GENERIC
      */
     public static SimpleDateFormat getDateFormat()
     {
@@ -130,6 +135,8 @@ public class CachingDateFormat extends SimpleDateFormat
 
     /**
      * @return Returns a thread-safe formatter for the generic date format
+     * 
+     * @see #FORMAT_DATE_GENERIC
      */
     public static SimpleDateFormat getDateOnlyFormat()
     {
@@ -149,6 +156,8 @@ public class CachingDateFormat extends SimpleDateFormat
 
     /**
      * @return Returns a thread-safe formatter for the generic time format
+     * 
+     * @see #FORMAT_TIME_GENERIC
      */
     public static SimpleDateFormat getTimeOnlyFormat()
     {
