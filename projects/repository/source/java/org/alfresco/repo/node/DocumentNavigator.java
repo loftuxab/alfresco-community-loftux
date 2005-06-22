@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -21,9 +22,9 @@ import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.jaxen.DefaultNavigator;
+import org.jaxen.JaxenException;
 import org.jaxen.UnsupportedAxisException;
 import org.jaxen.XPath;
-import org.saxpath.SAXPathException;
 
 /**
  * An implementation of the Jaxen xpath against the node service API
@@ -38,9 +39,8 @@ import org.saxpath.SAXPathException;
  */
 public class DocumentNavigator extends DefaultNavigator
 {
-
-    private NodeService nodeService; 
-    
+    private DictionaryService dictionaryService;
+    private NodeService nodeService;
     private NamespacePrefixResolver nspr;
     
     // Support classes to encapsulate stuff more akin to xml
@@ -65,34 +65,38 @@ public class DocumentNavigator extends DefaultNavigator
 
     private boolean followAllParentLinks;
 
-    public DocumentNavigator(NodeService nodeService, NamespacePrefixResolver nspr, boolean followAllParentLinks)
+    public DocumentNavigator(
+            DictionaryService dictionaryService,
+            NodeService nodeService,
+            NamespacePrefixResolver nspr,
+            boolean followAllParentLinks)
     {
         super();
+        this.dictionaryService = dictionaryService;
         this.nodeService = nodeService;
         this.nspr = nspr;
         this.followAllParentLinks = followAllParentLinks;
     }
 
-    @Override
     public String getAttributeName(Object o)
     {
         // Get the local name
         return ((Property)o).qname.getLocalName();
     }
 
-    @Override
+    
     public String getAttributeNamespaceUri(Object o)
     {
         return ((Property)o).qname.getNamespaceURI();
     }
 
-    @Override
+    
     public String getAttributeQName(Object o)
     {
         return ((Property)o).qname.toString();
     }
 
-    @Override
+    
     public String getAttributeStringValue(Object o)
     {
         // Only the first property of multi-valued properties is displayed
@@ -100,68 +104,68 @@ public class DocumentNavigator extends DefaultNavigator
         return ValueConverter.convert(String.class, ((Property)o).value);
     }
 
-    @Override
+    
     public String getCommentStringValue(Object o)
     {
         // There is no attribute that is a comment
         throw new UnsupportedOperationException("Comment string values are unsupported");
     }
 
-    @Override
+    
     public String getElementName(Object o)
     {
          return ((ChildAssociationRef)o).getQName().getLocalName();
     }
 
-    @Override
+    
     public String getElementNamespaceUri(Object o)
     {
         return ((ChildAssociationRef)o).getQName().getNamespaceURI();
     }
 
-    @Override
+    
     public String getElementQName(Object o)
     {
         return ((ChildAssociationRef)o).getQName().toString();
     }
 
-    @Override
+    
     public String getElementStringValue(Object o)
     {
         throw new UnsupportedOperationException("Element string values are unsupported");
     }
 
-    @Override
+    
     public String getNamespacePrefix(Object o)
     {
         return ((Namespace)o).prefix;
     }
 
-    @Override
+    
     public String getNamespaceStringValue(Object o)
     {
         return ((Namespace)o).uri;
     }
 
-    @Override
+    
     public String getTextStringValue(Object o)
     {
       throw new UnsupportedOperationException("Text nodes are unsupported");
     }
 
-    @Override
+    
     public boolean isAttribute(Object o)
     {
        return (o instanceof Property);
     }
 
-    @Override
+    
     public boolean isComment(Object o)
     {
        return false;
     }
 
-    @Override
+    
     public boolean isDocument(Object o)
     {
        if(!(o  instanceof ChildAssociationRef))
@@ -172,34 +176,33 @@ public class DocumentNavigator extends DefaultNavigator
        return (car.getParentRef() == null) && (car.getQName() == null);
     }
 
-    @Override
+    
     public boolean isElement(Object o)
     {
         return (o  instanceof ChildAssociationRef);
     }
 
-    @Override
+    
     public boolean isNamespace(Object o)
     {
        return (o instanceof Namespace);
     }
 
-    @Override
+    
     public boolean isProcessingInstruction(Object o)
     {
         return false;
     }
 
-    @Override
+    
     public boolean isText(Object o)
     {
         return false;
     }
 
-    @Override
-    public XPath parseXPath(String o) throws SAXPathException
+    public XPath parseXPath(String o) throws JaxenException
     {
-        return new NodeServiceXPath(o, nodeService, nspr, null, followAllParentLinks);
+        return new NodeServiceXPath(o, dictionaryService, nodeService, nspr, null, followAllParentLinks);
     }
 
     // Basic navigation support
@@ -289,4 +292,10 @@ public class DocumentNavigator extends DefaultNavigator
        return nodeService.contains(childRef, qname, sqlLikePattern);
     }
     
+    public Boolean isSubtypeOf(NodeRef nodeRef, QName typeQName)
+    {
+        // get the type of the node
+        QName nodeTypeQName = nodeService.getType(nodeRef);
+        return dictionaryService.isSubClass(nodeTypeQName, typeQName);
+    }
 }

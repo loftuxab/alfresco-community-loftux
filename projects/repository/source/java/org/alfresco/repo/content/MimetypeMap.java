@@ -29,6 +29,7 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_PDF = "application/pdf";
     public static final String MIMETYPE_WORD = "application/msword";
     public static final String MIMETYPE_EXCEL = "application/vnd.excel";
+    public static final String MIMETYPE_BINARY = "application/octet-stream";
     
     private static final String CONFIG_AREA = "mimetype-map";
     private static final String CONFIG_CONDITION = "Mimetype Map";
@@ -180,5 +181,21 @@ public class MimetypeMap implements MimetypeService
     public Map<String, String> getMimetypesByExtension()
     {
         return mimetypesByExtension;
+    }
+
+    /**
+     * @see #MIMETYPE_BINARY
+     */
+    public String guessExtension(String filename)
+    {
+        String mimetype = MIMETYPE_BINARY;
+        // extract the extension
+        int index = filename.lastIndexOf('.');
+        if (index > -1 && (index < filename.length() - 1))
+        {
+            String extension = filename.substring(index + 1);
+            mimetype = mimetypesByExtension.get(extension);
+        }
+        return mimetype;
     }
 }

@@ -451,7 +451,7 @@ public interface NodeService
      * @param nodeRef the node to get
      * @param propertyQName the name of the property
      * @param sqlLikePattern a SQL-like pattern to search for
-     * @param includeFTS - include full textv serach matches in the like test
+     * @param includeFTS - include full text search matches in the like test
      * @return Returns true if the pattern could be found
      */
     public boolean like(

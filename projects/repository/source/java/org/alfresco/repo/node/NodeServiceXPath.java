@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -26,6 +27,7 @@ import org.jaxen.JaxenException;
 import org.jaxen.Navigator;
 import org.jaxen.SimpleFunctionContext;
 import org.jaxen.SimpleVariableContext;
+import org.jaxen.function.BooleanFunction;
 import org.jaxen.function.StringFunction;
 
 /**
@@ -34,11 +36,19 @@ import org.jaxen.function.StringFunction;
 public class NodeServiceXPath extends BaseXPath
 {
     private static final long serialVersionUID = 3834032441789592882L;
+    
     private boolean followAllParentLinks;
 
-    public NodeServiceXPath(String arg0, NodeService nodeService, NamespacePrefixResolver nspr, QueryParameterDefinition[] paramDefs, boolean followAllParentLinks) throws JaxenException
+    public NodeServiceXPath(
+            String xpath,
+            DictionaryService dictionaryService,
+            NodeService nodeService,
+            NamespacePrefixResolver nspr,
+            QueryParameterDefinition[] paramDefs,
+            boolean followAllParentLinks) throws JaxenException
     {
-        super(arg0, new DocumentNavigator(nodeService, nspr, followAllParentLinks));
+        super(xpath, new DocumentNavigator(dictionaryService, nodeService, nspr, followAllParentLinks));
+        
         // Add support for parameters
         if (paramDefs != null)
         {
@@ -79,11 +89,52 @@ public class NodeServiceXPath extends BaseXPath
         }
         SimpleFunctionContext sfc = (SimpleFunctionContext) this.getFunctionContext();
         // TODO:Register extra functions here
-        sfc.registerFunction(null, "deref", new Deref());
-        sfc.registerFunction(null, "like", new Like());
-        sfc.registerFunction(null, "contains", new Contains());
+        sfc.registerFunction("", "subtypeOf", new SubTypeOf());
+        sfc.registerFunction("", "deref", new Deref());
+        sfc.registerFunction("", "like", new Like());
+        sfc.registerFunction("", "contains", new Contains());
     }
 
+    /**
+     * A boolean function to determine if a node type is a subtype of another type  
+     */
+    static class SubTypeOf implements Function
+    {
+        public Object call(Context context, List args) throws FunctionCallException
+        {
+            if (args.size() != 1)
+            {
+                throw new FunctionCallException("subtypeOf() requires one argument: subtypeOf(QName typeQName)");
+            }
+            return evaluate(context.getNodeSet(), args.get(0), context.getNavigator());
+        }
+
+        public Object evaluate(List nodes, Object qnameObj, Navigator nav)
+        {
+            if(nodes.size() != 1)
+            {
+                return false;
+            }
+            // resolve the qname of the type we are checking for
+            String qnameStr = StringFunction.evaluate(qnameObj, nav);
+            QName typeQName = QName.createQName(qnameStr);
+            // resolve the noderef
+            NodeRef nodeRef = null;
+            if(nav.isElement(nodes.get(0)))
+            {
+                nodeRef = ((ChildAssociationRef)nodes.get(0)).getChildRef();
+            }
+            else if(nav.isAttribute(nodes.get(0)))
+            {   
+                nodeRef = ((DocumentNavigator.Property)nodes.get(0)).parent;
+            }
+            
+            DocumentNavigator dNav = (DocumentNavigator)nav;
+            boolean result = dNav.isSubtypeOf(nodeRef, typeQName);
+            return result;
+        }
+    }
+    
     static class Deref implements Function
     {
 
@@ -117,20 +168,36 @@ public class NodeServiceXPath extends BaseXPath
         }
     }
     
+    /**
+     * A boolean function to determine if a node property matches a pattern and/or the node
+     * text matches the pattern.
+     * <p>
+     * The default is JSR170 compliant.  The optional boolean allows searching only against
+     * the property value itself.
+     * 
+     * @author Derek Hulley
+     */
     static class Like implements Function
     {
    
         public Object call(Context context, List args) throws FunctionCallException
         {
-            if (args.size() == 2)
+            if (args.size() < 2 || args.size() > 3)
             {
-                return evaluate(context.getNodeSet(), args.get(0), args.get(1), context.getNavigator());
+                throw new FunctionCallException(
+                        "like() usage: like(@attr, 'pattern' [, includeFTS]) \n" +
+                        " - includeFTS can be 'true' or 'false'");
             }
-
-            throw new FunctionCallException("like() requires two arguments.");
+            // default includeFTS to true
+            return evaluate(
+                    context.getNodeSet(),
+                    args.get(0),
+                    args.get(1),
+                    args.size() == 2 ? Boolean.toString(true) : args.get(2), 
+                    context.getNavigator());
         }
 
-        public Object evaluate(List nodes, Object obj, Object pattern, Navigator nav)
+        public Object evaluate(List nodes, Object obj, Object patternObj, Object includeFtsObj, Navigator nav)
         {
             Object attribute = null;
             if(obj instanceof List)
@@ -156,12 +223,13 @@ public class NodeServiceXPath extends BaseXPath
                 return false;
             }
             ChildAssociationRef car = (ChildAssociationRef)nodes.get(0);
-            String patternValue = StringFunction.evaluate(pattern, nav);
+            String pattern = StringFunction.evaluate(patternObj, nav);
+            boolean includeFts = BooleanFunction.evaluate(includeFtsObj, nav);
             QName qname = QName.createQName(nav.getAttributeNamespaceUri(attribute), nav.getAttributeName(attribute));
-            DocumentNavigator dNav = (DocumentNavigator)nav;
             
+            DocumentNavigator dNav = (DocumentNavigator)nav;
             // JSR 170 inclues full text matches
-            return dNav.like(car.getChildRef(), qname, patternValue, true); 
+            return dNav.like(car.getChildRef(), qname, pattern, includeFts); 
             
         }
     }

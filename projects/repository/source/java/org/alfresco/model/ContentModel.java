@@ -77,7 +77,6 @@ public interface ContentModel
     // expected application types
     static final QName TYPE_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "folder");
     static final QName ASSOC_CONTAINS = QName.createQName(NamespaceService.ALFRESCO_URI, "contains");
-    static final QName TYPE_FILE = QName.createQName(NamespaceService.ALFRESCO_URI, "file");
     
     // person
     static final QName TYPE_PERSON = QName.createQName(NamespaceService.ALFRESCO_URI, "person");

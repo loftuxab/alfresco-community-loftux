@@ -30,9 +30,9 @@ import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.search.Indexer;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
-import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -444,17 +444,30 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         return getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
     }
 
-    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xPath, QueryParameterDefinition[] paramDefs, NamespacePrefixResolver namespacePrefixResolver,
+    /**
+     * @see NodeServiceXPath
+     */
+    public synchronized List<NodeRef> selectNodes(
+            NodeRef contextNodeRef,
+            String xpath,
+            QueryParameterDefinition[] paramDefs,
+            NamespacePrefixResolver namespacePrefixResolver,
             boolean followAllParentLinks)
     {
         try
         {
-            NodeServiceXPath xpath = new NodeServiceXPath(xPath, this, namespacePrefixResolver, paramDefs, followAllParentLinks);
+            NodeServiceXPath nsXPath = new NodeServiceXPath(
+                    xpath,
+                    dictionaryService,
+                    this,
+                    namespacePrefixResolver,
+                    paramDefs,
+                    followAllParentLinks);
             for (String prefix : namespacePrefixResolver.getPrefixes())
             {
-                xpath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
+                nsXPath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
             }
-            List list = xpath.selectNodes(getPrimaryParent(contextNodeRef));
+            List list = nsXPath.selectNodes(getPrimaryParent(contextNodeRef));
             HashSet<NodeRef> unique = new HashSet<NodeRef>(list.size());
             for (Object o : list)
             {
@@ -471,21 +484,36 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         }
         catch (JaxenException e)
         {
-            throw new XPathException("Error executing xpath", e);
+            throw new XPathException("Error executing xpath: \n" +
+                    "   xpath: " + xpath,
+                    e);
         }
     }
 
-    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xPath, QueryParameterDefinition[] paramDefs, NamespacePrefixResolver namespacePrefixResolver,
+    /**
+     * @see NodeServiceXPath
+     */
+    public List<Serializable> selectProperties(
+            NodeRef contextNodeRef,
+            String xpath,
+            QueryParameterDefinition[] paramDefs,
+            NamespacePrefixResolver namespacePrefixResolver,
             boolean followAllParentLinks)
     {
         try
         {
-            NodeServiceXPath xpath = new NodeServiceXPath(xPath, this, namespacePrefixResolver, paramDefs, followAllParentLinks);
+            NodeServiceXPath nsXPath = new NodeServiceXPath(
+                    xpath,
+                    dictionaryService,
+                    this,
+                    namespacePrefixResolver,
+                    paramDefs,
+                    followAllParentLinks);
             for (String prefix : namespacePrefixResolver.getPrefixes())
             {
-                xpath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
+                nsXPath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
             }
-            List list = xpath.selectNodes(getPrimaryParent(contextNodeRef));
+            List list = nsXPath.selectNodes(getPrimaryParent(contextNodeRef));
             List<Serializable> answer = new ArrayList<Serializable>(list.size());
             for (Object o : list)
             {
@@ -572,7 +600,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
                 return false;
             }
             
-            // Need to turn the SQL like patter into lucene line
+            // Need to turn the SQL like pattern into lucene line
             // Need to replace unescaped % with * (? and ? will match and \ is
             // used
             // for escape so the rest is OK)
@@ -606,7 +634,8 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             }
             if (propertyQName != null)
             {
-                sb.append(" @").append(LuceneQueryParser.escape(propertyQName.toString())).append(":(").append(pattern).append(")");
+                sb.append(" @").append(LuceneQueryParser.escape(propertyQName.toString()))
+                  .append(":(").append(pattern).append(")");
             }
             sb.append(")");
 
@@ -621,15 +650,5 @@ public abstract class AbstractNodeServiceImpl implements NodeService
                 resultSet.close();
             }
         }
-    }
-
-    protected Indexer getIndexer()
-    {
-        return indexer;
-    }
-
-    protected SearchService getSearcher()
-    {
-        return searcher;
     }
 }

@@ -24,5 +24,14 @@ public interface MimetypeService
     public List<String> getMimetypes();
 
     public Map<String, String> getMimetypesByExtension();
-
+    
+    /**
+     * Provides a non-null best guess of the appropriate extension given a
+     * filename.
+     * 
+     * @param filename the name of the file with an optional file extension
+     * @return Returns the best guess extension or the mimetype for
+     *      straight binary files if no extension could be found.
+     */
+    public String guessExtension(String filename);
 }
