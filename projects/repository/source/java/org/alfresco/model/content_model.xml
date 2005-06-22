@@ -653,7 +653,7 @@
          <title>Lockable</title>
          <properties>
             <property name="alf:lockOwner">
-               <type>d:text</type>
+               <type>d:noderef</type>
                <protected>true</protected>
             </property>
             <property name="alf:lockType">

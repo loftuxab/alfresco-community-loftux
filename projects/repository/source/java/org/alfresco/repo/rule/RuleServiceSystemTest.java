@@ -31,6 +31,7 @@ import org.alfresco.repo.rule.action.TransformActionExecutor;
 import org.alfresco.repo.rule.condition.InCategoryEvaluator;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.repo.rule.condition.NoConditionEvaluator;
+import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
@@ -50,6 +51,7 @@ import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.TestWithUserUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StopWatch;
@@ -72,6 +74,7 @@ public class RuleServiceSystemTest extends TestCase
 	private ContentService contentService;
 	private ServiceRegistry serviceRegistry;
     private DictionaryDAO dictionaryDAO;
+    private AuthenticationService authenticationService;
 
     /**
      * Category related values
@@ -85,6 +88,9 @@ public class RuleServiceSystemTest extends TestCase
     private NodeRef catROne;
     private NodeRef catRTwo;
     private NodeRef catRThree;
+
+    private static final String USER_NAME = "userName";
+    private static final String PWD = "password";  
     
     /**
      * 
@@ -105,6 +111,7 @@ public class RuleServiceSystemTest extends TestCase
         this.lockService = (LockService)applicationContext.getBean("lockService");
 		this.contentService = (ContentService)applicationContext.getBean("contentService");
         this.dictionaryDAO = (DictionaryDAO)applicationContext.getBean("dictionaryDAO");
+        this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
         
         this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
@@ -118,6 +125,10 @@ public class RuleServiceSystemTest extends TestCase
         
         // Create categories used in tests
         createTestCategories();
+        
+        // Create and authenticate the user used in the tests
+        TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
+        TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);        
     }
     
     private void createTestCategories()
@@ -621,7 +632,7 @@ public class RuleServiceSystemTest extends TestCase
             if (childNodeRef.equals(newNodeRef) == true)
             {
                 // check that the node has been locked
-                LockStatus lockStatus = this.lockService.getLockStatus(childNodeRef, LockService.LOCK_USER);
+                LockStatus lockStatus = this.lockService.getLockStatus(childNodeRef, TestWithUserUtils.getCurrentUserRef(this.authenticationService));
                 assertEquals(LockStatus.LOCK_OWNER, lockStatus);
             }
             else if (this.nodeService.hasAspect(childNodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
@@ -675,7 +686,7 @@ public class RuleServiceSystemTest extends TestCase
 		assertFalse(this.nodeService.exists(workingCopy));
 		
 		// Check that the origional is no longer locked
-		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(newNodeRef, LockService.LOCK_USER));
+		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(newNodeRef, TestWithUserUtils.getCurrentUserRef(this.authenticationService)));
 		
 		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }

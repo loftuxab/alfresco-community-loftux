@@ -6,10 +6,14 @@ package org.alfresco.repo.coci;
 import java.io.Serializable;
 import java.util.Map;
 
+import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
+import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.repo.security.authentication.RepositoryUser;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInServiceException;
 import org.alfresco.service.cmr.lock.LockService;
@@ -62,6 +66,11 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	 * Policy component
 	 */
 	private PolicyComponent policyComponent;
+    
+    /**
+     * The authentication service
+     */
+    private AuthenticationService authenticationService;
 	
 	/**
 	 * Set the node service
@@ -113,6 +122,17 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	{
 		this.policyComponent = policyComponent;
 	}
+    
+    /**
+     * Sets the authenticatin service
+     * 
+     * @param authenticationService  the authentication service
+     */
+    public void setAuthenticationService(
+            AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService;
+    }
 	
 	/**
 	 * Initialise method
@@ -171,15 +191,38 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		// Apply the working copy aspect to the working copy
 		this.nodeService.addAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY, null);
 		
-		// Get the current user reference to use as the lock owner
-		// TODO Need to be able to get the current user reference.
-		
 		// Lock the origional node
-		this.lockService.lock(nodeRef, LockService.LOCK_USER, LockType.READ_ONLY_LOCK);
+		this.lockService.lock(nodeRef, getUserNodeRef(), LockType.READ_ONLY_LOCK);
 		
 		// Return the working copy
 		return workingCopy;
 	}
+    
+    /**
+     * Gets the authenticated users node reference
+     * 
+     * @return  the users node reference
+     */
+    private NodeRef getUserNodeRef()
+    {
+        NodeRef result = null;
+        Authentication auth = this.authenticationService.getCurrentAuthentication();
+        if (auth != null)
+        {
+            RepositoryUser user = (RepositoryUser)auth.getPrincipal();
+            if (user != null)
+            {
+                result = user.getUserNodeRef();
+            }
+        }
+        
+        if (result == null)
+        {
+            throw new CheckOutCheckInServiceException("Can not find the currently authenticated user details required by the CheckOutCheckIn service.");
+        }
+        
+        return result;
+    }
 
 	/**
 	 * @see org.alfresco.service.cmr.coci.CheckOutCheckInService#checkout(org.alfresco.service.cmr.repository.NodeRef)
@@ -225,7 +268,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			try
 			{
 				// Release the lock
-				this.lockService.unlock(nodeRef, LockService.LOCK_USER);
+				this.lockService.unlock(nodeRef, getUserNodeRef());
 			}
 			catch (UnableToReleaseLockException exception)
 			{
@@ -258,7 +301,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			else
 			{
 				// Re-lock the origional node
-				this.lockService.lock(nodeRef, LockService.LOCK_USER, LockType.READ_ONLY_LOCK);
+				this.lockService.lock(nodeRef, getUserNodeRef(), LockType.READ_ONLY_LOCK);
 			}
 			
 		}
@@ -315,12 +358,10 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			{
 				// Error since the origional node can not be found
 				throw new CheckOutCheckInServiceException(ERR_BAD_COPY);
-			}
-			
-			// TODO Need to get the current user reference
+			}			
 			
 			// Release the lock on the origional node
-			this.lockService.unlock(nodeRef, LockService.LOCK_USER);
+			this.lockService.unlock(nodeRef, getUserNodeRef());
 			
 			// Delete the working copy
 			this.nodeService.deleteNode(workingCopyNodeRef);

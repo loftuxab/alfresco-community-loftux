@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.version.VersionStoreConst;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.AspectMissingException;
@@ -25,6 +26,7 @@ import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.TestWithUserUtils;
 
 /**
  * Version operations service implementation unit tests
@@ -40,8 +42,9 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private CheckOutCheckInService cociService;
 	private ContentService contentService;
 	private VersionService versionService;
-	
-	/**
+    private AuthenticationService authenticationService;
+    
+    /**
 	 * Data used by the tests
 	 */
 	private StoreRef storeRef;
@@ -57,6 +60,12 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private static final QName PROP2_QNAME = QName.createQName("{test}prop2");
 	private static final String CONTENT_1 = "This is some content";
 	private static final String CONTENT_2 = "This is the cotent modified.";
+    
+    /**
+     * User details 
+     */
+    private static final String USER_NAME = "userName";
+    private static final String PWD = "password";
 	
 	/**
 	 * On setup in transaction implementation
@@ -70,6 +79,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		this.cociService = (CheckOutCheckInService)this.applicationContext.getBean("checkOutCheckInService");
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
 		this.versionService = (VersionService)this.applicationContext.getBean("versionService");
+        this.authenticationService = (AuthenticationService)this.applicationContext.getBean("authenticationService");
 		
 		// Create the store and get the root node reference
 		this.storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
@@ -95,6 +105,11 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		// Add the lock and version aspects to the created node
 		this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
 		this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);		
+        
+        // Create and authenticate the user
+        TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
+        TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);
+        
 	}
 	
 	/**

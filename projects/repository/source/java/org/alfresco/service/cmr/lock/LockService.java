@@ -9,6 +9,7 @@ import java.util.Collection;
 
 import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 
 
 /**
@@ -18,10 +19,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public interface LockService
 {
-	// TODO this is the lock user to use for the time being
-	public final static String LOCK_USER = "admin";
-        
-    /**
+   /**
     * Places a lock on a node.  
     * <p>
     * The lock prevents any other user or process from comitting updates 
@@ -36,7 +34,7 @@ public interface LockService
     * @throws LockAspectMissing
     *                   thrown if the lock aspect is missing
     */
-   public void lock(NodeRef nodeRef, String userRef, LockType lockType)
+   public void lock(NodeRef nodeRef, NodeRef userRef, LockType lockType)
        throws UnableToAquireLockException, AspectMissingException;
    
    /**
@@ -60,7 +58,7 @@ public interface LockService
     * @throws LockAspectMissing
     *                        thrown if the lock aspect is missing
     */
-   public void lock(NodeRef nodeRef, String userRef, LockType lockType, boolean lockChildren)
+   public void lock(NodeRef nodeRef, NodeRef userRef, LockType lockType, boolean lockChildren)
        throws UnableToAquireLockException, AspectMissingException;
    
    /**
@@ -72,16 +70,16 @@ public interface LockService
     * The user reference passed indicates who the owner of the lock(s) is.  
     * If any one of the child locks can not be taken then an exception will 
     * be raised and all locks canceled.
- * @param  nodeRefs a list of node references
- * @param  userRef  a reference to the user that will own the lock(s)
- * @param lockType TODO
-    *  
+    * 
+    * @param  nodeRefs a list of node references
+    * @param  userRef  a reference to the user that will own the lock(s)
+    * @param  lockType the type of lock being created
     * @throws UnableToAquireLockException
     *                  thrown if the lock could not be obtained
     * @throws LockAspectMissing
     *                   thrown if the lock aspect is missing
     */
-   public void lock(Collection<NodeRef> nodeRefs, String userRef, LockType lockType)
+   public void lock(Collection<NodeRef> nodeRefs, NodeRef userRef, LockType lockType)
        throws UnableToAquireLockException, AspectMissingException;
    
    /**
@@ -97,7 +95,7 @@ public interface LockService
     * @thrown AspectMissingException
     *                   thrown if the lock aspect is missing                 
     */
-   public void unlock(NodeRef nodeRef, String userRef)
+   public void unlock(NodeRef nodeRef, NodeRef userRef)
        throws UnableToReleaseLockException, AspectMissingException;
    
    /**
@@ -122,7 +120,7 @@ public interface LockService
     * @thrown AspectMissingException
     *                   thrown if the lock aspect is missing
     */
-   public void unlock(NodeRef nodeRef, String userRef, boolean lockChildren)
+   public void unlock(NodeRef nodeRef, NodeRef userRef, boolean lockChildren)
        throws UnableToReleaseLockException, AspectMissingException;
    
    /**
@@ -145,8 +143,21 @@ public interface LockService
     * @thrown AspectMissingException
     *                   thrown if the lock aspect is missing
     */
-   public void unlock(Collection<NodeRef> nodeRefs, String userRef)
+   public void unlock(Collection<NodeRef> nodeRefs, NodeRef userRef)
        throws UnableToReleaseLockException, AspectMissingException;
+   
+   /**
+    * Gets the lock status for the node reference relative to the current user.
+    * 
+    * @see LockService#getLockStatus(NodeRef, NodeRef)
+    * 
+    * @param nodeRef    the node reference
+    * @return           the lock status
+    * @throws AspectMissingException
+    *                   thrown if the lock aspect is missing
+    */
+   public LockStatus getLockStatus(NodeRef nodeRef)
+       throws AspectMissingException;
    
    /**
     * Indicates the current lock status for the user against the passed node.
@@ -164,7 +175,7 @@ public interface LockService
     * @thrown AspectMissingException
     *                   thrown if the lock aspect is missing
     */
-   public LockStatus getLockStatus(NodeRef nodeRef, String userRef)
+   public LockStatus getLockStatus(NodeRef nodeRef, NodeRef userRef)
        throws AspectMissingException;
    
    /**
@@ -210,6 +221,6 @@ public interface LockService
     *                  thrown if the node is determined to be locked based on the user ref and lock 
     *                  type
     */
-   public void checkForLockWithUser(NodeRef nodeRef, String userRef)
+   public void checkForLockWithUser(NodeRef nodeRef, NodeRef userRef)
        throws NodeLockedException;
 }

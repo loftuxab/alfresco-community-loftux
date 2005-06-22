@@ -469,6 +469,9 @@
 			<property name="policyComponent">
 				<ref bean="policyComponent"/>
 			</property>    
+			<property name="authenticationService">
+				<ref bean="authenticationService"></ref>
+			</property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -682,6 +685,9 @@
             </property>			
             <property name="policyComponent">
                <ref bean="policyComponent" />
+            </property>		
+            <property name="authenticationService">
+               <ref bean="authenticationService" />
             </property>
          </bean>
       </property>

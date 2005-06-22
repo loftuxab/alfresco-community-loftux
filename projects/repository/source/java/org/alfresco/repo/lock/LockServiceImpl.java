@@ -9,10 +9,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
+import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.repo.security.authentication.RepositoryUser;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.lock.LockType;
@@ -25,7 +29,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Simple Lock service implementation
@@ -48,6 +51,11 @@ public class LockServiceImpl implements LockService
 	 * List of node ref's to ignore when checking for locks
 	 */
 	private Set<NodeRef> ignoreNodeRefs = new HashSet<NodeRef>();
+
+    /**
+     * The authentication service
+     */
+    private AuthenticationService authenticationService;
     
     /**
      * Set the node service
@@ -68,6 +76,16 @@ public class LockServiceImpl implements LockService
 	{
 		this.policyComponent = policyComponent;
 	}
+    
+    /**
+     * Sets the authentication service
+     * 
+     * @param authenticationService  the authentication service
+     */
+    public void setAuthenticationService(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService;
+    }
     
     /**
      * Initialise methods called by Spring framework
@@ -104,7 +122,7 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, LockType)
      */
-    public synchronized void lock(NodeRef nodeRef, String userRef, LockType lockType)
+    public synchronized void lock(NodeRef nodeRef, NodeRef userRef, LockType lockType)
         throws UnableToAquireLockException, AspectMissingException
     {
         // Check for lock aspect
@@ -141,7 +159,7 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, LockType, boolean)
      */
-    public synchronized void lock(NodeRef nodeRef, String userRef, LockType lockType, boolean lockChildren)
+    public synchronized void lock(NodeRef nodeRef, NodeRef userRef, LockType lockType, boolean lockChildren)
         throws UnableToAquireLockException, AspectMissingException
     {
         lock(nodeRef, userRef, LockType.WRITE_LOCK);
@@ -159,7 +177,7 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(java.util.Collection, java.lang.String, LockType)
      */
-    public synchronized void lock(Collection<NodeRef> nodeRefs, String userRef, LockType lockType)
+    public synchronized void lock(Collection<NodeRef> nodeRefs, NodeRef userRef, LockType lockType)
         throws UnableToAquireLockException, AspectMissingException
     {        
         // Lock each of the specifed nodes
@@ -172,7 +190,7 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String)
      */
-    public synchronized void unlock(NodeRef nodeRef, String userRef)
+    public synchronized void unlock(NodeRef nodeRef, NodeRef userRef)
         throws UnableToReleaseLockException, AspectMissingException
     {
         // Check for lock aspect
@@ -203,7 +221,7 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String, boolean)
      */
-    public synchronized void unlock(NodeRef nodeRef, String userRef, boolean unlockChildren)
+    public synchronized void unlock(NodeRef nodeRef, NodeRef userRef, boolean unlockChildren)
         throws UnableToReleaseLockException, AspectMissingException
     {
         // Unlock the parent
@@ -223,7 +241,7 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.repo.lock.LockService#unlock(Collection<NodeRef>, String)
      */
-    public synchronized void unlock(Collection<NodeRef> nodeRefs, String userRef)
+    public synchronized void unlock(Collection<NodeRef> nodeRefs, NodeRef userRef)
         throws UnableToReleaseLockException, AspectMissingException
     {        
         for (NodeRef nodeRef : nodeRefs)
@@ -233,9 +251,17 @@ public class LockServiceImpl implements LockService
     }
     
     /**
+     * @see org.alfresco.service.cmr.lock.LockService#getLockStatus(NodeRef)
+     */
+    public LockStatus getLockStatus(NodeRef nodeRef) throws AspectMissingException
+    {
+        return getLockStatus(nodeRef, getUserRef());
+    }
+    
+    /**
      * @see org.alfresco.service.cmr.lock.LockService#getLockStatus(NodeRef, String)
      */
-    public LockStatus getLockStatus(NodeRef nodeRef, String userRef)
+    public LockStatus getLockStatus(NodeRef nodeRef, NodeRef userRef)
         throws AspectMissingException
     {
         // Check for lock aspect
@@ -244,8 +270,8 @@ public class LockServiceImpl implements LockService
         LockStatus result = LockStatus.NO_LOCK;
         
         // Get the current lock owner
-        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
-        if (currentUserRef != null && currentUserRef.length() != 0)
+        NodeRef currentUserRef = (NodeRef)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
+        if (currentUserRef != null)
         {
             if (currentUserRef.equals(userRef) == true)
             {
@@ -303,16 +329,14 @@ public class LockServiceImpl implements LockService
     public void checkForLock(NodeRef nodeRef)
 		throws NodeLockedException
     {
-		CodeMonkey.todo("We should be looking up the current user here.");
-		
-        // Check the lock
-        checkForLockWithUser(nodeRef, LockService.LOCK_USER);
+		// Check the lock
+        checkForLockWithUser(nodeRef, getUserRef());
     }
     
     /**
      * @see LockService#checkForLockWithUser(NodeRef, String)
      */
-    public void checkForLockWithUser(NodeRef nodeRef, String userRef)
+    public void checkForLockWithUser(NodeRef nodeRef, NodeRef userRef)
         throws NodeLockedException
     {     
 		// Ensure we have found a node reference
@@ -387,4 +411,24 @@ public class LockServiceImpl implements LockService
 		// Add the lock aspect, but do not version the property values
 		nodeDetails.addAspect(ContentModel.ASPECT_LOCKABLE);
 	}
+    
+    /**
+     * Get the current user reference
+     * 
+     * @return  the current user reference
+     */
+    private NodeRef getUserRef()
+    {
+        NodeRef userRef = null;
+        Authentication auth = this.authenticationService.getCurrentAuthentication();
+        if (auth != null)
+        {
+            RepositoryUser user = (RepositoryUser)auth.getPrincipal();
+            if (user != null)
+            {
+                userRef = user.getUserNodeRef();
+            }
+        }
+        return userRef;
+    }
 }

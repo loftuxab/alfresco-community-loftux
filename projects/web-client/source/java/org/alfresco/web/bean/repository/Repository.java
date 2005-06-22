@@ -203,7 +203,7 @@ public final class Repository
       if (node.hasAspect(ContentModel.ASPECT_LOCKABLE))
       {
          // TODO: replace username with real user name ref here!
-         LockStatus lockStatus = lockService.getLockStatus(node.getNodeRef(), USERNAME);
+         LockStatus lockStatus = lockService.getLockStatus(node.getNodeRef());
          if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
          {
             locked = Boolean.TRUE;
