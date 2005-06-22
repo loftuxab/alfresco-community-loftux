@@ -5,6 +5,7 @@ package org.alfresco.repo.rule.action;
 
 import java.util.List;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -36,16 +37,29 @@ public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
 	 */
 	private NodeService nodeService;
 	
+	/**
+	 * Set the node service
+	 * 
+	 * @param nodeService  the node service
+	 */
 	public void setNodeService(NodeService nodeService) 
 	{
 		this.nodeService = nodeService;
 	}
 	
+	/**
+	 * Set the coci service
+	 * 
+	 * @param cociService  the coci service
+	 */
 	public void setCociService(CheckOutCheckInService cociService) 
 	{
 		this.cociService = cociService;
 	}
     
+	/**
+	 * Add the parameter defintions
+	 */
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
@@ -59,7 +73,8 @@ public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
      */
     public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
-		if (this.nodeService.exists(actionedUponNodeRef) == true)
+		if (this.nodeService.exists(actionedUponNodeRef) == true &&
+			this.nodeService.hasAspect(actionedUponNodeRef, ContentModel.ASPECT_WORKING_COPY) == false)
 		{
 	        // Get the destination details
 	        NodeRef destinationParent = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
