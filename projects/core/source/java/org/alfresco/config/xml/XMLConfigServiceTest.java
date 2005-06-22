@@ -72,6 +72,61 @@ public class XMLConfigServiceTest extends BaseTest
     }
     
     /**
+     * Tests the retrieval of a named child
+     */
+    public void testGetNamedChild()
+    {
+       // setup the config service
+        String configFile = getResourcesDir() + "config.xml";
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
+        svc.init();
+        
+        // get the "Named Child Test" config
+        Config cfg = svc.getConfig("Named Child Test");
+        assertNotNull("Named child test config should not be null", cfg);
+        
+        // get the children config element
+        ConfigElement children = cfg.getConfigElement("children");
+        logger.info("Number of children: " + children.getChildCount());
+        // check the getNumberOfChildren method works
+        assertEquals("There should be four children", 4, children.getChildCount());
+        
+        // try and get a named child
+        ConfigElement childTwo = children.getChild("child-two");
+        assertNotNull("Child two config element should not be null", childTwo);
+        assertEquals("Child two value should be 'child two value'", "child two value", 
+              childTwo.getValue());
+        logger.info("Number of attributes for for child-two: " + 
+              childTwo.getAttributeCount());
+        assertEquals("The number of attributes should be 0", 0, childTwo.getAttributeCount());
+        
+        // try and get a non existent child and check its null
+        ConfigElement noChild = children.getChild("not-there");
+        assertNull("The noChild config element should be null", noChild);
+        
+        // test the retrieval of grand children
+        ConfigElement childThree = children.getChild("child-three");
+        assertNotNull("Child three config element should not be null", childThree);
+        ConfigElement grandKids = childThree.getChild("grand-children");
+        assertNotNull("Grand child config element should not be null", grandKids);
+        logger.info("Number of grand-children: " + grandKids.getChildCount());
+        assertEquals("There should be 2 grand child config elements", 2, 
+              grandKids.getChildCount());
+        ConfigElement grandKidOne = grandKids.getChild("grand-child-one");
+        assertNotNull("Grand child one config element should not be null", grandKidOne);
+        logger.info("Number of attributes for for grand-child-one: " + 
+              grandKidOne.getAttributeCount());
+        logger.info("Number of children for for grand-child-one: " + 
+              grandKidOne.getChildCount());
+        assertEquals("The number of attributes for grand child one should be 1", 
+              1, grandKidOne.getAttributeCount());
+        assertEquals("The number of children for grand child one should be 0", 
+              0, grandKidOne.getChildCount());
+        assertTrue("The attribute 'an-attribute' should be present", 
+              grandKidOne.getAttribute("an-attribute") != null);
+    }
+    
+    /**
      * Tests the config service's ability to reset
      */
     public void testReset()

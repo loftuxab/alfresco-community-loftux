@@ -22,4 +22,18 @@
       </children>
    </config>
    
+   <config evaluator="string-compare" condition="Named Child Test">
+      <children>
+         <child-one>child one value</child-one>
+         <child-two>child two value</child-two>
+         <child-three>
+            <grand-children>
+               <grand-child-one an-attribute="test">grand child one value</grand-child-one>
+               <grand-child-two>grand child two value</grand-child-two>
+            </grand-children>
+         </child-three>
+         <child-four>child four value</child-four>
+      </children>
+   </config>
+   
 </alfresco-config>

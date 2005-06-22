@@ -43,6 +43,13 @@ public interface ConfigElement
     public boolean hasAttribute(String name);
 
     /**
+     * Returns the number of attributes this config element has
+     * 
+     * @return The number of attributes
+     */
+    public int getAttributeCount();
+    
+    /**
      * Gets the value of this config element. If this config element has
      * children then this method may return null
      * 
@@ -50,6 +57,14 @@ public interface ConfigElement
      */
     public String getValue();
 
+    /**
+     * Returns a child config element of the given name 
+     * 
+     * @param name The name of the config element to retrieve
+     * @return The ConfigElement or null if it does not exist
+     */
+    public ConfigElement getChild(String name);
+    
     /**
      * Returns a list of children held by this ConfigElement
      * 
@@ -66,6 +81,13 @@ public interface ConfigElement
      */
     public boolean hasChildren();
 
+    /**
+     * Returns the number of children this config element has
+     * 
+     * @return The number of children
+     */
+    public int getChildCount();
+    
     /**
      * Combines the given config element with this config element and returns a
      * new instance containing the resulting combination. The combination of the

@@ -48,6 +48,14 @@ public abstract class ConfigElementAdapter implements ConfigElement
     {
         return Collections.unmodifiableMap(this.attributes);
     }
+    
+    /**
+     * @see org.alfresco.config.ConfigElement#getAttributeCount()
+     */
+    public int getAttributeCount()
+    {
+       return this.attributes.size();
+    }
 
     /**
      * @see org.alfresco.web.config.ConfigElement#getChildren()
@@ -56,7 +64,37 @@ public abstract class ConfigElementAdapter implements ConfigElement
     {
         return Collections.unmodifiableList(this.children);
     }
+    
+    /**
+     * @see org.alfresco.config.ConfigElement#getChildCount()
+     */
+    public int getChildCount()
+    {
+       return this.children.size();
+    }
 
+    /**
+     * @see org.alfresco.config.ConfigElement#getChild(java.lang.String)
+     */
+    public ConfigElement getChild(String name)
+    {
+       ConfigElement child = null;
+       
+       if (hasChildren())
+       {
+          for (ConfigElement ce : this.children)
+          {
+             if (ce.getName().equals(name))
+             {
+                child = ce;
+                break;
+             }
+          }
+       }
+       
+       return child;
+    }
+    
     /**
      * @see org.alfresco.web.config.ConfigElement#getName()
      */
