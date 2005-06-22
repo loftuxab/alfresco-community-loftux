@@ -173,11 +173,11 @@ public class UIShelf extends SelfRenderingComponent
                out.write("\">");
                if (isExpanded == true)
                {
-                  out.write(Utils.buildImageTag(context, EXPANDED_IMG, 10, 10, ""));
+                  out.write(Utils.buildImageTag(context, EXPANDED_IMG, 11, 11, ""));
                }
                else
                {
-                  out.write(Utils.buildImageTag(context, COLLAPSED_IMG, 10, 10, ""));
+                  out.write(Utils.buildImageTag(context, COLLAPSED_IMG, 11, 11, ""));
                }
                out.write("</a>&nbsp;");
                

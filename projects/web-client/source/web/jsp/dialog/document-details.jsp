@@ -87,13 +87,13 @@
                               
                               <%-- approve and reject --%>
                               <a:booleanEvaluator value="#{DocumentDetailsBean.approveStepName != null}">
-                                 <a:actionLink value="#{DocumentDetailsBean.approveStepName}" image="/images/icons/forward.gif" padding="4"
+                                 <a:actionLink value="#{DocumentDetailsBean.approveStepName}" image="/images/icons/approve.gif" padding="4"
                                                actionListener="#{DocumentDetailsBean.approve}" action="browse">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
                               <a:booleanEvaluator value="#{DocumentDetailsBean.rejectStepName != null}">
-                                 <a:actionLink value="#{DocumentDetailsBean.rejectStepName}" image="/images/icons/reply.gif" padding="4"
+                                 <a:actionLink value="#{DocumentDetailsBean.rejectStepName}" image="/images/icons/reject.gif" padding="4"
                                                actionListener="#{DocumentDetailsBean.reject}" action="browse">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                  </a:actionLink>

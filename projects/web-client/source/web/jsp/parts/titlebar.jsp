@@ -5,7 +5,7 @@
       <td width=100%>
          <table cellspacing=0 cellpadding=0 width=100%>
             <tr>
-               <td><a href="http://www.alfresco.org" target="new"><img src="<%=request.getContextPath()%>/images/icons/alfresco_logo_24x24.png" width=32 height=30 alt="Alfresco" title="Alfresco" border=0 style="padding-right:4px"></a></td>
+               <td><a href="http://www.alfresco.org" target="new"><img src="<%=request.getContextPath()%>/images/logo/AlfrescoLogo32.png" width=32 height=30 alt="Alfresco" title="Alfresco" border=0 style="padding-right:4px"></a></td>
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width=10 height=30></td>
                <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/titlebar_bg.gif)">
                   <%-- Toolbar --%>

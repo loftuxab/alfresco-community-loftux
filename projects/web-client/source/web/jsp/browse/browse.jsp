@@ -52,8 +52,8 @@
  
                            <%-- actions for browse mode --%>
                            <a:panel id="browse-actions" rendered="#{NavigationBean.searchContext == null}">
-                              <td width=30>
-                                 <img src="<%=request.getContextPath()%>/images/icons/ball_big.gif" width=26 height=27>
+                              <td width=32>
+                                 <img src="<%=request.getContextPath()%>/images/icons/space.gif" width=32 height=32>
                               </td>
                               <td>
                                  <%-- Summary --%>
@@ -72,7 +72,7 @@
                                  </a:actionLink>
                                  <a:actionLink value="#{msg.add_content}" image="/images/icons/add.gif" padding="4" action="addContent" actionListener="#{AddContentWizard.startWizard}" id="link3" />
                                  <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/more.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
-                                    <a:actionLink value="#{msg.create_content}" image="/images/icons/add.gif" id="link3_1" action="createContent" actionListener="#{CreateContentWizard.startWizard}" />
+                                    <a:actionLink value="#{msg.create_content}" image="/images/icons/new_content.gif" id="link3_1" action="createContent" actionListener="#{CreateContentWizard.startWizard}" />
                                     <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" id="link4" />
                                     <a:actionLink value="#{msg.change_details}" image="/images/icons/View_details.gif" id="link5" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param2" />
@@ -85,7 +85,7 @@
                                     </a:actionLink>
                                     <a:actionLink value="#{msg.paste_all}" image="/images/icons/paste.gif" actionListener="#{ClipboardBean.pasteAll}" id="link8" />
                                     <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/create_space.gif" action="createAdvancedSpace" actionListener="#{NewSpaceWizard.startWizard}" id="link9" />
-                                    <a:actionLink value="#{msg.manage_rules}" image="/images/icons/subscribe_small.gif" action="manageRules" actionListener="#{BrowseBean.setupSpaceAction}" id="link10">
+                                    <a:actionLink value="#{msg.manage_rules}" image="/images/icons/rule.gif" action="manageRules" actionListener="#{BrowseBean.setupSpaceAction}" id="link10">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
                                     </a:actionLink>
                                     <%-- TODO: add evaluator based on "admin" role --%>
@@ -430,12 +430,12 @@
                                  </a:actionLink>
                               </a:booleanEvaluator>
                               <a:booleanEvaluator value="#{r.approveStep != null}">
-                                 <a:actionLink value="#{r.approveStep}" image="/images/icons/forward.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.approve}">
+                                 <a:actionLink value="#{r.approveStep}" image="/images/icons/approve.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.approve}">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
                               <a:booleanEvaluator value="#{r.rejectStep != null}">
-                                 <a:actionLink value="#{r.rejectStep}" image="/images/icons/reply.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.reject}">
+                                 <a:actionLink value="#{r.rejectStep}" image="/images/icons/reject.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.reject}">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>

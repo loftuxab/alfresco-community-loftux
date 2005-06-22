@@ -61,7 +61,7 @@
                            <td width="100" style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
-                              <a:actionLink value="#{msg.create_rule}" image="/images/icons/subscribe_small.gif" padding="4" action="createRule" actionListener="#{NewRuleWizard.startWizard}" />
+                              <a:actionLink value="#{msg.create_rule}" image="/images/icons/new_rule.gif" padding="4" action="createRule" actionListener="#{NewRuleWizard.startWizard}" />
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
                            <td width="125" style="padding-left:2px">
@@ -129,7 +129,7 @@
                                        <a:sortLink label="Title" value="title" mode="case-insensitive" styleClass="header"/>
                                     </f:facet>
                                     <f:facet name="small-icon">
-                                       <a:actionLink value="#{r.title}" image="/images/icons/subscribe_small.gif" 
+                                       <a:actionLink value="#{r.title}" image="/images/icons/rule.gif" 
                                                      actionListener="#{NewRuleWizard.startWizardForEdit}" action="editRule"
                                                      showLink="false">
                                           <f:param name="id" value="#{r.id}" />
@@ -179,7 +179,7 @@
                                                   actionListener="#{RulesBean.setupRuleAction}" action="deleteRule">
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
-                                    <a:actionLink value="#{msg.change_details}" image="/images/icons/Change_details.gif" 
+                                    <a:actionLink value="#{msg.change_details}" image="/images/icons/change_rule.gif" 
                                                   showLink="false" styleClass="inlineAction"
                                                   actionListener="#{NewRuleWizard.startWizardForEdit}" action="editRule">
                                        <f:param name="id" value="#{r.id}" />
