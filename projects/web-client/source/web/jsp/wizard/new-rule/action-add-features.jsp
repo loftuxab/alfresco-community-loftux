@@ -102,8 +102,8 @@
                                  <tr>
                                     <td>Select&nbsp;required&nbsp;feature:&nbsp;</td>
                                     <td width="90%">
-                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.feature}">
-                                          <f:selectItems value="#{NewRuleWizard.features}" />
+                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.aspect}">
+                                          <f:selectItems value="#{NewRuleWizard.aspects}" />
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
