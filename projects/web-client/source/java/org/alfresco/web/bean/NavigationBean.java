@@ -236,17 +236,17 @@ public class NavigationBean
          setCurrentNodeId(homeSpaceRef.getId());
       }
       
-      // work out if we need to navigate, and perform it if we do
-      if (BrowseBean.BROWSE_VIEW_ID.equals(context.getViewRoot().getViewId()) == false)
-      {
-         context.getApplication().getNavigationHandler().handleNavigation(context, null, "browse");
-      }
+      // we need to force navigate to refresh the breadcrumb in the browse screen
+      context.getApplication().getNavigationHandler().handleNavigation(context, null, "browse");
    }
    
    
    // ------------------------------------------------------------------------------
    // Private helpers
    
+   /**
+    * Helper to get the company root node reference
+    */
    private NodeRef getCompanyRootRef()
    {
       if (this.companyRootRef == null)
