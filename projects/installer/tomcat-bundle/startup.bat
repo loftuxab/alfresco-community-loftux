@@ -3,6 +3,8 @@ rem ---------------------------------------------------------------------------
 rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
+echo Starting database...
+
 rem ---------------------------------------
 rem Start DB (MySQL) in a minimised console
 rem ---------------------------------------
@@ -19,6 +21,8 @@ rem ---------------------------------------
 rem Start DB (HSQLDB) in a minimised console
 rem ---------------------------------------
 rem start "HSQL Server" /min cmd /c java -cp tomcat/lib/hsqldb.jar org.hsqldb.Server -database.0 alfresco -dbname.0 alfresco
+
+echo Starting Tomcat...
 
 rem ---------------------------------------
 rem Start Tomcat

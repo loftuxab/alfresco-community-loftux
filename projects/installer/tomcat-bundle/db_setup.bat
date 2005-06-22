@@ -10,5 +10,7 @@ c:\mysql\bin\mysqladmin -u root shutdown
 rem ---------------------------------------
 rem Postgres create DB command
 rem ---------------------------------------
-rem c:\alfresco\postgres\bin\initdb -D c:\alfresco\data
-rem c:\alfresco\postgres\bin\createdb alfresco
+rem c:\alfresco\postgresql\bin\initdb -D c:\alfresco\data
+rem c:\alfresco\postgresql\bin\createdb alfresco
+
+echo Alfresco database configured.

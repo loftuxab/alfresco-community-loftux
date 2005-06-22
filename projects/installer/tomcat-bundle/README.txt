@@ -1,3 +1,12 @@
+========================
+Alfresco Preview Release
+========================
+
+Welcome to the Alfresco Preview Release.  This is provided as a
+snapshot of where we are currently in the development of the Alfresco
+system.  It is intended for preview use only and should not be used for
+any other purpose.  Not all functionality is available or complete.
+
 ===================================
 Installing Alfresco Preview Release
 ===================================
@@ -12,8 +21,6 @@ Requirements:
 - Java Development Kit Environment available from http://java.sun.com
 - MySQL Database available from http://www.mysql.com
 - alfrescoTC.zip available from http://www.alfresco.org
-
-Currently only tested on Windows XP Pro
 
 
 =================================
@@ -69,7 +76,7 @@ Navigate to the 'C:\alfresco' folder and run 'startup.bat'
 - when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
 - you can now try Alfresco by visiting:
 
-http://localhost:8080/web-client/faces/jsp/browse/browse.jsp
+http://localhost:8080/web-client/faces/jsp/login.jsp
 
 The server is configured with a single administrative login with user name and password
 both set to 'admin'.
@@ -92,8 +99,11 @@ Manual Installations
 ====================
 
 For other operating systems or where MySQL or Tomcat are already installed,
-you will need to adjust the instructions above as appropriate, such as changing
+you may need to adjust the instructions above as appropriate, such as changing
 the Tomcat port settings.
+
+The Alfresco server is packaged as a war file and can be found in:
+c:\alfresco\tomcat\webapps\web-client.war
 
 The Alfresco 'db_setup.bat' performs the following MySQL commands:
 
@@ -101,5 +111,5 @@ c:\mysql\bin\mqslqadmin -u root -p create alfresco
 c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
                    identified by 'alfresco' with grant option;"
 
-The Alfresco 'startup.bat' runs Tomcat's 'startup.bat', likewise for the
-'shutdown.bat'.
+The Alfresco 'startup.bat' starts the database and runs Tomcat's 'startup.bat'.
+The 'shutdown.bat' runs Tomcat's 'shutdown.bat' and shutsdown the database.
