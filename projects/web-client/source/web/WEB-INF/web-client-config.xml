@@ -13,7 +13,7 @@
    
    <config>
       <server>
-         <mode>servlet</mode>
+         <mode>portlet</mode>
          <error-page>/jsp/error.jsp</error-page>
          <login-page>/jsp/login.jsp</login-page>
       </server>
