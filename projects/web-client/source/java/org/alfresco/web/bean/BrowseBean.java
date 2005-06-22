@@ -404,7 +404,7 @@ public class BrowseBean implements IContextListener
       }
       catch (Exception err)
       {
-         Utils.addErrorMessage( MessageFormat.format(ERROR_GENERIC, err.getMessage()), err );
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_GENERIC, err.getMessage()), err );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
@@ -481,7 +481,7 @@ public class BrowseBean implements IContextListener
       catch (Exception err)
       {
          logger.info("Search failed for: " + query);
-         Utils.addErrorMessage( MessageFormat.format(ERROR_SEARCH, new Object[] {err.getMessage()}), err );
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_SEARCH, new Object[] {err.getMessage()}), err );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
@@ -913,9 +913,6 @@ public class BrowseBean implements IContextListener
    
    // ------------------------------------------------------------------------------
    // Private data
-   
-   private static final String ERROR_SEARCH  = "Search failed during to a system error: {0}";
-   private static final String ERROR_GENERIC = "A system error occured during the operation: {0}";
    
    public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
    

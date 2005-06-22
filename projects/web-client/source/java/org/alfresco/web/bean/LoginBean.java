@@ -3,6 +3,7 @@
  */
 package org.alfresco.web.bean;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,10 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.RepositoryUserDetails;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.NavigationBean.NavigationBreadcrumbHandler;
 import org.alfresco.web.bean.repository.Repository;
@@ -169,14 +172,15 @@ public class LoginBean
     */
    public String login()
    {
+      String outcome = null;
+      
       if (this.username != null && this.password != null)
       {
          // Authenticate via the authentication service, then save the details of user in an object
          // in the session - this is used by the servlet filter etc. on each page to check for login
+         FacesContext fc = FacesContext.getCurrentInstance();
          try
          {
-            FacesContext fc = FacesContext.getCurrentInstance();
-            
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.username, this.password);
             Authentication auth = this.authenticationService.authenticate(Repository.getStoreRef(), token);
             RepositoryUserDetails principal = (RepositoryUserDetails)auth.getPrincipal();
@@ -199,19 +203,23 @@ public class LoginBean
             elements.add(this.navigator.new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
             this.navigator.setLocation(elements);
             
-            return "success";
+            outcome = "success";
          }
          catch (AuthenticationException aerr)
          {
             Utils.addErrorMessage("Unable to login - unknown username/password.");
-            return null;
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NOHOME, Application.getCurrentUser(fc).getHomeSpaceId()), refErr );
          }
       }
       else
       {
          Utils.addErrorMessage("Must specify username and password.");
-         return null;
       }
+      
+      return outcome;
    }
    
    /**

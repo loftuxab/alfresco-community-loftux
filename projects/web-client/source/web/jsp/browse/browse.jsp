@@ -61,7 +61,6 @@
                                  <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" id="msg2" /></div>
                                  <div class="mainSubText"><h:outputText value="#{msg.view_description}" id="msg3" /></div>
                                  <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
-                                 <div class="mainSubText">There are currently 2 members of this space</div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
                               <td width=100 style="padding-left:2px">

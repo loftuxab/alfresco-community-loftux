@@ -27,7 +27,6 @@ import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
@@ -88,6 +87,9 @@ public class NewUserWizard extends AbstractWizardBean
    /** ref to system people folder */
    private NodeRef peopleRef = null;
    
+   /** ref to the company home space folder */
+   private NodeRef companyHomeSpaceRef = null;
+   
    
    /**
     * Initialises the wizard
@@ -123,6 +125,11 @@ public class NewUserWizard extends AbstractWizardBean
       this.companyId = (String)props.get("organizationId");
       // TODO: calculate home space name and parent space Id from homeFolderId
       String homeFolderId = (String)props.get("homeFolder");
+      if (this.nodeService.exists(new NodeRef(Repository.getStoreRef(), homeFolderId)) == false)
+      {
+         // couldn't find home space - revert to company space
+         homeFolderId = null;
+      }
       this.homeSpaceName = "";
       // TODO: this is wrong at present!
       this.homeSpaceLocation = homeFolderId;
@@ -837,23 +844,43 @@ public class NewUserWizard extends AbstractWizardBean
       return peopleRef;
    }
    
+   /**
+    * Helper to return the company home space
+    * 
+    * @param context
+    * 
+    * @return company home space NodeRef
+    */
    private NodeRef getCompanyHomeSpace(FacesContext context)
    {
-      String companySpaceName = Application.getCompanyRootName(context);
-      String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
-      
-      List<NodeRef> nodes = this.nodeService.selectNodes(
-            this.nodeService.getRootNode(Repository.getStoreRef()),
-            companyXPath, null, this.namespaceService, false);
-      
-      if (nodes.size() == 0)
+      if (this.companyHomeSpaceRef == null)
       {
-         throw new IllegalStateException("Unable to find company home space path: " + companySpaceName);
+         String companySpaceName = Application.getCompanyRootName(context);
+         String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
+         
+         List<NodeRef> nodes = this.nodeService.selectNodes(
+               this.nodeService.getRootNode(Repository.getStoreRef()),
+               companyXPath, null, this.namespaceService, false);
+         
+         if (nodes.size() == 0)
+         {
+            throw new IllegalStateException("Unable to find company home space path: " + companySpaceName);
+         }
+         
+         this.companyHomeSpaceRef = nodes.get(0);
       }
       
-      return nodes.get(0);
+      return this.companyHomeSpaceRef;
    }
    
+   /**
+    * Create the specified home space if it does not exist, and return the ID
+    * 
+    * @param locationId    Parent location
+    * @param spaceName     Home space to create, can be null to simply return the parent
+    * 
+    * @return ID of the home space
+    */
    private String createHomeSpace(String locationId, String spaceName)
    {
       String homeSpaceId = locationId;
@@ -861,58 +888,32 @@ public class NewUserWizard extends AbstractWizardBean
       {
          StoreRef storeRef = Repository.getStoreRef();
          
-         // TODO: implement by adding namespace resolver to Path/elements
-         //       NOTE: QName already has toPrefixString() which may be useful
-         Path path = this.nodeService.getPath(new NodeRef(storeRef, locationId));
-         StringBuilder buf = new StringBuilder(64);
-         for (int i=0; i<path.size(); i++)
-         {
-            String elementString = "";
-            Path.Element element = path.get(i);
-            if (element instanceof Path.ChildAssocElement)
-            {
-               ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
-               if (elementRef.getParentRef() != null)
-               {
-                  if (NamespaceService.ALFRESCO_URI.equals(elementRef.getQName().getNamespaceURI()))
-                  {
-                     elementString = '/' + NamespaceService.ALFRESCO_PREFIX + ':' + elementRef.getQName().getLocalName();
-                  }
-               }
-            }
-            
-            buf.append(elementString);
-         }
+         NodeRef parentRef = new NodeRef(Repository.getStoreRef(), locationId);
+
+         // found the parent, create a new Space under it with the specified name
+         String qname = QName.createValidLocalName(spaceName);
+         ChildAssociationRef assocRef = this.nodeService.createNode(
+               parentRef,
+               ContentModel.ASSOC_CONTAINS,
+               QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+               ContentModel.TYPE_FOLDER);
          
-         List<NodeRef> nodes = this.nodeService.selectNodes(
-               this.nodeService.getRootNode(storeRef), buf.toString(), null, this.namespaceService, false);
-         if (nodes.size() != 0)
-         {
-            // found the parent, create a new Space under it with the specified name
-            String qname = QName.createValidLocalName(spaceName);
-            ChildAssociationRef assocRef = this.nodeService.createNode(
-                  nodes.get(0),
-                  ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, qname),
-                  ContentModel.TYPE_FOLDER);
-            
-            NodeRef nodeRef = assocRef.getChildRef();
-            
-            // set the name property on the node
-            this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, spaceName);
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Created Home Space for with name: " + spaceName);
-            
-            // apply the uifacets aspect - icon, title and description props
-            Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
-            uiFacetsProps.put(ContentModel.PROP_ICON, "space-icon-default");
-            uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
-            this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
-            
-            // return the ID of the created space
-            homeSpaceId = nodeRef.getId();
-         }
+         NodeRef nodeRef = assocRef.getChildRef();
+         
+         // set the name property on the node
+         this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, spaceName);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Created Home Space for with name: " + spaceName);
+         
+         // apply the uifacets aspect - icon, title and description props
+         Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
+         uiFacetsProps.put(ContentModel.PROP_ICON, "space-icon-default");
+         uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
+         this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
+         
+         // return the ID of the created space
+         homeSpaceId = nodeRef.getId();
       }
       
       return homeSpaceId;

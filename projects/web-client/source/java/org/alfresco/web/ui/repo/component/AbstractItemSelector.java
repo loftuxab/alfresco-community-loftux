@@ -204,63 +204,77 @@ public abstract class AbstractItemSelector extends UIInput
          case MODE_BEFORE_SELECTION:
          case MODE_AFTER_SELECTION:
          {
-            String valueId = null;
-            String submittedValue = (String)getSubmittedValue();
-            if (submittedValue != null)
+            UserTransaction tx = null;
+            try
             {
-               valueId = submittedValue;
+               tx = Repository.getUserTransaction(context);
+               tx.begin();
+               
+               String valueId = null;
+               String submittedValue = (String)getSubmittedValue();
+               if (submittedValue != null)
+               {
+                  valueId = submittedValue;
+               }
+               else
+               {
+                  valueId = (String)getValue();
+               }
+               
+               // show just the initial or current selection link
+               String label;
+               if (valueId == null)
+               {
+                  label = getLabel();
+               }
+               else
+               {
+                  NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), valueId);
+                  label = Repository.getNameForNode(getNodeService(context), nodeRef);
+               }
+               
+               // output surrounding span for style purposes
+               buf.append("<span");
+               if (attrs.get("style") != null)
+               {
+                  buf.append(" style=\"")
+                     .append(attrs.get("style"))
+                     .append('"');
+               }
+               if (attrs.get("styleClass") != null)
+               {
+                  buf.append(" class=")
+                     .append(attrs.get("styleClass"));
+               }
+               buf.append(">");
+               
+               // field value is whether we are picking and the current or parent Id value
+               String fieldValue = encodeFieldValues(MODE_PERFORM_SELECTION, valueId);
+               buf.append("<a href='#' onclick=\"");
+               buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue));
+               buf.append('"');
+               if (attrs.get("nodeStyle") != null)
+               {
+                  buf.append(" style=\"")
+                     .append(attrs.get("nodeStyle"))
+                     .append('"');
+               }
+               if (attrs.get("nodeStyleClass") != null)
+               {
+                  buf.append(" class=")
+                     .append(attrs.get("nodeStyleClass"));
+               }
+               buf.append(">")
+                  .append(label)
+                  .append("</a></span>");
+               
+               tx.commit();
             }
-            else
+            catch (Throwable err)
             {
-               valueId = (String)getValue();
+               try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+               throw new RuntimeException(err);
             }
-            
-            // show just the initial or current selection link
-            String label;
-            if (valueId == null)
-            {
-               label = getLabel();
-            }
-            else
-            {
-               NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), valueId);
-               label = Repository.getNameForNode(getNodeService(context), nodeRef);
-            }
-            
-            // output surrounding span for style purposes
-            buf.append("<span");
-            if (attrs.get("style") != null)
-            {
-               buf.append(" style=\"")
-                  .append(attrs.get("style"))
-                  .append('"');
-            }
-            if (attrs.get("styleClass") != null)
-            {
-               buf.append(" class=")
-                  .append(attrs.get("styleClass"));
-            }
-            buf.append(">");
-            
-            // field value is whether we are picking and the current or parent Id value
-            String fieldValue = encodeFieldValues(MODE_PERFORM_SELECTION, valueId);
-            buf.append("<a href='#' onclick=\"");
-            buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue));
-            buf.append('"');
-            if (attrs.get("nodeStyle") != null)
-            {
-               buf.append(" style=\"")
-                  .append(attrs.get("nodeStyle"))
-                  .append('"');
-            }
-            if (attrs.get("nodeStyleClass") != null)
-            {
-               buf.append(" class=")
-                  .append(attrs.get("nodeStyleClass"));
-            }
-            buf.append(">")
-               .append(label)
-               .append("</a></span>");
             
             break;
          }

@@ -3,7 +3,6 @@
  */
 package org.alfresco.web.bean;
 
-import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -174,37 +173,20 @@ public class AdvancedSearchBean
             StringBuilder buf = new StringBuilder(64);
             for (int i=0; i<path.size(); i++)
             {
-               String elementString;
+               String elementString = "";
                Path.Element element = path.get(i);
                if (element instanceof Path.ChildAssocElement)
                {
                   ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
-                  if (elementRef.getParentRef() == null)
-                  {
-                     elementString = "/";
-                  }
-                  else
+                  if (elementRef.getParentRef() != null)
                   {
                      if (NamespaceService.ALFRESCO_URI.equals(elementRef.getQName().getNamespaceURI()))
                      {
-                        elementString = NamespaceService.ALFRESCO_PREFIX + ':' + elementRef.getQName().getLocalName();
-                     }
-                     else
-                     {
-                        // fallback - what should be do here with other prefix?
-                        elementString = elementRef.getQName().getLocalName();
+                        elementString = '/' + NamespaceService.ALFRESCO_PREFIX + ':' + elementRef.getQName().getLocalName();
                      }
                   }
                }
-               else
-               {
-                  elementString = element.getElementString();
-               }
                
-               if (buf.length() > 1)
-               {
-                  buf.append('/');
-               }
                buf.append(elementString);
             }
             // append syntax to get all children of the path

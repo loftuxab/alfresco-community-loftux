@@ -3,6 +3,7 @@
  */
 package org.alfresco.web.bean;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +13,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
@@ -21,6 +23,7 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
@@ -212,32 +215,43 @@ public class NavigationBean
     */
    public void toolbarLocationChanged(ActionEvent event)
    {
-      UIModeList locationList = (UIModeList)event.getComponent();
-      String location = locationList.getValue().toString();
-      setToolbarLocation(location);
-      
       FacesContext context = FacesContext.getCurrentInstance();
-      if (LOCATION_COMPANY.equals(location))
+      try
       {
-         List<IBreadcrumbHandler> elements = new ArrayList(1);
-         NodeRef companyRootRef = getCompanyRootRef();
-         elements.add(new NavigationBreadcrumbHandler(companyRootRef, Application.getCompanyRootName(context)));
-         setLocation(elements);
-         setCurrentNodeId(companyRootRef.getId());
+         UIModeList locationList = (UIModeList)event.getComponent();
+         String location = locationList.getValue().toString();
+         setToolbarLocation(location);
+         
+         if (LOCATION_COMPANY.equals(location))
+         {
+            List<IBreadcrumbHandler> elements = new ArrayList(1);
+            NodeRef companyRootRef = getCompanyRootRef();
+            elements.add(new NavigationBreadcrumbHandler(companyRootRef, Application.getCompanyRootName(context)));
+            setLocation(elements);
+            setCurrentNodeId(companyRootRef.getId());
+         }
+         else if (LOCATION_HOME.equals(location))
+         {
+            List<IBreadcrumbHandler> elements = new ArrayList(1);
+            String homeSpaceId = Application.getCurrentUser(context).getHomeSpaceId();
+            NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
+            String homeSpaceName = Repository.getNameForNode(this.nodeService, homeSpaceRef);
+            elements.add(new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
+            setLocation(elements);
+            setCurrentNodeId(homeSpaceRef.getId());
+         }
+         
+         // we need to force a navigation to refresh the browse screen breadcrumb
+         context.getApplication().getNavigationHandler().handleNavigation(context, null, "browse");
       }
-      else if (LOCATION_HOME.equals(location))
+      catch (InvalidNodeRefException refErr)
       {
-         List<IBreadcrumbHandler> elements = new ArrayList(1);
-         String homeSpaceId = Application.getCurrentUser(context).getHomeSpaceId();
-         NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
-         String homeSpaceName = Repository.getNameForNode(this.nodeService, homeSpaceRef);
-         elements.add(new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
-         setLocation(elements);
-         setCurrentNodeId(homeSpaceRef.getId());
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NOHOME, Application.getCurrentUser(context).getHomeSpaceId()), refErr );
       }
-      
-      // we need to force navigate to refresh the breadcrumb in the browse screen
-      context.getApplication().getNavigationHandler().handleNavigation(context, null, "browse");
+      catch (Exception err)
+      {
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_GENERIC, err.getMessage()), err );
+      }
    }
    
    
