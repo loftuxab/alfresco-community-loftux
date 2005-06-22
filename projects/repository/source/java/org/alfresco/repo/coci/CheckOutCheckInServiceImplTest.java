@@ -10,6 +10,7 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.version.VersionStoreConst;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -18,7 +19,10 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionHistory;
+import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.version.VersionType;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
@@ -35,6 +39,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private NodeService nodeService;
 	private CheckOutCheckInService cociService;
 	private ContentService contentService;
+	private VersionService versionService;
 	
 	/**
 	 * Data used by the tests
@@ -48,7 +53,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	 */
 	private static final String TEST_VALUE_1 = "testValue1";
 	private static final String TEST_VALUE_2 = "testValue2";
-	private static final QName PROP1_QNAME = QName.createQName("{test}prop1");
+	private static final QName PROP1_QNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
 	private static final QName PROP2_QNAME = QName.createQName("{test}prop2");
 	private static final String CONTENT_1 = "This is some content";
 	private static final String CONTENT_2 = "This is the cotent modified.";
@@ -61,9 +66,10 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		throws Exception 
 	{
 		// Set the services
-		this.nodeService = (NodeService)this.applicationContext.getBean("dbNodeService");
+		this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
 		this.cociService = (CheckOutCheckInService)this.applicationContext.getBean("checkOutCheckInService");
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
+		this.versionService = (VersionService)this.applicationContext.getBean("versionService");
 		
 		// Create the store and get the root node reference
 		this.storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
@@ -83,8 +89,6 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		this.nodeRef = childAssocRef.getChildRef();
 		
 		// Add the initial content to the node
-		//Map<QName, Serializable>contentProperties = new HashMap<QName, Serializable>();
-		//this.nodeService.addAspect(this.nodeRef, DictionaryBootstrap.ASPECT_QNAME_CONTENT, contentProperties);
 		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.nodeRef);
 		contentWriter.putContent(CONTENT_1);	
 		
@@ -120,9 +124,6 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	 */
 	private NodeRef checkout()
 	{
-		//System.out.println(
-		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
-		
 		// Check out the node
 		NodeRef workingCopy = this.cociService.checkout(
 				this.nodeRef, 
@@ -145,10 +146,6 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 				contentReader.getContentString(), 
 				contentReader2.getContentString());
 		
-		// Dump the store so we can have a look at what is going on
-		//System.out.println(
-		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
-		
 		return workingCopy;
 	}
 	
@@ -163,24 +160,45 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
 		versionProperties.put(Version.PROP_DESCRIPTION, "This is a test version");		
 		this.cociService.checkin(workingCopy, versionProperties);		
-		//System.out.println(
-		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		// Test check-in with content
         NodeRef workingCopy3 = checkout();
+		this.nodeService.setProperty(workingCopy3, PROP1_QNAME, TEST_VALUE_2);
         ContentWriter tempWriter = this.contentService.getWriter(workingCopy3);
 		assertNotNull(tempWriter);
 		tempWriter.putContent(CONTENT_2);
 		String contentUrl = tempWriter.getContentUrl();
 		Map<String, Serializable> versionProperties3 = new HashMap<String, Serializable>();
+		versionProperties3.put(Version.PROP_DESCRIPTION, "description");
 		versionProperties3.put(VersionStoreConst.PROP_VERSION_TYPE, VersionType.MAJOR);
 		NodeRef origNodeRef = this.cociService.checkin(workingCopy3, versionProperties3, contentUrl, true);
 		assertNotNull(origNodeRef);
+		
+		// Check the checked in content
 		ContentReader contentReader = this.contentService.getReader(origNodeRef);
 		assertNotNull(contentReader);
 		assertEquals(CONTENT_2, contentReader.getContentString());
-		//System.out.println(
-		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		
+		// Check that the version history is correct
+		Version version = this.versionService.getCurrentVersion(origNodeRef);
+		assertNotNull(version);
+		assertEquals("description", version.getDescription());
+		assertEquals(VersionType.MAJOR, version.getVersionType());
+		NodeRef versionNodeRef = version.getNodeRef();
+		assertNotNull(versionNodeRef);
+		
+		// Check the verioned content
+		ContentReader versionContentReader = this.contentService.getReader(versionNodeRef);
+		assertNotNull(versionContentReader);
+		assertEquals(CONTENT_1, versionContentReader.getContentString());		
+		
+		// Check the versioned values and the checked in values
+		String versionedValue = (String)this.nodeService.getProperty(versionNodeRef, PROP1_QNAME);
+		assertEquals(TEST_VALUE_1, versionedValue);
+		String checkedInValue = (String)this.nodeService.getProperty(origNodeRef, PROP1_QNAME);
+		assertEquals(TEST_VALUE_2, checkedInValue);
+		
+		// Cancel the check out after is has been left checked out
 		this.cociService.cancelCheckout(workingCopy3);
 		
 		// Test keep checked out flag
@@ -188,9 +206,38 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		Map<String, Serializable> versionProperties2 = new HashMap<String, Serializable>();
 		versionProperties2.put(Version.PROP_DESCRIPTION, "Another version test");		
 		this.cociService.checkin(workingCopy2, versionProperties2, null, true);
-		this.cociService.checkin(workingCopy2, new HashMap<String, Serializable>(), null, true);
-		//System.out.println(
-		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));		
+		this.cociService.checkin(workingCopy2, new HashMap<String, Serializable>(), null, true);	
+	}
+	
+	public void testVersionAspectNotSetOnCheckIn()
+	{
+		// Create a bag of props
+        Map<QName, Serializable> bagOfProps = createTypePropertyBag();
+        bagOfProps.put(ContentModel.PROP_MIME_TYPE, "text/plain");
+        bagOfProps.put(ContentModel.PROP_ENCODING, "UTF-8");
+
+		// Create a new node 
+		ChildAssociationRef childAssocRef = this.nodeService.createNode(
+				rootNodeRef,
+				ContentModel.ASSOC_CONTAINS,
+				QName.createQName("{test}test"),
+				ContentModel.TYPE_CONTENT,
+				bagOfProps);
+		NodeRef noVersionNodeRef = childAssocRef.getChildRef();
+		
+		// Check out and check in
+		NodeRef workingCopy = this.cociService.checkout(noVersionNodeRef);
+		this.cociService.checkin(workingCopy, new HashMap<String, Serializable>());
+		
+		try
+		{
+			// Check that the origional node has no version history dispite sending verion props
+			VersionHistory versionHistory = this.versionService.getVersionHistory(noVersionNodeRef);
+			fail("aspect should be missing");
+		}
+		catch (AspectMissingException exception)
+		{
+		}
 	}
 	
 	/**

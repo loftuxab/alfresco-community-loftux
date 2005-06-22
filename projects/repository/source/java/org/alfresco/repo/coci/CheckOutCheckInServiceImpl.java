@@ -14,6 +14,7 @@ import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInServiceException;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockType;
+import org.alfresco.service.cmr.lock.UnableToReleaseLockException;
 import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
@@ -148,18 +149,16 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			QName destinationAssocTypeQName, 
 			QName destinationAssocQName) 
 	{
-		// TODO should this be done here ??
+		// Make sure we are no checking out a working copy node
+		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
+		{
+			throw new CheckOutCheckInServiceException("A working copy can not be checked out.");
+		}
 		
 		// Apply the lock aspect if required
 		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE) == false)
 		{
 			this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_LOCKABLE, null);
-		}
-		
-		// Apply the version aspect if required
-		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
-		{
-			this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
 		}
 		
 		// Make the working copy
@@ -212,15 +211,6 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			throw new AspectMissingException(ContentModel.ASPECT_WORKING_COPY, workingCopyNodeRef);
 		}
 		
-		if (contentUrl != null)
-		{
-			// Set the content url value onto the working copy
-			this.nodeService.setProperty(
-					workingCopyNodeRef, 
-					ContentModel.PROP_CONTENT_URL, 
-					contentUrl);
-		}
-		
 		// Check that the working node still has the copy aspect applied
 		if (this.nodeService.hasAspect(workingCopyNodeRef, ContentModel.ASPECT_COPIEDFROM) == true)
 		{
@@ -232,17 +222,33 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 				throw new CheckOutCheckInServiceException(ERR_BAD_COPY);							
 			}
 			
-            // Release the lock
-			this.lockService.unlock(nodeRef, LockService.LOCK_USER);
+			try
+			{
+				// Release the lock
+				this.lockService.unlock(nodeRef, LockService.LOCK_USER);
+			}
+			catch (UnableToReleaseLockException exception)
+			{
+				throw new CheckOutCheckInServiceException("This user is not the owner of the working copy and can not check it in.", exception);
+			}
 			
-			// Copy the contents of the working copy onto the origional
-			this.copyService.copy(workingCopyNodeRef, nodeRef);
-			
-			if (versionProperties != null)
+			if (versionProperties != null && this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == true)
 			{
 				// Create the new version
 				this.versionService.createVersion(nodeRef, versionProperties);
 			}
+			
+			if (contentUrl != null)
+			{
+				// Set the content url value onto the working copy
+				this.nodeService.setProperty(
+						workingCopyNodeRef, 
+						ContentModel.PROP_CONTENT_URL, 
+						contentUrl);
+			}
+			
+			// Copy the contents of the working copy onto the origional
+			this.copyService.copy(workingCopyNodeRef, nodeRef);
 			
 			if (keepCheckedOut == false)
 			{

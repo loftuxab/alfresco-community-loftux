@@ -32,4 +32,15 @@ public class CheckOutCheckInServiceException extends RuntimeException
 	{
 		super(message);
 	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param message		the error message	
+	 * @param throwable		the cause of the exeption
+	 */
+	public CheckOutCheckInServiceException(String message, Throwable throwable)
+	{
+		super(message, throwable);
+	}
 }
