@@ -186,7 +186,7 @@ public class MimetypeMap implements MimetypeService
     /**
      * @see #MIMETYPE_BINARY
      */
-    public String guessExtension(String filename)
+    public String guessMimetype(String filename)
     {
         String mimetype = MIMETYPE_BINARY;
         // extract the extension
@@ -194,7 +194,10 @@ public class MimetypeMap implements MimetypeService
         if (index > -1 && (index < filename.length() - 1))
         {
             String extension = filename.substring(index + 1);
-            mimetype = mimetypesByExtension.get(extension);
+            if (mimetypesByExtension.containsValue(extension))
+            {
+                mimetype = mimetypesByExtension.get(extension);
+            }
         }
         return mimetype;
     }
