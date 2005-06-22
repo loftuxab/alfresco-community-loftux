@@ -125,14 +125,34 @@ public class DocumentDetailsBean
    }
    
    /**
+    * Determines whether the current document has any categories applied
+    * 
+    * @return true if the document has categories attached
+    */
+   public boolean isCategorised()
+   {
+      return getDocument().hasAspect(ContentModel.ASPECT_CLASSIFIABLE);
+   }
+   
+   /**
     * Returns a list of objects representing the categories applied to the 
     * current document
     *  
     * @return List of categories
     */
-   public List getCategories()
+   public String getCategoriesOverviewHTML()
    {
-      return null;
+      String html = null;
+      
+      if (isCategorised())
+      {
+         // retrieve the node ref representing the category
+         // applied to this document and create HTML overview
+         Map props = getDocument().getProperties();
+         
+      }
+      
+      return html;
    }
 
    /**

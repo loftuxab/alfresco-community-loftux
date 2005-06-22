@@ -186,8 +186,15 @@
                               </a:panel>
                               <br/>
                               <a:panel label="Categories" id="categories-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
-                                 Categories
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       rendered="#{DocumentDetailsBean.categorised}">
+                                 <h:outputText id="category-overview" value="#{DocumentDetailsBean.categoriesOverviewHTML}" 
+                                               escape="false" />
+                              </a:panel>
+                              <a:panel label="Categories" id="no-categories-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       rendered="#{DocumentDetailsBean.categorised == false}">
+                                 <h:outputText id="no-category-msg" value="This document is not categorised." />
                               </a:panel>
                               <br/>
                               <a:panel label="Version History" id="version-history-panel" progressive="true" expanded="false"
