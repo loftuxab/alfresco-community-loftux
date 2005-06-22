@@ -39,6 +39,8 @@ import org.jaxen.XPath;
  */
 public class DocumentNavigator extends DefaultNavigator
 {
+    private static final long serialVersionUID = 3618984485740165427L;
+
     private DictionaryService dictionaryService;
     private NodeService nodeService;
     private NamespacePrefixResolver nspr;
@@ -58,11 +60,6 @@ public class DocumentNavigator extends DefaultNavigator
         String uri;
     }
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3618984485740165427L;
-
     private boolean followAllParentLinks;
 
     public DocumentNavigator(
@@ -84,19 +81,16 @@ public class DocumentNavigator extends DefaultNavigator
         return ((Property)o).qname.getLocalName();
     }
 
-    
     public String getAttributeNamespaceUri(Object o)
     {
         return ((Property)o).qname.getNamespaceURI();
     }
 
-    
     public String getAttributeQName(Object o)
     {
         return ((Property)o).qname.toString();
     }
 
-    
     public String getAttributeStringValue(Object o)
     {
         // Only the first property of multi-valued properties is displayed
@@ -104,68 +98,57 @@ public class DocumentNavigator extends DefaultNavigator
         return ValueConverter.convert(String.class, ((Property)o).value);
     }
 
-    
     public String getCommentStringValue(Object o)
     {
         // There is no attribute that is a comment
         throw new UnsupportedOperationException("Comment string values are unsupported");
     }
 
-    
     public String getElementName(Object o)
     {
          return ((ChildAssociationRef)o).getQName().getLocalName();
     }
 
-    
     public String getElementNamespaceUri(Object o)
     {
         return ((ChildAssociationRef)o).getQName().getNamespaceURI();
     }
 
-    
     public String getElementQName(Object o)
     {
         return ((ChildAssociationRef)o).getQName().toString();
     }
 
-    
     public String getElementStringValue(Object o)
     {
         throw new UnsupportedOperationException("Element string values are unsupported");
     }
 
-    
     public String getNamespacePrefix(Object o)
     {
         return ((Namespace)o).prefix;
     }
 
-    
     public String getNamespaceStringValue(Object o)
     {
         return ((Namespace)o).uri;
     }
 
-    
     public String getTextStringValue(Object o)
     {
       throw new UnsupportedOperationException("Text nodes are unsupported");
     }
 
-    
     public boolean isAttribute(Object o)
     {
        return (o instanceof Property);
     }
 
-    
     public boolean isComment(Object o)
     {
        return false;
     }
 
-    
     public boolean isDocument(Object o)
     {
        if(!(o  instanceof ChildAssociationRef))
@@ -176,25 +159,21 @@ public class DocumentNavigator extends DefaultNavigator
        return (car.getParentRef() == null) && (car.getQName() == null);
     }
 
-    
     public boolean isElement(Object o)
     {
-        return (o  instanceof ChildAssociationRef);
+        return (o instanceof ChildAssociationRef);
     }
-
     
     public boolean isNamespace(Object o)
     {
        return (o instanceof Namespace);
     }
 
-    
     public boolean isProcessingInstruction(Object o)
     {
         return false;
     }
 
-    
     public boolean isText(Object o)
     {
         return false;

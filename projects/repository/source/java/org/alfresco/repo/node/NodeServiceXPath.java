@@ -19,6 +19,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.debug.CodeMonkey;
 import org.jaxen.BaseXPath;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -88,11 +89,17 @@ public class NodeServiceXPath extends BaseXPath
             }
         }
         SimpleFunctionContext sfc = (SimpleFunctionContext) this.getFunctionContext();
-        // TODO:Register extra functions here
+        // Register extra functions here - both null and empty namespace
+        CodeMonkey.issue("Investigate why both null and empty string ns are required for the functions"); //TODO
         sfc.registerFunction("", "subtypeOf", new SubTypeOf());
         sfc.registerFunction("", "deref", new Deref());
         sfc.registerFunction("", "like", new Like());
         sfc.registerFunction("", "contains", new Contains());
+        
+        sfc.registerFunction(null, "subtypeOf", new SubTypeOf());
+        sfc.registerFunction(null, "deref", new Deref());
+        sfc.registerFunction(null, "like", new Like());
+        sfc.registerFunction(null, "contains", new Contains());
     }
 
     /**

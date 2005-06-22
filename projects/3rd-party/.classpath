@@ -5,7 +5,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-0.9.jar"/>
 	<classpathentry exported="true" sourcepath="src/hibernate3_src.zip" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hrtlib.jar"/>
@@ -52,5 +51,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/acegi-security-0.8.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-5.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

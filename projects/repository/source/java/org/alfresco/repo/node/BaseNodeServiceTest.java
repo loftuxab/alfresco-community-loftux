@@ -918,7 +918,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         
         xpath = new NodeServiceXPath("*//.", dictionaryService, nodeService, namespacePrefixResolver, null, false);
         list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(11, list.size());
+//        assertEquals(11, list.size());
+        assertEquals(13, list.size());   // 13 unique paths through the graph - duplicates not being removed
         
         xpathStr = "test:root_p_n1";
         xpath = new NodeServiceXPath(xpathStr, dictionaryService, nodeService, namespacePrefixResolver, null, false);
@@ -1064,7 +1065,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 TYPE_QNAME_TEST_CONTENT.toString());
         answer = nodeService.selectNodes(
                 rootNodeRef,
-                "./*/*[like(@test:animal, $test:animal, false) OR subtypeOf($test:type)]",
+                "./*/*[like(@test:animal, $test:animal, false) or subtypeOf($test:type)]",
                 paramDefs,
                 namespacePrefixResolver,
                 false);
@@ -1076,7 +1077,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // fist time go too deep
         answer = nodeService.selectNodes(
                 n1Ref,
-                "./*/*[like(@test:animal, $test:animal, false) OR subtypeOf($test:type)]",
+                "./*/*[like(@test:animal, $test:animal, false) or subtypeOf($test:type)]",
                 paramDefs,
                 namespacePrefixResolver,
                 false);
@@ -1084,7 +1085,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // second time get it right
         answer = nodeService.selectNodes(
                 n1Ref,
-                "./*[like(@test:animal, $test:animal, false) OR subtypeOf($test:type)]",
+                "./*[like(@test:animal, $test:animal, false) or subtypeOf($test:type)]",
                 paramDefs,
                 namespacePrefixResolver,
                 false);
