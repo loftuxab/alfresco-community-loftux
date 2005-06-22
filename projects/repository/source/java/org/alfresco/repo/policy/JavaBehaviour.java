@@ -66,8 +66,8 @@ public class JavaBehaviour implements Behaviour
         return (T)proxy;
     }
 
-    /**
-     * Disable the behaviour
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.Behaviour#disable()
      */
     public void disable()
     {
@@ -75,8 +75,8 @@ public class JavaBehaviour implements Behaviour
         stack.push(hashCode());
     }
 
-    /**
-     * Enable the behaviour
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.Behaviour#enable()
      */
     public void enable()
     {
@@ -88,8 +88,8 @@ public class JavaBehaviour implements Behaviour
         stack.pop();
     }
 
-    /**
-     * @return  is the behaviour enabled
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.Behaviour#isEnabled()
      */
     public boolean isEnabled()
     {
@@ -97,15 +97,12 @@ public class JavaBehaviour implements Behaviour
         return stack.search(hashCode()) == -1;
     }
     
-    
-
     @Override
     public String toString()
     {
         return "Java method[class=" + instance.getClass().getName() + ", method=" + method + "]";
     }
 
-    
     /**
      * Gets the Invocation Handler.
      * 

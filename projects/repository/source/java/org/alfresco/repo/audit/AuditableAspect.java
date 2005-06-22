@@ -5,6 +5,7 @@ import java.util.Date;
 import net.sf.acegisecurity.Authentication;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationService;
@@ -36,6 +37,11 @@ public class AuditableAspect
     private AuthenticationService authenticationService;
     private PolicyComponent policyComponent;
 
+    // Behaviours
+    private Behaviour onCreateAudit;
+    private Behaviour onAddAudit;
+    private Behaviour onUpdateAudit;
+    
 
     /**
      * @param nodeService  the node service to use for audit property maintenance
@@ -45,7 +51,6 @@ public class AuditableAspect
         this.nodeService = nodeService;
     }
 
-
     /**
      * @param policyComponent  the policy component
      */
@@ -53,7 +58,6 @@ public class AuditableAspect
     {
         this.policyComponent = policyComponent;
     }
-
     
     /**
      * @param authenticationService  the authentication service
@@ -62,30 +66,22 @@ public class AuditableAspect
     {
         this.authenticationService = authenticationService; 
     }
-
     
     /**
      * Initialise the Auditable Aspect
      */
     public void init()
     {
-        // Bind auditable behaviour to node policies
-        policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
-                ContentModel.ASPECT_AUDITABLE,
-                new JavaBehaviour(this, "onCreateAudit"));
+        // Create behaviours
+        onCreateAudit =  new JavaBehaviour(this, "onCreateAudit");
+        onAddAudit = new JavaBehaviour(this, "onAddAudit");
+        onUpdateAudit = new JavaBehaviour(this, "onUpdateAudit");
         
-        policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"),
-                ContentModel.ASPECT_AUDITABLE,
-                new JavaBehaviour(this, "onAddAudit"));
-
-        policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateNode"),
-                ContentModel.ASPECT_AUDITABLE,
-                new JavaBehaviour(this, "onUpdateAudit"));
+        // Bind behaviours to node policies
+        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), ContentModel.ASPECT_AUDITABLE, onCreateAudit);
+        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), ContentModel.ASPECT_AUDITABLE, onAddAudit);
+        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateNode"), ContentModel.ASPECT_AUDITABLE, onUpdateAudit);
     }
-    
 
     /**
      * Maintain audit properties on creation of Node
@@ -94,12 +90,9 @@ public class AuditableAspect
      */
     public void onCreateAudit(ChildAssociationRef childAssocRef)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("AuditableAspect: setting create audit properties for created node " + childAssocRef.toString());
-        
-        setCreatedProperties(childAssocRef.getChildRef());
+        NodeRef nodeRef = childAssocRef.getChildRef();
+        onAddAudit(nodeRef, null);
     }
-
 
     /**
      * Maintain audit properties on addition of audit aspect to a node
@@ -109,12 +102,32 @@ public class AuditableAspect
      */
     public void onAddAudit(NodeRef nodeRef, QName aspect)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("AuditableAspect: setting create audit properties for introduced audit aspect on node " + nodeRef.toString());
-        
-        setCreatedProperties(nodeRef);
+        try
+        {
+            onUpdateAudit.disable();
+            
+            // Set created / updated date
+            Date now = new Date(System.currentTimeMillis());
+            nodeService.setProperty(nodeRef, ContentModel.PROP_CREATED, now);
+            nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, now);
+
+            // Set creator (but do not override, if explicitly set)
+            String creator = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_CREATOR);
+            if (creator == null || creator.length() == 0)
+            {
+                creator = getUsername();
+                nodeService.setProperty(nodeRef, ContentModel.PROP_CREATOR, creator);
+            }
+            nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIER, creator);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Auditable node " + nodeRef + " created [created,modified=" + now + ";creator,modifier=" + creator + "]");
+        }
+        finally
+        {
+            onUpdateAudit.enable();
+        }
     }
-    
 
     /**
      * Maintain audit properties on update of node
@@ -123,45 +136,18 @@ public class AuditableAspect
      */
     public void onUpdateAudit(NodeRef nodeRef)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("AuditableAspect: setting update audit properties for updated node " + nodeRef.toString());
-
-        setUpdatedProperties(nodeRef);
-    }
-
-
-    /**
-     * Populates the "created" set of properties
-     *  
-     * @param nodeRef
-     */
-    private void setCreatedProperties(NodeRef nodeRef)
-    {
-        // Set created date
-        Date now = new Date(System.currentTimeMillis());
-        nodeService.setProperty(nodeRef, ContentModel.PROP_CREATED, now);
-
-        // Set creator
-        nodeService.setProperty(nodeRef, ContentModel.PROP_CREATOR, getUsername());
-    }
-
-
-    /**
-     * Populates the "updated" set of properties
-     * 
-     * @param nodeRef
-     */
-    private void setUpdatedProperties(NodeRef nodeRef)
-    {
         // Set updated date
         Date now = new Date(System.currentTimeMillis());
         nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, now);
 
         // Set modifier
-        nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIER, getUsername());
+        String modifier = getUsername();
+        nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIER, modifier);
+        
+        if (logger.isDebugEnabled())
+            logger.debug("Auditable node " + nodeRef + " updated [modified=" + now + ";modifier=" + modifier + "]");
     }
-    
-    
+
     /**
      * @return  the current username (or unknown, if unknown)
      */

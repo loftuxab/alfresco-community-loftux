@@ -64,7 +64,7 @@ public class AuditableAspectTest extends BaseSpringTest
         // Assert auditable properties exist on folder
         assertAuditableProperties(childAssocRef.getChildRef());
         
-//        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
 	}	
 
     
@@ -88,7 +88,7 @@ public class AuditableAspectTest extends BaseSpringTest
         Set<QName> aspects = nodeService.getAspects(childAssocRef.getChildRef());
         assertFalse(aspects.contains(ContentModel.ASPECT_AUDITABLE));
         
-//        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
 
 
@@ -124,7 +124,7 @@ public class AuditableAspectTest extends BaseSpringTest
         // Assert the person's auditable property
         assertAuditableProperties(childAssocRef.getChildRef());
         
-//        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
 
     
@@ -147,7 +147,7 @@ public class AuditableAspectTest extends BaseSpringTest
         // Add auditable capability
         nodeService.addAspect(childAssocRef.getChildRef(), ContentModel.ASPECT_TITLED, null);
 
-//        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
 
 

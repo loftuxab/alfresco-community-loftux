@@ -20,4 +20,20 @@ public interface Behaviour
      * @return  the policy interface
      */
     public <T> T getInterface(Class<T> policy);
+    
+    /**
+     * Disable the behaviour (for this thread only)
+     */
+    public void disable();
+
+    /**
+     * Enable the behaviour (for this thread only)
+     */
+    public void enable();
+
+    /**
+     * @return  is the behaviour enabled (for this thread only)
+     */
+    public boolean isEnabled();
+    
 }
