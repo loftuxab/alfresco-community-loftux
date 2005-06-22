@@ -76,6 +76,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>configArea</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    </tag>
    
    <tag>

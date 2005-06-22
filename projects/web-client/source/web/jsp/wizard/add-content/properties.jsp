@@ -125,7 +125,7 @@
                                  <tr>
                                     <td>File Name:</td>
                                     <td width="85%">
-                                       <h:inputText id="file-name" value="#{AddContentWizard.fileName}" size="35" maxlength="1024" readonly="true"
+                                       <h:inputText id="file-name" value="#{AddContentWizard.fileName}" size="35" maxlength="1024" 
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>

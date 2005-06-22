@@ -15,6 +15,7 @@ public class PropertySheetGridTag extends BaseComponentTag
    private String var;
    private String columns;
    private String externalConfig;
+   private String configArea;
    private String readOnly;
    private String mode;
    private String labelStyleClass;
@@ -68,6 +69,14 @@ public class PropertySheetGridTag extends BaseComponentTag
    {
       this.externalConfig = externalConfig;
    }
+   
+   /**
+    * @param configArea Sets the named config area to use
+    */
+   public void setConfigArea(String configArea)
+   {
+      this.configArea = configArea;
+   }
 
    /**
     * @param mode The mode, either "edit" or "view"
@@ -118,6 +127,7 @@ public class PropertySheetGridTag extends BaseComponentTag
       
       setStringProperty(component, "value", this.value);
       setStringProperty(component, "mode", this.mode);
+      setStringProperty(component, "configArea", this.configArea);
       setStringStaticProperty(component, "var", this.var);
       setIntProperty(component, "columns", this.columns);
       setStringStaticProperty(component, "labelStyleClass", this.labelStyleClass);
@@ -136,6 +146,7 @@ public class PropertySheetGridTag extends BaseComponentTag
       this.var = null;
       this.columns = null;
       this.externalConfig = null;
+      this.configArea = null;
       this.readOnly = null;
       this.mode = null;
       this.labelStyleClass = null;

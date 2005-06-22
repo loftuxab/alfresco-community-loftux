@@ -7,7 +7,7 @@
       <constructor-arg>
          <list>
             <value>/WEB-INF/web-client-config.xml</value>
-            <!--<value>/WEB-INF/web-client-config-zoo.xml</value>-->
+            <value>/WEB-INF/web-client-config-edit-properties.xml</value>
          </list>
       </constructor-arg>
    </bean>

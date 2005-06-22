@@ -315,6 +315,18 @@ public class UIProperty extends UIPanel implements NamingContainer
          // if we are in view mode simply output the text to the screen
          control = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
          control.setRendererType("javax.faces.Text");
+         
+         // if it is a date or datetime property add the converter
+         if (typeName.equals(PropertyTypeDefinition.DATE) || 
+                  typeName.equals(PropertyTypeDefinition.DATETIME))
+         {
+            XMLDateConverter conv = (XMLDateConverter)context.getApplication().
+               createConverter("org.alfresco.faces.XMLDataConverter");
+            conv.setType("both");
+            conv.setDateStyle("long");
+            conv.setTimeStyle("short");
+            control.setConverter(conv);
+         }
       }
       else
       {
@@ -330,12 +342,24 @@ public class UIProperty extends UIPanel implements NamingContainer
             control = (UICategorySelector)context.getApplication().
                   createComponent("org.alfresco.faces.CategorySelector");
          }
+         else if (typeName.equals(PropertyTypeDefinition.DATE) || 
+                  typeName.equals(PropertyTypeDefinition.DATETIME))
+         {
+            control = (UIInput)context.getApplication().
+                  createComponent("javax.faces.Input");
+            control.setRendererType("org.alfresco.faces.DatePickerRenderer");
+            control.getAttributes().put("startYear", new Integer(1970));
+            control.getAttributes().put("yearCount", new Integer(50));
+            control.getAttributes().put("style", "margin-right: 7px;");
+         }
          else
          {
             // any other type is represented as an input text field
             control = (UIInput)context.getApplication().
                   createComponent("javax.faces.Input");
             control.setRendererType("javax.faces.Text");
+            control.getAttributes().put("size", "35");
+            control.getAttributes().put("maxlength", "1024");
          }
       
          // set control to disabled state if set to read only or if the
@@ -354,17 +378,6 @@ public class UIProperty extends UIPanel implements NamingContainer
 //            val.setMinimum(1);
 //            control.addValidator(val);
 //         }   
-      }
-      
-      // add a converter for datetime types
-      if (typeName.equals(PropertyTypeDefinition.DATE) || typeName.equals(PropertyTypeDefinition.DATETIME))
-      {
-         XMLDateConverter conv = (XMLDateConverter)context.getApplication().
-               createConverter("org.alfresco.faces.XMLDataConverter");
-         conv.setType("both");
-         conv.setDateStyle("long");
-         conv.setTimeStyle("short");
-         control.setConverter(conv);
       }
       
       // set up the common aspects of the control
@@ -426,6 +439,8 @@ public class UIProperty extends UIPanel implements NamingContainer
          // as we don't know the type of the property we can only output a text field 
          control = (UIInput)context.getApplication().createComponent("javax.faces.Input");
          control.setRendererType("javax.faces.Text");
+         control.getAttributes().put("size", "35");
+         control.getAttributes().put("maxlength", "1024");
       
          // set control to disabled state if set to read only
          if (isReadOnly())

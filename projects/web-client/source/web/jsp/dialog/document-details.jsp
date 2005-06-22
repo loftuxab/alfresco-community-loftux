@@ -165,7 +165,7 @@
                               <a:panel label="Properties" id="properties-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
-                                       actionListener="#{EditDocPropsDialog.startWizardForEdit}">
+                                       actionListener="#{EditDocPropsDialog.setupDocumentForAction}">
                                  <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />

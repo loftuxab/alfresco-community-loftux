@@ -164,23 +164,15 @@
          The bean that backs up the Edit Document Properties Dialog
       </description>
       <managed-bean-name>EditDocPropsDialog</managed-bean-name>
-      <managed-bean-class>org.alfresco.web.bean.wizard.AddContentWizard</managed-bean-class>
+      <managed-bean-class>org.alfresco.web.bean.DocumentPropertiesBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
-         <property-name>navigator</property-name>
-         <value>#{NavigationBean}</value>
-      </managed-property>
-      <managed-property>
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>contentService</property-name>
-         <value>#{AlfContentService}</value>
       </managed-property>
    </managed-bean>
    

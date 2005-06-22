@@ -103,14 +103,14 @@
                                  <tr>
                                     <td>File&nbsp;Name:</td>
                                     <td width="90%">
-                                       <h:inputText id="file-name" value="#{EditDocPropsDialog.fileName}" size="35" maxlength="1024"
+                                       <h:inputText id="file-name" value="#{EditDocPropsDialog.properties.name}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>Content&nbsp;Type:</td>
                                     <td>
-                                       <h:selectOneMenu value="#{EditDocPropsDialog.contentType}">
+                                       <h:selectOneMenu value="#{EditDocPropsDialog.properties.contentType}">
                                           <f:selectItems value="#{EditDocPropsDialog.contentTypes}" />
                                        </h:selectOneMenu>&nbsp;*
                                     </td>
@@ -118,20 +118,32 @@
                                  <tr>
                                     <td>Title:</td>
                                     <td>
-                                       <h:inputText id="title" value="#{EditDocPropsDialog.title}" size="35" maxlength="1024"
+                                       <h:inputText id="title" value="#{EditDocPropsDialog.properties.title}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>Description:</td>
                                     <td>
-                                       <h:inputText value="#{EditDocPropsDialog.description}" size="35" maxlength="1024" />
+                                       <h:inputText value="#{EditDocPropsDialog.properties.description}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>Author:</td>
                                     <td>
-                                       <h:inputText value="#{EditDocPropsDialog.author}" size="35" maxlength="1024" />
+                                       <h:inputText value="#{EditDocPropsDialog.properties.creator}" size="35" maxlength="1024" />
+                                    </td>
+                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td colspan="2" class="wizardSectionHeading">Other Properties</td>
+                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td colspan="2">
+                                       <r:propertySheetGrid id="document-props" value="#{EditDocPropsDialog.editableNode}" 
+                                                            var="editDocProps" columns="1" 
+                                                            externalConfig="true" configArea="edit-properties" />
                                     </td>
                                  </tr>
                               </table>
@@ -143,12 +155,12 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="OK" action="#{EditDocPropsDialog.finish}" styleClass="wizardButton" />
+                                       <h:commandButton id="ok-button" value="OK" action="#{EditDocPropsDialog.save}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{EditDocPropsDialog.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="Cancel" action="cancel" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

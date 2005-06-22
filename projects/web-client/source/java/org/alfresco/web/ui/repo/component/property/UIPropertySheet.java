@@ -10,6 +10,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
 import org.alfresco.config.Config;
+import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.bean.repository.Node;
@@ -36,6 +37,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
    private Node node;
    private Boolean readOnly;
    private String mode;
+   private String configArea;
    
    /**
     * Default constructor
@@ -83,17 +85,37 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
             if (logger.isDebugEnabled())
                logger.debug("Configuring property sheet using ConfigService");
 
+            // get the properties to display
             ConfigService configSvc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
                   context).getBean("configService");
-            Config configProps = configSvc.getConfig(this.node);
+            Config configProps = null;
+            if (getConfigArea() == null)
+            {
+               configProps = configSvc.getConfig(this.node);
+            }
+            else
+            {
+               // only look within the given area
+               configProps = configSvc.getConfig(this.node, new ConfigLookupContext(getConfigArea()));
+            }
+            
             PropertySheetConfigElement propsToDisplay = (PropertySheetConfigElement)configProps.
                getConfigElement("property-sheet");
-            List<PropertyConfig> propsToRender = propsToDisplay.getPropertiesToShow();
             
-            if (logger.isDebugEnabled())
-               logger.debug("Properties to render: " + propsToDisplay.getPropertyNamesToShow());
+            if (propsToDisplay != null)
+            {
+               List<PropertyConfig> propsToRender = propsToDisplay.getPropertiesToShow();
             
-            createPropertyComponentsFromConfig(context, propsToRender);
+               if (logger.isDebugEnabled())
+                  logger.debug("Properties to render: " + propsToDisplay.getPropertyNamesToShow());
+            
+               createPropertyComponentsFromConfig(context, propsToRender);
+            }
+            else
+            {
+               if (logger.isDebugEnabled())
+                  logger.debug("There are no properties to render!");
+            }
          }
          else
          {
@@ -128,6 +150,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       this.variable = (String)values[3];
       this.readOnly = (Boolean)values[4];
       this.mode = (String)values[5];
+      this.configArea = (String)values[6];
    }
    
    /**
@@ -135,7 +158,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[6];
+      Object values[] = new Object[7];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.nodeRef;
@@ -143,6 +166,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       values[3] = this.variable;
       values[4] = this.readOnly;
       values[5] = this.mode;
+      values[6] = this.configArea;
       return (values);
    }
    
@@ -257,6 +281,31 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
    public void setMode(String mode)
    {
       this.mode = mode;
+   }
+   
+   /**
+    * @return Returns the config area to use
+    */
+   public String getConfigArea()
+   {
+      if (this.configArea == null)
+      {
+         ValueBinding vb = getValueBinding("configArea");
+         if (vb != null)
+         {
+            this.configArea = (String)vb.getValue(getFacesContext());
+         }
+      }
+      
+      return configArea;
+   }
+   
+   /**
+    * @param configArea Sets the config area to use
+    */
+   public void setConfigArea(String configArea)
+   {
+      this.configArea = configArea;
    }
 
    /**

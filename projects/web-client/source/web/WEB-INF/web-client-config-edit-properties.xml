@@ -1,0 +1,46 @@
+<alfresco-config area="edit-properties">
+   
+   <plug-ins>
+      <evaluators>
+         <evaluator id="node-type" class="org.alfresco.web.config.NodeTypeEvaluator" />
+         <evaluator id="aspect-name" class="org.alfresco.web.config.AspectEvaluator" />
+      </evaluators>
+      <element-readers>
+         <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
+         <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
+      </element-readers>
+   </plug-ins>
+   
+   <config evaluator="aspect-name" condition="compliancable">
+      <property-sheet>
+         <show-property name="removeAfter" displayLabel="Remove After" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="dublincore">
+      <property-sheet>
+         <show-property name="publisher" displayLabel="Publisher" />
+         <show-property name="contributor" displayLabel="Contributor" />
+         <show-property name="type" displayLabel="Type" />
+         <show-property name="identifier" displayLabel="Identifier" />
+         <show-property name="dcsource" displayLabel="Source" />
+         <show-property name="coverage" displayLabel="Coverage" />
+         <show-property name="rights" displayLabel="Rights" />
+         <show-property name="subject" displayLabel="Subject" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="effectivity">
+      <property-sheet>
+         <show-property name="from" displayLabel="Effective From" />
+         <show-property name="to" displayLabel="Effective To" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="summarizable">
+      <property-sheet>
+         <show-property name="summary" displayLabel="Summary" />
+      </property-sheet>
+   </config>
+   
+</alfresco-config>

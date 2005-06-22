@@ -218,7 +218,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
     */
    public void sessionCreated(HttpSessionEvent event)
    {
-      logger.info("HTTP session created: " + event.getSession().getId());
+      if (logger.isDebugEnabled())
+         logger.debug("HTTP session created: " + event.getSession().getId());
    }
 
    /**
@@ -226,7 +227,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
     */
    public void sessionDestroyed(HttpSessionEvent event)
    {
-      logger.info("HTTP session destroyed: " + event.getSession().getId());
+      if (logger.isDebugEnabled())
+         logger.debug("HTTP session destroyed: " + event.getSession().getId());
       
       User user = (User)event.getSession().getAttribute(AuthenticationFilter.AUTHENTICATION_USER);
       if (user != null)
