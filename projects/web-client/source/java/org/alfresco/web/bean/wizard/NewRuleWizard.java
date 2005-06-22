@@ -120,7 +120,7 @@ public class NewRuleWizard extends AbstractWizardBean
          else if (this.condition.equals(InCategoryEvaluator.NAME))
          {
             // put the selected category in the condition params
-            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
+            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.conditionProperties.get(PROP_CATEGORY));
             conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY_VALUE, catNodeRef);
             
@@ -142,7 +142,7 @@ public class NewRuleWizard extends AbstractWizardBean
          else if (this.action.equals(CopyActionExecutor.NAME))
          {
             // add the destination space id to the action properties
-            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_DESTINATION));
             actionParams.put(CopyActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
             
@@ -156,7 +156,7 @@ public class NewRuleWizard extends AbstractWizardBean
          else if (this.action.equals(MoveActionExecutor.NAME))
          {
             // add the destination space id to the action properties
-            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_DESTINATION));
             actionParams.put(MoveActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
             
@@ -185,7 +185,7 @@ public class NewRuleWizard extends AbstractWizardBean
                   new Boolean(approveMove));
             
             // add the destination folder of the content
-            NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+            NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_APPROVE_FOLDER));
             actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER, 
                   approveDestNodeRef);
@@ -216,7 +216,7 @@ public class NewRuleWizard extends AbstractWizardBean
                      new Boolean(rejectMove));
                
                // add the destination folder of the content
-               NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+               NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(), 
                      this.actionProperties.get(PROP_REJECT_FOLDER));
                actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER, 
                      rejectDestNodeRef);
@@ -229,7 +229,7 @@ public class NewRuleWizard extends AbstractWizardBean
                   ContentModel.ASPECT_CLASSIFIABLE);
             
             // put the selected category in the action params
-            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(context), 
+            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_CATEGORY));
             actionParams.put(LinkCategoryActionExecutor.PARAM_CATEGORY_VALUE, 
                   catNodeRef);
@@ -238,7 +238,7 @@ public class NewRuleWizard extends AbstractWizardBean
          {
             // specify the location the checked out working copy should go
             // add the destination space id to the action properties
-            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_DESTINATION));
             actionParams.put(CheckOutActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
             
@@ -262,7 +262,7 @@ public class NewRuleWizard extends AbstractWizardBean
                   this.actionProperties.get(PROP_TRANSFORMER));
             
             // add the destination space id to the action properties
-            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(context), 
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_DESTINATION));
             actionParams.put(TransformActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
             

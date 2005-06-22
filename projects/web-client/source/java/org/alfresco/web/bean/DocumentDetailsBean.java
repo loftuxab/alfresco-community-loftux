@@ -319,7 +319,7 @@ public class DocumentDetailsBean
          updateProps.put(ContentModel.PROP_APPROVE_MOVE, new Boolean(approveMove));
          
          // create node ref representation of the destination folder
-         NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+         NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.workflowProperties.get(NewRuleWizard.PROP_APPROVE_FOLDER));
          updateProps.put(ContentModel.PROP_APPROVE_FOLDER, approveDestNodeRef);
          
@@ -349,7 +349,7 @@ public class DocumentDetailsBean
             updateProps.put(ContentModel.PROP_REJECT_MOVE, new Boolean(rejectMove));
 
             // create node ref representation of the destination folder
-            NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(context), 
+            NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.workflowProperties.get(NewRuleWizard.PROP_REJECT_FOLDER));
             updateProps.put(ContentModel.PROP_REJECT_FOLDER, rejectDestNodeRef);
          }
@@ -415,7 +415,7 @@ public class DocumentDetailsBean
          throw new AlfrescoRuntimeException("approve called without an id");
       }
       
-      NodeRef docNodeRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+      NodeRef docNodeRef = new NodeRef(Repository.getStoreRef(), id);
       Node docNode = new Node(docNodeRef, this.nodeService);
       
       if (docNode.hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW) == false)
@@ -513,7 +513,7 @@ public class DocumentDetailsBean
          throw new AlfrescoRuntimeException("reject called without an id");
       }
       
-      NodeRef docNodeRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+      NodeRef docNodeRef = new NodeRef(Repository.getStoreRef(), id);
       Node docNode = new Node(docNodeRef, this.nodeService);
       
       if (docNode.hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW) == false)

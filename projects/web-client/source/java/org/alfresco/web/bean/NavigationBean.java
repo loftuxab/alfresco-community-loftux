@@ -3,20 +3,15 @@
  */
 package org.alfresco.web.bean;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
-import org.apache.log4j.Logger;
-
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
@@ -28,25 +23,14 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
-import org.alfresco.web.ui.common.component.data.UIRichList;
+import org.alfresco.web.ui.common.component.UIModeList;
+import org.apache.log4j.Logger;
 
 /**
  * @author Kevin Roast
  */
 public class NavigationBean
 {
-   public NavigationBean()
-   {
-      // kick off the breadcrumb path and our root node Id
-      List<IBreadcrumbHandler> elements = new ArrayList(1);
-      elements.add(new NavigationBreadcrumbHandler(
-            Application.getCompanyRootName(FacesContext.getCurrentInstance())));
-      setLocation(elements);
-      setCurrentNodeId(Application.getCurrentUser(
-            FacesContext.getCurrentInstance()).getHomeSpaceId());
-   }
-   
-   
    // ------------------------------------------------------------------------------
    // Bean property getters and setters 
    
@@ -81,6 +65,22 @@ public class NavigationBean
    {
       this.searchService = searchService;
    }
+   
+   /**
+    * @return Returns the namespaceService.
+    */
+   public NamespaceService getNamespaceService()
+   {
+      return this.namespaceService;
+   }
+   
+   /**
+    * @param namespaceService The namespaceService to set.
+    */
+   public void setNamespaceService(NamespaceService namespaceService)
+   {
+      this.namespaceService = namespaceService;
+   }
 
    /**
     * Return the expanded state of the Shelf panel wrapper component
@@ -100,6 +100,22 @@ public class NavigationBean
    public void setShelfExpanded(boolean expanded)
    {
       this.shelfExpanded = expanded;
+   }
+   
+   /**
+    * @return Returns the toolbar Location.
+    */
+   public String getToolbarLocation()
+   {
+      return this.toolbarLocation;
+   }
+   
+   /**
+    * @param toolbarLocation  The toolbar Location to set.
+    */
+   public void setToolbarLocation(String toolbarLocation)
+   {
+      this.toolbarLocation = toolbarLocation;
    }
    
    /**
@@ -151,7 +167,7 @@ public class NavigationBean
     */
    public Map<String, Object> getNodeProperties()
    {
-      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), 
+      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), 
             this.currentNodeId);
       Node node = new Node(nodeRef, this.nodeService);
       this.nodeProperties = node.getProperties();
@@ -180,7 +196,7 @@ public class NavigationBean
    // Navigation action event handlers
    
    /**
-    * Action to toggle the expanded state of the shelf.
+    * Action handler to toggle the expanded state of the shelf.
     * The panel component wrapping the shelf area of the UI is value bound to the shelfExpanded property.
     * 
     * @param event
@@ -190,9 +206,69 @@ public class NavigationBean
       this.shelfExpanded = !this.shelfExpanded;
    }
    
+   /**
+    * Action to change the toolbar location
+    * Currently this will changed the location from Company to the users Home space
+    */
+   public void toolbarLocationChanged(ActionEvent event)
+   {
+      UIModeList locationList = (UIModeList)event.getComponent();
+      String location = locationList.getValue().toString();
+      setToolbarLocation(location);
+      
+      FacesContext context = FacesContext.getCurrentInstance();
+      if (LOCATION_COMPANY.equals(location))
+      {
+         List<IBreadcrumbHandler> elements = new ArrayList(1);
+         NodeRef companyRootRef = getCompanyRootRef();
+         elements.add(new NavigationBreadcrumbHandler(companyRootRef, Application.getCompanyRootName(context)));
+         setLocation(elements);
+         setCurrentNodeId(companyRootRef.getId());
+      }
+      else if (LOCATION_HOME.equals(location))
+      {
+         List<IBreadcrumbHandler> elements = new ArrayList(1);
+         String homeSpaceId = Application.getCurrentUser(context).getHomeSpaceId();
+         NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
+         String homeSpaceName = Repository.getNameForNode(this.nodeService, homeSpaceRef);
+         elements.add(new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
+         setLocation(elements);
+         setCurrentNodeId(homeSpaceRef.getId());
+      }
+      
+      // work out if we need to navigate, and perform it if we do
+      if (BrowseBean.BROWSE_VIEW_ID.equals(context.getViewRoot().getViewId()) == false)
+      {
+         context.getApplication().getNavigationHandler().handleNavigation(context, null, "browse");
+      }
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Private helpers
+   
+   private NodeRef getCompanyRootRef()
+   {
+      if (this.companyRootRef == null)
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         String companySpaceName = Application.getCompanyRootName(context);
+         String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
+         
+         List<NodeRef> nodes = this.nodeService.selectNodes(
+               this.nodeService.getRootNode(Repository.getStoreRef()),
+               companyXPath, null, this.namespaceService, false);
+         
+         if (nodes.size() == 0)
+         {
+            throw new IllegalStateException("Unable to find company home space path: " + companySpaceName);
+         }
+         
+         this.companyRootRef = nodes.get(0);
+      }
+      
+      return this.companyRootRef;
+   }
    
    
    // ------------------------------------------------------------------------------
@@ -201,7 +277,7 @@ public class NavigationBean
    /**
     * Class to handle breadcrumb interaction for top-level navigation pages
     */
-   private class NavigationBreadcrumbHandler implements IBreadcrumbHandler
+   public class NavigationBreadcrumbHandler implements IBreadcrumbHandler
    {
       private static final long serialVersionUID = 4833194653193016638L;
       
@@ -210,9 +286,10 @@ public class NavigationBean
        * 
        * @param label      Element label
        */
-      public NavigationBreadcrumbHandler(String label)
+      public NavigationBreadcrumbHandler(NodeRef ref, String label)
       {
          this.label = label;
+         this.ref = ref;
       }
       
       /**
@@ -228,9 +305,9 @@ public class NavigationBean
        */
       public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
-         // set the current node to the user home folder node ID
+         // set the current node to the specified top level node ID
          FacesContext fc = FacesContext.getCurrentInstance();
-         setCurrentNodeId(Application.getCurrentUser(fc).getHomeSpaceId());
+         setCurrentNodeId(ref.getId());
          setLocation( (List)breadcrumb.getValue() );
          
          if (fc.getViewRoot().getViewId().equals(BrowseBean.BROWSE_VIEW_ID))
@@ -244,6 +321,7 @@ public class NavigationBean
       }
       
       private String label;
+      private NodeRef ref;
    }
    
    
@@ -252,14 +330,27 @@ public class NavigationBean
    
    private static Logger s_logger = Logger.getLogger(NavigationBean.class);
    
+   /** constant values used by the toolbar location modelist control */
+   private static final String LOCATION_COMPANY = "company";
+   private static final String LOCATION_HOME = "home";
+   
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
    
    /** The SearchService to be used by the bean */
    private SearchService searchService;
    
+   /** NamespaceService bean reference */
+   private NamespaceService namespaceService;
+   
    /** Node we are currently in the context of */
    private String currentNodeId;
+   
+   /** Cached version of company root Id */
+   private NodeRef companyRootRef = null;
+   
+   /** Current toolbar location */
+   private String toolbarLocation = LOCATION_HOME;
    
    /** Search context object we are currently using or null for no search */
    private SearchContext searchContext;

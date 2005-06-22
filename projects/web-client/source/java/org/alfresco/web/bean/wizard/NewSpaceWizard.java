@@ -101,11 +101,11 @@ public class NewSpaceWizard extends AbstractWizardBean
                String nodeId = getNavigator().getCurrentNodeId();
                if (nodeId == null)
                {
-                  parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
+                  parentNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
                }
                else
                {
-                  parentNodeRef = new NodeRef(Repository.getStoreRef(context), nodeId);
+                  parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
                }
                
                String qname = QName.createValidLocalName(this.name);
@@ -137,8 +137,8 @@ public class NewSpaceWizard extends AbstractWizardBean
             else if (this.createFrom.equals("existing"))
             {
                // copy the selected space and update the name, description and icon
-               NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), this.existingSpaceId);
-               NodeRef parentSpace = new NodeRef(Repository.getStoreRef(context), getNavigator().getCurrentNodeId());
+               NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), this.existingSpaceId);
+               NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
                      ContentModel.ASSOC_CONTAINS,
                      QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.name)),
@@ -157,8 +157,8 @@ public class NewSpaceWizard extends AbstractWizardBean
             else if (this.createFrom.equals("template"))
             {
                // copy the selected space and update the name, description and icon
-               NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), this.templateSpaceId);
-               NodeRef parentSpace = new NodeRef(Repository.getStoreRef(context), getNavigator().getCurrentNodeId());
+               NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), this.templateSpaceId);
+               NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
                      ContentModel.ASSOC_CONTAINS,
                      QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.name)), 
@@ -192,13 +192,13 @@ public class NewSpaceWizard extends AbstractWizardBean
                      QName.createValidLocalName(Application.getTemplatesFolderName(FacesContext.getCurrentInstance()));
                
                List<NodeRef> templateNodeList = this.nodeService.selectNodes(
-                     this.nodeService.getRootNode(Repository.getStoreRef(context)),
+                     this.nodeService.getRootNode(Repository.getStoreRef()),
                      xpath, null, namespacePrefixResolver, false);
                if (templateNodeList.size() == 1)
                {
                   // get the first item in the list as we from test above there is only one!
                   NodeRef templateNode = templateNodeList.get(0);
-                  NodeRef sourceNode = new NodeRef(Repository.getStoreRef(context), newSpaceId);
+                  NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), newSpaceId);
                   NodeRef templateCopyNode = this.nodeOperationsService.copy(sourceNode, templateNode, 
                         ContentModel.ASSOC_CONTAINS, 
                         QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.templateName)));
@@ -432,7 +432,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                QName.createValidLocalName(Application.getTemplatesFolderName(context)) +
                "/*";
          
-         NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
+         NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
          List<NodeRef> results = this.nodeService.selectNodes(rootNodeRef, xpath, null, resolver, false);

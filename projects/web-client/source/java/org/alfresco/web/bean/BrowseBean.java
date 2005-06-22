@@ -353,12 +353,12 @@ public class BrowseBean implements IContextListener
          if (parentNodeId == null)
          {
             // no specific parent node specified - use the root node
-            parentRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
+            parentRef = this.nodeService.getRootNode(Repository.getStoreRef());
          }
          else
          {
             // build a NodeRef for the specified Id and our store
-            parentRef = new NodeRef(Repository.getStoreRef(context), parentNodeId);
+            parentRef = new NodeRef(Repository.getStoreRef(), parentNodeId);
          }
          
          // TODO: can we improve the Get here with an API call for children of a specific type?
@@ -430,7 +430,7 @@ public class BrowseBean implements IContextListener
          if (logger.isDebugEnabled())
             logger.debug("Searching using query: " + query);
          ResultSet results = this.searchService.query(
-               Repository.getStoreRef(FacesContext.getCurrentInstance()), 
+               Repository.getStoreRef(), 
                "lucene", query, null, null);
          if (logger.isDebugEnabled())
             logger.debug("Search results returned: " + results.length());
@@ -543,7 +543,7 @@ public class BrowseBean implements IContextListener
       {
          try
          {
-            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             
             // refresh UI based on node selection
             refreshUI(ref, link);
@@ -626,7 +626,7 @@ public class BrowseBean implements IContextListener
          try
          {
             // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             Node node = new Node(ref, this.nodeService);
             
             // prepare a node for the action context
@@ -666,7 +666,7 @@ public class BrowseBean implements IContextListener
          try
          {
             // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             Node node = new Node(ref, this.nodeService);
             
             // store the URL to for downloading the content

@@ -358,7 +358,7 @@ public class NewUserWizard extends AbstractWizardBean
             
             // create the ACEGI Authentication instance for this user
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.userName, this.password);
-            this.authenticationService.createAuthentication(Repository.getStoreRef(context), token);
+            this.authenticationService.createAuthentication(Repository.getStoreRef(), token);
             
             if (logger.isDebugEnabled())
                logger.debug("Created User Authentication instance for username: " + this.userName);
@@ -419,7 +419,7 @@ public class NewUserWizard extends AbstractWizardBean
          try
          {
             // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             Node node = new Node(ref, this.nodeService);
             
             // remember the Person node
@@ -453,7 +453,7 @@ public class NewUserWizard extends AbstractWizardBean
          try
          {
             // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             Node node = new Node(ref, this.nodeService);
             
             // remember the Person node
@@ -820,7 +820,7 @@ public class NewUserWizard extends AbstractWizardBean
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
          
          List<NodeRef> results = nodeService.selectNodes(
-               this.nodeService.getRootNode(Repository.getStoreRef(context)),
+               this.nodeService.getRootNode(Repository.getStoreRef()),
                RepositoryAuthenticationDao.PEOPLE_FOLDER,
                null,
                resolver,
@@ -843,7 +843,7 @@ public class NewUserWizard extends AbstractWizardBean
       String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
       
       List<NodeRef> nodes = this.nodeService.selectNodes(
-            this.nodeService.getRootNode(Repository.getStoreRef(context)),
+            this.nodeService.getRootNode(Repository.getStoreRef()),
             companyXPath, null, this.namespaceService, false);
       
       if (nodes.size() == 0)
@@ -857,7 +857,7 @@ public class NewUserWizard extends AbstractWizardBean
    private String createHomeSpace(String locationId, String spaceName)
    {
       FacesContext fc = FacesContext.getCurrentInstance();
-      StoreRef storeRef = Repository.getStoreRef(fc);
+      StoreRef storeRef = Repository.getStoreRef();
       
       // TODO: implement by adding namespace resolver to Path/elements
       //       NOTE: QName already has toPrefixString() which may be useful

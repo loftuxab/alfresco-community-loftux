@@ -169,7 +169,7 @@ public class AdvancedSearchBean
          // location path search
          if (this.lookin.equals(LOOKIN_OTHER) && this.location != null)
          {
-            NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), this.location);
+            NodeRef ref = new NodeRef(Repository.getStoreRef(), this.location);
             Path path = this.nodeService.getPath(ref);
             StringBuilder buf = new StringBuilder(64);
             for (int i=0; i<path.size(); i++)

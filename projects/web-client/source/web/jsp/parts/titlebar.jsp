@@ -9,10 +9,11 @@
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width=10 height=30></td>
                <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/titlebar_bg.gif)">
                   <%-- Toolbar --%>
-                  <a:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true" value="0"
-                        itemStyleClass="topToolbar" itemLinkStyleClass="topToolbarLink" selectedStyleClass="topToolbarHighlight" selectedLinkStyleClass="topToolbarLinkHighlight">
-                     <a:listItem value="0" label="Company Space" />
-                     <a:listItem value="1" label="My Home" />
+                  <a:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true"
+                        itemStyleClass="topToolbar" itemLinkStyleClass="topToolbarLink" selectedStyleClass="topToolbarHighlight" selectedLinkStyleClass="topToolbarLinkHighlight"
+                        value="#{NavigationBean.toolbarLocation}" actionListener="#{NavigationBean.toolbarLocationChanged}">
+                     <a:listItem value="company" label="Company Space" />
+                     <a:listItem value="home" label="My Home" />
                   </a:modeList>
                </td>
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width=8 height=30></td>

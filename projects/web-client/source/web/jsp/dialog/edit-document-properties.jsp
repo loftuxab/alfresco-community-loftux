@@ -66,7 +66,7 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="26">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/folder_large.png" />
+                              <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
                               <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>

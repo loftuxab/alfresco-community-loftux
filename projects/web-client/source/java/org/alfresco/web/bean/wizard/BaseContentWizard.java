@@ -89,11 +89,11 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             String nodeId = getNavigator().getCurrentNodeId();
             if (nodeId == null)
             {
-               containerNodeRef = this.nodeService.getRootNode(Repository.getStoreRef(context));
+               containerNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
             }
             else
             {
-               containerNodeRef = new NodeRef(Repository.getStoreRef(context), nodeId);
+               containerNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
             }
 
             // create properties for content type

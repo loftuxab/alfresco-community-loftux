@@ -67,7 +67,7 @@
                               <td width=100 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
-                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/space_small.gif" padding="4" action="createSpace" actionListener="#{NewSpaceDialog.startWizard}" id="link1" />
+                                 <a:actionLink value="#{msg.new_space}" image="/images/icons/create_space.gif" padding="4" action="createSpace" actionListener="#{NewSpaceDialog.startWizard}" id="link1" />
                                  <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link2" >
                                     <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                  </a:actionLink>
@@ -85,12 +85,12 @@
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param4" />
                                     </a:actionLink>
                                     <a:actionLink value="#{msg.paste_all}" image="/images/icons/paste.gif" actionListener="#{ClipboardBean.pasteAll}" id="link8" />
-                                    <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/space_small.gif" action="createAdvancedSpace" actionListener="#{NewSpaceWizard.startWizard}" id="link9" />
+                                    <a:actionLink value="#{msg.advanced_space_wizard}" image="/images/icons/create_space.gif" action="createAdvancedSpace" actionListener="#{NewSpaceWizard.startWizard}" id="link9" />
                                     <a:actionLink value="#{msg.manage_rules}" image="/images/icons/subscribe_small.gif" action="manageRules" actionListener="#{BrowseBean.setupSpaceAction}" id="link10">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
                                     </a:actionLink>
-                                    <%-- TODO: add evaluator based on "admin" role, add correct icon --%>
-                                    <a:actionLink value="#{msg.manage_users}" image="/images/icons/invite.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
+                                    <%-- TODO: add evaluator based on "admin" role --%>
+                                    <a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
                                  </a:menu>
                               </td>
                            </a:panel>
@@ -187,7 +187,7 @@
                               <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" image="/images/icons/folder.gif" actionListener="#{BrowseBean.clickSpace}" showLink="false">
+                              <a:actionLink value="#{r.name}" image="/images/icons/space_small.gif" actionListener="#{BrowseBean.clickSpace}" showLink="false">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </f:facet>

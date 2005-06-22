@@ -325,7 +325,7 @@ public class CheckinCheckoutBean
       try
       {
          // create the node ref, then our node representation
-         NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+         NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
          node = new Node(ref, this.nodeService);
          
          // create content URL to the content download servlet with ID and expected filename
@@ -379,7 +379,7 @@ public class CheckinCheckoutBean
             if (getCopyLocation().equals(COPYLOCATION_OTHER) && this.selectedSpaceId != null)
             {
                // checkout to a arbituary parent Space 
-               NodeRef destRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), 
+               NodeRef destRef = new NodeRef(Repository.getStoreRef(), 
                      this.selectedSpaceId);
                
                // TODO: The destination assoc type qname should come from the child assoc ref.

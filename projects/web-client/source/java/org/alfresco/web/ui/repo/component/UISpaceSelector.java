@@ -44,7 +44,7 @@ public class UISpaceSelector extends AbstractItemSelector
       if (this.navigationId.equals(Application.getCurrentUser(context).getHomeSpaceId()) == false)
       {
          ChildAssociationRef parentRef = getNodeService(context).getPrimaryParent(
-               new NodeRef(Repository.getStoreRef(context), this.navigationId));
+               new NodeRef(Repository.getStoreRef(), this.navigationId));
          id = parentRef.getParentRef().getId();
       }
       
@@ -58,7 +58,7 @@ public class UISpaceSelector extends AbstractItemSelector
     */
    public Collection<ChildAssociationRef> getChildrenForNode(FacesContext context)
    {
-      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(context), this.navigationId);
+      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.navigationId);
       List<ChildAssociationRef> allKids = getNodeService(context).getChildAssocs(nodeRef);
       NodeService service = getNodeService(context);
       
@@ -84,7 +84,7 @@ public class UISpaceSelector extends AbstractItemSelector
    {
       // get the root space from the current user
       String rootId = Application.getCurrentUser(context).getHomeSpaceId();
-      NodeRef rootRef = new NodeRef(Repository.getStoreRef(context), rootId);
+      NodeRef rootRef = new NodeRef(Repository.getStoreRef(), rootId);
 
       // get a child association reference back to the real repository root to satisfy
       // the generic API we have in the abstract super class

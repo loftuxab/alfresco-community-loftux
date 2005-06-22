@@ -223,7 +223,7 @@ public abstract class AbstractItemSelector extends UIInput
             }
             else
             {
-               NodeRef nodeRef = new NodeRef(Repository.getStoreRef(context), valueId);
+               NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), valueId);
                label = Repository.getNameForNode(getNodeService(context), nodeRef);
             }
             
@@ -318,7 +318,7 @@ public abstract class AbstractItemSelector extends UIInput
                         .append(childId).append("'/></td><td>");
                      
                      // get the name for the child (rather than association name)
-                     NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(context), childId);
+                     NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(), childId);
                      String name = Repository.getNameForNode(service, childNodeRef);
                      renderNodeLink(context, childId, name, buf);
                      buf.append("</td></tr>");
@@ -337,7 +337,7 @@ public abstract class AbstractItemSelector extends UIInput
                         .append(childId).append("'/></td><td>");
                      
                      // get the name for the child (rather than association name)
-                     NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(context), childId);
+                     NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(), childId);
                      String name = Repository.getNameForNode(service, childNodeRef);
                      renderNodeLink(context, childId, name, buf);
                      buf.append("</td></tr>");

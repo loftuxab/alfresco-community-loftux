@@ -21,12 +21,100 @@
       <managed-bean-class>org.alfresco.web.bean.LoginBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
          <property-name>authenticationService</property-name>
          <value>#{authenticationService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that holds navigation state.
+      </description>
+      <managed-bean-name>NavigationBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.NavigationBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>namespaceService</property-name>
+         <value>#{AlfNamespaceService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that holds folder browse state.
+      </description>
+      <managed-bean-name>BrowseBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.BrowseBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>lockService</property-name>
+         <value>#{AlfLockService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that holds a users Clipboard state.
+      </description>
+      <managed-bean-name>ClipboardBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.clipboard.ClipboardBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeOperationsService</property-name>
+         <value>#{AlfCopyService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that holds a state for the Advanced Search screen.
+      </description>
+      <managed-bean-name>AdvancedSearchBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.AdvancedSearchBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
       </managed-property>
    </managed-bean>
    
@@ -256,86 +344,6 @@
       <managed-property>
          <property-name>contentService</property-name>
          <value>#{AlfContentService}</value>
-      </managed-property>
-   </managed-bean>
-   
-   <managed-bean>
-      <description>
-         The bean that holds navigation state.
-      </description>
-      <managed-bean-name>NavigationBean</managed-bean-name>
-      <managed-bean-class>org.alfresco.web.bean.NavigationBean</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-      <managed-property>
-         <property-name>nodeService</property-name>
-         <value>#{AlfNodeService}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>searchService</property-name>
-         <value>#{AlfSearchService}</value>
-      </managed-property>
-   </managed-bean>
-   
-   <managed-bean>
-      <description>
-         The bean that holds folder browse state.
-      </description>
-      <managed-bean-name>BrowseBean</managed-bean-name>
-      <managed-bean-class>org.alfresco.web.bean.BrowseBean</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-      <managed-property>
-         <property-name>navigator</property-name>
-         <value>#{NavigationBean}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>nodeService</property-name>
-         <value>#{AlfNodeService}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>searchService</property-name>
-         <value>#{AlfSearchService}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>lockService</property-name>
-         <value>#{AlfLockService}</value>
-      </managed-property>
-   </managed-bean>
-   
-   <managed-bean>
-      <description>
-         The bean that holds a users Clipboard state.
-      </description>
-      <managed-bean-name>ClipboardBean</managed-bean-name>
-      <managed-bean-class>org.alfresco.web.bean.clipboard.ClipboardBean</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-      <managed-property>
-         <property-name>navigator</property-name>
-         <value>#{NavigationBean}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>nodeService</property-name>
-         <value>#{AlfNodeService}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>nodeOperationsService</property-name>
-         <value>#{AlfCopyService}</value>
-      </managed-property>
-   </managed-bean>
-   
-   <managed-bean>
-      <description>
-         The bean that holds a state for the Advanced Search screen.
-      </description>
-      <managed-bean-name>AdvancedSearchBean</managed-bean-name>
-      <managed-bean-class>org.alfresco.web.bean.AdvancedSearchBean</managed-bean-class>
-      <managed-bean-scope>session</managed-bean-scope>
-      <managed-property>
-         <property-name>navigator</property-name>
-         <value>#{NavigationBean}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>nodeService</property-name>
-         <value>#{AlfNodeService}</value>
       </managed-property>
    </managed-bean>
    

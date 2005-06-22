@@ -61,7 +61,7 @@
                            <td width=100 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
-                              <a:actionLink value="#{msg.create_user}" image="/images/icons/person.gif" padding="4" action="createUser" actionListener="#{NewUserWizard.startWizard}" />
+                              <a:actionLink value="#{msg.create_user}" image="/images/icons/adduser.gif" padding="4" action="createUser" actionListener="#{NewUserWizard.startWizard}" />
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
                            <td width=100 style="padding-left:2px">
@@ -125,7 +125,7 @@
                                     <f:facet name="header">
                                        <h:outputText value="#{msg.actions}"/>
                                     </f:facet>
-                                    <a:actionLink value="#{msg.modify}" action="editUser" actionListener="#{NewUserWizard.startWizardForEdit}">
+                                    <a:actionLink value="#{msg.modify}" image="/images/icons/edituser.gif" showLink="false" action="editUser" actionListener="#{NewUserWizard.startWizardForEdit}">
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
                                  </a:column>

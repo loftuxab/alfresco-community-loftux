@@ -62,7 +62,7 @@ public class UICategorySelector extends AbstractItemSelector
       String id = null;
       
       ChildAssociationRef parentRef = getNodeService(context).getPrimaryParent(
-            new NodeRef(Repository.getStoreRef(context), this.navigationId));
+            new NodeRef(Repository.getStoreRef(), this.navigationId));
       Node parentNode = new Node(parentRef.getParentRef(), getNodeService(context));
       QName type = parentNode.getType(); 
       if (type.equals(ContentModel.TYPE_CATEGORYROOT) == false)
@@ -80,7 +80,7 @@ public class UICategorySelector extends AbstractItemSelector
     */
    public Collection<ChildAssociationRef> getChildrenForNode(FacesContext context)
    {
-      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(context), this.navigationId);
+      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.navigationId);
       
       // TODO: replace this code with the proper call to the category service but 
       //       this seems to work for now until we get proper categories to test with
@@ -98,6 +98,6 @@ public class UICategorySelector extends AbstractItemSelector
     */
    public Collection<ChildAssociationRef> getRootChildren(FacesContext context)
    {
-      return getCategoryService(context).getRootCategories(Repository.getStoreRef(context));
+      return getCategoryService(context).getRootCategories(Repository.getStoreRef());
    }
 }

@@ -44,7 +44,7 @@
 
     <context-param>
         <param-name>org.apache.myfaces.AUTO_SCROLL</param-name>
-        <param-value>true</param-value>
+        <param-value>false</param-value>
         <description>
             If true, a javascript function will be rendered that is able to restore the
             former vertical scroll on every request. Convenient feature if you have pages

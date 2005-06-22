@@ -52,7 +52,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          String selectedNodeId = value.substring(0, separatorIndex);
          boolean isParent = Boolean.parseBoolean(value.substring(separatorIndex + 1));
          NodeService service = getNodeService(context);
-         NodeRef ref = new NodeRef(Repository.getStoreRef(context), selectedNodeId);
+         NodeRef ref = new NodeRef(Repository.getStoreRef(), selectedNodeId);
          
          UINodeDescendants.NodeSelectedEvent event = new UINodeDescendants.NodeSelectedEvent(component, ref, isParent); 
          component.queueEvent(event);

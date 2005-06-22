@@ -43,6 +43,9 @@ public final class Repository
    private static final String DEFAULT_FILE_IMAGE = IMAGE_PREFIX + "_default" + IMAGE_POSTFIX;
    private static final Map<String, String> s_fileExtensionMap = new HashMap<String, String>(89, 1.0f);
    
+   /** cache of client StoreRef */
+   private static StoreRef storeRef = null;
+   
    /**
     * Private constructor
     */
@@ -55,9 +58,9 @@ public final class Repository
     * 
     * @return A StoreRef object
     */
-   public static StoreRef getStoreRef(FacesContext context)
+   public static StoreRef getStoreRef()
    {
-      return new StoreRef(StoreRef.PROTOCOL_WORKSPACE, Application.getRepositoryStoreName(context));
+      return storeRef;
    }
    
    /**
@@ -67,7 +70,9 @@ public final class Repository
     */
    public static StoreRef getStoreRef(ServletContext context)
    {
-      return new StoreRef(StoreRef.PROTOCOL_WORKSPACE, Application.getRepositoryStoreName(context));
+      storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, Application.getRepositoryStoreName(context));
+      
+      return storeRef;
    }
 
    /**

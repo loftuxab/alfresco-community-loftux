@@ -221,7 +221,7 @@ public class ClipboardBean
     */
    private void performClipboardOperation(ClipboardItem item)
    {
-      NodeRef parentRef = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), 
+      NodeRef parentRef = new NodeRef(Repository.getStoreRef(), 
             this.navigator.getCurrentNodeId());
       
       // TODO: should we use primary parent here?
@@ -268,7 +268,7 @@ public class ClipboardBean
    {
       try
       {
-         NodeRef ref = new NodeRef(Repository.getStoreRef(FacesContext.getCurrentInstance()), id);
+         NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
          
          // check for duplicates first
          ClipboardItem item = new ClipboardItem(new Node(ref, this.nodeService), mode);

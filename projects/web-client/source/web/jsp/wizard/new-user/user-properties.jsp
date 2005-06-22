@@ -131,7 +131,7 @@
                                  <tr>
                                     <td>User Password:</td>
                                     <td>
-                                       <h:inputText id="password" value="#{NewUserWizard.password}" size="35" maxlength="1024" validator="#{LoginBean.validatePassword}" onkeyup="updateButtonState();" disabled="#{NewUserWizard.editMode}" />&nbsp;*
+                                       <h:inputSecret id="password" value="#{NewUserWizard.password}" size="35" maxlength="1024" validator="#{LoginBean.validatePassword}" onkeyup="updateButtonState();" disabled="#{NewUserWizard.editMode}" redisplay="true" />&nbsp;*
                                        &nbsp;<h:message id="errors2" for="password" style="color:red" />
                                     </td>
                                  </tr>

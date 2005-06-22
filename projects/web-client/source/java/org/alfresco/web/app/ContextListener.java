@@ -69,7 +69,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       if (repoStoreName == null)
       {
          throw new Error("Repository store name has not been configured, is 'store-name' element missing?");
-      }
+      }      
       
       // repo bootstrap code for our client
       UserTransaction tx = null;
@@ -79,6 +79,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          tx = registry.getUserTransaction();
          tx.begin();
          
+         // get and setup the initial store ref from config
          StoreRef storeRef = Repository.getStoreRef(servletContext);
          
          // check the repository exists, create if it doesn't

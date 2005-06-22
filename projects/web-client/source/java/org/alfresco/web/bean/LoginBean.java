@@ -3,6 +3,8 @@
  */
 package org.alfresco.web.bean;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.application.FacesMessage;
@@ -20,9 +22,11 @@ import org.alfresco.repo.security.authentication.RepositoryUserDetails;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
+import org.alfresco.web.bean.NavigationBean.NavigationBreadcrumbHandler;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 
 /**
  * JSF Managed Bean. Backs the "login.jsp" view to provide the form fields used
@@ -66,6 +70,22 @@ public class LoginBean
    public void setNodeService(NodeService nodeService)
    {
       this.nodeService = nodeService;
+   }
+   
+   /**
+    * @return Returns the navigation bean instance.
+    */
+   public NavigationBean getNavigator()
+   {
+      return this.navigator;
+   }
+   
+   /**
+    * @param navigator The NavigationBean to set.
+    */
+   public void setNavigator(NavigationBean navigator)
+   {
+      this.navigator = navigator;
    }
    
    public void setUsername(String val)
@@ -155,8 +175,10 @@ public class LoginBean
          // in the session - this is used by the servlet filter etc. on each page to check for login
          try
          {
+            FacesContext fc = FacesContext.getCurrentInstance();
+            
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.username, this.password);
-            Authentication auth = this.authenticationService.authenticate(Repository.getStoreRef(FacesContext.getCurrentInstance()), token);
+            Authentication auth = this.authenticationService.authenticate(Repository.getStoreRef(), token);
             RepositoryUserDetails principal = (RepositoryUserDetails)auth.getPrincipal();
             
             // setup User object and Home space ID etc.
@@ -164,8 +186,18 @@ public class LoginBean
             String homeSpaceId = (String)this.nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
             user.setHomeSpaceId(homeSpaceId);
             
-            Map session = FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
+            Map session = fc.getExternalContext().getSessionMap();
             session.put(AuthenticationFilter.AUTHENTICATION_USER, user);
+            
+            // kick off the breadcrumb path and our root node Id
+            NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
+            String homeSpaceName = Repository.getNameForNode(this.nodeService, homeSpaceRef);
+            
+            this.navigator.setCurrentNodeId(homeSpaceId);
+            
+            List<IBreadcrumbHandler> elements = new ArrayList(1);
+            elements.add(this.navigator.new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
+            this.navigator.setLocation(elements);
             
             return "success";
          }
@@ -213,4 +245,7 @@ public class LoginBean
    
    /** NodeService bean reference */
    private NodeService nodeService;
+   
+   /** The NavigationBean reference */
+   private NavigationBean navigator;
 }
