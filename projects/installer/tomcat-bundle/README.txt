@@ -37,7 +37,11 @@ Install MySQL
 - Download the Windows "without installer" option (~37M)
 - Unzip the download in C:\
 
-This will create a folder 'C:\mysql'.
+This will create a folder 'C:\mysql-4.xxxxx'.  Rename this folder to:
+C:\mysql
+
+If you already have a MySQL installation, you will either have to uninstall
+it first, or make any changes as implied by the Manual Installation notes below.
 
 
 Install Alfresco Tomcat Bundle
@@ -49,8 +53,9 @@ Install Alfresco Tomcat Bundle
 
 This will create a folder 'C:\alfresco'
 
-Navigate to the 'C:\alfresco' folder and run 'install.bat'
-- this creates a MySQL database named 'alfresco'
+Navigate to the 'C:\alfresco' folder and run 'db_setup.bat' if you did a new
+install of MySQL above.  This creates a MySQL database named 'alfresco' with a user 
+account and password of 'alfresco'.
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -64,7 +69,10 @@ Navigate to the 'C:\alfresco' folder and run 'startup.bat'
 - when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
 - you can now try Alfresco by visiting:
 
-http://localhost:8080
+http://localhost:8080/web-client/faces/jsp/browse/browse.jsp
+
+The server is configured with a single administrative login with user name and password
+both set to 'admin'.
 
 To test the installation, you may wish to follow the tutorial, available from:
 
@@ -87,9 +95,11 @@ For other operating systems or where MySQL or Tomcat are already installed,
 you will need to adjust the instructions above as appropriate, such as changing
 the Tomcat port settings.
 
-The Alfresco 'install.bat' performs the following MySQL command:
+The Alfresco 'db_setup.bat' performs the following MySQL commands:
 
 c:\mysql\bin\mqslqadmin -u root -p create alfresco
+c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
+                   identified by 'alfresco' with grant option;"
 
 The Alfresco 'startup.bat' runs Tomcat's 'startup.bat', likewise for the
 'shutdown.bat'.
