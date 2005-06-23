@@ -453,8 +453,8 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:compliancable">
-         <title>Compliancable</title>
+      <aspect name="alf:complianceable">
+         <title>Complianceable</title>
          <parent>alf:auditable</parent>
          <!-- TODO: Support mandatory-aspects on an aspect in the meta-model
          <mandatory-aspects>

@@ -11,7 +11,7 @@
       </element-readers>
    </plug-ins>
    
-   <config evaluator="aspect-name" condition="compliancable">
+   <config evaluator="aspect-name" condition="complianceable">
       <property-sheet>
          <show-property name="removeAfter" displayLabel="Remove After" />
       </property-sheet>

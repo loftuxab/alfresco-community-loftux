@@ -58,7 +58,7 @@
       </property-sheet>
    </config>
    
-   <config evaluator="aspect-name" condition="compliancable">
+   <config evaluator="aspect-name" condition="complianceable">
       <property-sheet>
          <show-property name="removeAfter" displayLabel="Remove After" />
       </property-sheet>
@@ -99,7 +99,7 @@
    <config evaluator="string-compare" condition="New Rule Wizard">
       <aspects>
          <aspect id="generalclassifiable" description="Classifiable"/>
-         <aspect id="compliancable" description="Compliancable"/>
+         <aspect id="complianceable" description="Complianceable"/>
          <aspect id="dublincore" description="Dublin Core"/>
          <aspect id="effectivity" description="Effectivity"/>
          <aspect id="summarizable" description="Summarizable"/>

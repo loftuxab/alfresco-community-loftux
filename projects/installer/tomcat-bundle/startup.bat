@@ -9,7 +9,7 @@ rem ---------------------------------------
 rem Start DB (MySQL) in a minimised console
 rem ---------------------------------------
 start "MySQL Server" /min cmd /c c:\mysql\bin\mysqld-nt --console
-sleep 5
+sleep 3
 
 rem ---------------------------------------
 rem Start Tomcat
