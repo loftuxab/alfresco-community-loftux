@@ -3,7 +3,13 @@
  */
 package org.alfresco.repo.rule;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.service.cmr.rule.RuleAction;
+import org.alfresco.service.cmr.rule.RuleCondition;
 
 
 /**
@@ -11,6 +17,7 @@ import org.alfresco.repo.rule.common.RuleImpl;
  */
 public class RuleXMLUtilTest extends RuleBaseTest
 {
+    private static final String TITLE2 = "title<>&*"; 
     protected static final String RULE_ID = "1";
     
     /**
@@ -18,16 +25,16 @@ public class RuleXMLUtilTest extends RuleBaseTest
      */
     private static final String XML = 
         "<rule id='1' ruleType='inbound'>" +
-        	"<title>title</title>" +
-        	"<description>description</description>" +
+        	"<title><![CDATA[" + TITLE2 +"]]></title>" +
+        	"<description><![CDATA[description]]></description>" +
         	"<conditions>" +
         		"<condition name='match-text'>" +
-        			"<parameter name='text'>.doc</parameter>" +
+        			"<parameter name='text'><![CDATA[.doc]]></parameter>" +
                 "</condition>" +
             "</conditions>" +
             "<actions>" +
             	"<action name='add-features'>" +
-            		"<parameter name='aspect-name'>{http://www.alfresco.org/1.0}lockable</parameter>" +
+            		"<parameter name='aspect-name'><![CDATA[{http://www.alfresco.org/1.0}lockable]]></parameter>" +
                 "</action>" +
             "</actions>" +
         "</rule>";
@@ -35,7 +42,7 @@ public class RuleXMLUtilTest extends RuleBaseTest
     /**
      * Test rule
      */
-    private RuleImpl rule; 
+    private RuleImpl rule;
     
     /**
      * Setup the tests
@@ -48,6 +55,7 @@ public class RuleXMLUtilTest extends RuleBaseTest
 		
         // Create the test rule
         this.rule = createTestRule(RULE_ID);
+        this.rule.setTitle(TITLE2);
     }
     
     /**
@@ -59,8 +67,37 @@ public class RuleXMLUtilTest extends RuleBaseTest
         RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, XML);
         assertNotNull(rule);
         
-        // Check the rule
-        checkRule(rule, RULE_ID);
+        // Check the basic details of the rule
+        assertEquals(RULE_ID, rule.getId());
+        assertEquals(this.ruleType.getName(), rule.getRuleType().getName());
+        assertEquals(TITLE2, rule.getTitle());
+        assertEquals(DESCRIPTION, rule.getDescription());
+
+        // Check conditions
+        List<RuleCondition> ruleConditions = rule.getRuleConditions();
+        assertNotNull(ruleConditions);
+        assertEquals(1, ruleConditions.size());
+        assertEquals(CONDITION_DEF_NAME, ruleConditions.get(0)
+                .getRuleConditionDefinition().getName());
+        Map<String, Serializable> condParams = ruleConditions.get(0)
+                .getParameterValues();
+        assertNotNull(condParams);
+        assertEquals(1, condParams.size());
+        assertTrue(condParams.containsKey(COND_PROP_NAME_1));
+        assertEquals(COND_PROP_VALUE_1, condParams.get(COND_PROP_NAME_1));
+
+        // Check the actions
+        List<RuleAction> ruleActions = rule.getRuleActions();
+        assertNotNull(ruleActions);
+        assertEquals(1, ruleActions.size());
+        assertEquals(ACTION_DEF_NAME, ruleActions.get(0)
+                .getRuleActionDefinition().getName());
+        Map<String, Serializable> actionParams = ruleActions.get(0)
+                .getParameterValues();
+        assertNotNull(actionParams);
+        assertEquals(1, actionParams.size());
+        assertTrue(actionParams.containsKey(ACTION_PROP_NAME_1));
+        assertEquals(ACTION_PROP_VALUE_1, actionParams.get(ACTION_PROP_NAME_1));
     }
     
     /**

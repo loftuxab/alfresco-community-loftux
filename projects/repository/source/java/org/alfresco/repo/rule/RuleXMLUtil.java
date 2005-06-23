@@ -207,13 +207,13 @@ import org.dom4j.io.SAXReader;
 		String title = rule.getTitle();
 		if (title != null)
 		{
-			builder.append("<title>").append(rule.getTitle()).append("</title>");
+			builder.append("<title><![CDATA[").append(rule.getTitle()).append("]]></title>");
 		}
 		
 		String description = rule.getDescription();
 		if (description != null)
 		{
-            builder.append("<description>").append(rule.getDescription()).append("</description>");
+            builder.append("<description><![CDATA[").append(rule.getDescription()).append("]]></description>");
 		}
         
         // Output the details of the conditions
@@ -263,9 +263,9 @@ import org.dom4j.io.SAXReader;
             }
             
             builder.
-                append("<parameter name='").append(entry.getKey()).append("'>").
+                append("<parameter name='").append(entry.getKey()).append("'><![CDATA[").
                 append(getStringFromValue((Serializable)entry.getValue(), paramDef.getType())).
-                append("</parameter>");
+                append("]]></parameter>");
         }
         
         return builder.toString();
