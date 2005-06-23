@@ -561,7 +561,7 @@ public class LuceneCategoryTest extends TestCase
         
         
         result = impl.getRootCategories(rootNodeRef.getStoreRef());
-        assertEquals(4, result.size());
+        assertEquals(1, result.size());
         
         
         result = impl.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "assetClass"), CategoryService.Depth.IMMEDIATE);
@@ -587,7 +587,7 @@ public class LuceneCategoryTest extends TestCase
     {
         buildBaseIndex();
         assertEquals(1, categoryService.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE).size());
-        assertEquals(4, categoryService.getRootCategories(rootNodeRef.getStoreRef()).size());
+        assertEquals(1, categoryService.getRootCategories(rootNodeRef.getStoreRef()).size());
         assertEquals(2, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "assetClass"), CategoryService.Depth.IMMEDIATE).size());
         assertEquals(6, categoryService.getCategoryAspects().size());
     }

@@ -10,6 +10,21 @@
 
 <r:page>
 
+<script language="JavaScript1.2">
+   function checkButtonState()
+   {
+      if (document.getElementById("new-space:name").value.length == 0 )
+      {
+         document.getElementById("new-space:ok-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("new-space:ok-button").disabled = false;
+      }
+   }
+
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -90,7 +105,8 @@
                                  <tr>
                                     <td>Name:</td>
                                     <td>
-                                       <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" maxlength="1024" />&nbsp;*
+                                       <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" maxlength="1024" 
+                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
@@ -141,7 +157,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Create Space" action="#{NewSpaceDialog.finish}" styleClass="wizardButton" />
+                                       <h:commandButton id="ok-button" value="Create Space" action="#{NewSpaceDialog.finish}" 
+                                                        styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr>

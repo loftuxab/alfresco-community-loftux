@@ -86,13 +86,13 @@
                               </a:booleanEvaluator>
                               
                               <%-- approve and reject --%>
-                              <a:booleanEvaluator value="#{DocumentDetailsBean.approveStepName != null}">
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.approveStepName != null && DocumentDetailsBean.workingCopy == false && DocumentDetailsBean.locked == false}">
                                  <a:actionLink value="#{DocumentDetailsBean.approveStepName}" image="/images/icons/approve.gif" padding="4"
                                                actionListener="#{DocumentDetailsBean.approve}" action="browse">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
-                              <a:booleanEvaluator value="#{DocumentDetailsBean.rejectStepName != null}">
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.rejectStepName != null && DocumentDetailsBean.workingCopy == false && DocumentDetailsBean.locked == false}">
                                  <a:actionLink value="#{DocumentDetailsBean.rejectStepName}" image="/images/icons/reject.gif" padding="4"
                                                actionListener="#{DocumentDetailsBean.reject}" action="browse">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
@@ -196,7 +196,10 @@
                               <a:panel label="Category" id="no-category-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.categorised == false}">
-                                 <h:outputText id="no-category-msg" value="This document is not categorised." />
+                                 <h:outputText id="no-category-msg1" value="This document is not categorised." />
+                                 <f:verbatim><br/><br/></f:verbatim>
+                                 <a:actionLink id="make-classifiable" value="Allow Categorization" 
+                                               action="#{DocumentDetailsBean.applyClassifiable}" />
                               </a:panel>
                               <br/>
                               <a:panel label="Version History" id="version-history-panel" progressive="true" expanded="false"
@@ -248,7 +251,10 @@
                               <a:panel label="Version History" id="no-version-history-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.versionable == false}">
-                                 <h:outputText id="no-history-msg" value="This document has no version history." />
+                                 <h:outputText id="no-history-msg1" value="This document has no version history." />
+                                 <f:verbatim><br/><br/></f:verbatim>
+                                 <a:actionLink id="make-versionable" value="Allow Versioning" 
+                                               action="#{DocumentDetailsBean.applyVersionable}" />
                               </a:panel>
                               <br/>
                            </td>

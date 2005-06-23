@@ -698,6 +698,64 @@ public class DocumentDetailsBean
    }
    
    /**
+    * Applies the classifiable aspect to the current document
+    */
+   public void applyClassifiable()
+   {
+      UserTransaction tx = null;
+      
+      try
+      {
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx.begin();
+         
+         // add the general classifiable aspect to the node
+         this.nodeService.addAspect(getDocument().getNodeRef(), ContentModel.ASPECT_GEN_CLASSIFIABLE, null);
+         
+         // commit the transaction
+         tx.commit();
+         
+         // reset the state of the current document
+         getDocument().reset();
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new AlfrescoRuntimeException("Failed to apply the classifiable aspect to the document", e);
+      }
+   }
+   
+   /**
+    * Applies the versionable aspect to the current document
+    */
+   public void applyVersionable()
+   {
+      UserTransaction tx = null;
+      
+      try
+      {
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx.begin();
+         
+         // add the versionable aspect to the node
+         this.nodeService.addAspect(getDocument().getNodeRef(), ContentModel.ASPECT_VERSIONABLE, null);
+         
+         // commit the transaction
+         tx.commit();
+         
+         // reset the state of the current document
+         getDocument().reset();
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new AlfrescoRuntimeException("Failed to apply the versionable aspect to the document", e);
+      }
+   }
+   
+   /**
     * Returns whether the current document is locked
     * 
     * @return true if the document is checked out

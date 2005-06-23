@@ -211,7 +211,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         ResultSet resultSet = null;
         try
         {
-            resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH_WITH_REPEATS:\"//alf:categoryRoot/*\"", null, null);
+            resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH_WITH_REPEATS:\"//alf:categoryRoot\"", null, null);
             return resultSetToChildAssocCollection(resultSet);
         }
         finally
