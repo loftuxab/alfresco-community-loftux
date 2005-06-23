@@ -18,7 +18,6 @@
          -->
          <!-- Or for use in Tomcat standalone -->
          <mode>servlet</mode>
-         -->
          <error-page>/jsp/error.jsp</error-page>
          <login-page>/jsp/login.jsp</login-page>
       </server>

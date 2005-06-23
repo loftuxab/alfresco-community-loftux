@@ -11,7 +11,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.util.debug.CodeMonkey;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
@@ -237,7 +236,7 @@ public class ContentTransformerRegistry
     private List<ContentTransformer> findComplexTransformer(String sourceMimetype, String targetMimetype)
     {
         // get a complete list of mimetypes
-        CodeMonkey.todo("Build complex transformers by searching for transformations by mimetype"); // TODO
+        // TODO: Build complex transformers by searching for transformations by mimetype
         return Collections.emptyList();
     }
     

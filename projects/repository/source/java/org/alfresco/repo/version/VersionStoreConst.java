@@ -3,7 +3,6 @@
  */
 package org.alfresco.repo.version;
 
-import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 

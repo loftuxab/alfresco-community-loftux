@@ -3,8 +3,6 @@
  */
 package org.alfresco.web.ui.common.component;
 
-import java.util.Map;
-
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;

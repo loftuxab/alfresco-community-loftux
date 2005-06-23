@@ -2,7 +2,6 @@ package org.alfresco.web.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +12,10 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionHistory;
 import org.alfresco.service.cmr.version.VersionService;
@@ -29,9 +26,7 @@ import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.bean.wizard.AbstractWizardBean;
 import org.alfresco.web.bean.wizard.NewRuleWizard;
-import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.log4j.Logger;
 

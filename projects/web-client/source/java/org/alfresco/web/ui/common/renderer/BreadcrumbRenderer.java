@@ -7,11 +7,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
-import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 
 import org.alfresco.web.ui.common.Utils;

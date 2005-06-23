@@ -5,12 +5,10 @@ package org.alfresco.repo.version.common.counter.db;
 
 import javax.sql.DataSource;
 
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.util.debug.CodeMonkey;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Version counter Db DAO service implemtation.
@@ -19,11 +17,7 @@ import org.alfresco.util.debug.CodeMonkey;
  */
 public class DbVersionCounterDaoServiceImpl implements VersionCounterDaoService
 {
-	static
-	{
-		// TODO 
-		CodeMonkey.todo("the queries need to moved to a query register at some point");
-	}
+    // TODO: the queries need to moved to a query register at some point
 	
     /**
      * SQL - create table

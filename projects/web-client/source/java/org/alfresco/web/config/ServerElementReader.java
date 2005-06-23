@@ -1,7 +1,5 @@
 package org.alfresco.web.config;
 
-import java.util.Iterator;
-
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;

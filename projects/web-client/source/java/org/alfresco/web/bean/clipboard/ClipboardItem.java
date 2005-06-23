@@ -3,7 +3,6 @@
  */
 package org.alfresco.web.bean.clipboard;
 
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.bean.repository.Node;
 
 /**

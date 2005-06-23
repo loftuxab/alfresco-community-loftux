@@ -3,8 +3,6 @@
  */
 package org.alfresco.web.ui.common.tag;
 
-import java.util.Random;
-
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.servlet.jsp.JspException;

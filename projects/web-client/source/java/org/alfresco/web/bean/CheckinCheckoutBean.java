@@ -5,15 +5,12 @@ package org.alfresco.web.bean;
 
 import java.io.File;
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
@@ -35,7 +32,6 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.log4j.Logger;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast

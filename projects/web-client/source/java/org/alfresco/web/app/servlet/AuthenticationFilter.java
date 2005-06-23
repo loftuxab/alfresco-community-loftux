@@ -17,14 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.StoreContextHolder;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
  * @author Kevin Roast

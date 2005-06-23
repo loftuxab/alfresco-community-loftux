@@ -3,10 +3,7 @@
  */
 package org.alfresco.web.ui.common.tag;
 
-import javax.faces.webapp.UIComponentTag;
 import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.el.ValueBinding;
 
 /**
  * @author kevinr

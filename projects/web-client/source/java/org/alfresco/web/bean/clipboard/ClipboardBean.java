@@ -14,8 +14,8 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.context.UIContextService;
@@ -26,7 +26,6 @@ import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.repo.component.shelf.UIClipboardShelfItem;
 import org.apache.log4j.Logger;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast

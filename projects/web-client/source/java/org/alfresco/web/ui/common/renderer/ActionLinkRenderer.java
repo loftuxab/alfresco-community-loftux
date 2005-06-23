@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;

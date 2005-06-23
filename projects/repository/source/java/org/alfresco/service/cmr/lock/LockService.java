@@ -9,7 +9,6 @@ import java.util.Collection;
 
 import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
 
 
 /**

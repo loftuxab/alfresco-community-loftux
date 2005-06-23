@@ -188,7 +188,7 @@ public class StoreRedirectorProxyFactory<I> implements FactoryBean, Initializing
             }
 
             if (logger.isDebugEnabled())
-                logger.debug("Redirecting method " + method + " to binding " + binding + " based on store type " + storeRef);
+                logger.debug("Redirecting method " + method + " based on store type " + storeRef);
 
             try
             {

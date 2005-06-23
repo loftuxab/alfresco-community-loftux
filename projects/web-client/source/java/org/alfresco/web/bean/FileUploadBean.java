@@ -1,12 +1,6 @@
 package org.alfresco.web.bean;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.apache.commons.fileupload.FileItem;
 
 /**
  * Bean to hold the results of a file upload

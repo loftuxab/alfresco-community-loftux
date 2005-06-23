@@ -12,10 +12,8 @@ import javax.servlet.http.HttpSession;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.ErrorBean;
-import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ServerConfigElement;
 import org.apache.log4j.Logger;

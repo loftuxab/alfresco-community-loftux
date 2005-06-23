@@ -5,17 +5,14 @@ package jsftest;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.faces.component.UIParameter;
 import javax.faces.event.ActionEvent;
-
-import org.apache.log4j.Logger;
 
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
+import org.apache.log4j.Logger;
 
 /**
  * @author kevinr

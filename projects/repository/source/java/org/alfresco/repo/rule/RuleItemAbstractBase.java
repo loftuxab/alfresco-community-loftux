@@ -3,11 +3,9 @@
  */
 package org.alfresco.repo.rule;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.RuleItem;

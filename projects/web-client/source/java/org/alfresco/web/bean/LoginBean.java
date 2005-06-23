@@ -25,7 +25,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
-import org.alfresco.web.bean.NavigationBean.NavigationBreadcrumbHandler;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;

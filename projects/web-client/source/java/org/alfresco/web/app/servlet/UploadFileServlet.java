@@ -13,7 +13,6 @@ import javax.servlet.http.HttpSession;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;

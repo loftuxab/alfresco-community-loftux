@@ -6,7 +6,6 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.util.debug.CodeMonkey;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pdfbox.pdmodel.PDDocument;
@@ -27,7 +26,7 @@ public class PdfBoxContentTransformer extends AbstractContentTransformer
      */
     public double getReliability(String sourceMimetype, String targetMimetype)
     {
-        CodeMonkey.todo("Expand PDFBox usage to convert images to PDF and investigate other conversions"); // TODO
+        // TODO: Expand PDFBox usage to convert images to PDF and investigate other conversions
         
         if (!MimetypeMap.MIMETYPE_PDF.equals(sourceMimetype) ||
                 !MimetypeMap.MIMETYPE_TEXT_PLAIN.equals(targetMimetype))

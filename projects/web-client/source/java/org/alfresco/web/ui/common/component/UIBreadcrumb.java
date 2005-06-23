@@ -3,15 +3,12 @@
  */
 package org.alfresco.web.ui.common.component;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import javax.faces.event.AbortProcessingException;

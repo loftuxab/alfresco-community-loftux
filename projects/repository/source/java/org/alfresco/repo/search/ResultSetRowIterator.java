@@ -7,7 +7,6 @@
  */
 package org.alfresco.repo.search;
 
-import java.util.Iterator;
 import java.util.ListIterator;
 
 import org.alfresco.service.cmr.search.ResultSetRow;

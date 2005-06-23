@@ -3,15 +3,10 @@ package org.alfresco.web.bean;
 import java.util.List;
 import java.util.Map;
 
-import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import javax.transaction.UserTransaction;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
-import org.alfresco.web.bean.repository.Node;
-import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIModeList;

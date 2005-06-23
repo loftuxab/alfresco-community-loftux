@@ -25,7 +25,6 @@ import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.repo.security.authentication.StoreContextHolder;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -70,7 +69,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       {
          throw new Error("Repository store name has not been configured, is 'store-name' element missing?");
       }      
-      
+
       // repo bootstrap code for our client
       UserTransaction tx = null;
       String companySpaceId = null;
@@ -189,15 +188,15 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             {
                 throw new Exception("Unable to find system types folder path: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
             }
-            
+
             nodeService.createNode(
                   results.get(0),
                   ContentModel.ASSOC_CHILDREN,
-                  ContentModel.TYPE_PERSON,  // expecting this qname path in the authentication methods 
+                  ContentModel.TYPE_PERSON,  // expecting this qname path in the authentication methods
                   ContentModel.TYPE_PERSON,
                   props);
          }
-         
+
          // commit the transaction
          tx.commit();
       }
@@ -205,6 +204,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         System.out.println(e.toString());
          throw new AlfrescoRuntimeException("Failed to initialise ", e);
       }
       

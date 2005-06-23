@@ -46,7 +46,7 @@ public class RepositoryUser extends User implements RepositoryUserDetails
 
     public String getSalt()
     {
-        System.out.println("Salt is "+salt);
+        //System.out.println("Salt is "+salt);
         return salt;
     }
 

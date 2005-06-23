@@ -3,8 +3,6 @@ package org.alfresco.web.bean.wizard;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,6 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -27,7 +24,6 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.log4j.Logger;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Base Handler class used by the Content Wizards 

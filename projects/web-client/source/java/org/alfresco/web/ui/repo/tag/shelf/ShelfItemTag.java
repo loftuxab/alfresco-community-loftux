@@ -3,8 +3,6 @@
  */
 package org.alfresco.web.ui.repo.tag.shelf;
 
-import javax.faces.component.UIComponent;
-
 import org.alfresco.web.ui.common.tag.HtmlComponentTag;
 
 /**

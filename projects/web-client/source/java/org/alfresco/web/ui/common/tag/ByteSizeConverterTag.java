@@ -6,7 +6,6 @@ package org.alfresco.web.ui.common.tag;
 import javax.faces.convert.Converter;
 import javax.faces.webapp.ConverterTag;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
 
 import org.alfresco.web.ui.common.converter.ByteSizeConverter;
 

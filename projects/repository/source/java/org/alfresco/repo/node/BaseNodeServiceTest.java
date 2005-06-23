@@ -37,7 +37,6 @@ import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
-import org.alfresco.util.debug.CodeMonkey;
 import org.hibernate.Session;
 
 /**
@@ -538,15 +537,15 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 ASSOC_TYPE_QNAME_TEST_CONTAINS,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
-                CodeMonkey.todo("Fix test checks");
-//        int countBefore = countChildrenOfNode(rootNodeRef);
-//        assertEquals("Root children count incorrect", 1, countBefore);
+        // TODO: Fix test checks
+        // int countBefore = countChildrenOfNode(rootNodeRef);
+        // assertEquals("Root children count incorrect", 1, countBefore);
         // associate the two nodes
         nodeService.addChild(rootNodeRef, assocRef.getChildRef(), ASSOC_TYPE_QNAME_TEST_CONTAINS, QName.createQName("pathB"));
         // there should now be 2 child assocs on the root
-        CodeMonkey.todo("Fix test checks");
-//        int countAfter = countChildrenOfNode(rootNodeRef);
-//        assertEquals("Root children count incorrect", 2, countAfter);
+        // TODO: Fix test checks
+        // int countAfter = countChildrenOfNode(rootNodeRef);
+        // assertEquals("Root children count incorrect", 2, countAfter);
     }
     
     public void testRemoveChildByRef() throws Exception

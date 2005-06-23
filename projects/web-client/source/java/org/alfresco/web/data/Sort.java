@@ -1,15 +1,14 @@
 package org.alfresco.web.data;
 
+import java.lang.reflect.Method;
+import java.text.CollationKey;
+import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.text.Collator;
-import java.text.CollationKey;
 
 import org.apache.log4j.Logger;
 

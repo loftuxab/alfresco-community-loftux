@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.event.AbortProcessingException;
@@ -18,8 +17,6 @@ import javax.faces.event.FacesEvent;
 
 import org.alfresco.web.bean.SearchContext;
 import org.alfresco.web.ui.common.Utils;
-import org.alfresco.web.ui.common.component.SelfRenderingComponent;
-import org.alfresco.web.ui.repo.component.property.UIPropertySheet;
 import org.apache.log4j.Logger;
 
 /**

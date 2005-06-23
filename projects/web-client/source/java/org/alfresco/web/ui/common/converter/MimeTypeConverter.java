@@ -4,10 +4,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.DateTimeConverter;
 
-import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.web.bean.repository.Repository;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Converter class to convert an XML date representation into a Date

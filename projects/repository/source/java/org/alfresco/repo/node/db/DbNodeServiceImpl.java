@@ -40,7 +40,6 @@ import org.alfresco.service.cmr.repository.StoreExistsException;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
-import org.alfresco.util.debug.CodeMonkey;
 import org.springframework.util.Assert;
 
 /**
@@ -186,7 +185,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Assert.notNull(assocTypeQName);
         Assert.notNull(assocQName);
         
-        CodeMonkey.todo("Check that the child association is allowed"); // TODO
+        // TODO: Check that the child association is allowed
         if (properties == null)
         {
             properties = Collections.emptyMap();
@@ -262,7 +261,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Assert.notNull(assocTypeQName);
         Assert.notNull(assocQName);
         
-        CodeMonkey.todo("Check that the child association is allowed"); // TODO
+        // TODO: Check that the child association is allowed
         
         // check the node references
         Node nodeToMove = getNodeNotNull(nodeToMoveRef);
@@ -512,7 +511,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		invokeBeforeUpdateNode(parentRef);
         invokeBeforeCreateChildAssociation(parentRef, childRef, assocTypeQName, assocQName);
 		
-        CodeMonkey.todo("Check that the child association is allowed"); // TODO
+        // TODO: Check that the child association is allowed
         // check that both nodes belong to the same store
         if (!parentRef.getStoreRef().equals(childRef.getStoreRef()))
         {
@@ -810,7 +809,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		// Invoke policy behaviours
 		invokeBeforeUpdateNode(sourceRef);
 		
-        CodeMonkey.todo("Check that the association is allowed"); // TODO
+        // TODO: Check that the association is allowed
         Node sourceNode = getNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // see if it exists
@@ -1004,7 +1003,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             boolean isPrimary = assoc.getIsPrimary();
             // build a real association reference
             ChildAssociationRef assocRef = new ChildAssociationRef(assoc.getTypeQName(), parentRef, qname, childRef, isPrimary, -1);
-            CodeMonkey.issue("Is ordering relevant here?");  // TODO: consider ordering
+            // TODO: Issue - Is ordering relevant here?
             Path.Element element = new Path.ChildAssocElement(assocRef);
             // create a new path that builds on the current path
             Path path = new Path();

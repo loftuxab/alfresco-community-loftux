@@ -18,7 +18,6 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.TempFileProvider;
-import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * A content service that determines at runtime the store that the
@@ -49,7 +48,7 @@ public class RoutingContentService implements ContentService
             ContentTransformerRegistry transformerRegistry,
             ContentStore store)
     {
-        CodeMonkey.todo("The store root should be set on the store directly and via a config file");  // TODO
+        // TODO: The store root should be set on the store directly and via a config file
         this.dictionaryService = dictionaryService;
         this.nodeService = nodeService;
         this.transformerRegistry = transformerRegistry;
@@ -78,7 +77,7 @@ public class RoutingContentService implements ContentService
             return null;
         }
         
-        CodeMonkey.todo("Choose the store to read from at runtime");  // TODO
+        // TODO: Choose the store to read from at runtime
         ContentReader reader = store.getReader(contentUrl);
         
         // get the content mimetype
@@ -106,7 +105,7 @@ public class RoutingContentService implements ContentService
             throw new InvalidTypeException("The node must be an instance of type content", nodeType);
         }
         
-        CodeMonkey.todo("Choose the store to write to at runtime");  // TODO
+        // TODO: Choose the store to write to at runtime
         ContentWriter writer = store.getWriter();
 
         // get the content mimetype
@@ -207,7 +206,7 @@ public class RoutingContentService implements ContentService
         
         public void setNodeService(NodeService nodeService)
         {
-            CodeMonkey.issue("The listener should get the node service from a registry"); // TODO
+            // TODO: Issue - The listener should get the node service from a registry
             this.nodeService = nodeService;
         }
 

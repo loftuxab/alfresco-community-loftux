@@ -90,7 +90,7 @@ public class NodeServiceXPath extends BaseXPath
         }
         SimpleFunctionContext sfc = (SimpleFunctionContext) this.getFunctionContext();
         // Register extra functions here - both null and empty namespace
-        CodeMonkey.issue("Investigate why both null and empty string ns are required for the functions"); //TODO
+        // TODO: Issue - Investigate why both null and empty string ns are required for the functions
         sfc.registerFunction("", "subtypeOf", new SubTypeOf());
         sfc.registerFunction("", "deref", new Deref());
         sfc.registerFunction("", "like", new Like());

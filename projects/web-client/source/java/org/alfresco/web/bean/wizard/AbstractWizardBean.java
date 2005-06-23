@@ -4,7 +4,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.NavigationBean;

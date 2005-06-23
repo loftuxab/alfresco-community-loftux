@@ -6,10 +6,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.DateTimeConverter;
 
-import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.web.bean.repository.Repository;
-import org.springframework.web.jsf.FacesContextUtils;
-
 /**
  * Converter class to convert the size of an item in bytes into a readable KB/MB form.
  * 

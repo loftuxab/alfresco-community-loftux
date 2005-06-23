@@ -5,7 +5,6 @@ import java.util.List;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.util.debug.CodeMonkey;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -79,11 +78,10 @@ public class ContentStoreCleanupJob implements Job
         for (String contentUrl : contentUrls)
         {
             // search for it
-            CodeMonkey.issue("Sort out where the content URLs will be stored in the new model");  // TODO
+            // TODO: Issue - Sort out where the content URLs will be stored in the new model
             // perform the search
             // we search for document that are young enough and have the URL
             // if found - continue
-// TODO:
             
             // not found - it is not in the repo, but check that it is old enough to delete
             ContentReader reader = contentStore.getReader(contentUrl);

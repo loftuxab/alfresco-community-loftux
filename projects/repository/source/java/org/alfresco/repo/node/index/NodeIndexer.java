@@ -10,7 +10,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.debug.CodeMonkey;
 
 /**
  * Handles the node policy callbacks to ensure that the node hierarchy is properly
@@ -48,7 +47,7 @@ public class NodeIndexer
      */
     private void init()
     {
-        CodeMonkey.issue("How can we be sure that the behaviour isn't hijacked?");  // TODO: Behaviour hijacking
+        // TODO: Issue - How can we be sure that the behaviour isn't hijacked?
         
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateStore"),

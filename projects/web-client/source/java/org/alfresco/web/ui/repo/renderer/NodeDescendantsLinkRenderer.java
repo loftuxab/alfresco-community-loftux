@@ -22,7 +22,6 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast

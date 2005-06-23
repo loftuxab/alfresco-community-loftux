@@ -3,16 +3,12 @@ package org.alfresco.web.ui.common.component.description;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.el.ValueBinding;
 
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 import org.apache.log4j.Logger;

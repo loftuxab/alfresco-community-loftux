@@ -9,7 +9,6 @@ import javax.servlet.ServletContext;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
