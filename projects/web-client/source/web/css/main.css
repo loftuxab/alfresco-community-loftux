@@ -60,6 +60,11 @@ a.path:hover
 	font-weight: normal;
 }
 
+headerText
+{
+   font-weight: bold;
+}
+
 a.header:link, a.header:visited
 {
 	font-weight: bold;
@@ -67,6 +72,12 @@ a.header:link, a.header:visited
 
 a.header:hover
 {
+	font-weight: bold;
+}
+
+titleText
+{
+   font-size: 12px;
 	font-weight: bold;
 }
 

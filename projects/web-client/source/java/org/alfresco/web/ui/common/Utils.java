@@ -673,7 +673,7 @@ public final class Utils
       context.addMessage(null, facesMsg);
       if (err != null && logger.isDebugEnabled())
       {
-         err.printStackTrace();
+         logger.error(msg, err);
       }
    }
    

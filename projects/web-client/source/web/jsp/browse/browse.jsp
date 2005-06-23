@@ -314,6 +314,7 @@
                            <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
+                           <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
                            <h:graphicImage url="/images/icons/locked.gif" width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
@@ -325,6 +326,7 @@
                            <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="header">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
+                           <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" styleClass="headerText" />
                            <h:graphicImage url="/images/icons/locked.gif" width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
@@ -336,6 +338,7 @@
                            <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="title">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
+                           <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" styleClass="titleText" />
                            <h:graphicImage url="/images/icons/locked.gif" width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
@@ -425,7 +428,7 @@
                                  </a:actionLink>
                               </a:booleanEvaluator>
                               <a:booleanEvaluator value="#{r.workingCopy == true}"> <%-- TODO: add "|| r.locked == true" later if possible to do --%>
-                                 <a:actionLink value="#{msg.undocheckout}" image="/images/icons/UndoCheckOut_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
+                                 <a:actionLink value="#{msg.undocheckout}" image="/images/icons/undo_checkout.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>

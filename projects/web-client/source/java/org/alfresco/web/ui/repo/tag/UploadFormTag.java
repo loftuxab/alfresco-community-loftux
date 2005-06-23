@@ -38,7 +38,7 @@ public class UploadFormTag extends TagSupport
                                    getAttribute("javax.portlet.response");
             if (renderResp == null)
             {
-               throw new IllegalStateException("RenderResponse object is null");
+               throw new IllegalStateException("RenderResponse object is null. The web-client is executing in 'portlet' mode - is this correct?");
             }
             
             out.write(renderResp.createActionURL().toString());

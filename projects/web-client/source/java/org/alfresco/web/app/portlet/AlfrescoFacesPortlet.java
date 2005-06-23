@@ -7,26 +7,35 @@ import java.util.List;
 
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewRoot;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortalContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.servlet.ServletContext;
 
+import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.repo.security.authentication.StoreContextHolder;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
+import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.log4j.Logger;
+import org.apache.myfaces.context.servlet.ServletFacesContextImpl;
 import org.apache.myfaces.portlet.MyFacesGenericPortlet;
 import org.apache.myfaces.portlet.PortletUtil;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
 {
@@ -169,6 +178,13 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
          {
             try
             {
+               // setup the authentication context
+               WebApplicationContext ctx = (WebApplicationContext)getPortletContext().getAttribute(
+                     WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+               AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
+               StoreContextHolder.setContext(Repository.getStoreRef());
+               auth.validate(user.getTicket());
+               
                // do the normal JSF processing
                super.facesRender(request, response);
             }
@@ -286,4 +302,8 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
       
       return this.errorPage;
    }
+   
+   // PortletSession attribute
+   private static final String CURRENT_FACES_CONTEXT = 
+       MyFacesGenericPortlet.class.getName() + ".CURRENT_FACES_CONTEXT";
 }

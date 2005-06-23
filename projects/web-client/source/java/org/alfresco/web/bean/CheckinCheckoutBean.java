@@ -378,31 +378,14 @@ public class CheckinCheckoutBean
                NodeRef destRef = new NodeRef(Repository.getStoreRef(), 
                      this.selectedSpaceId);
                
-               // TODO: The destination assoc type qname should come from the child assoc ref.
                ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(destRef);
                workingCopyRef = this.versionOperationsService.checkout(node.getNodeRef(),
-                     destRef, null, childAssocRef.getQName());
+                     destRef, ContentModel.ASSOC_CONTAINS, childAssocRef.getQName());
             }
             else
             {
                workingCopyRef = this.versionOperationsService.checkout(node.getNodeRef());
             }
-            
-            // modify the name to include an additional string
-            // save the original name so we can set it back later
-            String originalName = node.getName();
-            String workingCopyName;
-            int extIndex = originalName.lastIndexOf('.');
-            if (extIndex != -1)
-            {
-               workingCopyName = originalName.substring(0, extIndex) + WORKING_COPY + originalName.substring(extIndex);  
-            }
-            else
-            {
-               workingCopyName = originalName + WORKING_COPY;
-            }
-            this.nodeService.setProperty(workingCopyRef, ContentModel.PROP_NAME, workingCopyName);
-            this.nodeService.setProperty(workingCopyRef, QNAME_ORIGINALNAME, originalName);
             
             // set the working copy Node instance
             Node workingCopy = new Node(workingCopyRef, this.nodeService);
@@ -617,16 +600,16 @@ public class CheckinCheckoutBean
       {
          try
          {
-            // TODO: find the working copy for this document and cancel the checkout on it
             if (node.hasAspect(ContentModel.ASPECT_WORKING_COPY))
             {
                this.versionOperationsService.cancelCheckout(node.getNodeRef());
             }
             else if (node.hasAspect(ContentModel.ASPECT_LOCKABLE))
             {
-               // TODO: is this possible? as currently only the workingcopy aspect has the copyReference
+               // TODO: find the working copy for this document and cancel the checkout on it
+               //       is this possible? as currently only the workingcopy aspect has the copyReference
                //       attribute - this means we cannot find out where the copy is to cancel it!
-               //       can we construct a search? (errgh)
+               //       can we construct an XPath node lookup?
                throw new RuntimeException("NOT IMPLEMENTED");
             }
             else
@@ -672,14 +655,6 @@ public class CheckinCheckoutBean
             if (logger.isDebugEnabled())
                logger.debug("Trying to checkin content node Id: " + node.getId());
             
-            // get the original name and the working copy name
-            String origNameProp = (String)node.getProperties().get("originalName");
-            String nameProp = node.getName();
-            
-            // switch the name back to the original name before checkin
-            // otherwise the working copy name will get set on the original doc!
-            this.nodeService.setProperty(node.getNodeRef(), ContentModel.PROP_NAME, origNameProp);
-            
             // we can either checkin the content from the current working copy node
             // which would have been previously updated by the user
             String contentUrl;
@@ -710,12 +685,6 @@ public class CheckinCheckoutBean
                   props,
                   contentUrl, 
                   this.keepCheckedOut);
-            
-            // restore working copy name after checkin copy opp
-            if (this.keepCheckedOut == true)
-            {
-               this.nodeService.setProperty(node.getNodeRef(), ContentModel.PROP_NAME, nameProp);
-            }
             
             // commit the transaction
             tx.commit();
@@ -830,14 +799,11 @@ public class CheckinCheckoutBean
    
    private static Logger logger = Logger.getLogger(CheckinCheckoutBean.class);
    
-   private static final String WORKING_COPY = " (working copy)";
+   //private static final String WORKING_COPY = " (working copy)";
    
    /** constants for copy location selection */
    private static final String COPYLOCATION_CURRENT = "current";
    private static final String COPYLOCATION_OTHER   = "other";
-   
-   /** well known QName values */
-   private static final QName QNAME_ORIGINALNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "originalName");
    
    /** The current document */
    private Node document;

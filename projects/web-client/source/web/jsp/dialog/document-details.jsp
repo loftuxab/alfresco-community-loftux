@@ -79,7 +79,7 @@
                                  </a:actionLink>
                               </a:booleanEvaluator>
                               <a:booleanEvaluator value="#{DocumentDetailsBean.workingCopy == true}">
-                                 <a:actionLink value="#{msg.undocheckout}" image="/images/icons/UndoCheckOut_icon.gif" padding="4" 
+                                 <a:actionLink value="#{msg.undocheckout}" image="/images/icons/undo_checkout.gif" padding="4" 
                                                actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                  </a:actionLink>
