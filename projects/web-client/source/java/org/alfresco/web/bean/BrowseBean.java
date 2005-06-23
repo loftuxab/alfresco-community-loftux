@@ -499,7 +499,8 @@ public class BrowseBean implements IContextListener
       node.put("locked", Repository.isNodeLocked(node, this.lockService));
       node.put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));
       node.put("url", DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName()));
-      node.put("fileTypeImage", Repository.getFileTypeImage(node));
+      node.put("fileType16", Repository.getFileTypeImage(node, true));
+      node.put("fileType32", Repository.getFileTypeImage(node, false));
    }
    
    

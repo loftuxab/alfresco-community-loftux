@@ -309,7 +309,7 @@
                               <a:sortLink label="Name" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileTypeImage}" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType16}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" />
                            <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
@@ -319,7 +319,7 @@
                         <%-- Primary column for icons view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left;vertical-align:top;" rendered="#{BrowseBean.browseViewMode == 'icons'}">
                            <f:facet name="large-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file_medium.gif" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="header" />
                            <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
@@ -329,7 +329,7 @@
                         <%-- Primary column for list view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
                            <f:facet name="large-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file_medium.gif" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="title" />
                            <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />

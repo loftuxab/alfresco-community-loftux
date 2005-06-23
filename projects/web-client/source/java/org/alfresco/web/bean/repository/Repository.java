@@ -40,9 +40,11 @@ public final class Repository
    // TODO: TEMP! Replace this once we have "users" in the system!
    private static final String USERNAME = "admin";
    
-   private static final String IMAGE_PREFIX = "/images/filetypes/";
+   private static final String IMAGE_PREFIX16 = "/images/filetypes/";
+   private static final String IMAGE_PREFIX32 = "/images/filetypes32/";
    private static final String IMAGE_POSTFIX = ".gif";
-   private static final String DEFAULT_FILE_IMAGE = IMAGE_PREFIX + "_default" + IMAGE_POSTFIX;
+   private static final String DEFAULT_FILE_IMAGE16 = IMAGE_PREFIX16 + "_default" + IMAGE_POSTFIX;
+   private static final String DEFAULT_FILE_IMAGE32 = IMAGE_PREFIX32 + "_default" + IMAGE_POSTFIX;
    private static final Map<String, String> s_fileExtensionMap = new HashMap<String, String>(89, 1.0f);
    
    /** cache of client StoreRef */
@@ -259,27 +261,29 @@ public final class Repository
     * Return the image path to the filetype icon for the specified node
     * 
     * @param node       Node to build filetype icon path for
+    * @param small      True for the small 16x16 icon or false for the large 32x32 
     * 
     * @return the image path for the specified node type or the default icon if not found
     */
-   public static String getFileTypeImage(Node node)
+   public static String getFileTypeImage(Node node, boolean small)
    {
-      String image = DEFAULT_FILE_IMAGE;
+      String image = (small ? DEFAULT_FILE_IMAGE16 : DEFAULT_FILE_IMAGE32);
       
       String name = node.getName();
       int extIndex = name.lastIndexOf('.');
       if (extIndex != -1 && name.length() > extIndex + 1)
       {
          String ext = name.substring(extIndex + 1).toLowerCase();
+         String key = ext + ' ' + (small ? "16" : "32");
          
-         // found file extension
+         // found file extension for appropriate size image
          synchronized (s_fileExtensionMap)
          {
-            image = s_fileExtensionMap.get(ext);
+            image = s_fileExtensionMap.get(key);
             if (image == null)
             {
                // not found create for first time
-               image = IMAGE_PREFIX + ext + IMAGE_POSTFIX;
+               image = (small ? IMAGE_PREFIX16 : IMAGE_PREFIX32) + ext + IMAGE_POSTFIX;
                
                // TODO: add support for Large filetype icons also!
                
@@ -287,13 +291,13 @@ public final class Repository
                if (FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(image) != null)
                {
                   // found the image for this extension - save it for later
-                  s_fileExtensionMap.put(ext, image);
+                  s_fileExtensionMap.put(key, image);
                }
                else
                {
                   // not found, save the default image for this extension instead
-                  image = DEFAULT_FILE_IMAGE;
-                  s_fileExtensionMap.put(ext, image);
+                  image = (small ? DEFAULT_FILE_IMAGE16 : DEFAULT_FILE_IMAGE32);
+                  s_fileExtensionMap.put(key, image);
                }
             }
          }

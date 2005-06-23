@@ -122,21 +122,15 @@
                                     <td>
                                        <table border="0" cellpadding="0" cellspacing="0"><tr><td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                                       <a:imagePickerRadio columns="7" spacing="4" value="#{EditSpaceDialog.icon}">
+                                       <a:imagePickerRadio columns="8" spacing="4" value="#{EditSpaceDialog.icon}">
                                           <a:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
-                                          <a:listItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
-                                          <a:listItem value="space-icon-www" image="/images/icons/space-icon-www.gif" />
-                                          <a:listItem value="space-icon-world" image="/images/icons/space-icon-world.gif" />
-                                          <a:listItem value="space-icon-spanner" image="/images/icons/space-icon-spanner.gif" />
-                                          <a:listItem value="space-icon-public" image="/images/icons/space-icon-public.gif" />
-                                          <a:listItem value="space-icon-orange-ball" image="/images/icons/space-icon-orange-ball.gif" />
-                                          <a:listItem value="space-icon-lock" image="/images/icons/space-icon-lock.gif" />
-                                          <a:listItem value="space-icon-library" image="/images/icons/space-icon-library.gif" />
-                                          <a:listItem value="space-icon-images" image="/images/icons/space-icon-images.gif" />
-                                          <a:listItem value="space-icon-id" image="/images/icons/space-icon-id.gif" />
-                                          <a:listItem value="space-icon-glasses" image="/images/icons/space-icon-glasses.gif" />
-                                          <a:listItem value="space-icon-download" image="/images/icons/space-icon-download.gif" />
-                                          <a:listItem value="space-icon-documents" image="/images/icons/space-icon-documents.gif" />
+                                          <a:listItem value="space-icon-purple" image="/images/icons/space-icon-purple.gif" />
+                                          <a:listItem value="space-icon-blue" image="/images/icons/space-icon-blue.gif" />
+                                          <a:listItem value="space-icon-brown" image="/images/icons/space-icon-brown.gif" />
+                                          <a:listItem value="space-icon-grey" image="/images/icons/space-icon-grey.gif" />
+                                          <a:listItem value="space-icon-red" image="/images/icons/space-icon-red.gif" />
+                                          <a:listItem value="space-icon-yellow" image="/images/icons/space-icon-yellow.gif" />
+                                          <a:listItem value="space-icon-magenta" image="/images/icons/space-icon-magenta.gif" />
                                        </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                        </td></tr></table>
