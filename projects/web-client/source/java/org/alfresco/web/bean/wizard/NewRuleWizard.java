@@ -921,6 +921,9 @@ public class NewRuleWizard extends AbstractWizardBean
     */
    public List<SelectItem> getAspects()
    {
+      if (true)
+         throw new AlfrescoRuntimeException("forced error");
+         
       if (this.aspects == null)
       {
          ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(

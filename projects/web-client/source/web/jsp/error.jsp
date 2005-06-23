@@ -9,14 +9,15 @@
 <table cellspacing="0" cellpadding="2" width="100%">
    <tr>
       <%-- Top level toolbar and company logo area --%>
-      <td width="100%">
+      <td width=100%>
          <table cellspacing="0" cellpadding="0" width="100%">
             <tr>
-               <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width="28" height="30" /></td>
-               <td width="100%" style="background-image: url(<%=request.getContextPath()%>/images/parts/titlebar_bg.gif)">
+               <td><a href="http://www.alfresco.org" target="new"><img src="<%=request.getContextPath()%>/images/logo/AlfrescoLogo32.png" width=32 height=30 alt="Alfresco" title="Alfresco" border=0 style="padding-right:4px"></a></td>
+               <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width="10" height="30"></td>
+               <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/titlebar_bg.gif)">
                   <span class="topToolbarTitle">System Error</span>
                </td>
-               <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width=4 height=30></td>
+               <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width="8" height="30"></td>
             </tr>
          </table>
       </td>

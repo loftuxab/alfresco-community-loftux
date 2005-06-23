@@ -5,18 +5,16 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.faces.application.ViewHandler;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import javax.portlet.UnavailableException;
-
-import net.sf.acegisecurity.Authentication;
 
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
@@ -42,6 +40,9 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
    
    private static Logger logger = Logger.getLogger(AlfrescoFacesPortlet.class);
 
+   private String loginPage = null;
+   private String errorPage = null;
+   
    /**
     * Called by the portlet container to allow the portlet to process an action request.
     */
@@ -107,7 +108,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
       }
       catch (Throwable e)
       {
-         if (Application.getErrorPage(getPortletContext()) != null)
+         if (getErrorPage() != null)
          {
             handleError(request, response, e);
          }
@@ -129,23 +130,6 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
             }
          }
       }
-   }
-   
-   private void handleError(ActionRequest request, ActionResponse response, Throwable error)
-      throws PortletException, IOException
-   {
-      // get the error bean from the session and set the error that occurred.
-      PortletSession session = request.getPortletSession();
-      ErrorBean errorBean = (ErrorBean)session.getAttribute(ErrorBean.ERROR_BEAN_NAME, 
-                             PortletSession.PORTLET_SCOPE);
-      if (errorBean == null)
-      {
-         errorBean = new ErrorBean();
-         session.setAttribute(ErrorBean.ERROR_BEAN_NAME, errorBean, PortletSession.PORTLET_SCOPE);
-      }
-      errorBean.setLastError(error);
-      
-      response.setRenderParameter(ERROR_OCCURRED, "true");
    }
 
    /**
@@ -171,7 +155,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
          // use the viewId to check that we are not already on the login page
          String viewId = request.getParameter(VIEW_ID);
          User user = (User)request.getPortletSession().getAttribute(AuthenticationFilter.AUTHENTICATION_USER);
-         if (user == null && (viewId == null || viewId.equals(getLoginPage(getPortletContext())) == false))
+         if (user == null && (viewId == null || viewId.equals(getLoginPage()) == false))
          {
             if (logger.isDebugEnabled())
                logger.debug("No valid login, requesting login page. ViewId: " + viewId);
@@ -183,22 +167,123 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
          }
          else
          {
-            // TODO: Add error handling around here so errors in getter's get caught!
-            super.facesRender(request, response);
+            try
+            {
+               // do the normal JSF processing
+               super.facesRender(request, response);
+            }
+            catch (Throwable e)
+            {
+               if (getErrorPage() != null)
+               {
+                  handleError(request, response, e);
+               }
+               else
+               {
+                  logger.warn("No error page configured, re-throwing exception");
+                  
+                  if (e instanceof PortletException)
+                  {
+                     throw (PortletException)e;
+                  }
+                  else if (e instanceof IOException)
+                  {
+                     throw (IOException)e;
+                  }
+                  else
+                  {
+                     throw new PortletException(e);
+                  }
+               }
+            }
          }
       }
    }
    
-   private String getLoginPage(PortletContext context)
+   /**
+    * Handles errors that occur during a process action request
+    */
+   private void handleError(ActionRequest request, ActionResponse response, Throwable error)
+      throws PortletException, IOException
+   {
+      // get the error bean from the session and set the error that occurred.
+      PortletSession session = request.getPortletSession();
+      ErrorBean errorBean = (ErrorBean)session.getAttribute(ErrorBean.ERROR_BEAN_NAME, 
+                             PortletSession.PORTLET_SCOPE);
+      if (errorBean == null)
+      {
+         errorBean = new ErrorBean();
+         session.setAttribute(ErrorBean.ERROR_BEAN_NAME, errorBean, PortletSession.PORTLET_SCOPE);
+      }
+      errorBean.setLastError(error);
+      
+      response.setRenderParameter(ERROR_OCCURRED, "true");
+   }
+   
+   /**
+    * Handles errors that occur during a render request
+    */
+   private void handleError(RenderRequest request, RenderResponse response, Throwable error)
+      throws PortletException, IOException
+   {
+      // get the error bean from the session and set the error that occurred.
+      PortletSession session = request.getPortletSession();
+      ErrorBean errorBean = (ErrorBean)session.getAttribute(ErrorBean.ERROR_BEAN_NAME, 
+                             PortletSession.PORTLET_SCOPE);
+      if (errorBean == null)
+      {
+         errorBean = new ErrorBean();
+         session.setAttribute(ErrorBean.ERROR_BEAN_NAME, errorBean, PortletSession.PORTLET_SCOPE);
+      }
+      errorBean.setLastError(error);
+
+      // if the faces context is available set the current view to the browse page
+      // so that the error page goes back to the application (rather than going back
+      // to the same page which just throws the error again meaning we can never leave
+      // the error page)
+      FacesContext context = FacesContext.getCurrentInstance();
+      if (context != null)
+      {
+         ViewHandler viewHandler = context.getApplication().getViewHandler();
+         // TODO: configure the portlet error return page
+         UIViewRoot view = viewHandler.createView(context, "/jsp/browse/browse.jsp");
+         context.setViewRoot(view);
+      }
+
+      // get the error page and include that instead
+      String errorPage = getErrorPage();
+      
+      if (logger.isDebugEnabled())
+         logger.debug("An error has occurred, redirecting to error page: " + errorPage);
+      
+      response.setContentType("text/html");
+      PortletRequestDispatcher dispatcher = getPortletContext().getRequestDispatcher(errorPage);
+      dispatcher.include(request, response);
+   }
+   
+   /**
+    * @return Retrieves the configured login page
+    */
+   private String getLoginPage()
    {
       if (this.loginPage == null)
       {
-         this.loginPage = Application.getLoginPage(context);
+         this.loginPage = Application.getLoginPage(getPortletContext());
       }
       
       return this.loginPage;
    }
    
-   
-   private String loginPage = null;
+   /**
+    * @return Retrieves the configured error page
+    */
+   private String getErrorPage()
+   {
+      if (this.errorPage == null)
+      {
+         this.errorPage = Application.getErrorPage(getPortletContext());
+      }
+      
+      return this.errorPage;
+   }
 }

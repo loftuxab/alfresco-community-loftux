@@ -3,6 +3,8 @@ package org.alfresco.web.bean;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import javax.servlet.ServletException;
+
 /**
  * Bean used by the error page, holds the last exception to be thrown by the system
  * 
@@ -56,13 +58,36 @@ public class ErrorBean
       
       if (this.lastError != null)
       {
-         StringBuilder builder = new StringBuilder(this.lastError.toString());
-         Throwable cause = this.lastError.getCause();
+         StringBuilder builder = null;
+         Throwable cause = null;
+         if (this.lastError instanceof ServletException && 
+             ((ServletException)this.lastError).getRootCause() != null)
+         {
+            // servlet exception puts the actual error in root cause!!
+            Throwable actualError = ((ServletException)this.lastError).getRootCause();
+            builder = new StringBuilder(actualError.toString());
+            cause = actualError.getCause();
+         }
+         else
+         {
+            builder = new StringBuilder(this.lastError.toString());
+            cause = this.lastError.getCause(); 
+         }
+         
          while (cause != null)
          {
             builder.append("<br/><br/>caused by:<br/>");
             builder.append(cause.toString());
-            cause = cause.getCause();
+            
+            if (cause instanceof ServletException && 
+             ((ServletException)cause).getRootCause() != null)
+            {
+               cause = ((ServletException)cause).getRootCause();
+            }
+            else
+            {
+               cause = cause.getCause();
+            }  
          }
          
          message = builder.toString();
@@ -78,8 +103,18 @@ public class ErrorBean
    {
       StringWriter stringWriter = new StringWriter();
       PrintWriter writer = new PrintWriter(stringWriter);
-      this.lastError.printStackTrace(writer);
-      String stackTrace = stringWriter.toString().replaceAll("\r\n", "<br/>");
-      return stackTrace;
+      
+      if (this.lastError instanceof ServletException && 
+          ((ServletException)this.lastError).getRootCause() != null)
+      {
+         Throwable actualError = ((ServletException)this.lastError).getRootCause();
+         actualError.printStackTrace(writer);
+      }
+      else
+      {
+         this.lastError.printStackTrace(writer);
+      }
+      
+      return stringWriter.toString().replaceAll("\r\n", "<br/>");
    }
 }

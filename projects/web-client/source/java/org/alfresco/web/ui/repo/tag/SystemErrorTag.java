@@ -180,8 +180,8 @@ public class SystemErrorTag extends TagSupport
             
             PortletURL url = renderResp.createRenderURL();
             // NOTE: we don't have to specify the page for the portlet, just the VIEW_ID parameter
-            //       being present will cause the same JSF view to be re-displayed
-            url.setParameter("org.apache.myfaces.portlet.MyFacesGenericPortlet.VIEW_ID", "same-jsf-page");
+            //       being present will cause the current JSF view to be re-displayed
+            url.setParameter("org.apache.myfaces.portlet.MyFacesGenericPortlet.VIEW_ID", "current-view");
             out.write(url.toString());
          }
          else
