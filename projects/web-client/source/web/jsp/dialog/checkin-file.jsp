@@ -81,61 +81,7 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
-                                 <tr>
-                                    <td class="wizardSectionHeading">Working copy location</td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       To check-in a file from your computer, first upload the content to the repository.
-                                    </td>
-                                 </tr>
-                                 </h:form>
-                                 
-                                 <r:uploadForm>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td>
-                                       Location:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td class="mainSubText">Click upload</td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <input style="margin-left:12px;" type="submit" value="Upload" />
-                                    </td>
-                                 </tr>
-                                 <%
-                                 CheckinCheckoutBean bean = (CheckinCheckoutBean)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "CheckinCheckoutBean");
-                                 if (bean == null)
-                                 {
-                                 	bean = (CheckinCheckoutBean)session.getAttribute("CheckinCheckoutBean");
-                                 }
-                                 if (bean != null && bean.getFileName() != null) {
-                                 %>
-                                    <tr>
-                                       <td>
-                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                          The file "<%=bean.getFileName()%>" was uploaded successfully.
-                                       </td>
-                                    </tr>
-                                 <% } %>
-                                 </r:uploadForm>
-                                 
-                                 <h:form id="checkin-file2">
-                                 <tr>
-                                    <td>
-                                       <h:selectOneRadio value="#{CheckinCheckoutBean.copyLocation}" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemDisabled="#{CheckinCheckoutBean.fileName != null}" itemLabel="Use copy in current space" />
-                                          <f:selectItem itemValue="other" itemLabel="Use copy uploaded from my computer" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td class="wizardSectionHeading">Check In options</td>
                                  </tr>
@@ -156,8 +102,26 @@
                                        <span style="vertical-align:20%">Check in changes and keep file checked out</span>
                                     </td>
                                  </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td class="wizardSectionHeading">Working copy location</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       Which copy do you want to check-in?
+                                    </td>
+                                 </tr>
+                                 
+                                 <tr>
+                                    <td>
+                                       <h:selectOneRadio value="#{CheckinCheckoutBean.copyLocation}" layout="pageDirection">
+                                          <f:selectItem itemValue="current" itemDisabled="#{CheckinCheckoutBean.fileName != null}" itemLabel="Use copy in current space" />
+                                          <f:selectItem itemValue="other" itemLabel="Use copy uploaded from my computer" />
+                                       </h:selectOneRadio>
+                                    </td>
+                                 </tr>
                               </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                              
                            </td>
                            
                            <td width="100%" valign="top">
@@ -178,11 +142,58 @@
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                         </tr>
+                        
+                        </h:form>
+
+                        <tr>
+                           <td style="padding-left: 32px;">
+                              <r:uploadForm>
+                              <table>
+                                 <tr>
+                                    <td>1. Locate document to upload</td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>
+                                       Location:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td class="mainSubText">2. Click upload</td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <input style="margin-left:12px;" type="submit" value="Upload" />
+                                    </td>
+                                 </tr>
+                                 <%
+                                 CheckinCheckoutBean bean = (CheckinCheckoutBean)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "CheckinCheckoutBean");
+                                 if (bean == null)
+                                 {
+                                    bean = (CheckinCheckoutBean)session.getAttribute("CheckinCheckoutBean");
+                                 }
+                                 if (bean != null && bean.getFileName() != null) {
+                                 %>
+                                    <tr><td class="paddingRow"></td></tr>
+                                    <tr>
+                                       <td>
+                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                          The file "<%=bean.getFileName()%>" was uploaded successfully.
+                                       </td>
+                                    </tr>
+                                 <% } %>
+                              </table>
+                              </r:uploadForm>
+                           </td>
+                        </tr>
                      </table>
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>
                
+               <h:form id="checkin-file2">
+                            
                <%-- Error Messages --%>
                <tr valign="top">
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
@@ -200,12 +211,12 @@
                   <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_9.gif" width="4" height="4"></td>
                </tr>
                
+               </h:form>
+               
             </table>
           </td>
        </tr>
     </table>
-    
-    </h:form>
     
 </f:view>
 

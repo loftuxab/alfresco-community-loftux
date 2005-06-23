@@ -88,7 +88,7 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       Locate and upload your document to the repository
+                                       1. Locate and upload your document to the repository
                                     </td>
                                  </tr>
                                  </h:form>
@@ -102,7 +102,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText">Click upload</td>
+                                    <td class="mainSubText">2. Click upload</td>
                                  </tr>
                                  <tr>
                                     <td>
