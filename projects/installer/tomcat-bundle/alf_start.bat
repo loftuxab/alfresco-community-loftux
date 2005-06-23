@@ -3,16 +3,22 @@ rem ---------------------------------------------------------------------------
 rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
+echo Starting database...
+
 rem ---------------------------------------
-rem Shutdown Tomcat
+rem Start DB (MySQL) in a minimised console
+rem ---------------------------------------
+start "MySQL Server" /min cmd /c c:\mysql\bin\mysqld-nt --console
+sleep 3
+
+rem ---------------------------------------
+rem Start Tomcat
 rem ---------------------------------------
 cd \alfresco\tomcat
-call bin\shutdown.bat
+call bin\startup.bat
 cd \alfresco
 
 rem ---------------------------------------
-rem Shutdown MySQL
+rem Start OpenOffice for transformations
 rem ---------------------------------------
-c:\mysql\bin\mysqladmin -u root shutdown
-
-
+if exist "start_oo.bat" call "start_oo.bat"

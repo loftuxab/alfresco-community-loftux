@@ -22,6 +22,9 @@ Requirements:
 - MySQL Database available from http://www.mysql.com
 - alfrescoTC.zip available from http://www.alfresco.org
 
+Optional:
+- OpenOffice for document transformation available from http://www.openoffice.org
+
 
 =================================
 Simple Installation on Windows XP
@@ -67,11 +70,29 @@ account and password of 'alfresco'.
 You have now installed all the components needed to run the Alfresco server.
 
 
+Optional Install of OpenOffice
+------------------------------
+
+If you would like to have a range of document transformations available from within
+Alfresco, you need to install OpenOffice 1.1.4.  This is entirely optional and can be
+done at any point after Alfresco has been installed.  OpenOffice should be installed
+in C:\Program Files\OpenOffice.org1.1.4
+
+- Browse to http://download.openoffice.org/1.1.4/index.html
+- Download the Windows version
+- Install OpenOffice with defaults (except file associations, unless you wish to)
+- Start one of the OpenOffice programs to go through initial registration, then close it
+- Rename the 'zstart_oo.bat' in 'C:\alfresco' to 'start_oo.bat'
+- Rename the 'zstop_oo.bat' in 'C:\alfresco' to 'stop_oo.bat'
+- Stop and restart the Alfresco server if it is already running
+
+
 ===========================
 Running the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'startup.bat'
+Navigate to the 'C:\alfresco' folder and run 'alf_start.bat'
+- two minimized windows will be started for MySQL and OpenOffice
 - a console window will open for Tomcat
 - when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
 - you can now try Alfresco by visiting:
@@ -90,7 +111,7 @@ http://www.alfresco.org/tutorial
 Closing the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'shutdown.bat'
+Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
 
 
 
@@ -111,5 +132,5 @@ c:\mysql\bin\mqslqadmin -u root -p create alfresco
 c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
                    identified by 'alfresco' with grant option;"
 
-The Alfresco 'startup.bat' starts the database and runs Tomcat's 'startup.bat'.
-The 'shutdown.bat' runs Tomcat's 'shutdown.bat' and shutsdown the database.
+The Alfresco 'alf_start.bat' starts the database and runs Tomcat's 'startup.bat'.
+The 'alf_stop.bat' runs Tomcat's 'shutdown.bat' and shutsdown the database.
