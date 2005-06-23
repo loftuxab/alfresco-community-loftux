@@ -143,7 +143,10 @@
                                     <td colspan="2">
                                        <r:propertySheetGrid id="document-props" value="#{EditDocPropsDialog.editableNode}" 
                                                             var="editDocProps" columns="1" 
+                                                            rendered="#{EditDocPropsDialog.otherPropertiesPresent}"
                                                             externalConfig="true" configArea="edit-properties" />
+                                       <h:outputText value="This document does not have any other properties to show." 
+                                                     rendered="#{EditDocPropsDialog.otherPropertiesPresent == false}" />
                                     </td>
                                  </tr>
                               </table>

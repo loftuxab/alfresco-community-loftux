@@ -47,7 +47,6 @@ public class Application
 {
    public static final String BEAN_CONFIG_SERVICE = "configService";
    public static final String BEAN_DATA_DICTIONARY = "dataDictionary";
-   public static final String BEAN_CURRENT_USER = "currentUser";
    
    private static String repoStoreName;
    private static String companyRootName;

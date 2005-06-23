@@ -205,8 +205,8 @@
                               <a:panel label="Category" id="no-category-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.categorised == false}">
-                                 <h:outputText id="no-category-msg1" value="This document is not categorised." />
-                                 <f:verbatim><br/><br/></f:verbatim>
+                                 <h:outputText id="no-category-msg" value="This document is not categorised.<br/><br/>" 
+                                               escape="false"/>
                                  <a:actionLink id="make-classifiable" value="Allow Categorization" 
                                                action="#{DocumentDetailsBean.applyClassifiable}" />
                               </a:panel>
@@ -260,9 +260,9 @@
                               <a:panel label="Version History" id="no-version-history-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.versionable == false}">
-                                 <h:outputText id="no-history-msg1" value="This document has no version history." />
-                                 <f:verbatim><br/><br/></f:verbatim>
-                                 <a:actionLink id="make-versionable" value="Allow Versioning" 
+                                 <h:outputText id="no-history-msg" value="This document has no version history.<br/><br/>" 
+                                               escape="false" />
+                                 <a:actionLink id="make-versionable" value="Allow Versioning"
                                                action="#{DocumentDetailsBean.applyVersionable}" />
                               </a:panel>
                               <br/>

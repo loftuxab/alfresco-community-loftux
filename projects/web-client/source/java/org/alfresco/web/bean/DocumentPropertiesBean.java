@@ -28,16 +28,22 @@ import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigLookupContext;
+import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.config.PropertySheetConfigElement;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Backing bean for the edit document properties dialog
@@ -50,6 +56,7 @@ public class DocumentPropertiesBean
    private BrowseBean browseBean;
    private List<SelectItem> contentTypes;
    private Node editableNode;
+   private Boolean hasOtherProperties;
    
    /**
     * Returns the node being edited
@@ -70,6 +77,7 @@ public class DocumentPropertiesBean
    {
       this.editableNode = new Node(this.browseBean.getDocument().getNodeRef(),
             this.nodeService);
+      this.hasOtherProperties = null;
    }
    
    /**
@@ -152,6 +160,29 @@ public class DocumentPropertiesBean
       }
       
       return this.contentTypes;
+   }
+   
+   /**
+    * Determines whether this document has any other properties other than the 
+    * default set to display to the user.
+    * 
+    * @return true of there are properties to show, false otherwise
+    */
+   public boolean getOtherPropertiesPresent()
+   {
+      if (this.hasOtherProperties == null)
+      {
+         // we need to use the config service to see whether there are any
+         // editable properties configured for this document.
+         ConfigService configSvc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config configProps = configSvc.getConfig(this.editableNode, new ConfigLookupContext("edit-properties"));
+         PropertySheetConfigElement propsToDisplay = (PropertySheetConfigElement)configProps.
+               getConfigElement("property-sheet");
+         this.hasOtherProperties = new Boolean(propsToDisplay != null);
+      }
+      
+      return this.hasOtherProperties.booleanValue();
    }
    
    /**

@@ -30,6 +30,7 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.config.PropertySheetConfigElement;
 import org.alfresco.web.config.PropertySheetConfigElement.PropertyConfig;
@@ -104,7 +105,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
 
             // get the properties to display
             ConfigService configSvc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
-                  context).getBean("configService");
+                  context).getBean(Application.BEAN_CONFIG_SERVICE);
             Config configProps = null;
             if (getConfigArea() == null)
             {
