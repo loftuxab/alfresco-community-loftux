@@ -140,12 +140,19 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
                     transformer.transform(sourceReader.getReader(), targetWriter);
                     
                     // if the target format is any type of text, then it must contain the 'quick' phrase
-                    if (targetMimetype.startsWith(StringExtractingContentTransformer.PREFIX_TEXT))
+                    if (targetMimetype.equals(MimetypeMap.MIMETYPE_TEXT_PLAIN))
                     {
                         ContentReader targetReader = targetWriter.getReader();
                         String checkContent = targetReader.getContentString();
-                        assertTrue("Quick phrase not present in document converted to text by transformer: " + transformer,
+                        assertTrue("Quick phrase not present in document converted to text by transformer: " + transformer + " writer " + targetReader + " reader " + sourceReader,
                                 checkContent.contains(QUICK_CONTENT));
+                    }
+                    else if (targetMimetype.startsWith(StringExtractingContentTransformer.PREFIX_TEXT))
+                    {
+                        ContentReader targetReader = targetWriter.getReader();
+                        String checkContent = targetReader.getContentString();
+                        assertTrue("Quick phrase not present in document converted to text by transformer: " + transformer + " writer " + targetReader + " reader " + sourceReader,
+                                checkContent.contains("quick"));
                     }
                     // increment count
                     count++;

@@ -66,7 +66,7 @@ public class UnoContentTransformer extends AbstractContentTransformer
                 new DocumentFormatWrapper(DocumentFormat.HTML_WRITER, 1.0));
         formatsByConversion.put(
                 new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_HTML, MimetypeMap.MIMETYPE_PDF),
-                new DocumentFormatWrapper(DocumentFormat.PDF_WRITER, 1.0));
+                new DocumentFormatWrapper(DocumentFormat.PDF_WRITER_WEB, 1.0));
         
         // there are many more formats available and therefore many more transformation combinations possible
 //        DocumentFormat.FLASH_IMPRESS
