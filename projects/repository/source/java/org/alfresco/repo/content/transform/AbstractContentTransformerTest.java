@@ -23,6 +23,8 @@ import org.alfresco.util.TempFileProvider;
 public abstract class AbstractContentTransformerTest extends BaseSpringTest
 {
     private static String QUICK_CONTENT = "The quick brown fox jumps over the lazy dog";
+    private static String[] QUICK_WORDS = new String[] {
+            "quick", "brown", "fox", "jumps", "lazy", "dog"};
 
     protected MimetypeMap mimetypeMap;
     protected ContentTransformer transformer;
@@ -144,15 +146,26 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
                     {
                         ContentReader targetReader = targetWriter.getReader();
                         String checkContent = targetReader.getContentString();
-                        assertTrue("Quick phrase not present in document converted to text by transformer: " + transformer + " writer " + targetReader + " reader " + sourceReader,
+                        assertTrue("Quick phrase not present in document converted to text: \n" +
+                                "   transformer: " + transformer + "\n" +
+                                "   source: " + sourceReader + "\n" +
+                                "   target: " + targetWriter,
                                 checkContent.contains(QUICK_CONTENT));
                     }
                     else if (targetMimetype.startsWith(StringExtractingContentTransformer.PREFIX_TEXT))
                     {
                         ContentReader targetReader = targetWriter.getReader();
                         String checkContent = targetReader.getContentString();
-                        assertTrue("Quick phrase not present in document converted to text by transformer: " + transformer + " writer " + targetReader + " reader " + sourceReader,
-                                checkContent.contains("quick"));
+                        // essentially check that FTS indexing can use the conversion properly
+                        for (int word = 0; word < QUICK_WORDS.length; i++)
+                        {
+                            assertTrue("Quick phrase word not present in document converted to text: \n" +
+                                    "   transformer: " + transformer + "\n" +
+                                    "   source: " + sourceReader + "\n" +
+                                    "   target: " + targetWriter + "\n" +
+                                    "   word: " + word,
+                                    checkContent.contains(QUICK_WORDS[word]));
+                        }
                     }
                     // increment count
                     count++;
