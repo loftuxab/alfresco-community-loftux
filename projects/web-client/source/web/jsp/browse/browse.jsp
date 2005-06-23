@@ -311,11 +311,9 @@
                            <f:facet name="small-icon">
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileTypeImage}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
-                           <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
-                              <f:param name="id" value="#{r.id}" />
-                           </a:actionLink>
+                           <a:actionLink value="#{r.name}" href="#{r.url}" />
                            <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
-                           <h:graphicImage url="/images/icons/locked.gif" width="16" height="16" rendered="#{r.locked == true}" />
+                           <h:graphicImage url="/images/icons/locked.gif" align="absmiddle" width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
                         <%-- Primary column for icons view mode --%>
@@ -323,11 +321,9 @@
                            <f:facet name="large-icon">
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file_medium.gif" showLink="false" styleClass="inlineAction" />
                            </f:facet>
-                           <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="header">
-                              <f:param name="id" value="#{r.id}" />
-                           </a:actionLink>
+                           <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="header" />
                            <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
-                           <h:graphicImage url="/images/icons/locked.gif" width="16" height="16" rendered="#{r.locked == true}" />
+                           <h:graphicImage url="/images/icons/locked.gif" align="absmiddle"  width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
                         <%-- Primary column for list view mode --%>
@@ -335,11 +331,9 @@
                            <f:facet name="large-icon">
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="/images/icons/file_medium.gif" showLink="false" styleClass="inlineAction" />
                            </f:facet>
-                           <a:actionLink value="#{r.name}" tooltip="#{msg.view_details_file} '#{r.name}'" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails" styleClass="title">
-                              <f:param name="id" value="#{r.id}" />
-                           </a:actionLink>
+                           <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="title" />
                            <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
-                           <h:graphicImage url="/images/icons/locked.gif" width="16" height="16" rendered="#{r.locked == true}" />
+                           <h:graphicImage url="/images/icons/locked.gif" align="absmiddle" width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
                         <%-- Description column for all view modes --%>

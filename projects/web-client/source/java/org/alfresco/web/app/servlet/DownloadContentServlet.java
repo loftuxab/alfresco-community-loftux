@@ -166,7 +166,7 @@ public class DownloadContentServlet extends HttpServlet
             ref.getStoreRef().getProtocol(),
             ref.getStoreRef().getIdentifier(),
             ref.getId(),
-            URLEncoder.encode(name)} );
+            name} );
    }
    
    

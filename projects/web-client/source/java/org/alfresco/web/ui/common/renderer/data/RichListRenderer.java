@@ -300,7 +300,8 @@ public class RichListRenderer extends BaseRenderer
       // maximum displayable textual lines within a single item cell
       private final static int MAX_DISPLAYABLE_LINES = 3;
       
-      private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='padding:3px'></div</td></tr>";
+      private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='padding:3px'></div></td></tr>";
+      private final static String COLUMN_SPACER = "<td><div style='padding-left:8px'></div></td>";
       
       public static final String VIEWMODEID = "list";
       
@@ -487,6 +488,10 @@ public class RichListRenderer extends BaseRenderer
             // end row and output a blank padding row/div
             out.write(END_ROW_SEPARATOR);
          }
+         else
+         {
+            out.write(COLUMN_SPACER);
+         }
          
          this.rowIndex++;
       }
@@ -538,7 +543,7 @@ public class RichListRenderer extends BaseRenderer
       // maximum displayable textual lines within a single item cell
       private final static int MAX_DISPLAYABLE_LINES = 3;
       
-      private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='padding:3px'></div</td></tr>";
+      private final static String END_ROW_SEPARATOR = "</tr><tr><td colspan=10><div style='padding:3px'></div></td></tr>";
       
       public static final String VIEWMODEID = "icons";
       
