@@ -107,7 +107,7 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
-                                       <r:spaceSelector label="Click here to select an existing space..." 
+                                       <r:spaceSelector label="Click here to select an existing Space" 
                                                         value="#{NewSpaceWizard.existingSpaceId}" 
                                                         style="border: 1px dashed #cccccc; padding: 6px;" />
                                     </td>

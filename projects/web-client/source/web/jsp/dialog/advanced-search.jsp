@@ -108,7 +108,7 @@
                                  </tr>
                                  <tr>
                                     <td style="padding-left:26px">
-                                       <r:spaceSelector label="Click here to select a Space..." value="#{AdvancedSearchBean.location}" style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                       <r:spaceSelector label="Click here to select a Space" value="#{AdvancedSearchBean.location}" style="border: 1px dashed #cccccc; padding: 2px;"/>
                                     </td>
                                  </tr>
                                  
@@ -132,7 +132,9 @@
                                     <td>Show me results in the categories:</td>
                                  </tr>
                                  <tr>
-                                    <td>[TBD]</td>
+                                    <td style="padding-left:8px">
+                                       <r:categorySelector label="Click here to select a Category" value="#{AdvancedSearchBean.category}" style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                    </td>
                                  </tr>
                                  
                               </table>

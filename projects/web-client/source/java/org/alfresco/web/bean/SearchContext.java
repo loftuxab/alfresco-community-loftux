@@ -58,6 +58,7 @@ public final class SearchContext implements Serializable
     */
    public String buildQuery()
    {
+      // TODO: change this to a StringBuilder
       String query;
       
       // the QName for the well known "name" attribute
@@ -110,10 +111,25 @@ public final class SearchContext implements Serializable
       }
       
       // match a specific PATH
-      String pathQuery = null;
-      if (location != null)
+      StringBuilder pathQuery = null;
+      if (location != null || (categories != null && categories.length !=0))
       {
-         pathQuery = " +PATH:\"" + location + "\" ";
+         pathQuery = new StringBuilder(128);
+         if (location != null)
+         {
+            pathQuery.append(" +PATH:\"").append(location).append("\" ");
+         }
+         if (categories != null && categories.length != 0)
+         {
+            for (int i=0; i<categories.length; i++)
+            {
+               if (pathQuery.length() != 0)
+               {
+                  pathQuery.append("OR");
+               }
+               pathQuery.append(" +PATH:\"").append(categories[i]).append("\" "); 
+            }
+         }
       }
       
       // match against CONTENT type

@@ -82,7 +82,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
                               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
-                                    <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
+                                    <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="16" height="16"/></td>
                                     <td class="mainSubText">A copy of the file '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' will be made for you to work with.<br>
                                         When you have completed your changes you need to check-in the file to allow others to view the changes.
                                     </td>
@@ -128,7 +128,7 @@
                                  <tr>
                                     <td style="padding-left:26px">
                                        <%-- Space selector to allow user to pick a Space --%>
-                                       <r:spaceSelector label="Click here to select a Space..."
+                                       <r:spaceSelector label="Click here to select a Space"
                                                 value="#{CheckinCheckoutBean.selectedSpaceId}"
                                                 style="border: 1px dashed #cccccc; padding: 2px;"/>
                                     </td>

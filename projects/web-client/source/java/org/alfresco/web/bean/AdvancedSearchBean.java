@@ -130,6 +130,22 @@ public class AdvancedSearchBean
       this.text = text;
    }
    
+   /**
+    * @return Returns the category.
+    */
+   public String getCategory()
+   {
+      return this.category;
+   }
+   
+   /**
+    * @param category The category to set.
+    */
+   public void setCategory(String category)
+   {
+      this.category = category;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Action event handlers
@@ -182,36 +198,51 @@ public class AdvancedSearchBean
          // location path search
          if (this.lookin.equals(LOOKIN_OTHER) && this.location != null)
          {
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), this.location);
-            Path path = this.nodeService.getPath(ref);
-            StringBuilder buf = new StringBuilder(64);
-            for (int i=0; i<path.size(); i++)
-            {
-               String elementString = "";
-               Path.Element element = path.get(i);
-               if (element instanceof Path.ChildAssocElement)
-               {
-                  ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
-                  if (elementRef.getParentRef() != null)
-                  {
-                     if (NamespaceService.ALFRESCO_URI.equals(elementRef.getQName().getNamespaceURI()))
-                     {
-                        elementString = '/' + NamespaceService.ALFRESCO_PREFIX + ':' + elementRef.getQName().getLocalName();
-                     }
-                  }
-               }
-               
-               buf.append(elementString);
-            }
-            // append syntax to get all children of the path
-            buf.append("//*");
-            search.setLocation(buf.toString());
+            search.setLocation(getPathFromSpaceId(this.location, true));
+         }
+         
+         // category path search
+         if (this.category != null)
+         {
+            search.setCategories(new String[]{getPathFromSpaceId(this.category, true)});
          }
          
          outcome = "browse";
       }
       
       return outcome;
+   }
+   
+   private String getPathFromSpaceId(String id, boolean children)
+   {
+      NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
+      Path path = this.nodeService.getPath(ref);
+      StringBuilder buf = new StringBuilder(64);
+      for (int i=0; i<path.size(); i++)
+      {
+         String elementString = "";
+         Path.Element element = path.get(i);
+         if (element instanceof Path.ChildAssocElement)
+         {
+            ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
+            if (elementRef.getParentRef() != null)
+            {
+               if (NamespaceService.ALFRESCO_URI.equals(elementRef.getQName().getNamespaceURI()))
+               {
+                  elementString = '/' + NamespaceService.ALFRESCO_PREFIX + ':' + elementRef.getQName().getLocalName();
+               }
+            }
+         }
+         
+         buf.append(elementString);
+      }
+      if (children == true)
+      {
+         // append syntax to get all children of the path
+         buf.append("//*");
+      }
+      
+      return buf.toString();
    }
    
    

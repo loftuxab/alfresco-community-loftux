@@ -123,7 +123,7 @@
                                  <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
                                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                     <tr>
-                                       <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="13" height="12"/></td>
+                                       <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="16" height="16"/></td>
                                        <td><td class="mainSubText">
                                              You may want to
                                              <a:actionLink value="#{msg.checkout_document}" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
