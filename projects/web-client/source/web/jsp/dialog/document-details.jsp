@@ -159,7 +159,16 @@
                            <td width="100%" valign="top">
                               <a:panel label="Preview" id="preview-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
-                                 <a:actionLink value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" />
+                                 <table width=100% cellspacing=0 cellpadding=0 border=0>
+                                    <tr>
+                                       <td align=left>
+                                          <a:actionLink value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" />
+                                       </td>
+                                       <td align=right>
+                                          <a:actionLink value="#{msg.view_in_browser}" href="#{DocumentDetailsBean.browserUrl}" />
+                                       </td>
+                                    </tr>
+                                 </table>
                               </a:panel>
                               <br/>
                               <a:panel label="Properties" id="properties-panel" progressive="true"

@@ -68,13 +68,23 @@ public class DocumentDetailsBean
    }
    
    /**
-    * Returns the URL to the content for the current document
+    * Returns the URL to download content for the current document
     * 
-    * @return Content url of the current document
+    * @return Content url to download the current document
     */
    public String getUrl()
    {
       return (String)getDocument().getProperties().get("url");
+   }
+   
+   /**
+    * Returns the URL to the content for the current document
+    *  
+    * @return Content url to the current document
+    */
+   public String getBrowserUrl()
+   {
+      return DownloadContentServlet.generateBrowserURL(getDocument().getNodeRef(), getDocument().getName());
    }
    
    /**
@@ -130,7 +140,7 @@ public class DocumentDetailsBean
                clientVersion.put("versionLabel", version.getVersionLabel());
                clientVersion.put("author", clientVersion.get("creator"));
                clientVersion.put("versionDate", version.getCreatedDate());
-               clientVersion.put("url", DownloadContentServlet.generateURL(version.getNodeRef(), 
+               clientVersion.put("url", DownloadContentServlet.generateDownloadURL(version.getNodeRef(), 
                      clientVersion.getName()));
                
                // add the client side version to the list

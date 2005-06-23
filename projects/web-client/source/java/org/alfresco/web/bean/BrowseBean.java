@@ -498,7 +498,7 @@ public class BrowseBean implements IContextListener
       // special properties to be used by the value binding components on the page
       node.put("locked", Repository.isNodeLocked(node, this.lockService));
       node.put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));
-      node.put("url", DownloadContentServlet.generateURL(node.getNodeRef(), node.getName()));
+      node.put("url", DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName()));
       node.put("fileTypeImage", Repository.getFileTypeImage(node));
    }
    
@@ -669,7 +669,7 @@ public class BrowseBean implements IContextListener
             
             // store the URL to for downloading the content
             String name = node.getName();
-            node.getProperties().put("url", DownloadContentServlet.generateURL(ref, name));
+            node.getProperties().put("url", DownloadContentServlet.generateDownloadURL(ref, name));
             
             // remember the document
             setDocument(node);

@@ -326,7 +326,7 @@ public class CheckinCheckoutBean
          
          // create content URL to the content download servlet with ID and expected filename
          // the myfile part will be ignored by the servlet but gives the browser a hint
-         String url = DownloadContentServlet.generateURL(ref, node.getName());
+         String url = DownloadContentServlet.generateDownloadURL(ref, node.getName());
          node.getProperties().put("url", url);
          node.getProperties().put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));            
          
@@ -393,7 +393,7 @@ public class CheckinCheckoutBean
             
             // create content URL to the content download servlet with ID and expected filename
             // the myfile part will be ignored by the servlet but gives the browser a hint
-            String url = DownloadContentServlet.generateURL(workingCopyRef, workingCopy.getName());
+            String url = DownloadContentServlet.generateDownloadURL(workingCopyRef, workingCopy.getName());
             
             workingCopy.getProperties().put("url", url);
             

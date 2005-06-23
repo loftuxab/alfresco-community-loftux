@@ -53,35 +53,44 @@ public class DownloadContentServlet extends HttpServlet
          WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
          // TODO: add compression here?
          //       see http://servlets.com/jservlet2/examples/ch06/ViewResourceCompress.java for example
+         //       only really needed if we don't use the built in compression of the servlet container
          
          // The URL contains multiple parts
-         // /web-client/download/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
+         // /web-client/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
          // the protocol, followed by the store, followed by the Id
          // the last part is only used for mimetype and browser use
          String uri = req.getRequestURI();
+         
          if (logger.isDebugEnabled())
             logger.debug("Processing URL: " + uri);
+         
          StringTokenizer t = new StringTokenizer(uri, "/");
-         if (t.countTokens() < 6)
+         if (t.countTokens() < 7)
          {
             throw new IllegalArgumentException("Download URL did not contain all required args: " + uri); 
          }
+         
          t.nextToken();    // skip web app name
          t.nextToken();    // skip servlet name
+         boolean attachment = t.nextToken().equals("attach");
          StoreRef storeRef = new StoreRef(t.nextToken(), t.nextToken());
          String id = t.nextToken();
          String filename = t.nextToken();
          NodeRef nodeRef = new NodeRef(storeRef, id);
          if (logger.isDebugEnabled())
+         {
             logger.debug("Found NodeRef: " + nodeRef.toString());
+            logger.debug("Will use filename: " + filename);
+            logger.debug("With attachment mode: " + attachment);
+         }
          
-         // set header based on filename - will force a Save As from the browse if it doesn't recognise it
-         // this is better than the default response of the browse trying to display the contents!
-         // TODO: make this configurable - and check it does not prevent streaming of large files
-         res.setHeader("Content-Disposition", "attachment;filename=\"" + URLDecoder.decode(filename) + '"');
-         
-         // useful debug output!
-         //logger.debug(NodeStoreInspector.dumpNodeStore((NodeService)context.getBean("dbNodeService"), storeRef));
+         if (attachment == true)
+         {
+            // set header based on filename - will force a Save As from the browse if it doesn't recognise it
+            // this is better than the default response of the browse trying to display the contents!
+            // TODO: make this configurable - and check it does not prevent streaming of large files
+            res.setHeader("Content-Disposition", "attachment;filename=\"" + URLDecoder.decode(filename) + '"');
+         }
          
          // get the content mimetype from the node properties
          NodeService nodeService = (NodeService)context.getBean("nodeService");
@@ -122,7 +131,17 @@ public class DownloadContentServlet extends HttpServlet
       }
    }
    
-   public final static String generateURL(NodeRef ref, String name)
+   /**
+    * Helper to generate a URL to a content node for downloading content from the server.
+    * The content is supplied as an HTTP1.1 attachment to the response. This generally means
+    * a browser should prompt the user to save the content to specified location.
+    * 
+    * @param ref     NodeRef of the content node to generate URL for (cannot be null)
+    * @param name    File name to return in the URL (cannot be null)
+    * 
+    * @return URL to download the content from the specified node
+    */
+   public final static String generateDownloadURL(NodeRef ref, String name)
    {
       return MessageFormat.format(DOWNLOAD_URL, new Object[] {
             ref.getStoreRef().getProtocol(),
@@ -131,8 +150,28 @@ public class DownloadContentServlet extends HttpServlet
             URLEncoder.encode(name) } );
    }
    
+   /**
+    * Helper to generate a URL to a content node for downloading content from the server.
+    * The content is supplied directly in the reponse. This generally means a browser will
+    * attempt to open the content directly if possible, else it will prompt to save the file.
+    * 
+    * @param ref     NodeRef of the content node to generate URL for (cannot be null)
+    * @param name    File name to return in the URL (cannot be null)
+    * 
+    * @return URL to download the content from the specified node
+    */
+   public final static String generateBrowserURL(NodeRef ref, String name)
+   {
+      return MessageFormat.format(BROWSER_URL, new Object[] {
+            ref.getStoreRef().getProtocol(),
+            ref.getStoreRef().getIdentifier(),
+            ref.getId(),
+            URLEncoder.encode(name)} );
+   }
+   
    
    private static Logger logger = Logger.getLogger(DownloadContentServlet.class);
    
-   private static final String DOWNLOAD_URL = "/download/{0}/{1}/{2}/{3}";
+   private static final String DOWNLOAD_URL  = "/download/attach/{0}/{1}/{2}/{3}";
+   private static final String BROWSER_URL   = "/download/direct/{0}/{1}/{2}/{3}";
 }
