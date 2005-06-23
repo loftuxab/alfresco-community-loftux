@@ -58,6 +58,15 @@ public class UnoContentTransformer extends AbstractContentTransformer
         formatsByConversion.put(
                 new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_EXCEL, MimetypeMap.MIMETYPE_PDF),
                 new DocumentFormatWrapper(DocumentFormat.PDF_CALC, 1.0));
+        formatsByConversion.put(
+                new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_PPT, MimetypeMap.MIMETYPE_FLASH),
+                new DocumentFormatWrapper(DocumentFormat.FLASH_IMPRESS, 1.0));
+        formatsByConversion.put(
+                new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_WORD, MimetypeMap.MIMETYPE_HTML),
+                new DocumentFormatWrapper(DocumentFormat.HTML_WRITER, 1.0));
+        formatsByConversion.put(
+                new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_HTML, MimetypeMap.MIMETYPE_PDF),
+                new DocumentFormatWrapper(DocumentFormat.PDF_WRITER, 1.0));
         
         // there are many more formats available and therefore many more transformation combinations possible
 //        DocumentFormat.FLASH_IMPRESS

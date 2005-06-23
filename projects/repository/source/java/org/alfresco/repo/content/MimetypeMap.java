@@ -30,6 +30,8 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_WORD = "application/msword";
     public static final String MIMETYPE_EXCEL = "application/vnd.excel";
     public static final String MIMETYPE_BINARY = "application/octet-stream";
+    public static final String MIMETYPE_PPT = "application/vnd.powerpoint";
+    public static final String MIMETYPE_FLASH = "application/x-shockwave-flash";
     
     private static final String CONFIG_AREA = "mimetype-map";
     private static final String CONFIG_CONDITION = "Mimetype Map";

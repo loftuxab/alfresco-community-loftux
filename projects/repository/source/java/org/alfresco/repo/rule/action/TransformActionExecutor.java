@@ -12,6 +12,8 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.MimetypeService;
+import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
@@ -34,8 +36,15 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 	private NodeService nodeService;
 	private ContentService contentService;
 	private CopyService copyService;
+    private MimetypeService mimetypeService;
+    
 
-	public void setNodeService(NodeService nodeService) 
+    public void setMimetypeService(MimetypeService mimetypeService) 
+    {
+        this.mimetypeService = mimetypeService;
+    }
+    
+    public void setNodeService(NodeService nodeService) 
 	{
 		this.nodeService = nodeService;
 	}
@@ -99,13 +108,56 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 				// Set the mime type on the copy
 				this.nodeService.setProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE, mimeType);
 				
+                // Adjust the name of the copy
+                String originalMimetype = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_MIME_TYPE);
+                String originalName = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
+                String newName = transformName(originalName, originalMimetype, mimeType);
+                nodeService.setProperty(copyNodeRef, ContentModel.PROP_NAME, newName);
+                String originalTitle = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_TITLE);
+                if (originalTitle != null && originalTitle.length() > 0)
+                {
+                    String newTitle = transformName(originalTitle, originalMimetype, mimeType);
+                    nodeService.setProperty(copyNodeRef, ContentModel.PROP_TITLE, newTitle);
+                }
+                
 				// Get the content reader and writer
 				ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef);
 				ContentWriter contentWriter = this.contentService.getUpdatingWriter(copyNodeRef);
 				
 				// Try and transform the content
-				this.contentService.transform(contentReader, contentWriter);
+                try
+                {
+				    this.contentService.transform(contentReader, contentWriter);
+                }
+                catch(NoTransformerException e)
+                {
+                    // TODO: Revisit this for alternative solutions
+                    nodeService.deleteNode(copyNodeRef);
+                }
 			}	
 		}
 	}
+    
+
+    /**
+     * Transform name from original extension to new extension
+     * 
+     * @param original
+     * @param originalMimetype
+     * @param newMimetype
+     * @return
+     */
+    private String transformName(String original, String originalMimetype, String newMimetype)
+    {
+        String transformed = original;
+        String originalExtension = mimetypeService.getExtension(originalMimetype);
+        String newExtension = mimetypeService.getExtension(newMimetype);
+        int ext = original.lastIndexOf(originalExtension);
+        if (ext != -1)
+        {
+            transformed = original.substring(0, ext) + newExtension;
+        }
+        return transformed;
+    }
+    
 }

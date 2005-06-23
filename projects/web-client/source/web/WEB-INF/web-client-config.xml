@@ -110,6 +110,7 @@
          <transformer id="application/pdf" description="PDF" />
          <transformer id="text/plain" description="Text" />
          <transformer id="text/xml" description="XML" />
+         <transformer id="application/x-shockwave-flash" description="Flash" />
       </transformers>
    </config>
    
