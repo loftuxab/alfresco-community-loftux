@@ -11,13 +11,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * @author Roy Wetherall
@@ -124,6 +125,11 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
      */
     public void testGetChildAssocs()
     {
+//      Lets have a look at the version store ..
+        System.out.println(NodeStoreInspector.dumpNodeStore(
+                this.dbNodeService, 
+                this.versionService.getVersionStoreReference()) + "\n\n");
+        
         // Create a new versionable node
         NodeRef versionableNode = createNewVersionableNode();
         Collection<ChildAssociationRef> origionalChildren = this.dbNodeService.getChildAssocs(versionableNode);
@@ -140,7 +146,9 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         Version version = createVersion(versionableNode, this.versionProperties);
         
         // Lets have a look at the version store ..
-        //System.out.println(NodeStoreInspector.dumpNodeStore(this.dbNodeService, this.lightWeightVersionStoreVersionService.getVersionStoreReference()));
+        System.out.println(NodeStoreInspector.dumpNodeStore(
+                this.dbNodeService, 
+                this.versionService.getVersionStoreReference()));
         
         // Get the children of the versioned node
         Collection<ChildAssociationRef> versionedChildren = this.lightWeightVersionStoreNodeService.getChildAssocs(version.getNodeRef());
@@ -227,6 +235,48 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
         // TODO check that the set's contain the same items
     }
 	
+    /**
+     * Test getParentAssocs
+     */
+    public void testGetParentAssocs()
+    {
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        Set<QName> origAspects = this.dbNodeService.getAspects(versionableNode);
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+        NodeRef nodeRef = version.getNodeRef();
+        
+        List<ChildAssociationRef> results = this.lightWeightVersionStoreNodeService.getParentAssocs(nodeRef);
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        ChildAssociationRef childAssoc = results.get(0);
+        assertEquals(nodeRef, childAssoc.getChildRef());
+        NodeRef versionStoreRoot = this.dbNodeService.getRootNode(this.versionService.getVersionStoreReference());
+        assertEquals(versionStoreRoot, childAssoc.getParentRef());
+    }
+    
+    /**
+     * Test getPrimaryParent
+     */
+    public void testGetPrimaryParent()
+    {
+        // Create a new versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        Set<QName> origAspects = this.dbNodeService.getAspects(versionableNode);
+        
+        // Create a new version
+        Version version = createVersion(versionableNode, this.versionProperties);
+        NodeRef nodeRef = version.getNodeRef();
+        
+        ChildAssociationRef childAssoc = this.lightWeightVersionStoreNodeService.getPrimaryParent(nodeRef);
+        assertNotNull(childAssoc);
+        assertEquals(nodeRef, childAssoc.getChildRef());
+        NodeRef versionStoreRoot = this.dbNodeService.getRootNode(this.versionService.getVersionStoreReference());
+        assertEquals(versionStoreRoot, childAssoc.getParentRef());        
+    }
+    
 	/** ================================================
 	 *  These test ensure that the following operations
 	 *  are not supported as expected.
@@ -360,28 +410,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
 			}
 		}	
     }
-
-//    /**
-//     * Test removeChildren
-//     */
-//    public void testRemoveChildren()
-//    {
-//        try
-//        {
-//            this.lightWeightVersionStoreNodeService.removeChildren(
-//                    this.dummyNodeRef,
-//                    this.dummyQName);
-//            fail("This operation is not supported.");
-//        }
-//        catch (UnsupportedOperationException exception)
-//        {
-//            if (exception.getMessage() != MSG_ERR)
-//            {
-//                fail("Unexpected exception raised during method excution: " + exception.getMessage());
-//            }
-//        }
-//    }
-//    
+    
     /**
      * Test setProperties
      */
@@ -423,45 +452,7 @@ public class NodeServiceImplTest extends VersionStoreBaseTest
                 fail("Unexpected exception raised during method excution: " + exception.getMessage());
             }
         }
-    }
-    
-    /**
-     * Test getParentAssocs
-     */
-    public void testGetParentAssocs()
-    {
-        try
-        {
-            this.lightWeightVersionStoreNodeService.getParentAssocs(this.dummyNodeRef);
-            fail("This operation is not supported.");
-        }
-        catch (UnsupportedOperationException exception)
-        {
-            if (exception.getMessage() != MSG_ERR)
-            {
-                fail("Unexpected exception raised during method excution: " + exception.getMessage());
-            }
-        }
-    }
-    
-    /**
-     * Test getPrimaryParent
-     */
-    public void testGetPrimaryParent()
-    {
-        try
-        {
-            this.lightWeightVersionStoreNodeService.getPrimaryParent(this.dummyNodeRef);
-            fail("This operation is not supported.");
-        }
-        catch (UnsupportedOperationException exception)
-        {
-            if (exception.getMessage() != MSG_ERR)
-            {
-                fail("Unexpected exception raised during method excution: " + exception.getMessage());
-            }
-        }
-    }
+    }   
     
     /**
      * Test createAssociation

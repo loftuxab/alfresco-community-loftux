@@ -249,19 +249,33 @@ public abstract class AbstractVersionServiceImpl
 			{
 				Serializable propValue = this.nodeService.getProperty(nodeRef, propertyName);
 				nodeDetails.addProperty(classRef, propertyName, propValue);
-			}			
-			
-			// Copy the associations (child and target)
-			List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
-			for (ChildAssociationRef childAssocRef : childAssocRefs) 
-			{
-				nodeDetails.addChildAssociation(classRef, childAssocRef);
-			}
-			List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
-			for (AssociationRef nodeAssocRef : nodeAssocRefs) 
-			{
-				nodeDetails.addAssociation(classRef, nodeAssocRef);
-			}
+			}		
+            
+            // Version the associations (child and target)
+            Map<QName, AssociationDefinition> assocDefs = classDefinition.getAssociations();
+
+            // TODO: Need way of getting child assocs of a given type
+            if (classDefinition.isContainer())
+            {
+                List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
+                for (ChildAssociationRef childAssocRef : childAssocRefs) 
+                {
+                    if (assocDefs.containsKey(childAssocRef.getTypeQName()))
+                    {
+                        nodeDetails.addChildAssociation(classDefinition.getName(), childAssocRef);
+                    }
+                }
+            }
+            
+            // TODO: Need way of getting assocs of a given type
+            List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+            for (AssociationRef nodeAssocRef : nodeAssocRefs) 
+            {
+                if (assocDefs.containsKey(nodeAssocRef.getTypeQName()))
+                {
+                    nodeDetails.addAssociation(classDefinition.getName(), nodeAssocRef);
+                }
+            }
 		}
 	}
 	

@@ -27,6 +27,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -44,6 +45,11 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      */
     private final static String MSG_UNSUPPORTED = 
         "This operation is not supported by a version store implementation of the node service.";
+    
+    /**
+     * The name of the spoofed root association
+     */
+    private static final QName rootAssocName = QName.createQName(NamespaceService.ALFRESCO_URI, "versionedState");
 	
     /**
      * The db node service, used as the version store implementation
@@ -300,21 +306,32 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     }
     
     /**
-     * @throws UnsupportedOperationException always
+     * The node will appear to be attached to the root of the version store
+     * 
+     * @see NodeService#getParentAssocs(NodeRef)
      */
     public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef)
     {
-        // This operation is not supported for a verion store
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
-    }
-
+        return getParentAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+    }    
+    
     /**
-     * @see NodeService#getChildAssocs(NodeRef)
+     * The node will apprear to be attached to the root of the version store
+     * 
+     * @see NodeService#getParentAssocs(NodeRef, QNamePattern)
      */
     public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
     {
-        // This operation is not supported for a verion store
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+        List<ChildAssociationRef> result = new ArrayList<ChildAssociationRef>();
+        if (qnamePattern.isMatch(rootAssocName) == true)
+        {
+            result.add(new ChildAssociationRef(
+                    ContentModel.ASSOC_CHILDREN,
+                    dbNodeService.getRootNode(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, STORE_ID)),
+                    rootAssocName,
+                    nodeRef));
+        }
+        return result;
     }
 
     /**
@@ -377,12 +394,15 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     }
     
     /**
-     * @throws UnsupportedOperationException always
+     * Simulates the node begin attached ot the root node of the version store. 
      */
     public ChildAssociationRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        // This operation is not supported for a verion store
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+        return new ChildAssociationRef(
+                ContentModel.ASSOC_CHILDREN,
+                dbNodeService.getRootNode(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, STORE_ID)),
+                rootAssocName,
+                nodeRef);
     }
     
     /**
@@ -457,7 +477,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);       
     }
     
     /**
