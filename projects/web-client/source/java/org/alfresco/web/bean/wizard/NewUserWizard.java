@@ -49,9 +49,9 @@ public class NewUserWizard extends AbstractWizardBean
    
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE_NEW = "New User Wizard";
-   private static final String WIZARD_DESC_NEW = "Use this wizard to add a user to the repository.";
+   private static final String WIZARD_DESC_NEW = "This wizard helps you to add a user to the repository.";
    private static final String WIZARD_TITLE_EDIT = "Edit User Wizard";
-   private static final String WIZARD_DESC_EDIT = "Use this wizard to modify a user in the repository.";
+   private static final String WIZARD_DESC_EDIT = "This wizard helps you modify a user in the repository.";
    private static final String STEP1_TITLE = "Step One - Person Properties";
    private static final String STEP1_DESCRIPTION = "Enter information about this person.";
    private static final String STEP2_TITLE = "Step Two - User Properties";

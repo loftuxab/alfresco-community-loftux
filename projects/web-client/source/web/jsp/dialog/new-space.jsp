@@ -71,7 +71,7 @@
                            <td>
                               <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
                               <div class="mainTitle">Create Space</div>
-                              <div class="mainSubText">Use this dialog to create a new space.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.newspace_description}" /></div>
                            </td>
                         </tr>
                      </table>

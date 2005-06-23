@@ -67,13 +67,16 @@ public class NewRuleWizard extends AbstractWizardBean
    
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "New Rule Wizard";
-   private static final String WIZARD_DESC = "Use this wizard to create a new rule.";
+   private static final String WIZARD_TITLE_EDIT = "Edit Rule Wizard";
+   private static final String WIZARD_DESC = "This wizard helps you create a new rule.";
+   private static final String WIZARD_DESC_EDIT = "This wizard helps you modify a rule.";
    private static final String STEP1_TITLE = "Step One - Enter Details";
    private static final String STEP2_TITLE = "Step Two - Select Condition";
    private static final String STEP3_TITLE = "Step Three - Condition Settings";
    private static final String STEP4_TITLE = "Step Four - Select Action";
    private static final String STEP5_TITLE = "Step Five - Action Settings";
    private static final String FINISH_INSTRUCTION = "To create the rule click Finish.";
+   private static final String FINISH_INSTRUCTION_EDIT = "To update the rule click Finish.";
    
    // new rule wizard specific properties
    private String title;
@@ -377,7 +380,14 @@ public class NewRuleWizard extends AbstractWizardBean
     */
    public String getWizardDescription()
    {
-      return WIZARD_DESC;
+      if (this.editMode)
+      {
+         return WIZARD_DESC_EDIT;
+      }
+      else
+      {
+         return WIZARD_DESC;
+      }
    }
 
    /**
@@ -385,7 +395,14 @@ public class NewRuleWizard extends AbstractWizardBean
     */
    public String getWizardTitle()
    {
-      return WIZARD_TITLE;
+      if (this.editMode)
+      {
+         return WIZARD_TITLE_EDIT;
+      }
+      else
+      {
+         return WIZARD_TITLE;
+      }
    }
    
    /**
@@ -470,12 +487,26 @@ public class NewRuleWizard extends AbstractWizardBean
       {
          case 5:
          {
-            stepInstruction = FINISH_INSTRUCTION;
+            if (this.editMode)
+            {
+               stepInstruction = FINISH_INSTRUCTION_EDIT;
+            }
+            else
+            {
+               stepInstruction = FINISH_INSTRUCTION;
+            }
             break;
          }
          case 6:
          {
-            stepInstruction = FINISH_INSTRUCTION;
+            if (this.editMode)
+            {
+               stepInstruction = FINISH_INSTRUCTION_EDIT;
+            }
+            else
+            {
+               stepInstruction = FINISH_INSTRUCTION;
+            }
             break;
          }
          default:

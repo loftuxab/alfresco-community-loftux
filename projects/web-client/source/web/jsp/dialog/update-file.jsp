@@ -58,8 +58,6 @@
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
                               <div class="mainTitle">Update '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
-                              <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText">Current status is 'draft'.</div>
                               <div class="mainSubText"><h:outputText value="#{msg.updatefile_description}" /></div>
                            </td>
                         </tr>

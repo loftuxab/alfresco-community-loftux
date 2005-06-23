@@ -98,7 +98,7 @@
                            <td>
                               <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
                               <div class="mainTitle">Modify Properties of Simple Workflow</div>
-                              <div class="mainSubText">Use this page to modify the simple workflow properties then click OK.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.editworkflow_description}" /></div>
                            </td>
                         </tr>
                      </table>

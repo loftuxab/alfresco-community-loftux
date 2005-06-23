@@ -56,8 +56,6 @@
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
                               <div class="mainTitle">Check Out of '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' Complete</div>
-                              <div class="mainSubText">Current version created by Linton Baddeley at 11:01pm on 12th May 2005</div>
-                              <div class="mainSubText">Current version last modified by Linton Baddeley at 11:01pm on 12th May 2005</div>
                               <div class="mainSubText"><h:outputText value="#{msg.checkoutfilelink_description}" /></div>
                            </td>
                         </tr>

@@ -71,7 +71,7 @@
                            <td>
                               <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
                               <div class="mainTitle">Modify Properties of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
-                              <div class="mainSubText">Use this page to modify the document properties then click OK.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.editdocument_description}" /></div>
                            </td>
                         </tr>
                      </table>

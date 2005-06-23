@@ -55,7 +55,7 @@
                            <td>
                               <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
                               <div class="mainTitle">Modify category of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
-                              <div class="mainSubText">Use this page to set the category for the document then click OK.</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.editcategory_description}" /></div>
                            </td>
                         </tr>
                      </table>

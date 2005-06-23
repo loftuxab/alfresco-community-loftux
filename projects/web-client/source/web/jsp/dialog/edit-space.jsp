@@ -68,8 +68,8 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
-                              <div class="mainTitle">Space Properties</div>
-                              <div class="mainSubText">Use this dialog to modify properties then click OK.</div>
+                              <div class="mainTitle">Modify Properties of '<h:outputText value="#{BrowseBean.actionSpace.name}" />'</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.editspace_description}" /></div>
                            </td>
                         </tr>
                      </table>

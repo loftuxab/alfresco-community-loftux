@@ -16,7 +16,7 @@ public class CreateContentWizard extends BaseContentWizard
 
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "Create Content Wizard";
-   private static final String WIZARD_DESC = "Use this wizard to create a new document in a space.";
+   private static final String WIZARD_DESC = "This wizard helps you to create a new document in a space.";
    private static final String STEP1_TITLE = "Step One - Enter Content";
    private static final String STEP1_DESCRIPTION = "Enter your document content into the repository.";
    private static final String STEP2_TITLE = "Step Two - Properties";
