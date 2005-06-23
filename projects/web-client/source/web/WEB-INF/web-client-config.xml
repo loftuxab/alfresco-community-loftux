@@ -13,9 +13,10 @@
    
    <config>
       <server>
-         <!-- for use in JBoss Portal etc -->
+         <!-- for use in JBoss Portal etc
          <mode>portlet</mode>
-         <!-- Or for use in Tomcat standalone
+         -->
+         <!-- Or for use in Tomcat standalone -->
          <mode>servlet</mode>
          -->
          <error-page>/jsp/error.jsp</error-page>
