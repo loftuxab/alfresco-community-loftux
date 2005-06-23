@@ -40,6 +40,8 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.data.IDataContainer;
+import org.alfresco.web.data.QuickSort;
 import org.apache.log4j.Logger;
 
 /**
@@ -334,6 +336,10 @@ public abstract class BaseContentWizard extends AbstractWizardBean
          {
             this.contentTypes.add(new SelectItem(mimeType, mimeTypes.get(mimeType)));
          }
+         
+         // make sure the list is sorted by the values
+         QuickSort sorter = new QuickSort(this.contentTypes, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+         sorter.sort();
       }
       
       return this.contentTypes;

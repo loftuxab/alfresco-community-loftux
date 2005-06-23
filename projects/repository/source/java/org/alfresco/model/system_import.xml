@@ -10,13 +10,13 @@
          <alf:folder>
             <alf:uifacets/>
             <alf:name>${glossaryName}</alf:name>
-            <alf:icon>space-icon-spanner</alf:icon>
+            <alf:icon>space-icon-default</alf:icon>
             <alf:title>${glossaryName}</alf:title>
             <alf:contains>
                <alf:folder>
                   <alf:uifacets/>
                   <alf:name>${templatesName}</alf:name>
-                  <alf:icon>space-icon-spanner</alf:icon>
+                  <alf:icon>space-icon-default</alf:icon>
                   <alf:title>${templatesName}</alf:title>
                </alf:folder>
             </alf:contains>

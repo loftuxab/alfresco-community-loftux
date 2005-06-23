@@ -41,6 +41,8 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.data.IDataContainer;
+import org.alfresco.web.data.QuickSort;
 import org.apache.log4j.Logger;
 
 /**
@@ -436,9 +438,6 @@ public class NewSpaceWizard extends AbstractWizardBean
       {
          this.templates = new ArrayList<SelectItem>();
          
-         // add an entry to instruct the user to select a template
-         this.templates.add(new SelectItem("none", "Select a template..."));
-         
          FacesContext context = FacesContext.getCurrentInstance();
          String actNs = NamespaceService.ALFRESCO_PREFIX;
          String xpath = actNs + ":" + 
@@ -461,7 +460,14 @@ public class NewSpaceWizard extends AbstractWizardBean
                Node childNode = new Node(assocRef, this.nodeService);
                this.templates.add(new SelectItem(childNode.getId(), childNode.getName()));
             }
+            
+            // make sure the list is sorted by the label
+            QuickSort sorter = new QuickSort(this.templates, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+            sorter.sort();
          }
+         
+         // add an entry (at the start) to instruct the user to select a template
+         this.templates.add(0, new SelectItem("none", "Select a template..."));
       }
       
       return this.templates;

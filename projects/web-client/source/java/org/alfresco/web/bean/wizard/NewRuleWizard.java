@@ -55,6 +55,8 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.RulesBean;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.data.IDataContainer;
+import org.alfresco.web.data.QuickSort;
 import org.apache.log4j.Logger;
 import org.springframework.web.jsf.FacesContextUtils;
 
@@ -829,6 +831,10 @@ public class NewRuleWizard extends AbstractWizardBean
          {
             this.actions.add(new SelectItem(ruleActionDef.getName(), ruleActionDef.getTitle()));
          }
+         
+         // make sure the list is sorted by the label
+         QuickSort sorter = new QuickSort(this.actions, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+         sorter.sort();
       }
       
       return this.actions;
@@ -866,6 +872,10 @@ public class NewRuleWizard extends AbstractWizardBean
             this.conditions.add(new SelectItem(ruleConditionDef.getName(), 
                   ruleConditionDef.getTitle()));
          }
+         
+         // make sure the list is sorted by the label
+         QuickSort sorter = new QuickSort(this.conditions, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+         sorter.sort();
       }
       
       return this.conditions;
@@ -947,6 +957,10 @@ public class NewRuleWizard extends AbstractWizardBean
                   this.transformers.add(new SelectItem(child.getAttribute("id"), 
                         child.getAttribute("description")));
                }
+               
+               // make sure the list is sorted by the label
+               QuickSort sorter = new QuickSort(this.transformers, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+               sorter.sort();
             }
             else
             {
@@ -985,6 +999,10 @@ public class NewRuleWizard extends AbstractWizardBean
                   this.aspects.add(new SelectItem(child.getAttribute("id"), 
                         child.getAttribute("description")));
                }
+               
+               // make sure the list is sorted by the label
+               QuickSort sorter = new QuickSort(this.aspects, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+               sorter.sort();
             }
             else
             {
