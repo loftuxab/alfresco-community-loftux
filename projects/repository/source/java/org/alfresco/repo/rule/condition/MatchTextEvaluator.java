@@ -8,11 +8,13 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleCondition;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Contains text evaluator
@@ -39,6 +41,11 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
     private NodeService nodeService;
     
     /**
+     * The dictionary service
+     */
+    private DictionaryService dictionaryService;
+    
+    /**
      * Special star string
      */
     private static final String STAR = "*";
@@ -51,7 +58,18 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 	public void setNodeService(NodeService nodeService) 
 	{
 		this.nodeService = nodeService;
-	}	
+	}
+    
+    /**
+     * Set dictionary service
+     * 
+     * @param dictionaryService  the dictionary service
+     */
+    public void setDictionaryService(DictionaryService dictionaryService) 
+    {
+        this.dictionaryService = dictionaryService;
+    }   
+    
 	
     /**
      * Add paremeter defintions
@@ -75,48 +93,53 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 		
 		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
-			// Get the text to match against
-			String matchText = (String)ruleCondition.getParameterValue(PARAM_TEXT);
-			
-			// Get the operation to be performed
-			Operation operation = null;
-			String stringOperation = (String)ruleCondition.getParameterValue(PARAM_OPERATION);
-			if (stringOperation != null)
-			{
-				operation = Operation.valueOf(stringOperation);
-			}
-            else
+            // TODO: Move this type check into its own Class Evaluator
+            QName nodeType = nodeService.getType(actionedUponNodeRef);
+            if (dictionaryService.isSubClass(nodeType, ContentModel.TYPE_CONTENT))
             {
-                // Check for a trailing or leading star since it implies special behaviour when no default operation is specified
-                if (matchText.startsWith(STAR) == true)
-                {
-                    // Remove the star and set the operation to endsWith
-                    operation = Operation.ENDS;
-                    matchText = matchText.substring(1);
-                }
-                else if (matchText.endsWith(STAR) == true)
-                {
-                    // Remove the star and set the operation to startsWith
-                    operation = Operation.BEGINS;
-                    matchText = matchText.substring(0, (matchText.length()-2));
-                }
+    			// Get the text to match against
+    			String matchText = (String)ruleCondition.getParameterValue(PARAM_TEXT);
+    			
+    			// Get the operation to be performed
+    			Operation operation = null;
+    			String stringOperation = (String)ruleCondition.getParameterValue(PARAM_OPERATION);
+    			if (stringOperation != null)
+    			{
+    				operation = Operation.valueOf(stringOperation);
+    			}
                 else
                 {
-                    operation = Operation.CONTAINS;
+                    // Check for a trailing or leading star since it implies special behaviour when no default operation is specified
+                    if (matchText.startsWith(STAR) == true)
+                    {
+                        // Remove the star and set the operation to endsWith
+                        operation = Operation.ENDS;
+                        matchText = matchText.substring(1);
+                    }
+                    else if (matchText.endsWith(STAR) == true)
+                    {
+                        // Remove the star and set the operation to startsWith
+                        operation = Operation.BEGINS;
+                        matchText = matchText.substring(0, (matchText.length()-2));
+                    }
+                    else
+                    {
+                        operation = Operation.CONTAINS;
+                    }
                 }
+    			
+    			// Build the reg ex
+    			String regEx = buildRegEx(matchText, operation);
+    			
+    			// Get the name value of the node
+    			String name = (String)this.nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
+    			
+    			// Do the match
+    			if (name != null)
+    			{
+    				result = name.matches(regEx);
+    			}
             }
-			
-			// Build the reg ex
-			String regEx = buildRegEx(matchText, operation);
-			
-			// Get the name value of the node
-			String name = (String)this.nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
-			
-			// Do the match
-			if (name != null)
-			{
-				result = name.matches(regEx);
-			}
 		}
 		
 		return result;

@@ -69,11 +69,21 @@
 	  </property>
    </bean>	
 
-   <bean id="no-condition" class="org.alfresco.repo.rule.condition.NoConditionEvaluator" parent="rule-condition-evaluator"/>
+   <bean id="no-condition" class="org.alfresco.repo.rule.condition.NoConditionEvaluator" parent="rule-condition-evaluator">
+	  <property name="nodeService">
+         <ref bean="nodeService"/>
+	  </property>
+	  <property name="dictionaryService">
+         <ref bean="dictionaryService"/>
+	  </property>
+   </bean>
 	
    <bean id="match-text" class="org.alfresco.repo.rule.condition.MatchTextEvaluator" parent="rule-condition-evaluator">
 	  <property name="nodeService">
          <ref bean="nodeService"/>
+	  </property>
+	  <property name="dictionaryService">
+         <ref bean="dictionaryService"/>
 	  </property>
    </bean>
    
