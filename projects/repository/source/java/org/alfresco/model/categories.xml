@@ -1,9 +1,14 @@
 <v:view xmlns:v="http://www.alfresco.org/repository/view/0.1" xmlns:alf="http://www.alfresco.org/1.0">
    
+
+  <alf:category_root v:childName="alf:categoryRoot">
+    <alf:name>categories</alf:name>
+    <alf:categories>
+
    <!-- Software Document Classification -->
-   <alf:category_root v:childName="alf:categoryRoot">
+   <alf:category v:childName="alf:generalclassifiable">
       <alf:name>Software Document Classification</alf:name>
-      <alf:categories>
+      <alf:subcategories>
          <alf:category>
             <alf:name>Software Descriptions</alf:name>
             <alf:subcategories>
@@ -186,14 +191,14 @@
                </alf:category>
             </alf:subcategories>
          </alf:category>
-      </alf:categories>
-   </alf:category_root>
+      </alf:subcategories>
+   </alf:category>
    
    
    <!-- Languages -->
-   <alf:category_root v:childName="alf:categoryRoot">
+   <alf:category v:childName="alf:generalclassifiable">
       <alf:name>Languages</alf:name>
-      <alf:categories>
+      <alf:subcategories>
          <alf:category>
             <alf:name>English</alf:name>
             <alf:subcategories>
@@ -253,14 +258,14 @@
                </alf:category>
             </alf:subcategories>
          </alf:category>
-      </alf:categories>
-   </alf:category_root>
+      </alf:subcategories>
+   </alf:category>
    
    
    <!-- Regions -->
-   <alf:category_root v:childName="alf:categoryRoot">
+   <alf:category v:childName="alf:generalclassifiable">
       <alf:name>Regions</alf:name>
-      <alf:categories>
+      <alf:subcategories>
          <alf:category>
             <alf:name>AFRICA</alf:name>
             <alf:subcategories>
@@ -1082,7 +1087,10 @@
                </alf:category>
             </alf:subcategories>
          </alf:category>
-      </alf:categories>
-   </alf:category_root>
+      </alf:subcategories>
+   </alf:category>
+
+    </alf:categories>
+  </alf:category_root>
    
 </v:view>
