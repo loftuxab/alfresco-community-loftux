@@ -984,6 +984,7 @@
    </bean>
    
    <!-- CIFS Server -->
+   <!--
    <bean id="cifsServer" class="org.alfresco.filesys.CIFSServer" init-method="startServer" >
       <constructor-arg>
          <ref bean="serviceRegistry" />
@@ -992,6 +993,7 @@
          <value>org/alfresco/filesys/file-servers.xml</value>
       </constructor-arg>
    </bean>
+   -->
 
    <!-- Service Registry -->
 
