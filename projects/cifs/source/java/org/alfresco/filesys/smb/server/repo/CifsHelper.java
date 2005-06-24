@@ -295,32 +295,57 @@ public class CifsHelper
     }
     
     /**
+     * Helper class to carry fast search result
+     */
+    private static class NodeRefResult
+    {
+        public final NodeRef nodeRef;
+        public final boolean confident;
+        public NodeRefResult(NodeRef nodeRef, boolean confident)
+        {
+            this.nodeRef = nodeRef;
+            this.confident = confident;
+        }
+        public String toString()
+        {
+            return nodeRef.toString();
+        }
+    }
+    
+    /**
      * Helper method to perform a Lucene-based search directly against the path provided.
      * Since the CIFS path is really just a sequence of unique node names, there is
      * no guarantee that it equates directly to the path.  Also, if the path contains wildcard
      * characters, then a single node request is invalid and no result will be returned.
      * <p>
-     * Essentially, if the method returns a result, you can be guaranteed that it is the correct
-     * result.  If the method returns <code>null</code>, it is NOT a guarantee that the path
-     * can't be resolved to a node by another means, example by walking the hierarchy and
-     * comparing the node names directly to the path elements.
-     * <p>
-     * However, most searches are for a specific file occuring below a set of folders that have
+     * Most searches are for a specific file occuring below a set of folders that have
      * fairly short (<100 characters) names.  Under these conditions, the path search will be
      * unique.
      * 
      * @param serviceRegistry 
      * @param searchRootNodeRef the parent node from which to search
      * @param path a path to search.  This is the standard CIFS path
-     * @return Returns the node referred to by the path, or null if not found.  Null will
-     *      also be returned if the path uniqueness can't be guaranteed.
+     * @return Returns the node referred to by the path (may be null) and a flag indicating
+     *      confidence in the result
      */
-    private static NodeRef getNodeRefFast(ServiceRegistry serviceRegistry, NodeRef searchRootNodeRef, String path)
+    private static NodeRefResult getNodeRefFast(ServiceRegistry serviceRegistry, NodeRef searchRootNodeRef, String path)
     {
+        // OUT FOR NOW
+        if (true)
+        {
+            return new NodeRefResult(null, false);
+        }
+        
+        // an empty path means that we are getting the root
+        // TODO:  Also, Lucene doesn't handle the search PATH:/
+        if (path.length() == 0 || path.equals(FileName.DOS_SEPERATOR_STR))
+        {
+            return new NodeRefResult(searchRootNodeRef, true);
+        }
         // check for any wildcards and drop out directly if there are
         if (WildCard.containsWildcards(path))
         {
-            return null;
+            return new NodeRefResult(null, false);
         }
         
         // get required services
@@ -332,52 +357,82 @@ public class CifsHelper
         StringBuilder sb = new StringBuilder(250);
         
         // open the path literal
-        sb.append("PATH:'");
+        sb.append("PATH:\"/");
         
         // get the path of the search root node and start the search path with this
         Path rootPath = nodeService.getPath(searchRootNodeRef);
         
-        
-        StringTokenizer tokenizer = new StringTokenizer(path, FileName.DOS_SEPERATOR_STR);
+        // parse
+        StringTokenizer tokenizer = new StringTokenizer(path, FileName.DOS_SEPERATOR_STR, false);
         while (tokenizer.hasMoreTokens())
         {
             String pathElement = tokenizer.nextToken();
+            
             // normalise the path element.  This is where the discrepancy can arise between
             // the node's name and the path.  Mostly, when searching for 
             // stick it onto the
             String validPathElement = QName.createValidLocalName(pathElement);
-            QName pathQName = QName.createQName("alf", validPathElement, namespaceService);
+            
+            if (validPathElement.length() >= QName.MAX_LENGTH)
+            {
+                // our path uniqueness failed
+                return new NodeRefResult(null, false);
+            }
             
             // build the path
-            sb.append('/').append(pathQName);
+            sb.append("alf:").append(validPathElement);
+            // TODO: We use the alf: prefix here, but we don't pass the namespace service to the search
+            //       There is an assumption that they are the same - let's hope they are
+            //       When the SearchService takes a prefix resolver, USE IT
+            if (tokenizer.hasMoreTokens())
+            {
+                sb.append("/");
+            }
         }
         
         // close the path literal
-        sb.append('\'');
+        sb.append('\"');
         
-        StoreRef storeRef = searchRootNodeRef.getStoreRef();
-        String search = sb.toString();
-        ResultSet rs = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, search);
-        // More than one results means that we don't have a unique path
-        // This breaks the method contract so we have to return no result
-        if (rs.length() == 0 || rs.length() > 1)
+        ResultSet rs = null;
+        try
         {
-            // no results
-            return null;
+            StoreRef storeRef = searchRootNodeRef.getStoreRef();
+            String search = sb.toString();
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Searching for single single result using Lucene search: \n" +
+                        "   search root: " + searchRootNodeRef + "\n" +
+                        "   path: " + path + "\n" +
+                        "   lucene: " + search);
+            }
+            rs = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, search);
+            
+            NodeRefResult result = null;
+            if (rs.length() == 0)
+            {
+                // no result, but we are confident of it
+                result = new NodeRefResult(null, true);
+            }
+            else if (rs.length() == 1)
+            {
+                // exactly one result is great
+                result = new NodeRefResult(rs.getNodeRef(0), true);
+            }
+            else
+            {
+                // multiple results are dodgey
+                result = new NodeRefResult(null, false);
+            }
+            
+            return result;
         }
-        // we have exactly one result - the path worked
-        NodeRef result = rs.getNodeRef(0);
-        
-        // done
-        if (logger.isDebugEnabled())
+        finally
         {
-            logger.debug("Found single result using Lucene search: \n" +
-                    "   search root: " + searchRootNodeRef + "\n" +
-                    "   path: " + path + "\n" +
-                    "   lucene: " + search + "\n" +
-                    "   result: " + result);
+            if (rs != null)
+            {
+                rs.close();
+            }
         }
-        return result;
     }
     
     /**
@@ -398,11 +453,17 @@ public class CifsHelper
             String path) throws FileNotFoundException
     {
         // first attempt to get the node using the faster direct path search
-        NodeRef nodeRef = CifsHelper.getNodeRefFast(serviceRegistry, searchRootNodeRef, path);
-        if (nodeRef != null)
+        NodeRefResult nodeRefResult = CifsHelper.getNodeRefFast(serviceRegistry, searchRootNodeRef, path);
+        if (nodeRefResult.confident)
         {
-            // the faster query worked
-            return nodeRef;
+            if (nodeRefResult.nodeRef == null)
+            {
+                throw new FileNotFoundException(path);
+            }
+            else
+            {
+                return nodeRefResult.nodeRef;
+            }
         }
         
         // attempt to get the file/folder node using hierarchy walking
@@ -412,9 +473,7 @@ public class CifsHelper
                 path);
         if (nodeRefs.size() == 0)
         {
-            throw new FileNotFoundException("Unable to find file: \n" +
-                    "   search root: " + searchRootNodeRef + "\n" +
-                    "   path: " + path);
+            throw new FileNotFoundException(path);
         }
         else if (nodeRefs.size() > 1)
         {
@@ -423,7 +482,7 @@ public class CifsHelper
                     "   path: " + path);
         }
         // take the first one - not sure if it is possible for the path to refer to more than one
-        nodeRef = nodeRefs.get(0);
+        NodeRef nodeRef = nodeRefs.get(0);
         // done
         return nodeRef;
     }
