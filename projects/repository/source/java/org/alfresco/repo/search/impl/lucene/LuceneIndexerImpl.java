@@ -1272,7 +1272,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             {
                                 for (Path path : nodeService.getPaths(catRef, false))
                                 {
-                                    if (path.get(1) instanceof Path.ChildAssocElement)
+                                    if ((path.size() > 1) && (path.get(1) instanceof Path.ChildAssocElement))
                                     {
                                         Path.ChildAssocElement cae = (Path.ChildAssocElement) path.get(1);
                                         boolean isFakeRoot = true;
