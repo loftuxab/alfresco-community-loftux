@@ -71,8 +71,8 @@ public final class SearchContext implements Serializable
       if (text.indexOf(' ') == -1)
       {
          // simple single word text search
-         fullTextQuery = " TEXT:\"" + safeText + '"';
-         nameAttrQuery = " +@" + nameAttr + ":" + safeText + "*";
+         fullTextQuery = " TEXT:" + safeText + '*';
+         nameAttrQuery = " +@" + nameAttr + ":" + safeText + '*';
       }
       else
       {
@@ -95,7 +95,7 @@ public final class SearchContext implements Serializable
             {
                String term = t.nextToken();
                
-               fullTextBuf.append("TEXT:\"").append(term).append('"');
+               fullTextBuf.append("TEXT:").append(term).append('*');
                nameAttrBuf.append("@").append(nameAttr).append(":").append(term).append('*');
                if (t.hasMoreTokens())
                {
