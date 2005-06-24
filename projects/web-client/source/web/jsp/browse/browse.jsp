@@ -408,10 +408,10 @@
                               <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.editFile}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
-                              <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.cutNode}">
-                                 <f:param name="id" value="#{r.id}" />
-                              </a:actionLink>
                            </a:booleanEvaluator>
+                           <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.cutNode}">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
                            <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.copyNode}">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
