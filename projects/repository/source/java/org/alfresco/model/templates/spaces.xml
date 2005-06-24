@@ -9,22 +9,13 @@
       <alf:contains>
          <alf:folder>
          	<alf:uifacets/>
-			<alf:name>Documents</alf:name>
+			<alf:name>Documentation</alf:name>
 		    <alf:icon>space-icon-default</alf:icon>
       		<alf:contains>
 				<alf:folder>
 	         		<alf:uifacets/>
 					<alf:name>Drafts</alf:name>
 				    <alf:icon>space-icon-default</alf:icon>
-				    <alf:contains>
-						<alf:content>
-	         				<alf:uifacets/>
-				    		<alf:title>System Overview</alf:title>
-            				<alf:name>System Overview</alf:name>
-            				<alf:mimetype>text/html</alf:mimetype>
-            				<alf:contentUrl>classpath:org/alfresco/model/templates/system-overview.html</alf:contentUrl>
-            	        </alf:content>
-         			</alf:contains>
 				</alf:folder>
 				<alf:folder>
 	         		<alf:uifacets/>
@@ -35,6 +26,20 @@
 	         		<alf:uifacets/>
 					<alf:name>Published</alf:name>
 				    <alf:icon>space-icon-default</alf:icon>
+				</alf:folder>
+				<alf:folder>
+	         		<alf:uifacets/>
+					<alf:name>Samples</alf:name>
+				    <alf:icon>space-icon-blue</alf:icon>
+				    <alf:contains>
+						<alf:content>
+	         				<alf:uifacets/>
+				    		<alf:title>System Overview</alf:title>
+            				<alf:name>System Overview</alf:name>
+            				<alf:mimetype>text/html</alf:mimetype>
+            				<alf:contentUrl>classpath:org/alfresco/model/templates/system-overview.html</alf:contentUrl>
+            	        </alf:content>
+         			</alf:contains>
 				</alf:folder>
 			</alf:contains>
 		</alf:folder>

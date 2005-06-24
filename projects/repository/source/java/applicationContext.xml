@@ -964,6 +964,10 @@
                <prop key="location">org/alfresco/model/templates/spaces.xml</prop>
             </props>
             <props>
+               <prop key="path">/alf:${companySpaceName}</prop>
+               <prop key="location">org/alfresco/model/templates/tutorial.xml</prop>
+            </props>
+            <props>
                <prop key="path">/</prop>
                <prop key="location">org/alfresco/model/categories.xml</prop>
             </props>
