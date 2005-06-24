@@ -11,7 +11,7 @@
       <netBIOSSMB/>
       <hostAnnounce interval="5"/>
 -->
-      <Win32NetBIOS name="ALFRESCO2"/>
+      <Win32NetBIOS name="ALFRESCO3"/>
       <Win32Announce interval="5"/>
 
 <!--
@@ -25,8 +25,8 @@
 
    <config evaluator="string-compare" condition="Filesystems">
       <filesystem name="TESTAREA">
-         <store>workspace://Test_1119457969862</store>
-         <rootPath>/</rootPath>
+         <store>workspace://cifsstore</store>
+         <rootPath>/alf:cifsroot</rootPath>
 
          <accessControl default="Write">
             <user name="derekh" access="Write"/>

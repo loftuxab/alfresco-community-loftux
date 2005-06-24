@@ -409,8 +409,7 @@ public class ContentDiskDriver implements DiskInterface
         else
         {
             // it is not a directory, but what is it?
-            // we pretend that it is a directory
-            return true;   
+            return false;   
         }
     }
 
