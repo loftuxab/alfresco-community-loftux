@@ -191,11 +191,20 @@
                               <a:panel label="Properties" id="properties-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
-                                       actionListener="#{EditDocPropsDialog.setupDocumentForAction}">
+                                       actionListener="#{EditDocPropsDialog.setupDocumentForAction}"
+                                       linkTooltip="Modify" rendered="#{DocumentDetailsBean.locked == false}">
                                  <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
-                                 <h:messages styleClass="errorMessage" layout="table" />
+                                 <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
+                              </a:panel>
+                              <a:panel label="Properties" id="properties-panel-locked" progressive="true"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       rendered="#{DocumentDetailsBean.locked}">
+                                 <r:propertySheetGrid id="document-props-locked" value="#{DocumentDetailsBean.document}" var="documentProps" 
+                                                      columns="1" mode="view" labelStyleClass="propertiesLabel" 
+                                                      externalConfig="true" />
+                                 <h:messages id="props-locked-msgs" styleClass="errorMessage" layout="table" />
                               </a:panel>
                               <br/>
                               <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"

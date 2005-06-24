@@ -94,10 +94,33 @@
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <table cellspacing="0" cellpadding="3" border="0" width="100%">
+                  <td style="padding-top: 4px;">
+                     <table cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                           <td width="100%" valign="top">
+                           <td width="7"><img src='<%=request.getContextPath()%>/images/parts/white_01.gif' width=7 height=7 alt=''></td>
+                           <td width="100%" background='<%=request.getContextPath()%>/images/parts/white_02.gif'><img src='<%=request.getContextPath()%>/images/parts/white_02.gif' width=7 height=7 alt=''></td>
+                           <td width="7"><img src='<%=request.getContextPath()%>/images/parts/white_03.gif' width=7 height=7 alt=''></td>
+                           <td rowspan="4" valign="top" style="padding-left:6px;">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
+                              <table cellpadding="1" cellspacing="1" border="0">
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Check In" action="#{CheckinCheckoutBean.checkinFileOK}" styleClass="dialogControls" />
+                                    </td>
+                                 </tr>
+                                 <tr><td class="dialogButtonSpacing"></td></tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="Cancel" action="#{CheckinCheckoutBean.cancel}" styleClass="dialogControls" />
+                                    </td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td background='<%=request.getContextPath()%>/images/parts/white_04.gif'><img src='<%=request.getContextPath()%>/images/parts/white_04.gif' width=7 height=7 alt=''></td>
+                           <td>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
                                     <td class="wizardSectionHeading">Check In options</td>
@@ -135,34 +158,17 @@
                                     </td>
                                  </tr>
                               </table>
-                              
                            </td>
-                           
-                           <td width="100%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <table cellpadding="1" cellspacing="1" border="0">
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Check In" action="#{CheckinCheckoutBean.checkinFileOK}" styleClass="dialogControls" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="dialogButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="Cancel" action="#{CheckinCheckoutBean.cancel}" styleClass="dialogControls" />
-                                    </td>
-                                 </tr>
-                              </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>
+                           <td background='<%=request.getContextPath()%>/images/parts/white_06.gif'><img src='<%=request.getContextPath()%>/images/parts/white_06.gif' width=7 height=7 alt=''></td>
                         </tr>
-                        
+                           
                         </h:form>
-
+                        
                         <tr>
-                           <td style="padding-left: 32px;">
+                           <td background='<%=request.getContextPath()%>/images/parts/white_04.gif'><img src='<%=request.getContextPath()%>/images/parts/white_04.gif' width=7 height=7 alt=''></td>
+                           <td>
                               <r:uploadForm>
-                              <table>
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%" style="padding-left: 27px;">
                                  <tr>
                                     <td>1. Locate document to upload</td>
                                  </tr>
@@ -200,6 +206,12 @@
                               </table>
                               </r:uploadForm>
                            </td>
+                           <td background='<%=request.getContextPath()%>/images/parts/white_06.gif'><img src='<%=request.getContextPath()%>/images/parts/white_06.gif' width=7 height=7 alt=''></td>
+                        </tr>
+                        <tr>
+                           <td width="7"><img src='<%=request.getContextPath()%>/images/parts/white_07.gif' width=7 height=7 alt=''></td>
+                           <td width="100%" background='<%=request.getContextPath()%>/images/parts/white_08.gif'><img src='<%=request.getContextPath()%>/images/parts/white_08.gif' width=7 height=7 alt=''></td>
+                           <td width="7"><img src='<%=request.getContextPath()%>/images/parts/white_09.gif' width=7 height=7 alt=''></td>
                         </tr>
                      </table>
                   </td>
