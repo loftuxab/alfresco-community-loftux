@@ -99,7 +99,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="OK" action="#{DocumentDetailsBean.saveCategory}" styleClass="wizardButton" />
+                                       <h:commandButton value="OK" action="#{DocumentDetailsBean.saveCategory}" styleClass="wizardButton" 
+                                                        disabled="#{DocumentDetailsBean.category == null}"/>
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>

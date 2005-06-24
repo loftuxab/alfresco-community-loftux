@@ -47,7 +47,7 @@ public class UISpaceSelector extends AbstractItemSelector
    }
 
    /**
-    * Returns the parent id of the current space or null if the parent space is the current users home space
+    * Returns the parent id of the current space or null if the parent space is the company home space
     * 
     * @see org.alfresco.web.ui.repo.component.AbstractItemSelector#getParentNodeId(javax.faces.context.FacesContext)
     */
@@ -55,7 +55,7 @@ public class UISpaceSelector extends AbstractItemSelector
    {
       String id = null;
       
-      if (this.navigationId.equals(Application.getCurrentUser(context).getHomeSpaceId()) == false)
+      if (this.navigationId.equals(Application.getCompanyRootId()) == false)
       {
          ChildAssociationRef parentRef = getNodeService(context).getPrimaryParent(
                new NodeRef(Repository.getStoreRef(), this.navigationId));
@@ -97,8 +97,8 @@ public class UISpaceSelector extends AbstractItemSelector
    public Collection<ChildAssociationRef> getRootChildren(FacesContext context)
    {
       // get the root space from the current user
-      String rootId = Application.getCurrentUser(context).getHomeSpaceId();
-      NodeRef rootRef = new NodeRef(Repository.getStoreRef(), rootId);
+      //String rootId = Application.getCurrentUser(context).getHomeSpaceId();
+      NodeRef rootRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
 
       // get a child association reference back to the real repository root to satisfy
       // the generic API we have in the abstract super class

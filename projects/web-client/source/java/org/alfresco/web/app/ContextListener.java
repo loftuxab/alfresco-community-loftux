@@ -152,8 +152,9 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             if (logger.isDebugEnabled())
                 logger.debug("Bootstrap data imported into store: " + repoStoreName);
          }
-         // Extract company space id
+         // Extract company space id and store it in the Application object
          companySpaceId = nodes.get(0).getId();
+         Application.setCompanyRootId(companySpaceId);
          
          // check the admin user exists, create if it doesn't
          RepositoryAuthenticationDao dao = (RepositoryAuthenticationDao)ctx.getBean("alfDaoImpl");

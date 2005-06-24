@@ -298,9 +298,9 @@ input,textarea,select
    padding-left: 5px;
 }
 
-a.topToolbarLink
+a.topToolbarLink, a.topToolbarLink:link, a.topToolbarLink:visited
 {
-   color:#ffffff;
+   color: white;
    font-weight: bold;
 }
 
@@ -311,7 +311,7 @@ a.topToolbarLink
    border-width:1px;
 }
 
-a.topToolbarLinkHighlight
+a.topToolbarLinkHighlight, a.topToolbarLinkHighlight:link, a.topToolbarLinkHighlight:visited
 {
    color:#5D747F;
    font-weight: bold;

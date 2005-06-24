@@ -50,6 +50,7 @@ public class Application
    
    private static String repoStoreName;
    private static String companyRootName;
+   private static String companyRootId;
    private static String companyRootDescription;
    private static String glossaryFolderName;
    private static String templatesFolderName;
@@ -227,6 +228,24 @@ public class Application
    public static String getRepositoryStoreName(FacesContext context)
    {
       return getRepositoryStoreName(FacesContextUtils.getRequiredWebApplicationContext(context));
+   }
+   
+   /**
+    * @return Returns id of the company root 
+    */
+   public static String getCompanyRootId()
+   {
+      return companyRootId;
+   }
+   
+   /**
+    * Sets the company root id
+    * 
+    * @param id The company root id
+    */
+   public static void setCompanyRootId(String id)
+   {
+      companyRootId = id;
    }
    
    /**
