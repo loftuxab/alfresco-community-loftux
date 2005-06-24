@@ -213,7 +213,7 @@ public class MimetypeMap implements MimetypeService
         if (index > -1 && (index < filename.length() - 1))
         {
             String extension = filename.substring(index + 1);
-            if (mimetypesByExtension.containsValue(extension))
+            if (mimetypesByExtension.containsKey(extension))
             {
                 mimetype = mimetypesByExtension.get(extension);
             }
