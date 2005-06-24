@@ -33,6 +33,8 @@ import org.alfresco.service.namespace.QName;
  */
 public interface SearchService
 {
+    public static final String LANGUAGE_LUCENE = "lucene";
+    
     /**
      * Search against a store.
      * 
@@ -45,7 +47,7 @@ public interface SearchService
      * @param attributePaths -
      *            explicit list of attributes/properties to extract for the selected nodes in xpath style syntax
      * @param queryParameterDefinition - query parameter definitions - the default value is used for the value.
-     * @return
+     * @return Returns the query results
      */
     public ResultSet query(StoreRef store, String language, String query, Path[] attributePaths,
             QueryParameterDefinition[] queryParameterDefinitions);
@@ -61,7 +63,7 @@ public interface SearchService
      *            the query language
      * @param query -
      *            the query string - which may include parameters
-     * @return
+     * @return Returns the query results
      */
     public ResultSet query(StoreRef store, String language, String query);
     
@@ -75,7 +77,7 @@ public interface SearchService
      * @param query -
      *            the query string - which may include parameters
      * @param queryParameterDefinition - query parameter definitions - the default value is used for the value.
-     * @return
+     * @return Returns the query results
      */
     public ResultSet query(StoreRef store, String language, String query, QueryParameterDefinition[] queryParameterDefintions);
     
@@ -91,7 +93,7 @@ public interface SearchService
      *            the query string - which may include parameters
      * @param attributePaths -
      *            explicit list of attributes/properties to extract for the selected nodes in xpath style syntax
-     * @return
+     * @return Returns the query results
      */
     public ResultSet query(StoreRef store, String language, String query, Path[] attributePaths);
     
@@ -103,7 +105,7 @@ public interface SearchService
      *       the store against which to search
      * @param queryId - the query identifier
      * @param queryParameters - parameterisation for the canned query
-     * @return the query results
+     * @return Returns the query results
      */
     public ResultSet query(StoreRef store, QName queryId,  QueryParameter[] queryParameters);
 }

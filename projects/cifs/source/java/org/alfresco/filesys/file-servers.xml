@@ -1,0 +1,62 @@
+<alfresco-config area="file-servers">
+
+	<config evaluator="string-compare" condition="CIFS Server">
+		<host name="ALFRESCO" domain="STARLASOFT"/>
+	   <comment>Alfresco CIFS server</comment>
+<!--
+      <bindto>90.1.0.2</bindto>
+      <broadcast>90.1.255.255</broadcast>
+
+      <tcpipSMB/>
+      <netBIOSSMB/>
+      <hostAnnounce interval="5"/>
+-->
+      <Win32NetBIOS name="ALFRESCO32"/>
+      <Win32Announce interval="5"/>
+
+<!--
+      <WINS>
+         <primary>1.2.3.4</primary>
+         <secondary>5.6.7.8</secondary>
+      </WINS>
+-->
+      <sessionDebug flags="File,FileIO,Info"/>
+   </config>
+
+   <config evaluator="string-compare" condition="Filesystems">
+      <filesystem name="TESTAREA">
+         <store>workspace://cifsstore</store>
+         <rootPath>/alf:cifsroot</rootPath>
+
+         <accessControl default="Read">
+            <user name="gkspencer" access="Write"/>
+            <user name="GK Spencer" access="Write"/>
+            <address subnet="90.1.0.0" mask="255.255.0.0" access="Write"/>
+         </accessControl>
+      </filesystem>
+   </config>
+
+   <config evaluator="string-compare" condition="Filesystem Security">
+      <JCEProvider>...</JCEProvider>
+
+      <authenticator type="local">
+         <allowGuest/>
+      </authenticator>
+
+<!--
+      <authenticator type="passthru">
+         <allowGuest/>
+      <Server>90.1.0.2</Server>
+         <Domain>STARLASOFT</Domain>
+      </authenticator>
+-->
+      <globalAccessControl default="None">
+         <user name="gkspencer" access="Write"/>
+         <user name="GK Spencer" access="Write"/>
+         <address ip="90.1.0.90" access="Write"/>
+         <uid id="0" access="Write"/>
+         <gid id="0" access="Write"/>
+      </globalAccessControl>
+   </config>
+
+</alfresco-config>

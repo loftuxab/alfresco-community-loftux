@@ -9,30 +9,35 @@
    NOTE: There is no guaranteed order the projects will be executed in the targets below, to define 
          an explicit order use a filelist instead of a fileset.
    -->
+   <filelist id="project-build-files" dir="."
+         files="projects/core/project-build.xml
+                projects/repository/project-build.xml
+                projects/cifs/project-build.xml
+                projects/web-client/project-build.xml"/>
 
    <target name="build-all" depends="common-init" description="Builds all the projects after cleaning">
       <subant target="build">
-         <fileset dir="." includes="**/project-build.xml" />
+         <filelist refid="project-build-files"/>
       </subant>
       <antcall target="deploy" />
    </target>
 
    <target name="incremental-all" depends="common-init" description="Builds all the projects">
       <subant target="incremental">
-         <fileset dir="." includes="**/project-build.xml" />
+         <filelist refid="project-build-files"/>
       </subant>
       <antcall target="deploy" />
    </target>
 
    <target name="test-all" depends="common-init" description="Runs unit tests for all the projects">
       <subant target="run-tests">
-         <fileset dir="." includes="**/project-build.xml" />
+         <filelist refid="project-build-files"/>
       </subant>
    </target>
 
    <target name="clean-all" depends="common-init" description="Cleans all the projects">
       <subant target="clean">
-         <fileset dir="." includes="**/project-build.xml" />
+         <filelist refid="project-build-files"/>
       </subant>
    </target>
 
