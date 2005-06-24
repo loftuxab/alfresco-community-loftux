@@ -14,13 +14,13 @@ Installing Alfresco Preview Release
 The Alfresco Preview Release is intended for evaluation purposes only.
 
 ====================================
-Alfresco JBoss Bunded Installation
-===================================
+Alfresco Tomcat Bundled Installation
+====================================
 
 Requirements:
 - Java Development Kit Environment available from http://java.sun.com
 - MySQL Database available from http://www.mysql.com
-- alfrescoJB.zip available from http://www.alfresco.org
+- alfrescoTC.zip available from http://www.alfresco.org
 
 Optional:
 - OpenOffice for document transformation available from http://www.openoffice.org
@@ -58,7 +58,7 @@ Install Alfresco Tomcat Bundle
 ------------------------------
 
 - Browse to http://www.alfresco.org/downloads
-- Download the "Alfresco JBoss Bundle" option
+- Download the "Alfresco Tomcat Bundle" option
 - Unzip alfrescoTC.zip in C:\
 
 This will create a folder 'C:\alfresco'
@@ -83,7 +83,6 @@ in C:\Program Files\OpenOffice.org1.1.4
 - Install OpenOffice with defaults (except file associations, unless you wish to)
 - Start one of the OpenOffice programs to go through initial registration, then close it
 - Rename the 'zstart_oo.bat' in 'C:\alfresco' to 'start_oo.bat'
-- Rename the 'zstop_oo.bat' in 'C:\alfresco' to 'stop_oo.bat'
 - Stop and restart the Alfresco server if it is already running
 
 
@@ -91,32 +90,27 @@ in C:\Program Files\OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'alf_start.bat'
+Navigate to the 'C:\alfresco' folder and run 'alf_start_tc.bat'
 - two minimized windows will be started for MySQL and OpenOffice
-- a console window will open for JBoss
-- when the console has the message 'Started in nnnnn ms', JBoss is running
+- a console window will open for Tomcat
+- when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
 - you can now try Alfresco by visiting:
 
-http://localhost:8080/portal and navigating to 'web-client' from the Page Menu and
-then maximizing the portlet (top-right-most icon).
-
-Or:
-
-http://localhost:8080/portal/index.html?ctrl:id=window.default.AlfrescoClientWindow&ctrl:type=nav&ctrl:windowstate=maximized
+http://localhost:8080/web-client/faces/jsp/login.jsp
 
 The server is configured with a single administrative login with user name and password
 both set to 'admin'.
 
 To test the installation, you may wish to follow the tutorial, available from:
 
-http://www.alfresco.org/tutorial
+http://www.alfresco.org/downloads or from the company space from within the Web Client.
 
 
 ===========================
 Closing the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
+Navigate to the 'C:\alfresco' folder and run 'alf_stop_tc.bat'
 
 
 
@@ -137,5 +131,5 @@ c:\mysql\bin\mqslqadmin -u root -p create alfresco
 c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
                    identified by 'alfresco' with grant option;"
 
-The Alfresco 'alf_start.bat' starts the database and runs Tomcat's 'startup.bat'.
-The 'alf_stop.bat' runs Tomcat's 'shutdown.bat' and shutsdown the database.
+The Alfresco 'alf_start_tc.bat' starts the database and runs Tomcat's 'startup.bat'.
+The 'alf_stop_tc.bat' runs Tomcat's 'shutdown.bat' and shutsdown the database.
