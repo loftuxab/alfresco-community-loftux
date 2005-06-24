@@ -918,13 +918,13 @@
          </props>
       </property>
    </bean>
-  
+   
    <bean id="ticketComponent" class="org.alfresco.repo.security.authentication.InMemoryTicketComponentImpl">
       <property name="validDuration">
          <value>P1H</value>
       </property>
       <property name="ticketsExpire">
-         <value>true</value>
+         <value>false</value>
       </property>
       <property name="oneOff">
          <value>false</value>
