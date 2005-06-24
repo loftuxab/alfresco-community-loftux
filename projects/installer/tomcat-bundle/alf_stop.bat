@@ -4,10 +4,10 @@ rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
 rem ---------------------------------------
-rem Shutdown Tomcat
+rem Shutdown JBoss
 rem ---------------------------------------
-cd \alfresco\tomcat
-call bin\shutdown.bat
+cd \alfresco\jboss
+call bin\shutdown.bat -S
 cd \alfresco
 
 rem ---------------------------------------

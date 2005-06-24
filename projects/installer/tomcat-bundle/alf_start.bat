@@ -9,13 +9,12 @@ rem ---------------------------------------
 rem Start DB (MySQL) in a minimised console
 rem ---------------------------------------
 start "MySQL Server" /min cmd /c c:\mysql\bin\mysqld-nt --console
-sleep 3
 
 rem ---------------------------------------
-rem Start Tomcat
+rem Start JBoss
 rem ---------------------------------------
-cd \alfresco\tomcat
-call bin\startup.bat
+cd \alfresco\jboss
+start "JBoss Server" cmd /c bin\run.bat
 cd \alfresco
 
 rem ---------------------------------------

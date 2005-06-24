@@ -14,13 +14,13 @@ Installing Alfresco Preview Release
 The Alfresco Preview Release is intended for evaluation purposes only.
 
 ====================================
-Alfresco Tomcat Bundled Installation
-====================================
+Alfresco JBoss Bunded Installation
+===================================
 
 Requirements:
 - Java Development Kit Environment available from http://java.sun.com
 - MySQL Database available from http://www.mysql.com
-- alfrescoTC.zip available from http://www.alfresco.org
+- alfrescoJB.zip available from http://www.alfresco.org
 
 Optional:
 - OpenOffice for document transformation available from http://www.openoffice.org
@@ -58,7 +58,7 @@ Install Alfresco Tomcat Bundle
 ------------------------------
 
 - Browse to http://www.alfresco.org/downloads
-- Download the "Alfresco Tomcat Bundle" option
+- Download the "Alfresco JBoss Bundle" option
 - Unzip alfrescoTC.zip in C:\
 
 This will create a folder 'C:\alfresco'
@@ -93,11 +93,16 @@ Running the Alfresco Server
 
 Navigate to the 'C:\alfresco' folder and run 'alf_start.bat'
 - two minimized windows will be started for MySQL and OpenOffice
-- a console window will open for Tomcat
-- when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
+- a console window will open for JBoss
+- when the console has the message 'Started in nnnnn ms', JBoss is running
 - you can now try Alfresco by visiting:
 
-http://localhost:8080/web-client/faces/jsp/login.jsp
+http://localhost:8080/portal and navigating to 'web-client' from the Page Menu and
+then maximizing the portlet (top-right-most icon).
+
+Or:
+
+http://localhost:8080/portal/index.html?ctrl:id=window.default.AlfrescoClientWindow&ctrl:type=nav&ctrl:windowstate=maximized
 
 The server is configured with a single administrative login with user name and password
 both set to 'admin'.
