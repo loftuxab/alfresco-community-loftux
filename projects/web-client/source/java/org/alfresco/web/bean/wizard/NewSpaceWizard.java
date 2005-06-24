@@ -379,7 +379,7 @@ public class NewSpaceWizard extends AbstractWizardBean
       this.createFrom = "scratch";
       this.spaceType = "container";
       this.icon = "space-icon-default";
-      this.copyPolicy = "structure";
+      this.copyPolicy = "contents";
       this.existingSpaceId = null;
       this.templateSpaceId = null;
       this.name = null;

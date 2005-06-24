@@ -104,15 +104,12 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       Version Notes
+                                       <h:outputText value="Version Notes<br/>" escape="false"
+                                                     rendered="#{CheckinCheckoutBean.versionable}" />
+                                       <h:inputTextarea value="#{CheckinCheckoutBean.versionNotes}" rows="2" cols="50" 
+                                                        rendered="#{CheckinCheckoutBean.versionable}"/>
                                     </td>
                                  </tr>
-                                 <tr>
-                                    <td>
-                                       <h:inputTextarea value="#{CheckinCheckoutBean.versionNotes}" rows="2" cols="50" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
                                        <h:selectBooleanCheckbox value="#{CheckinCheckoutBean.keepCheckedOut}" />

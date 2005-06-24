@@ -88,12 +88,6 @@
       <property-sheet>
          <show-property name="summary" displayLabel="Summary" />
       </property-sheet>
-   </config>   
-
-   <config evaluator="aspect-name" condition="versionable">
-      <property-sheet>
-         <show-property name="versionLabel" displayLabel="Version Label" />
-      </property-sheet>
    </config>
    
    <config evaluator="string-compare" condition="New Rule Wizard">

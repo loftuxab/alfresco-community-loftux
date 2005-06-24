@@ -152,6 +152,17 @@ public class CheckinCheckoutBean
    }
    
    /**
+    * Determines whether the document being checked in has 
+    * the versionable aspect applied
+    * 
+    * @return true if the versionable aspect is applied
+    */
+   public boolean isVersionable()
+   {
+      return getDocument().hasAspect(ContentModel.ASPECT_VERSIONABLE);
+   }
+   
+   /**
     * @param keepCheckedOut   The keepCheckedOut to set.
     */
    public void setKeepCheckedOut(boolean keepCheckedOut)
