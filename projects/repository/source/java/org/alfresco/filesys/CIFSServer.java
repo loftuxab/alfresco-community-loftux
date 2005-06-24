@@ -17,15 +17,15 @@
  */
 package org.alfresco.filesys;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.SocketException;
 
-import org.alfresco.filesys.netbios.server.*;
-import org.alfresco.filesys.netbios.win32.*;
-import org.alfresco.filesys.server.*;
-import org.alfresco.filesys.server.config.*;
-import org.alfresco.filesys.smb.server.*;
-import org.apache.log4j.*;
+import org.alfresco.filesys.netbios.server.NetBIOSNameServer;
+import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
+import org.alfresco.filesys.server.NetworkServer;
+import org.alfresco.filesys.server.config.ServerConfiguration;
+import org.alfresco.filesys.smb.server.SMBServer;
+import org.apache.log4j.Logger;
 
 /**
  * CIFS Server Class

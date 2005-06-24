@@ -17,12 +17,11 @@
  */
 package org.alfresco.filesys;
 
-import java.io.*;
+import java.io.PrintStream;
 
-import org.alfresco.config.source.*;
-import org.alfresco.config.xml.*;
-import org.alfresco.filesys.server.config.*;
-import org.apache.log4j.*;
+import org.alfresco.config.source.ClassPathConfigSource;
+import org.alfresco.config.xml.XMLConfigService;
+import org.alfresco.filesys.server.config.ServerConfiguration;
 
 /**
  * CIFS Server Test Application

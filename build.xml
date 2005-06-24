@@ -12,7 +12,6 @@
    <filelist id="project-build-files" dir="."
          files="projects/core/project-build.xml
                 projects/repository/project-build.xml
-                projects/cifs/project-build.xml
                 projects/web-client/project-build.xml"/>
 
    <target name="build-all" depends="common-init" description="Builds all the projects after cleaning">
