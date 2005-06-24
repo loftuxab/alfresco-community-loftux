@@ -203,12 +203,15 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
          {
             try
             {
-               // setup the authentication context
-               WebApplicationContext ctx = (WebApplicationContext)getPortletContext().getAttribute(
-                     WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
-               AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
-               StoreContextHolder.setContext(Repository.getStoreRef());
-               auth.validate(user.getTicket());
+               if (user != null)
+               {
+                  // setup the authentication context
+                  WebApplicationContext ctx = (WebApplicationContext)getPortletContext().getAttribute(
+                        WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+                  AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
+                  StoreContextHolder.setContext(Repository.getStoreRef());
+                  auth.validate(user.getTicket());
+               }
                
                // do the normal JSF processing
                super.facesRender(request, response);
