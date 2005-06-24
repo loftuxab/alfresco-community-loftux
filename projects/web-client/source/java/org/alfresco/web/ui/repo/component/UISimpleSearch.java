@@ -233,7 +233,7 @@ public class UISimpleSearch extends UICommand
       out.write(getClientId(context));
       // TODO: style and class from component properties!
       out.write("' onkeypress=\"return _noenter(event)\"");
-      out.write(" type='text' maxlength='255' style='width:90px;padding-top:3px;font-size:10px' value=\"");
+      out.write(" type='text' maxlength='1024' style='width:130px;padding-top:3px;font-size:10px' value=\"");
       // output previous search text stored in this component!
       out.write(Utils.replace(getLastSearch(), "\"", "&quot;"));
       out.write("\">");

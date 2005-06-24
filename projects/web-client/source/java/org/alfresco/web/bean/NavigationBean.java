@@ -239,7 +239,7 @@ public class NavigationBean
          if (LOCATION_COMPANY.equals(location))
          {
             List<IBreadcrumbHandler> elements = new ArrayList(1);
-            NodeRef companyRootRef = getCompanyRootRef();
+            NodeRef companyRootRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
             elements.add(new NavigationBreadcrumbHandler(companyRootRef, Application.getCompanyRootName(context)));
             setLocation(elements);
             setCurrentNodeId(companyRootRef.getId());
@@ -271,32 +271,6 @@ public class NavigationBean
    
    // ------------------------------------------------------------------------------
    // Private helpers
-   
-   /**
-    * Helper to get the company root node reference
-    */
-   private NodeRef getCompanyRootRef()
-   {
-      if (this.companyRootRef == null)
-      {
-         FacesContext context = FacesContext.getCurrentInstance();
-         String companySpaceName = Application.getCompanyRootName(context);
-         String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
-         
-         List<NodeRef> nodes = this.nodeService.selectNodes(
-               this.nodeService.getRootNode(Repository.getStoreRef()),
-               companyXPath, null, this.namespaceService, false);
-         
-         if (nodes.size() == 0)
-         {
-            throw new IllegalStateException("Unable to find company home space path: " + companySpaceName);
-         }
-         
-         this.companyRootRef = nodes.get(0);
-      }
-      
-      return this.companyRootRef;
-   }
    
    
    // ------------------------------------------------------------------------------

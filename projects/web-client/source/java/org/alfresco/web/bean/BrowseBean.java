@@ -58,6 +58,9 @@ import org.alfresco.web.ui.repo.component.UISimpleSearch;
 import org.apache.log4j.Logger;
 
 /**
+ * Bean providing properties and behaviour for the main folder/document browse screen and
+ * search results screens.
+ * 
  * @author Kevin Roast
  */
 public class BrowseBean implements IContextListener

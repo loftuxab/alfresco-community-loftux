@@ -130,9 +130,6 @@
                                           <a:listItem value="space-icon-blue" image="/images/icons/space-icon-blue.gif" />
                                           <a:listItem value="space-icon-brown" image="/images/icons/space-icon-brown.gif" />
                                           <a:listItem value="space-icon-grey" image="/images/icons/space-icon-grey.gif" />
-                                          <a:listItem value="space-icon-red" image="/images/icons/space-icon-red.gif" />
-                                          <a:listItem value="space-icon-yellow" image="/images/icons/space-icon-yellow.gif" />
-                                          <a:listItem value="space-icon-magenta" image="/images/icons/space-icon-magenta.gif" />
                                        </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                        </td></tr></table>

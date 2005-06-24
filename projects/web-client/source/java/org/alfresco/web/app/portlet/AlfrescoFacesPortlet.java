@@ -54,6 +54,13 @@ import org.apache.myfaces.portlet.PortletUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+/**
+ * Class to extend the MyFacesGenericPortlet to provide behaviour specific to Alfresco web client.
+ * Handles upload of multi-part forms through a JSR-168 Portlet, generic error handling and session
+ * login authentication.
+ * 
+ * @author Gavin Cornwell, Kevin Roast
+ */
 public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
 {
    public static final String INSTANCE_NAME = "AlfrescoClientInstance";
@@ -68,6 +75,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
 
    private String loginPage = null;
    private String errorPage = null;
+   
    
    /**
     * Called by the portlet container to allow the portlet to process an action request.
@@ -319,8 +327,4 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
       
       return this.errorPage;
    }
-   
-   // PortletSession attribute
-   private static final String CURRENT_FACES_CONTEXT = 
-       MyFacesGenericPortlet.class.getName() + ".CURRENT_FACES_CONTEXT";
 }

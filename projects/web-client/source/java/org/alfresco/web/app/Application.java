@@ -239,7 +239,7 @@ public class Application
    }
    
    /**
-    * Sets the company root id
+    * Sets the company root id. This is setup by the ContextListener.
     * 
     * @param id The company root id
     */

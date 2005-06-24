@@ -114,7 +114,7 @@
                               <td width=100 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg14" /><br>
-                                 <a:actionLink value="#{msg.close_search}" image="/images/icons/delete.gif" padding="4" actionListener="#{BrowseBean.closeSearch}" id="link20" />
+                                 <a:actionLink value="#{msg.close_search}" image="/images/icons/action.gif" padding="4" actionListener="#{BrowseBean.closeSearch}" id="link20" />
                               </td>
                            </a:panel>
                            
@@ -391,9 +391,6 @@
                               <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.editFile}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
-                              <a:actionLink value="#{msg.update}" image="/images/icons/update.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
-                                 <f:param name="id" value="#{r.id}" />
-                              </a:actionLink>
                               <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.cutNode}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
@@ -411,11 +408,16 @@
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </a:booleanEvaluator>
+                           <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" showLink="false" styleClass="inlineAction" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
                            <%-- More actions menu --%>
                            <a:menu itemSpacing="4" image="/images/icons/more.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
-                              <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
-                                 <f:param name="id" value="#{r.id}" />
-                              </a:actionLink>
+                              <a:booleanEvaluator value="#{r.locked == false}">
+                                 <a:actionLink value="#{msg.update}" image="/images/icons/update.gif" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
+                                    <f:param name="id" value="#{r.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
                               <a:booleanEvaluator value="#{r.locked == false && r.workingCopy == false}">
                                  <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" actionListener="#{BrowseBean.setupContentAction}" action="deleteFile">
                                     <f:param name="id" value="#{r.id}" />
