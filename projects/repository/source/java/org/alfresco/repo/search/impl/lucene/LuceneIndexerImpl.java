@@ -130,7 +130,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private Boolean isFTSUpdate = null;
 
-    private List<Command> deltaDeletes = new ArrayList<Command>(10000);
+    private List<Command> commandList = new ArrayList<Command>(10000);
 
     private FTSIndexerAware callBack;
 
@@ -712,15 +712,18 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     {
 
         delete(nodeRef, true);
-        // index(nodeRef, false);
     }
 
     private void delete(NodeRef nodeRef, boolean forReindex) throws LuceneIndexException
     {
+        addCommand(new Command(nodeRef, forReindex ? Action.REINDEX : Action.DELETE));
+    }
 
-        deltaDeletes.add(new Command(nodeRef, forReindex ? Action.REINDEX : Action.DELETE));
+    private void addCommand(Command command)
+    {
+        commandList.add(command);
 
-        if (deltaDeletes.size() > 10000)
+        if (commandList.size() > 10000)
         {
             flushPending();
         }
@@ -729,20 +732,32 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     private void flushPending() throws LuceneIndexException
     {
         Set<NodeRef> forIndex = new LinkedHashSet<NodeRef>();
-        for (Command command : deltaDeletes)
+        for (Command command : commandList)
         {
-            if (command.action == Action.REINDEX)
+            if (command.action == Action.INDEX)
             {
+                // Indexing just requires the node to be added to the list
+                forIndex.add(command.nodeRef);
+            }
+            else if (command.action == Action.REINDEX)
+            {
+                // Reindex is a delete and then and index
                 Set<NodeRef> set = deleteImpl(command.nodeRef, true);
+                // Deleting any pending index actions 
+                // - make sure we only do at most one index
                 forIndex.removeAll(set);
+                // Add the nodes for index
                 forIndex.addAll(set);
             }
             else if (command.action == Action.DELETE)
             {
-                deleteImpl(command.nodeRef, false);
+                // Delete the nodes
+                Set<NodeRef> set = deleteImpl(command.nodeRef, false);
+                // Remove any pending indexes
+                forIndex.removeAll(set);
             }
         }
-        deltaDeletes.clear();
+        commandList.clear();
         index(forIndex, false);
     }
 
