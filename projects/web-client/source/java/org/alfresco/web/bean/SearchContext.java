@@ -65,10 +65,17 @@ public final class SearchContext implements Serializable
       String nameAttr = Repository.escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "name"));
       
       // match against content text
+      String text = this.text.trim();
       String safeText = Utils.remove(text, "\"");
       String fullTextQuery;
       String nameAttrQuery;
-      if (text.indexOf(' ') == -1)
+      if (text.equals("*") == true)
+      {
+         // special case to handle search against EVERYTHING
+         fullTextQuery = " ISNODE:*";
+         nameAttrQuery = " ISNODE:*";
+      }
+      else if (text.indexOf(' ') == -1)
       {
          // simple single word text search
          fullTextQuery = " TEXT:" + safeText + '*';
