@@ -328,7 +328,8 @@ public class ContentDiskDriver implements DiskInterface
         {
             throw new AlfrescoRuntimeException("Failed to get file information: \n" +
                     "   device: " + tree.getContext().getDeviceName() + "\n" +
-                    "   path: " + path);
+                    "   path: " + path,
+                    e);
         }
     }
 
@@ -407,7 +408,9 @@ public class ContentDiskDriver implements DiskInterface
         }
         else
         {
-            throw new AlfrescoRuntimeException("Node type not supported: " + nodeTypeQName);
+            // it is not a directory, but what is it?
+            // we pretend that it is a directory
+            return true;   
         }
     }
 

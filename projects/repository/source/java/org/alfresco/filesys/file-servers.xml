@@ -11,7 +11,7 @@
       <netBIOSSMB/>
       <hostAnnounce interval="5"/>
 -->
-      <Win32NetBIOS name="ALFRESCO32"/>
+      <Win32NetBIOS name="ALFRESCO2"/>
       <Win32Announce interval="5"/>
 
 <!--
@@ -25,12 +25,11 @@
 
    <config evaluator="string-compare" condition="Filesystems">
       <filesystem name="TESTAREA">
-         <store>workspace://cifsstore</store>
-         <rootPath>/alf:cifsroot</rootPath>
+         <store>workspace://Test_1119457969862</store>
+         <rootPath>/</rootPath>
 
-         <accessControl default="Read">
-            <user name="gkspencer" access="Write"/>
-            <user name="GK Spencer" access="Write"/>
+         <accessControl default="Write">
+            <user name="derekh" access="Write"/>
             <address subnet="90.1.0.0" mask="255.255.0.0" access="Write"/>
          </accessControl>
       </filesystem>
@@ -57,6 +56,13 @@
          <uid id="0" access="Write"/>
          <gid id="0" access="Write"/>
       </globalAccessControl>
+<!--
+      <globalAccessControl default="Write">
+         <address ip="90.1.0.90" access="Write"/>
+         <uid id="0" access="Write"/>
+         <gid id="0" access="Write"/>
+      </globalAccessControl>
+-->
    </config>
 
 </alfresco-config>

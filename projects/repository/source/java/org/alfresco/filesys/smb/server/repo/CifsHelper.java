@@ -198,12 +198,6 @@ public class CifsHelper
             NodeRef searchRootNodeRef,
             String path)
     {
-        if (path.length() == 0)
-        {
-            // just return the search context
-            return Collections.singletonList(searchRootNodeRef);
-        }
-        
         // get the required services
         NamespaceService namespaceService = serviceRegistry.getNamespaceService();
         DictionaryService dictionaryService = serviceRegistry.getDictionaryService();
@@ -295,147 +289,6 @@ public class CifsHelper
     }
     
     /**
-     * Helper class to carry fast search result
-     */
-    private static class NodeRefResult
-    {
-        public final NodeRef nodeRef;
-        public final boolean confident;
-        public NodeRefResult(NodeRef nodeRef, boolean confident)
-        {
-            this.nodeRef = nodeRef;
-            this.confident = confident;
-        }
-        public String toString()
-        {
-            return nodeRef.toString();
-        }
-    }
-    
-    /**
-     * Helper method to perform a Lucene-based search directly against the path provided.
-     * Since the CIFS path is really just a sequence of unique node names, there is
-     * no guarantee that it equates directly to the path.  Also, if the path contains wildcard
-     * characters, then a single node request is invalid and no result will be returned.
-     * <p>
-     * Most searches are for a specific file occuring below a set of folders that have
-     * fairly short (<100 characters) names.  Under these conditions, the path search will be
-     * unique.
-     * 
-     * @param serviceRegistry 
-     * @param searchRootNodeRef the parent node from which to search
-     * @param path a path to search.  This is the standard CIFS path
-     * @return Returns the node referred to by the path (may be null) and a flag indicating
-     *      confidence in the result
-     */
-    private static NodeRefResult getNodeRefFast(ServiceRegistry serviceRegistry, NodeRef searchRootNodeRef, String path)
-    {
-        // OUT FOR NOW
-        if (true)
-        {
-            return new NodeRefResult(null, false);
-        }
-        
-        // an empty path means that we are getting the root
-        // TODO:  Also, Lucene doesn't handle the search PATH:/
-        if (path.length() == 0 || path.equals(FileName.DOS_SEPERATOR_STR))
-        {
-            return new NodeRefResult(searchRootNodeRef, true);
-        }
-        // check for any wildcards and drop out directly if there are
-        if (WildCard.containsWildcards(path))
-        {
-            return new NodeRefResult(null, false);
-        }
-        
-        // get required services
-        NamespaceService namespaceService = serviceRegistry.getNamespaceService();
-        NodeService nodeService = serviceRegistry.getNodeService();
-        SearchService searchService = serviceRegistry.getSearchService();
-        
-        // build a Lucene query
-        StringBuilder sb = new StringBuilder(250);
-        
-        // open the path literal
-        sb.append("PATH:\"/");
-        
-        // get the path of the search root node and start the search path with this
-        Path rootPath = nodeService.getPath(searchRootNodeRef);
-        
-        // parse
-        StringTokenizer tokenizer = new StringTokenizer(path, FileName.DOS_SEPERATOR_STR, false);
-        while (tokenizer.hasMoreTokens())
-        {
-            String pathElement = tokenizer.nextToken();
-            
-            // normalise the path element.  This is where the discrepancy can arise between
-            // the node's name and the path.  Mostly, when searching for 
-            // stick it onto the
-            String validPathElement = QName.createValidLocalName(pathElement);
-            
-            if (validPathElement.length() >= QName.MAX_LENGTH)
-            {
-                // our path uniqueness failed
-                return new NodeRefResult(null, false);
-            }
-            
-            // build the path
-            sb.append("alf:").append(validPathElement);
-            // TODO: We use the alf: prefix here, but we don't pass the namespace service to the search
-            //       There is an assumption that they are the same - let's hope they are
-            //       When the SearchService takes a prefix resolver, USE IT
-            if (tokenizer.hasMoreTokens())
-            {
-                sb.append("/");
-            }
-        }
-        
-        // close the path literal
-        sb.append('\"');
-        
-        ResultSet rs = null;
-        try
-        {
-            StoreRef storeRef = searchRootNodeRef.getStoreRef();
-            String search = sb.toString();
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Searching for single single result using Lucene search: \n" +
-                        "   search root: " + searchRootNodeRef + "\n" +
-                        "   path: " + path + "\n" +
-                        "   lucene: " + search);
-            }
-            rs = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, search);
-            
-            NodeRefResult result = null;
-            if (rs.length() == 0)
-            {
-                // no result, but we are confident of it
-                result = new NodeRefResult(null, true);
-            }
-            else if (rs.length() == 1)
-            {
-                // exactly one result is great
-                result = new NodeRefResult(rs.getNodeRef(0), true);
-            }
-            else
-            {
-                // multiple results are dodgey
-                result = new NodeRefResult(null, false);
-            }
-            
-            return result;
-        }
-        finally
-        {
-            if (rs != null)
-            {
-                rs.close();
-            }
-        }
-    }
-    
-    /**
      * Attempts to fetch a specific single node at the given path.
      * <p>
      * The first pass search attempts to use Lucene to extract a single node by
@@ -452,20 +305,6 @@ public class CifsHelper
             NodeRef searchRootNodeRef,
             String path) throws FileNotFoundException
     {
-        // first attempt to get the node using the faster direct path search
-        NodeRefResult nodeRefResult = CifsHelper.getNodeRefFast(serviceRegistry, searchRootNodeRef, path);
-        if (nodeRefResult.confident)
-        {
-            if (nodeRefResult.nodeRef == null)
-            {
-                throw new FileNotFoundException(path);
-            }
-            else
-            {
-                return nodeRefResult.nodeRef;
-            }
-        }
-        
         // attempt to get the file/folder node using hierarchy walking
         List<NodeRef> nodeRefs = CifsHelper.getNodeRefs(
                 serviceRegistry,
