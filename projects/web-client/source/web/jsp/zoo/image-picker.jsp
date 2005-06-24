@@ -32,9 +32,9 @@
    
       <a:imagePickerRadio columns="4" spacing="5" value="#{DummyBean.properties.one}">
          <a:listItem value="1" label="Checkin" tooltip="Checkin"
-                           image="/images/icons/CheckIn.gif" />
+                           image="/images/icons/check_in_large.gif" />
          <a:listItem value="2" label="Checkout" tooltip="Checkout"
-                           image="/images/icons/CheckOut.gif" />
+                           image="/images/icons/check_out_large.gif" />
          <a:listItem value="3" label="New File" tooltip="New File"
                            image="/images/icons/large_newFile.gif" />
       </a:imagePickerRadio>
@@ -43,8 +43,8 @@
       
       <p/>
       <a:imagePickerRadio columns="1" spacing="6" value="#{DummyBean.properties.two}" style="border: 1px solid black">
-         <a:listItem value="1" tooltip="Checkin" image="/images/icons/CheckIn.gif" />
-         <a:listItem value="2" tooltip="Checkout" image="/images/icons/CheckOut.gif" />
+         <a:listItem value="1" tooltip="Checkin" image="/images/icons/check_in_large.gif" />
+         <a:listItem value="2" tooltip="Checkout" image="/images/icons/check_out_large.gif" />
          <a:listItem value="3" tooltip="New File" image="/images/icons/large_newFile.gif" />
       </a:imagePickerRadio>
       <br/>

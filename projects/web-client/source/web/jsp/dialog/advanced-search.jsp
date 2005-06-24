@@ -67,8 +67,8 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
-                           <td width=30>
-                              <img src="<%=request.getContextPath()%>/images/icons/search_large.gif" width=28 height=28>
+                           <td width=32>
+                              <img src="<%=request.getContextPath()%>/images/icons/search_large.gif" width=32 height=32>
                            </td>
                            <td>
                               <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>

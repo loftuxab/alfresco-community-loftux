@@ -67,8 +67,8 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
-                           <td width="20">
-                              <h:graphicImage url="/images/icons/delete.gif" width="14" height="14"/>
+                           <td width="32">
+                              <h:graphicImage url="/images/icons/delete_large.gif"/>
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>

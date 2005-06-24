@@ -113,8 +113,8 @@
                            
                            <%-- actions for search results mode --%>
                            <a:panel id="search-actions" rendered="#{NavigationBean.searchContext != null}">
-                              <td width=30>
-                                 <img src="<%=request.getContextPath()%>/images/icons/search_large.gif" width=28 height=28>
+                              <td width=32>
+                                 <img src="<%=request.getContextPath()%>/images/icons/search_results_large.gif" width=32 height=32>
                               </td>
                               <td>
                                  <%-- Summary --%>
