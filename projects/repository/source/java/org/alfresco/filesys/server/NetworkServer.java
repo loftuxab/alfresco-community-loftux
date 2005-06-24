@@ -26,6 +26,7 @@ import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.server.core.ShareMapper;
 import org.alfresco.filesys.server.core.SharedDevice;
 import org.alfresco.filesys.server.core.SharedDeviceList;
+import org.alfresco.service.ServiceRegistry;
 import org.apache.log4j.Logger;
 
 /**
@@ -45,8 +46,9 @@ public abstract class NetworkServer
 
     private String m_version;
 
+    /** repository connection */
+    private ServiceRegistry serviceRegistry;
     // Server configuration
-
     private ServerConfiguration m_config;
 
     // Debug enabled flag and debug flags
@@ -81,14 +83,20 @@ public abstract class NetworkServer
      * @param proto String
      * @param config ServerConfiguration
      */
-    public NetworkServer(String proto, ServerConfiguration config)
+    public NetworkServer(String proto, ServiceRegistry serviceRegistry, ServerConfiguration config)
     {
         m_protoName = proto;
+        this.serviceRegistry = serviceRegistry;
         m_config = config;
     }
 
+    protected final ServiceRegistry getServiceRegistry()
+    {
+        return serviceRegistry;
+    }
+    
     /**
-     * Return the server configuration.
+     * Returns the server configuration.
      * 
      * @return ServerConfiguration
      */

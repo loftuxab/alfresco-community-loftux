@@ -20,11 +20,15 @@ package org.alfresco.filesys;
 import java.io.IOException;
 import java.net.SocketException;
 
+import org.alfresco.config.source.ClassPathConfigSource;
+import org.alfresco.config.xml.XMLConfigService;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.netbios.server.NetBIOSNameServer;
 import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.smb.server.SMBServer;
+import org.alfresco.service.ServiceRegistry;
 import org.apache.log4j.Logger;
 
 /**
@@ -38,24 +42,22 @@ import org.apache.log4j.Logger;
  */
 public class CIFSServer
 {
-
-    // Debug logging
-
     private static final Logger logger = Logger.getLogger("org.alfresco.smb.server");
 
     // Filesystem configuration
 
-    private ServerConfiguration m_config;
+    private ServiceRegistry serviceRegistry;
+    private String configLocation;
+    private ServerConfiguration filesysConfig;
 
     /**
-     * Class constructor
-     * 
-     * @param config
-     *            ServerConfiguration
+     * @param serviceRegistry connects to the repository
+     * @param configService
      */
-    public CIFSServer(ServerConfiguration config)
+    public CIFSServer(ServiceRegistry serviceRegistry, String configLocation)
     {
-        m_config = config;
+        this.serviceRegistry = serviceRegistry;
+        this.configLocation = configLocation;
     }
 
     /**
@@ -68,49 +70,53 @@ public class CIFSServer
      */
     public final void startServer() throws SocketException, IOException
     {
-
-        // Load the Win32 NetBIOS library
-        //
-        // For some strange reason the native code loadLibrary() call hangs if
-        // done later by the SMBServer.
-        // Forcing the Win32NetBIOS class to load here and run the static
-        // initializer fixes the problem.
-
-        if (m_config.hasWin32NetBIOS())
-            Win32NetBIOS.LanaEnum();
-
-        // Create the SMB server and NetBIOS name server, if enabled
-
-        if (m_config.isSMBServerEnabled())
+        try
         {
-
-            // Create the NetBIOS name server if NetBIOS SMB is enabled
-
-            if (m_config.hasNetBIOSSMB())
-                m_config.addServer(new NetBIOSNameServer(m_config));
-
-            // Create the SMB server
-
-            m_config.addServer(new SMBServer(m_config));
+            ClassPathConfigSource classPathConfigSource = new ClassPathConfigSource(configLocation);
+            XMLConfigService xmlConfigService = new XMLConfigService(classPathConfigSource);
+            xmlConfigService.init();
+            filesysConfig = new ServerConfiguration(serviceRegistry, xmlConfigService);
+            filesysConfig.init();
+        
+            // Load the Win32 NetBIOS library
+            //
+            // For some strange reason the native code loadLibrary() call hangs if
+            // done later by the SMBServer.
+            // Forcing the Win32NetBIOS class to load here and run the static
+            // initializer fixes the problem.
+    
+            if (filesysConfig.hasWin32NetBIOS())
+                Win32NetBIOS.LanaEnum();
+    
+            // Create the SMB server and NetBIOS name server, if enabled
+            if (filesysConfig.isSMBServerEnabled())
+            {
+    
+                // Create the NetBIOS name server if NetBIOS SMB is enabled
+                if (filesysConfig.hasNetBIOSSMB())
+                    filesysConfig.addServer(new NetBIOSNameServer(serviceRegistry, filesysConfig));
+    
+                // Create the SMB server
+                filesysConfig.addServer(new SMBServer(serviceRegistry, filesysConfig));
+            }
+    
+            // Start the configured servers
+            for (int i = 0; i < filesysConfig.numberOfServers(); i++)
+            {
+                // Get the current server
+                NetworkServer server = filesysConfig.getServer(i);
+    
+                if (logger.isInfoEnabled())
+                    logger.info("Starting server " + server.getProtocolName() + " ...");
+    
+                // Start the server
+                filesysConfig.getServer(i).startServer();
+            }
         }
-
-        // Start the configured servers
-
-        for (int i = 0; i < m_config.numberOfServers(); i++)
+        catch (Throwable e)
         {
-
-            // Get the current server
-
-            NetworkServer server = m_config.getServer(i);
-
-            // DEBUG
-
-            if (logger.isInfoEnabled())
-                logger.info("Starting server " + server.getProtocolName() + " ...");
-
-            // Start the server
-
-            m_config.getServer(i).startServer();
+            filesysConfig = null;
+            throw new AlfrescoRuntimeException("Failed to start CIFS Server", e);
         }
     }
 
@@ -119,25 +125,22 @@ public class CIFSServer
      */
     public final void stopServer()
     {
-
-        // Shutdown the servers
-
-        for (int i = 0; i < m_config.numberOfServers(); i++)
+        if (filesysConfig == null)
         {
-
+            // initialisation failed
+            return;
+        }
+        // Shutdown the servers
+        for (int i = 0; i < filesysConfig.numberOfServers(); i++)
+        {
             // Get the current server
-
-            NetworkServer server = m_config.getServer(i);
-
-            // DEBUG
+            NetworkServer server = filesysConfig.getServer(i);
 
             if (logger.isInfoEnabled())
                 logger.info("Shutting server " + server.getProtocolName() + " ...");
 
             // Start the server
-
-            m_config.getServer(i).shutdownServer(false);
+            filesysConfig.getServer(i).shutdownServer(false);
         }
-
     }
 }

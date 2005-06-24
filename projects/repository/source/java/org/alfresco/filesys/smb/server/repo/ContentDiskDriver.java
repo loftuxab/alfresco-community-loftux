@@ -55,8 +55,6 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * First-pass implementation to enable SMB support in the repo.
@@ -65,19 +63,25 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class ContentDiskDriver implements DiskInterface
 {
-    private static final String[] CONTEXT_CONFIG = new String[] {"applicationContext.xml"};
     private static final String KEY_STORE = "store";
     private static final String KEY_ROOT_PATH = "rootPath";
     
     private static final Log logger = LogFactory.getLog(ContentDiskDriver.class);
     
-    private ApplicationContext appContext;
     private ServiceRegistry serviceRegistry;
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
     private ContentService contentService;
     private MimetypeService mimetypeService;
+
+    /**
+     * @param serviceRegistry to connect to the repository services
+     */
+    public ContentDiskDriver(ServiceRegistry serviceRegistry)
+    {
+        this.serviceRegistry = serviceRegistry;
+    }
     
     /**
      * @param element the configuration element from which to configure the class
@@ -90,8 +94,6 @@ public class ContentDiskDriver implements DiskInterface
          */
         
         // connect to the repository
-        appContext = new ClassPathXmlApplicationContext(CONTEXT_CONFIG);
-        serviceRegistry = (ServiceRegistry) appContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
         namespaceService = serviceRegistry.getNamespaceService();
         dictionaryService = serviceRegistry.getDictionaryService();
         nodeService = serviceRegistry.getNodeService();

@@ -978,6 +978,16 @@
       <property name="policyComponent"><ref bean="policyComponent"/></property>
       <property name="authenticationService"><ref bean="authenticationService"/></property>
    </bean>
+   
+   <!-- CIFS Server -->
+   <bean id="cifsServer" class="org.alfresco.filesys.CIFSServer" init-method="startServer" >
+      <constructor-arg>
+         <ref bean="serviceRegistry" />
+      </constructor-arg>
+      <constructor-arg>
+         <value>org/alfresco/filesys/file-servers.xml</value>
+      </constructor-arg>
+   </bean>
 
    <!-- Service Registry -->
 

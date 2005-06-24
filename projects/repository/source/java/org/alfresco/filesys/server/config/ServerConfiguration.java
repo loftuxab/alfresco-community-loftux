@@ -48,6 +48,7 @@ import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.smb.server.repo.ContentDiskDriver;
 import org.alfresco.filesys.util.IPAddress;
+import org.alfresco.service.ServiceRegistry;
 
 /**
  * <p>
@@ -68,8 +69,10 @@ public class ServerConfiguration
 
     private static final String ConfigSecurity = "Filesystem Security";
 
+    /** connection to database */
+    private ServiceRegistry serviceRegistry;
+    
     // Configuration service used to read the configuration from
-
     private ConfigService m_configService;
 
     // Main server enable flags, to enable SMB, FTP and/or NFS server components
@@ -214,15 +217,14 @@ public class ServerConfiguration
      * @param config
      *            ConfigService
      */
-    public ServerConfiguration(ConfigService config)
+    public ServerConfiguration(ServiceRegistry serviceRegistry, ConfigService config)
     {
-
+        // to get services from the repo
+        this.serviceRegistry = serviceRegistry; 
         // Save the configuration service
-
         m_configService = config;
 
         // Allocate the shared device list
-
         m_shareList = new SharedDeviceList();
 
         // Allocate the SMB dialect selector, and initialize using the default
@@ -691,7 +693,7 @@ public class ServerConfiguration
                 try
                 {
                     // Create a new filesystem driver instance and create a context for the new filesystem
-                    DiskInterface filesysDriver = new ContentDiskDriver();
+                    DiskInterface filesysDriver = new ContentDiskDriver(serviceRegistry);
                     DiskDeviceContext filesysContext = (DiskDeviceContext) filesysDriver.createContext(elem);
 
                     // Create the shared device and add to the list of available

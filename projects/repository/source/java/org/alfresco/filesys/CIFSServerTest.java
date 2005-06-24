@@ -19,9 +19,9 @@ package org.alfresco.filesys;
 
 import java.io.PrintStream;
 
-import org.alfresco.config.source.ClassPathConfigSource;
-import org.alfresco.config.xml.XMLConfigService;
-import org.alfresco.filesys.server.config.ServerConfiguration;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * CIFS Server Test Application
@@ -34,8 +34,7 @@ public class CIFSServerTest
     /**
      * CIFS Server test application
      * 
-     * @param args
-     *            String[]
+     * @param args String[]
      */
     public static void main(String[] args)
     {
@@ -47,33 +46,22 @@ public class CIFSServerTest
 
         try
         {
-            // Create the configuration service in the same way that Spring
-            // creates it
+            // Create the configuration service in the same way that Spring creates it
+            ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-            ClassPathConfigSource classPathConfigSource = new ClassPathConfigSource(
-                    "org/alfresco/filesys/file-servers.xml");
+            // get the CIFS server bean
+            CIFSServer server = (CIFSServer) ctx.getBean("cifsServer");
+            if (server == null)
+            {
+                throw new AlfrescoRuntimeException("Server bean 'cifsServer' not defined");
+            }
 
-            XMLConfigService xmlConfigService = new XMLConfigService(classPathConfigSource);
-            xmlConfigService.init();
-
-            // Create the filesystem service configuration
-
-            ServerConfiguration filesysConfig = new ServerConfiguration(xmlConfigService);
-            filesysConfig.init();
-
-            // Create the CIFS server and start it
-
-            CIFSServer cifsServer = new CIFSServer(filesysConfig);
-            cifsServer.startServer();
-
+            // it should have automatically started
             // Wait for shutdown via the console
-
             out.println("Enter 'x' to shutdown ...");
             boolean shutdown = false;
 
-            // Wait while the server runs, user may stop the server by typing a
-            // key
-
+            // Wait while the server runs, user may stop the server by typing a key
             while (shutdown == false)
             {
 
@@ -83,11 +71,15 @@ public class CIFSServerTest
 
                 if (ch == 'x' || ch == 'X')
                     shutdown = true;
+
+                synchronized (server)
+                {
+                    server.wait(20);
+                }
             }
 
             // Stop the server
-
-            cifsServer.stopServer();
+            server.stopServer();
         }
         catch (Exception ex)
         {
