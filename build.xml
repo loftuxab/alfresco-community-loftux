@@ -64,14 +64,14 @@
 
    <target name="build-tomcat" depends="common-init">
       <subant target="build">
-         <fileset dir="." includes="**/project-build.xml" />
+         <filelist refid="project-build-files"/>
       </subant>
       <antcall target="deploy-tomcat" />
    </target>
 
    <target name="incremental-tomcat" depends="common-init">
       <subant target="incremental">
-         <fileset dir="." includes="**/project-build.xml" />
+         <filelist refid="project-build-files"/>
       </subant>
       <antcall target="deploy-tomcat" />
    </target>
