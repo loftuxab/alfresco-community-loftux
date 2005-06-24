@@ -151,6 +151,7 @@
                                              <td style="padding-top:6px;">
                                                 <r:spaceSelector label="Click here to select the destination" 
                                                         value="#{DocumentDetailsBean.workflowProperties.approveFolder}" 
+                                                        initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
                                              </td>
                                           </tr>
@@ -205,6 +206,7 @@
                                                                <td style="padding-top:6px;">
                                                                   <r:spaceSelector label="Click here to select the destination" 
                                                                           value="#{DocumentDetailsBean.workflowProperties.rejectFolder}" 
+                                                                          initialSelection="#{NavigationBean.currentNodeId}"
                                                                           style="border: 1px dashed #cccccc; padding: 6px;"/>
                                                                </td>
                                                             </tr>

@@ -50,6 +50,7 @@ public abstract class AbstractItemSelector extends UIInput
    protected final static int MODE_BEFORE_SELECTION = 0;
    protected final static int MODE_PERFORM_SELECTION = 1;
    protected final static int MODE_AFTER_SELECTION = 2;
+   protected final static int MODE_INITIAL_SELECTION = 3;
    
    /** label to be displayed before a space is selected */
    protected String label = null;
@@ -62,6 +63,9 @@ public abstract class AbstractItemSelector extends UIInput
    
    /** currently browsing node id */
    protected String navigationId = null;
+   
+   /** id of the initially selected item, if value is not set */
+   protected String initialSelectionId = null;
    
    // ------------------------------------------------------------------------------
    // Component Impl 
@@ -116,6 +120,7 @@ public abstract class AbstractItemSelector extends UIInput
       this.spacing = (Integer)values[2];
       this.mode = ((Integer)values[3]).intValue();
       this.navigationId = (String)values[4];
+      this.initialSelectionId = (String)values[5];
    }
    
    /**
@@ -123,13 +128,14 @@ public abstract class AbstractItemSelector extends UIInput
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[5];
+      Object values[] = new Object[6];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.label;
       values[2] = this.spacing;
       values[3] = this.mode;
       values[4] = this.navigationId;
+      values[5] = this.initialSelectionId;
       return (values);
    }
    
@@ -262,8 +268,16 @@ public abstract class AbstractItemSelector extends UIInput
                }
                buf.append(">");
                
+               int theMode = MODE_PERFORM_SELECTION;
+               // if we have an initial selection and no value set the initial one up
+               if (valueId == null && this.getInitialSelection() != null)
+               {
+                  valueId = this.getInitialSelection();
+                  theMode = MODE_INITIAL_SELECTION;
+               }
+               
                // field value is whether we are picking and the current or parent Id value
-               String fieldValue = encodeFieldValues(MODE_PERFORM_SELECTION, valueId);
+               String fieldValue = encodeFieldValues(theMode, valueId);
                buf.append("<a href='#' onclick=\"");
                buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue));
                buf.append('"');
@@ -294,6 +308,7 @@ public abstract class AbstractItemSelector extends UIInput
          }
          
          case MODE_PERFORM_SELECTION:
+         case MODE_INITIAL_SELECTION:
          {
             // show the picker list
             // get the children of the node ref to show
@@ -317,6 +332,14 @@ public abstract class AbstractItemSelector extends UIInput
                      .append(attrs.get("styleClass"));
                }
                buf.append(">");
+               
+               // if we are setting up the initial selection we need to get the
+               // parent id of the initial selection so the user can actually see
+               // the item when the list is rendered
+               if (this.mode == MODE_INITIAL_SELECTION)
+               {
+                  this.navigationId = getParentNodeId(context);
+               }
                
                // render "Go Up" link
                if (this.navigationId != null)
@@ -343,7 +366,15 @@ public abstract class AbstractItemSelector extends UIInput
                      String childId = childRef.getChildRef().getId();
                      buf.append("<tr><td><input type='radio' name='")
                         .append(clientId).append(OPTION).append("' value='")
-                        .append(childId).append("'/></td><td>");
+                        .append(childId).append("'");
+                     if (childId.equals(this.initialSelectionId))
+                     {
+                        buf.append(" checked");
+                        
+                        // now remove the initial selection as we only need it the first time
+                        this.initialSelectionId = null;
+                     }
+                     buf.append("/></td><td>");
                      
                      // get the name for the child (rather than association name)
                      NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(), childId);
@@ -362,7 +393,15 @@ public abstract class AbstractItemSelector extends UIInput
                      String childId = childRef.getChildRef().getId();
                      buf.append("<tr><td><input type='radio' name='")
                         .append(clientId).append(OPTION).append("' value='")
-                        .append(childId).append("'/></td><td>");
+                        .append(childId).append("'");
+                     if (childId.equals(this.initialSelectionId))
+                     {
+                        buf.append(" checked");
+                        
+                        // now remove the initial selection as we only need it the first time
+                        this.initialSelectionId = null;
+                     }
+                     buf.append("/></td><td>");
                      
                      // get the name for the child (rather than association name)
                      NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(), childId);
@@ -452,6 +491,27 @@ public abstract class AbstractItemSelector extends UIInput
       this.spacing = spacing;
    }
    
+   /**
+    * @return Returns the initial selecttion.
+    */
+   public String getInitialSelection()
+   {
+      ValueBinding vb = getValueBinding("initialSelection");
+      if (vb != null)
+      {
+         this.initialSelectionId = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.initialSelectionId;
+   }
+   
+   /**
+    * @param initialSelection The initial selection to set.
+    */
+   public void setInitialSelection(String initialSelection)
+   {
+      this.initialSelectionId = initialSelection;
+   }
    
    // ------------------------------------------------------------------------------
    // Protected helpers

@@ -143,7 +143,7 @@
                                  <tr>
                                     <td>Home Space Location:</td>
                                     <td>
-                                       <r:spaceSelector label="Click here to select the Home Space location" value="#{NewUserWizard.homeSpaceLocation}" style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                       <r:spaceSelector label="Click here to select the Home Space location" value="#{NewUserWizard.homeSpaceLocation}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 2px;"/>
                                     </td>
                                  </tr>
                                  <tr>

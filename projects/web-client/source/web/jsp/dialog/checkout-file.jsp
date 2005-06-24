@@ -130,6 +130,7 @@
                                        <%-- Space selector to allow user to pick a Space --%>
                                        <r:spaceSelector label="Click here to select a Space"
                                                 value="#{CheckinCheckoutBean.selectedSpaceId}"
+                                                initialSelection="#{NavigationBean.currentNodeId}"
                                                 style="border: 1px dashed #cccccc; padding: 2px;"/>
                                     </td>
                                  </tr>

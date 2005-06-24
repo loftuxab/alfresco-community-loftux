@@ -108,7 +108,7 @@
                                  </tr>
                                  <tr>
                                     <td style="padding-left:26px">
-                                       <r:spaceSelector label="Click here to select a Space" value="#{AdvancedSearchBean.location}" style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                       <r:spaceSelector label="Click here to select a Space" value="#{AdvancedSearchBean.location}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 2px;"/>
                                     </td>
                                  </tr>
                                  

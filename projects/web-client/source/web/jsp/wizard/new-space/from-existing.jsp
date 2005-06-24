@@ -109,6 +109,7 @@
                                     <td>
                                        <r:spaceSelector label="Click here to select an existing Space" 
                                                         value="#{NewSpaceWizard.existingSpaceId}" 
+                                                        initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;" />
                                     </td>
                                  </tr>

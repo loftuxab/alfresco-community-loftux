@@ -104,6 +104,7 @@
                                     <td width="100%">
                                        <r:spaceSelector label="Click here to select the check out location" 
                                                         value="#{NewRuleWizard.actionProperties.destinationLocation}" 
+                                                        initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
                                     </td>
                                  </tr>

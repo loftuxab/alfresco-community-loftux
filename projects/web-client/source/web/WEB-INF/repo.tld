@@ -362,6 +362,12 @@
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      
+      <attribute>
+         <name>initialSelection</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
    </tag>
    
    <tag>
@@ -425,6 +431,12 @@
 
       <attribute>
          <name>spacing</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>initialSelection</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
