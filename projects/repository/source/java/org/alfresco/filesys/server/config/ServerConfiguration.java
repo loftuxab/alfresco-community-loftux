@@ -21,8 +21,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Provider;
 import java.security.Security;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
@@ -31,10 +30,9 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.NetworkServerList;
-import org.alfresco.filesys.server.auth.SrvAuthenticator;
-import org.alfresco.filesys.server.auth.UserAccountList;
-import org.alfresco.filesys.server.auth.acl.AccessControlList;
-import org.alfresco.filesys.server.auth.acl.AccessControlManager;
+import org.alfresco.filesys.server.auth.*;
+import org.alfresco.filesys.server.auth.acl.*;
+import org.alfresco.filesys.server.auth.passthru.*;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.core.ShareMapper;
 import org.alfresco.filesys.server.core.SharedDevice;
@@ -54,7 +52,7 @@ import org.alfresco.service.ServiceRegistry;
  * <p>
  * Provides the configuration parameters for the network file servers.
  * 
- * @author Gary Spencer
+ * @author Gary K. Spencer
  */
 public class ServerConfiguration
 {
@@ -69,9 +67,34 @@ public class ServerConfiguration
 
     private static final String ConfigSecurity = "Filesystem Security";
 
+    //  SMB/CIFS session debug type strings
+    //
+    //  Must match the bit mask order.
+
+    private static final String m_sessDbgStr[] = { "NETBIOS",
+                                                   "STATE",
+                                                   "NEGOTIATE",
+                                                   "TREE",
+                                                   "SEARCH",
+                                                   "INFO",
+                                                   "FILE",
+                                                   "FILEIO",
+                                                   "TRANSACT",
+                                                   "ECHO",
+                                                   "ERROR",
+                                                   "IPC",
+                                                   "LOCK",
+                                                   "PKTTYPE",
+                                                   "DCERPC",
+                                                   "STATECACHE",
+                                                   "NOTIFY",
+                                                   "STREAMS",
+                                                   "SOCKET"
+    };
+    
     /** connection to database */
     private ServiceRegistry serviceRegistry;
-    
+
     // Configuration service used to read the configuration from
     private ConfigService m_configService;
 
@@ -214,13 +237,12 @@ public class ServerConfiguration
     /**
      * Class constructor
      * 
-     * @param config
-     *            ConfigService
+     * @param config ConfigService
      */
     public ServerConfiguration(ServiceRegistry serviceRegistry, ConfigService config)
     {
         // to get services from the repo
-        this.serviceRegistry = serviceRegistry; 
+        this.serviceRegistry = serviceRegistry;
         // Save the configuration service
         m_configService = config;
 
@@ -239,21 +261,10 @@ public class ServerConfiguration
         m_dialects.AddDialect(Dialect.LanMan2_1);
         m_dialects.AddDialect(Dialect.NT);
 
-        // Use the default authenticator, that allows any user to connect to the
+        // Use the local authenticator, that allows locally defined users to connect to the
         // server
 
-        try
-        {
-            setAuthenticator(
-                    "org.alfresco.filesys.server.auth.DefaultAuthenticator",
-                    null,
-                    SrvAuthenticator.USER_MODE,
-                    true);
-        }
-        catch (InvalidConfigurationException ex)
-        {
-            throw new AlfrescoRuntimeException("Failed to set authenticator", ex);
-        }
+        setAuthenticator(new LocalAuthenticator(), null, true);
 
         // Use the default share mapper
 
@@ -268,6 +279,11 @@ public class ServerConfiguration
             throw new AlfrescoRuntimeException("Failed to initialise share mapper", ex);
         }
 
+        // Set the default access control manager
+        
+        m_aclManager = new DefaultAccessControlManager();
+        m_aclManager.initialize( this, null);
+        
         // Use the default timezone
 
         try
@@ -315,8 +331,7 @@ public class ServerConfiguration
     /**
      * Process the CIFS server configuration
      * 
-     * @param config
-     *            Config
+     * @param config Config
      */
     private final void processCIFSServerConfig(Config config)
     {
@@ -662,15 +677,58 @@ public class ServerConfiguration
             if (secondaryWINS != null)
                 setSecondaryWINSServer(secondaryWINS);
         }
+
+        //  Check if session debug is enabled
+        
+        elem = config.getConfigElement( "sessionDebug");
+        if (elem != null) {
+            
+            //  Check for session debug flags
+            
+            String flags = elem.getAttribute("flags");
+            int sessDbg = 0;
+            
+            if ( flags != null) {
+                
+                //  Parse the flags
+                
+                flags = flags.toUpperCase();
+                StringTokenizer token = new StringTokenizer(flags,",");
+                
+                while ( token.hasMoreTokens()) {
+                    
+                    //  Get the current debug flag token
+                    
+                    String dbg = token.nextToken().trim();
+                    
+                    //  Find the debug flag name
+                    
+                    int idx = 0;
+                    
+                    while ( idx < m_sessDbgStr.length && m_sessDbgStr[idx].equalsIgnoreCase(dbg) == false)
+                        idx++;
+                        
+                    if ( idx > m_sessDbgStr.length)
+                        throw new AlfrescoRuntimeException( "Invalid session debug flag, " + dbg);
+                        
+                    //  Set the debug flag
+                    
+                    sessDbg += 1 << idx;
+                }
+            }
+
+            //  Set the session debug flags
+            
+            setSessionDebugFlags(sessDbg);
+        }
     }
 
     /**
      * Process the filesystems configuration
      * 
-     * @param config
-     *            Config
+     * @param config Config
      */
-    private final void processFilesystemsConfig(Config config)
+private final void processFilesystemsConfig(Config config)
     {
 
         // Get the filesystem configuration elements
@@ -692,14 +750,47 @@ public class ServerConfiguration
 
                 try
                 {
-                    // Create a new filesystem driver instance and create a context for the new filesystem
+                    // Create a new filesystem driver instance and create a context for
+                    // the new filesystem
                     DiskInterface filesysDriver = new ContentDiskDriver(serviceRegistry);
                     DiskDeviceContext filesysContext = (DiskDeviceContext) filesysDriver.createContext(elem);
+
+                    // Check if an access control list has been specified
+
+                    AccessControlList acls = null;
+                    ConfigElement aclElem = elem.getChild("accessControl");
+
+                    if (aclElem != null)
+                    {
+
+                        // Parse the access control list
+
+                        acls = processAccessControlList(aclElem);
+                    }
+                    else if (hasGlobalAccessControls())
+                    {
+
+                        // Use the global access control list for this disk share
+
+                        acls = getGlobalAccessControls();
+                    }
+
+                    // Create the shared filesystem
+                    
+                    DiskSharedDevice filesys = new DiskSharedDevice(filesysName, filesysDriver, filesysContext);
+                    
+                    // Add any access controls to the share
+                  
+                    filesys.setAccessControlList(acls);
+
+                    // Start the filesystem
+                        
+                    filesysContext.startFilesystem(filesys);
 
                     // Create the shared device and add to the list of available
                     // shared filesystems
 
-                    addShare(new DiskSharedDevice(filesysName, filesysDriver, filesysContext));
+                    addShare( filesys);
                 }
                 catch (DeviceContextException ex)
                 {
@@ -712,19 +803,243 @@ public class ServerConfiguration
     /**
      * Process the security configuration
      * 
-     * @param config
-     *            Config
+     * @param config Config
      */
     private final void processSecurityConfig(Config config)
     {
 
+        // Check if global access controls have been specified
+
+        ConfigElement globalACLs = config.getConfigElement("globalAccessControl");
+        if (globalACLs != null)
+        {
+
+            // Parse the access control list
+
+            AccessControlList acls = processAccessControlList(globalACLs);
+            if (acls != null)
+                setGlobalAccessControls(acls);
+        }
+
+        // Check if a JCE provider class has been specified
+
+        ConfigElement jceElem = config.getConfigElement("JCEProvider");
+        if (jceElem != null)
+        {
+
+            // Set the JCE provider
+
+            setJCEProvider(jceElem.getValue());
+        }
+
+        // Check if an authenticator has been specified
+
+        ConfigElement authElem = config.getConfigElement("authenticator");
+        if (authElem != null)
+        {
+
+            // Get the authenticator type, should be either 'local' or 'passthru'
+
+            String authType = authElem.getAttribute("type");
+            if (authType == null)
+                throw new AlfrescoRuntimeException("Authenticator type not specified");
+
+            // Set the authenticator class to use
+
+            SrvAuthenticator auth = null;
+            if (authType.equalsIgnoreCase("local"))
+                auth = new LocalAuthenticator();
+            else if (authType.equalsIgnoreCase("passthru"))
+                auth = new PassthruAuthenticator();
+            else
+                throw new AlfrescoRuntimeException("Invalid authenticator type, " + authType);
+
+            // Get the allow guest setting
+
+            boolean allowGuest = authElem.getChild("allowGuest") != null ? true : false;
+
+            // Initialize and set the authenticator class
+
+            setAuthenticator(auth, authElem, allowGuest);
+        }
+
+        // Add the users
+
+        ConfigElement usersElem = config.getConfigElement("users");
+        if (usersElem != null)
+        {
+
+            // Get the list of user elements
+
+            List<ConfigElement> userElemList = usersElem.getChildren();
+
+            for (int i = 0; i < userElemList.size(); i++)
+            {
+
+                // Get the current user element
+
+                ConfigElement curUserElem = userElemList.get(i);
+
+                if (curUserElem.getName().equals("localuser"))
+                {
+                    processUser(curUserElem);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Process an access control sub-section and return the access control list
+     * 
+     * @param aclsElem ConfigElement
+     */
+    private final AccessControlList processAccessControlList(ConfigElement aclsElem)
+    {
+
+        // Check if there is an access control manager configured
+
+        if (getAccessControlManager() == null)
+            throw new AlfrescoRuntimeException("No access control manager configured");
+
+        // Create the access control list
+
+        AccessControlList acls = new AccessControlList();
+
+        // Check if there is a default access level for the ACL group
+
+        String attrib = aclsElem.getAttribute("default");
+
+        if (attrib != null && attrib.length() > 0)
+        {
+
+            // Get the access level and validate
+
+            try
+            {
+
+                // Parse the access level name
+
+                int access = AccessControlParser.parseAccessTypeString(attrib);
+
+                // Set the default access level for the access control list
+
+                acls.setDefaultAccessLevel(access);
+            }
+            catch (InvalidACLTypeException ex)
+            {
+                throw new AlfrescoRuntimeException("Default access level error", ex);
+            }
+            catch (ACLParseException ex)
+            {
+                throw new AlfrescoRuntimeException("Default access level error", ex);
+            }
+        }
+
+        // Parse each access control element
+
+        List<ConfigElement> aclElemList = aclsElem.getChildren();
+
+        if (aclElemList != null && aclElemList.size() > 0)
+        {
+
+            // Create the access controls
+
+            for (int i = 0; i < aclsElem.getChildCount(); i++)
+            {
+
+                // Get the current ACL element
+
+                ConfigElement curAclElem = aclElemList.get(i);
+
+                try
+                {
+                    // Create the access control and add to the list
+
+                    acls.addControl(getAccessControlManager().createAccessControl(curAclElem.getName(), curAclElem));
+                }
+                catch (InvalidACLTypeException ex)
+                {
+                    throw new AlfrescoRuntimeException("Invalid access control type - " + curAclElem.getName());
+                }
+                catch (ACLParseException ex)
+                {
+                    throw new AlfrescoRuntimeException("Access control parse error (" + curAclElem.getName() + ")", ex);
+                }
+            }
+        }
+
+        // Check if there are no access control rules but the default access level is set to 'None',
+        // this is not allowed as the share would not be accessible or visible.
+
+        if (acls.getDefaultAccessLevel() == AccessControl.NoAccess && acls.numberOfControls() == 0)
+            throw new AlfrescoRuntimeException("Empty access control list and default access 'None' not allowed");
+
+        // Return the access control list
+
+        return acls;
+    }
+
+    /**
+     * Add a user account
+     * 
+     * @param user ConfigElement
+     */
+    private final void processUser(ConfigElement user)
+    {
+
+        // Get the username
+
+        String attr = user.getAttribute("name");
+        if (attr == null || attr.length() == 0)
+            throw new AlfrescoRuntimeException("User name not specified, or zero length");
+
+        // Check if the user already exists
+
+        String userName = attr;
+
+        if (hasUserAccounts() && getUserAccounts().findUser(userName) != null)
+            throw new AlfrescoRuntimeException("User " + userName + " already defined");
+
+        // Get the password for the account
+
+        ConfigElement elem = user.getChild("password");
+        if (elem == null)
+            throw new AlfrescoRuntimeException("No password specified for user " + userName);
+
+        String password = elem.getValue();
+
+        // Create the user account
+
+        UserAccount userAcc = new UserAccount(userName, password);
+
+        // Check if the user in an administrator
+
+        if (user.getChild("administrator") != null)
+            userAcc.setAdministrator(true);
+
+        // Get the real user name and comment
+
+        elem = user.getChild("realname");
+        if (elem != null)
+            userAcc.setRealName(elem.getValue());
+
+        elem = user.getChild("comment");
+        if (elem != null)
+            userAcc.setComment(elem.getValue());
+
+        // Add the user account
+
+        UserAccountList accList = getUserAccounts();
+        if (accList == null)
+            setUserAccounts(new UserAccountList());
+        getUserAccounts().addUser(userAcc);
     }
 
     /**
      * Add a shared device to the server configuration.
      * 
-     * @param shr
-     *            SharedDevice
+     * @param shr SharedDevice
      * @return boolean
      */
     public final boolean addShare(SharedDevice shr)
@@ -735,8 +1050,7 @@ public class ServerConfiguration
     /**
      * Add a server to the list of active servers
      * 
-     * @param srv
-     *            NetworkServer
+     * @param srv NetworkServer
      */
     public final void addServer(NetworkServer srv)
     {
@@ -746,8 +1060,7 @@ public class ServerConfiguration
     /**
      * Find an active server using the protocol name
      * 
-     * @param proto
-     *            String
+     * @param proto String
      * @return NetworkServer
      */
     public final NetworkServer findServer(String proto)
@@ -758,8 +1071,7 @@ public class ServerConfiguration
     /**
      * Remove an active server
      * 
-     * @param proto
-     *            String
+     * @param proto String
      * @return NetworkServer
      */
     public final NetworkServer removeServer(String proto)
@@ -780,8 +1092,7 @@ public class ServerConfiguration
     /**
      * Return the server at the specified index
      * 
-     * @param idx
-     *            int
+     * @param idx int
      * @return NetworkServer
      */
     public final NetworkServer getServer(int idx)
@@ -830,8 +1141,8 @@ public class ServerConfiguration
     }
 
     /**
-     * Get the authenticator object that is used to provide user and share
-     * connection authentication.
+     * Get the authenticator object that is used to provide user and share connection
+     * authentication.
      * 
      * @return Authenticator
      */
@@ -891,8 +1202,7 @@ public class ServerConfiguration
     }
 
     /**
-     * Return the enabled SMB dialects that the server will use when negotiating
-     * sessions.
+     * Return the enabled SMB dialects that the server will use when negotiating sessions.
      * 
      * @return DialectSelector
      */
@@ -962,8 +1272,7 @@ public class ServerConfiguration
     }
 
     /**
-     * Return the Win32 NetBIOS server name, if null the default server name
-     * will be used
+     * Return the Win32 NetBIOS server name, if null the default server name will be used
      * 
      * @return String
      */
@@ -973,8 +1282,8 @@ public class ServerConfiguration
     }
 
     /**
-     * Determine if the server should be announced via Win32 NetBIOS, so that it
-     * appears under Network Neighborhood.
+     * Determine if the server should be announced via Win32 NetBIOS, so that it appears under
+     * Network Neighborhood.
      * 
      * @return boolean
      */
@@ -1074,8 +1383,7 @@ public class ServerConfiguration
     }
 
     /**
-     * Determine if the NetBIOS name server should bind to a particular local
-     * address
+     * Determine if the NetBIOS name server should bind to a particular local address
      * 
      * @return boolean
      */
@@ -1105,8 +1413,7 @@ public class ServerConfiguration
     }
 
     /**
-     * Determine if the server should be announced so that it appears under
-     * Network Neighborhood.
+     * Determine if the server should be announced so that it appears under Network Neighborhood.
      * 
      * @return boolean
      */
@@ -1200,8 +1507,7 @@ public class ServerConfiguration
     /**
      * Set the SMB server enabled state
      * 
-     * @param ena
-     *            boolean
+     * @param ena boolean
      */
     public final void setSMBServerEnabled(boolean ena)
     {
@@ -1209,59 +1515,30 @@ public class ServerConfiguration
     }
 
     /**
-     * Set the authenticator to be used to authenticate users and share
-     * connections.
+     * Set the authenticator to be used to authenticate users and share connections.
      * 
-     * @param authClass
-     *            String
-     * @param params
-     *            ConfigElement
-     * @param accessMode
-     *            int
-     * @param allowGuest
-     *            boolean
-     * @exception InvalidConfigurationException
+     * @param auth SrvAuthenticator
+     * @param params ConfigElement
+     * @param allowGuest boolean
      */
-    public final void setAuthenticator(String authClass, ConfigElement params, int accessMode, boolean allowGuest)
-            throws InvalidConfigurationException
+    public final void setAuthenticator(SrvAuthenticator auth, ConfigElement params, boolean allowGuest)
     {
 
-        // Validate the authenticator class
+        // Set the server authenticator mode and guest access
 
-        SrvAuthenticator auth = null;
-
-        try
-        {
-
-            // Load the authenticator class
-
-            Object authObj = Class.forName(authClass).newInstance();
-            if (authObj instanceof SrvAuthenticator)
-            {
-
-                // Set the server authenticator
-
-                auth = (SrvAuthenticator) authObj;
-                auth.setAccessMode(accessMode);
-                auth.setAllowGuest(allowGuest);
-            }
-            else
-            {
-                throw new InvalidConfigurationException("Authenticator is not derived from required base class");
-            }
-        }
-        catch (ClassNotFoundException ex)
-        {
-            throw new InvalidConfigurationException("Authenticator class " + authClass + " not found");
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidConfigurationException("Authenticator class error", ex);
-        }
+        auth.setAccessMode(SrvAuthenticator.USER_MODE);
+        auth.setAllowGuest(allowGuest);
 
         // Initialize the authenticator using the parameter values
 
-        auth.initialize(this, params);
+        try
+        {
+            auth.initialize(this, params);
+        }
+        catch (InvalidConfigurationException ex)
+        {
+            throw new AlfrescoRuntimeException("Failed to initialize authenticator", ex);
+        }
 
         // Set the server authenticator and initialization parameters
 
@@ -1271,8 +1548,7 @@ public class ServerConfiguration
     /**
      * Set the local address that the SMB server should bind to.
      * 
-     * @param addr
-     *            InetAddress
+     * @param addr InetAddress
      */
     public final void setSMBBindAddress(InetAddress addr)
     {
@@ -1282,8 +1558,7 @@ public class ServerConfiguration
     /**
      * Set the local address that the NetBIOS name server should bind to.
      * 
-     * @param addr
-     *            InetAddress
+     * @param addr InetAddress
      */
     public final void setNetBIOSBindAddress(InetAddress addr)
     {
@@ -1293,8 +1568,7 @@ public class ServerConfiguration
     /**
      * Set the broadcast mask to be used for broadcast datagrams.
      * 
-     * @param mask
-     *            String
+     * @param mask String
      */
     public final void setBroadcastMask(String mask)
     {
@@ -1304,8 +1578,7 @@ public class ServerConfiguration
     /**
      * Set the server comment.
      * 
-     * @param comment
-     *            String
+     * @param comment String
      */
     public final void setComment(String comment)
     {
@@ -1315,8 +1588,7 @@ public class ServerConfiguration
     /**
      * Set the domain that the server belongs to.
      * 
-     * @param domain
-     *            String
+     * @param domain String
      */
     public final void setDomainName(String domain)
     {
@@ -1326,8 +1598,7 @@ public class ServerConfiguration
     /**
      * Enable/disable the host announcer.
      * 
-     * @param b
-     *            boolean
+     * @param b boolean
      */
     public final void setHostAnnouncer(boolean b)
     {
@@ -1337,8 +1608,7 @@ public class ServerConfiguration
     /**
      * Set the host announcement interval, in minutes
      * 
-     * @param ival
-     *            int
+     * @param ival int
      */
     public final void setHostAnnounceInterval(int ival)
     {
@@ -1348,11 +1618,9 @@ public class ServerConfiguration
     /**
      * Set the JCE provider
      * 
-     * @param providerClass
-     *            String
-     * @exception InvalidConfigurationException
+     * @param providerClass String
      */
-    public final void setJCEProvider(String providerClass) throws InvalidConfigurationException
+    public final void setJCEProvider(String providerClass)
     {
 
         // Validate the JCE provider class
@@ -1380,24 +1648,23 @@ public class ServerConfiguration
             }
             else
             {
-                throw new InvalidConfigurationException("JCE provider class is not a valid Provider class");
+                throw new AlfrescoRuntimeException("JCE provider class is not a valid Provider class");
             }
         }
         catch (ClassNotFoundException ex)
         {
-            throw new InvalidConfigurationException("JCE provider class " + providerClass + " not found");
+            throw new AlfrescoRuntimeException("JCE provider class " + providerClass + " not found");
         }
         catch (Exception ex)
         {
-            throw new InvalidConfigurationException("JCE provider class error", ex);
+            throw new AlfrescoRuntimeException("JCE provider class error", ex);
         }
     }
 
     /**
      * Enable/disable NetBIOS name server debug output
      * 
-     * @param ena
-     *            boolean
+     * @param ena boolean
      */
     public final void setNetBIOSDebug(boolean ena)
     {
@@ -1407,8 +1674,7 @@ public class ServerConfiguration
     /**
      * Enable/disable host announcement debug output
      * 
-     * @param ena
-     *            boolean
+     * @param ena boolean
      */
     public final void setHostAnnounceDebug(boolean ena)
     {
@@ -1418,8 +1684,7 @@ public class ServerConfiguration
     /**
      * Set the server name.
      * 
-     * @param name
-     *            String
+     * @param name String
      */
     public final void setServerName(String name)
     {
@@ -1429,8 +1694,7 @@ public class ServerConfiguration
     /**
      * Set the debug flags to be used by the server.
      * 
-     * @param flags
-     *            int
+     * @param flags int
      */
     public final void setSessionDebugFlags(int flags)
     {
@@ -1440,8 +1704,7 @@ public class ServerConfiguration
     /**
      * Set the user account list.
      * 
-     * @param users
-     *            UserAccountList
+     * @param users UserAccountList
      */
     public final void setUserAccounts(UserAccountList users)
     {
@@ -1451,8 +1714,7 @@ public class ServerConfiguration
     /**
      * Set the global access control list
      * 
-     * @param acls
-     *            AccessControlList
+     * @param acls AccessControlList
      */
     public final void setGlobalAccessControls(AccessControlList acls)
     {
@@ -1462,8 +1724,7 @@ public class ServerConfiguration
     /**
      * Enable/disable the NetBIOS SMB support
      * 
-     * @param ena
-     *            boolean
+     * @param ena boolean
      */
     public final void setNetBIOSSMB(boolean ena)
     {
@@ -1473,8 +1734,7 @@ public class ServerConfiguration
     /**
      * Enable/disable the TCP/IP SMB support
      * 
-     * @param ena
-     *            boolean
+     * @param ena boolean
      */
     public final void setTcpipSMB(boolean ena)
     {
@@ -1484,8 +1744,7 @@ public class ServerConfiguration
     /**
      * Enable/disable the Win32 NetBIOS SMB support
      * 
-     * @param ena
-     *            boolean
+     * @param ena boolean
      */
     public final void setWin32NetBIOS(boolean ena)
     {
@@ -1495,8 +1754,7 @@ public class ServerConfiguration
     /**
      * Set the Win32 NetBIOS file server name
      * 
-     * @param name
-     *            String
+     * @param name String
      */
     public final void setWin32NetBIOSName(String name)
     {
@@ -1506,8 +1764,7 @@ public class ServerConfiguration
     /**
      * Enable/disable the Win32 NetBIOS host announcer.
      * 
-     * @param b
-     *            boolean
+     * @param b boolean
      */
     public final void setWin32HostAnnouncer(boolean b)
     {
@@ -1517,8 +1774,7 @@ public class ServerConfiguration
     /**
      * Set the Win32 LANA to be used by the Win32 NetBIOS interface
      * 
-     * @param ival
-     *            int
+     * @param ival int
      */
     public final void setWin32LANA(int ival)
     {
@@ -1528,8 +1784,7 @@ public class ServerConfiguration
     /**
      * Set the Win32 NetBIOS host announcement interval, in minutes
      * 
-     * @param ival
-     *            int
+     * @param ival int
      */
     public final void setWin32HostAnnounceInterval(int ival)
     {
@@ -1539,10 +1794,8 @@ public class ServerConfiguration
     /**
      * Set the server timezone name
      * 
-     * @param name
-     *            String
-     * @exception InvalidConfigurationException
-     *                If the timezone is invalid
+     * @param name String
+     * @exception InvalidConfigurationException If the timezone is invalid
      */
     public final void setTimeZone(String name) throws InvalidConfigurationException
     {
@@ -1565,8 +1818,7 @@ public class ServerConfiguration
     /**
      * Set the timezone offset from UTC in seconds (+/-)
      * 
-     * @param offset
-     *            int
+     * @param offset int
      */
     public final void setTimeZoneOffset(int offset)
     {
@@ -1576,8 +1828,7 @@ public class ServerConfiguration
     /**
      * Set the primary WINS server address
      * 
-     * @param addr
-     *            InetAddress
+     * @param addr InetAddress
      */
     public final void setPrimaryWINSServer(InetAddress addr)
     {
@@ -1587,8 +1838,7 @@ public class ServerConfiguration
     /**
      * Set the secondary WINS server address
      * 
-     * @param addr
-     *            InetAddress
+     * @param addr InetAddress
      */
     public final void setSecondaryWINSServer(InetAddress addr)
     {

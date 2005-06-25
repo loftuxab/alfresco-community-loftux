@@ -2,7 +2,7 @@
 
 	<config evaluator="string-compare" condition="CIFS Server">
 		<host name="ALFRESCO" domain="STARLASOFT"/>
-	   <comment>Alfresco CIFS server</comment>
+	   	<comment>Alfresco CIFS server</comment>
 <!--
       <bindto>90.1.0.2</bindto>
       <broadcast>90.1.255.255</broadcast>
@@ -11,7 +11,7 @@
       <netBIOSSMB/>
       <hostAnnounce interval="5"/>
 -->
-      <Win32NetBIOS name="ALFRESCO"/>
+      <Win32NetBIOS/>
       <Win32Announce interval="5"/>
 
 <!--
@@ -36,7 +36,7 @@
    </config>
 
    <config evaluator="string-compare" condition="Filesystem Security">
-      <JCEProvider>...</JCEProvider>
+			<JCEProvider>cryptix.jce.provider.CryptixCrypto</JCEProvider>
 
       <authenticator type="local">
          <allowGuest/>
@@ -45,7 +45,7 @@
 <!--
       <authenticator type="passthru">
          <allowGuest/>
-      <Server>90.1.0.2</Server>
+      	 <Server>90.1.0.2</Server>
          <Domain>STARLASOFT</Domain>
       </authenticator>
 -->
@@ -53,16 +53,22 @@
          <user name="gkspencer" access="Write"/>
          <user name="GK Spencer" access="Write"/>
          <address ip="90.1.0.90" access="Write"/>
-         <uid id="0" access="Write"/>
-         <gid id="0" access="Write"/>
       </globalAccessControl>
-<!--
-      <globalAccessControl default="Write">
-         <address ip="90.1.0.90" access="Write"/>
-         <uid id="0" access="Write"/>
-         <gid id="0" access="Write"/>
-      </globalAccessControl>
--->
+
+			<users>
+				<localuser name="gkspencer">
+					<password>roboter</password>
+					<realname>Gary K. Spencer</realname>
+					<comment>System administrator</comment>
+					<administrator/>
+				</localuser>
+	
+				<localuser name="administrator">
+					<password>Autobahn89</password>
+					<administrator/>
+				</localuser>
+			</users>
+
    </config>
 
 </alfresco-config>

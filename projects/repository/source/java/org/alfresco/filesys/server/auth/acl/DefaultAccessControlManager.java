@@ -21,7 +21,6 @@ import java.util.Enumeration;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.filesys.server.SrvSession;
-import org.alfresco.filesys.server.config.InvalidConfigurationException;
 import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.server.core.SharedDevice;
 import org.alfresco.filesys.server.core.SharedDeviceList;
@@ -31,6 +30,8 @@ import org.apache.log4j.Logger;
  * Default Access Control Manager Class
  * <p>
  * Default access control manager implementation.
+ * 
+ * @author Gary K. Spencer
  */
 public class DefaultAccessControlManager implements AccessControlManager
 {
@@ -201,16 +202,17 @@ public class DefaultAccessControlManager implements AccessControlManager
     }
 
     /**
+     * Initialize the access control manager
+     * 
      * @param config ServerConfiguration
      * @param params ConfigElement
-     * @throws InvalidConfigurationException
      */
-    public void initialize(ServerConfiguration config, ConfigElement params) throws InvalidConfigurationException
+    public void initialize(ServerConfiguration config, ConfigElement params)
     {
 
         // Check if debug output is enabled
 
-        if (params.getChild("debug") != null)
+        if (params != null && params.getChild("debug") != null)
             setDebug(true);
 
         // Add the default access control types

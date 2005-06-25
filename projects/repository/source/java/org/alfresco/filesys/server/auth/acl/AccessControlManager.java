@@ -19,7 +19,6 @@ package org.alfresco.filesys.server.auth.acl;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.filesys.server.SrvSession;
-import org.alfresco.filesys.server.config.InvalidConfigurationException;
 import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.server.core.SharedDevice;
 import org.alfresco.filesys.server.core.SharedDeviceList;
@@ -28,6 +27,8 @@ import org.alfresco.filesys.server.core.SharedDeviceList;
  * Access Control Manager Interface
  * <p>
  * Used to control access to shared filesystems.
+ * 
+ * @author Gary K. Spencer
  */
 public interface AccessControlManager
 {
@@ -37,9 +38,8 @@ public interface AccessControlManager
      * 
      * @param config ServerConfiguration
      * @param params ConfigElement
-     * @exception InvalidConfigurationException
      */
-    public void initialize(ServerConfiguration config, ConfigElement params) throws InvalidConfigurationException;
+    public void initialize(ServerConfiguration config, ConfigElement params);
 
     /**
      * Check access to the shared filesystem for the specified session
