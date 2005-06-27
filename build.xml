@@ -110,21 +110,55 @@
    <!-- ** Cleaning targets ** -->
    <!-- ********************** -->
    
+   <target name="clean-distribution" depends="common-init" description="Cleans the distibution">
+      <delete quiet="yes" includeEmptyDirs="true" dir="${build.dir}"/>
+   </target>
+      
    <target name="clean-all" depends="common-init" description="Cleans all the projects">
       <subant target="clean">
-         <filelist refid="project-build-files"/>
+         <filelist refid="project-build-files" />
       </subant>
+      <antcall target="clean-distribution" />
    </target>
    
    <!-- ************************** -->
    <!-- ** Distribution targets ** -->
    <!-- ************************** -->
    
-   <target name="distribute"></target>
+   <target name="distribute" 
+           depends="package-jboss-binary-distribution, package-tomcat-binary-distribution,
+                    package-source-distribution" />
    
-   <target name="package-jboss-bundle" depends="package-source-bundle"></target>
-   <target name="package-tomcat-bundle" depends="package-source-bundle"></target>
+   <target name="package-jboss-binary-distribution" depends="build-jboss">
+      <mkdir dir="${dist.dir}" />
+      <zip destfile="${dist.dir}/${jboss.zip.binary.name}">
+         <zipfileset dir="${installer.project.dir}" 
+                     excludes="alf_start_tc.bat,alf_stop_tc.bat,README_tomcat.txt,*.doc,*Tutorial.pdf" />
+         <zipfileset dir="${jboss.distribution.dir}" prefix="jboss" />
+         <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
+                     prefix="jboss/server/default/deploy" />
+      </zip>
+      <!-- TODO: create tar file distribution -->
+   </target>
    
-   <target name="package-source-bundle"></target>
+   <target name="package-tomcat-binary-distribution" depends="build-tomcat">
+      <mkdir dir="${dist.dir}" />
+      <zip destfile="${dist.dir}/${tomcat.zip.binary.name}">
+         <zipfileset dir="${installer.project.dir}" 
+                     excludes="alf_start_jb.bat,alf_stop_jb.bat,README_jboss.txt,*.doc,*Tutorial.pdf" />
+         <zipfileset dir="${tomcat.distribution.dir}" prefix="tomcat" />
+         <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
+                     prefix="tomcat/webapps" />
+      </zip>
+      <!-- TODO: create tar file distribution -->
+   </target>
+   
+   <target name="package-source-distribution" depends="common-init">
+      <mkdir dir="${dist.dir}" />
+      <zip destfile="${dist.dir}/${zip.src.name}">
+         <zipfileset dir="${basedir}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,**/*.classpath" />
+      </zip>
+      <!-- TODO: create tar file distribution -->
+   </target>
 
 </project>
