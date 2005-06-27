@@ -146,6 +146,38 @@ public class AdvancedSearchBean
       this.category = category;
    }
    
+   /**
+    * @return Returns true to search location children, false for just the specified location.
+    */
+   public boolean getLocationChildren()
+   {
+      return this.locationChildren;
+   }
+   
+   /**
+    * @param locationChildren    True to search location children, false for just the specified location.
+    */
+   public void setLocationChildren(boolean locationChildren)
+   {
+      this.locationChildren = locationChildren;
+   }
+   
+   /**
+    * @return Returns true to search category children, false for just the specified category.
+    */
+   public boolean getCategoryChildren()
+   {
+      return this.categoryChildren;
+   }
+   
+   /**
+    * @param categoryChildren    True to search category children, false for just the specified category.
+    */
+   public void setCategoryChildren(boolean categoryChildren)
+   {
+      this.categoryChildren = categoryChildren;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Action event handlers
@@ -198,13 +230,13 @@ public class AdvancedSearchBean
          // location path search
          if (this.lookin.equals(LOOKIN_OTHER) && this.location != null)
          {
-            search.setLocation(getPathFromSpaceId(this.location, true));
+            search.setLocation(getPathFromSpaceId(this.location, this.locationChildren));
          }
          
          // category path search
          if (this.category != null)
          {
-            search.setCategories(new String[]{getPathFromSpaceId(this.category, true)});
+            search.setCategories(new String[]{getPathFromSpaceId(this.category, this.categoryChildren)});
          }
          
          outcome = "browse";
@@ -213,6 +245,15 @@ public class AdvancedSearchBean
       return outcome;
    }
    
+   /**
+    * Generate a search XPATH pointing to the specified node Id, optionally return an XPATH
+    * that includes the child nodes.
+    *  
+    * @param id         Of the node to generate path too
+    * @param children   Whether to include children of the node
+    * 
+    * @return the path
+    */
    private String getPathFromSpaceId(String id, boolean children)
    {
       NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
@@ -240,6 +281,11 @@ public class AdvancedSearchBean
       {
          // append syntax to get all children of the path
          buf.append("//*");
+      }
+      else
+      {
+         // append syntax to just represent the path, not the children
+         buf.append("/*");
       }
       
       return buf.toString();
@@ -277,4 +323,10 @@ public class AdvancedSearchBean
    
    /** categories to search */
    private String category = null;
+   
+   /** true to search location children as well as location */
+   private boolean locationChildren = true;
+   
+   /** true to search category children as well as category */
+   private boolean categoryChildren = true;
 }

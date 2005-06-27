@@ -49,7 +49,13 @@ public final class SearchContext implements Serializable
    
    /** categories to add to the search */
    private String[] categories = new String[0];
-
+   
+   /** true to search location children as well as location */
+   private boolean locationChildren = true;
+   
+   /** true to search category children as well as category */
+   private boolean categoryChildren = true;
+   
    
    /**
     * Build the search query string based on the current search context members.
@@ -124,7 +130,7 @@ public final class SearchContext implements Serializable
          pathQuery = new StringBuilder(128);
          if (location != null)
          {
-            pathQuery.append(" +PATH:\"").append(location).append("\" ");
+            pathQuery.append(" PATH:\"").append(location).append("\" ");
          }
          if (categories != null && categories.length != 0)
          {
@@ -134,7 +140,7 @@ public final class SearchContext implements Serializable
                {
                   pathQuery.append("OR");
                }
-               pathQuery.append(" +PATH:\"").append(categories[i]).append("\" "); 
+               pathQuery.append(" PATH:\"").append(categories[i]).append("\" "); 
             }
          }
       }
@@ -241,5 +247,37 @@ public final class SearchContext implements Serializable
    public void setText(String text)
    {
       this.text = text;
+   }
+
+   /**
+    * @return Returns true to search location children, false for just the specified location.
+    */
+   public boolean getLocationChildren()
+   {
+      return this.locationChildren;
+   }
+   
+   /**
+    * @param locationChildren    True to search location children, false for just the specified location.
+    */
+   public void setLocationChildren(boolean locationChildren)
+   {
+      this.locationChildren = locationChildren;
+   }
+   
+   /**
+    * @return Returns true to search category children, false for just the specified category.
+    */
+   public boolean getCategoryChildren()
+   {
+      return this.categoryChildren;
+   }
+   
+   /**
+    * @param categoryChildren    True to search category children, false for just the specified category.
+    */
+   public void setCategoryChildren(boolean categoryChildren)
+   {
+      this.categoryChildren = categoryChildren;
    }
 }

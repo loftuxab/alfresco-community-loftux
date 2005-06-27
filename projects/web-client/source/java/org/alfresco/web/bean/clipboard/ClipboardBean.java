@@ -239,7 +239,7 @@ public class ClipboardBean
       
       // TODO: should we use primary parent here?
       //       The problem is we can't pass round ChildAssocRefs as form params etc. in the UI!
-      //       It's naff backend design if we need to pass childassocref around everywhere...!
+      //       It's tricky if we need to pass childassocref around everywhere...!
       ChildAssociationRef assocRef = this.nodeService.getPrimaryParent(item.Node.getNodeRef());
       
       if (item.Mode == ClipboardStatus.COPY)

@@ -120,12 +120,17 @@
                                           <f:selectItem itemValue="all" itemLabel="All Spaces" />
                                           <f:selectItem itemValue="other" itemLabel="Specify Space:" />
                                        </h:selectOneRadio>
-                                       <%-- TODO: just this space, or children checkbox --%>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td style="padding-left:26px">
                                        <r:spaceSelector label="Click here to select a Space" value="#{AdvancedSearchBean.location}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td style="padding-left:22px">
+                                       <h:selectBooleanCheckbox value="#{AdvancedSearchBean.locationChildren}" />
+                                       <span style="vertical-align:20%">Include child spaces</span>
                                     </td>
                                  </tr>
                                  
@@ -151,6 +156,12 @@
                                  <tr>
                                     <td style="padding-left:8px">
                                        <r:categorySelector label="Click here to select a Category" value="#{AdvancedSearchBean.category}" style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td style="padding-left:4px">
+                                       <h:selectBooleanCheckbox value="#{AdvancedSearchBean.categoryChildren}" />
+                                       <span style="vertical-align:20%">Include sub-categories</span>
                                     </td>
                                  </tr>
                                  
