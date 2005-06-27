@@ -1,83 +1,86 @@
-<project name="alfresco" default="build-all">
+<project name="alfresco" default="build-tomcat">
 
-   <!-- Checking the SVN SWITCH -->
+   <!-- ********************************** -->
+   <!-- ** Initialisation/Configuration ** -->
+   <!-- ********************************** -->
 
    <property name="common.dir" value="${basedir}" />
    <import file="${common.dir}/common-init.xml" />
 
-   <!--
-   NOTE: There is no guaranteed order the projects will be executed in the targets below, to define 
-         an explicit order use a filelist instead of a fileset.
-   -->
-   <filelist id="project-build-files" dir="."
-         files="projects/core/project-build.xml
-                projects/repository/project-build.xml
-                projects/web-client/project-build.xml"/>
+   <!-- Define an ordered list of projects to build -->
+   <target name="common-init" depends="common-init.common-init">
+      <filelist id="project-build-files" dir="."
+                files="${projects.dir.name}/core/${project.build.file} 
+                       ${projects.dir.name}/repository/${project.build.file}
+                       ${projects.dir.name}/web-client/${project.build.file}"/>
+                       
+      <!-- TODO: Add some checking in here for tomcat / jboss pre-requesties -->
+   </target>
 
-   <target name="build-all" depends="common-init" description="Builds all the projects after cleaning">
+   <!-- ********************** -->
+   <!-- ** Building targets ** -->
+   <!-- ********************** -->
+   
+   <target name="build-jboss" depends="common-init" description="Builds the projects for use in JBoss after cleaning">
       <subant target="build">
+         <property name="server" value="jboss"/>
          <filelist refid="project-build-files"/>
       </subant>
-      <antcall target="deploy" />
+      <antcall target="deploy-jboss" />
+   </target>
+   
+   <target name="build-tomcat" depends="common-init" description="Builds the projects for use in Tomcat after cleaning">
+      <subant target="build">
+         <property name="server" value="tomcat"/>
+         <filelist refid="project-build-files"/>
+      </subant>
+      <antcall target="deploy-tomcat" />
    </target>
 
-   <target name="incremental-all" depends="common-init" description="Builds all the projects">
+   <target name="incremental-jboss" depends="common-init" description="Builds the projects for use in JBoss">
       <subant target="incremental">
+         <property name="server" value="jboss"/>
          <filelist refid="project-build-files"/>
       </subant>
-      <antcall target="deploy" />
+      <antcall target="deploy-jboss" />
    </target>
-
-   <target name="test-all" depends="common-init" description="Runs unit tests for all the projects">
-      <subant target="run-tests">
+   
+   <target name="incremental-tomcat" depends="common-init" description="Builds the projects for use in Tomcat">
+      <subant target="incremental">
+         <property name="server" value="tomcat"/>
          <filelist refid="project-build-files"/>
       </subant>
+      <antcall target="deploy-tomcat" />
    </target>
-
-   <target name="clean-all" depends="common-init" description="Cleans all the projects">
-      <subant target="clean">
-         <filelist refid="project-build-files"/>
-      </subant>
-   </target>
-
-   <target name="deploy" depends="common-init" description="Deploys to JBoss">
-      <copy file="${basedir}/projects/web-client/build/dist/web-client.ear" todir="${deploy.dir}" />
+   
+   <!-- ************************ -->
+   <!-- ** Deployment targets ** -->
+   <!-- ************************ -->
+   
+   <target name="deploy-jboss" depends="common-init" description="Deploys to JBoss">
+      <copy file="${deploy.file}" todir="${jboss.deploy.dir}" />
    </target>
 
    <target name="deploy-tomcat" depends="common-init" description="Deploys to Tomcat">
-      <delete dir="${tomcat.home}/webapps/web-client" includeEmptyDirs="true" quiet="yes" />
-      <delete dir="${tomcat.home}/work/catalina/localhost/web-client" includeEmptyDirs="true" quiet="yes" />
-      <copy file="${basedir}/projects/web-client/build/dist/web-client.war" todir="${tomcat.home}/webapps" />
+      <delete dir="${tomcat.deploy.dir}/${web-client.project.name}" includeEmptyDirs="true" quiet="yes" />
+      <delete dir="${tomcat.home}/work/catalina/localhost/${web-client.project.name}" includeEmptyDirs="true" quiet="yes" />
+      <copy file="${deploy.file}" todir="${tomcat.deploy.dir}" />
    </target>
 
    <target name="deploy-exploded-web-client-jboss" depends="common-init">
       <input message="Enter name of temporary JBoss folder" addproperty="jboss.tmp.deploy.dirname" />
-      <property name="jboss.tmp.deploy.dir" value="${deploy.dir}/../tmp/deploy/${jboss.tmp.deploy.dirname}/web-client-exp.war" />
+      <property name="jboss.tmp.deploy.dir" value="${jboss.deploy.dir}/../tmp/deploy/${jboss.tmp.deploy.dirname}" />
       <available file="${jboss.tmp.deploy.dir}" type="dir" property="jboss.tmp.deploy.dir.present" />
       <fail unless="jboss.tmp.deploy.dir.present"
             message="The temporary folder you entered does not exist, has JBoss been restarted?" />
       <copy todir="${jboss.tmp.deploy.dir}" verbose="true">
-         <fileset dir="projects/web-client/source/web" excludes="WEB-INF/**" />
+         <fileset dir="${web-client.project.dir}/source/web" excludes="WEB-INF/**" />
       </copy>
    </target>
 
-   <target name="build-tomcat" depends="common-init">
-      <subant target="build">
-         <filelist refid="project-build-files"/>
-      </subant>
-      <antcall target="deploy-tomcat" />
-   </target>
-
-   <target name="incremental-tomcat" depends="common-init">
-      <subant target="incremental">
-         <filelist refid="project-build-files"/>
-      </subant>
-      <antcall target="deploy-tomcat" />
-   </target>
-
    <target name="deploy-exploded-web-client-tomcat" depends="common-init">
-      <copy todir="${tomcat.home}/webapps/web-client" verbose="true">
-         <fileset dir="projects/web-client/source/web" excludes="WEB-INF/**" />
+      <copy todir="${tomcat.deploy.dir}/${web-client.project.name}" verbose="true">
+         <fileset dir="${web-client.project.dir}/source/web" excludes="WEB-INF/**" />
       </copy>
    </target>
 
@@ -92,5 +95,36 @@
          <arg line="/k start run.bat" />
       </exec>
    </target>
+   
+   <!-- ********************** -->
+   <!-- ** Testing targets ** -->
+   <!-- ********************** -->
+
+   <target name="test-all" depends="common-init" description="Runs unit tests for all the projects">
+      <subant target="run-tests">
+         <filelist refid="project-build-files"/>
+      </subant>
+   </target>
+
+   <!-- ********************** -->
+   <!-- ** Cleaning targets ** -->
+   <!-- ********************** -->
+   
+   <target name="clean-all" depends="common-init" description="Cleans all the projects">
+      <subant target="clean">
+         <filelist refid="project-build-files"/>
+      </subant>
+   </target>
+   
+   <!-- ************************** -->
+   <!-- ** Distribution targets ** -->
+   <!-- ************************** -->
+   
+   <target name="distribute"></target>
+   
+   <target name="package-jboss-bundle" depends="package-source-bundle"></target>
+   <target name="package-tomcat-bundle" depends="package-source-bundle"></target>
+   
+   <target name="package-source-bundle"></target>
 
 </project>

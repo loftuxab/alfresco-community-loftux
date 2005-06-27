@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_2.dtd">
 
 <taglib>
    <tlibversion>1.0</tlibversion>
-   <jspversion>1.1</jspversion>
+   <jspversion>1.2</jspversion>
    <shortname>r</shortname>
+   <display-name>Alfresco Repository JSF Components</display-name>
+   <description>Tag library consisting of Alfresco repository JSF components i.e. those that can only be used in Alfresco based projects</description>
 
    <tag>
       <name>propertySheetGrid</name>
       <tagclass>org.alfresco.web.ui.repo.tag.property.PropertySheetGridTag</tagclass>
       <bodycontent>JSP</bodycontent>
+      <display-name>Property Sheet</display-name>
+      <description>Displays the current properties for a node in the repository</description>
       
       <attribute>
          <name>id</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
+         <description>The component identifier for this component</description>
       </attribute>
       
       <attribute>
          <name>value</name>
          <required>true</required>
          <rtexprvalue>true</rtexprvalue>
+         <description>A NodeRef object representing the node to show the properties of</description>
       </attribute>
       
       <attribute>
@@ -51,6 +57,7 @@
          <name>mode</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
+         <description>Whether the property sheet is in read-only mode or edit mode, values can be "view" or "edit"</description>
       </attribute>
       
       <attribute>

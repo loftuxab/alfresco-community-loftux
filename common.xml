@@ -57,8 +57,6 @@
    <target name="incremental" depends="package"
            description="Incrementally builds the project" />
 
-   <target name="continuous-build" />
-
    <!-- ************************* -->
    <!-- ** Compilation targets ** -->
    <!-- ************************* -->
@@ -85,6 +83,15 @@
       <javadoc sourcepath="${src.java.dir}" destdir="${javadoc.dir}" 
                packagenames="${javadoc.packages}" author="true" version="true" 
                windowtitle="${javadoc.title}" />
+   </target>
+
+   <target name="compile-taglibdocs" depends="init" 
+           description="Creates the tag library docs for the project">
+      <mkdir dir="${taglibdoc.dir}" />
+      <java fork="true" jar="${common.lib.dir}/tlddoc.jar" failonerror="true">
+        <arg line="-d ${taglibdoc.dir}"/>
+        <arg value="${src.webinf.dir}/*.tld"/>
+      </java>
    </target>
    
    <target name="run-tests" depends="package-jar"
@@ -119,7 +126,8 @@
    <!-- ** Packaging targets ** -->
    <!-- *********************** -->
 
-   <target name="package" depends="package-war" description="Packages the archive files" />
+   <!-- we provide the package target so projects can override to build what they need -->
+   <target name="package" depends="package-jar" description="Packages the archive files" />
       
    <target name="package-jar" depends="compile-java" description="Packages the JAR file">
       <mkdir dir="${dist.dir}"/>
@@ -149,53 +157,6 @@
          <fileset dir="${assemble.dir}"/>
       </ear>
    </target>
-   
-   <target name="distribute" depends="package-binary, package-source"
-           description="Creates the binary and source distributions" />
-
-   <target name="package-binary" depends="package-binary-zip, package-binary-tar" 
-           description="Creates the binary distribution" />
-
-   <target name="package-source" depends="package-source-zip, package-source-tar" 
-           description="Creates the source distribution" />
-
-   <target name="package-binary-zip" depends="clean, package" 
-           description="Packages the files into a binary distribution in the form of a ZIP file">
-      <zip destfile="${dist.dir}/${zip.binary.name}">
-         <zipfileset dir="${dist.dir}" excludes="*.zip, *.tar"/>
-      </zip>
-   </target>
-
-   <target name="package-binary-tar" depends="clean, package" 
-           description="Packages the files into a binary distribution in the form of a TAR file">
-      <!-- TODO: Do this when I have a Linux box available to test on -->
-   </target>
-
-   <target name="package-source-zip" depends="init" 
-           description="Packages the files into a source distribution in the form of a ZIP file">
-      <zip destfile="${dist.dir}/${zip.source.name}">
-         <zipfileset dir="${basedir}" excludes="build/**" />
-      </zip>
-   </target>
-
-   <target name="package-source-tar" depends="init" 
-           description="Packages the files into a source distribution in the form of a TAR file">
-      <!-- TODO: Do this when I have a Linux box available to test on -->
-   </target>
-
-   <!-- *************************** -->
-   <!-- ** Build control targets ** -->
-   <!-- *************************** -->
-
-   <target name="publish" />
-
-   <!-- ************************ -->
-   <!-- ** Deployment targets ** -->
-   <!-- ************************ -->
-
-   <target name="deploy" depends="init" description="Deploys the EAR file to an application server">
-      <copy file="${dist.dir}/${ear.name}" todir="${deploy.dir}" />
-   </target>
 
    <!-- ********************** -->
    <!-- ** Cleaning targets ** -->
@@ -206,6 +167,7 @@
       <delete includeEmptyDirs="true" quiet="yes" dir="${dist.dir}"/>
       <delete includeEmptyDirs="true" quiet="yes" dir="${assemble.dir}"/>
       <delete includeEmptyDirs="true" quiet="yes" dir="${test.results.dir}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${docs.dir}"/>
    </target>
 
 </project>
