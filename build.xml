@@ -14,7 +14,7 @@
                        ${projects.dir.name}/repository/${project.build.file}
                        ${projects.dir.name}/web-client/${project.build.file}"/>
                        
-      <!-- TODO: Add some checking in here for tomcat / jboss pre-requesties -->
+      <!-- TODO: Add some checking for tomcat / jboss pre-requesties -->
    </target>
 
    <!-- ********************** -->
@@ -112,6 +112,7 @@
    
    <target name="clean-distribution" depends="common-init" description="Cleans the distibution">
       <delete quiet="yes" includeEmptyDirs="true" dir="${build.dir}"/>
+      <delete quiet="yes" includeEmptyDirs="true" dir="${docs.dir}"/>
    </target>
       
    <target name="clean-all" depends="common-init" description="Cleans all the projects">
@@ -126,39 +127,80 @@
    <!-- ************************** -->
    
    <target name="distribute" 
-           depends="package-jboss-binary-distribution, package-tomcat-binary-distribution,
-                    package-source-distribution" />
+           depends="clean-distribution, package-jboss-binary-distribution-windows,
+                    package-jboss-binary-distribution-linux, package-tomcat-binary-distribution-windows,
+                    package-tomcat-binary-distribution-linux, package-source-distribution" 
+           description="Creates the distribution files for all platforms for all appservers"/>
    
-   <target name="package-jboss-binary-distribution" depends="build-jboss">
+   <target name="package-jboss-binary-distribution-windows" depends="build-jboss"
+           description="Creates the Windows binary distribution files for JBoss">
       <mkdir dir="${dist.dir}" />
-      <zip destfile="${dist.dir}/${jboss.zip.binary.name}">
+      <zip destfile="${dist.dir}/${jboss.dist.filename}.zip">
          <zipfileset dir="${installer.project.dir}" 
-                     excludes="alf_start_tc.bat,alf_stop_tc.bat,README_tomcat.txt,*.doc,*Tutorial.pdf" />
+                     includes="alf_start_jb.bat,alf_stop_jb.bat,AlfrescoTest.pdf,db_remove.bat,db_setup.bat,
+                               license.txt,notice.txt,README_jboss_win.txt,README_war.txt,start_oo2.bat,
+                               stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${jboss.distribution.dir}" prefix="jboss" />
          <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
       </zip>
-      <!-- TODO: create tar file distribution -->
    </target>
    
-   <target name="package-tomcat-binary-distribution" depends="build-tomcat">
+   <target name="package-jboss-binary-distribution-linux" depends="build-jboss"
+           description="Creates the Linux binary distribution files for JBoss">
       <mkdir dir="${dist.dir}" />
-      <zip destfile="${dist.dir}/${tomcat.zip.binary.name}">
+      <tar destfile="${dist.dir}/${jboss.dist.filename}.tar" longfile="gnu">
+         <tarfileset dir="${installer.project.dir}" 
+                     includes="alf_start_jb.sh,alf_stop_jb.sh,AlfrescoTest.pdf,db_remove.sh,db_setup.sh,
+                               license.txt,notice.txt,README_jboss_linux.txt,README_war.txt,stop_oo.sh,
+                               zstart_oo.sh" />
+         <tarfileset dir="${jboss.distribution.dir}" prefix="jboss" />
+         <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
+                     prefix="jboss/server/default/deploy" />
+      </tar>
+      <gzip zipfile="${dist.dir}/${jboss.dist.filename}.tar.gz" src="${dist.dir}/${jboss.dist.filename}.tar" />
+   </target>
+   
+   <target name="package-tomcat-binary-distribution-windows" depends="build-tomcat"
+           description="Creates the Windows binary distribution files for Tomcat">
+      <mkdir dir="${dist.dir}" />
+      <zip destfile="${dist.dir}/${tomcat.dist.filename}.zip">
          <zipfileset dir="${installer.project.dir}" 
-                     excludes="alf_start_jb.bat,alf_stop_jb.bat,README_jboss.txt,*.doc,*Tutorial.pdf" />
+                     includes="alf_start_tc.bat,alf_stop_tc.bat,AlfrescoTest.pdf,db_remove.bat,db_setup.bat,
+                               license.txt,notice.txt,README_tomcat_win.txt,README_war.txt,start_oo2.bat,
+                               stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${tomcat.distribution.dir}" prefix="tomcat" />
          <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
       </zip>
-      <!-- TODO: create tar file distribution -->
    </target>
    
-   <target name="package-source-distribution" depends="common-init">
+   <target name="package-tomcat-binary-distribution-linux" depends="build-tomcat"
+           description="Creates the Linux binary distribution files for Tomcat">
       <mkdir dir="${dist.dir}" />
-      <zip destfile="${dist.dir}/${zip.src.name}">
+      <tar destfile="${dist.dir}/${tomcat.dist.filename}.tar" longfile="gnu">
+         <tarfileset dir="${installer.project.dir}" 
+                     includes="alf_start_tc.sh,alf_stop_tc.sh,AlfrescoTest.pdf,db_remove.sh,db_setup.sh,
+                               license.txt,notice.txt,README_tomcat_linux.txt,README_war.txt,stop_oo.sh,
+                               zstart_oo.sh" />
+         <tarfileset dir="${tomcat.distribution.dir}" prefix="tomcat" />
+         <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
+                     prefix="tomcat/webapps" />
+      </tar>
+      <gzip zipfile="${dist.dir}/${tomcat.dist.filename}.tar.gz" src="${dist.dir}/${tomcat.dist.filename}.tar" />
+   </target>
+   
+   <target name="package-source-distribution" depends="common-init"
+           description="Creates the source distribution file for all platforms">
+      <mkdir dir="${dist.dir}" />
+      <zip destfile="${dist.dir}/${src.dist.filename}.zip">
          <zipfileset dir="${basedir}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,**/*.classpath" />
       </zip>
-      <!-- TODO: create tar file distribution -->
+      
+      <tar destfile="${dist.dir}/${src.dist.filename}.tar" longfile="gnu">
+         <tarfileset dir="${basedir}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,**/*.classpath" />
+      </tar>
+      <gzip zipfile="${dist.dir}/${src.dist.filename}.tar.gz" src="${dist.dir}/${src.dist.filename}.tar" />
    </target>
 
 </project>
