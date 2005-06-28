@@ -123,7 +123,8 @@ public class FileContentStore implements ContentStore
             throw new RuntimeException(
                     "This store is reserved for URLs starting with " +
                     urlStartCheck + ": \n" +
-                    "   store: " + this);
+                    "   store: " + this +
+                    " the invlid url is: "+contentUrl);
         }
     }
     

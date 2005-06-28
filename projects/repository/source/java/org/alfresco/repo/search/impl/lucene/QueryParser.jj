@@ -416,6 +416,7 @@ public class QueryParser {
   protected Query getBooleanQuery(Vector clauses) throws ParseException
   {
     BooleanQuery query = new BooleanQuery();
+    query.
     for (int i = 0; i < clauses.size(); i++) {
   query.add((BooleanClause)clauses.elementAt(i));
     }

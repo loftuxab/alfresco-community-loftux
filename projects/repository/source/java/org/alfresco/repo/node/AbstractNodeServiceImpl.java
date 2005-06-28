@@ -54,6 +54,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.XPathException;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
@@ -76,6 +77,8 @@ import org.jaxen.JaxenException;
  */
 public abstract class AbstractNodeServiceImpl implements NodeService
 {
+    private static final String REG_EXP_ESCAPE = "+?.*^$(){}|\\"; 
+    
     /** controls policy delegates */
     private PolicyComponent policyComponent;
 
@@ -464,22 +467,12 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     /**
      * @see NodeServiceXPath
      */
-    public synchronized List<NodeRef> selectNodes(
-            NodeRef contextNodeRef,
-            String xpath,
-            QueryParameterDefinition[] paramDefs,
-            NamespacePrefixResolver namespacePrefixResolver,
+    public synchronized List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] paramDefs, NamespacePrefixResolver namespacePrefixResolver,
             boolean followAllParentLinks)
     {
         try
         {
-            NodeServiceXPath nsXPath = new NodeServiceXPath(
-                    xpath,
-                    dictionaryService,
-                    this,
-                    namespacePrefixResolver,
-                    paramDefs,
-                    followAllParentLinks);
+            NodeServiceXPath nsXPath = new NodeServiceXPath(xpath, dictionaryService, this, namespacePrefixResolver, paramDefs, followAllParentLinks);
             for (String prefix : namespacePrefixResolver.getPrefixes())
             {
                 nsXPath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
@@ -501,31 +494,19 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         }
         catch (JaxenException e)
         {
-            throw new XPathException("Error executing xpath: \n" +
-                    "   xpath: " + xpath,
-                    e);
+            throw new XPathException("Error executing xpath: \n" + "   xpath: " + xpath, e);
         }
     }
 
     /**
      * @see NodeServiceXPath
      */
-    public List<Serializable> selectProperties(
-            NodeRef contextNodeRef,
-            String xpath,
-            QueryParameterDefinition[] paramDefs,
-            NamespacePrefixResolver namespacePrefixResolver,
+    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] paramDefs, NamespacePrefixResolver namespacePrefixResolver,
             boolean followAllParentLinks)
     {
         try
         {
-            NodeServiceXPath nsXPath = new NodeServiceXPath(
-                    xpath,
-                    dictionaryService,
-                    this,
-                    namespacePrefixResolver,
-                    paramDefs,
-                    followAllParentLinks);
+            NodeServiceXPath nsXPath = new NodeServiceXPath(xpath, dictionaryService, this, namespacePrefixResolver, paramDefs, followAllParentLinks);
             for (String prefix : namespacePrefixResolver.getPrefixes())
             {
                 nsXPath.addNamespace(prefix, namespacePrefixResolver.getNamespaceURI(prefix));
@@ -606,59 +587,123 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         ResultSet resultSet = null;
         try
         {
-            if (searcher == null || indexer == null)
+            if (includeFTS && (searcher == null || indexer == null))
             {
+                // We only need lucene for FTS
                 // without both, no Lucene search is possible
                 return false;
             }
 
-            if(!includeFTS && (propertyQName == null))
+            // Nothing to do
+            if (!includeFTS && (propertyQName == null))
             {
                 return false;
             }
-            
-            // Need to turn the SQL like pattern into lucene line
-            // Need to replace unescaped % with * (? and ? will match and \ is
-            // used
-            // for escape so the rest is OK)
 
-            // replace the SQL-like search string with appropriate Lucene syntax
-            StringBuilder sb = new StringBuilder();
-            char previous = ' ';
-            char current = ' ';
-            for (int i = 0; i < sqlLikePattern.length(); i++)
+            if (includeFTS)
             {
-                previous = current;
-                current = sqlLikePattern.charAt(i);
-                if ((current == '%') && (previous != '\\'))
+                // Need to turn the SQL like pattern into lucene line
+                // Need to replace unescaped % with *
+                // (? and ? will match and \
+                // is
+                // used
+                // for escape so the rest is OK)
+
+                // replace the SQL-like search string with appropriate Lucene
+                // syntax
+                StringBuilder sb = new StringBuilder();
+                char previous = ' ';
+                char current = ' ';
+                for (int i = 0; i < sqlLikePattern.length(); i++)
                 {
-                    sb.append("*");
+                    previous = current;
+                    current = sqlLikePattern.charAt(i);
+                    if ((current == '%') && (previous != '\\'))
+                    {
+                        sb.append("*");
+                    }
+                    else if ((current == '_') && (previous != '\\'))
+                    {
+                        sb.append("?");
+                    }
+                    else if (current == '*')
+                    {
+                        sb.append("\\*");
+                    }
+                    else if (current == '?')
+                    {
+                        sb.append("\\?");
+                    }
+                    else
+                    {
+                        sb.append(current);
+                    }
+                }
+                String pattern = sb.toString();
+
+                // build Lucene search string specific to the node
+                sb = new StringBuilder();
+                sb.append("+ID:").append(nodeRef.getId()).append(" +(");
+                // FTS or attribute matches
+                if (includeFTS)
+                {
+                    sb.append("TEXT:(").append(pattern).append(") ");
+                }
+                if (propertyQName != null)
+                {
+                    sb.append(" @").append(LuceneQueryParser.escape(propertyQName.toString())).append(":(").append(pattern).append(")");
+                }
+                sb.append(")");
+
+                resultSet = searcher.query(nodeRef.getStoreRef(), "lucene", sb.toString());
+                boolean answer = resultSet.length() > 0;
+                return answer;
+            }
+            else
+            {
+                if(propertyQName == null)
+                {
+                    return false;
+                }
+                // replace the SQL-like search string with appropriate Regexp
+                // syntax
+                StringBuilder sb = new StringBuilder();
+                char previous = ' ';
+                char current = ' ';
+                for (int i = 0; i < sqlLikePattern.length(); i++)
+                {
+                    previous = current;
+                    current = sqlLikePattern.charAt(i);
+                    if ((current == '%') && (previous != '\\'))
+                    {
+                        sb.append(".*");
+                    }
+                    else if ((current == '_') && (previous != '\\'))
+                    {
+                        sb.append(".");
+                    }
+                    else if (REG_EXP_ESCAPE.indexOf(current) != -1)
+                    {
+                        sb.append("\\").append(current);
+                    }
+                    else
+                    {
+                        sb.append(current);
+                    }
+                }
+                String pattern = sb.toString();
+                Serializable property = getProperty(nodeRef, propertyQName);
+                if(property == null)
+                {
+                    return false;
                 }
                 else
                 {
-                    sb.append(current);
+                    String propertyString = ValueConverter.convert(String.class, getProperty(nodeRef, propertyQName));
+                    return propertyString.matches(pattern);
                 }
             }
-            String pattern = sb.toString();
 
-            // build Lucene search string specific to the node
-            sb = new StringBuilder();
-            sb.append("+ID:").append(nodeRef.getId()).append(" +(");
-            // FTS or attribute matches
-            if (includeFTS)
-            {
-                sb.append("TEXT:(").append(pattern).append(") ");
-            }
-            if (propertyQName != null)
-            {
-                sb.append(" @").append(LuceneQueryParser.escape(propertyQName.toString()))
-                  .append(":(").append(pattern).append(")");
-            }
-            sb.append(")");
-
-            resultSet = searcher.query(nodeRef.getStoreRef(), "lucene", sb.toString());
-            boolean answer = resultSet.length() > 0;
-            return answer;
         }
         finally
         {

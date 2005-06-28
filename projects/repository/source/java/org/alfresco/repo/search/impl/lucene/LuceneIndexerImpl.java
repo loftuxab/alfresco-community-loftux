@@ -287,7 +287,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     Document document = mainReader.document(doc);
                     String id = document.get("ID");
                     NodeRef ref = new NodeRef(store, id);
-                    deleteImpl(ref, false);
+                    deleteImpl(ref, false, mainReader);
                 }
             }
             catch (IOException e)
@@ -731,67 +731,38 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void flushPending() throws LuceneIndexException
     {
-        Set<NodeRef> forIndex = new LinkedHashSet<NodeRef>();
-        for (Command command : commandList)
-        {
-            if (command.action == Action.INDEX)
-            {
-                // Indexing just requires the node to be added to the list
-                forIndex.add(command.nodeRef);
-            }
-            else if (command.action == Action.REINDEX)
-            {
-                // Reindex is a delete and then and index
-                Set<NodeRef> set = deleteImpl(command.nodeRef, true);
-                // Deleting any pending index actions 
-                // - make sure we only do at most one index
-                forIndex.removeAll(set);
-                // Add the nodes for index
-                forIndex.addAll(set);
-            }
-            else if (command.action == Action.DELETE)
-            {
-                // Delete the nodes
-                Set<NodeRef> set = deleteImpl(command.nodeRef, false);
-                // Remove any pending indexes
-                forIndex.removeAll(set);
-            }
-        }
-        commandList.clear();
-        index(forIndex, false);
-    }
-
-    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex) throws LuceneIndexException
-    {
-        // startTimer();
-        getDeltaReader();
-        // outputTime("Delete "+nodeRef+" size = "+getDeltaWriter().docCount());
-        Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
-
         IndexReader mainReader = null;
         try
         {
             mainReader = getReader();
-            refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader(), true));
-
-            refs.addAll(deleteContainerAndBelow(nodeRef, mainReader, false));
-
-            if (!forReindex)
+            Set<NodeRef> forIndex = new LinkedHashSet<NodeRef>();
+            for (Command command : commandList)
             {
-                Set<NodeRef> leafrefs = new LinkedHashSet<NodeRef>();
-
-                leafrefs.addAll(deletePrimary(refs, getDeltaReader(), true));
-                leafrefs.addAll(deletePrimary(refs, mainReader, false));
-
-                leafrefs.addAll(deleteReference(refs, getDeltaReader(), true));
-                leafrefs.addAll(deleteReference(refs, mainReader, false));
-
-                refs.addAll(leafrefs);
+                if (command.action == Action.INDEX)
+                {
+                    // Indexing just requires the node to be added to the list
+                    forIndex.add(command.nodeRef);
+                }
+                else if (command.action == Action.REINDEX)
+                {
+                    // Reindex is a delete and then and index
+                    Set<NodeRef> set = deleteImpl(command.nodeRef, true, mainReader);
+                    // Deleting any pending index actions
+                    // - make sure we only do at most one index
+                    forIndex.removeAll(set);
+                    // Add the nodes for index
+                    forIndex.addAll(set);
+                }
+                else if (command.action == Action.DELETE)
+                {
+                    // Delete the nodes
+                    Set<NodeRef> set = deleteImpl(command.nodeRef, false, mainReader);
+                    // Remove any pending indexes
+                    forIndex.removeAll(set);
+                }
             }
-
-            deletions.addAll(refs);
-
-            return refs;
+            commandList.clear();
+            index(forIndex, false);
         }
         finally
         {
@@ -807,6 +778,36 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
             }
         }
+    }
+
+    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex, IndexReader mainReader) throws LuceneIndexException
+    {
+        // startTimer();
+        getDeltaReader();
+        // outputTime("Delete "+nodeRef+" size = "+getDeltaWriter().docCount());
+        Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
+
+        refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader(), true));
+
+        refs.addAll(deleteContainerAndBelow(nodeRef, mainReader, false));
+
+        if (!forReindex)
+        {
+            Set<NodeRef> leafrefs = new LinkedHashSet<NodeRef>();
+
+            leafrefs.addAll(deletePrimary(refs, getDeltaReader(), true));
+            leafrefs.addAll(deletePrimary(refs, mainReader, false));
+
+            leafrefs.addAll(deleteReference(refs, getDeltaReader(), true));
+            leafrefs.addAll(deleteReference(refs, mainReader, false));
+
+            refs.addAll(leafrefs);
+        }
+
+        deletions.addAll(refs);
+
+        return refs;
+
     }
 
     private Set<NodeRef> deletePrimary(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws LuceneIndexException

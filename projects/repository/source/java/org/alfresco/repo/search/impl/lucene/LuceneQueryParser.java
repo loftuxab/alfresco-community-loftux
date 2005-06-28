@@ -41,6 +41,11 @@ public class LuceneQueryParser extends QueryParser
     
     private DictionaryService dictionaryService;
     
+    static
+    {
+        BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+    }
+    
     /**
      * Parses a query string, returning a {@link org.apache.lucene.search.Query}.
      * 

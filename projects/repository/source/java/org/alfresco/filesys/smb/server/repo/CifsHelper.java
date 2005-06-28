@@ -391,6 +391,8 @@ public class CifsHelper
         // append to the xpath
         if (wildcardSearch)
         {
+            // fix up wildcard matches for like function
+            pathElement = pathElement.replace('*', '%');  // TODO: Proper escaping
             // use the like function (do not match FTS)
             sb.append("./*[like(@alf:name, $").append(nameParam).append(", false)");
         }
@@ -456,6 +458,8 @@ public class CifsHelper
             // the cache had results for good or bad
             return cachedResults;
         }
+        
+        
         
         // tokenize the path and push into a stack in reverse order so that
         // the root directory gets popped first
