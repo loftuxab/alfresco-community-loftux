@@ -750,6 +750,10 @@ private final void processFilesystemsConfig(Config config)
                         acls = getGlobalAccessControls();
                     }
 
+                    // Check if change notifications are disabled
+                    
+                    boolean changeNotify = elem.getChild("disableChangeNotification") == null ? true : false;
+                    
                     // Create the shared filesystem
                     
                     DiskSharedDevice filesys = new DiskSharedDevice(filesysName, filesysDriver, filesysContext);
@@ -758,6 +762,10 @@ private final void processFilesystemsConfig(Config config)
                   
                     filesys.setAccessControlList(acls);
 
+                    // Enable/disable change notification for this device
+                    
+                    filesysContext.enableChangeHandler(changeNotify);
+                    
                     // Start the filesystem
                         
                     filesysContext.startFilesystem(filesys);
