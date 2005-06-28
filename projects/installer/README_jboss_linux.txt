@@ -40,6 +40,7 @@ Install JDK 5.0
 - Select the "JDK 5.0 Update x" option
 - Download your preferred "Linux Platform" option (~45M)
 - Install once downloaded
+- Ensure the JAVA_HOME variable is set correctly
 
 
 Install MySQL
