@@ -234,7 +234,8 @@
                                  <h:outputText id="no-category-msg" value="This document is not categorised.<br/><br/>" 
                                                escape="false"/>
                                  <a:actionLink id="make-classifiable" value="Allow Categorization" 
-                                               action="#{DocumentDetailsBean.applyClassifiable}" />
+                                               action="#{DocumentDetailsBean.applyClassifiable}"
+                                               rendered="#{DocumentDetailsBean.locked == false}" />
                               </a:panel>
                               <br/>
                               <a:panel label="Version History" id="version-history-panel" progressive="true" expanded="false"
@@ -289,7 +290,8 @@
                                  <h:outputText id="no-history-msg" value="This document has no version history.<br/><br/>" 
                                                escape="false" />
                                  <a:actionLink id="make-versionable" value="Allow Versioning"
-                                               action="#{DocumentDetailsBean.applyVersionable}" />
+                                               action="#{DocumentDetailsBean.applyVersionable}" 
+                                               rendered="#{DocumentDetailsBean.locked == false}" />
                               </a:panel>
                               <br/>
                            </td>
