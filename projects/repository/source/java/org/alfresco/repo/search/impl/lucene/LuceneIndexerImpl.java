@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,6 +69,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 
+import com.sun.corba.se.spi.orbutil.fsm.Action;
+
 /**
  * The implementation of the lucene based indexer. Supports basic transactional
  * behaviour if used on its own.
@@ -91,7 +94,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     private ContentService contentService;
 
     /**
-     * A list of all deletoins we have made - at merge these deletions need to
+     * A list of all deletions we have made - at merge these deletions need to
      * be made against the main index.
      * 
      * TODO: Consider if this informantion needs to be persisted for recovery
@@ -253,6 +256,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void createNode(ChildAssociationRef relationshipRef) throws LuceneIndexException
     {
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Create node " + relationshipRef.getChildRef());
+        }
         checkAbleToDoWork(false);
         try
         {
@@ -313,6 +320,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void updateNode(NodeRef nodeRef) throws LuceneIndexException
     {
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Update node " + nodeRef);
+        }
         checkAbleToDoWork(false);
         try
         {
@@ -327,6 +338,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void deleteNode(ChildAssociationRef relationshipRef) throws LuceneIndexException
     {
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Delete node " + relationshipRef.getChildRef());
+        }
         checkAbleToDoWork(false);
         try
         {
@@ -341,6 +356,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void createChildRelationship(ChildAssociationRef relationshipRef) throws LuceneIndexException
     {
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Create child " + relationshipRef);
+        }
         checkAbleToDoWork(false);
         try
         {
@@ -357,6 +376,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef, ChildAssociationRef relationshipAfterRef) throws LuceneIndexException
     {
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Update child " + relationshipBeforeRef + " to " + relationshipAfterRef);
+        }
         checkAbleToDoWork(false);
         try
         {
@@ -376,6 +399,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void deleteChildRelationship(ChildAssociationRef relationshipRef) throws LuceneIndexException
     {
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Delete child " + relationshipRef);
+        }
         checkAbleToDoWork(false);
         try
         {
@@ -402,6 +429,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      */
     public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId, String indexRootLocation) throws LuceneIndexException
     {
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Creating indexer");
+        }
         LuceneIndexerImpl indexer = new LuceneIndexerImpl();
         indexer.setIndexRootLocation(indexRootLocation);
         indexer.initialise(storeRef, deltaId, false);
@@ -710,7 +741,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void reindex(NodeRef nodeRef) throws LuceneIndexException
     {
-
         delete(nodeRef, true);
     }
 
@@ -721,13 +751,54 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void addCommand(Command command)
     {
+        purgeCommandList(command);
         commandList.add(command);
-
+        
         if (commandList.size() > 10000)
         {
             flushPending();
         }
     }
+
+    private void purgeCommandList(Command command)
+    {
+        if (command.action == Action.DELETE)
+        {
+            removeFromCommandList(command, false);
+        }
+        else if (command.action == Action.REINDEX)
+        {
+            removeFromCommandList(command, true);
+        }
+        else if (command.action == Action.INDEX)
+        {
+            removeFromCommandList(command, true);
+        }
+    }
+    
+    private void removeFromCommandList(Command command, boolean matchExact)
+    {
+       for(ListIterator<Command> it = commandList.listIterator(commandList.size()); it.hasPrevious(); /**/)
+       {
+           Command current = it.previous();
+           if(matchExact)
+           {
+               if( (current.action == command.action) && (current.nodeRef.equals(command.nodeRef)))
+               {
+                   it.remove();
+                   return;
+               }
+           }
+           else
+           {
+               if(current.nodeRef.equals(command.nodeRef))
+               {
+                   it.remove();
+               } 
+           }
+       }
+    }
+   
 
     private void flushPending() throws LuceneIndexException
     {
@@ -736,6 +807,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             mainReader = getReader();
             Set<NodeRef> forIndex = new LinkedHashSet<NodeRef>();
+
             for (Command command : commandList)
             {
                 if (command.action == Action.INDEX)
@@ -747,6 +819,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 {
                     // Reindex is a delete and then and index
                     Set<NodeRef> set = deleteImpl(command.nodeRef, true, mainReader);
+
                     // Deleting any pending index actions
                     // - make sure we only do at most one index
                     forIndex.removeAll(set);
@@ -1594,6 +1667,31 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             this.nodeRef = nodeRef;
             this.action = action;
         }
+
+        public String toString()
+        {
+            StringBuffer buffer = new StringBuffer();
+            if (action == Action.INDEX)
+            {
+                buffer.append("Index ");
+            }
+            else if (action == Action.DELETE)
+            {
+                buffer.append("Delete ");
+            }
+            else if (action == Action.REINDEX)
+            {
+                buffer.append("Reindex ");
+            }
+            else
+            {
+                buffer.append("Unknown ... ");
+            }
+            buffer.append(nodeRef);
+            return buffer.toString();
+        }
+        
+        
     }
 
     private FullTextSearchIndexer luceneFullTextSearchIndexer;
