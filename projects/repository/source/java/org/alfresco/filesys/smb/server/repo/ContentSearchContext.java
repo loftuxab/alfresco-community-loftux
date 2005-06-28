@@ -17,11 +17,13 @@
  */
 package org.alfresco.filesys.smb.server.repo;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.alfresco.filesys.server.filesys.FileAttribute;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.SearchContext;
+import org.alfresco.filesys.server.filesys.cache.FilePathCache;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -40,6 +42,7 @@ public class ContentSearchContext extends SearchContext
     private static final Log logger = LogFactory.getLog(ContentSearchContext.class);
     
     private ServiceRegistry serviceRegistry;
+    private CifsHelper cifsHelper;
     private List<NodeRef> results;
     private int index = -1;
     
@@ -50,6 +53,7 @@ public class ContentSearchContext extends SearchContext
      * a specific file or directory, or any file or directory.
      * 
      * @param serviceRegistry used to gain access the the repository
+     * @param cifsHelper caches path query results
      * @param searchRootNodeRef the node whos children are to be searched
      * @param searchStr the search string relative to the search root node
      * @param attributes the search attributes, e.g. searching for folders, etc
@@ -57,6 +61,7 @@ public class ContentSearchContext extends SearchContext
      */
     public static ContentSearchContext search(
             ServiceRegistry serviceRegistry,
+            CifsHelper cifsHelper,
             NodeRef searchRootNodeRef,
             String searchStr,
             int attributes)
@@ -64,10 +69,10 @@ public class ContentSearchContext extends SearchContext
         boolean isFile = (FileAttribute.Directory & attributes) == 0;
         
         // perform the search
-        List<NodeRef> results = CifsHelper.getNodeRefs(serviceRegistry, searchRootNodeRef, searchStr);
+        List<NodeRef> results = cifsHelper.getNodeRefs(searchRootNodeRef, searchStr);
         
         // build the search context to store the results
-        ContentSearchContext searchCtx = new ContentSearchContext(serviceRegistry, results, searchStr);
+        ContentSearchContext searchCtx = new ContentSearchContext(serviceRegistry, cifsHelper, results, searchStr);
         
         // done
         if (logger.isDebugEnabled())
@@ -80,13 +85,18 @@ public class ContentSearchContext extends SearchContext
     }
     
     /**
-     * @see ContentSearchContext#search(ServiceRegistry, NodeRef, String)
+     * @see ContentSearchContext#search(ServiceRegistry, FilePathCache, NodeRef, String, int)
      */
-    private ContentSearchContext(ServiceRegistry serviceRegistry, List<NodeRef> results, String searchStr)
+    private ContentSearchContext(
+            ServiceRegistry serviceRegistry,
+            CifsHelper cifsHelper,
+            List<NodeRef> results,
+            String searchStr)
     {
         super();
         super.setSearchString(searchStr);
         this.serviceRegistry = serviceRegistry;
+        this.cifsHelper = cifsHelper;
         this.results = results;
     }
     
@@ -127,7 +137,7 @@ public class ContentSearchContext extends SearchContext
         // get the file info
         try
         {
-            FileInfo nextInfo = ContentDiskDriver.getFileInformation(serviceRegistry, nextNodeRef, true);
+            FileInfo nextInfo = cifsHelper.getFileInformation(nextNodeRef, "", true);
             // copy to info handle
             info.copyFrom(nextInfo);
             // success
@@ -136,6 +146,11 @@ public class ContentSearchContext extends SearchContext
         catch (InvalidNodeRefException e)
         {
             // node is no longer valid
+            return false;
+        }
+        catch (FileNotFoundException e)
+        {
+            // node no longer available
             return false;
         }
     }

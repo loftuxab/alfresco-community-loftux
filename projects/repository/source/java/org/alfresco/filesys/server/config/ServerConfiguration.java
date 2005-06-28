@@ -21,7 +21,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Provider;
 import java.security.Security;
-import java.util.*;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
@@ -30,9 +32,18 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.NetworkServerList;
-import org.alfresco.filesys.server.auth.*;
-import org.alfresco.filesys.server.auth.acl.*;
-import org.alfresco.filesys.server.auth.passthru.*;
+import org.alfresco.filesys.server.auth.LocalAuthenticator;
+import org.alfresco.filesys.server.auth.SrvAuthenticator;
+import org.alfresco.filesys.server.auth.UserAccount;
+import org.alfresco.filesys.server.auth.UserAccountList;
+import org.alfresco.filesys.server.auth.acl.ACLParseException;
+import org.alfresco.filesys.server.auth.acl.AccessControl;
+import org.alfresco.filesys.server.auth.acl.AccessControlList;
+import org.alfresco.filesys.server.auth.acl.AccessControlManager;
+import org.alfresco.filesys.server.auth.acl.AccessControlParser;
+import org.alfresco.filesys.server.auth.acl.DefaultAccessControlManager;
+import org.alfresco.filesys.server.auth.acl.InvalidACLTypeException;
+import org.alfresco.filesys.server.auth.passthru.PassthruAuthenticator;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.core.ShareMapper;
 import org.alfresco.filesys.server.core.SharedDevice;
@@ -44,7 +55,6 @@ import org.alfresco.filesys.server.filesys.DiskSharedDevice;
 import org.alfresco.filesys.smb.Dialect;
 import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
-import org.alfresco.filesys.smb.server.repo.ContentDiskDriver;
 import org.alfresco.filesys.util.IPAddress;
 import org.alfresco.service.ServiceRegistry;
 
@@ -56,21 +66,15 @@ import org.alfresco.service.ServiceRegistry;
  */
 public class ServerConfiguration
 {
-
     // Filesystem configuration constants
-
     private static final String ConfigArea = "file-servers";
-
     private static final String ConfigCIFS = "CIFS Server";
-
     private static final String ConfigFilesystems = "Filesystems";
-
     private static final String ConfigSecurity = "Filesystem Security";
 
     //  SMB/CIFS session debug type strings
     //
     //  Must match the bit mask order.
-
     private static final String m_sessDbgStr[] = { "NETBIOS",
                                                    "STATE",
                                                    "NEGOTIATE",
@@ -94,72 +98,58 @@ public class ServerConfiguration
     
     /** connection to database */
     private ServiceRegistry serviceRegistry;
-
-    // Configuration service used to read the configuration from
+    /** Configuration service used to read the configuration from */
     private ConfigService m_configService;
-
+    /** the device to connect use */
+    private DiskInterface diskInterface;
+    
     // Main server enable flags, to enable SMB, FTP and/or NFS server components
-
     private boolean m_smbEnable = true;
 
     // Server name
-
     private String m_name;
 
     // Server type, used by the host announcer
-
     private int m_srvType = ServerType.WorkStation + ServerType.Server + ServerType.NTServer;
 
     // Active server list
-
     private NetworkServerList m_serverList;
 
     // Server comment
-
     private String m_comment;
 
     // Server domain
-
     private String m_domain;
 
     // Network broadcast mask string
-
     private String m_broadcast;
 
     // Announce the server to network neighborhood, announcement interval in
     // minutes
-
     private boolean m_announce;
 
     private int m_announceInterval;
 
     // Default SMB dialects to enable
-
     private DialectSelector m_dialects;
 
     // List of shared devices
-
     private SharedDeviceList m_shareList;
 
     // Authenticator, used to authenticate users and share connections.
-
     private SrvAuthenticator m_authenticator;
 
     // Share mapper
-
     private ShareMapper m_shareMapper;
 
     // Access control manager
-
     private AccessControlManager m_aclManager;
 
     // Global access control list, applied to all shares that do not have access
     // controls
-
     private AccessControlList m_globalACLs;
 
     // SMB server, NetBIOS name server and host announcer debug enable
-
     private boolean m_srvDebug = false;
 
     private boolean m_nbDebug = false;
@@ -167,12 +157,10 @@ public class ServerConfiguration
     private boolean m_announceDebug = false;
 
     // Default session debugging setting
-
     private int m_sessDebug;
 
     // Flags to indicate if NetBIOS, native TCP/IP SMB and/or Win32 NetBIOS
     // should be enabled
-
     private boolean m_netBIOSEnable = true;
 
     private boolean m_tcpSMBEnable = false;
@@ -180,26 +168,20 @@ public class ServerConfiguration
     private boolean m_win32NBEnable = false;
 
     // Address to bind the SMB server to, if null all local addresses are used
-
     private InetAddress m_smbBindAddress;
 
     // Address to bind the NetBIOS name server to, if null all addresses are
     // used
-
     private InetAddress m_nbBindAddress;
 
     // WINS servers
-
     private InetAddress m_winsPrimary;
-
     private InetAddress m_winsSecondary;
 
     // User account list
-
     private UserAccountList m_userList;
 
     // Enable/disable Macintosh extension SMBs
-
     private boolean m_macExtensions;
 
     // --------------------------------------------------------------------------------
@@ -207,31 +189,24 @@ public class ServerConfiguration
     //
     // Server name to register under Win32 NetBIOS, if not set the main server
     // name is used
-
     private String m_win32NBName;
 
     // LANA to be used for Win32 NetBIOS, if not specified the first available
     // is used
-
     private int m_win32NBLANA = -1;
 
     // Send out host announcements via the Win32 NetBIOS interface
-
     private boolean m_win32NBAnnounce = false;
-
     private int m_win32NBAnnounceInterval;
 
     // --------------------------------------------------------------------------------
     // Global server configuration
     //
     // Timezone name and offset from UTC in minutes
-
     private String m_timeZone;
-
     private int m_tzOffset;
 
     // JCE provider class name
-
     private String m_jceProviderClass;
 
     /**
@@ -239,10 +214,10 @@ public class ServerConfiguration
      * 
      * @param config ConfigService
      */
-    public ServerConfiguration(ServiceRegistry serviceRegistry, ConfigService config)
+    public ServerConfiguration(ServiceRegistry serviceRegistry, ConfigService config, DiskInterface diskInterface)
     {
-        // to get services from the repo
         this.serviceRegistry = serviceRegistry;
+        this.diskInterface = diskInterface;
         // Save the configuration service
         m_configService = config;
 
@@ -752,7 +727,7 @@ private final void processFilesystemsConfig(Config config)
                 {
                     // Create a new filesystem driver instance and create a context for
                     // the new filesystem
-                    DiskInterface filesysDriver = new ContentDiskDriver(serviceRegistry);
+                    DiskInterface filesysDriver = this.diskInterface;
                     DiskDeviceContext filesysContext = (DiskDeviceContext) filesysDriver.createContext(elem);
 
                     // Check if an access control list has been specified

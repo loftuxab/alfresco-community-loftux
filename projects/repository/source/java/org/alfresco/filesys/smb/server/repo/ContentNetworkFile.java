@@ -17,6 +17,7 @@
  */
 package org.alfresco.filesys.smb.server.repo;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -46,6 +47,7 @@ public class ContentNetworkFile extends NetworkFile
     private static final Log logger = LogFactory.getLog(ContentNetworkFile.class);
     
     private ServiceRegistry serviceRegistry;
+    private CifsHelper cifsHelper;
     private NodeRef nodeRef;
     /** keeps track of the read/write access */
     private FileChannel channel;
@@ -54,11 +56,16 @@ public class ContentNetworkFile extends NetworkFile
      * Helper method to create a {@link NetworkFile network file} given a node reference.
      * 
      * @param serviceRegistry
+     * @param filePathCache used to speed up repeated searches
      * @param nodeRef the node representing the file or directory
      * @param params the parameters dictating the path and other attributes with which the file is being accessed
      * @return Returns a new instance of the network file
      */
-    public static ContentNetworkFile createFile(ServiceRegistry serviceRegistry, NodeRef nodeRef, FileOpenParams params)
+    public static ContentNetworkFile createFile(
+            ServiceRegistry serviceRegistry,
+            CifsHelper cifsHelper,
+            NodeRef nodeRef,
+            FileOpenParams params)
     {
         String path = params.getPath();
         
@@ -66,7 +73,7 @@ public class ContentNetworkFile extends NetworkFile
         // TODO: Check access writes and compare to write requirements
         
         // create the file
-        ContentNetworkFile netFile = new ContentNetworkFile(serviceRegistry, nodeRef, path);
+        ContentNetworkFile netFile = new ContentNetworkFile(serviceRegistry, cifsHelper, nodeRef, path);
         // set relevant parameters
         if (params.isReadOnlyAccess())
         {
@@ -78,7 +85,15 @@ public class ContentNetworkFile extends NetworkFile
         }
         
         // check the type
-        FileInfo fileInfo = ContentDiskDriver.getFileInformation(serviceRegistry, nodeRef, true);
+        FileInfo fileInfo;
+        try
+        {
+            fileInfo = cifsHelper.getFileInformation(nodeRef, "", true);
+        }
+        catch (FileNotFoundException e)
+        {
+            throw new AlfrescoRuntimeException("File not found when creating network file: " + nodeRef, e);
+        }
         if (fileInfo.isDirectory())
         {
             netFile.setAttributes(FileAttribute.Directory);
@@ -95,11 +110,12 @@ public class ContentNetworkFile extends NetworkFile
         return netFile;
     }
 
-    private ContentNetworkFile(ServiceRegistry serviceRegistry, NodeRef nodeRef, String name)
+    private ContentNetworkFile(ServiceRegistry serviceRegistry, CifsHelper cifsHelper, NodeRef nodeRef, String name)
     {
         super(name);
         setFullName(name);
         this.serviceRegistry = serviceRegistry;
+        this.cifsHelper = cifsHelper;
         this.nodeRef = nodeRef;
     }
     
@@ -195,9 +211,6 @@ public class ContentNetworkFile extends NetworkFile
     @Override
     public synchronized void closeFile() throws IOException
     {
-        // get the file info
-        FileInfo fileInfo = ContentDiskDriver.getFileInformation(serviceRegistry, nodeRef, true);
-        
         if (isDirectory())              // ignore if this is a directory
         {
             return;

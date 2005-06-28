@@ -27,6 +27,7 @@ import org.alfresco.filesys.netbios.server.NetBIOSNameServer;
 import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.config.ServerConfiguration;
+import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.smb.server.SMBServer;
 import org.alfresco.service.ServiceRegistry;
 import org.apache.log4j.Logger;
@@ -48,16 +49,18 @@ public class CIFSServer
 
     private ServiceRegistry serviceRegistry;
     private String configLocation;
+    private DiskInterface diskInterface;
     private ServerConfiguration filesysConfig;
 
     /**
      * @param serviceRegistry connects to the repository
      * @param configService
      */
-    public CIFSServer(ServiceRegistry serviceRegistry, String configLocation)
+    public CIFSServer(ServiceRegistry serviceRegistry, String configLocation, DiskInterface diskInterface)
     {
         this.serviceRegistry = serviceRegistry;
         this.configLocation = configLocation;
+        this.diskInterface = diskInterface;
     }
 
     /**
@@ -75,7 +78,7 @@ public class CIFSServer
             ClassPathConfigSource classPathConfigSource = new ClassPathConfigSource(configLocation);
             XMLConfigService xmlConfigService = new XMLConfigService(classPathConfigSource);
             xmlConfigService.init();
-            filesysConfig = new ServerConfiguration(serviceRegistry, xmlConfigService);
+            filesysConfig = new ServerConfiguration(serviceRegistry, xmlConfigService, diskInterface);
             filesysConfig.init();
         
             // Load the Win32 NetBIOS library

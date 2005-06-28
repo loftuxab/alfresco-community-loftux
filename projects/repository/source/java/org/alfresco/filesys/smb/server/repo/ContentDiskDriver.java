@@ -32,7 +32,6 @@ import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.filesys.DiskDeviceContext;
 import org.alfresco.filesys.server.filesys.DiskInterface;
-import org.alfresco.filesys.server.filesys.FileAttribute;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileName;
 import org.alfresco.filesys.server.filesys.FileOpenParams;
@@ -50,7 +49,6 @@ import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -68,6 +66,7 @@ public class ContentDiskDriver implements DiskInterface
     
     private static final Log logger = LogFactory.getLog(ContentDiskDriver.class);
     
+    private CifsHelper cifsHelper;
     private ServiceRegistry serviceRegistry;
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
@@ -78,9 +77,10 @@ public class ContentDiskDriver implements DiskInterface
     /**
      * @param serviceRegistry to connect to the repository services
      */
-    public ContentDiskDriver(ServiceRegistry serviceRegistry)
+    public ContentDiskDriver(ServiceRegistry serviceRegistry, CifsHelper cifsHelper)
     {
         this.serviceRegistry = serviceRegistry;
+        this.cifsHelper = cifsHelper;
     }
     
     /**
@@ -199,89 +199,6 @@ public class ContentDiskDriver implements DiskInterface
     }
     
     /**
-     * Helper method to extract file info from a node
-     * 
-     * @param serviceRegistry used to access the repository
-     * @param nodeRef the file/folder node
-     * @param includeName if the name property is to be carried into the filesystem
-     * @return Returns the file information pertinent to the node
-     */
-    public static FileInfo getFileInformation(
-            ServiceRegistry serviceRegistry,
-            NodeRef nodeRef,
-            boolean includeName)
-    {
-        // get required serviceRegistry
-        NodeService nodeService = serviceRegistry.getNodeService();
-        DictionaryService dictionaryService = serviceRegistry.getDictionaryService();
-
-        // retrieve required properties and create file info
-        Map<QName, Serializable> nodeProperties = nodeService.getProperties(nodeRef);
-        FileInfo fileInfo = new FileInfo();
-        
-        // unset all attribute flags
-        int fileAttributes = 0;
-        fileInfo.setFileAttributes(fileAttributes);
-        
-        if (ContentDiskDriver.isDirectory(serviceRegistry, nodeRef))
-        {
-            // add directory attribute
-            fileAttributes |= FileAttribute.Directory;
-            fileInfo.setFileAttributes(fileAttributes);
-        }
-        else
-        {
-            // get the file size
-            Object propSize = nodeProperties.get(ContentModel.PROP_SIZE);
-            long size = 0L;
-            if (propSize != null)       // it can be null if no content has been uploaded yet
-            {
-                size = ValueConverter.longValue(propSize);
-            }
-            fileInfo.setSize(size);
-        }
-        // created
-        Object propCreated = nodeProperties.get(ContentModel.PROP_CREATED);
-        if (propCreated != null)
-        {
-            long created = ValueConverter.longValue(propCreated);
-            fileInfo.setCreationDateTime(created);
-        }
-        // modified
-        Object propModified = nodeProperties.get(ContentModel.PROP_MODIFIED);
-        if (propModified != null)
-        {
-            long modified = ValueConverter.longValue(propModified);
-            fileInfo.setModifyDateTime(modified);
-        }
-        // name (only relevant if the path had something on it)
-        if (includeName)
-        {
-            Object propName = nodeProperties.get(ContentModel.PROP_NAME);
-            if (propName != null)
-            {
-                String name = ValueConverter.convert(String.class, propName);
-                fileInfo.setFileName(name);
-            }
-        }
-        else
-        {
-            fileInfo.setFileName("");
-        }
-        
-        // read/write access
-        // TODO: "Set read/write access flags"); //TODO
-        
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Fetched file info: \n" +
-                    "   info: " + fileInfo);
-        }
-        return fileInfo;
-    }
-    
-    /**
      * Helper method to get the device root
      * 
      * @param tree
@@ -313,16 +230,17 @@ public class ContentDiskDriver implements DiskInterface
         // get the device root
         NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
         
-        // attempt to get the file/folder node
-        NodeRef nodeRef = CifsHelper.getNodeRef(
-                serviceRegistry,
-                deviceRootNodeRef,
-                path);
-        
         try
         {
             boolean includeName = (path.length() > 0);
-            return ContentDiskDriver.getFileInformation(serviceRegistry, nodeRef, includeName);
+            FileInfo fileInfo = cifsHelper.getFileInformation(deviceRootNodeRef, path, includeName);
+            // done
+            return fileInfo;
+        }
+        catch (FileNotFoundException e)
+        {
+            // a valid use case
+            throw e;
         }
         catch (Throwable e)
         {
@@ -338,7 +256,7 @@ public class ContentDiskDriver implements DiskInterface
         // get the device root
         NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
         
-        SearchContext ctx = ContentSearchContext.search(serviceRegistry, deviceRootNodeRef, searchPath, attrib);
+        SearchContext ctx = ContentSearchContext.search(serviceRegistry, cifsHelper, deviceRootNodeRef, searchPath, attrib);
         return ctx;
     }
 
@@ -386,59 +304,17 @@ public class ContentDiskDriver implements DiskInterface
         return status;
     }
     
-    /**
-     * @param serviceRegistry for repo connection
-     * @param nodeRef
-     * @return Returns true if the node is a subtype of {@link ContentModel#TYPE_FOLDER folder}
-     * @throws AlfrescoRuntimeException if the type is neither related to a folder or content
-     */
-    public static boolean isDirectory(ServiceRegistry serviceRegistry, NodeRef nodeRef)
-    {
-        DictionaryService dictionaryService = serviceRegistry.getDictionaryService();
-        NodeService nodeService = serviceRegistry.getNodeService();
-        
-        QName nodeTypeQName = nodeService.getType(nodeRef);
-        if (dictionaryService.isSubClass(nodeTypeQName, ContentModel.TYPE_FOLDER))
-        {
-            return true;
-        }
-        else if (dictionaryService.isSubClass(nodeTypeQName, ContentModel.TYPE_CONTENT))
-        {
-            return false;
-        }
-        else
-        {
-            // it is not a directory, but what is it?
-            return false;   
-        }
-    }
-
     public NetworkFile openFile(SrvSession sess, TreeConnection tree, FileOpenParams params) throws IOException
     {
         // get the device root
         NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
         
         String path = params.getPath(); 
-//        boolean isFile = !params.isDirectory();
 
         // get the file info
-        NodeRef nodeRef = CifsHelper.getNodeRef(
-                serviceRegistry,
-                deviceRootNodeRef,
-                path);
+        NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, path);
         
-//        // check that we have the correct type
-//        if (isFile == ContentDiskDriver.isDirectory(serviceRegistry, nodeRef))
-//        {
-//            // we have a directory when the open is for a file
-//            throw new FileNotFoundException("Found file or folder, but not of correct type: \n" +
-//                    "   device root: " + deviceRootNodeRef + "\n" +
-//                    "   opening file: " + isFile + "\n" +
-//                    "   found file: " + !isFile + "\n" +
-//                    "   node: " + nodeRef);
-//        }
-        
-        NetworkFile netFile = ContentNetworkFile.createFile(serviceRegistry, nodeRef, params);
+        NetworkFile netFile = ContentNetworkFile.createFile(serviceRegistry, cifsHelper, nodeRef, params);
         return netFile;
     }
     
@@ -454,10 +330,10 @@ public class ContentDiskDriver implements DiskInterface
         boolean isFile = !params.isDirectory();
         
         // create it - the path will be created, if necessary
-        NodeRef nodeRef = CifsHelper.createNode(serviceRegistry, deviceRootNodeRef, path, isFile);
+        NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
         
         // create the network file
-        NetworkFile netFile = ContentNetworkFile.createFile(serviceRegistry, nodeRef, params);
+        NetworkFile netFile = ContentNetworkFile.createFile(serviceRegistry, cifsHelper, nodeRef, params);
         // done
         return netFile;
     }
@@ -471,7 +347,7 @@ public class ContentDiskDriver implements DiskInterface
         boolean isFile = !params.isDirectory();
         
         // create it - the path will be created, if necessary
-        NodeRef nodeRef = CifsHelper.createNode(serviceRegistry, deviceRootNodeRef, path, isFile);
+        NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
     }
 
     public void deleteDirectory(SrvSession sess, TreeConnection tree, String dir) throws IOException
@@ -482,7 +358,7 @@ public class ContentDiskDriver implements DiskInterface
         try
         {
             // get the node
-            NodeRef nodeRef = CifsHelper.getNodeRef(serviceRegistry, deviceRootNodeRef, dir);
+            NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, dir);
             if (nodeService.exists(nodeRef))
             {
                 nodeService.deleteNode(nodeRef);
@@ -524,7 +400,7 @@ public class ContentDiskDriver implements DiskInterface
         try
         {
             // get the node
-            NodeRef nodeRef = CifsHelper.getNodeRef(serviceRegistry, deviceRootNodeRef, name);
+            NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, name);
             if (nodeService.exists(nodeRef))
             {
                 nodeService.deleteNode(nodeRef);
@@ -545,13 +421,13 @@ public class ContentDiskDriver implements DiskInterface
         NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
         
         // get the file/folder to move
-        NodeRef nodeToMoveRef = CifsHelper.getNodeRef(serviceRegistry, deviceRootNodeRef, oldName);
+        NodeRef nodeToMoveRef = cifsHelper.getNodeRef(deviceRootNodeRef, oldName);
         ChildAssociationRef nodeToMoveAssoc = nodeService.getPrimaryParent(nodeToMoveRef);
         
         // get the new target folder - it must be a folder
         String[] splitPaths = FileName.splitPath(newName);
-        NodeRef targetFolderRef = CifsHelper.getNodeRef(serviceRegistry, deviceRootNodeRef, splitPaths[0]);
-        if (!ContentDiskDriver.isDirectory(serviceRegistry, targetFolderRef))
+        NodeRef targetFolderRef = cifsHelper.getNodeRef(deviceRootNodeRef, splitPaths[0]);
+        if (!cifsHelper.isDirectory(targetFolderRef))
         {
             throw new AlfrescoRuntimeException("Cannot move not into anything but a folder: \n" +
                     "   device root: " + deviceRootNodeRef + "\n" +
@@ -569,7 +445,7 @@ public class ContentDiskDriver implements DiskInterface
         // set the properties
         Map<QName, Serializable> properties = nodeService.getProperties(nodeToMoveRef);
         properties.put(ContentModel.PROP_NAME, splitPaths[1]);
-        if (!ContentDiskDriver.isDirectory(serviceRegistry, nodeToMoveRef))
+        if (!cifsHelper.isDirectory(nodeToMoveRef))
         {
             // reguess the mimetype in case the extension has changed
             properties.put(ContentModel.PROP_MIME_TYPE, mimetypeService.guessMimetype(splitPaths[1]));
