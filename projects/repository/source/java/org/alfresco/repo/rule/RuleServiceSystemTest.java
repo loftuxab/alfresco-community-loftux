@@ -205,18 +205,26 @@ public class RuleServiceSystemTest extends TestCase
         rule.addRuleAction(action, params);
         
         this.ruleService.addRule(this.nodeRef, rule);
-				
-		NodeRef newNodeRef = this.nodeService.createNode(
+
+        NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CONTAINER).getChildRef();        
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();            
         assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));   
 		
-        // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+        // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));        
     }   
 	
-	/**
+	private Map<QName, Serializable> getContentProperties()
+    {
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+        properties.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        return properties;
+    }
+
+    /**
      * Test:
      *          rule type:  inbound
      *          condition:  no-condition
@@ -250,7 +258,8 @@ public class RuleServiceSystemTest extends TestCase
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CONTAINER).getChildRef();        
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();        
         
 		assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW));   
 		assertEquals("approveStep", this.nodeService.getProperty(newNodeRef, ContentModel.PROP_APPROVE_STEP));
@@ -366,7 +375,8 @@ public class RuleServiceSystemTest extends TestCase
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "noAspect"),
-                ContentModel.TYPE_CONTAINER).getChildRef(); 
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef(); 
         
         // Check that the category value has been set
         NodeRef setValue = (NodeRef)this.nodeService.getProperty(newNodeRef2, CAT_PROP_QNAME);
@@ -408,7 +418,8 @@ public class RuleServiceSystemTest extends TestCase
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CONTAINER).getChildRef();        
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();        
         
         // An email should appear in the recipients email
         
@@ -440,15 +451,12 @@ public class RuleServiceSystemTest extends TestCase
         
         this.ruleService.addRule(this.nodeRef, rule);
 
-        Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
-        props.put(ContentModel.PROP_NAME, "bobbins");
-        
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
-                ContentModel.TYPE_CMOBJECT,
-                props).getChildRef(); 
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef(); 
         
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
         
@@ -586,7 +594,8 @@ public class RuleServiceSystemTest extends TestCase
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
-                ContentModel.TYPE_CONTAINER).getChildRef(); 
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef(); 
         
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
         
@@ -632,7 +641,8 @@ public class RuleServiceSystemTest extends TestCase
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"),
-                ContentModel.TYPE_CMOBJECT).getChildRef();
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();
         
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
         
@@ -686,7 +696,8 @@ public class RuleServiceSystemTest extends TestCase
                 this.rootNodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
-                ContentModel.TYPE_CMOBJECT).getChildRef();
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();
         NodeRef workingCopy = this.cociService.checkout(newNodeRef);
         
         // Move the working copy into the actionable folder
@@ -780,11 +791,12 @@ public class RuleServiceSystemTest extends TestCase
 		// Test condition failure
 		Map<QName, Serializable> props1 = new HashMap<QName, Serializable>();
 		props1.put(ContentModel.PROP_NAME, "bobbins.txt");
+        props1.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
 		NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CMOBJECT,
+                ContentModel.TYPE_CONTENT,
                 props1).getChildRef();   
         
         Map<QName, Serializable> map = this.nodeService.getProperties(newNodeRef);
@@ -795,11 +807,12 @@ public class RuleServiceSystemTest extends TestCase
 		// Test condition success
 		Map<QName, Serializable> props2 = new HashMap<QName, Serializable>();
 		props2.put(ContentModel.PROP_NAME, "bobbins.doc");
+        props2.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
 		NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CMOBJECT,
+                ContentModel.TYPE_CONTENT,
                 props2).getChildRef();        
         assertTrue(this.nodeService.hasAspect(
                 newNodeRef2, 
@@ -812,7 +825,8 @@ public class RuleServiceSystemTest extends TestCase
 	                this.nodeRef,
 	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
 	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-	                ContentModel.TYPE_CMOBJECT).getChildRef();        
+	                ContentModel.TYPE_CONTENT,
+                    getContentProperties()).getChildRef();        
 		}
 		catch (RuleServiceException exception)
 		{
@@ -827,20 +841,22 @@ public class RuleServiceSystemTest extends TestCase
         this.ruleService.addRule(this.nodeRef, rule);
         Map<QName, Serializable> propsx = new HashMap<QName, Serializable>();
         propsx.put(ContentModel.PROP_NAME, "mybobbins.doc");
+        propsx.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         NodeRef newNodeRefx = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CMOBJECT,
+                ContentModel.TYPE_CONTENT,
                 propsx).getChildRef();   
         assertFalse(this.nodeService.hasAspect(newNodeRefx, ContentModel.ASPECT_VERSIONABLE));  
         Map<QName, Serializable> propsy = new HashMap<QName, Serializable>();
         propsy.put(ContentModel.PROP_NAME, "bobbins.doc");
+        propsy.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         NodeRef newNodeRefy = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CMOBJECT,
+                ContentModel.TYPE_CONTENT,
                 propsy).getChildRef();        
         assertTrue(this.nodeService.hasAspect(
                 newNodeRefy, 
@@ -854,20 +870,22 @@ public class RuleServiceSystemTest extends TestCase
         this.ruleService.addRule(this.nodeRef, rule);
         Map<QName, Serializable> propsa = new HashMap<QName, Serializable>();
         propsa.put(ContentModel.PROP_NAME, "bobbins.document");
+        propsa.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         NodeRef newNodeRefa = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CMOBJECT,
+                ContentModel.TYPE_CONTENT,
                 propsa).getChildRef();   
         assertFalse(this.nodeService.hasAspect(newNodeRefa, ContentModel.ASPECT_VERSIONABLE));  
         Map<QName, Serializable> propsb = new HashMap<QName, Serializable>();
         propsb.put(ContentModel.PROP_NAME, "bobbins.doc");
+        propsb.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         NodeRef newNodeRefb = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                ContentModel.TYPE_CMOBJECT,
+                ContentModel.TYPE_CONTENT,
                 propsb).getChildRef();        
         assertTrue(this.nodeService.hasAspect(
                 newNodeRefb, 
