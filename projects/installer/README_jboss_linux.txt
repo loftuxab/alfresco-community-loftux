@@ -18,9 +18,9 @@ Alfresco JBoss Bundled Installation
 ===================================
 
 Requirements:
-- Java Development Kit Environment available from http://java.sun.com
+- Java Development Kit available from http://java.sun.com
 - MySQL Database available from http://www.mysql.com
-- alfrescoJB.zip available from http://www.alfresco.org
+- Alfresco available from http://www.alfresco.org
 
 Optional:
 - OpenOffice for document transformation available from http://www.openoffice.org
@@ -31,12 +31,14 @@ Simple Installation on Linux
 ============================
 
 
-Install JSEE SDK
-----------------
+Install JDK 5.0
+---------------
+
+- If you already have J2SE Development Kit 5.0 installed, skip to "Install MySQL"
 
 - Browse to http://java.sun.com/j2se/1.5.0/download.jsp
-- Select the "JDK 5.0 Update 4" option
-- Download the Windows Offline Installation" option (~55M)
+- Select the "JDK 5.0 Update x" option
+- Download your preferred "Linux Platform" option (~45M)
 - Install once downloaded
 
 
@@ -44,11 +46,11 @@ Install MySQL
 -------------
 
 - Browse to http://dev.mysql.com/downloads/mysql/4.1.html
-- Download the Windows "without installer" option (~37M)
-- Unzip the download in C:\
+- From "Linux downloads", choose your platform "Standard" option (~29M)
+- Tar uncompress the download in your home directory
 
-This will create a folder 'C:\mysql-4.xxxxx'.  Rename this folder to:
-C:\mysql
+This will create a folder '~/mysql-4.xxxxx'.  Rename this folder to:
+mysql
 
 If you already have a MySQL installation, you will either have to uninstall
 it first, or make any changes as implied by the Manual Installation notes below.
@@ -58,13 +60,13 @@ Install Alfresco JBoss Bundle
 -----------------------------
 
 - Browse to http://www.alfresco.org/downloads
-- Download the "Alfresco JBoss Bundle" option
-- Unzip alfrescoJB.zip in C:\
+- Download the "Alfresco Linux JBoss Bundle" option
+- Unzip alfresco-jb.tar.gz in your home directory
 
-This will create a folder 'C:\alfresco'
+This will create a folder '~/alfresco'
 
-Navigate to the 'C:\alfresco' folder and run 'db_setup.bat' if you did a new
-install of MySQL above.  This creates a MySQL database named 'alfresco' with a user 
+Navigate to the '~/alfresco' folder and run 'db_setup.sh' if you did a new
+install of MySQL above.  This creates a MySQL database named 'alfresco' with a user
 account and password of 'alfresco'.
 
 You have now installed all the components needed to run the Alfresco server.
@@ -76,13 +78,13 @@ Optional Install of OpenOffice
 If you would like to have a range of document transformations available from within
 Alfresco, you need to install OpenOffice 1.1.4.  This is entirely optional and can be
 done at any point after Alfresco has been installed.  OpenOffice should be installed
-in C:\Program Files\OpenOffice.org1.1.4
+in /opt/OpenOffice.org1.1.4
 
 - Browse to http://download.openoffice.org/1.1.4/index.html
 - Download the Windows version
 - Install OpenOffice with defaults (except file associations, unless you wish to)
 - Start one of the OpenOffice programs to go through initial registration, then close it
-- Rename the 'zstart_oo.bat' in 'C:\alfresco' to 'start_oo.bat'
+- Rename the 'zstart_oo.sh' in '~/alfresco' to 'start_oo.sh'
 - Stop and restart the Alfresco server if it is already running
 
 
@@ -90,7 +92,7 @@ in C:\Program Files\OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'alf_start_jb.bat'
+Navigate to the '~/alfresco' folder and run 'alf_start_jb.sh'
 - two minimized windows will be started for MySQL and OpenOffice
 - a console window will open for JBoss
 - when the console has the message 'Started in nnnnn ms', JBoss is running
@@ -115,7 +117,7 @@ http://www.alfresco.org/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'alf_stop_jb.bat'
+Navigate to the '~/alfresco' folder and run 'alf_stop_jb.sh'
 
 
 
@@ -127,14 +129,14 @@ For other operating systems or where MySQL or JBoss are already installed,
 you may need to adjust the instructions above as appropriate, such as changing
 the Tomcat port settings.
 
-The Alfresco server is packaged as a war file and can be found in:
-c:\alfresco\tomcat\webapps\web-client.war
+The Alfresco server is packaged as an ear file and can be found in:
+~/alfresco/jboss/server/default/deploy/web-client.ear
 
-The Alfresco 'db_setup.bat' performs the following MySQL commands:
+The Alfresco 'db_setup.sh' performs the following MySQL commands:
 
-c:\mysql\bin\mqslqadmin -u root -p create alfresco
-c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
+mqslqadmin -u root -p create alfresco
+mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
                    identified by 'alfresco' with grant option;"
 
-The Alfresco 'alf_start_jb.bat' starts the database and runs JBoss's 'run.bat'.
-The 'alf_stop_jb.bat' runs JBoss's 'shutdown.bat' and shutsdown the database.
+The Alfresco 'alf_start_jb.sh' starts the database and runs JBoss's 'run.sh'.
+The 'alf_stop_jb.sh' runs JBoss's 'shutdown.sh' and shutsdown the database.

@@ -18,9 +18,9 @@ Alfresco JBoss Bundled Installation
 ===================================
 
 Requirements:
-- Java Development Kit Environment available from http://java.sun.com
+- Java Development Kit available from http://java.sun.com
 - MySQL Database available from http://www.mysql.com
-- alfrescoJB.zip available from http://www.alfresco.org
+- Alfresco available from http://www.alfresco.org
 
 Optional:
 - OpenOffice for document transformation available from http://www.openoffice.org
@@ -31,11 +31,13 @@ Simple Installation on Windows XP
 =================================
 
 
-Install JSEE SDK
-----------------
+Install JDK 5.0
+---------------
+
+- If you already have J2SE Development Kit 5.0 installed, skip to "Install MySQL"
 
 - Browse to http://java.sun.com/j2se/1.5.0/download.jsp
-- Select the "JDK 5.0 Update 4" option
+- Select the "JDK 5.0 Update x" option
 - Download the Windows Offline Installation" option (~55M)
 - Install once downloaded
 
@@ -58,10 +60,9 @@ Install Alfresco JBoss Bundle
 -----------------------------
 
 - Browse to http://www.alfresco.org/downloads
-- Download the "Alfresco JBoss Bundle" option
-- Unzip alfrescoJB.zip in C:\
-
-This will create a folder 'C:\alfresco'
+- Download the "Alfresco Windows JBoss Bundle" option
+- Create a folder 'C:\alfresco'
+- Unzip alfresco-jb.zip in C:\alfresco
 
 Navigate to the 'C:\alfresco' folder and run 'db_setup.bat' if you did a new
 install of MySQL above.  This creates a MySQL database named 'alfresco' with a user 
@@ -127,8 +128,8 @@ For other operating systems or where MySQL or JBoss are already installed,
 you may need to adjust the instructions above as appropriate, such as changing
 the Tomcat port settings.
 
-The Alfresco server is packaged as a war file and can be found in:
-c:\alfresco\tomcat\webapps\web-client.war
+The Alfresco server is packaged as an ear file and can be found in:
+C:\alfresco\jboss\server\default\deploy\web-client.ear
 
 The Alfresco 'db_setup.bat' performs the following MySQL commands:
 

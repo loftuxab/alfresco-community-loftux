@@ -4,14 +4,14 @@
 # ---------------------------------------
 
 echo "Starting MySQL..."
-mysqld --console
+~/alfresco/mysql/bin/mysqld --console
 sleep 3
 
 echo "Deleting Alfresco database..."
-mysqladmin -u root drop alfresco
+~/alfresco/mysql/bin/mysqladmin -u root drop alfresco
 
 echo "Shutting down MySQL..."
-mysqladmin -u root shutdown
+~/alfresco/mysql/bin/mysqladmin -u root shutdown
 
 echo "Deleting indexes..."
 \rm -r alfresco/tomcat/alfresco/contentstore alfresco/tomcat/alfresco/lucene-indexes

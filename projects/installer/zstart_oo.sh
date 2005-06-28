@@ -4,5 +4,5 @@
 # ---------------------------------------------------------------------------
 
 echo "Starting OpenOffice service..."
-soffice "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless
+~/OpenOffice.org1.1.4/bin/soffice "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless
 

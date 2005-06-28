@@ -17,7 +17,7 @@ cd ~/alfresco
 # ---------------------------------------
 
 echo "Shutting down MySQL..."
-mysqladmin -u root shutdown
+~/alfresco/mysql/bin/mysqladmin -u root shutdown
 
 # ---------------------------------------
 # Stop OpenOffice for transformations

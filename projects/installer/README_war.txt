@@ -18,7 +18,7 @@ Alfresco WAR Installation
 =========================
 
 Requirements:
-- Java Development Kit Environment available from http://java.sun.com
+- Java Development Kit available from http://java.sun.com
 - MySQL Database available from http://www.mysql.com
 - alfrescoWAR.zip available from http://www.alfresco.org
 
@@ -31,12 +31,14 @@ Simple Installation
 ===================
 
 
-Install JSEE SDK
-----------------
+Install JDK 5.0
+---------------
+
+- If you already have J2SE Development Kit 5.0 installed, skip to "Install MySQL"
 
 - Browse to http://java.sun.com/j2se/1.5.0/download.jsp
-- Select the "JDK 5.0 Update 4" option
-- Download the Windows Offline Installation" option (~55M)
+- Select the "JDK 5.0 Update x" option
+- Download the appropriate platform option (~55M)
 - Install once downloaded
 
 

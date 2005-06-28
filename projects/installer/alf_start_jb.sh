@@ -8,7 +8,7 @@
 # ---------------------------------------
 
 echo "Starting MySQL..."
-mysqld --console
+~/alfresco/mysql/bin/mysqld --console
 
 # ---------------------------------------
 # Start JBoss
