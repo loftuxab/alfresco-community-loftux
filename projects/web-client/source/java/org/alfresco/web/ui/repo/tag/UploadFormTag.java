@@ -49,7 +49,7 @@ public class UploadFormTag extends TagSupport
          
          out.write("<form name='upload-form' method='post' enctype='multipart/form-data' action='");
          
-         if (Application.inPortalServer(pageContext.getServletContext()))
+         if (Application.inPortalServer())
          {
             RenderResponse renderResp  = (RenderResponse)pageContext.getRequest().
                                    getAttribute("javax.portlet.response");

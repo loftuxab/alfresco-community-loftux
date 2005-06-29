@@ -48,6 +48,7 @@ public class Application
    public static final String BEAN_CONFIG_SERVICE = "configService";
    public static final String BEAN_DATA_DICTIONARY = "dataDictionary";
    
+   private static boolean inPortalServer = true;
    private static String repoStoreName;
    private static String companyRootName;
    private static String companyRootId;
@@ -63,25 +64,23 @@ public class Application
    }
    
    /**
+    * Sets whether this application is running inside a portal server
+    * 
+    * @param inPortal true to indicate the application is running as a portlet 
+    */
+   public static void setInPortalServer(boolean inPortal)
+   {
+      inPortalServer = inPortal;
+   }
+   
+   /**
     * Determines whether the server is running in a portal
     * 
-    * @param servletContext The servlet context
     * @return true if we are running inside a portal server
     */
-   public static boolean inPortalServer(ServletContext servletContext)
+   public static boolean inPortalServer()
    {
-      boolean inPortal = true;
-      
-      ConfigService svc = (ConfigService)WebApplicationContextUtils.getRequiredWebApplicationContext(
-            servletContext).getBean("configService");
-      ServerConfigElement serverConfig = (ServerConfigElement)svc.getGlobalConfig().getConfigElement("server");
-      
-      if (serverConfig != null)
-      {
-         inPortal = serverConfig.isPortletMode();
-      }
-      
-      return inPortal;
+      return inPortalServer;
    }
    
    /**

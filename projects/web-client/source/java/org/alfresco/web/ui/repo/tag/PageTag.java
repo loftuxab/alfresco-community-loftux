@@ -60,7 +60,7 @@ public class PageTag extends TagSupport
       {
          Writer out = pageContext.getOut();
          
-         if (Application.inPortalServer(pageContext.getServletContext()) == false)
+         if (Application.inPortalServer() == false)
          {
             out.write("<html><head><title>");
             if (this.title == null)
@@ -93,7 +93,7 @@ public class PageTag extends TagSupport
 
    public int doEndTag() throws JspException
    {
-      if (Application.inPortalServer(pageContext.getServletContext()) == false)
+      if (Application.inPortalServer() == false)
       {
          try
          {

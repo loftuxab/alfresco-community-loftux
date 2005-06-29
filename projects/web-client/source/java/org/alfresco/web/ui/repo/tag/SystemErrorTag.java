@@ -186,7 +186,7 @@ public class SystemErrorTag extends TagSupport
          // output a link to return to the application
          out.write("\n<div style='padding-top:16px;'><a href='");
       
-         if (Application.inPortalServer(pageContext.getServletContext()))
+         if (Application.inPortalServer())
          {
             RenderResponse renderResp  = (RenderResponse)pageContext.getRequest().
                                    getAttribute("javax.portlet.response");

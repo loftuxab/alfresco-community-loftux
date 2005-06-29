@@ -127,13 +127,21 @@
    <!-- ************************** -->
    
    <target name="distribute" 
-           depends="clean-distribution, package-jboss-binary-distribution-windows,
-                    package-jboss-binary-distribution-linux, package-tomcat-binary-distribution-windows,
-                    package-tomcat-binary-distribution-linux, package-source-distribution" 
+           depends="clean-distribution, package-jboss-binary-distribution,
+                    package-tomcat-binary-distribution, package-source-distribution" 
            description="Creates the distribution files for all platforms for all appservers"/>
    
-   <target name="package-jboss-binary-distribution-windows" depends="build-jboss"
-           description="Creates the Windows binary distribution files for JBoss">
+   <target name="package-jboss-binary-distribution" 
+           depends="build-jboss, package-jboss-binary-distribution-windows, 
+                    package-jboss-binary-distribution-linux" 
+           description="Creates the distibution files for JBoss"/>
+           
+   <target name="package-tomcat-binary-distribution" 
+           depends="build-tomcat, package-tomcat-binary-distribution-windows, 
+                    package-tomcat-binary-distribution-linux" 
+           description="Creates the distibution files for Tomcat"/>
+           
+   <target name="package-jboss-binary-distribution-windows" depends="common-init">
       <mkdir dir="${dist.dir}" />
       <zip destfile="${dist.dir}/${jboss.dist.filename}.zip">
          <zipfileset dir="${installer.project.dir}" 
@@ -146,8 +154,7 @@
       </zip>
    </target>
    
-   <target name="package-jboss-binary-distribution-linux" depends="build-jboss"
-           description="Creates the Linux binary distribution files for JBoss">
+   <target name="package-jboss-binary-distribution-linux" depends="common-init">
       <mkdir dir="${dist.dir}" />
       <tar destfile="${dist.dir}/${jboss.dist.filename}.tar" longfile="gnu">
          <tarfileset dir="${installer.project.dir}" 
@@ -161,8 +168,7 @@
       <gzip zipfile="${dist.dir}/${jboss.dist.filename}.tar.gz" src="${dist.dir}/${jboss.dist.filename}.tar" />
    </target>
    
-   <target name="package-tomcat-binary-distribution-windows" depends="build-tomcat"
-           description="Creates the Windows binary distribution files for Tomcat">
+   <target name="package-tomcat-binary-distribution-windows" depends="common-init">
       <mkdir dir="${dist.dir}" />
       <zip destfile="${dist.dir}/${tomcat.dist.filename}.zip">
          <zipfileset dir="${installer.project.dir}" 
@@ -175,8 +181,7 @@
       </zip>
    </target>
    
-   <target name="package-tomcat-binary-distribution-linux" depends="build-tomcat"
-           description="Creates the Linux binary distribution files for Tomcat">
+   <target name="package-tomcat-binary-distribution-linux" depends="common-init">
       <mkdir dir="${dist.dir}" />
       <tar destfile="${dist.dir}/${tomcat.dist.filename}.tar" longfile="gnu">
          <tarfileset dir="${installer.project.dir}" 

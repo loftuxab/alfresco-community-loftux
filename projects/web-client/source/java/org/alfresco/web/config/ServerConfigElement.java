@@ -27,7 +27,6 @@ import org.alfresco.config.element.ConfigElementAdapter;
  */
 public class ServerConfigElement extends ConfigElementAdapter
 {
-   private String mode;
    private String errorPage;
    private String loginPage;
    
@@ -55,27 +54,9 @@ public class ServerConfigElement extends ConfigElementAdapter
       //       to return a new instance of the given config element
       
       ServerConfigElement combined = new ServerConfigElement();
-      combined.setMode(((ServerConfigElement)configElement).getMode());
       combined.setErrorPage(((ServerConfigElement)configElement).getErrorPage());
       combined.setLoginPage(((ServerConfigElement)configElement).getLoginPage());
       return combined;
-   }
-
-   /**
-    * @return The mode the server should run in, either <code>portlet</code>
-    *         or <code>servlet</code>
-    */
-   public String getMode()
-   {
-      return this.mode;
-   }
-   
-   /**
-    * @param mode Sets the mode
-    */
-   public void setMode(String mode)
-   {
-      this.mode = mode;
    }
    
    /**
@@ -108,20 +89,5 @@ public class ServerConfigElement extends ConfigElementAdapter
    public void setLoginPage(String loginPage)
    {
       this.loginPage = loginPage;
-   }
-   
-   /**
-    * @return Returns true if we are configured to run in a portal server
-    */
-   public boolean isPortletMode()
-   {
-      boolean inPortlet = true;
-      
-      if (this.mode != null && this.mode.equalsIgnoreCase("servlet"))
-      {
-         inPortlet = false;
-      }
-      
-      return inPortlet;
    }
 }

@@ -30,7 +30,6 @@ import org.dom4j.Element;
 public class ServerElementReader implements ConfigElementReader
 {
    public static final String ELEMENT_SERVER = "server";
-   public static final String ELEMENT_MODE = "mode";
    public static final String ELEMENT_ERROR_PAGE = "error-page";
    public static final String ELEMENT_LOGIN_PAGE = "login-page";
    
@@ -52,13 +51,6 @@ public class ServerElementReader implements ConfigElementReader
          }
          
          configElement = new ServerConfigElement();
-         
-         // get the server mode
-         Element mode = element.element(ELEMENT_MODE);
-         if (mode != null)
-         {
-            configElement.setMode(mode.getTextTrim());
-         }
          
          // get the error page
          Element errorPage = element.element(ELEMENT_ERROR_PAGE);

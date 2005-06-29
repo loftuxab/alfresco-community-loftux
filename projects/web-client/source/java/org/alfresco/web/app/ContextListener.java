@@ -222,12 +222,9 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         System.out.println(e.toString());
+         logger.error("Failed to initialise ", e);
          throw new AlfrescoRuntimeException("Failed to initialise ", e);
       }
-      
-      if (logger.isDebugEnabled())
-         logger.debug("Server is running in portal server: " + Application.inPortalServer(servletContext));
    }
 
    /**
