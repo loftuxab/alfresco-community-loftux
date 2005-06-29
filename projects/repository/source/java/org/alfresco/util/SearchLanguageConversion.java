@@ -9,20 +9,20 @@ import org.alfresco.repo.search.impl.lucene.QueryParser;
  */
 public class SearchLanguageConversion
 {
-    public static LanguageDefinition DEF_XPATH = new SimpleLanguageDef('\\', "%", "_", "\\%_/.{}");
+    public static LanguageDefinition DEF_XPATH_LIKE = new SimpleLanguageDef('\\', "%", "_", "\\%_");
     public static LanguageDefinition DEF_REGEX = new SimpleLanguageDef('\\', ".*", ".", "\\*.+?^$(){}|");
     public static LanguageDefinition DEF_LUCENE = new LuceneLanguageDef();
 
     
     /**
-     * Escape a string according to the <b>XPath</b> query language syntax.
+     * Escape a string according to the <b>XPath</b> like function syntax.
      * 
      * @param str the string to escape
      * @return Returns the escaped string
      */
-    public static String escapeForXPath(String str)
+    public static String escapeForXPathLike(String str)
     {
-        return escape(DEF_XPATH, str);
+        return escape(DEF_XPATH_LIKE, str);
     }
     
     /**
@@ -66,7 +66,7 @@ public class SearchLanguageConversion
      */
     public static String convertXPathLikeToRegex(String xpathLikeClause)
     {
-        return convert(DEF_XPATH, DEF_REGEX, xpathLikeClause);
+        return convert(DEF_XPATH_LIKE, DEF_REGEX, xpathLikeClause);
     }
     
     /**
@@ -78,7 +78,7 @@ public class SearchLanguageConversion
      */
     public static String convertXPathLikeToLucene(String xpathLikeClause)
     {
-        return convert(DEF_XPATH, DEF_LUCENE, xpathLikeClause);
+        return convert(DEF_XPATH_LIKE, DEF_LUCENE, xpathLikeClause);
     }
     
     private static String convert(LanguageDefinition from, LanguageDefinition to, String query)

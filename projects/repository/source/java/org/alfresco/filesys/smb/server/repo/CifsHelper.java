@@ -47,6 +47,7 @@ import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.SearchLanguageConversion;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -391,8 +392,10 @@ public class CifsHelper
         // append to the xpath
         if (wildcardSearch)
         {
+            // escape the path element
+            pathElement = SearchLanguageConversion.escapeForXPathLike(pathElement);
             // fix up wildcard matches for like function
-            pathElement = pathElement.replace('*', '%');  // TODO: Proper escaping
+            pathElement = pathElement.replace('*', '%');
             // use the like function (do not match FTS)
             sb.append("./*[like(@alf:name, $").append(nameParam).append(", false)");
         }

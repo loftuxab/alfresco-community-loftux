@@ -20,16 +20,16 @@ public class SearchLanguageConversionTest extends TestCase
             ", . < > + ? " +
             "/ \\\\ \\* \\? \\_";
     
-    public void testEscapeXPath()
+    public void testEscapeXPathLike()
     {
-        String good = SearchLanguageConversion.escapeForXPath(BAD_STRING);
+        String good = SearchLanguageConversion.escapeForXPathLike(BAD_STRING);
         assertEquals("Escaping for xpath failed",
                 "\\\\ | ! \" £ " +
                 "$ \\% ^ & * ( " +
-                ") \\_ \\{ \\} [ ] " +
+                ") \\_ { } [ ] " +
                 "@ # ~ ' : ; " +
-                ", \\. < > + ? " +
-                "\\/ \\\\\\\\ \\\\* \\\\? \\\\\\_",
+                ", . < > + ? " +
+                "/ \\\\\\\\ \\\\* \\\\? \\\\\\_",
                 good);
     }
     
