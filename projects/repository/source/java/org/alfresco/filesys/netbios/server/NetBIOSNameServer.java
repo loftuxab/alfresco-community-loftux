@@ -666,7 +666,8 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                     // Debug
 
-                    logger.error("NetBIOS Name refresh thread exception", ex);
+                    if ( m_hshutdown == false)
+                        logger.error("NetBIOS Name refresh thread exception", ex);
                 }
             }
         }
@@ -1633,7 +1634,8 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                     // Debug
 
-                    logger.error("NetBIOSNameServer error", ex);
+                    if ( m_shutdown == false)
+                        logger.error("NetBIOSNameServer error", ex);
 
                     // Store the error and inform listeners of the server error. If the server is
                     // shutting down we expect a

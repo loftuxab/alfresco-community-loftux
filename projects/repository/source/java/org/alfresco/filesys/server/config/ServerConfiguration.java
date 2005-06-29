@@ -21,9 +21,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Provider;
 import java.security.Security;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
@@ -72,37 +70,30 @@ public class ServerConfiguration
     private static final String ConfigFilesystems = "Filesystems";
     private static final String ConfigSecurity = "Filesystem Security";
 
-    //  SMB/CIFS session debug type strings
+    // SMB/CIFS session debug type strings
     //
-    //  Must match the bit mask order.
-    private static final String m_sessDbgStr[] = { "NETBIOS",
-                                                   "STATE",
-                                                   "NEGOTIATE",
-                                                   "TREE",
-                                                   "SEARCH",
-                                                   "INFO",
-                                                   "FILE",
-                                                   "FILEIO",
-                                                   "TRANSACT",
-                                                   "ECHO",
-                                                   "ERROR",
-                                                   "IPC",
-                                                   "LOCK",
-                                                   "PKTTYPE",
-                                                   "DCERPC",
-                                                   "STATECACHE",
-                                                   "NOTIFY",
-                                                   "STREAMS",
-                                                   "SOCKET"
+    // Must match the bit mask order.
+    private static final String m_sessDbgStr[] = { "NETBIOS", "STATE", "NEGOTIATE", "TREE", "SEARCH", "INFO", "FILE",
+            "FILEIO", "TRANSACT", "ECHO", "ERROR", "IPC", "LOCK", "PKTTYPE", "DCERPC", "STATECACHE", "NOTIFY",
+            "STREAMS", "SOCKET" };
+
+    // Platform types
+
+    private enum PlatformType
+    {
+        Unknown, WINDOWS, LINUX
     };
-    
+
     /** connection to database */
     private ServiceRegistry serviceRegistry;
     /** Configuration service used to read the configuration from */
     private ConfigService m_configService;
     /** the device to connect use */
     private DiskInterface diskInterface;
-    
+
+    // Runtime platform type
+    private PlatformType m_platform = PlatformType.Unknown;
+
     // Main server enable flags, to enable SMB, FTP and/or NFS server components
     private boolean m_smbEnable = true;
 
@@ -255,10 +246,10 @@ public class ServerConfiguration
         }
 
         // Set the default access control manager
-        
+
         m_aclManager = new DefaultAccessControlManager();
-        m_aclManager.initialize( this, null);
-        
+        m_aclManager.initialize(this, null);
+
         // Use the default timezone
 
         try
@@ -285,6 +276,10 @@ public class ServerConfiguration
 
         ConfigLookupContext configCtx = new ConfigLookupContext(ConfigArea);
 
+        // Set the platform type
+
+        determinePlatformType();
+
         // Process the security configuration, must be done first to set the
         // global ACL list
 
@@ -301,6 +296,31 @@ public class ServerConfiguration
         config = m_configService.getConfig(ConfigFilesystems, configCtx);
         processFilesystemsConfig(config);
 
+    }
+
+    /**
+     * Determine the platform type
+     */
+    private final void determinePlatformType()
+    {
+        // Get the operating system type
+
+        String osName = System.getProperty("os.name");
+
+        if (osName.startsWith("Windows"))
+            m_platform = PlatformType.WINDOWS;
+        else if (osName.equalsIgnoreCase("Linux"))
+            m_platform = PlatformType.LINUX;
+    }
+
+    /**
+     * Return the platform type
+     * 
+     * @return PlatformType
+     */
+    private final PlatformType getPlatformType()
+    {
+        return m_platform;
     }
 
     /**
@@ -414,15 +434,35 @@ public class ServerConfiguration
         elem = config.getConfigElement("netBIOSSMB");
         if (elem != null)
         {
+            // Check if NetBIOS over TCP/IP is enabled for the current platform
 
-            // Check if the broadvast mask has been specified
+            String platformsStr = elem.getAttribute("platforms");
+            boolean platformOK = false;
+
+            if (platformsStr != null)
+            {
+                // Parse the list of platforms that NetBIOS over TCP/IP is to be enabled for and
+                // check if the current platform is included
+
+                EnumSet<PlatformType> enabledPlatforms = parsePlatformString(platformsStr);
+                if (enabledPlatforms.contains(getPlatformType()))
+                    platformOK = true;
+            }
+            else
+            {
+                // No restriction on platforms
+
+                platformOK = true;
+            }
+
+            // Check if the broadcast mask has been specified
 
             if (getBroadcastMask() == null)
                 throw new AlfrescoRuntimeException("Network broadcast mask not specified");
 
-            // Enable the NetBIOS SMB support
+            // Enable the NetBIOS SMB support, if enabled for this platform
 
-            setNetBIOSSMB(true);
+            setNetBIOSSMB(platformOK);
 
             // Check for a bind address
 
@@ -470,9 +510,30 @@ public class ServerConfiguration
         if (elem != null)
         {
 
-            // Enable the TCP/IP SMB support
+            // Check if native SMB is enabled for the current platform
 
-            setTcpipSMB(true);
+            String platformsStr = elem.getAttribute("platforms");
+            boolean platformOK = false;
+
+            if (platformsStr != null)
+            {
+                // Parse the list of platforms that native SMB is to be enabled for and
+                // check if the current platform is included
+
+                EnumSet<PlatformType> enabledPlatforms = parsePlatformString(platformsStr);
+                if (enabledPlatforms.contains(getPlatformType()))
+                    platformOK = true;
+            }
+            else
+            {
+                // No restriction on platforms
+
+                platformOK = true;
+            }
+
+            // Enable the TCP/IP SMB support, if enabled for this platform
+
+            setTcpipSMB(platformOK);
         }
         else
         {
@@ -653,47 +714,50 @@ public class ServerConfiguration
                 setSecondaryWINSServer(secondaryWINS);
         }
 
-        //  Check if session debug is enabled
-        
-        elem = config.getConfigElement( "sessionDebug");
-        if (elem != null) {
-            
-            //  Check for session debug flags
-            
+        // Check if session debug is enabled
+
+        elem = config.getConfigElement("sessionDebug");
+        if (elem != null)
+        {
+
+            // Check for session debug flags
+
             String flags = elem.getAttribute("flags");
             int sessDbg = 0;
-            
-            if ( flags != null) {
-                
-                //  Parse the flags
-                
+
+            if (flags != null)
+            {
+
+                // Parse the flags
+
                 flags = flags.toUpperCase();
-                StringTokenizer token = new StringTokenizer(flags,",");
-                
-                while ( token.hasMoreTokens()) {
-                    
-                    //  Get the current debug flag token
-                    
+                StringTokenizer token = new StringTokenizer(flags, ",");
+
+                while (token.hasMoreTokens())
+                {
+
+                    // Get the current debug flag token
+
                     String dbg = token.nextToken().trim();
-                    
-                    //  Find the debug flag name
-                    
+
+                    // Find the debug flag name
+
                     int idx = 0;
-                    
-                    while ( idx < m_sessDbgStr.length && m_sessDbgStr[idx].equalsIgnoreCase(dbg) == false)
+
+                    while (idx < m_sessDbgStr.length && m_sessDbgStr[idx].equalsIgnoreCase(dbg) == false)
                         idx++;
-                        
-                    if ( idx > m_sessDbgStr.length)
-                        throw new AlfrescoRuntimeException( "Invalid session debug flag, " + dbg);
-                        
-                    //  Set the debug flag
-                    
+
+                    if (idx > m_sessDbgStr.length)
+                        throw new AlfrescoRuntimeException("Invalid session debug flag, " + dbg);
+
+                    // Set the debug flag
+
                     sessDbg += 1 << idx;
                 }
             }
 
-            //  Set the session debug flags
-            
+            // Set the session debug flags
+
             setSessionDebugFlags(sessDbg);
         }
     }
@@ -703,7 +767,7 @@ public class ServerConfiguration
      * 
      * @param config Config
      */
-private final void processFilesystemsConfig(Config config)
+    private final void processFilesystemsConfig(Config config)
     {
 
         // Get the filesystem configuration elements
@@ -751,29 +815,29 @@ private final void processFilesystemsConfig(Config config)
                     }
 
                     // Check if change notifications are disabled
-                    
+
                     boolean changeNotify = elem.getChild("disableChangeNotification") == null ? true : false;
-                    
+
                     // Create the shared filesystem
-                    
+
                     DiskSharedDevice filesys = new DiskSharedDevice(filesysName, filesysDriver, filesysContext);
-                    
+
                     // Add any access controls to the share
-                  
+
                     filesys.setAccessControlList(acls);
 
                     // Enable/disable change notification for this device
-                    
+
                     filesysContext.enableChangeHandler(changeNotify);
-                    
+
                     // Start the filesystem
-                        
+
                     filesysContext.startFilesystem(filesys);
 
                     // Create the shared device and add to the list of available
                     // shared filesystems
 
-                    addShare( filesys);
+                    addShare(filesys);
                 }
                 catch (DeviceContextException ex)
                 {
@@ -1017,6 +1081,49 @@ private final void processFilesystemsConfig(Config config)
         if (accList == null)
             setUserAccounts(new UserAccountList());
         getUserAccounts().addUser(userAcc);
+    }
+
+    /**
+     * Parse the platforms attribute returning the set of platform ids
+     * 
+     * @param platformStr String
+     * @return EnumSet<PlatformType>
+     */
+    private final EnumSet<PlatformType> parsePlatformString(String platformStr)
+    {
+        // Split the platform string and build up a set of platform types
+
+        EnumSet<PlatformType> platformTypes = EnumSet.noneOf(PlatformType.class);
+        if (platformStr == null || platformStr.length() == 0)
+            return platformTypes;
+
+        StringTokenizer token = new StringTokenizer(platformStr.toUpperCase(), ",");
+        String typ = null;
+
+        try
+        {
+            while (token.hasMoreTokens())
+            {
+
+                // Get the current platform type string and validate
+
+                typ = token.nextToken().trim();
+                PlatformType platform = PlatformType.valueOf(typ);
+
+                if (platform != PlatformType.Unknown)
+                    platformTypes.add(platform);
+                else
+                    throw new AlfrescoRuntimeException("Invalid platform type, " + typ);
+            }
+        }
+        catch (IllegalArgumentException ex)
+        {
+            throw new AlfrescoRuntimeException("Invalid platform type, " + typ);
+        }
+
+        // Return the platform types
+
+        return platformTypes;
     }
 
     /**

@@ -1566,7 +1566,7 @@ public class SMBSrvSession extends SrvSession implements Runnable
 
             // DEBUG
 
-            logger.error("Socket closed by remote client", ex);
+            logger.error("Socket closed by remote client");
         }
         catch (Exception ex)
         {
