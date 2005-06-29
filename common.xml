@@ -140,8 +140,8 @@
       <war warfile="${dist.dir}\${war.name}" webxml="${src.web.dir}\WEB-INF\web.xml">
          <fileset dir="${src.web.dir}" excludes="WEB-INF\web.xml" />
          <zipfileset dir="${common.lib.dir}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}" 
-                     prefix="web-inf/lib" />
-         <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="web-inf/lib" />
+                     prefix="WEB-INF/lib" />
+         <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="WEB-INF/lib" />
       </war>
    </target>
 

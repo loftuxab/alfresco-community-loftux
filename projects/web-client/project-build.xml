@@ -19,17 +19,16 @@
          <echo>Building WAR file for @{for}</echo>
          <mkdir dir="${dist.dir}" />
          <war warfile="${dist.dir}\${war.name}" webxml="${src.web.dir}\WEB-INF\web.xml">
-            <fileset dir="${src.web.dir}" excludes="WEB-INF\web.xml,WEB-INF\classes\*" />
-            <zipfileset dir="${src.webinf.dir}\classes" prefix="web-inf/classes" />
-            <zipfileset dir="${common.lib.dir}" prefix="web-inf/lib"
+            <fileset dir="${src.web.dir}" excludes="WEB-INF\web.xml" />
+            <zipfileset dir="${common.lib.dir}" prefix="WEB-INF/lib"
                         includes="${webinf.lib.includes}" 
                         excludes="${@{for}.webinf.lib.excludes}" />
-            <zipfileset dir="${common.lib.dir}/jibx" includes="*.jar" prefix="web-inf/lib" />
-            <zipfileset dir="${common.lib.dir}/openoffice" includes="*.jar" prefix="web-inf/lib" />
-            <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="web-inf/lib" />
-            <zipfileset dir="${common.dir}/projects/core/build/dist" prefix="web-inf/lib"
+            <zipfileset dir="${common.lib.dir}/jibx" includes="*.jar" prefix="WEB-INF/lib" />
+            <zipfileset dir="${common.lib.dir}/openoffice" includes="*.jar" prefix="WEB-INF/lib" />
+            <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="WEB-INF/lib" />
+            <zipfileset dir="${common.dir}/projects/core/build/dist" prefix="WEB-INF/lib"
                         includes="core.jar" />
-            <zipfileset dir="${common.dir}/projects/repository/build/dist" prefix="web-inf/lib"
+            <zipfileset dir="${common.dir}/projects/repository/build/dist" prefix="WEB-INF/lib"
                         includes="repository.jar" />
          </war>
       </sequential>
