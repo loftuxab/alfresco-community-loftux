@@ -62,6 +62,7 @@ import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.SearchLanguageConversion;
 import org.jaxen.JaxenException;
 
 /**
@@ -77,8 +78,6 @@ import org.jaxen.JaxenException;
  */
 public abstract class AbstractNodeServiceImpl implements NodeService
 {
-    private static final String REG_EXP_ESCAPE = "+?.*^$(){}|\\"; 
-    
     /** controls policy delegates */
     private PolicyComponent policyComponent;
 
@@ -91,43 +90,26 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     /** the component with which to search the node hierarchy (optional) */
     private SearchService searcher;
 
-    /**
+    /*
      * Policy delegates
      */
     private ClassPolicyDelegate<BeforeCreateStorePolicy> beforeCreateStoreDelegate;
-
     private ClassPolicyDelegate<OnCreateStorePolicy> onCreateStoreDelegate;
-
     private ClassPolicyDelegate<BeforeCreateNodePolicy> beforeCreateNodeDelegate;
-
     private ClassPolicyDelegate<OnCreateNodePolicy> onCreateNodeDelegate;
-
     private ClassPolicyDelegate<BeforeUpdateNodePolicy> beforeUpdateNodeDelegate;
-
     private ClassPolicyDelegate<OnUpdateNodePolicy> onUpdateNodeDelegate;
-
     private ClassPolicyDelegate<BeforeDeleteNodePolicy> beforeDeleteNodeDelegate;
-
     private ClassPolicyDelegate<OnDeleteNodePolicy> onDeleteNodeDelegate;
-
     private ClassPolicyDelegate<BeforeAddAspectPolicy> beforeAddAspectDelegate;
-
     private ClassPolicyDelegate<OnAddAspectPolicy> onAddAspectDelegate;
-
     private ClassPolicyDelegate<BeforeRemoveAspectPolicy> beforeRemoveAspectDelegate;
-
     private ClassPolicyDelegate<OnRemoveAspectPolicy> onRemoveAspectDelegate;
-
     private AssociationPolicyDelegate<BeforeCreateChildAssociationPolicy> beforeCreateChildAssociationDelegate;
-
     private AssociationPolicyDelegate<OnCreateChildAssociationPolicy> onCreateChildAssociationDelegate;
-
     private AssociationPolicyDelegate<BeforeDeleteChildAssociationPolicy> beforeDeleteChildAssociationDelegate;
-
     private AssociationPolicyDelegate<OnDeleteChildAssociationPolicy> onDeleteChildAssociationDelegate;
-
     private AssociationPolicyDelegate<BeforeCreateAssociationPolicy> beforeCreateAssociationDelegate;
-
     private AssociationPolicyDelegate<BeforeDeleteAssociationPolicy> beforeDeleteAssociationDelegate;
 
     /**
@@ -584,132 +566,69 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      */
     public boolean like(NodeRef nodeRef, QName propertyQName, String sqlLikePattern, boolean includeFTS)
     {
-        ResultSet resultSet = null;
-        try
+        if (propertyQName == null)
         {
-            if (includeFTS && (searcher == null || indexer == null))
-            {
-                // We only need lucene for FTS
-                // without both, no Lucene search is possible
-                return false;
-            }
+            throw new IllegalArgumentException("Property QName is mandatory for the like expression");
+        }
+        
+        // don't do anything if the searching is disabled
+        if (includeFTS && (searcher == null || indexer == null))
+        {
+            // We only need lucene for FTS
+            // without both, no Lucene search is possible
+            return false;
+        }
 
-            // Nothing to do
-            if (!includeFTS && (propertyQName == null))
-            {
-                return false;
-            }
+        StringBuilder sb = new StringBuilder(sqlLikePattern.length() * 3);
+        
+        if (includeFTS)
+        {
+            // convert the SQL-like pattern into a Lucene-compatible string
+            String pattern = SearchLanguageConversion.convertXPathLikeToLucene(sqlLikePattern);
 
+            // build Lucene search string specific to the node
+            sb = new StringBuilder();
+            sb.append("+ID:").append(nodeRef.getId()).append(" +(");
+            // FTS or attribute matches
             if (includeFTS)
             {
-                // Need to turn the SQL like pattern into lucene line
-                // Need to replace unescaped % with *
-                // (? and ? will match and \
-                // is
-                // used
-                // for escape so the rest is OK)
+                sb.append("TEXT:(").append(pattern).append(") ");
+            }
+            if (propertyQName != null)
+            {
+                sb.append(" @").append(LuceneQueryParser.escape(propertyQName.toString())).append(":(").append(pattern).append(")");
+            }
+            sb.append(")");
 
-                // replace the SQL-like search string with appropriate Lucene
-                // syntax
-                StringBuilder sb = new StringBuilder();
-                char previous = ' ';
-                char current = ' ';
-                for (int i = 0; i < sqlLikePattern.length(); i++)
-                {
-                    previous = current;
-                    current = sqlLikePattern.charAt(i);
-                    if ((current == '%') && (previous != '\\'))
-                    {
-                        sb.append("*");
-                    }
-                    else if ((current == '_') && (previous != '\\'))
-                    {
-                        sb.append("?");
-                    }
-                    else if (current == '*')
-                    {
-                        sb.append("\\*");
-                    }
-                    else if (current == '?')
-                    {
-                        sb.append("\\?");
-                    }
-                    else
-                    {
-                        sb.append(current);
-                    }
-                }
-                String pattern = sb.toString();
-
-                // build Lucene search string specific to the node
-                sb = new StringBuilder();
-                sb.append("+ID:").append(nodeRef.getId()).append(" +(");
-                // FTS or attribute matches
-                if (includeFTS)
-                {
-                    sb.append("TEXT:(").append(pattern).append(") ");
-                }
-                if (propertyQName != null)
-                {
-                    sb.append(" @").append(LuceneQueryParser.escape(propertyQName.toString())).append(":(").append(pattern).append(")");
-                }
-                sb.append(")");
-
+            ResultSet resultSet = null;
+            try
+            {
                 resultSet = searcher.query(nodeRef.getStoreRef(), "lucene", sb.toString());
                 boolean answer = resultSet.length() > 0;
                 return answer;
             }
-            else
+            finally
             {
-                if(propertyQName == null)
+                if (resultSet != null)
                 {
-                    return false;
-                }
-                // replace the SQL-like search string with appropriate Regexp
-                // syntax
-                StringBuilder sb = new StringBuilder();
-                char previous = ' ';
-                char current = ' ';
-                for (int i = 0; i < sqlLikePattern.length(); i++)
-                {
-                    previous = current;
-                    current = sqlLikePattern.charAt(i);
-                    if ((current == '%') && (previous != '\\'))
-                    {
-                        sb.append(".*");
-                    }
-                    else if ((current == '_') && (previous != '\\'))
-                    {
-                        sb.append(".");
-                    }
-                    else if (REG_EXP_ESCAPE.indexOf(current) != -1)
-                    {
-                        sb.append("\\").append(current);
-                    }
-                    else
-                    {
-                        sb.append(current);
-                    }
-                }
-                String pattern = sb.toString();
-                Serializable property = getProperty(nodeRef, propertyQName);
-                if(property == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    String propertyString = ValueConverter.convert(String.class, getProperty(nodeRef, propertyQName));
-                    return propertyString.matches(pattern);
+                    resultSet.close();
                 }
             }
-
         }
-        finally
+        else
         {
-            if (resultSet != null)
+            // convert the SQL-like pattern into a Lucene-compatible string
+            String pattern = SearchLanguageConversion.convertXPathLikeToRegex(sqlLikePattern);
+
+            Serializable property = getProperty(nodeRef, propertyQName);
+            if(property == null)
             {
-                resultSet.close();
+                return false;
+            }
+            else
+            {
+                String propertyString = ValueConverter.convert(String.class, getProperty(nodeRef, propertyQName));
+                return propertyString.matches(pattern);
             }
         }
     }

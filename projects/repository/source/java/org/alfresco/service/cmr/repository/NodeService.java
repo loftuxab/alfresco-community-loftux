@@ -466,7 +466,7 @@ public interface NodeService
      * Search for string pattern in both the node text (if present) and node properties
      * 
      * @param nodeRef the node to get
-     * @param propertyQName the name of the property
+     * @param propertyQName the name of the property (mandatory)
      * @param sqlLikePattern a SQL-like pattern to search for
      * @param includeFTS - include full text search matches in the like test
      * @return Returns true if the pattern could be found

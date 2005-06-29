@@ -18,6 +18,8 @@
 package org.alfresco.filesys;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.SocketException;
 
 import org.alfresco.config.source.ClassPathConfigSource;
@@ -31,6 +33,8 @@ import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.smb.server.SMBServer;
 import org.alfresco.service.ServiceRegistry;
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * CIFS Server Class
@@ -45,8 +49,6 @@ public class CIFSServer
 {
     private static final Logger logger = Logger.getLogger("org.alfresco.smb.server");
 
-    // Filesystem configuration
-
     private ServiceRegistry serviceRegistry;
     private String configLocation;
     private DiskInterface diskInterface;
@@ -55,6 +57,7 @@ public class CIFSServer
     /**
      * @param serviceRegistry connects to the repository
      * @param configService
+     * @param diskInterface
      */
     public CIFSServer(ServiceRegistry serviceRegistry, String configLocation, DiskInterface diskInterface)
     {
@@ -90,25 +93,27 @@ public class CIFSServer
 
             if (filesysConfig.hasWin32NetBIOS())
             {
-
                 // Try and load the Win32 NetBIOS JNI code, if it fails switch off Win32 NetBIOS support
-
                 try
                 {
-
                     // Get a list of available NetBIOS LANAs
-
-                    Win32NetBIOS.LanaEnum();
+                    PrintStream err = System.err;
+                    try
+                    {
+                        System.setErr(new PrintStream(new NullOutputStream()));
+                        Win32NetBIOS.LanaEnum();
+                    }
+                    finally
+                    {
+                        System.setErr(err);
+                    }
                 }
                 catch (UnsatisfiedLinkError ex)
                 {
-
                     // Switch off Win32 NetBIOS support
-
                     filesysConfig.setWin32NetBIOS(false);
 
                     // Log the error
-
                     logger.error("Win32 NetBIOS support not available, required DLL not found");
                 }
             }
@@ -116,7 +121,6 @@ public class CIFSServer
             // Create the SMB server and NetBIOS name server, if enabled
             if (filesysConfig.isSMBServerEnabled())
             {
-    
                 // Create the NetBIOS name server if NetBIOS SMB is enabled
                 if (filesysConfig.hasNetBIOSSMB())
                     filesysConfig.addServer(new NetBIOSNameServer(serviceRegistry, filesysConfig));
@@ -167,5 +171,73 @@ public class CIFSServer
             // Start the server
             filesysConfig.getServer(i).shutdownServer(false);
         }
+    }
+    
+    /**
+     * Throws away all data written to it
+     */
+    private static class NullOutputStream extends OutputStream
+    {
+        @Override
+        public void write(int b) throws IOException
+        {
+            // do nothing
+        }
+    }
+    
+    /**
+     * Runs the CIFS server directly
+     * 
+     * @param args String[]
+     */
+    public static void main(String[] args)
+    {
+        PrintStream out = System.out;
+
+        out.println("CIFS Server Test");
+        out.println("----------------");
+
+        try
+        {
+            // Create the configuration service in the same way that Spring creates it
+            ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+            // get the CIFS server bean
+            CIFSServer server = (CIFSServer) ctx.getBean("cifsServer");
+            if (server == null)
+            {
+                throw new AlfrescoRuntimeException("Server bean 'cifsServer' not defined");
+            }
+
+            // it should have automatically started
+            // Wait for shutdown via the console
+            out.println("Enter 'x' to shutdown ...");
+            boolean shutdown = false;
+
+            // Wait while the server runs, user may stop the server by typing a key
+            while (shutdown == false)
+            {
+
+                // Wait for the user to enter the shutdown key
+
+                int ch = System.in.read();
+
+                if (ch == 'x' || ch == 'X')
+                    shutdown = true;
+
+                synchronized (server)
+                {
+                    server.wait(20);
+                }
+            }
+
+            // Stop the server
+            server.stopServer();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        System.exit(1);
     }
 }

@@ -983,7 +983,6 @@
    </bean>
    
    <!-- CIFS Server -->
-   <!--
    <bean id="cifsServer" class="org.alfresco.filesys.CIFSServer" init-method="startServer" >
       <constructor-arg>
          <ref bean="serviceRegistry" />
@@ -995,7 +994,6 @@
          <ref bean="contentDiskDriver" />
       </constructor-arg>
    </bean>
-   -->
    
    <bean id="contentDiskDriver" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">

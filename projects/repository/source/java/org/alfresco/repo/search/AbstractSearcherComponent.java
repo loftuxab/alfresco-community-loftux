@@ -23,8 +23,17 @@ import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 
+/**
+ * Provides basic searcher support
+ * 
+ * @author Andy Hind
+ */
 public abstract class AbstractSearcherComponent implements SearchService
 {
+    public String translateQuery(String fromLanguage, String toLangage, String query)
+    {
+        throw new UnsupportedOperationException();
+    }
 
     public ResultSet query(StoreRef store, String language, String query)
     {
@@ -40,5 +49,4 @@ public abstract class AbstractSearcherComponent implements SearchService
     {
         return query(store, language, query, attributePaths, null);
     }
-
 }

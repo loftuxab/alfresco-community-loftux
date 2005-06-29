@@ -1061,7 +1061,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         
-        List<NodeRef> answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monkey', 'false')]", null, namespacePrefixResolver, false);
+        List<NodeRef> answer =  nodeService.selectNodes(
+                rootNodeRef,
+                "//*[like(@test:animal, 'm__k%', false)]",
+                null,
+                namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         
         answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('monkey')]", null, namespacePrefixResolver, false);
