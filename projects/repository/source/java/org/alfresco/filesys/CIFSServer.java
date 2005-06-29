@@ -87,9 +87,31 @@ public class CIFSServer
             // done later by the SMBServer.
             // Forcing the Win32NetBIOS class to load here and run the static
             // initializer fixes the problem.
-    
+
             if (filesysConfig.hasWin32NetBIOS())
-                Win32NetBIOS.LanaEnum();
+            {
+
+                // Try and load the Win32 NetBIOS JNI code, if it fails switch off Win32 NetBIOS support
+
+                try
+                {
+
+                    // Get a list of available NetBIOS LANAs
+
+                    Win32NetBIOS.LanaEnum();
+                }
+                catch (UnsatisfiedLinkError ex)
+                {
+
+                    // Switch off Win32 NetBIOS support
+
+                    filesysConfig.setWin32NetBIOS(false);
+
+                    // Log the error
+
+                    logger.error("Win32 NetBIOS support not available, required DLL not found");
+                }
+            }
     
             // Create the SMB server and NetBIOS name server, if enabled
             if (filesysConfig.isSMBServerEnabled())
