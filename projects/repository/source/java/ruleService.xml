@@ -182,10 +182,10 @@
 	  </property>
    </bean>
    
-   <!--<bean id="mail" class="org.alfresco.repo.rule.action.MailActionExecutor" parent="rule-condition-executor">
+   <!-- <bean id="mail" class="org.alfresco.repo.rule.action.MailActionExecutor" parent="rule-condition-executor">
 	  <property name="mailService">
 		 <ref bean="mailService"></ref>
 	  </property>
-   </bean>-->
+   </bean> -->
    
 </beans>

@@ -404,7 +404,7 @@ public class RuleServiceSystemTest extends TestCase
         RuleActionDefinition action = this.ruleService.getActionDefinition(MailActionExecutor.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(MailActionExecutor.PARAM_TO, "roy.wetherall@alfresco.org");
+        params.put(MailActionExecutor.PARAM_TO, "alfresco.test@gmail.com");
         params.put(MailActionExecutor.PARAM_SUBJECT, "Unit test");
         params.put(MailActionExecutor.PARAM_TEXT, "This is a test to check that the mail action is working.");
         

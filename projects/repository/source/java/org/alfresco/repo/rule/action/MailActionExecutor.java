@@ -41,6 +41,11 @@ public class MailActionExecutor extends RuleActionExecutorAbstractBase
     public static final String PARAM_TO = "to";
     public static final String PARAM_SUBJECT = "subject";
     public static final String PARAM_TEXT = "text";
+    
+    /**
+     * From address
+     */
+    public static final String FROM_ADDRESS = "alfresco_repository@alfresco.org";
 	
 	/**
 	 * The java mail sender
@@ -70,6 +75,7 @@ public class MailActionExecutor extends RuleActionExecutorAbstractBase
 		simpleMailMessage.setTo((String)ruleAction.getParameterValue(PARAM_TO));
 		simpleMailMessage.setSubject((String)ruleAction.getParameterValue(PARAM_SUBJECT));
 		simpleMailMessage.setText((String)ruleAction.getParameterValue(PARAM_TEXT));
+        simpleMailMessage.setFrom(FROM_ADDRESS);
 			
         // Send the message
 		javaMailSender.send(simpleMailMessage);
