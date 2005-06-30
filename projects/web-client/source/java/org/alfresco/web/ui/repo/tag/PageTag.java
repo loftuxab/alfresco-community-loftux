@@ -25,6 +25,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.alfresco.web.app.Application;
+import org.apache.log4j.Logger;
 
 /**
  * A non-JSF tag library that adds the HTML begin and end tags if running in servlet mode
@@ -33,6 +34,14 @@ import org.alfresco.web.app.Application;
  */
 public class PageTag extends TagSupport
 {
+   private final static String SCRIPTS_1 = "<script language=\"JavaScript1.2\" src=\"";
+   private final static String SCRIPTS_2 = "/scripts/menu.js\"></script>\n";
+   private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
+   private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
+   
+   private static Logger logger = Logger.getLogger(PageTag.class);
+   
+   private long startTime = 0;
    private String title;
    
    /**
@@ -56,6 +65,9 @@ public class PageTag extends TagSupport
     */
    public int doStartTag() throws JspException
    {
+      if (logger.isDebugEnabled())
+         startTime = System.currentTimeMillis();
+      
       try
       {
          Writer out = pageContext.getOut();
@@ -91,6 +103,9 @@ public class PageTag extends TagSupport
       return EVAL_BODY_INCLUDE;
    }
 
+   /**
+    * @see javax.servlet.jsp.tagext.TagSupport#doEndTag()
+    */
    public int doEndTag() throws JspException
    {
       if (Application.inPortalServer() == false)
@@ -105,11 +120,12 @@ public class PageTag extends TagSupport
          }
       }
       
+      if (logger.isDebugEnabled())
+      {
+         long endTime = System.currentTimeMillis();
+         logger.debug("Time to generate page: " + (endTime - startTime) + "ms");
+      }
+      
       return super.doEndTag();
    }
-   
-   private final static String SCRIPTS_1 = "<script language=\"JavaScript1.2\" src=\"";
-   private final static String SCRIPTS_2 = "/scripts/menu.js\"></script>\n";
-   private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
-   private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
 }

@@ -156,8 +156,6 @@ public class UIDataPager extends UICommand
       String value = (String)requestMap.get(fieldId);
       if (value != null && value.length() != 0)
       {
-         if (s_logger.isDebugEnabled())
-            s_logger.debug("Caught pager click using field: " + fieldId + "; with value: " + value);
          // we were clicked - queue an event to represent the click
          // cannot handle the event here as other components etc. have not had
          // a chance to decode() - we queue an event to be processed later
