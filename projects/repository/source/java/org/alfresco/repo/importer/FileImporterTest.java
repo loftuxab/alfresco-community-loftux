@@ -170,8 +170,14 @@ public class FileImporterTest extends TestCase
         {
             UserTransaction tx = test.serviceRegistry.getUserTransaction();
             tx.begin();
+            long start = System.nanoTime();
             test.createFileImporter().loadFile(location.get(0), new File(args[2]), true);
+            long end = System.nanoTime();
+            System.out.println("Created in "+((end-start)/1000000.0));
+            start = System.nanoTime();
             tx.commit();
+            end = System.nanoTime();
+            System.out.println("Commit in "+((end-start)/1000000.0));
         }
         else
         {

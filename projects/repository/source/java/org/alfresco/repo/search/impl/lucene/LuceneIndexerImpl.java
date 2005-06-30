@@ -141,7 +141,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private ArrayList<Helper> toFTSIndex = new ArrayList<Helper>();
 
-    private QName contentPropertyQName;
+    private QName contentPropertyQName = ContentModel.PROP_CONTENT_URL;
 
     LuceneIndexerImpl()
     {
@@ -151,7 +151,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         super.setDictionaryService(dictionaryService);
-        contentPropertyQName = QName.createQName(NamespaceService.ALFRESCO_URI, "contentUrl");
     }
 
     /**

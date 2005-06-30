@@ -14,6 +14,7 @@
          select-before-update="false"
          optimistic-lock="version" >
       <!-- composite PK -->
+      <cache usage="read-write"></cache>
       <composite-id name="key" class="org.alfresco.repo.domain.NodeKey">
          <key-property name="protocol" length="100" />
          <key-property name="identifier" length="100" />
@@ -22,12 +23,14 @@
       <property name="typeNamespaceUri" column="type_namespace_uri" length="100" not-null="true" />
       <property name="typeLocalName" column="type_local_name" length="100" not-null="true" />
       <map
-            name="properties"
+            name="properties" 
             table="node_properties"
-            lazy="true"
+            lazy="false"
+            fetch="join"  
             sort="unsorted"
             inverse="false"
             cascade="all" >
+         <cache usage="read-write"></cache>
          <key>
             <column name="protocol" length="100"  />
             <column name="identifier" length="100" />
@@ -39,10 +42,12 @@
       <set
             name="aspects"
             table="node_aspects"
-            lazy="false"
+            lazy="true"
+            fetch="select"
             sort="unsorted"
             inverse="false"
             cascade="all" >
+         <cache usage="read-write"></cache>
          <key>
             <column name="protocol" length="100"  />
             <column name="identifier" length="100" />
@@ -56,15 +61,19 @@
             class="org.alfresco.repo.domain.hibernate.StoreImpl"
             not-null="true"
             insert="false"
-            update="false" >
+            update="false" 
+            lazy="true" >
          <column name="protocol" />
          <column name="identifier" />
       </many-to-one>
       <!-- inverse assoc to parent childassocs -->
       <set
             name="parentAssocs"
+            lazy="true"
+            fetch="select"
             inverse="true" 
             cascade="delete" >
+         <cache usage="read-write"></cache>
          <key>
             <column name="child_protocol" />
             <column name="child_identifier" />
@@ -75,20 +84,25 @@
       <!-- inverse assoc to child childassocs -->
       <set
             name="childAssocs"
-            inverse="true" 
+            inverse="true"
+            lazy="true"
+            fetch="select" 
             cascade="delete" >
+         <cache usage="read-write"></cache>
          <key>
             <column name="parent_protocol" />
             <column name="parent_identifier" />
             <column name="parent_guid" length="36" />
          </key>
-         <one-to-many class="org.alfresco.repo.domain.hibernate.ChildAssocImpl" />
+         <one-to-many class="org.alfresco.repo.domain.hibernate.ChildAssocImpl"  />
+         
       </set>
       <!-- inverse assoc to source nodeassocs -->
       <set
             name="sourceNodeAssocs"
             inverse="true" 
             cascade="delete" >
+         <cache usage="read-write"></cache>
          <key>
             <column name="target_protocol" />
             <column name="target_identifier" />
@@ -101,6 +115,7 @@
             name="targetNodeAssocs"
             inverse="true" 
             cascade="delete" >
+         <cache usage="read-write"></cache>
          <key>
             <column name="source_protocol" />
             <column name="source_identifier" />
@@ -114,6 +129,7 @@
          name="org.alfresco.repo.domain.hibernate.ChildAssocImpl"
          proxy="org.alfresco.repo.domain.ChildAssoc"
          table="child_assoc" >
+      <cache usage="read-write"></cache>
       <id
             name="id"
             column="id"
@@ -126,9 +142,10 @@
       <property name="localName" column="local_name" length="100" not-null="true" />
       <property name="isPrimary" />
       <!-- forward assoc to parent node -->
-      <many-to-one
+      <many-to-one 
             name="parent"
             class="org.alfresco.repo.domain.hibernate.NodeImpl"
+            lazy="true" 
             not-null="true" >
          <column name="parent_protocol" />
          <column name="parent_identifier" />
@@ -136,7 +153,10 @@
       </many-to-one>
       <!-- forward assoc to child node -->
       <many-to-one
-            name="child"
+            name="child" 
+            outer-join="false"
+            lazy="false"
+            fetch="join"
             class="org.alfresco.repo.domain.hibernate.NodeImpl"
             not-null="true" >
          <column name="child_protocol" />
@@ -149,6 +169,7 @@
          name="org.alfresco.repo.domain.hibernate.NodeAssocImpl"
          proxy="org.alfresco.repo.domain.NodeAssoc"
          table="node_assoc" >
+      <cache usage="read-write"></cache>
       <id
             name="id"
             column="id"

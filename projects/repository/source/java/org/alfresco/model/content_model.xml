@@ -67,6 +67,12 @@
             <property name="alf:contentUrl">
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <!--- Index content in the background -->
+               <index enabled="true">
+                  <atomic>true</atomic>
+                  <stored>false</stored>
+                  <tokenised>true</tokenised>
+               </index>
             </property>
             <property name="alf:mimetype">
                <type>d:text</type>

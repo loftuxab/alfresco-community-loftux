@@ -55,8 +55,10 @@
             <prop key='hibernate.show_sql'>false</prop>
             <prop key='hibernate.hbm2ddl.auto'>update</prop>
             <prop key='hibernate.cache.use_query_cache'>true</prop>
-            <prop key='hibernate.max_fetch_depth'>1</prop>
+            <prop key='hibernate.max_fetch_depth'>10</prop>
             <prop key='hibernate.cache.provider_class'>org.hibernate.cache.EhCacheProvider</prop>
+            <prop key='hibernate.default_batch_fetch_size'>50</prop>
+            <prop key='hibernate.jdbc.batch_size'>50</prop>
          </props>
       </property>
    </bean>
