@@ -500,7 +500,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Node node = getNodeNotNull(nodeRef);
         Set<QName> aspectQNames = node.getAspects();
-        return Collections.unmodifiableSet(aspectQNames);
+        // copy the set to ensure initialization
+        Set<QName> ret = new HashSet<QName>(aspectQNames.size());
+        ret.addAll(aspectQNames);
+        // done
+        return Collections.unmodifiableSet(ret);
     }
 
     public void deleteNode(NodeRef nodeRef)
@@ -719,7 +723,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     }
 
     /**
-     * Transforms {@link Node#getParentAssocs()} into an unmodifiable collection
+     * Transforms {@link Node#getParentAssocs()} to a new collection
      */
     public Collection<NodeRef> getParents(NodeRef nodeRef) throws InvalidNodeRefException
     {
