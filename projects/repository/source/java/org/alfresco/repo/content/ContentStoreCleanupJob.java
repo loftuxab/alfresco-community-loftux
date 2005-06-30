@@ -41,10 +41,6 @@ import org.quartz.JobExecutionException;
  */
 public class ContentStoreCleanupJob implements Job
 {
-    public ContentStoreCleanupJob()
-    {
-    }
-
     /**
      * Gets all content URLs from the store, checks if it is in use by any node
      * and deletes those that aren't.
@@ -94,11 +90,7 @@ public class ContentStoreCleanupJob implements Job
         List<String> contentUrls = contentStore.listUrls();
         for (String contentUrl : contentUrls)
         {
-            // search for it
-            // TODO: Issue - Sort out where the content URLs will be stored in the new model
-            // perform the search
-            // we search for document that are young enough and have the URL
-            // if found - continue
+            // TODO here we need to get hold of all the orphaned content in this store
             
             // not found - it is not in the repo, but check that it is old enough to delete
             ContentReader reader = contentStore.getReader(contentUrl);
@@ -115,10 +107,12 @@ public class ContentStoreCleanupJob implements Job
             }
             
             // it is not in the repo and is old enough
-            contentStore.delete(contentUrl);
-        }
+            boolean result = contentStore.delete(contentUrl);
+            System.out.println(contentUrl + ": " + Boolean.toString(result));
+        }       
         
-        // only take this out when the search is plugged in correctly
+        // TODO for now throw this exception to ensure that this job does not get run untill
+        //      the orphaned content can be correctly retrieved
         throw new UnsupportedOperationException();
     }
 }

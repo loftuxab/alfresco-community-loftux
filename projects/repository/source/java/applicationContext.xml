@@ -831,11 +831,14 @@
 
    <!-- passing a list to the SchedulerFactoryBean only instantiates the first one -->   
    <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	  <property name="overwriteExistingJobs">
+		<value>true</value>
+	  </property>
       <property name="triggers">
          <list>
             <ref local="ftsIndexerTrigger"/>
             <ref local="tempFileCleanerTrigger"/>
-            <ref local="fileContentStoreCleanerTrigger"/>
+            <!-- <ref local="fileContentStoreCleanerTrigger"/> -->
             <ref local="contentTransformerCacheResetTrigger"/>
          </list>
        </property>
