@@ -17,6 +17,7 @@
  */
 package org.alfresco.repo.version;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 
@@ -45,7 +46,8 @@ public interface VersionStoreConst
    
 	
     public static final String PROP_VERSION_LABEL = "versionLabel";
-    public static final String PROP_CREATED_DATE = "createdDate";
+    public static final String PROP_CREATED_DATE = ContentModel.PROP_CREATED.getLocalName(); 
+    public static final String PROP_CREATOR = ContentModel.PROP_CREATOR.getLocalName();
     public static final String PROP_VERSION_TYPE = "versionType";
     public static final String PROP_VERSION_NUMBER = "versionNumber";
     public static final String PROP_FROZEN_NODE_ID = "frozenNodeId";
@@ -78,13 +80,26 @@ public interface VersionStoreConst
      */
     public static final QName PROP_QNAME_VERSION_LABEL = QName.createQName(NAMESPACE_URI, PROP_VERSION_LABEL);
     public static final QName PROP_QNAME_VERSION_NUMBER = QName.createQName(NAMESPACE_URI, PROP_VERSION_NUMBER);
-    public static final QName PROP_QNAME_VERSION_CREATED_DATE = QName.createQName(NAMESPACE_URI, PROP_CREATED_DATE);
     public static final QName PROP_QNAME_FROZEN_NODE_ID = QName.createQName(NAMESPACE_URI, PROP_FROZEN_NODE_ID);
     public static final QName PROP_QNAME_FROZEN_NODE_TYPE = QName.createQName(NAMESPACE_URI, PROP_FROZEN_NODE_TYPE);
     public static final QName PROP_QNAME_FROZEN_NODE_STORE_PROTOCOL = QName.createQName(NAMESPACE_URI, PROP_FROZEN_NODE_STORE_PROTOCOL);
     public static final QName PROP_QNAME_FROZEN_NODE_STORE_ID = QName.createQName(NAMESPACE_URI, PROP_FROZEN_NODE_STORE_ID);
     public static final QName PROP_QNAME_FROZEN_ASPECTS = QName.createQName(NAMESPACE_URI, PROP_FROZEN_ASPECTS);
     public static final QName ASSOC_SUCCESSOR = QName.createQName(NAMESPACE_URI, "successor");    
+    
+    /**
+     * Version Meta Data Value type
+     */
+    public static final String TYPE_VERSION_META_DATA_VALUE = "versionMetaDataValue";
+    public static final QName TYPE_QNAME_VERSION_META_DATA_VALUE = QName.createQName(NAMESPACE_URI, TYPE_VERSION_META_DATA_VALUE);
+    
+    /**
+     * Version Meta Data Value attributes
+     */
+    public static final String PROP_META_DATA_NAME = "metaDataName";
+    public static final QName PROP_QNAME_META_DATA_NAME = QName.createQName(NAMESPACE_URI, PROP_META_DATA_NAME);
+    public static final String PROP_META_DATA_VALUE = "metaDataValue";
+    public static final QName PROP_QNAME_META_DATA_VALUE = QName.createQName(NAMESPACE_URI, PROP_META_DATA_VALUE);
     
     /**
      * Versioned attribute type
@@ -132,10 +147,12 @@ public interface VersionStoreConst
     public static final String CHILD_VERSIONED_ATTRIBUTES = "versionedAttributes";
     public static final String CHILD_VERSIONED_CHILD_ASSOCS = "versionedChildAssocs";
     public static final String CHILD_VERSIONED_ASSOCS = "versionedAssocs";
+    public static final String CHILD_VERSION_META_DATA = "versionMetaData";
     
     public static final QName CHILD_QNAME_VERSION_HISTORIES = QName.createQName(NAMESPACE_URI, CHILD_VERSION_HISTORIES);
     public static final QName CHILD_QNAME_VERSIONS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONS);
     public static final QName CHILD_QNAME_VERSIONED_ATTRIBUTES = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_ATTRIBUTES);
     public static final QName CHILD_QNAME_VERSIONED_CHILD_ASSOCS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_CHILD_ASSOCS);
     public static final QName CHILD_QNAME_VERSIONED_ASSOCS = QName.createQName(NAMESPACE_URI, CHILD_VERSIONED_ASSOCS);
+    public static final QName CHILD_QNAME_VERSION_META_DATA = QName.createQName(NAMESPACE_URI, CHILD_VERSION_META_DATA);
 }

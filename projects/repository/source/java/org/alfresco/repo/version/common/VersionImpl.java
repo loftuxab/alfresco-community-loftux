@@ -89,6 +89,11 @@ public class VersionImpl implements Version
     {
         return (Date)this.versionProperties.get(VersionStoreConst.PROP_CREATED_DATE);
     }
+    
+    public String getCreator()
+    {
+        return (String)this.versionProperties.get(VersionStoreConst.PROP_CREATOR);
+    }
 
     /**
      * Helper method to get the version label from the version property data.

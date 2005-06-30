@@ -16,6 +16,19 @@
 
    <types>
       
+	  <type name="ver:versionMetaDataValue">
+         <parent>alf:base</parent>
+         
+         <properties>
+            <property name="ver:metaDataName">
+               <type>d:text</type>
+            </property>
+            <property name="ver:metaDataValue">
+               <type>d:any</type>
+            </property>
+         </properties>
+      </type>
+	  
       <type name="ver:versionedProperty">
          <parent>alf:base</parent>
          
@@ -62,12 +75,12 @@
             <property name="ver:versionLabel">
                <type>d:text</type>
             </property>
-            <property name="ver:createdDate">
+            <!--<property name="ver:createdDate">
                <type>d:datetime</type>
             </property>
             <property name="ver:modifiedDate">
                <type>d:datetime</type>
-            </property>
+            </property>-->
             <property name="ver:frozenNodeId">
                <type>d:guid</type>
             </property>
@@ -84,9 +97,13 @@
                <type>d:qname</type>
                <multiple>true</multiple>
             </property>
-         </properties>
-         
-         <associations>
+         </properties>	
+		 <associations>
+			<child-association name="ver:versionMetaData">
+               <target>
+                  <class>ver:versionMetaDataValue</class>
+               </target>
+            </child-association>
             <child-association name="ver:versionedAttributes">
                <target>
                   <class>ver:versionedProperty</class>
@@ -108,6 +125,10 @@
                </target>
             </association>
          </associations>
+		 
+         <mandatory-aspects>
+            <aspect>alf:auditable</aspect>
+         </mandatory-aspects>
       </type>
       
       <type name="ver:versionHistory">

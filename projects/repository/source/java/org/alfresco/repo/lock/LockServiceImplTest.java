@@ -42,9 +42,6 @@ import org.alfresco.util.TestWithUserUtils;
  */
 public class LockServiceImplTest extends BaseSpringTest
 {
-   // private static final NodeRef this.goodUserNodeRef = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test"), "userRef1");
-   // private static final NodeRef this.badUserNodeRef = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test"), "userRef2");
-    
     /**
      * Services used in tests
      */

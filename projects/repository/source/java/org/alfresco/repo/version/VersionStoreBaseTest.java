@@ -25,6 +25,7 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Model;
+import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -36,6 +37,7 @@ import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.TestWithUserUtils;
 
 public class VersionStoreBaseTest extends BaseSpringTest 
 {
@@ -47,6 +49,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
     protected VersionCounterDaoService versionCounterDaoService;
     protected ContentService contentService;
 	protected DictionaryDAO dictionaryDAO;
+    protected AuthenticationService authenticationService;
 	
     /*
      * Data used by tests
@@ -83,7 +86,13 @@ public class VersionStoreBaseTest extends BaseSpringTest
     /**
      * Test content
      */
-    protected static final String TEST_CONTENT = "This is the versioned test content.";	
+    protected static final String TEST_CONTENT = "This is the versioned test content.";
+    
+    /**
+     * Test user details
+     */
+    private static final String PWD = "password";
+    private static final String USER_NAME = "username";	
     
 	/**
 	 * Sets the meta model dao
@@ -105,6 +114,7 @@ public class VersionStoreBaseTest extends BaseSpringTest
         this.versionService = (VersionService)applicationContext.getBean("versionService");
         this.versionCounterDaoService = (VersionCounterDaoService)applicationContext.getBean("versionCounterDaoService");
         this.contentService = (ContentService)applicationContext.getBean("contentService");
+        this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
         
 		// Create the test model
 		createTestModel();
@@ -128,6 +138,10 @@ public class VersionStoreBaseTest extends BaseSpringTest
         
         // Get a reference to the root node
         this.rootNodeRef = this.dbNodeService.getRootNode(this.testStoreRef);
+        
+        // Create an authenticate the user
+        TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.dbNodeService, this.authenticationService);
+        TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);
     }
 	
 	/**
@@ -277,6 +291,9 @@ public class VersionStoreBaseTest extends BaseSpringTest
         {
             fail("The created date of the version is incorrect.");
         }
+        
+        // Check the creator 
+        assertEquals(USER_NAME, newVersion.getCreator());
         
         // Check the properties of the verison
         Map<String, Serializable> props = newVersion.getVersionProperties();

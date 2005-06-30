@@ -49,6 +49,7 @@ public class VersionImplTest extends TestCase
     private final static String VALUE_3 = "value3";  
     private final static String VALUE_DESCRIPTION = "This string describes the version details.";
     private final static VersionType VERSION_TYPE = VersionType.MINOR;
+    private final static String USER_NAME = "userName";
     
     /**
      * Version labels
@@ -78,6 +79,7 @@ public class VersionImplTest extends TestCase
         this.versionProperties = new HashMap<String, Serializable>();
         this.versionProperties.put(VersionStoreConst.PROP_VERSION_LABEL, VERSION_1);
         this.versionProperties.put(VersionStoreConst.PROP_CREATED_DATE, this.createdDate);
+        this.versionProperties.put(VersionStoreConst.PROP_CREATOR, USER_NAME);
         this.versionProperties.put(Version.PROP_DESCRIPTION, VALUE_DESCRIPTION);
         this.versionProperties.put(VersionStoreConst.PROP_VERSION_TYPE, VERSION_TYPE);
         this.versionProperties.put(PROP_1, VALUE_1);
@@ -97,6 +99,14 @@ public class VersionImplTest extends TestCase
     {
         Date createdDate1 = this.version.getCreatedDate();
         assertEquals(this.createdDate, createdDate1);
+    }
+    
+    /**
+     * Test getCreator
+     */
+    public void testGetCreator()
+    {
+        assertEquals(USER_NAME, this.version.getCreator());
     }
 
     /**

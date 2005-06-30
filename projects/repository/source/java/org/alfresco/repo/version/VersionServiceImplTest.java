@@ -36,7 +36,7 @@ public class VersionServiceImplTest extends VersionStoreBaseTest
     public void testCreateIntialVersion()
     {
         NodeRef versionableNode = createNewVersionableNode();
-        createVersion(versionableNode);
+        createVersion(versionableNode);               
     }     
     
     /**

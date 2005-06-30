@@ -45,6 +45,13 @@ public interface Version extends Serializable
      * @return  the date the version was created
      */
     public Date getCreatedDate();
+    
+    /**
+     * Helper method to get the creator of the version.
+     * 
+     * @return  the creator of the version
+     */
+    public String getCreator();
 
     /**
      * Helper method to get the version label from the version property data.

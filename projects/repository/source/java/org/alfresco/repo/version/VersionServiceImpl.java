@@ -20,7 +20,6 @@ package org.alfresco.repo.version;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +90,11 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      * The version store content store
      */
     private ContentStore versionContentStore;		
+    
+    /**
+     * The version cache
+     */
+    private HashMap<NodeRef, Version> versionCache = new HashMap<NodeRef, Version>(100);
     
     /**
      * Sets the db node service, used as the version store implementation
@@ -174,7 +178,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     public StoreRef getVersionStoreReference()
     {
         return new StoreRef(
-				//VersionStoreConst.STORE_PROTOCOL,
                 StoreRef.PROTOCOL_WORKSPACE,
 				VersionStoreConst.STORE_ID);
     }
@@ -357,9 +360,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             }
         }
         
-		// Add the standard version properties
-		addStandardVersionProperties(versionProperties, nodeRef, currentVersionRef, versionNumber);
-		
 		// Create the node details
 		QName classRef = this.nodeService.getType(nodeRef);
 		PolicyScope nodeDetails = new PolicyScope(classRef);
@@ -371,6 +371,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         NodeRef newVersionRef = createNewVersion(
                 nodeRef, 
                 versionHistoryRef,
+                getStandardVersionProperties(versionProperties, nodeRef, currentVersionRef, versionNumber),
                 versionProperties, 
                 nodeDetails);
         
@@ -412,9 +413,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     {
         // Check for the version aspect
         checkForVersionAspect(nodeRef);
-
-        // TODO could definatly do with a cache since these are read-only objects ... maybe not 
-        //      since they are dependant on the workspace of the node passed
         
         VersionHistory versionHistory = null;
         
@@ -447,36 +445,37 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		return version;
 	}
 	
-	private void addStandardVersionProperties(Map<String, Serializable> versionProperties, NodeRef nodeRef, NodeRef preceedingNodeRef, int versionNumber)
+	private Map<QName, Serializable> getStandardVersionProperties(Map<String, Serializable> versionProperties, NodeRef nodeRef, NodeRef preceedingNodeRef, int versionNumber)
 	{
-		// Set the version number for the new version
-		versionProperties.put(VersionStoreConst.PROP_VERSION_NUMBER, Integer.toString(versionNumber));
+        Map<QName, Serializable> result = new HashMap<QName, Serializable>(10);
         
-        // Set the created date
-		versionProperties.put(VersionStoreConst.PROP_CREATED_DATE, new Date());
+		// Set the version number for the new version
+        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_VERSION_NUMBER), Integer.toString(versionNumber));
 		
 		// Set the versionable node id
-		versionProperties.put(VersionStoreConst.PROP_FROZEN_NODE_ID, nodeRef.getId());
+        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_NODE_ID), nodeRef.getId());
 		
 		// Set the versionable node store protocol
-		versionProperties.put(VersionStoreConst.PROP_FROZEN_NODE_STORE_PROTOCOL, nodeRef.getStoreRef().getProtocol());
+        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_NODE_STORE_PROTOCOL), nodeRef.getStoreRef().getProtocol());
 		
 		// Set the versionable node store id
-		versionProperties.put(VersionStoreConst.PROP_FROZEN_NODE_STORE_ID, nodeRef.getStoreRef().getIdentifier());
+        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_NODE_STORE_ID), nodeRef.getStoreRef().getIdentifier());
         
         // Store the current node type
         QName nodeType = this.nodeService.getType(nodeRef);
-		versionProperties.put(VersionStoreConst.PROP_FROZEN_NODE_TYPE, nodeType);
+		result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_NODE_TYPE), nodeType);
         
         // Store the current aspects
         Set<QName> aspects = this.nodeService.getAspects(nodeRef);
-		versionProperties.put(VersionStoreConst.PROP_FROZEN_ASPECTS, (Serializable)aspects);
+        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_ASPECTS), (Serializable)aspects);
         
         // Calculate the version label
 		QName classRef = this.nodeService.getType(nodeRef);
 		Version preceedingVersion = getVersion(preceedingNodeRef);
         String versionLabel = invokeCalculateVersionLabel(classRef, preceedingVersion, versionNumber, versionProperties);
-		versionProperties.put(VersionStoreConst.PROP_VERSION_LABEL, versionLabel);
+        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_VERSION_LABEL), versionLabel);
+        
+        return result;
 	}	
     
     /**
@@ -493,31 +492,21 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     private NodeRef createNewVersion(
 			NodeRef versionableNodeRef, 
 			NodeRef versionHistoryRef, 
+            Map<QName, Serializable> standardVersionProperties,
 			Map<String, Serializable> versionProperties,
 			PolicyScope nodeDetails)
-    {
-        HashMap<QName, Serializable> props = new HashMap<QName, Serializable>(15, 1.0f);        
-        
-		// Set the property values
-        for (String key : versionProperties.keySet())
-        {
-            // Apply the namespace to the verison property
-            QName propertyName = QName.createQName(
-                    VersionServiceImpl.NAMESPACE_URI,
-                    key);
-            
-            // Set the property value on the node
-            props.put(propertyName, versionProperties.get(key));
-        }
-        
+    {       
         // Create the new version
         ChildAssociationRef childAssocRef = this.dbNodeService.createNode(
                 versionHistoryRef, 
 				CHILD_QNAME_VERSIONS,
                 CHILD_QNAME_VERSIONS,
                 TYPE_QNAME_VERSION,
-                props);
+                standardVersionProperties);
         NodeRef versionNodeRef = childAssocRef.getChildRef();
+        
+        // Store the meta data
+        storeVersionMetaData(versionNodeRef, versionProperties);
 		
 		// Freeze the various parts of the node
 		freezeProperties(versionNodeRef, nodeDetails.getProperties());
@@ -529,7 +518,30 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		return versionNodeRef;
     }
     
-	/**
+    /**
+     * 
+     * @param versionNodeRef
+     * @param versionProperties
+     */
+	private void storeVersionMetaData(NodeRef versionNodeRef, Map<String, Serializable> versionProperties)
+    {
+        for (Map.Entry<String, Serializable> entry : versionProperties.entrySet())
+        {
+            HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+            
+            properties.put(PROP_QNAME_META_DATA_NAME, entry.getKey());
+            properties.put(PROP_QNAME_META_DATA_VALUE, entry.getValue());
+            
+            ChildAssociationRef newRef = this.dbNodeService.createNode(
+                    versionNodeRef,
+                    CHILD_QNAME_VERSION_META_DATA, 
+                    CHILD_QNAME_VERSION_META_DATA, 
+                    TYPE_QNAME_VERSION_META_DATA_VALUE,
+                    properties);
+        }
+    }
+
+    /**
 	 * 
 	 * @param nodeDetails
 	 * @param versionNodeRef
@@ -721,7 +733,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         }
         
         return versionHistory;
-    }
+    }       
     
     /**
      * Constructs the a version object to contain the version information from the version node ref.
@@ -731,28 +743,43 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      */
     private Version getVersion(NodeRef versionRef)
     {
-        // TODO could definatly do with a cache since these are read only objects ...
-        
-		Version result = null;
+        Version result = null;
 		
 		if (versionRef != null)
 		{
-	        Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
-	        
-	        // Get the node properties
-	        Map<QName, Serializable> nodeProperties = this.dbNodeService.getProperties(versionRef);
-	        for (QName key : nodeProperties.keySet())
-	        {
-	            if (key.getNamespaceURI().equals(VersionServiceImpl.NAMESPACE_URI) == true)
-	            {                   
+            // check to see if this version is already in the cache
+            result = this.versionCache.get(versionRef);
+            
+            if (result == null)
+            {
+    	        Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
+    	        
+    	        // Get the standard node details
+    	        Map<QName, Serializable> nodeProperties = this.dbNodeService.getProperties(versionRef);
+    	        for (QName key : nodeProperties.keySet())
+    	        {                 
 	                Serializable value = nodeProperties.get(key);
 	                versionProperties.put(key.getLocalName(), value);
-	            }
-	        }
-	        
-	        // Create and return the version object
-            NodeRef newNodeRef = new NodeRef(new StoreRef(STORE_PROTOCOL, STORE_ID), versionRef.getId());
-	        result = new VersionImpl(versionProperties, newNodeRef);   
+    	        }
+                
+                // Get the meta data
+                List<ChildAssociationRef> metaData = 
+                    this.dbNodeService.getChildAssocs(versionRef, CHILD_QNAME_VERSION_META_DATA);
+                for (ChildAssociationRef ref : metaData)
+                {
+                    NodeRef metaDataValue = (NodeRef)ref.getChildRef();
+                    String name = (String)this.dbNodeService.getProperty(metaDataValue, PROP_QNAME_META_DATA_NAME);
+                    Serializable value = this.dbNodeService.getProperty(metaDataValue, PROP_QNAME_META_DATA_VALUE);
+                    versionProperties.put(name, value);
+                }
+    	        
+    	        // Create and return the version object
+                NodeRef newNodeRef = new NodeRef(new StoreRef(STORE_PROTOCOL, STORE_ID), versionRef.getId());
+    	        result = new VersionImpl(versionProperties, newNodeRef);
+                
+                // Add the version to the cache
+                this.versionCache.put(versionRef, result);
+            }
 		}
 		
 		return result;
@@ -767,8 +794,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     private NodeRef getVersionHistoryNodeRef(NodeRef nodeRef)
     {
         NodeRef result = null;
-        
-        // TODO use the sercher to retrieve the version history node
         
         Collection<ChildAssociationRef> versionHistories = this.dbNodeService.getChildAssocs(getRootNode());
         for (ChildAssociationRef versionHistory : versionHistories)
@@ -795,8 +820,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      */
     private NodeRef getCurrentVersionNodeRef(NodeRef versionHistory, NodeRef nodeRef)
     {
-        // TODO use the searcher to retrieve the version node
-        
         NodeRef result = null;
         String versionLabel = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_VERSION_LABEL);
         
