@@ -240,7 +240,7 @@ public class NavigationBean
          {
             List<IBreadcrumbHandler> elements = new ArrayList(1);
             NodeRef companyRootRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
-            elements.add(new NavigationBreadcrumbHandler(companyRootRef, Application.getCompanyRootName(context)));
+            elements.add(new NavigationBreadcrumbHandler(companyRootRef, Application.getRootPath(context)));
             setLocation(elements);
             setCurrentNodeId(companyRootRef.getId());
          }

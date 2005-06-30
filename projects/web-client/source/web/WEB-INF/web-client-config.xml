@@ -17,11 +17,13 @@
          <login-page>/jsp/login.jsp</login-page>
       </server>
       <repository>
-         <store-name>SpacesStore</store-name>
-         <company-root-name>Company Home</company-root-name>
+         <store-url>workspace://SpacesStore</store-url>
+         <root-path>Company Home</root-path>
+         <!--
          <company-root-description>The company root space</company-root-description>
          <glossary-folder-name>Glossary</glossary-folder-name>
          <templates-folder-name>Templates</templates-folder-name>
+         -->
       </repository>
       <admin>
          <initial-password>admin</initial-password>

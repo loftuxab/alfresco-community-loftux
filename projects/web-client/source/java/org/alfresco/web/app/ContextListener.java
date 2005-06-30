@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -37,7 +36,6 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.importer.ImporterBootstrap;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.repo.security.authentication.StoreContextHolder;
@@ -81,10 +79,10 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       SearchService searchService = registry.getSearchService();
       NamespaceService namespaceService = registry.getNamespaceService();
 
-      String repoStoreName = Application.getRepositoryStoreName(servletContext);
-      if (repoStoreName == null)
+      String repoStoreUrl = Application.getRepositoryStoreUrl(servletContext);
+      if (repoStoreUrl == null)
       {
-         throw new Error("Repository store name has not been configured, is 'store-name' element missing?");
+         throw new AlfrescoRuntimeException("Repository store URL has not been configured, is 'store-url' element missing?");
       }      
 
       // repo bootstrap code for our client
@@ -101,56 +99,19 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          // check the repository exists, create if it doesn't
          if (nodeService.exists(storeRef) == false)
          {
-            storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, repoStoreName);
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Created store with name: " + repoStoreName);
+             throw new AlfrescoRuntimeException("Store not created prior to application startup: " + storeRef);
          }
+
          
          NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
          
          // see if the company home space is present
-         String companySpaceName = Application.getCompanyRootName(servletContext);
-         String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
+         String rootPath = Application.getRootPath(servletContext);
+         String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(rootPath);
          List<NodeRef> nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
          if (nodes.size() == 0)
          {
-            if (logger.isDebugEnabled())
-                logger.debug("Importing bootstrap data into store: " + repoStoreName + "...");
-             
-            // Construct binding values for import
-            String companySpaceDescription = Application.getCompanyRootDescription(servletContext);
-            String glossaryFolderName = Application.getGlossaryFolderName(servletContext);
-            String templatesFolderName = Application.getTemplatesFolderName(servletContext);
-            if (companySpaceName == null)
-            {
-               throw new Error("Company root name has not been configured, is 'company-root-name' element missing?");
-            }
-            if (glossaryFolderName == null)
-            {
-               throw new Error("Glossary folder name has not been configured, is 'glossary-folder-name' element missing?");
-            }
-            if (templatesFolderName == null)
-            {
-               throw new Error("Templates folder name has not been configured, is 'templates-folder-name' element missing?");
-            }
-            Properties configuration = new Properties();
-            configuration.put("companySpaceName", companySpaceName);
-            configuration.put("companySpaceDescription", companySpaceDescription);
-            configuration.put("glossaryName", glossaryFolderName);
-            configuration.put("templatesName", templatesFolderName);
-
-            // Import bootstrap set of data
-            ImporterBootstrap bootstrap = (ImporterBootstrap)ctx.getBean("importerBootstrap");
-            bootstrap.setConfiguration(configuration);
-            bootstrap.setStoreId(repoStoreName);
-            bootstrap.bootstrap();
-
-            // Find company root after import
-            nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
-            
-            if (logger.isDebugEnabled())
-                logger.debug("Bootstrap data imported into store: " + repoStoreName);
+             throw new AlfrescoRuntimeException("Root path not created prior to application startup: " + rootPath);
          }
          // Extract company space id and store it in the Application object
          companySpaceId = nodes.get(0).getId();
@@ -218,7 +179,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          // commit the transaction
          tx.commit();
       }
-      catch (Exception e)
+      catch (Throwable e)
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}

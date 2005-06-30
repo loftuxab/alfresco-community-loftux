@@ -69,7 +69,7 @@ public class ImporterComponentTest extends BaseSpringTest
         configuration.put("glossaryName", "glossary name");
         configuration.put("templatesName", "template name");
 
-        importerBootstrap.setStoreId(this.storeRef.getIdentifier());
+        importerBootstrap.setStoreUrl(this.storeRef.toString());
         importerBootstrap.setConfiguration(configuration);
         importerBootstrap.bootstrap();
         //System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));

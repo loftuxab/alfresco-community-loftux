@@ -869,7 +869,7 @@ public class NewUserWizard extends AbstractWizardBean
    {
       if (this.companyHomeSpaceRef == null)
       {
-         String companySpaceName = Application.getCompanyRootName(context);
+         String companySpaceName = Application.getRootPath(context);
          String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
          
          List<NodeRef> nodes = this.nodeService.selectNodes(

@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import javax.transaction.UserTransaction;
 
+import org.alfresco.repo.importer.ImporterService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
@@ -63,7 +64,7 @@ public interface ServiceRegistry
     static final QName VERSION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "VersionService");
     static final QName COCI_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CheckoutCheckinService");
     static final QName RULE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "RuleService");
-
+    static final QName IMPORTER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ImporterService");
     
     /**
      * Get Services provided by Repository
@@ -155,4 +156,9 @@ public interface ServiceRegistry
      * @return  the category service (or null, if one is not provided)
      */
     CategoryService getCategoryService();
+    
+    /**
+     * @return Returns the importer service or null if not present
+     */
+    ImporterService getImporterService();
 }

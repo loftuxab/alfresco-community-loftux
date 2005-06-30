@@ -49,8 +49,8 @@ public class Application
    public static final String BEAN_DATA_DICTIONARY = "dataDictionary";
    
    private static boolean inPortalServer = true;
-   private static String repoStoreName;
-   private static String companyRootName;
+   private static String repoStoreUrl;
+   private static String rootPath;
    private static String companyRootId;
    private static String companyRootDescription;
    private static String glossaryFolderName;
@@ -214,19 +214,19 @@ public class Application
    }
    
    /**
-    * @return Returns the repository store name (retrieved from config service)
+    * @return Returns the repository store URL (retrieved from config service)
     */
-   public static String getRepositoryStoreName(ServletContext context)
+   public static String getRepositoryStoreUrl(ServletContext context)
    {
-      return getRepositoryStoreName(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
+      return getRepositoryStoreUrl(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
    }
    
    /**
-    * @return Returns the company root name (retrieved from config service)
+    * @return Returns the repository store URL (retrieved from config service)
     */
-   public static String getRepositoryStoreName(FacesContext context)
+   public static String getRepositoryStoreUrl(FacesContext context)
    {
-      return getRepositoryStoreName(FacesContextUtils.getRequiredWebApplicationContext(context));
+      return getRepositoryStoreUrl(FacesContextUtils.getRequiredWebApplicationContext(context));
    }
    
    /**
@@ -248,19 +248,19 @@ public class Application
    }
    
    /**
-    * @return Returns the company root name (retrieved from config service)
+    * @return Returns the root path for the application (retrieved from config service)
     */
-   public static String getCompanyRootName(ServletContext context)
+   public static String getRootPath(ServletContext context)
    {
-      return getCompanyRootName(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
+      return getRootPath(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
    }
    
    /**
-    * @return Returns the company root name (retrieved from config service)
+    * @return Returns the root path for the application (retrieved from config service)
     */
-   public static String getCompanyRootName(FacesContext context)
+   public static String getRootPath(FacesContext context)
    {
-      return getCompanyRootName(FacesContextUtils.getRequiredWebApplicationContext(context));
+      return getRootPath(FacesContextUtils.getRequiredWebApplicationContext(context));
    }
    
    /**
@@ -312,51 +312,47 @@ public class Application
    }
    
    /**
-    * Returns the repository store name (retrieved from config service)
+    * Returns the repository store URL (retrieved from config service)
     * 
     * @param context The spring context
-    * @return The company root name
+    * @return The repository store URL to use
     */
-   private static String getRepositoryStoreName(WebApplicationContext context)
+   private static String getRepositoryStoreUrl(WebApplicationContext context)
    {
-      if (repoStoreName == null)
+      if (repoStoreUrl == null)
       {
          ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
          ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
-         for (ConfigElement child : repoConfig.getChildren())
+         ConfigElement storeUrlConfig = repoConfig.getChild("store-url");
+         if (storeUrlConfig != null)
          {
-            if (child.getName().equals("store-name"))
-            {
-               repoStoreName = child.getValue();
-            }
+             repoStoreUrl = storeUrlConfig.getValue();
          }
       }
       
-      return repoStoreName;
+      return repoStoreUrl;
    }
    
    /**
-    * Returns the company root name (retrieved from config service)
+    * Returns the root path for the application (retrieved from config service)
     * 
     * @param context The spring context
-    * @return The company root name
+    * @return The application root path
     */
-   private static String getCompanyRootName(WebApplicationContext context)
+   private static String getRootPath(WebApplicationContext context)
    {
-      if (companyRootName == null)
+      if (rootPath == null)
       {
          ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
          ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
-         for (ConfigElement child : repoConfig.getChildren())
+         ConfigElement rootPathConfig = repoConfig.getChild("root-path");
+         if (rootPathConfig != null)
          {
-            if (child.getName().equals("company-root-name"))
-            {
-               companyRootName = child.getValue();
-            }
+             rootPath = rootPathConfig.getValue();
          }
       }
       
-      return companyRootName;
+      return rootPath;
    }
    
    /**

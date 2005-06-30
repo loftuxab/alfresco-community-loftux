@@ -20,10 +20,8 @@ package org.alfresco.filesys.smb.server.repo;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -112,8 +110,7 @@ public class ContentDiskDriver implements DiskInterface
         // connect to the repo and ensure that the store exists
         if (!nodeService.exists(storeRef))
         {
-            // no such store - create it
-            nodeService.createStore(storeRef.getProtocol(), storeRef.getIdentifier());
+            throw new DeviceContextException("Store not created prior to application startup: " + storeRef);
         }
         NodeRef storeRootNodeRef = nodeService.getRootNode(storeRef);
         
@@ -136,43 +133,9 @@ public class ContentDiskDriver implements DiskInterface
         }
         else if (nodeRefs.size() == 0)
         {
-            // nothing found - create the path
-            StringTokenizer tokenizer = new StringTokenizer(rootPath, "/", false);
-            if (tokenizer.countTokens() == 0)
-            {
-                throw new DeviceContextException("Store root node may not be used as the device root: \n" +
-                        "   root path: " + rootPath);
-            }
-            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-            while (tokenizer.hasMoreTokens())  // we have checked: There is at least one
-            {
-                String pathElement = tokenizer.nextToken();
-                properties.put(ContentModel.PROP_NAME, pathElement);
-                // create a node with both this path and this
-                ChildAssociationRef assocRef = null;
-                if (rootNodeRef == null)
-                {
-                    // use the root node as a starting point
-                    assocRef = nodeService.createNode(
-                            storeRootNodeRef,
-                            ContentModel.ASSOC_CHILDREN,  // child of store root
-                            QName.createQName(pathElement, namespaceService),
-                            ContentModel.TYPE_FOLDER,
-                            properties);
-                }
-                else
-                {
-                    // we have already created a folder
-                    assocRef = nodeService.createNode(
-                            rootNodeRef,
-                            ContentModel.ASSOC_CONTAINS,  // child of folder
-                            QName.createQName(pathElement, namespaceService),
-                            ContentModel.TYPE_FOLDER,
-                            properties);
-                }
-                // use the new node as a root
-                rootNodeRef = assocRef.getChildRef();
-            }
+            // nothing found
+            throw new DeviceContextException("No root found for device: \n" +
+                    "   root path: " + rootPath);
         }
         else
         {

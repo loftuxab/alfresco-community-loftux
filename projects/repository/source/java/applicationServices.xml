@@ -243,4 +243,21 @@
       </property>
    </bean>
 
+   <alias alias="AlfImporterService" name="importerComponent"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <value>ImporterService</value>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.repo.importer.ImporterService</value>
+      </property>
+      <property name="description">
+         <value>Importer Service</value>
+      </property>
+      <property name="implementation">
+         <idref bean="AlfImporterService"/>
+      </property>
+   </bean>
+
 </beans>

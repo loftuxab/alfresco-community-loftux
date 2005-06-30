@@ -955,9 +955,17 @@
       <property name="contentService"><ref bean="contentService"/></property>
    </bean>
 
-   <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap">
-      <property name="importerService"><ref bean="importerComponent"/></property>
-      <property name="namespaceService"><ref bean="namespaceService"/></property>
+   <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap" init-method="bootstrap">
+      <property name="serviceRegistry"><ref bean="serviceRegistry"/></property>
+      <property name="storeUrl"><value>workspace://SpacesStore</value></property>
+      <property name="configuration">
+         <props>
+            <prop key="companySpaceName">Company Home</prop>
+            <prop key="companySpaceDescription">The company root space</prop>
+            <prop key="glossaryName">Glossary</prop>
+            <prop key="templatesName">Templates</prop>
+         </props>
+      </property>
       <property name="bootstrapViews">
          <list>
             <props>
@@ -988,7 +996,7 @@
    </bean>
    
    <!-- CIFS Server -->
-   <bean id="cifsServer" class="org.alfresco.filesys.CIFSServer" init-method="startServer" >
+   <bean id="cifsServer" class="org.alfresco.filesys.CIFSServer" init-method="startServer" depends-on="importerBootstrap">
       <constructor-arg>
          <ref bean="serviceRegistry" />
       </constructor-arg>

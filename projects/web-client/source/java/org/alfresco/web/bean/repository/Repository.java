@@ -92,7 +92,7 @@ public final class Repository
     */
    public static StoreRef getStoreRef(ServletContext context)
    {
-      storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, Application.getRepositoryStoreName(context));
+      storeRef = new StoreRef(Application.getRepositoryStoreUrl(context));
       
       return storeRef;
    }

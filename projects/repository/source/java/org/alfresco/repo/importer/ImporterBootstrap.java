@@ -22,7 +22,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
 
+import javax.transaction.UserTransaction;
+
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -45,31 +50,19 @@ public class ImporterBootstrap
     private static final Log logger = LogFactory.getLog(ImporterBootstrap.class);
 
     // Dependencies
-    private NamespaceService namespaceService;
-    private ImporterService importerService;
+    private ServiceRegistry serviceRegistry;
     private List<Properties> bootstrapViews;
-    private String storeId;
+    private StoreRef storeRef;
     private Properties configuration;
     
-
     /**
-     * Sets the namespace service
+     * Sets the service providing repository access
      * 
-     * @param namespaceService
+     * @param serviceRegistry
      */
-    public void setNamespaceService(NamespaceService namespaceService)
+    public void setServiceRegistry(ServiceRegistry serviceRegistry)
     {
-        this.namespaceService = namespaceService;
-    }
-    
-    /**
-     * Sets the importer service
-     * 
-     * @param importerService
-     */
-    public void setImporterService(ImporterService importerService)
-    {
-        this.importerService = importerService;
+        this.serviceRegistry = serviceRegistry;
     }
 
     /**
@@ -82,13 +75,13 @@ public class ImporterBootstrap
     }
     
     /**
-     * Sets the Store ID to bootstrap into
+     * Sets the Store URL to bootstrap into
      * 
-     * @param storeId
+     * @param storeUrl
      */
-    public void setStoreId(String storeId)
+    public void setStoreUrl(String storeUrl)
     {
-        this.storeId = storeId;
+        this.storeRef = new StoreRef(storeUrl);
     }
     
     /**
@@ -107,48 +100,88 @@ public class ImporterBootstrap
      */
     public void bootstrap()
     {
+        NamespaceService namespaceService = serviceRegistry.getNamespaceService();
+        NodeService nodeService = serviceRegistry.getNodeService();
+        ImporterService importerService = serviceRegistry.getImporterService();
+        
         if (namespaceService == null)
         {
             throw new ImporterException("Namespace Service must be provided");
+        }
+        if (nodeService == null)
+        {
+            throw new ImporterException("Node Service must be provided");
         }
         if (importerService == null)
         {
             throw new ImporterException("Importer Service must be provided");
         }
-        if (storeId == null || storeId.length() == 0)
+        if (storeRef == null)
         {
-            throw new ImporterException("Store Id must be provided");
+            throw new ImporterException("Store URL must be provided");
         }
         
-        for (Properties bootstrapView : bootstrapViews)
+        UserTransaction txn = null;
+        try
         {
-            // Create input stream onto view file
-            String view = bootstrapView.getProperty(VIEW_LOCATION_VIEW);
-            if (view == null || view.length() == 0)
+           txn = serviceRegistry.getUserTransaction();
+           txn.begin();
+           
+            // check the repository exists, create if it doesn't
+            if (!nodeService.exists(storeRef))
             {
-                throw new ImporterException("View file location must be provided");
+               storeRef = nodeService.createStore(storeRef.getProtocol(), storeRef.getIdentifier());
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Created store: " + storeRef);
             }
-            InputStream viewStream = getClass().getClassLoader().getResourceAsStream(view);
-            if (viewStream == null)
+            else
             {
-                throw new ImporterException("Could not find view file " + view);
+                // the store exists and we therefore
+                if (logger.isDebugEnabled())
+                    logger.debug("Store exists - bootstrap ignored: " + storeRef);
+                txn.rollback();
+                return;
             }
             
-            // Create import location
-            Location importLocation = new Location(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, storeId));
-            String path = bootstrapView.getProperty(VIEW_PATH_PROPERTY);
-            if (path != null && path.length() > 0)
+            for (Properties bootstrapView : bootstrapViews)
             {
-                importLocation.setPath(path);
+                // Create input stream onto view file
+                String view = bootstrapView.getProperty(VIEW_LOCATION_VIEW);
+                if (view == null || view.length() == 0)
+                {
+                    throw new ImporterException("View file location must be provided");
+                }
+                InputStream viewStream = getClass().getClassLoader().getResourceAsStream(view);
+                if (viewStream == null)
+                {
+                    throw new ImporterException("Could not find view file " + view);
+                }
+                
+                // Create import location
+                Location importLocation = new Location(storeRef);
+                String path = bootstrapView.getProperty(VIEW_PATH_PROPERTY);
+                if (path != null && path.length() > 0)
+                {
+                    importLocation.setPath(path);
+                }
+                String childAssocType = bootstrapView.getProperty(VIEW_CHILDASSOCTYPE_PROPERTY);
+                if (childAssocType != null && childAssocType.length() > 0)
+                {
+                    importLocation.setChildAssocType(QName.createQName(childAssocType, namespaceService));
+                }
+    
+                // Now import...
+                importerService.importNodes(viewStream, importLocation, configuration, new BootstrapProgress());
             }
-            String childAssocType = bootstrapView.getProperty(VIEW_CHILDASSOCTYPE_PROPERTY);
-            if (childAssocType != null && childAssocType.length() > 0)
-            {
-                importLocation.setChildAssocType(QName.createQName(childAssocType, namespaceService));
-            }
-
-            // Now import...
-            importerService.importNodes(viewStream, importLocation, configuration, new BootstrapProgress());
+            // commit txn
+            txn.commit();
+        }
+        catch (Throwable e)
+        {
+           // rollback the transaction
+           try { if (txn != null) {txn.rollback();} } catch (Exception ex) {}
+           throw new AlfrescoRuntimeException("Bootstrap failed", e);
         }
     }
     

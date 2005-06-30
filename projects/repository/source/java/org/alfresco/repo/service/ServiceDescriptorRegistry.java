@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.transaction.UserTransaction;
 
+import org.alfresco.repo.importer.ImporterService;
 import org.alfresco.service.ServiceDescriptor;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
@@ -214,6 +215,11 @@ public class ServiceDescriptorRegistry
     public NamespaceService getNamespaceService()
     {
         return (NamespaceService)getService(NAMESPACE_SERVICE);
+    }
+    
+    public ImporterService getImporterService()
+    {
+        return (ImporterService)getService(IMPORTER_SERVICE);
     }
     
 }

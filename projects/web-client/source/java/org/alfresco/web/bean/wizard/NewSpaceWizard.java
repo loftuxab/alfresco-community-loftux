@@ -204,7 +204,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                
                String actNs = NamespaceService.ALFRESCO_PREFIX;
                String xpath = actNs + ":" + 
-                     QName.createValidLocalName(Application.getCompanyRootName(FacesContext.getCurrentInstance())) + 
+                     QName.createValidLocalName(Application.getRootPath(FacesContext.getCurrentInstance())) + 
                      "/" + actNs + ":" + 
                      QName.createValidLocalName(Application.getGlossaryFolderName(FacesContext.getCurrentInstance())) +
                      "/" + actNs + ":" + 
@@ -441,7 +441,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          FacesContext context = FacesContext.getCurrentInstance();
          String actNs = NamespaceService.ALFRESCO_PREFIX;
          String xpath = actNs + ":" + 
-               QName.createValidLocalName(Application.getCompanyRootName(context)) + 
+               QName.createValidLocalName(Application.getRootPath(context)) + 
                "/" + actNs + ":" + 
                QName.createValidLocalName(Application.getGlossaryFolderName(context)) +
                "/" + actNs + ":" + 
