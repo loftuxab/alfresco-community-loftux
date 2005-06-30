@@ -46,15 +46,23 @@ Install JDK 5.0
 Install MySQL
 -------------
 
+- If you already have MySQL 4.1 installed, skip to "Install Alfresco Tomcat Bundle"
+
 - Browse to http://dev.mysql.com/downloads/mysql/4.1.html
-- From "Linux downloads", choose your platform "Max" option (~29M)
-- Tar uncompress the download in your home directory
+- Download the approprate MySQL Max for your platform
+- Install by following MySQL's installation instructions
 
-This will create a folder '~/mysql-4.xxxxx'.  Rename this folder to:
-mysql
+Then create a database schema named 'alfresco', e.g.:
+   mysqladmin -u root create alfresco
 
-If you already have a MySQL installation, you will either have to uninstall
-it first, or make any changes as implied by the Manual Installation notes below.
+Then create a new user with full rights on this database, e.g.:
+   mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost' identified by 'alfresco' with grant option;"
+
+To check that this is working correctly, start MySQL and connect to the database:
+   mysql -u alfresco -p
+   mysql> use alfresco;
+   Database changed
+   mysql> quit
 
 
 Install Alfresco Tomcat Bundle
@@ -65,10 +73,6 @@ Install Alfresco Tomcat Bundle
 - Unzip alfresco-tc.tar.gz in your home directory
 
 This will create a folder '~/alfresco'
-
-Navigate to the '~/alfresco' folder and run 'db_setup.sh' if you did a new
-install of MySQL above.  This creates a MySQL database named 'alfresco' with a user 
-account and password of 'alfresco'.
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -93,7 +97,8 @@ in /opt/OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Navigate to the '~/alfresco' folder and run 'alf_start_tc.sh'
+Ensure that the MySQL server is running, then navigate to the '~/alfresco' folder and
+run 'alf_start_tc.sh'
 - two processes will be started for MySQL and OpenOffice
 - a console window will open for Tomcat
 - when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
@@ -135,4 +140,4 @@ mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
                    identified by 'alfresco' with grant option;"
 
 The Alfresco 'alf_start_tc.sh' starts the database and runs Tomcat's 'run.sh'.
-The 'alf_stop_tc.sh' runs Tomcat's 'shutdown.sh' and shutsdown the database.
+The 'alf_stop_tc.sh' runs Tomcat's 'shutdown.sh'.

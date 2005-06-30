@@ -46,16 +46,23 @@ Install JDK 5.0
 Install MySQL
 -------------
 
+- If you already have MySQL 4.1 installed, skip to "Install Alfresco JBoss Bundle"
+
 - Browse to http://dev.mysql.com/downloads/mysql/4.1.html
-- From "Linux downloads", choose your platform "Standard" option (~29M)
-- Tar uncompress the download in your home directory
+- Download the approprate MySQL Max for your platform
+- Install by following MySQL's installation instructions
 
-This will create a folder '~/mysql-4.xxxxx'.  Rename this folder to:
-mysql
+Then create a database schema named 'alfresco', e.g.:
+   mysqladmin -u root create alfresco
 
-If you already have a MySQL installation, you will either have to uninstall
-it first, or make any changes as implied by the Manual Installation notes below.
+Then create a new user with full rights on this database, e.g.:
+   mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost' identified by 'alfresco' with grant option;"
 
+To check that this is working correctly, start MySQL and connect to the database:
+   mysql -u alfresco -p
+   mysql> use alfresco;
+   Database changed
+   mysql> quit
 
 Install Alfresco JBoss Bundle
 -----------------------------
