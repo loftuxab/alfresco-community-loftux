@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -51,6 +52,7 @@ public class FileContentStore implements ContentStore
     private static final Log logger = LogFactory.getLog(FileContentStore.class);
     
     private File rootDirectory;
+    private String rootAbsolutePath;
 
     /**
      * @param rootDirectory the root under which files will be stored.  The
@@ -67,6 +69,7 @@ public class FileContentStore implements ContentStore
             }
         }
         rootDirectory = rootDirectory.getAbsoluteFile();
+        rootAbsolutePath = rootDirectory.getAbsolutePath();
     }
     
     public String toString()
@@ -117,15 +120,88 @@ public class FileContentStore implements ContentStore
      */
     private void checkUrl(String contentUrl) throws RuntimeException
     {
-        String urlStartCheck = FileContentStore.STORE_PROTOCOL + rootDirectory;
-        if (!contentUrl.startsWith(urlStartCheck))
+        if (!contentUrl.startsWith(FileContentStore.STORE_PROTOCOL))
         {
             throw new RuntimeException(
                     "This store is reserved for URLs starting with " +
-                    urlStartCheck + ": \n" +
+                    FileContentStore.STORE_PROTOCOL + ": \n" +
                     "   store: " + this +
                     " the invlid url is: "+contentUrl);
         }
+    }
+
+    /**
+     * Takes the file absolute path, strips off the protocol and the root
+     * path of the store to create the URL.
+     * 
+     * @param file the file from which to create the URL
+     * @return Returns a relative URL
+     * @throws Exception
+     */
+    private String makeContentUrl(File file)
+    {
+        String path = file.getAbsolutePath();
+        // check if it belongs to this store
+        if (!path.startsWith(rootAbsolutePath))
+        {
+            throw new AlfrescoRuntimeException(
+                    "File does not fall below the store's root: \n" +
+                    "   file: " + file + "\n" +
+                    "   store: " + this);
+        }
+        // strip off the file separator char, if present
+        int index = rootAbsolutePath.length();
+        if (path.charAt(index) == File.separatorChar)
+        {
+            index++;
+        }
+        // strip off the root path
+        String url = FileContentStore.STORE_PROTOCOL + path.substring(index);
+        // done
+        return url;
+    }
+    
+    /**
+     * Creates a file from the given relative URL.  The URL must start with
+     * the required {@link FileContentStore#STORE_PROTOCOL protocol prefix}.
+     * 
+     * @param contentUrl the content URL including the protocol prefix
+     * @return Returns a file representing the URL - the file may or may not
+     *      exist 
+     * 
+     * @see #checkUrl(String)
+     */
+    private static boolean warned = false;
+    private File makeFile(String contentUrl)
+    {
+        /*
+         * This temporary code is here to prevent mass barfing for data where
+         * the content URL is still in the old absolute format
+         */
+        if (contentUrl.contains("alfresco\\contentstore\\") ||
+                contentUrl.contains("alfresco/contentstore/"))
+        {
+            // strip off everything before that
+            int index = contentUrl.indexOf("alfresco\\contentstore\\");
+            if (index < 0)
+            {
+                index = contentUrl.indexOf("alfresco/contentstore/");
+            }
+            contentUrl = FileContentStore.STORE_PROTOCOL + contentUrl.substring(index + 22);
+            if (!warned)
+            {
+                logger.warn("Content URLs in database are absolute.  See issue AR-4");
+                warned = true;
+            }
+        }
+        
+        checkUrl(contentUrl);
+        // take just the part after the protocol
+        String relativeUrl = contentUrl.substring(7);
+        // get the file
+        File file = new File(rootDirectory, relativeUrl);
+        // done
+        return file;
     }
     
     /**
@@ -134,16 +210,16 @@ public class FileContentStore implements ContentStore
      */
     public ContentReader getReader(String contentUrl)
     {
-        checkUrl(contentUrl);
         try
         {
-            File file = new File(contentUrl.substring(6));
-            ContentReader reader = new FileContentReader(file);
+            File file = makeFile(contentUrl);
+            ContentReader reader = new FileContentReader(file, contentUrl);
             // done
             if (logger.isDebugEnabled())
             {
                 logger.debug("Created content reader: \n" +
                         "   url: " + contentUrl + "\n" +
+                        "   file: " + file + "\n" +
                         "   reader: " + reader);
             }
             return reader;
@@ -162,7 +238,10 @@ public class FileContentStore implements ContentStore
         try
         {
             File file = getNewStorageFile();
-            ContentWriter writer = new FileContentWriter(file);
+            // make a URL
+            String contentUrl = makeContentUrl(file);
+            // create the writer
+            ContentWriter writer = new FileContentWriter(file, contentUrl);
             // done
             if (logger.isDebugEnabled())
             {
@@ -210,29 +289,28 @@ public class FileContentStore implements ContentStore
             else
             {
                 // found a file - create and add the URL
-                String contentUrl = (FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
+                String contentUrl = makeContentUrl(file);
                 contentUrls.add(contentUrl);
             }
         }
     }
 
     /**
-     * Deletes the content at the URL provided it is <b>older than 24 hours</b>.
+     * Attempts to delete the content at the URL provided.
      */
     public boolean delete(String contentUrl) throws ContentIOException
     {
-        checkUrl(contentUrl);
-        // check if the file exists
         try
         {
-            File file = new File(contentUrl.substring(6));
-            if (file.exists() &&
-                    file.lastModified() < (System.currentTimeMillis() - 86400000))  // modified more than 24 hours ago 
+            File file = makeFile(contentUrl);
+            // check if the file exists
+            if (file.exists()) 
             {
                 return file.delete();
             }
             else
             {
+                // already gone
                 return true;
             }
         }

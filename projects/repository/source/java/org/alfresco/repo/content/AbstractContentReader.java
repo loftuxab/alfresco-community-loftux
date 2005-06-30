@@ -55,7 +55,8 @@ public abstract class AbstractContentReader extends AbstractContent implements C
     private ReadableByteChannel channel;
     
     /**
-     * @param contentUrl the content URL
+     * @param contentUrl the content URL - this should be relative to the root of the store
+     *      and not absolute: to enable moving of the stores
      */
     protected AbstractContentReader(String contentUrl)
     {

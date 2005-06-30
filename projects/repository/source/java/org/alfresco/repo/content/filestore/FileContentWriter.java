@@ -48,12 +48,26 @@ public class FileContentWriter extends AbstractContentWriter implements RandomAc
     private File file;
     
     /**
-     * @param file the file for reading and writing.  This will most likely be directly
+     * Constructor that builds a URL based on the absolute path of the file.
+     * 
+     * @param file the file for writing.  This will most likely be directly
      *      related to the content URL.
      */
     public FileContentWriter(File file)
     {
-        super(FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
+        this(file, FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
+    }
+    
+    /**
+     * Constructor that explicitely sets the URL that the reader represents.
+     * 
+     * @param file the file for writing.  This will most likely be directly
+     *      related to the content URL.
+     * @param url the relative url that the reader represents
+     */
+    public FileContentWriter(File file, String url)
+    {
+        super(url);
         
         this.file = file;
     }
@@ -73,7 +87,7 @@ public class FileContentWriter extends AbstractContentWriter implements RandomAc
     @Override
     protected ContentReader createReader() throws ContentIOException
     {
-        return new FileContentReader(this.file);
+        return new FileContentReader(this.file, getContentUrl());
     }
     
     @Override
