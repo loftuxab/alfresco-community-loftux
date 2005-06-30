@@ -38,6 +38,9 @@
 	  <property name="contentService">
 		 <ref bean="contentService"/>
 	  </property>	
+	  <property name="dictionaryService">
+		 <ref bean="dictionaryService"></ref>
+	  </property>
    </bean>
    
    <!-- Definitions for beans that use the common resource -->

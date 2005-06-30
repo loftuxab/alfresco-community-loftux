@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleCondition;
 
@@ -59,6 +60,11 @@ public class RuleXMLUtilTest extends RuleBaseTest
     private RuleImpl rule;
     
     /**
+     * The dictionary service
+     */
+    private DictionaryService dictionaryService;
+    
+    /**
      * Setup the tests
      * 
      * @see junit.framework.TestCase#setUp()
@@ -66,7 +72,10 @@ public class RuleXMLUtilTest extends RuleBaseTest
     protected void onSetUpInTransaction() throws Exception
     {
         super.onSetUpInTransaction();
-		
+        
+        // Set the dictionary service
+        this.dictionaryService = (DictionaryService)this.applicationContext.getBean("dictionaryService");
+        
         // Create the test rule
         this.rule = createTestRule(RULE_ID);
         this.rule.setTitle(TITLE2);
@@ -78,7 +87,7 @@ public class RuleXMLUtilTest extends RuleBaseTest
     public void testXMLToRule()
     {
         // Get the rule from the XML
-        RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, XML);
+        RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, XML, this.dictionaryService);
         assertNotNull(rule);
         
         // Check the basic details of the rule
@@ -133,7 +142,7 @@ public class RuleXMLUtilTest extends RuleBaseTest
 		this.rule.setTitle(null);
 		this.rule.setDescription(null);
 		String ruleXML = RuleXMLUtil.ruleToXML(this.rule);
-		RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, ruleXML);
+		RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, ruleXML, this.dictionaryService);
 		assertNull(rule.getTitle());
 		assertNull(rule.getDescription());
 	}

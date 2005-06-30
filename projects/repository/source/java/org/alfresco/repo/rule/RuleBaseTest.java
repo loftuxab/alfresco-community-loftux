@@ -100,6 +100,8 @@ public class RuleBaseTest extends BaseSpringTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
+        
+        
         // Get the services
         this.nodeService = (NodeService) this.applicationContext
                 .getBean("nodeService");

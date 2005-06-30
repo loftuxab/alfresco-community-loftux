@@ -24,10 +24,11 @@ package org.alfresco.service.cmr.rule;
  */
 public enum ParameterType
 {
-    STRING,
-    INT,
-    BOOLEAN,
-    DATE,
-    QNAME,
-    NODE_REF
+    STRING,             
+    INT,                
+    BOOLEAN,            
+    DATE,               
+    QNAME,              
+    NODE_REF,       
+    PROPERTY_VALUES     
 }

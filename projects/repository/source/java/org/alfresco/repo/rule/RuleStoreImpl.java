@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -63,6 +64,11 @@ public class RuleStoreImpl implements RuleStore
 	private RuleService ruleService;
     
     /**
+     * The dictionary service
+     */
+    private DictionaryService dictionaryService;
+    
+    /**
      * Rule cache entries indexed by node reference
      */
     private Map<NodeRef, RuleCacheEntry> ruleCache = new HashMap<NodeRef, RuleCacheEntry>();
@@ -96,6 +102,16 @@ public class RuleStoreImpl implements RuleStore
 	{
 		this.ruleService = ruleService;
 	}
+    
+    /**
+     * Set the dictionary service
+     * 
+     * @param dictionaryService  the dictionary service
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
     
 	/**
 	 * @see org.alfresco.repo.rule.RuleStore#hasRules(org.alfresco.service.cmr.repository.NodeRef)
@@ -275,7 +291,7 @@ public class RuleStoreImpl implements RuleStore
                 {
                     // Create the rule from the XML content
                     String ruleXML = contentReader.getContentString();
-                    RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, ruleXML);
+                    RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, ruleXML, this.dictionaryService);
                     
                     // Set the rule content id
                     rule.setRuleContentNodeRef(nodeRef);

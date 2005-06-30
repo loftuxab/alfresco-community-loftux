@@ -213,7 +213,29 @@ public class RuleServiceSystemTest extends TestCase
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();            
         assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));   
-		
+        
+        Map<QName, Serializable> aspectProps = new HashMap<QName, Serializable>();
+        aspectProps.put(ContentModel.PROP_APPROVE_STEP, "approveStep");
+        aspectProps.put(ContentModel.PROP_APPROVE_MOVE, false);
+        
+        Map<String, Serializable> params2 = new HashMap<String, Serializable>(2);
+        params2.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, ContentModel.ASPECT_SIMPLE_WORKFLOW);
+        params2.put(AddFeaturesActionExecutor.PARAM_ASPECT_PROPERTIES, (Serializable)aspectProps);
+        
+        rule.removeAllRuleActions();
+        rule.addRuleAction(action, params2);
+        this.ruleService.addRule(this.nodeRef, rule);
+        
+        NodeRef newNodeRef2 = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();            
+        assertTrue(this.nodeService.hasAspect(newNodeRef2, ContentModel.ASPECT_SIMPLE_WORKFLOW));
+        assertEquals("approveStep", this.nodeService.getProperty(newNodeRef2, ContentModel.PROP_APPROVE_STEP));
+        assertEquals(false, this.nodeService.getProperty(newNodeRef2, ContentModel.PROP_APPROVE_MOVE));
+        
         // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));        
     }   
 	

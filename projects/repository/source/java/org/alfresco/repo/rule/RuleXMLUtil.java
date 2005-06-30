@@ -25,7 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
@@ -51,6 +54,11 @@ import org.dom4j.io.SAXReader;
 /*package*/ class RuleXMLUtil
 {
     /**
+     * Property values delimiter
+     */
+    private static final String PROPERTY_VALUES_DELIMITER = "~";
+    
+    /**
      * XML nodes and attribute names
      */
     private static final String ATT_ID = "id";
@@ -70,7 +78,7 @@ import org.dom4j.io.SAXReader;
      * @param ruleService	the rule service
      * @param ruleXML		the rule XML
      */
-    public static RuleImpl XMLToRule(RuleService ruleService, String ruleXML)
+    public static RuleImpl XMLToRule(RuleService ruleService, String ruleXML, DictionaryService dictionaryService)
     {
         try
         {
@@ -124,7 +132,7 @@ import org.dom4j.io.SAXReader;
                 }                
                 
                 // Get the parameter values
-                Map<String, Serializable> params = XMLToParameters(ruleConditionDefinition, conditionElement);
+                Map<String, Serializable> params = XMLToParameters(ruleConditionDefinition, conditionElement, dictionaryService);
                 
                 // Add the condition to the rule
                 rule.addRuleCondition(ruleConditionDefinition, params);
@@ -149,7 +157,7 @@ import org.dom4j.io.SAXReader;
                 }                
                 
                 // Get the parameter values
-                Map<String, Serializable> params = XMLToParameters(ruleActionDefinition, actionElement);
+                Map<String, Serializable> params = XMLToParameters(ruleActionDefinition, actionElement, dictionaryService);
                 
                 // Add the condition to the rule
                 rule.addRuleAction(ruleActionDefinition, params);
@@ -172,7 +180,8 @@ import org.dom4j.io.SAXReader;
      */
     private static Map<String, Serializable> XMLToParameters(
             RuleItemDefinition ruleItemDefinition, 
-            Element itemElement)
+            Element itemElement,
+            DictionaryService dictionaryService)
     {
         Map<String, Serializable> params = new HashMap<String, Serializable>();
         
@@ -196,7 +205,7 @@ import org.dom4j.io.SAXReader;
             
             // Get the value of the parameter
             String valueAsString = paramElement.getStringValue();
-            Serializable value = getValueFromString(valueAsString, paramDef.getType());
+            Serializable value = getValueFromString(valueAsString, paramDef.getType(), dictionaryService);
             
             params.put(name, value);
         }
@@ -267,18 +276,22 @@ import org.dom4j.io.SAXReader;
     {
         StringBuilder builder = new StringBuilder();
         
-        for (Map.Entry entry : ruleItem.getParameterValues().entrySet())
-        {
-            ParameterDefinition paramDef = ruleItemDefinition.getParameterDefintion((String)entry.getKey());
+        for (Map.Entry<String, Serializable> entry : ruleItem.getParameterValues().entrySet())
+        {         
+            // Get the parameter definition
+            String name = entry.getKey();
+            ParameterDefinition paramDef = ruleItemDefinition.getParameterDefintion(name);
             if (paramDef == null)
             {
                 throw new RuleServiceException(
-                        MessageFormat.format("Unable to find defintion of parameter {0}", new Object[]{entry.getKey()}));
+                        MessageFormat.format(
+                                "The parameter {0} is not defined for the rule item {1}.",
+                                new Object[]{name, ruleItemDefinition.getName()}));
             }
             
             builder.
                 append("<parameter name='").append(entry.getKey()).append("'><![CDATA[").
-                append(getStringFromValue((Serializable)entry.getValue(), paramDef.getType())).
+                append(getStringFromValue(entry.getValue(), paramDef.getType())).
                 append("]]></parameter>");
         }
         
@@ -294,56 +307,93 @@ import org.dom4j.io.SAXReader;
      */
     private static Serializable getValueFromString(
             String valueAsString, 
-            ParameterType type)
+            ParameterType type,
+            DictionaryService dictionaryService)
     {
         Serializable result = null;
         switch (type)
         {
+            case PROPERTY_VALUES:
+                Map<QName, Serializable> map = new HashMap<QName, Serializable>();
+                String[] values = valueAsString.split(PROPERTY_VALUES_DELIMITER);
+                for (int i = 0; i < values.length; i++)
+                {
+                    String qnameString = values[i];
+                    String valueString = values[i+1];
+                    
+                    QName propertyName = ValueConverter.convert(QName.class, qnameString);
+                    PropertyTypeDefinition propertyTypeDefinition = dictionaryService.getProperty(propertyName).getPropertyType();
+                    Serializable value = (Serializable)ValueConverter.convert(propertyTypeDefinition, valueString);
+                    
+                    map.put(propertyName, value);
+                    
+                    i++;
+                }
+                result = (Serializable)map;
+                break;
             case DATE:
-                result = new Date(Long.parseLong(valueAsString));
+                result = ValueConverter.convert(Date.class, valueAsString);
                 break;
             case QNAME:
-                result = QName.createQName(valueAsString);
+                result = ValueConverter.convert(QName.class, valueAsString);
                 break;
             case NODE_REF:
-                result = new NodeRef(valueAsString);
+                result = ValueConverter.convert(NodeRef.class, valueAsString);
                 break;
             case INT:
-                result = Integer.getInteger(valueAsString);
+                result = ValueConverter.convert(Integer.class, valueAsString);
                 break;
             case BOOLEAN:
-				result = Boolean.valueOf(valueAsString);
+                result = ValueConverter.convert(Boolean.class, valueAsString);
 				break;
             default:
                 result = valueAsString;
                 break;
         }
         return result;
-    }
-
+    }           
+    
     /**
-     * Get the string from value
-     * 
-     * @param value		the value
-     * @param type		the parameter type
-     * @return			the value as a string
+     * Get the string value 
+     * @param value
+     * @param type
+     * @return
      */
     private static String getStringFromValue(
-            Serializable value, 
+            Serializable value,
             ParameterType type)
     {
         String result = null;
         switch (type)
         {
-            case DATE:
-                result = Long.toString(((Date)value).getTime());
+            case PROPERTY_VALUES:
+                boolean bFirstTime = true;
+                StringBuilder builder = new StringBuilder();
+                Map<QName, Serializable> propertyMap = (Map<QName, Serializable>)value;
+                for (Map.Entry<QName, Serializable> entry : propertyMap.entrySet())
+                {
+                    if (bFirstTime == true)
+                    {
+                        bFirstTime = false;
+                    }
+                    else
+                    {
+                        builder.append(PROPERTY_VALUES_DELIMITER);
+                    }
+                    
+                    builder.append(ValueConverter.convert(String.class, entry.getKey()));
+                    builder.append(PROPERTY_VALUES_DELIMITER);
+                    builder.append(ValueConverter.convert(String.class, entry.getValue()));
+                }
+                result = builder.toString();
                 break;
+            case DATE:
             case QNAME:
             case NODE_REF:
-            case INT:    
+            case INT:
             case BOOLEAN:
             default:
-                result = value.toString();
+                result = ValueConverter.convert(String.class, value);
                 break;
         }
         return result;

@@ -169,7 +169,7 @@ public class ValueConverter
     }
 
     /**
-     * Get a typed iterator over the values int eh multi valued collection
+     * Get a typed iterator over the values in the multi valued collection
      * Also works for single value 
      * 
      * next() may fail with conversion failures as we convert as we go.
@@ -698,6 +698,15 @@ public class ValueConverter
                     public QName convert(String source)
                     {
                         return QName.createQName(source);
+                    }
+
+                });
+        
+        map.put(NodeRef.class, new Converter<String, NodeRef>()
+                {
+                    public NodeRef convert(String source)
+                    {
+                        return new NodeRef(source);
                     }
 
                 });
