@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -38,6 +39,7 @@ import org.alfresco.repo.rule.action.CheckInActionExecutor;
 import org.alfresco.repo.rule.action.CheckOutActionExecutor;
 import org.alfresco.repo.rule.action.CopyActionExecutor;
 import org.alfresco.repo.rule.action.LinkCategoryActionExecutor;
+import org.alfresco.repo.rule.action.MailActionExecutor;
 import org.alfresco.repo.rule.action.MoveActionExecutor;
 import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
 import org.alfresco.repo.rule.action.TransformActionExecutor;
@@ -81,6 +83,9 @@ public class NewRuleWizard extends AbstractWizardBean
    public static final String PROP_REJECT_FOLDER = "rejectFolder";
    public static final String PROP_CHECKIN_DESC = "checkinDescription";
    public static final String PROP_TRANSFORMER = "transformer";
+   public static final String PROP_MESSAGE = "message";
+   public static final String PROP_SUBJECT = "subject";
+   public static final String PROP_TO = "to";
    
    private static Logger logger = Logger.getLogger(NewRuleWizard.class);
    
@@ -110,6 +115,7 @@ public class NewRuleWizard extends AbstractWizardBean
    private List<SelectItem> actions;
    private List<SelectItem> transformers;
    private List<SelectItem> aspects;
+   private List<SelectItem> users;
    private Map<String, String> conditionDescriptions;
    private Map<String, String> actionDescriptions;
    private Map<String, String> conditionProperties;
@@ -295,6 +301,20 @@ public class NewRuleWizard extends AbstractWizardBean
             actionParams.put(TransformActionExecutor.PARAM_ASSOC_QNAME, 
                   QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
          }
+         else if (this.action.equals(MailActionExecutor.NAME))
+         {
+            // add the actual email text to send
+            actionParams.put(MailActionExecutor.PARAM_TEXT, 
+                  this.actionProperties.get(PROP_MESSAGE));
+               
+            // add the person it's going to
+            actionParams.put(MailActionExecutor.PARAM_TO, 
+                  this.actionProperties.get(PROP_TO));
+            
+            // add the subject for the email
+            actionParams.put(MailActionExecutor.PARAM_SUBJECT,
+                  this.actionProperties.get(PROP_SUBJECT));
+         }
 
          // get the definition for the selected condition and action
          Rule rule = null;
@@ -333,11 +353,14 @@ public class NewRuleWizard extends AbstractWizardBean
          this.ruleService.addRule(currentSpace.getNodeRef(), rule);
          
          if (logger.isDebugEnabled())
-            logger.debug("Added rule '" + this.title + "' with condition '" + 
+         {
+            logger.debug(this.editMode ? "Updated" : "Added" 
+                         + " rule '" + this.title + "' with condition '" + 
                          this.condition + "', action '" + this.action + 
                          "', condition params of " +
                          this.conditionProperties + " and action params of " + 
                          this.actionProperties);
+         }
          
          // commit the transaction
          tx.commit();
@@ -550,6 +573,12 @@ public class NewRuleWizard extends AbstractWizardBean
       this.action = "add-features";
       this.condition = "no-condition";
       
+      if (this.users != null)
+      {
+         this.users.clear();
+         this.users = null;
+      }
+      
       if (this.actions != null)
       {
          this.actions.clear();
@@ -701,6 +730,17 @@ public class NewRuleWizard extends AbstractWizardBean
          
          NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecutor.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+      }
+      else if (this.action.equals(MailActionExecutor.NAME))
+      {
+         String subject = (String)actionProps.get(MailActionExecutor.PARAM_SUBJECT);
+         this.actionProperties.put(PROP_SUBJECT, subject);
+         
+         String message = (String)actionProps.get(MailActionExecutor.PARAM_TEXT);
+         this.actionProperties.put(PROP_MESSAGE, message);
+         
+         String to = (String)actionProps.get(MailActionExecutor.PARAM_TO);
+         this.actionProperties.put(PROP_TO, to);
       }
    }
 
@@ -1016,6 +1056,30 @@ public class NewRuleWizard extends AbstractWizardBean
       }
       
       return this.aspects;
+   }
+   
+   public List<SelectItem> getUsers()
+   {
+      if (this.users == null)
+      {
+         List<Node> userNodes = Repository.getUsers(FacesContext.getCurrentInstance(),
+               this.nodeService);
+         this.users = new ArrayList<SelectItem>();
+         for (Node user : userNodes)
+         {
+            String email = (String)user.getProperties().get("email");
+            if (email != null && email.length() > 0)
+            {
+               this.users.add(new SelectItem(email, (String)user.getProperties().get("fullName")));
+            }
+         }
+         
+         // make sure the list is sorted by the label
+         QuickSort sorter = new QuickSort(this.users, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+         sorter.sort();
+      }
+      
+      return this.users;
    }
    
    /**

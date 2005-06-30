@@ -24,6 +24,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
+import org.apache.log4j.Logger;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -34,6 +35,8 @@ import org.springframework.mail.javamail.JavaMailSender;
  */
 public class MailActionExecutor extends RuleActionExecutorAbstractBase 
 {
+    private static Logger logger = Logger.getLogger(MailActionExecutor.class);
+    
 	/**
 	 * Action executor constants
 	 */
@@ -77,8 +80,16 @@ public class MailActionExecutor extends RuleActionExecutorAbstractBase
 		simpleMailMessage.setText((String)ruleAction.getParameterValue(PARAM_TEXT));
         simpleMailMessage.setFrom(FROM_ADDRESS);
 			
-        // Send the message
-		javaMailSender.send(simpleMailMessage);
+        try
+        {
+           // Send the message
+           javaMailSender.send(simpleMailMessage);
+        }
+        catch (Throwable e)
+        {
+           // don't stop the action but let admins know email is not getting sent
+           logger.error("Failed to send email to " + (String)ruleAction.getParameterValue(PARAM_TO), e);
+        }
 	}
 
     /**

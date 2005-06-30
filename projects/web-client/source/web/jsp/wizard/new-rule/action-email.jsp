@@ -27,13 +27,40 @@
 
 <r:page>
 
+   
+<script language="JavaScript1.2">
+   
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("new-rule-email:subject").focus();
+      checkButtonState();
+   }
+   
+   function checkButtonState()
+   {
+      if (document.getElementById("new-rule-email:subject").value.length == 0 ||
+          document.getElementById("new-rule-email:address").value.length == 0)
+      {
+         document.getElementById("new-rule-email:next-button").disabled = true;
+         document.getElementById("new-rule-email:finish-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("new-rule-email:next-button").disabled = false;
+         document.getElementById("new-rule-email:finish-button").disabled = false;
+      }
+   }
+</script>
+   
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="messages" var="msg"/>
    
    <h:form id="new-rule-email">
-   
+      
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
       
@@ -116,12 +143,30 @@
                                     <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 
-
-                                 <tr><td>Email settings defined here</td></tr>
-
-
-
+                                 <tr>
+                                    <td>Subject:</td>
+                                    <td width="90%">
+                                       <h:inputText id="subject" value="#{NewRuleWizard.actionProperties.subject}" 
+                                                    size="75" maxlength="1024" 
+                                                    onkeyup="javascript:checkButtonState();"/>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td valign="top">Message:</td>
+                                    <td>
+                                       <h:inputTextarea value="#{NewRuleWizard.actionProperties.message}" 
+                                                        rows="5" cols="75" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td valign="top">To:</td>
+                                    <td>
+                                       <h:selectOneMenu id="address" value="#{NewRuleWizard.actionProperties.to}"
+                                                            onchange="javascript:checkButtonState();">
+                                          <f:selectItems value="#{NewRuleWizard.users}" />
+                                       </h:selectOneMenu>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
@@ -135,7 +180,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton id="next-button" value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -145,7 +190,7 @@
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewRuleWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton id="finish-button" value="Finish" action="#{NewRuleWizard.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>

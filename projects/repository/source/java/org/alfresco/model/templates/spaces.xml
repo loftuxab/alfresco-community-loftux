@@ -34,8 +34,8 @@
 				    <alf:contains>
 						<alf:content>
 	         				<alf:uifacets/>
-				    		<alf:title>System Overview</alf:title>
-            				<alf:name>System Overview</alf:name>
+				    		   <alf:title>System Overview</alf:title>
+            				<alf:name>system-overview.html</alf:name>
             				<alf:mimetype>text/html</alf:mimetype>
             				<alf:contentUrl>classpath:org/alfresco/model/templates/system-overview.html</alf:contentUrl>
             	        </alf:content>

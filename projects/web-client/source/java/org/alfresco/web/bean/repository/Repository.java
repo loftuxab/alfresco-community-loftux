@@ -18,18 +18,25 @@
 package org.alfresco.web.bean.repository;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -37,9 +44,11 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.ui.common.Utils;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -66,6 +75,9 @@ public final class Repository
    
    /** cache of client StoreRef */
    private static StoreRef storeRef = null;
+   
+   /** reference to person folder */
+   private static NodeRef peopleRef = null;
    
    /**
     * Private constructor
@@ -376,5 +388,100 @@ public final class Repository
    {
        return (ServiceRegistry)FacesContextUtils.getRequiredWebApplicationContext(
                context).getBean(ServiceRegistry.SERVICE_REGISTRY);
+   }
+   
+   /**
+    * Query a list of Person type nodes from the repo
+    * It is currently assumed that all Person nodes exist below the Repository root node
+    * 
+    * @param context Faces Context
+    * @param nodeService The node service
+    * @return List of Person node objects
+    */
+   public static List<Node> getUsers(FacesContext context, NodeService nodeService)
+   {
+      List<Node> personNodes = null;
+      
+      UserTransaction tx = null;
+      try
+      {
+         tx = Repository.getUserTransaction(context);
+         tx.begin();
+         
+         NodeRef peopleRef = getSystemPeopleFolderRef(context, nodeService);
+         
+         // TODO: better to perform an XPath search or a get for a specific child type here?
+         List<ChildAssociationRef> childRefs = nodeService.getChildAssocs(peopleRef);
+         personNodes = new ArrayList<Node>(childRefs.size());
+         for (ChildAssociationRef ref: childRefs)
+         {
+            // create our Node representation from the NodeRef
+            NodeRef nodeRef = ref.getChildRef();
+            
+            if (nodeService.getType(nodeRef).equals(ContentModel.TYPE_PERSON))
+            {
+               // create our Node representation
+               MapNode node = new MapNode(nodeRef, nodeService);
+               
+               // set data binding properties
+               // this will also force initialisation of the props now during the UserTransaction
+               // it is much better for performance to do this now rather than during page bind
+               Map<String, Object> props = node.getProperties(); 
+               props.put("fullName", ((String)props.get("firstName")) + ' ' + ((String)props.get("lastName")));
+               
+               personNodes.add(node);
+            }
+         }
+         
+         // commit the transaction
+         tx.commit();
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {"root"}) );
+         personNodes = Collections.<Node>emptyList();
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+      }
+      catch (Exception err)
+      {
+         Utils.addErrorMessage( MessageFormat.format(ERROR_GENERIC, err.getMessage()), err );
+         personNodes = Collections.<Node>emptyList();
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+      }
+      
+      return personNodes;
+   }
+   
+   /**
+    * Return a reference to the special system folder containing Person instances
+    * 
+    * @param context
+    * 
+    * @return NodeRef to Person folder
+    */
+   public static NodeRef getSystemPeopleFolderRef(FacesContext context, NodeService nodeService)
+   {
+      if (peopleRef == null)
+      {
+         // get a reference to the system types folder node
+         DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
+         resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+         
+         List<NodeRef> results = nodeService.selectNodes(
+               nodeService.getRootNode(Repository.getStoreRef()),
+               RepositoryAuthenticationDao.PEOPLE_FOLDER,
+               null,
+               resolver,
+               false);
+         
+         if (results.size() != 1)
+         {
+            throw new AlfrescoRuntimeException("Unable to find system types folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
+         }
+         
+         peopleRef = results.get(0);
+      }
+      
+      return peopleRef;
    }
 }

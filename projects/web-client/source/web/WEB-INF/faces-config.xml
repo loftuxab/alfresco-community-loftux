@@ -832,7 +832,7 @@
          <to-view-id>/jsp/wizard/new-rule/action-transform.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
-         <from-outcome>email</from-outcome>
+         <from-outcome>mail</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/action-email.jsp</to-view-id>
       </navigation-case>
       <navigation-case>

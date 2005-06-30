@@ -264,22 +264,6 @@ public class Application
    }
    
    /**
-    * @return Returns the company root description (retrieved from config service)
-    */
-   public static String getCompanyRootDescription(ServletContext context)
-   {
-      return getCompanyRootDescription(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
-   }
-   
-   /**
-    * @return Returns the company root description (retrieved from config service)
-    */
-   public static String getCompanyRootDescription(FacesContext context)
-   {
-      return getCompanyRootDescription(FacesContextUtils.getRequiredWebApplicationContext(context));
-   }
-   
-   /**
     * @return Returns the glossary folder name (retrieved from config service)
     */
    public static String getGlossaryFolderName(ServletContext context)
@@ -353,30 +337,6 @@ public class Application
       }
       
       return rootPath;
-   }
-   
-   /**
-    * Returns the company root description (retrieved from config service)
-    * 
-    * @param context The spring context
-    * @return The company root description
-    */
-   private static String getCompanyRootDescription(WebApplicationContext context)
-   {
-      if (companyRootDescription == null)
-      {
-         ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
-         ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
-         for (ConfigElement child : repoConfig.getChildren())
-         {
-            if (child.getName().equals("company-root-description"))
-            {
-               companyRootDescription = child.getValue();
-            }
-         }
-      }
-      
-      return companyRootDescription;
    }
    
    /**

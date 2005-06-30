@@ -64,6 +64,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 {
    private static Logger logger = Logger.getLogger(ContextListener.class);
    private static final String ADMIN = "admin";
+   private static final String ADMIN_FIRSTNAME = "Repository";
+   private static final String ADMIN_LASTNAME = "Administrator";
    private ServletContext servletContext;
    
    /**
@@ -102,17 +104,23 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
              throw new AlfrescoRuntimeException("Store not created prior to application startup: " + storeRef);
          }
 
-         
+         // get hold of the root node
          NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
          
          // see if the company home space is present
          String rootPath = Application.getRootPath(servletContext);
+         if (rootPath == null)
+         {
+            throw new AlfrescoRuntimeException("Root path has not been configured, is 'root-path' element missing?");
+         }
+         
          String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(rootPath);
          List<NodeRef> nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
          if (nodes.size() == 0)
          {
              throw new AlfrescoRuntimeException("Root path not created prior to application startup: " + rootPath);
          }
+         
          // Extract company space id and store it in the Application object
          companySpaceId = nodes.get(0).getId();
          Application.setCompanyRootId(companySpaceId);
@@ -153,8 +161,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             // create the node to represent the Person instance for the admin user
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
             props.put(ContentModel.PROP_USERNAME, ADMIN);
-            props.put(ContentModel.PROP_FIRSTNAME, ADMIN);
-            props.put(ContentModel.PROP_LASTNAME, ADMIN);
+            props.put(ContentModel.PROP_FIRSTNAME, ADMIN_FIRSTNAME);
+            props.put(ContentModel.PROP_LASTNAME, ADMIN_LASTNAME);
             props.put(ContentModel.PROP_HOMEFOLDER, companySpaceId);
             props.put(ContentModel.PROP_EMAIL, "");
             props.put(ContentModel.PROP_ORGID, "");

@@ -19,8 +19,6 @@ package org.alfresco.web.bean.wizard;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,16 +35,13 @@ import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -72,9 +67,6 @@ public class NewUserWizard extends AbstractWizardBean
    private static final String STEP2_DESCRIPTION = "Enter information about this user.";
    private static final String FINISH_INSTRUCTION = "To add the user to this space click Finish.<br/>" +
                                                     "To review or change your selections click Back.";
-
-  
-   private static final String ERROR_GENERIC = "A system error occured during the operation: {0}";
    
    /** form variables */
    private String firstName = null;
@@ -345,7 +337,7 @@ public class NewUserWizard extends AbstractWizardBean
          else
          {
             // get the node ref of the node that will contain the content
-            NodeRef peopleNode = getSystemPeopleFolderRef(context);
+            NodeRef peopleNode = Repository.getSystemPeopleFolderRef(context, this.nodeService);
             
             // create properties for Person type from submitted Form data
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
@@ -510,7 +502,7 @@ public class NewUserWizard extends AbstractWizardBean
     */
    public List<Node> getUsers()
    {
-      return queryPersonNodes();
+      return Repository.getUsers(FacesContext.getCurrentInstance(), this.nodeService);
    }
 
    /**
@@ -763,100 +755,6 @@ public class NewUserWizard extends AbstractWizardBean
    
    // ------------------------------------------------------------------------------
    // Helper methods
-   
-   /**
-    * Query a list of Person type nodes from the repo
-    * It is currently assumed that all Person nodes exist below the Repository root node
-    * 
-    * @return List of Person node objects
-    */
-   private List<Node> queryPersonNodes()
-   {
-      List<Node> personNodes = null;
-      
-      UserTransaction tx = null;
-      try
-      {
-         FacesContext context = FacesContext.getCurrentInstance();
-         tx = Repository.getUserTransaction(context);
-         tx.begin();
-         
-         NodeRef peopleRef = getSystemPeopleFolderRef(context);
-         
-         // TODO: better to perform an XPath search or a get for a specific child type here?
-         List<ChildAssociationRef> childRefs = this.nodeService.getChildAssocs(peopleRef);
-         personNodes = new ArrayList<Node>(childRefs.size());
-         for (ChildAssociationRef ref: childRefs)
-         {
-            // create our Node representation from the NodeRef
-            NodeRef nodeRef = ref.getChildRef();
-            
-            if (this.nodeService.getType(nodeRef).equals(ContentModel.TYPE_PERSON))
-            {
-               // create our Node representation
-               MapNode node = new MapNode(nodeRef, this.nodeService);
-               
-               // set data binding properties
-               // this will also force initialisation of the props now during the UserTransaction
-               // it is much better for performance to do this now rather than during page bind
-               Map<String, Object> props = node.getProperties(); 
-               props.put("fullName", ((String)props.get("firstName")) + ' ' + ((String)props.get("lastName")));
-               
-               personNodes.add(node);
-            }
-         }
-         
-         // commit the transaction
-         tx.commit();
-      }
-      catch (InvalidNodeRefException refErr)
-      {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {"root"}) );
-         personNodes = Collections.<Node>emptyList();
-         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-      }
-      catch (Exception err)
-      {
-         Utils.addErrorMessage( MessageFormat.format(ERROR_GENERIC, err.getMessage()), err );
-         personNodes = Collections.<Node>emptyList();
-         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-      }
-      
-      return personNodes;
-   }
-   
-   /**
-    * Return a reference to the special system folder containing Person instances
-    * 
-    * @param context
-    * 
-    * @return NodeRef to Person folder
-    */
-   private NodeRef getSystemPeopleFolderRef(FacesContext context)
-   {
-      if (peopleRef == null)
-      {
-         // get a reference to the system types folder node
-         DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-         
-         List<NodeRef> results = nodeService.selectNodes(
-               this.nodeService.getRootNode(Repository.getStoreRef()),
-               RepositoryAuthenticationDao.PEOPLE_FOLDER,
-               null,
-               resolver,
-               false);
-         
-         if (results.size() != 1)
-         {
-            throw new AlfrescoRuntimeException("Unable to find system types folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
-         }
-         
-         peopleRef = results.get(0);
-      }
-      
-      return peopleRef;
-   }
    
    /**
     * Helper to return the company home space
