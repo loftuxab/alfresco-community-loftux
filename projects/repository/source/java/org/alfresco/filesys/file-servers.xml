@@ -30,9 +30,9 @@
          <store>workspace://SpacesStore</store>
          <rootPath>/alf:Company_Home</rootPath>
 
-         <accessControl default="Read">
+         <accessControl default="Write">
             <user name="derekh" access="Write"/>
-						<user name="gkspencer" access="Write"/>
+   			<user name="gkspencer" access="Write"/>
             <address subnet="90.1.0.0" mask="255.255.0.0" access="Write"/>
          </accessControl>
       </filesystem>
