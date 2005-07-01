@@ -65,7 +65,7 @@ public class DictionaryDAOTest extends TestCase
         List<String> bootstrapModels = new ArrayList<String>();
         bootstrapModels.add("org/alfresco/model/dictionary_model.xml");
         bootstrapModels.add("org/alfresco/model/content_model.xml");
-        bootstrapModels.add("org/alfresco/repo/version/lightweight/version_model.xml");
+        bootstrapModels.add("org/alfresco/repo/version/version_model.xml");
         dictionaryDAO.setBootstrapModels(bootstrapModels);
         dictionaryDAO.bootstrap();
     }
@@ -82,14 +82,14 @@ public class DictionaryDAOTest extends TestCase
         // Test invalid args
         try
         {
-            boolean test = service.isSubClass(invalid, referencable);
+            service.isSubClass(invalid, referencable);
             fail("Failed to catch invalid class parameter");
         }
         catch(InvalidTypeException e) {}
 
         try
         {
-            boolean test = service.isSubClass(referencable, invalid);
+            service.isSubClass(referencable, invalid);
             fail("Failed to catch invalid class parameter");
         }
         catch(InvalidTypeException e) {}
