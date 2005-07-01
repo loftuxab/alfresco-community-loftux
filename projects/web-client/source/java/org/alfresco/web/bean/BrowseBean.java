@@ -45,6 +45,7 @@ import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.NodePropertyResolver;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
@@ -357,6 +358,10 @@ public class BrowseBean implements IContextListener
     */
    private void queryBrowseNodes(String parentNodeId)
    {
+      long startTime = 0;
+      if (logger.isDebugEnabled())
+         startTime = System.currentTimeMillis();
+      
       UserTransaction tx = null;
       try
       {
@@ -391,15 +396,22 @@ public class BrowseBean implements IContextListener
             // look for Space or File nodes
             if (type.equals(ContentModel.TYPE_FOLDER))
             {
+               // TODO: Build a specific impl of a MapNode - one that matches certain props
+               //       to return them dynamically - this is to reduce pulling back the entire
+               //       set of props and aspects for all nodes - even if they are not displayed!
+               //       Will this help? As we need to get at least Name etc. for sorting purposes,
+               //       if the props are always needed then it's better to get them here. At least
+               //       the aspects are not always requried - e.g. only need lock info if visible.
+               
                // create our Node representation
-               MapNode node = new MapNode(nodeRef, this.nodeService);
+               MapNode node = new MapNode(nodeRef, this.nodeService, true);
                
                this.containerNodes.add(node);
             }
             else if (type.equals(ContentModel.TYPE_CONTENT))
             {
                // create our Node representation
-               MapNode node = new MapNode(nodeRef, this.nodeService);
+               MapNode node = new MapNode(nodeRef, this.nodeService, true);
                
                setupDataBindingProperties(node);
                
@@ -424,6 +436,12 @@ public class BrowseBean implements IContextListener
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
+      
+      if (logger.isDebugEnabled())
+      {
+         long endTime = System.currentTimeMillis();
+         logger.debug("Time to query and build map nodes: " + (endTime - startTime) + "ms");
+      }
    }
    
    /**
@@ -433,6 +451,10 @@ public class BrowseBean implements IContextListener
     */
    private void searchBrowseNodes(SearchContext searchContext)
    {
+      long startTime = 0;
+      if (logger.isDebugEnabled())
+         startTime = System.currentTimeMillis();
+      
       // get the searcher object and perform the search of the root node
       String query = searchContext.buildQuery();
       
@@ -466,24 +488,22 @@ public class BrowseBean implements IContextListener
                if (type.equals(ContentModel.TYPE_FOLDER))
                {
                   // create our Node representation
-                  MapNode node = new MapNode(nodeRef, this.nodeService);
+                  MapNode node = new MapNode(nodeRef, this.nodeService, true);
                   
                   // construct the path to this Node
-                  Path path = this.nodeService.getPath(nodeRef);
-                  node.getProperties().put("displayPath", Repository.getDisplayPath(path));
+                  node.addPropertyResolver("displayPath", this.resolverDisplayPath);
                   
                   this.containerNodes.add(node);
                }
                else if (type.equals(ContentModel.TYPE_CONTENT))
                {
                   // create our Node representation
-                  MapNode node = new MapNode(nodeRef, this.nodeService);
+                  MapNode node = new MapNode(nodeRef, this.nodeService, true);
                   
                   setupDataBindingProperties(node);
                   
                   // construct the path to this Node
-                  Path path = this.nodeService.getPath(nodeRef);
-                  node.getProperties().put("displayPath", Repository.getDisplayPath(path));
+                  node.addPropertyResolver("displayPath", this.resolverDisplayPath);
                   
                   this.contentNodes.add(node);
                }
@@ -501,24 +521,71 @@ public class BrowseBean implements IContextListener
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
+      
+      if (logger.isDebugEnabled())
+      {
+         long endTime = System.currentTimeMillis();
+         logger.debug("Time to query and build map nodes: " + (endTime - startTime) + "ms");
+      }
    }
    
    /**
     * Setup the additional properties required at data-binding time.
+    * <p>
     * These are properties used by components on the page when iterating over the nodes.
-    * Information such as whether the node is locked, a working copy, download URL etc. 
+    * Information such as whether the node is locked, a working copy, download URL etc.
+    * <p>
+    * We use a set of annoymous inner classes to provide the implemention for the property
+    * getters. The interfaces are only called when the properties are first required. 
     * 
     * @param node       MapNode to add the properties too
     */
    private void setupDataBindingProperties(MapNode node)
    {
       // special properties to be used by the value binding components on the page
-      node.put("locked", Repository.isNodeLocked(node, this.lockService));
-      node.put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));
-      node.put("url", DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName()));
-      node.put("fileType16", Repository.getFileTypeImage(node, true));
-      node.put("fileType32", Repository.getFileTypeImage(node, false));
+      node.addPropertyResolver("locked", this.resolverlocked);
+      node.addPropertyResolver("workingCopy", this.resolverWorkingCopy);
+      node.addPropertyResolver("url", this.resolverUrl);
+      node.addPropertyResolver("fileType16", this.resolverFileType16);
+      node.addPropertyResolver("fileType32", this.resolverFileType32);
    }
+   
+   private NodePropertyResolver resolverlocked = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         return Repository.isNodeLocked(node, lockService);
+      }
+   };
+   
+   private NodePropertyResolver resolverWorkingCopy = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         return node.hasAspect(ContentModel.ASPECT_WORKING_COPY);
+      }
+   };
+   
+   private NodePropertyResolver resolverUrl = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         return DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName());
+      }
+   };
+   
+   private NodePropertyResolver resolverFileType16 = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         return Repository.getFileTypeImage(node, true);
+      }
+   };
+   
+   private NodePropertyResolver resolverFileType32 = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         return Repository.getFileTypeImage(node, false);
+      }
+   };
+   
+   private NodePropertyResolver resolverDisplayPath = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         Path path = nodeService.getPath(node.getNodeRef());
+         return node.getProperties().put("displayPath", Repository.getDisplayPath(path));
+      }
+   };
    
    
    // ------------------------------------------------------------------------------

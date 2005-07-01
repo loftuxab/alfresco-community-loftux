@@ -29,7 +29,7 @@
                   <a:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true"
                         itemStyleClass="topToolbar" itemLinkStyleClass="topToolbarLink" selectedStyleClass="topToolbarHighlight" selectedLinkStyleClass="topToolbarLinkHighlight"
                         value="#{NavigationBean.toolbarLocation}" actionListener="#{NavigationBean.toolbarLocationChanged}">
-                     <a:listItem value="company" label="Company Space" />
+                     <a:listItem value="company" label="Company Home" />
                      <a:listItem value="home" label="My Home" />
                   </a:modeList>
                </td>
