@@ -582,8 +582,7 @@ public class BrowseBean implements IContextListener
    
    private NodePropertyResolver resolverDisplayPath = new NodePropertyResolver() {
       public Object get(MapNode node) {
-         Path path = nodeService.getPath(node.getNodeRef());
-         return node.getProperties().put("displayPath", Repository.getDisplayPath(path));
+         return Repository.getDisplayPath( nodeService.getPath(node.getNodeRef()) );
       }
    };
    
