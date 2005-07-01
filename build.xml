@@ -12,7 +12,7 @@
       <filelist id="project-build-files" dir="."
                 files="${projects.dir.name}/core/${project.build.file} 
                        ${projects.dir.name}/repository/${project.build.file}
-                       ${projects.dir.name}/web-client/${project.build.file}"/>
+                       ${projects.dir.name}/web-client/${project.build.file}" />
                        
       <!-- TODO: Add some checking for tomcat / jboss pre-requesties -->
    </target>
@@ -52,6 +52,9 @@
       </subant>
       <antcall target="deploy-tomcat" />
    </target>
+   
+   <!--<target name="continuous" depends="test, distribute" />-->
+   <target name="continuous" depends="distribute" />
    
    <!-- ************************ -->
    <!-- ** Deployment targets ** -->
@@ -100,26 +103,36 @@
    <!-- ** Testing targets ** -->
    <!-- ********************** -->
 
-   <target name="test-all" depends="common-init" description="Runs unit tests for all the projects">
+   <target name="test" depends="clean" description="Runs unit tests for all the projects">
       <subant target="run-tests">
          <filelist refid="project-build-files"/>
       </subant>
+      
+      <!-- copy the combined results into a top level results folder -->
+      <mkdir dir="${test.results.dir}" />
+      <copy todir="${test.results.dir}">
+         <fileset dir="${projects.dir.name}/core/build/test-results" />
+         <fileset dir="${projects.dir.name}/repository/build/test-results" />
+         <fileset dir="${projects.dir.name}/web-client/build/test-results" />
+      </copy>
    </target>
 
    <!-- ********************** -->
    <!-- ** Cleaning targets ** -->
    <!-- ********************** -->
-   
-   <target name="clean-distribution" depends="common-init" description="Cleans the distibution">
-      <delete quiet="yes" includeEmptyDirs="true" dir="${build.dir}"/>
-      <delete quiet="yes" includeEmptyDirs="true" dir="${docs.dir}"/>
-   </target>
       
-   <target name="clean-all" depends="common-init" description="Cleans all the projects">
+   <target name="clean" depends="common-init" description="Cleans all the projects">
       <subant target="clean">
          <filelist refid="project-build-files" />
       </subant>
-      <antcall target="clean-distribution" />
+      
+      <!-- clean local files up -->
+      <delete quiet="yes" includeEmptyDirs="true" dir="${build.dir}" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${docs.dir}" />
+   </target>
+   
+   <target name="clean-war" depends="common-init" description="Cleans just the WAR file">
+      <delete file="${deploy.file}" />
    </target>
    
    <!-- ************************** -->
@@ -127,7 +140,7 @@
    <!-- ************************** -->
    
    <target name="distribute" 
-           depends="clean-distribution, package-jboss-binary-distribution,
+           depends="package-jboss-binary-distribution,
                     package-tomcat-binary-distribution, package-source-distribution" 
            description="Creates the distribution files for all platforms for all appservers"/>
    
@@ -164,6 +177,7 @@
                      prefix="jboss/server/default/deploy" />
       </tar>
       <gzip zipfile="${dist.dir}/${jboss.dist.filename}.tar.gz" src="${dist.dir}/${jboss.dist.filename}.tar" />
+      <delete file="${dist.dir}/${jboss.dist.filename}.tar" />
    </target>
    
    <target name="package-tomcat-binary-distribution-windows" depends="common-init">
@@ -189,6 +203,7 @@
                      prefix="tomcat/webapps" />
       </tar>
       <gzip zipfile="${dist.dir}/${tomcat.dist.filename}.tar.gz" src="${dist.dir}/${tomcat.dist.filename}.tar" />
+      <delete file="${dist.dir}/${tomcat.dist.filename}.tar" />
    </target>
    
    <target name="package-source-distribution" depends="common-init"
@@ -202,6 +217,7 @@
          <tarfileset dir="${basedir}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,**/*.classpath" />
       </tar>
       <gzip zipfile="${dist.dir}/${src.dist.filename}.tar.gz" src="${dist.dir}/${src.dist.filename}.tar" />
+      <delete file="${dist.dir}/${src.dist.filename}.tar" />
    </target>
 
 </project>
