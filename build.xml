@@ -158,9 +158,10 @@
       <mkdir dir="${dist.dir}" />
       <tar destfile="${dist.dir}/${jboss.dist.filename}.tar" longfile="gnu">
          <tarfileset dir="${installer.project.dir}" 
-                     includes="alf_start_jb.sh,alf_stop_jb.sh,AlfrescoTest.pdf,db_remove.sh,db_setup.sh,
-                               license.txt,notice.txt,README_jboss_linux.txt,README_war.txt,stop_oo.sh,
-                               zstart_oo.sh" />
+                     includes="AlfrescoTest.pdf,license.txt,notice.txt,README_jboss_linux.txt,README_war.txt" />
+         <tarfileset dir="${installer.project.dir}" mode="755"
+                     includes="alf_start_jb.sh,alf_stop_jb.sh,db_remove.sh,db_setup.sh,
+                               stop_oo.sh,zstart_oo.sh" />
          <tarfileset dir="${jboss.distribution.dir}" prefix="jboss" />
          <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
@@ -185,9 +186,10 @@
       <mkdir dir="${dist.dir}" />
       <tar destfile="${dist.dir}/${tomcat.dist.filename}.tar" longfile="gnu">
          <tarfileset dir="${installer.project.dir}" 
-                     includes="alf_start_tc.sh,alf_stop_tc.sh,AlfrescoTest.pdf,db_remove.sh,db_setup.sh,
-                               license.txt,notice.txt,README_tomcat_linux.txt,README_war.txt,stop_oo.sh,
-                               zstart_oo.sh" />
+                     includes="AlfrescoTest.pdf,license.txt,notice.txt,README_tomcat_linux.txt,README_war.txt" />
+         <tarfileset dir="${installer.project.dir}" mode="755"
+                     includes="alf_start_tc.sh,alf_stop_tc.sh,db_remove.sh,db_setup.sh,
+                               stop_oo.sh,zstart_oo.sh" />
          <tarfileset dir="${tomcat.distribution.dir}" prefix="tomcat" />
          <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
