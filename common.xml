@@ -111,7 +111,7 @@
                <include name="**/source/test-resources" />
             </dirset>
          </classpath>
-         <formatter type="plain"/>
+         <formatter type="xml"/>
          <batchtest fork="yes" todir="${test.results.dir}">
             <fileset dir="${src.java.dir}">
                <include name="**/*Test.java" />
