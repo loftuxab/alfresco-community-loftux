@@ -69,13 +69,8 @@ Install Alfresco JBoss Bundle
 
 - Browse to http://www.alfresco.org/downloads
 - Download the "Alfresco Linux JBoss Bundle" option
-- Unzip alfresco-jb.tar.gz in your home directory
-
-This will create a folder '~/alfresco'
-
-Navigate to the '~/alfresco' folder and run 'db_setup.sh' if you did a new
-install of MySQL above.  This creates a MySQL database named 'alfresco' with a user
-account and password of 'alfresco'.
+- Create a directory named 'alfresco'
+- Unzip alfresco-jb.tar.gz in the '~/alfresco' directory
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -100,11 +95,11 @@ in /opt/OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Navigate to the '~/alfresco' folder and run 'alf_start_jb.sh'
-- two minimized windows will be started for MySQL and OpenOffice
-- a console window will open for JBoss
-- when the console has the message 'Started in nnnnn ms', JBoss is running
-- you can now try Alfresco by visiting:
+Navigate to the '~/alfresco' folder
+- Run 'jboss/bin/run.sh' to start JBoss
+- Open a new command window
+- If you wish to use OpenOffice document transformations, run 'start_oo.sh'
+- You can now try Alfresco by visiting:
 
 http://localhost:8080/portal and navigating to 'web-client' from the Page Menu and
 then maximizing the portlet (top-right-most icon).
@@ -125,26 +120,6 @@ http://www.alfresco.org/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the '~/alfresco' folder and run 'alf_stop_jb.sh'
+Navigate to the '~/alfresco' folder and run 'jboss/bin/shutdown.sh -S'
+If you started OpenOffice as above, then also run 'killall soffice.bin'
 
-
-
-====================
-Manual Installations
-====================
-
-For other operating systems or where MySQL or JBoss are already installed,
-you may need to adjust the instructions above as appropriate, such as changing
-the Tomcat port settings.
-
-The Alfresco server is packaged as an ear file and can be found in:
-~/alfresco/jboss/server/default/deploy/web-client.ear
-
-The Alfresco 'db_setup.sh' performs the following MySQL commands:
-
-mqslqadmin -u root -p create alfresco
-mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
-                   identified by 'alfresco' with grant option;"
-
-The Alfresco 'alf_start_jb.sh' starts the database and runs JBoss's 'run.sh'.
-The 'alf_stop_jb.sh' runs JBoss's 'shutdown.sh' and shutsdown the database.

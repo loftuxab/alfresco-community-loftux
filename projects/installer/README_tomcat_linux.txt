@@ -70,9 +70,8 @@ Install Alfresco Tomcat Bundle
 
 - Browse to http://www.alfresco.org/downloads
 - Download the "Alfresco Linux Tomcat Bundle" option
-- Unzip alfresco-tc.tar.gz in your home directory
-
-This will create a folder '~/alfresco'
+- Create a directory named 'alfresco'
+- Unzip alfresco-tc.tar.gz in the '~/alfresco' directory
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -97,13 +96,10 @@ in /opt/OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Ensure that the MySQL server is running, then navigate to the '~/alfresco' folder and
-run 'alf_start_tc.sh'
-- two processes will be started for MySQL and OpenOffice
-- a console window will open for Tomcat
-- when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
-- you can now try Alfresco by visiting:
-
+Ensure that the MySQL server is running, then navigate to the '~/alfresco/tomcat' directory
+- Run 'bin/startup.sh' to start Tomcat
+- If you wish to use OpenOffice document transformations, run '../start_oo.sh'
+- You can now try Alfresco by visiting:
 http://localhost:8080/web-client/faces/jsp/login.jsp
 
 The server is configured with a single administrative login with user name and password
@@ -118,7 +114,8 @@ http://www.alfresco.org/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the '~/alfresco' folder and run 'alf_stop_tc.sh'
+Navigate to the '~/alfresco/tomcat' folder and run 'bin/shutdown.sh'
+If you started OpenOffice as above, then also run 'killall soffice.bin'
 
 
 
