@@ -86,11 +86,6 @@ public class ContentDiskDriver implements DiskInterface
      */
     public DeviceContext createContext(ConfigElement cfg) throws DeviceContextException
     {
-        /*
-         * This method is bloated - break it up and share load with tree opened and other
-         * helper methods
-         */
-        
         // connect to the repository
         namespaceService = serviceRegistry.getNamespaceService();
         dictionaryService = serviceRegistry.getDictionaryService();
@@ -198,11 +193,22 @@ public class ContentDiskDriver implements DiskInterface
             boolean includeName = (path.length() > 0);
             FileInfo fileInfo = cifsHelper.getFileInformation(deviceRootNodeRef, path, includeName);
             // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Getting file information: \n" +
+                        "   path: " + path + "\n" +
+                        "   file info: " + fileInfo);
+            }
             return fileInfo;
         }
         catch (FileNotFoundException e)
         {
             // a valid use case
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Getting file information - File not found: \n" +
+                        "   path: " + path);
+            }
             throw e;
         }
         catch (Throwable e)
@@ -214,12 +220,19 @@ public class ContentDiskDriver implements DiskInterface
         }
     }
 
-    public SearchContext startSearch(SrvSession sess, TreeConnection tree, String searchPath, int attrib) throws FileNotFoundException
+    public SearchContext startSearch(SrvSession sess, TreeConnection tree, String searchPath, int attributes) throws FileNotFoundException
     {
         // get the device root
         NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
         
-        SearchContext ctx = ContentSearchContext.search(serviceRegistry, cifsHelper, deviceRootNodeRef, searchPath, attrib);
+        SearchContext ctx = ContentSearchContext.search(serviceRegistry, cifsHelper, deviceRootNodeRef, searchPath, attributes);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Started search: \n" +
+                    "   search path: " + searchPath + "\n" +
+                    "   attributes: " + attributes);
+        }
         return ctx;
     }
 
@@ -260,7 +273,6 @@ public class ContentDiskDriver implements DiskInterface
         if (logger.isDebugEnabled())
         {
             logger.debug("File status determinded: \n" +
-                    "   device: " + tree.getContext().getDeviceName() + "\n" +
                     "   name: " + name + "\n" +
                     "   status: " + status);
         }
@@ -278,6 +290,15 @@ public class ContentDiskDriver implements DiskInterface
         NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, path);
         
         NetworkFile netFile = ContentNetworkFile.createFile(serviceRegistry, cifsHelper, nodeRef, params);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Opened network file: \n" +
+                    "   path: " + path + "\n" +
+                    "   file open parameters: " + params + "\n" +
+                    "   network file: " + netFile);
+        }
+
         return netFile;
     }
     
@@ -298,6 +319,14 @@ public class ContentDiskDriver implements DiskInterface
         // create the network file
         NetworkFile netFile = ContentNetworkFile.createFile(serviceRegistry, cifsHelper, nodeRef, params);
         // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Created file: \n" +
+                    "   path: " + path + "\n" +
+                    "   file open parameters: " + params + "\n" +
+                    "   node: " + nodeRef + "\n" +
+                    "   network file: " + netFile);
+        }
         return netFile;
     }
 
@@ -311,6 +340,14 @@ public class ContentDiskDriver implements DiskInterface
         
         // create it - the path will be created, if necessary
         NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Created directory: \n" +
+                    "   path: " + path + "\n" +
+                    "   file open params: " + params + "\n" +
+                    "   node: " + nodeRef);
+        }
     }
 
     public void deleteDirectory(SrvSession sess, TreeConnection tree, String dir) throws IOException
@@ -326,10 +363,22 @@ public class ContentDiskDriver implements DiskInterface
             {
                 nodeService.deleteNode(nodeRef);
             }
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Deleted directory: \n" +
+                        "   directory: " + dir + "\n" +
+                        "   node: " + nodeRef);
+            }
         }
         catch (FileNotFoundException e)
         {
             // already gone
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Deleted directory <alfready gone>: \n" +
+                        "   directory: " + dir);
+            }
         }
     }
 
@@ -353,6 +402,13 @@ public class ContentDiskDriver implements DiskInterface
                 nodeService.deleteNode(nodeRef);
             }
         }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Closed file: \n" +
+                    "   network file: " + file + "\n" +
+                    "   deleted on close: " + file.hasDeleteOnClose());
+        }
     }
 
     public void deleteFile(SrvSession sess, TreeConnection tree, String name) throws IOException
@@ -368,10 +424,22 @@ public class ContentDiskDriver implements DiskInterface
             {
                 nodeService.deleteNode(nodeRef);
             }
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Deleted file: \n" +
+                        "   file: " + name + "\n" +
+                        "   node: " + nodeRef);
+            }
         }
         catch (FileNotFoundException e)
         {
             // already gone
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Deleted file <alfready gone>: \n" +
+                        "   file: " + name);
+            }
         }
     }
 
@@ -435,6 +503,13 @@ public class ContentDiskDriver implements DiskInterface
     public void truncateFile(SrvSession sess, TreeConnection tree, NetworkFile file, long size) throws IOException
     {
         file.truncateFile(size);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Truncated file: \n" +
+                    "   network file: " + file + "\n" +
+                    "   size: " + size);
+        }
     }
 
     /**
@@ -444,7 +519,19 @@ public class ContentDiskDriver implements DiskInterface
             SrvSession sess, TreeConnection tree, NetworkFile file,
             byte[] buffer, int bufferPosition, int size, long fileOffset) throws IOException
     {
-        return file.readFile(buffer, size, bufferPosition, fileOffset);
+        int count = file.readFile(buffer, size, bufferPosition, fileOffset);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Read bytes from file: \n" +
+                    "   network file: " + file + "\n" +
+                    "   buffer size: " + buffer.length + "\n" +
+                    "   buffer pos: " + bufferPosition + "\n" +
+                    "   size: " + size + "\n" +
+                    "   file offset: " + fileOffset + "\n" +
+                    "   bytes read: " + count);
+        }
+        return count;
     }
 
     public long seekFile(SrvSession sess, TreeConnection tree, NetworkFile file, long pos, int typ) throws IOException
@@ -459,6 +546,15 @@ public class ContentDiskDriver implements DiskInterface
             byte[] buffer, int bufferOffset, int size, long fileOffset) throws IOException
     {
         file.writeFile(buffer, size, bufferOffset, fileOffset);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Wrote bytes to file: \n" +
+                    "   network file: " + file + "\n" +
+                    "   buffer size: " + buffer.length + "\n" +
+                    "   size: " + size + "\n" +
+                    "   file offset: " + fileOffset);
+        }
         return size;
     }
 

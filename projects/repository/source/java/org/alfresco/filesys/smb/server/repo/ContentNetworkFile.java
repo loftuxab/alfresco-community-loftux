@@ -268,6 +268,10 @@ public class ContentNetworkFile extends NetworkFile
         // read from the channel
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, position, length);
         int count = channel.read(byteBuffer, fileOffset);
+        if (count < 0)
+        {
+            count = 0;  // doesn't obey the same rules, i.e. just returns the bytes read
+        }
         // done
         if (logger.isDebugEnabled())
         {
