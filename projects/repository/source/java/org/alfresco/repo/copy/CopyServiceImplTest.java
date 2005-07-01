@@ -30,6 +30,9 @@ import org.alfresco.repo.dictionary.impl.M2ChildAssociation;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.M2Property;
 import org.alfresco.repo.dictionary.impl.M2Type;
+import org.alfresco.repo.rule.action.AddFeaturesActionExecutor;
+import org.alfresco.repo.rule.condition.NoConditionEvaluator;
+import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -40,9 +43,13 @@ import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * Node operations service unit tests
@@ -55,9 +62,10 @@ public class CopyServiceImplTest extends BaseSpringTest
 	 * Services used by the tests
 	 */
 	private NodeService nodeService;
-	private CopyService nodeOperationsService;
+	private CopyService copyService;
 	private DictionaryDAO dictionaryDAO;
 	private ContentService contentService;
+    private RuleService ruleService;
 	
 	/**
 	 * Data used by the tests
@@ -118,8 +126,9 @@ public class CopyServiceImplTest extends BaseSpringTest
 	{
 		// Set the services
 		this.nodeService = (NodeService)this.applicationContext.getBean("dbNodeService");
-		this.nodeOperationsService = (CopyService)this.applicationContext.getBean("copyService");
+		this.copyService = (CopyService)this.applicationContext.getBean("copyService");
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
+        this.ruleService = (RuleService)this.applicationContext.getBean("ruleService");
 		
 		// Create the test model
 		createTestModel();
@@ -274,7 +283,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 	public void testCopyToNewNode()
 	{
 		// Copy to new node without copying children
-		NodeRef copy = this.nodeOperationsService.copy(
+		NodeRef copy = this.copyService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
                 TEST_CHILD_ASSOC_TYPE_QNAME,
@@ -282,7 +291,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		checkCopiedNode(this.sourceNodeRef, copy, true, true, false);
 		
         // Copy to new node, copying children
-		NodeRef copy2 = this.nodeOperationsService.copy(
+		NodeRef copy2 = this.copyService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
                 TEST_CHILD_ASSOC_TYPE_QNAME,
@@ -291,7 +300,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		checkCopiedNode(this.sourceNodeRef, copy2, true, true, true);
 		
 		// Check that a copy of a copy works correctly
-		NodeRef copyOfCopy = this.nodeOperationsService.copy(
+		NodeRef copyOfCopy = this.copyService.copy(
 				copy,
 				this.rootNodeRef,
                 TEST_CHILD_ASSOC_TYPE_QNAME,
@@ -304,7 +313,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		// Check copying from a node with content	
 		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.sourceNodeRef);
 		contentWriter.putContent(SOME_CONTENT);		
-		NodeRef copyWithContent = this.nodeOperationsService.copy(
+		NodeRef copyWithContent = this.copyService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
                 TEST_CHILD_ASSOC_TYPE_QNAME,
@@ -315,15 +324,53 @@ public class CopyServiceImplTest extends BaseSpringTest
 		assertEquals(SOME_CONTENT, contentReader.getContentString());
 		
 		// TODO check copying to a different store
-		
-		//System.out.println(
+        
+        //System.out.println(
 		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 	}	
+    
+    public void testCopyNodeWithRules()
+    {
+        // Make the node actionable
+        this.ruleService.makeActionable(this.sourceNodeRef);
+        
+        // Create a new rule and add it to the source noderef
+        RuleType ruleType = this.ruleService.getRuleType(InboundRuleTypeAdapter.NAME);
+        Rule rule = this.ruleService.createRule(ruleType);
+        rule.addRuleCondition(this.ruleService.getConditionDefinition(NoConditionEvaluator.NAME), null);
+        Map<String, Serializable> props = new HashMap<String, Serializable>(1);
+        props.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
+        rule.addRuleAction(this.ruleService.getActionDefinition(AddFeaturesActionExecutor.NAME), props);
+        this.ruleService.addRule(this.sourceNodeRef, rule);
+        
+        // Now copy the node that has rules associated with it
+        NodeRef copy = this.copyService.copy(
+                this.sourceNodeRef,
+                this.rootNodeRef,
+                TEST_CHILD_ASSOC_TYPE_QNAME,
+                QName.createQName("{test}withRulesCopy"),
+                true);
+        checkCopiedNode(this.sourceNodeRef, copy, true, true, true);
+        
+        assertTrue(this.ruleService.isActionable(copy));
+        assertTrue(this.ruleService.hasRules(copy));
+        assertTrue(this.ruleService.rulesEnabled(copy));
+        List<Rule> copiedRules = this.ruleService.getRules(copy);
+        assertEquals(1, copiedRules.size());
+        Rule copiedRule = copiedRules.get(0);
+        assertEquals(rule.getId(), copiedRule.getId());
+        
+        // TODO double check that the cofiguration folder is being copied
+        
+        //System.out.println(
+        //              NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        
+    }
 	
 	public void testCopyToExistingNode()
 	{
 		// Copy nodes within the same store
-		this.nodeOperationsService.copy(this.sourceNodeRef, this.destinationNodeRef);
+		this.copyService.copy(this.sourceNodeRef, this.destinationNodeRef);
 		checkCopiedNode(this.sourceNodeRef, this.destinationNodeRef, false, true, false);
 		
 		// TODO check copying from a copy
@@ -360,36 +407,15 @@ public class CopyServiceImplTest extends BaseSpringTest
 			{
 				// Check that destiantion has the same id as the source
 				assertEquals(sourceNodeRef.getId(), destinationNodeRef.getId());
-		}
+            }
 		}
 		
-		// TODO
-		// Check that all the appropriate aspects have been applied to the desitation node
-//		Set<ClassRef> sourceAspects = this.nodeService.getAspects(sourceNodeRef);
-//		Set<ClassRef> destinationAspects = this.nodeService.getAspects(destinationNodeRef);
-//		if (sameStore == true && newCopy == true)
-//		{
-//			assertEquals(sourceAspects.size()+1, destinationAspects.size());
-//		}
-//		else
-//		{
-//			assertEquals(sourceAspects.size(), destinationAspects.size());
-//		}
 		boolean hasTestAspect = this.nodeService.hasAspect(destinationNodeRef, TEST_ASPECT_QNAME);
 		assertTrue(hasTestAspect);
 		
 		// Check that all the correct properties have been copied
 		Map<QName, Serializable> destinationProperties = this.nodeService.getProperties(destinationNodeRef);
 		assertNotNull(destinationProperties);
-		// TODO
-//		if (sameStore == true && newCopy == true)
-//		{
-//			assertEquals(5, destinationProperties.size());
-//		}
-//		else
-//		{
-//			assertEquals(4, destinationProperties.size());
-//		}
 		String value1 = (String)destinationProperties.get(PROP1_QNAME_MANDATORY);
 		assertNotNull(value1);
 		assertEquals(TEST_VALUE_1, value1);
@@ -428,11 +454,11 @@ public class CopyServiceImplTest extends BaseSpringTest
 				if (copyChildren == false)
 				{
 					assertFalse(ref.isPrimary());
-					//assertEquals(this.childNodeRef, ref.getChildRef());
+					assertEquals(this.childNodeRef, ref.getChildRef());
 				}
 				else
 				{
-					//assertTrue(ref.isPrimary());
+					assertTrue(ref.isPrimary());
 					assertTrue(this.childNodeRef.equals(ref.getChildRef()) == false);
 					
 					// TODO need to check that the copied child has all the correct details ..

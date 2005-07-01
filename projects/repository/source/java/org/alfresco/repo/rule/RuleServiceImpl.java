@@ -26,7 +26,9 @@ import java.util.Set;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.rule.action.RuleActionExecutor;
 import org.alfresco.repo.rule.common.RuleActionDefinitionImpl;
 import org.alfresco.repo.rule.common.RuleConditionDefinitionImpl;
@@ -35,10 +37,13 @@ import org.alfresco.repo.rule.condition.RuleConditionEvaluator;
 import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
@@ -100,7 +105,7 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
      * The rule store
      */
     private RuleStore ruleStore;
-	
+    
 	/**
 	 * Thread local set containing all the pending rules to be executed when the transaction ends
 	 */
@@ -110,6 +115,12 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 * Thread local set to the currently executing rule (this should prevent and execution loops)
 	 */
 	private ThreadLocal<Set<ExecutedRuleData>> threadLocalExecutedRules = new ThreadLocal<Set<ExecutedRuleData>>();
+    
+    /**
+     * List of disabled node refs.  The rules associated with these nodes will node be added to the pending list, and
+     * therefore not fired.  This list is transient.
+     */
+    private Set<NodeRef> disabledNodeRefs = new HashSet<NodeRef>(5);
 
 	/**
 	 * All the rule type currently registered
@@ -126,6 +137,18 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 */
 	private Map<String, RuleActionDefinition> actionDefinitions = new HashMap<String, RuleActionDefinition>();       
 
+    /**
+     * Service initialisation methods     
+     */
+    private void init()
+    {
+        // Register the copy policy behaviour
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
+                ContentModel.ASPECT_ACTIONABLE,
+                new JavaBehaviour(this, "onCopyNode"));
+    }
+    
 	/**
 	 * Set the application context
 	 * 
@@ -262,7 +285,7 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
             NodeRef nodeRef)
     {
         // Get the root config node
-		NodeRef rootConfigFolder = getRootConfigNodeRef(nodeRef);
+		NodeRef rootConfigFolder = getRootConfigNodeRef(nodeRef.getStoreRef());
 		
 		// Create the configuraion folder
 		NodeRef configurationsNodeRef = this.nodeService.createNode(
@@ -285,16 +308,16 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	/**
 	 * Get the root config node reference
 	 * 
-	 * @param nodeRef	the node reference
+	 * @param storeRef	the store reference
 	 * @return			the root config node reference
 	 */
-	private NodeRef getRootConfigNodeRef(NodeRef nodeRef) 
+	private NodeRef getRootConfigNodeRef(StoreRef storeRef) 
 	{
 		// TODO maybe this should be cached ...
 		// TODO the QNames should be put in the DicitionaryBootstrap
 		
 		NodeRef rootConfigFolder = null;
-		NodeRef rootNode = this.nodeService.getRootNode(nodeRef.getStoreRef());
+		NodeRef rootNode = this.nodeService.getRootNode(storeRef);
 		List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(
 							  					rootNode, 
 												QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"));
@@ -323,11 +346,37 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleService#hasRules(org.alfresco.repo.ref.NodeRef)
+     * @see org.alfresco.service.cmr.rule.RuleService#hasRules(org.alfresco.repo.ref.NodeRef)
      */
     public boolean hasRules(NodeRef nodeRef)
     {
         return this.ruleStore.hasRules(nodeRef);
+    }       
+    
+    /**
+     * @see org.alfresco.service.cmr.rule.RuleService#rulesEnabled(NodeRef)
+     */
+    public boolean rulesEnabled(NodeRef nodeRef)
+    {
+        return (this.disabledNodeRefs.contains(nodeRef) == false);
+    }
+
+    /**
+     * @see org.alfresco.service.cmr.rule.RuleService#disableRules(NodeRef)
+     */
+    public void disableRules(NodeRef nodeRef)
+    {
+        // Add the node to the set of disabled nodes
+        this.disabledNodeRefs.add(nodeRef);
+    }
+
+    /**
+     * @see org.alfresco.service.cmr.rule.RuleService#enableRules(NodeRef)
+     */
+    public void enableRules(NodeRef nodeRef)
+    {
+        // Remove the node from the set of disabled nodes
+        this.disabledNodeRefs.remove(nodeRef);
     }
 
     /**
@@ -407,20 +456,24 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 */
 	public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
 	{
-		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule);
-		Set<ExecutedRuleData> executedRules = this.threadLocalExecutedRules.get();
-		
-		if (executedRules == null || executedRules.contains(new ExecutedRuleData(actionableNodeRef, rule)) == false)
-		{
-			Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
-			if (pendingRules == null)
-			{
-				pendingRules = new HashSet<PendingRuleData>();					
-			}
-			
-			pendingRules.add(pendingRuleData);		
-			this.threadLocalPendingData.set(pendingRules);
-		}
+        // First check to seee if the node has been disabled
+        if (this.disabledNodeRefs.contains(actionableNodeRef) == false)
+        {
+    		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule);
+    		Set<ExecutedRuleData> executedRules = this.threadLocalExecutedRules.get();
+    		
+    		if (executedRules == null || executedRules.contains(new ExecutedRuleData(actionableNodeRef, rule)) == false)
+    		{
+    			Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
+    			if (pendingRules == null)
+    			{
+    				pendingRules = new HashSet<PendingRuleData>();					
+    			}
+    			
+    			pendingRules.add(pendingRuleData);		
+    			this.threadLocalPendingData.set(pendingRules);
+    		}
+        }
 	}
 
 	/**
@@ -439,6 +492,9 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
         }
 	}     
     
+    /**
+     * Executes the pending rules
+     */
     private void executePendingRulesImpl()
     {
         Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
@@ -567,6 +623,46 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 		RuleActionDefinition action = ruleActionExecutor.getRuleActionDefinition();
 		this.actionDefinitions.put(action.getName(), action);
 	}
+    
+    /**
+     * onCopyNode policy behaviour implementation.
+     *
+     * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, PolicyScope)
+     */
+    public void onCopyNode(
+            QName classRef,
+            NodeRef sourceNodeRef,
+            StoreRef destinationStoreRef,
+            boolean copyToNewNode,
+            PolicyScope copyDetails)
+    {
+        // The source node reference is configurable so get the config folder node
+        NodeRef rootConfigFolder = getRootConfigNodeRef(destinationStoreRef);
+        
+        // Get the config folder from the actionable node
+        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
+                                                sourceNodeRef, 
+                                                ContentModel.ASSOC_CONFIGURATIONS);
+        if (nodeAssocRefs.size() == 0)
+        {
+            throw new RuleServiceException("The configuration folder has not been set for this actionable node.");
+        }
+        
+        NodeRef sourceConfigFolder = nodeAssocRefs.get(0).getTargetRef();
+        
+        // Copy the source config folder into the destination root config folder
+        CopyService copyService = this.serviceRegistry.getCopyService();
+        NodeRef newConfigFolder = copyService.copy(
+                sourceConfigFolder, 
+                rootConfigFolder,
+                ContentModel.ASSOC_CONTAINS,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
+                true);
+        
+        // Add the aspect and add the reference to the copied config folder
+        copyDetails.addAspect(classRef);
+        copyDetails.addAssociation(classRef, new AssociationRef(sourceNodeRef, ContentModel.ASSOC_CONFIGURATIONS, newConfigFolder));
+    }
     
     /**
      * Helper class to contain the information about a rule that is executed

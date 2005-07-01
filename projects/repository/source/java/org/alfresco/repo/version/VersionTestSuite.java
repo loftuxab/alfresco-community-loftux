@@ -47,6 +47,7 @@ public class VersionTestSuite extends TestSuite
         suite.addTestSuite(VersionServiceImplTest.class);
         suite.addTestSuite(NodeServiceImplTest.class);
         suite.addTestSuite(ContentServiceImplTest.class);
+        //suite.addTestSuite(StateRetrievalTest.class);
         return suite;
     }
 }

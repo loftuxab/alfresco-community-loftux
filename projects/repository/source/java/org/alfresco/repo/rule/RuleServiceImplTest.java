@@ -186,4 +186,17 @@ public class RuleServiceImplTest extends RuleBaseTest
         assertNotNull(actions);
         assertEquals(1, actions.size());
     }
+    
+    /**
+     * Test disabling the rules
+     */
+    public void testRulesDisabled()
+    {
+        testAddRule();
+        assertTrue(this.ruleService.rulesEnabled(this.nodeRef));
+        this.ruleService.disableRules(this.nodeRef);
+        assertFalse(this.ruleService.rulesEnabled(this.nodeRef));
+        this.ruleService.enableRules(this.nodeRef);
+        assertTrue(this.ruleService.rulesEnabled(this.nodeRef));
+    }
 }

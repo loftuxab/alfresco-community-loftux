@@ -38,6 +38,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -163,13 +164,14 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	/**
 	 * onCopy policy behaviour
 	 * 
-	 * @see org.alfresco.repo.node.operations.CopyServicePolicies.OnCopyPolicy#onCopy(ClassRef, NodeRef, PolicyScope)
-	 * 
-	 * @param sourceClassRef  the source class reference
-	 * @param sourceNodeRef	  the source node reference
-	 * @param copyDetails	  the copy details
+	 * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, StoreRef, boolean, PolicyScope)
 	 */
-	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	public void onCopy(
+            QName sourceClassRef, 
+            NodeRef sourceNodeRef, 
+            StoreRef destinationStoreRef,
+            boolean copyToNewNode,
+            PolicyScope copyDetails)
 	{
 		// Do nothing to ensure that the working copy aspect does not appear on the copy
 	}

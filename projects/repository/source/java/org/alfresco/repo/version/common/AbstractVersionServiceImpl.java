@@ -40,6 +40,7 @@ import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionServiceException;
 import org.alfresco.service.namespace.NamespaceService;
@@ -134,11 +135,14 @@ public abstract class AbstractVersionServiceImpl
 	 * Ensures that the propety values of the version aspect are not copied onto
 	 * the destination node.
 	 * 
-	 * @param sourceClassRef  the source class reference
-	 * @param sourceNodeRef	  the source node reference
-	 * @param copyDetails	  the copy details
+	 * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, StoreRef, boolean, PolicyScope)
 	 */
-	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	public void onCopy(
+            QName sourceClassRef, 
+            NodeRef sourceNodeRef, 
+            StoreRef destinationStoreRef,
+            boolean copyToNewNode,            
+            PolicyScope copyDetails)
 	{
 		// Add the version aspect, but do not copy any of the properties
 		copyDetails.addAspect(ContentModel.ASPECT_VERSIONABLE);

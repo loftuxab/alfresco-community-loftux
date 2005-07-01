@@ -739,6 +739,46 @@ public class RuleServiceSystemTest extends TestCase
     }
     
     /**
+     * Check that the rules can be enabled and disabled
+     */
+    public void testRulesDisabled()
+    {
+        this.ruleService.makeActionable(this.nodeRef);
+        
+        RuleType ruleType = this.ruleService.getRuleType("inbound");
+        RuleConditionDefinition cond = this.ruleService.getConditionDefinition(NoConditionEvaluator.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
+        
+        Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
+        actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
+        
+        Rule rule = this.ruleService.createRule(ruleType);
+        rule.addRuleCondition(cond, null);
+        rule.addRuleAction(action, actionParams);
+        
+        this.ruleService.addRule(this.nodeRef, rule);        
+        this.ruleService.disableRules(this.nodeRef);
+        
+        NodeRef newNodeRef = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();            
+        assertFalse(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));      
+        
+        this.ruleService.enableRules(this.nodeRef);
+        
+        NodeRef newNodeRef2 = this.nodeService.createNode(
+                this.nodeRef,
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();            
+        assertTrue(this.nodeService.hasAspect(newNodeRef2, ContentModel.ASPECT_VERSIONABLE));       
+    }
+    
+    /**
      * Test checkMandatoryProperties method
      */
     public void testCheckMandatoryProperties()

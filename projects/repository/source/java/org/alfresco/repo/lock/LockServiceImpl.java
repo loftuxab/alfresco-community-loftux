@@ -41,6 +41,7 @@ import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -395,11 +396,14 @@ public class LockServiceImpl implements LockService
 	 * Ensures that the propety values of the lock aspect are not copied onto
 	 * the destination node.
 	 * 
-	 * @param sourceClassRef  the source class reference
-	 * @param sourceNodeRef	  the source node reference
-	 * @param copyDetails	  the copy details
+	 * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, StoreRef, boolean, PolicyScope)
 	 */
-	public void onCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	public void onCopy(
+            QName sourceClassRef, 
+            NodeRef sourceNodeRef, 
+            StoreRef destinationStoreRef,
+            boolean copyToNewNode,
+            PolicyScope copyDetails)
 	{
 		// Add the lock aspect, but do not copy any of the properties
 		copyDetails.addAspect(ContentModel.ASPECT_LOCKABLE);

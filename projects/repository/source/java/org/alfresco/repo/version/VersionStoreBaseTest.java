@@ -184,7 +184,6 @@ public abstract class VersionStoreBaseTest extends BaseSpringTest
         NodeRef child1 = this.dbNodeService.createNode(
                 nodeRef,
 				TEST_CHILD_ASSOC_1,
-                //QName.createQName("{test}ChildNode1"),
                 TEST_CHILD_ASSOC_1,
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
@@ -194,7 +193,6 @@ public abstract class VersionStoreBaseTest extends BaseSpringTest
         NodeRef child2 = this.dbNodeService.createNode(
                 nodeRef,
 				TEST_CHILD_ASSOC_2,
-                //QName.createQName("{test}ChildNode2"),
                 TEST_CHILD_ASSOC_2,
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();

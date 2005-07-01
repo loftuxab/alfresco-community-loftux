@@ -44,6 +44,8 @@ import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.CopyServiceException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -70,6 +72,11 @@ public class CopyServiceImpl implements CopyService
 	 * Policy component
 	 */
 	private PolicyComponent policyComponent;
+    
+    /**
+     * Rule service
+     */
+    private RuleService ruleService;
 
 	/**
 	 * Policy delegates
@@ -105,6 +112,16 @@ public class CopyServiceImpl implements CopyService
 	{
 		this.policyComponent = policyComponent;
 	}
+    
+    /**
+     * Set the rule service
+     * 
+     * @param ruleService  the rule service
+     */
+    public void setRuleService(RuleService ruleService)
+    {
+        this.ruleService = ruleService;
+    }
     
 	/**
 	 * Initialise method
@@ -169,7 +186,7 @@ public class CopyServiceImpl implements CopyService
         }
         
         // Establish the scope of the copy
-		PolicyScope copyDetails = getCopyDetails(sourceNodeRef);
+		PolicyScope copyDetails = getCopyDetails(sourceNodeRef, destinationParent.getStoreRef(), true);
 		
         // Create collection of properties for type and mandatory aspects
         Map<QName, Serializable> typeProps = copyDetails.getProperties(); 
@@ -197,16 +214,25 @@ public class CopyServiceImpl implements CopyService
         NodeRef destinationNodeRef = destinationChildAssocRef.getChildRef();
         copiedChildren.add(destinationNodeRef);
 		
-		//	Apply the copy aspect to the new node	
-		Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
-		copyProperties.put(ContentModel.PROP_COPY_REFERENCE, sourceNodeRef);
-		this.nodeService.addAspect(destinationNodeRef, ContentModel.ASPECT_COPIEDFROM, copyProperties);
-		
-		// Copy the aspects 
-		copyAspects(destinationNodeRef, copyDetails);
-		
-		// Copy the associations
-		copyAssociations(destinationNodeRef, copyDetails, copyChildren, copiedChildren);
+        // Prevent any rules being fired on the new destination node
+        this.ruleService.disableRules(destinationNodeRef);
+        try
+        {
+            //	Apply the copy aspect to the new node	
+    		Map<QName, Serializable> copyProperties = new HashMap<QName, Serializable>();
+    		copyProperties.put(ContentModel.PROP_COPY_REFERENCE, sourceNodeRef);
+    		this.nodeService.addAspect(destinationNodeRef, ContentModel.ASPECT_COPIEDFROM, copyProperties);
+    		
+    		// Copy the aspects 
+    		copyAspects(destinationNodeRef, copyDetails);
+    		
+    		// Copy the associations
+    		copyAssociations(destinationNodeRef, copyDetails, copyChildren, copiedChildren);
+        }
+        finally
+        {
+            this.ruleService.enableRules(destinationNodeRef);
+        }
         
         return destinationNodeRef;
     }
@@ -221,13 +247,13 @@ public class CopyServiceImpl implements CopyService
 	 * @param sourceNodeRef		the source node reference
 	 * @return					the copy details
 	 */
-	private PolicyScope getCopyDetails(NodeRef sourceNodeRef)
+	private PolicyScope getCopyDetails(NodeRef sourceNodeRef, StoreRef destinationStoreRef, boolean copyToNewNode)
 	{
 		QName sourceClassRef = this.nodeService.getType(sourceNodeRef);		
 		PolicyScope copyDetails = new PolicyScope(sourceClassRef);
 		
 		// Invoke the onCopy behaviour
-		invokeOnCopy(sourceClassRef, sourceNodeRef, copyDetails);
+		invokeOnCopy(sourceClassRef, sourceNodeRef, destinationStoreRef, copyToNewNode, copyDetails);
 		
 		// TODO What do we do aboout props and assocs that are on the node node but not part of the type definition?
 		
@@ -236,7 +262,7 @@ public class CopyServiceImpl implements CopyService
 		for (QName sourceAspect : sourceAspects) 
 		{
 			// Invoke the onCopy behaviour
-			invokeOnCopy(sourceAspect, sourceNodeRef, copyDetails);
+			invokeOnCopy(sourceAspect, sourceNodeRef, destinationStoreRef, copyToNewNode, copyDetails);
 		}
 		
 		return copyDetails;
@@ -249,7 +275,12 @@ public class CopyServiceImpl implements CopyService
 	 * @param sourceNodeRef		source node reference
 	 * @param copyDetails		the copy details
 	 */
-	private void invokeOnCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	private void invokeOnCopy(
+            QName sourceClassRef, 
+            NodeRef sourceNodeRef, 
+            StoreRef destinationStoreRef, 
+            boolean copyToNewNode, 
+            PolicyScope copyDetails)
 	{
 		Collection<CopyServicePolicies.OnCopyNodePolicy> policies = this.onCopyNodeDelegate.getList(sourceClassRef);
 		if (policies.isEmpty() == true)
@@ -260,7 +291,7 @@ public class CopyServiceImpl implements CopyService
 		{
 			for (CopyServicePolicies.OnCopyNodePolicy policy : policies) 
 			{
-				policy.onCopyNode(sourceClassRef, sourceNodeRef, copyDetails);
+				policy.onCopyNode(sourceClassRef, sourceNodeRef, destinationStoreRef, copyToNewNode, copyDetails);
 			}
 		}
 	}
@@ -504,7 +535,7 @@ public class CopyServiceImpl implements CopyService
 		}
 		
 		// Get the copy details
-		PolicyScope copyDetails = getCopyDetails(sourceNodeRef);
+		PolicyScope copyDetails = getCopyDetails(sourceNodeRef, destinationNodeRef.getStoreRef(), false);
 		
 		// Copy over the top of the destination node
 		copyProperties(destinationNodeRef, copyDetails);
@@ -522,7 +553,12 @@ public class CopyServiceImpl implements CopyService
 	 * @param sourceNodeRef		the source node reference
 	 * @param copyDetails	    the copy details
 	 */
-	public void copyAspectOnCopy(QName sourceClassRef, NodeRef sourceNodeRef, PolicyScope copyDetails)
+	public void copyAspectOnCopy(
+            QName classRef,
+            NodeRef sourceNodeRef,
+            StoreRef destinationStoreRef,
+            boolean copyToNewNode,
+            PolicyScope copyDetails)
 	{
 		// Do nothing.  This will ensure that copy aspect on the source node does not get copied onto
 		// the destination node.

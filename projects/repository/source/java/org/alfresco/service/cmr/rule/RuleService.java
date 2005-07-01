@@ -87,6 +87,31 @@ public interface RuleService
      * @return true if the node is actionable, false otherwise
      */
     public boolean isActionable(NodeRef nodeRef);
+    
+    /**
+     * Indicates wether the rules for a given node are enabled or not.  If the 
+     * rules are not enabled then they will not be executed.
+     * 
+     * @param nodeRef       the node reference
+     * @return              true if the rules are enabled, false otherwise
+     */
+    public boolean rulesEnabled(NodeRef nodeRef);
+    
+    /**
+     * Disables the rules for a given node reference.  When the rules are disabled they
+     * will not execute.
+     * 
+     * @param nodeRef  the node reference
+     */
+    public void disableRules(NodeRef nodeRef);
+    
+    /**
+     * Enables the rules for a given node reference.  When the rules are enabled they
+     * will execute as usual.  By default all rules are enabled.
+     * 
+     * @param nodeRef   the node reference
+     */
+    public void enableRules(NodeRef nodeRef);
 
     /**
      * Indicates whether the node in question has any rules associated with it.

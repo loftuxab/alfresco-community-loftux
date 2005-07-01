@@ -98,7 +98,7 @@ public abstract class RuleTypeAdapterAbstractBase extends CommonResourceAbstract
             NodeRef actionableNodeRef, 
             NodeRef actionedUponNodeRef)
     {
-        if (this.ruleService.hasRules(actionableNodeRef) == true)
+        if (this.ruleService.rulesEnabled(actionableNodeRef) == true && this.ruleService.hasRules(actionableNodeRef) == true)
         {
             List<Rule> rules = this.ruleService.getRulesByRuleType(
                     actionableNodeRef, 

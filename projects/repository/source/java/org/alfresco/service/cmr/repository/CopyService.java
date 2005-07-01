@@ -113,8 +113,8 @@ public interface CopyService
      * aspect properties will take on the values already assigned to them in the
      * destination node. 
      * 
-     * @param sourceNodeRef    the destination node reference
-     * @param destinationNodeRef         the source node reference
+     * @param sourceNodeRef         the source node reference
+     * @param destinationNodeRef    the destination node reference
      */
     public void copy(NodeRef sourceNodeRef, NodeRef destinationNodeRef);        
 }

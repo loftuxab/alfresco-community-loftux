@@ -669,6 +669,9 @@
 			<property name="policyComponent">
 				<ref bean="policyComponent"/>
 			</property> 
+			<property name="ruleService">
+				<ref bean="ruleService"/>
+			</property>
          </bean>
       </property>
       <property name="transactionAttributes">
