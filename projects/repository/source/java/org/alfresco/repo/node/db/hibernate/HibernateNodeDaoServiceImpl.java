@@ -18,6 +18,8 @@
 package org.alfresco.repo.node.db.hibernate;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -153,8 +155,26 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         }
     }
     
-    public void deleteNode(Node node)
+    /**
+     * Manually ensures that all cascading of associations is taken care of
+     */
+    public void deleteNode(Node node, boolean cascade)
     {
+        // delete all parent assocs
+        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
+        parentAssocs = new HashSet<ChildAssoc>(parentAssocs);
+        for (ChildAssoc assoc : parentAssocs)
+        {
+            deleteChildAssoc(assoc, false);  // we don't cascade upwards
+        }
+        // delete all child assocs
+        Set<ChildAssoc> childAssocs = node.getChildAssocs();
+        childAssocs = new HashSet<ChildAssoc>(childAssocs);
+        for (ChildAssoc assoc : childAssocs)
+        {
+            deleteChildAssoc(assoc, cascade);   // potentially cascade downwards
+        }
+        // finally delete the node
         getHibernateTemplate().delete(node);
         // done
     }
@@ -177,15 +197,28 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return assoc;
     }
     
-    public void deleteChildAssoc(ChildAssoc assoc)
+    /**
+     * Manually enforces cascade deletions down primary associations
+     */
+    public void deleteChildAssoc(ChildAssoc assoc, boolean cascade)
     {
+        Node childNode = assoc.getChild();
+        
         // maintain inverse association sets
         assoc.removeAssociation();
         // remove instance
         getHibernateTemplate().delete(assoc);
         
-        // enforce the cascade
-        getHibernateTemplate().flush();
+        if (cascade && assoc.getIsPrimary())   // the assoc is primary
+        {
+            // delete the child node
+            deleteNode(childNode, cascade);
+            /*
+             * The child node deletion will cascade delete all assocs to
+             * and from it, but we have safely removed this one, so no
+             * duplicate call will be received to do this
+             */
+        }
     }
 
     public ChildAssoc getPrimaryParentAssoc(Node node)

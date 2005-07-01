@@ -39,7 +39,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.TestWithUserUtils;
 
-public class VersionStoreBaseTest extends BaseSpringTest 
+public abstract class VersionStoreBaseTest extends BaseSpringTest 
 {
 	/*
      * Services used by the tests

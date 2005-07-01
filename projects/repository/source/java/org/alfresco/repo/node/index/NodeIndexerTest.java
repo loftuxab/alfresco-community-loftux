@@ -19,10 +19,8 @@ package org.alfresco.repo.node.index;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.repo.node.BaseNodeServiceTest;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -31,7 +29,6 @@ import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.util.perf.PerformanceMonitor;
 
 /**
@@ -100,18 +97,18 @@ public class NodeIndexerTest extends BaseNodeServiceTest
         List<NodeRef> answer;
         
         selectNodesPerf.start();
-        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, '*monkey')]", null, namespacePrefixResolver, false);
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'm_nkey')]", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         selectNodesPerf.stop();
         
         selectNodesPerf.start();
-        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, '%monkey')]", null, namespacePrefixResolver, false);
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'm%key')]", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         selectNodesPerf.stop();
         
         selectNodesPerf.start();
-        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monk*')]", null, namespacePrefixResolver, false);
-        assertEquals(0, answer.size());
+        answer =  nodeService.selectNodes(rootNodeRef, "//*[like(@test:animal, 'monk__')]", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
         selectNodesPerf.stop();
         
         selectNodesPerf.start();

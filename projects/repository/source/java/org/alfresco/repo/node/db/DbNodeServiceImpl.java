@@ -296,7 +296,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         invokeBeforeUpdateNode(newParentRef);                  // new parent ditto
         
         // remove the child assoc from the old parent
-        nodeDaoService.deleteChildAssoc(oldAssoc);
+        // don't cascade as we will still need the node afterwards
+        nodeDaoService.deleteChildAssoc(oldAssoc, false);
         // create a new assoc
         ChildAssoc newAssoc = nodeDaoService.newChildAssoc(newParentNode, nodeToMove, true, assocTypeQName, assocQName);
 
@@ -520,7 +521,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		QName nodeTypeQName = node.getTypeQName();
         Set<QName> nodeAspectQNames = node.getAspects();
         // delete it
-        nodeDaoService.deleteNode(node);
+        nodeDaoService.deleteNode(node, true);
 		
 		// Invoke policy behaviours
 		invokeOnDeleteNode(childAssocRef, nodeTypeQName, nodeAspectQNames);
@@ -587,7 +588,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             {
                 // delete the association instance - it is not primary
                 invokeBeforeDeleteChildAssociation(assocRef);
-                nodeDaoService.deleteChildAssoc(assoc);
+                nodeDaoService.deleteChildAssoc(assoc, true);   // cascade
                 invokeOnDeleteChildAssociation(assocRef);
                 deletedRefs.add(assoc.getChildAssocRef());    // save for return value
             }

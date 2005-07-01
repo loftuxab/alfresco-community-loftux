@@ -435,6 +435,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
             }
             catch (Throwable e)
             {
+                try {txn.rollback(); } catch (Exception ee) {}
                 throw new RuntimeException("Failed writing to output stream for writer: " + writer, e);
             }
             finally

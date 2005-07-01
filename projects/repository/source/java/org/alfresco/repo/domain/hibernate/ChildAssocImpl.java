@@ -21,6 +21,7 @@ import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.EqualsHelper;
 
 /**
  * @author Derek Hulley
@@ -80,6 +81,32 @@ public class ChildAssocImpl implements ChildAssoc
           .append(", isPrimary=").append(isPrimary)
           .append("]");
         return sb.toString();
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        else if (obj == this)
+        {
+            return true;
+        }
+        else if (!(obj instanceof ChildAssoc))
+        {
+            return false;
+        }
+        ChildAssoc that = (ChildAssoc) obj;
+        return (EqualsHelper.nullSafeEquals(this.getTypeQName(), that.getTypeQName())
+                && EqualsHelper.nullSafeEquals(this.getQName(), that.getQName())
+                && EqualsHelper.nullSafeEquals(this.getParent(), that.getParent())
+                && EqualsHelper.nullSafeEquals(this.getChild(), that.getChild()));
+    }
+    
+    public int hashCode()
+    {
+        return (this.getLocalName() == null ? 0 : getLocalName().hashCode());
     }
 
     public Long getId()

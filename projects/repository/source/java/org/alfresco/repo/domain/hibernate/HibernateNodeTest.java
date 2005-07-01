@@ -264,6 +264,9 @@ public class HibernateNodeTest extends BaseHibernateTest
         assoc2.setQName(QName.createQName(null, "number2"));
         assoc2.buildAssociation(containerNode, contentNode);
         getSession().save(assoc2);
+        
+        assertFalse("Hashcode incorrent", assoc2.hashCode() == 0);
+        assertNotSame("Assoc equals failure", assoc1, assoc2);
 
 //        flushAndClear();
 

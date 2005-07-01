@@ -92,8 +92,9 @@ public interface NodeDaoService
      * up with any other ancillary deletes
      * 
      * @param node the entity to delete
+     * @param cascade true if the assoc deletions must cascade to primary child nodes
      */
-    public void deleteNode(Node node);
+    public void deleteNode(Node node, boolean cascade);
     
     /**
      * @return Returns the persisted and filled association
@@ -108,8 +109,9 @@ public interface NodeDaoService
     
     /**
      * @param assoc the child association to remove
+     * @param cascade true if the assoc deletions must cascade to primary child nodes
      */
-    public void deleteChildAssoc(ChildAssoc assoc);
+    public void deleteChildAssoc(ChildAssoc assoc, boolean cascade);
     
     /**
      * Finds the association between the node's primary parent and the node itself

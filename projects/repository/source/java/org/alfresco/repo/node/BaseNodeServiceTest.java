@@ -893,6 +893,20 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
     }
     
+    public void testPrimaryPathCascadeDelete() throws Exception
+    {
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
+        NodeRef n1Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "root_p_n1")).getChildRef();
+        NodeRef n6Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n3_p_n6")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8")).getChildRef();
+        
+        // delete n1
+        nodeService.deleteNode(n1Ref);
+        // check that the rest disappeared
+        assertFalse("n6 not cascade deleted", nodeService.exists(n6Ref));
+        assertFalse("n8 not cascade deleted", nodeService.exists(n8Ref));
+    }
+    
     public void testNodeXPath() throws Exception
     {
         Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();

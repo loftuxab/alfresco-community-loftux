@@ -17,9 +17,15 @@
  */
 package org.alfresco.repo.node.db;
 
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.repo.node.BaseNodeServiceTest;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * @see org.alfresco.repo.node.db.DbNodeServiceImpl
@@ -37,5 +43,28 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
     protected ContentService getContentService()
     {
         return (ContentService) applicationContext.getBean("contentService");
+    }
+    
+    /**
+     * Deletes a child node and then iterates over the children of the parent node,
+     * getting the QName.  This caused some issues after we did some optimization
+     * using lazy loading of the associations.
+     */
+    public void testLazyLoadIssue() throws Exception
+    {
+        Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
+        ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
+        NodeRef n6Ref = n6pn8Ref.getParentRef();
+        NodeRef n8Ref = n6pn8Ref.getChildRef();
+        
+        // delete n8
+        nodeService.deleteNode(n8Ref);
+        
+        // get the parent children
+        List<ChildAssociationRef> assocs = nodeService.getChildAssocs(n6Ref);
+        for (ChildAssociationRef assoc : assocs)
+        {
+            // just checking
+        }
     }
 }
