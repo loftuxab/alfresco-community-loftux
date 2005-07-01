@@ -17,6 +17,7 @@
  */
 package org.alfresco.repo.search.impl.lucene;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.GUID;
+import org.apache.lucene.search.BooleanQuery;
 
 /**
  * This class is resource manager LuceneIndexers and LuceneSearchers.
@@ -57,8 +59,21 @@ import org.alfresco.util.GUID;
 public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher, XAResource
 {
     private DictionaryService dictionaryService;
+
     private NamespaceService nameSpaceService;
-    
+
+    private int queryMaxClauses;
+
+    private int indexerBatchSize;
+
+    private int indexerMinMergeDocs;
+
+    private int indexerMergeFactor;
+
+    private int indexerMaxMergeDocs;
+
+    private String lockDirectory;
+
     /**
      * The factory instance
      */
@@ -101,12 +116,13 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private NodeService nodeService;
 
     private LuceneIndexLock luceneIndexLock;
-    
+
     private FullTextSearchIndexer luceneFullTextSearchIndexer;
-    
+
     private String indexRootLocation;
-    
+
     private ContentService contentService;
+
     private QueryRegisterComponent queryRegister;
 
     /**
@@ -149,17 +165,17 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     {
         this.nameSpaceService = nameSpaceService;
     }
-    
+
     public void setLuceneIndexLock(LuceneIndexLock luceneIndexLock)
     {
         this.luceneIndexLock = luceneIndexLock;
     }
-    
+
     public void setLuceneFullTextSearchIndexer(FullTextSearchIndexer luceneFullTextSearchIndexer)
     {
         this.luceneFullTextSearchIndexer = luceneFullTextSearchIndexer;
     }
-    
+
     public void setIndexRootLocation(String indexRootLocation)
     {
         this.indexRootLocation = indexRootLocation;
@@ -169,7 +185,6 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     {
         this.queryRegister = queryRegister;
     }
-    
 
     /**
      * Check if we are in a global transactoin according to the transaction
@@ -304,12 +319,11 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      */
     private LuceneIndexerImpl createIndexer(StoreRef storeRef, String deltaId)
     {
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(storeRef, deltaId, indexRootLocation);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(storeRef, deltaId, this);
         indexer.setNodeService(nodeService);
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setLuceneFullTextSearchIndexer(luceneFullTextSearchIndexer);
-        indexer.setIndexRootLocation(indexRootLocation);
         indexer.setContentService(contentService);
         return indexer;
     }
@@ -338,12 +352,11 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      */
     private LuceneSearcher getSearcher(StoreRef storeRef, String deltaId) throws SearcherException
     {
-        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, deltaId, indexRootLocation);
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, deltaId, this);
         searcher.setNamespacePrefixResolver(nameSpaceService);
         searcher.setLuceneIndexLock(luceneIndexLock);
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
-        searcher.setIndexRootLocation(indexRootLocation);
         searcher.setQueryRegister(queryRegister);
         return searcher;
     }
@@ -628,9 +641,9 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         }
         finally
         {
-            if( threadLocalIndexers.get() != null)
+            if (threadLocalIndexers.get() != null)
             {
-               threadLocalIndexers.get().clear();
+                threadLocalIndexers.get().clear();
             }
         }
     }
@@ -699,12 +712,12 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                 }
             }
         }
-        
-        if( threadLocalIndexers.get() != null)
+
+        if (threadLocalIndexers.get() != null)
         {
-           threadLocalIndexers.get().clear();
+            threadLocalIndexers.get().clear();
         }
-        
+
     }
 
     public void setContentService(ContentService contentService)
@@ -712,9 +725,96 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         this.contentService = contentService;
     }
 
-    public String getIndexLocation()
+    public String getIndexRootLocation()
     {
         return indexRootLocation;
     }
-    
+
+    public int getIndexerBatchSize()
+    {
+        return indexerBatchSize;
+    }
+
+    public void setIndexerBatchSize(int indexerBatchSize)
+    {
+        this.indexerBatchSize = indexerBatchSize;
+    }
+
+    public int getIndexerMaxMergeDocs()
+    {
+        return indexerMaxMergeDocs;
+    }
+
+    public void setIndexerMaxMergeDocs(int indexerMaxMergeDocs)
+    {
+        this.indexerMaxMergeDocs = indexerMaxMergeDocs;
+    }
+
+    public int getIndexerMergeFactor()
+    {
+        return indexerMergeFactor;
+    }
+
+    public void setIndexerMergeFactor(int indexerMergeFactor)
+    {
+        this.indexerMergeFactor = indexerMergeFactor;
+    }
+
+    public int getIndexerMinMergeDocs()
+    {
+        return indexerMinMergeDocs;
+    }
+
+    public void setIndexerMinMergeDocs(int indexerMinMergeDocs)
+    {
+        this.indexerMinMergeDocs = indexerMinMergeDocs;
+    }
+
+    public String getLockDirectory()
+    {
+        return lockDirectory;
+    }
+
+    public void setLockDirectory(String lockDirectory)
+    {
+        this.lockDirectory = lockDirectory;
+        // Set the lucene lock file via System property
+        // org.apache.lucene.lockdir
+        System.setProperty("org.apache.lucene.lockdir", lockDirectory);
+        // Make sure the lock directory exists
+        File lockDir = new File(lockDirectory);
+        if (!lockDir.exists())
+        {
+            lockDir.mkdirs();
+        }
+        // clean out any existing locks when we start up
+
+        File[] children = lockDir.listFiles();
+        if (children != null)
+        {
+            for (int i = 0; i < children.length; i++)
+            {
+                File child = children[i];
+                if (child.isFile())
+                {
+                    if (child.exists() && !child.delete() && child.exists())
+                    {
+                        throw new IllegalStateException("Failed to delete " + child);
+                    }
+                }
+            }
+        }
+    }
+
+    public int getQueryMaxClauses()
+    {
+        return queryMaxClauses;
+    }
+
+    public void setQueryMaxClauses(int queryMaxClauses)
+    {
+        this.queryMaxClauses = queryMaxClauses;
+        BooleanQuery.setMaxClauseCount(this.queryMaxClauses);
+    }
+
 }

@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
+import javax.transaction.UserTransaction;
+
 import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
@@ -32,6 +34,7 @@ import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.M2Property;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -52,6 +55,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class LuceneCategoryTest extends TestCase
 {    
     public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CHILDREN;
+    
+    private ServiceRegistry serviceRegistry;
     
     static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
     NodeService nodeService;
@@ -115,6 +120,7 @@ public class LuceneCategoryTest extends TestCase
         searcher = (SearchService) ctx.getBean("searcherComponent");
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
         categoryService = (CategoryService) ctx.getBean("categoryService");
+        serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
         
         createTestTypes();
         
@@ -304,7 +310,7 @@ public class LuceneCategoryTest extends TestCase
     
     private void buildBaseIndex()
     {
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher.getIndexLocation());
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -343,11 +349,13 @@ public class LuceneCategoryTest extends TestCase
     }
 
     
-    public void testMulti()
+    public void testMulti() throws Exception
     {
+        UserTransaction tx = serviceRegistry.getUserTransaction();
+        tx.begin();
         buildBaseIndex();
         
-        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher.getIndexLocation());
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
         
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
@@ -358,13 +366,16 @@ public class LuceneCategoryTest extends TestCase
         //printPaths(results);
         assertEquals(9, results.length());
         results.close();
+        tx.rollback();
     }
     
-    public void testBasic()
+    public void testBasic() throws Exception
     {
+        UserTransaction tx = serviceRegistry.getUserTransaction();
+        tx.begin();
         buildBaseIndex();
         
-        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher.getIndexLocation());
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
         
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
@@ -517,13 +528,16 @@ public class LuceneCategoryTest extends TestCase
         //printPaths(results);
         assertEquals(9, results.length());
         results.close();
+        tx.rollback();
     }
     
-    public void testCategoryServiceImpl()
+    public void testCategoryServiceImpl() throws Exception
     {
+        UserTransaction tx = serviceRegistry.getUserTransaction();
+        tx.begin();
         buildBaseIndex();
         
-        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher.getIndexLocation());
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
         
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
@@ -581,6 +595,7 @@ public class LuceneCategoryTest extends TestCase
         Collection<QName> aspects = impl.getCategoryAspects();
         assertEquals(6, aspects.size());    
        
+        tx.rollback();
     }
     
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
@@ -593,13 +608,16 @@ public class LuceneCategoryTest extends TestCase
         return nspr;
     }
     
-    public void testCategoryService()
+    public void testCategoryService() throws Exception
     {
+        UserTransaction tx = serviceRegistry.getUserTransaction();
+        tx.begin();
         buildBaseIndex();
         assertEquals(1, categoryService.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE).size());
         assertEquals(4, categoryService.getRootCategories(rootNodeRef.getStoreRef()).size());
         assertEquals(2, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "assetClass"), CategoryService.Depth.IMMEDIATE).size());
         assertEquals(6, categoryService.getCategoryAspects().size());
+        tx.rollback();
     }
     
     private int getTotalScore(ResultSet results)

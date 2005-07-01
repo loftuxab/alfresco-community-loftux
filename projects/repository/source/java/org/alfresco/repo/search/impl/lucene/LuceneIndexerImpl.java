@@ -54,7 +54,6 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.ResultSetRow;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
@@ -68,8 +67,6 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
-
-import com.sun.corba.se.spi.orbutil.fsm.Action;
 
 /**
  * The implementation of the lucene based indexer. Supports basic transactional
@@ -426,14 +423,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * @param deltaId
      * @return
      */
-    public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId, String indexRootLocation) throws LuceneIndexException
+    public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId, LuceneConfig config) throws LuceneIndexException
     {
         if (s_logger.isDebugEnabled())
         {
             s_logger.debug("Creating indexer");
         }
         LuceneIndexerImpl indexer = new LuceneIndexerImpl();
-        indexer.setIndexRootLocation(indexRootLocation);
+        indexer.setLuceneConfig(config);
         indexer.initialise(storeRef, deltaId, false);
         return indexer;
     }
@@ -753,7 +750,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         purgeCommandList(command);
         commandList.add(command);
         
-        if (commandList.size() > 10000)
+        if (commandList.size() > getLuceneConfig().getIndexerBatchSize())
         {
             flushPending();
         }

@@ -14,15 +14,26 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the
  * License.
+ *
+ * Created on 30-Jun-2005
  */
 package org.alfresco.repo.search.impl.lucene;
 
-import org.alfresco.repo.search.IndexerAndSearcher;
-import org.alfresco.repo.search.IndexerException;
-
-public interface LuceneIndexerAndSearcher extends IndexerAndSearcher, LuceneConfig
+public interface LuceneConfig
 {
-    public int prepare() throws IndexerException;
-    public void commit() throws IndexerException;
-    public void rollback();
+ 
+    public String getIndexRootLocation();
+    
+    public int getIndexerBatchSize();
+
+    public int getIndexerMaxMergeDocs();
+
+    public int getIndexerMergeFactor();
+
+    public int getIndexerMinMergeDocs();
+
+    public String getLockDirectory();
+
+    public int getQueryMaxClauses();
+   
 }

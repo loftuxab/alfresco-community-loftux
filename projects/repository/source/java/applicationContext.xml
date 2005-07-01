@@ -263,7 +263,7 @@
    
    <bean id="fileContentStore" class="org.alfresco.repo.content.filestore.FileContentStore">
       <constructor-arg>
-         <value>${dir.root}${dir.contentstore}</value>
+         <value>${dir.contentstore}</value>
       </constructor-arg>
    </bean>
    
@@ -419,13 +419,31 @@
          <ref bean="LuceneFullTextSearchIndexer"/>
       </property>
       <property name="indexRootLocation">
-         <value>${dir.root}${dir.indexes}</value>
+         <value>${dir.indexes}</value>
       </property>
       <property name="contentService">
          <ref bean="contentService"/>
       </property>
       <property name="queryRegister">
          <ref bean="queryRegisterComponent"/>
+      </property>
+      <property name="queryMaxClauses">
+         <value>${lucene.query.maxClauses}</value>
+      </property>
+      <property name="indexerBatchSize">
+         <value>${lucene.indexer.batchSize}</value>
+      </property>
+      <property name="indexerMinMergeDocs">
+         <value>${lucene.indexer.minMergeDocs}</value>
+      </property>
+      <property name="indexerMergeFactor">
+         <value>${lucene.indexer.mergeFactor}</value>
+      </property>
+      <property name="indexerMaxMergeDocs">
+         <value>${lucene.indexer.maxMergeDocs}</value>
+      </property>
+       <property name="lockDirectory">
+         <value>${dir.indexes.lock}</value>
       </property>
    </bean>
    

@@ -128,7 +128,7 @@ public abstract class LuceneBase implements Lockable
 
     private LuceneIndexLock luceneIndexLock;
 
-    private String indexRootLocation = null; // File.separator +
+    private LuceneConfig config;
 
     // "lucene-indexes";
 
@@ -212,11 +212,11 @@ public abstract class LuceneBase implements Lockable
      */
     private String getBasePath()
     {
-        if (indexRootLocation == null)
+        if (config.getIndexRootLocation() == null)
         {
             throw new IndexerException("No configuration for index location");
         }
-        String basePath = indexRootLocation + File.separator + store.getProtocol() + File.separator + store.getIdentifier() + File.separator;
+        String basePath = config.getIndexRootLocation() + File.separator + store.getProtocol() + File.separator + store.getIdentifier() + File.separator;
         return basePath;
     }
 
@@ -383,9 +383,9 @@ public abstract class LuceneBase implements Lockable
             }
         }
         deltaWriter.setUseCompoundFile(true);
-        deltaWriter.minMergeDocs = 1000;
-        deltaWriter.mergeFactor = 100;
-        deltaWriter.maxMergeDocs = 100000;
+        deltaWriter.minMergeDocs = config.getIndexerMinMergeDocs();
+        deltaWriter.mergeFactor = config.getIndexerMergeFactor();
+        deltaWriter.maxMergeDocs = config.getIndexerMaxMergeDocs();
         return deltaWriter;
     }
 
@@ -552,9 +552,9 @@ public abstract class LuceneBase implements Lockable
             }
             mainWriter.setUseCompoundFile(true);
 
-            mainWriter.minMergeDocs = 1000;
-            mainWriter.mergeFactor = 1000;
-            mainWriter.maxMergeDocs = 1000000;
+            mainWriter.minMergeDocs = config.getIndexerMinMergeDocs();
+            mainWriter.mergeFactor = config.getIndexerMergeFactor();
+            mainWriter.maxMergeDocs = config.getIndexerMaxMergeDocs();
 
             try
             {
@@ -854,9 +854,15 @@ public abstract class LuceneBase implements Lockable
         return dictionaryService;
     }
 
-    public void setIndexRootLocation(String indexRootLocation)
+    public void setLuceneConfig(LuceneConfig config)
     {
-        this.indexRootLocation = indexRootLocation;
+        this.config = config;
+    }
+    
+    public LuceneConfig getLuceneConfig()
+    {
+        return config;
     }
 
+    
 }
