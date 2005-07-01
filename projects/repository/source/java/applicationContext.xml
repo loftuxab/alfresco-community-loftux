@@ -735,7 +735,7 @@
    
    <bean id="ftsIndexerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
       <property name="jobDetail">
-         <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+         <bean id="ftsIndexerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
             <property name="jobClass">
                <value>org.alfresco.repo.search.impl.lucene.fts.FTSIndexerJob</value>
             </property>
@@ -758,7 +758,7 @@
    
    <bean id="tempFileCleanerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
       <property name="jobDetail">
-         <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+         <bean id="tempFileCleanerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
             <property name="jobClass">
                <value>org.alfresco.util.TempFileProvider$TempFileCleanerJob</value>
             </property>
@@ -781,7 +781,7 @@
 
    <bean id="fileContentStoreCleanerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
       <property name="jobDetail">
-         <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+         <bean id="fileContentStoreCleanerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
             <property name="jobClass">
                <value>org.alfresco.repo.content.ContentStoreCleanupJob</value>
             </property>
@@ -810,7 +810,7 @@
 
    <bean id="contentTransformerCacheResetTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
       <property name="jobDetail">
-         <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+         <bean id="contentTransformerCacheResetJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
             <property name="jobClass">
                <value>org.alfresco.repo.content.transform.ContentTransformerRegistry$CacheResetJob</value>
             </property>
@@ -833,15 +833,12 @@
 
    <!-- passing a list to the SchedulerFactoryBean only instantiates the first one -->   
    <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-	  <property name="overwriteExistingJobs">
-		<value>true</value>
-	  </property>
       <property name="triggers">
          <list>
-            <ref local="ftsIndexerTrigger"/>
             <ref local="tempFileCleanerTrigger"/>
-            <!-- <ref local="fileContentStoreCleanerTrigger"/> -->
+           <!-- <ref local="fileContentStoreCleanerTrigger"/> -->
             <ref local="contentTransformerCacheResetTrigger"/>
+			<ref local="ftsIndexerTrigger"/>
          </list>
        </property>
    </bean>  
