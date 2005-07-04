@@ -6,6 +6,9 @@
 
    <target name="compile-java" depends="common.compile-java">
       <antcall target="compile-jibx" />
+      <copy todir="${classes.dir}">
+         <fileset dir="${src.test-resources.dir}" />
+      </copy>
    </target>
 
    <target name="compile-jibx" depends="init">
