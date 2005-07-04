@@ -17,6 +17,7 @@
  */
 package org.alfresco.filesys.server.config;
 
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Provider;
@@ -28,6 +29,8 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.filesys.netbios.*;
+import org.alfresco.filesys.netbios.win32.*;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.NetworkServerList;
 import org.alfresco.filesys.server.auth.LocalAuthenticator;
@@ -55,6 +58,7 @@ import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.util.IPAddress;
 import org.alfresco.service.ServiceRegistry;
+import org.apache.log4j.*;
 
 /**
  * <p>
@@ -64,6 +68,10 @@ import org.alfresco.service.ServiceRegistry;
  */
 public class ServerConfiguration
 {
+    // Debug logging
+
+    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+
     // Filesystem configuration constants
     private static final String ConfigArea = "file-servers";
     private static final String ConfigCIFS = "CIFS Server";
@@ -79,10 +87,13 @@ public class ServerConfiguration
 
     // Platform types
 
-    private enum PlatformType
+    public enum PlatformType
     {
         Unknown, WINDOWS, LINUX
     };
+
+    // Token name to substitute current server name into the CIFS server name
+    private static final String TokenLocalName = "${localname}";
 
     /** connection to database */
     private ServiceRegistry serviceRegistry;
@@ -200,6 +211,11 @@ public class ServerConfiguration
     // JCE provider class name
     private String m_jceProviderClass;
 
+    // Local server name and domain/workgroup name
+
+    private String m_localName;
+    private String m_localDomain;
+
     /**
      * Class constructor
      * 
@@ -280,22 +296,20 @@ public class ServerConfiguration
 
         determinePlatformType();
 
-        // Process the security configuration, must be done first to set the
-        // global ACL list
-
-        Config config = m_configService.getConfig(ConfigSecurity, configCtx);
-        processSecurityConfig(config);
-
         // Process the CIFS server configuration
 
-        config = m_configService.getConfig(ConfigCIFS, configCtx);
+        Config config = m_configService.getConfig(ConfigCIFS, configCtx);
         processCIFSServerConfig(config);
+
+        // Process the security configuration
+
+        config = m_configService.getConfig(ConfigSecurity, configCtx);
+        processSecurityConfig(config);
 
         // Process the filesystems configuration
 
         config = m_configService.getConfig(ConfigFilesystems, configCtx);
         processFilesystemsConfig(config);
-
     }
 
     /**
@@ -318,7 +332,7 @@ public class ServerConfiguration
      * 
      * @return PlatformType
      */
-    private final PlatformType getPlatformType()
+    public final PlatformType getPlatformType()
     {
         return m_platform;
     }
@@ -330,33 +344,12 @@ public class ServerConfiguration
      */
     private final void processCIFSServerConfig(Config config)
     {
-
-        // Get the host configuration
-
-        ConfigElement elem = config.getConfigElement("host");
-        if (elem == null)
-            throw new AlfrescoRuntimeException("CIFS server host settings not specified");
-
-        String hostName = elem.getAttribute("name");
-        if (hostName == null || hostName.length() == 0)
-            throw new AlfrescoRuntimeException("Host name not specified or invalid");
-        setServerName(hostName.toUpperCase());
-
-        // Get the domain/workgroup name
-
-        String domain = elem.getAttribute("domain");
-        if (domain != null && domain.length() > 0)
-            setDomainName(domain.toUpperCase());
-
-        // Check for a server comment
-
-        elem = config.getConfigElement("comment");
-        if (elem != null)
-            setComment(elem.getValue());
-
         // Get the network broadcast address
+        //
+        // Note: We need to set this first as the call to getLocalDomainName() may use a NetBIOS
+        // name lookup, so the broadcast mask must be set before then.
 
-        elem = config.getConfigElement("broadcast");
+        ConfigElement elem = config.getConfigElement("broadcast");
         if (elem != null)
         {
 
@@ -369,6 +362,71 @@ public class ServerConfiguration
 
             setBroadcastMask(elem.getValue());
         }
+
+        // Get the host configuration
+
+        elem = config.getConfigElement("host");
+        if (elem == null)
+            throw new AlfrescoRuntimeException("CIFS server host settings not specified");
+
+        String hostName = elem.getAttribute("name");
+        if (hostName == null || hostName.length() == 0)
+            throw new AlfrescoRuntimeException("Host name not specified or invalid");
+
+        // Check if the host name contains the local name token
+
+        int pos = hostName.indexOf(TokenLocalName);
+        if (pos != -1)
+        {
+
+            // Get the local server name
+
+            String srvName = getLocalServerName(true);
+
+            // Rebuild the host name substituting the token with the local server name
+
+            StringBuilder hostStr = new StringBuilder();
+
+            hostStr.append(hostName.substring(0, pos));
+            hostStr.append(srvName);
+
+            pos += TokenLocalName.length();
+            if (pos < hostName.length())
+                hostStr.append(hostName.substring(pos));
+
+            hostName = hostStr.toString();
+
+            // Make sure the CIFS server name does not match the local server name
+
+            if (hostName.equals(srvName))
+                throw new AlfrescoRuntimeException("CIFS server name must be unique");
+        }
+
+        // Set the CIFS server name
+
+        setServerName(hostName.toUpperCase());
+
+        // Get the domain/workgroup name
+
+        String domain = elem.getAttribute("domain");
+        if (domain != null && domain.length() > 0)
+        {
+            // Set the domain/workgroup name
+
+            setDomainName(domain.toUpperCase());
+        }
+        else
+        {
+            // Get the local domain/workgroup name
+
+            setDomainName(getLocalDomainName());
+        }
+
+        // Check for a server comment
+
+        elem = config.getConfigElement("comment");
+        if (elem != null)
+            setComment(elem.getValue());
 
         // Check for a bind address
 
@@ -1533,6 +1591,129 @@ public class ServerConfiguration
     }
 
     /**
+     * Get the local server name and optionally trim the domain name
+     * 
+     * @param trimDomain boolean
+     * @return String
+     */
+    public final String getLocalServerName(boolean trimDomain)
+    {
+        // Check if the name has already been set
+
+        if (m_localName != null)
+            return m_localName;
+
+        // Find the local server name
+
+        String srvName = null;
+
+        if (getPlatformType() == PlatformType.WINDOWS)
+        {
+            // Get the local name via JNI
+
+            srvName = Win32NetBIOS.GetLocalNetBIOSName();
+        }
+        else
+        {
+            // Get the DNS name of the local system
+
+            try
+            {
+                srvName = InetAddress.getLocalHost().getHostName();
+            }
+            catch (UnknownHostException ex)
+            {
+            }
+        }
+
+        // Strip the domain name
+
+        if (trimDomain && srvName != null)
+        {
+            int pos = srvName.indexOf(".");
+            if (pos != -1)
+                srvName = srvName.substring(0, pos);
+        }
+
+        // Save the local server name
+
+        m_localName = srvName;
+
+        // Return the local server name
+
+        return srvName;
+    }
+
+    /**
+     * Get the local domain/workgroup name
+     * 
+     * @return String
+     */
+    public final String getLocalDomainName()
+    {
+        // Check if the local domain has been set
+
+        if (m_localDomain != null)
+            return m_localDomain;
+
+        // Find the local domain name
+
+        String domainName = null;
+
+        if (getPlatformType() == PlatformType.WINDOWS)
+        {
+            // Get the local domain/workgroup name via JNI
+
+            domainName = Win32NetBIOS.GetLocalDomainName();
+
+            // Debug
+
+            if (logger.isDebugEnabled())
+                logger.debug("Local domain name is " + domainName + " (via JNI)");
+        }
+        else
+        {
+            NetBIOSName nbName = null;
+
+            try
+            {
+                // Try and find the browse master on the local network
+
+                nbName = NetBIOSSession.FindName(NetBIOSName.BrowseMasterName, NetBIOSName.BrowseMasterGroup, 5000);
+
+                // Log the browse master details
+
+                if (logger.isDebugEnabled())
+                    logger.debug("Found browse master at " + nbName.getIPAddressString(0));
+
+                // Get the NetBIOS name list from the browse master
+
+                NetBIOSNameList nbNameList = NetBIOSSession.FindNamesForAddress(nbName.getIPAddressString(0));
+                nbName = nbNameList.findName(NetBIOSName.MasterBrowser, false);
+
+                // Set the domain/workgroup name
+
+                if (nbName != null)
+                    domainName = nbName.getName();
+                else
+                    throw new AlfrescoRuntimeException("Failed to find local domain/workgroup name");
+            }
+            catch (IOException ex)
+            {
+                throw new AlfrescoRuntimeException("Failed to determine local domain/workgroup");
+            }
+        }
+
+        // Save the local domain name
+
+        m_localDomain = domainName;
+
+        // Return the local domain/workgroup name
+
+        return domainName;
+    }
+
+    /**
      * Determine if Macintosh extension SMBs are enabled
      * 
      * @return boolean
@@ -1663,6 +1844,10 @@ public class ServerConfiguration
     public final void setBroadcastMask(String mask)
     {
         m_broadcast = mask;
+
+        // Copy settings to the NetBIOS session class
+
+        NetBIOSSession.setSubnetMask(mask);
     }
 
     /**

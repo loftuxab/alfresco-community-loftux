@@ -17,9 +17,11 @@
  */
 package org.alfresco.filesys.server.auth.passthru;
 
+import java.io.*;
 import java.util.Hashtable;
 
 import org.alfresco.config.ConfigElement;
+import org.alfresco.error.*;
 import org.alfresco.filesys.netbios.NetBIOSName;
 import org.alfresco.filesys.netbios.NetBIOSNameList;
 import org.alfresco.filesys.netbios.NetBIOSSession;
@@ -45,7 +47,6 @@ import org.apache.log4j.Logger;
  */
 public class PassthruAuthenticator extends SrvAuthenticator implements SessionListener
 {
-
     // Debug logging
 
     private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol.auth");
@@ -64,10 +65,6 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
     // Session connection timeout, in milliseconds
 
     private int m_sessTmo = DefaultSessionTmo;
-
-    // Debug enable flag
-
-    private boolean m_debug;
 
     // SMB server
 
@@ -90,16 +87,6 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
         // Allocate the session table
 
         m_sessions = new Hashtable<String, PassthruDetails>();
-    }
-
-    /**
-     * Check if debug output is enabled
-     * 
-     * @return boolean
-     */
-    public final boolean hasDebug()
-    {
-        return m_debug;
     }
 
     /**
@@ -162,7 +149,7 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 
                         // Debug
 
-                        if (logger.isDebugEnabled() && hasDebug())
+                        if (logger.isDebugEnabled())
                             logger.debug("Passthru authenticate user=" + client.getUserName() + ", GUEST");
                     }
                 }
@@ -175,7 +162,7 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 
                     // Debug
 
-                    if (logger.isDebugEnabled() && hasDebug())
+                    if (logger.isDebugEnabled())
                         logger.debug("Passthru authenticate user=" + client.getUserName() + ", FULL");
                 }
             }
@@ -209,7 +196,7 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 
                     // DEBUG
 
-                    if (logger.isDebugEnabled() && hasDebug())
+                    if (logger.isDebugEnabled())
                         logger.debug("Closed auth session, sessId=" + authSess.getSessionId());
                 }
                 catch (Exception ex)
@@ -226,7 +213,7 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 
             // DEBUG
 
-            if (logger.isDebugEnabled() && hasDebug())
+            if (logger.isDebugEnabled())
                 logger.debug("  No PassthruDetails for " + sess.getUniqueId());
         }
 
@@ -301,7 +288,7 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 
                 // DEBUG
 
-                if (logger.isDebugEnabled() && hasDebug())
+                if (logger.isDebugEnabled())
                     logger.debug("Passthru sessId=" + authSess.getSessionId() + ", negotiate key=["
                             + HexDump.hexString(chKey) + "]");
             }
@@ -333,11 +320,6 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 
         super.initialize(config, params);
 
-        // Check if debug output is enabled
-
-        if (params.getChild("Debug") != null)
-            m_debug = true;
-
         // Check if the session timeout has been specified
 
         ConfigElement sessTmoElem = params.getChild("Timeout");
@@ -357,6 +339,20 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
             }
         }
 
+        // Check if the local server should be used
+
+        String srvName = null;
+
+        if (params.getChild("LocalServer") != null)
+        {
+
+            // Get the local server name, trim the domain name
+
+            srvName = config.getLocalServerName(true);
+            if(srvName == null)
+                throw new AlfrescoRuntimeException("Passthru authenticator failed to get local server name");
+        }
+
         // Check if a server name has been specified
 
         ConfigElement srvNameElem = params.getChild("Server");
@@ -364,115 +360,200 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
         if (srvNameElem != null && srvNameElem.getValue().length() > 0)
         {
 
-            try
-            {
+            // Check if the server name was already set
 
-                // Get the passthru authenticator server name
+            if (srvName != null)
+                throw new AlfrescoRuntimeException("Set passthru server via local server or specify name");
 
-                String srvName = srvNameElem.getValue();
+            // Get the passthru authenticator server name
 
-                // DEBUG
+            srvName = srvNameElem.getValue();
+        }
 
-                if (logger.isDebugEnabled() && hasDebug())
-                    logger.debug("Passthru authenticator connecting to server " + srvName + " ...");
+        // If the passthru server name has been set initialize the passthru connection
 
-                // Validate the server name, open a connection
+        if (srvName != null)
+        {
+            // Initialize using a specific server
 
-                PCShare authSrv = new PCShare(srvName, "IPC$", "", "");
-                AuthenticateSession authSess = AuthSessionFactory.OpenAuthenticateSession(authSrv, DefaultSessionTmo,
-                        null);
-                if (authSess != null)
-                    authSess.CloseSession();
-
-                // Save the authentication server details
-
-                m_authSrv = authSrv;
-
-                // Debug
-
-                if (logger.isDebugEnabled() && hasDebug())
-                    logger.debug("Test connection to passthru authentication server " + srvName + " successful");
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidConfigurationException("Passthru authenticator error, " + ex.toString());
-            }
+            initializeServerPassthru(srvName);
         }
         else
         {
 
+            // Get the domain/workgroup name
+            
+            String domainName = null;
+            
+            // Check if the local domain/workgroup should be used
+            
+            if (params.getChild("LocalDomain") != null)
+            {
+                // Get the local domain/workgroup name
+                
+                domainName = config.getLocalDomainName();
+            }
+            
             // Check if a domain name has been specified
 
             ConfigElement domNameElem = params.getChild("Domain");
 
-            if (domNameElem != null && m_authSrv != null)
-                throw new InvalidConfigurationException(
-                        "Specify Server or Domain for PassthruAuthenticator configuration");
-
-            String domName = domNameElem.getValue();
-
-            if (domName != null && domName.length() > 0)
+            if (domNameElem != null && domNameElem.getValue().length() > 0)
             {
 
-                try
-                {
+                // Check if the authentication server has already been set, ie. server name was also specified
+                
+                if (m_authSrv != null)
+                    throw new AlfrescoRuntimeException("Specify server or domain name for passthru authentication");
 
-                    // DEBUG
-
-                    if (logger.isDebugEnabled() && hasDebug())
-                        logger.debug("Passthru authenticator finding domain controller for " + domName + " ...");
-
-                    // Find the domain controller
-
-                    NetBIOSName nbName = NetBIOSSession.FindName(domName, NetBIOSName.DomainControllers, m_sessTmo);
-
-                    // DEBUG
-
-                    if (logger.isDebugEnabled() && hasDebug())
-                        logger.debug("  Found domain controller at " + nbName.getIPAddressString(0));
-
-                    // Get the domain controller name
-
-                    NetBIOSNameList nameList = NetBIOSSession.FindNamesForAddress(nbName.getIPAddressString(0));
-                    NetBIOSName dcName = nameList.findName(NetBIOSName.FileServer, false);
-
-                    if (dcName == null)
-                        throw new InvalidConfigurationException("Domain controller not running server service");
-
-                    // DEBUG
-
-                    if (logger.isDebugEnabled() && hasDebug())
-                        logger.debug("  Domain controller name is " + dcName.getName());
-
-                    // Validate the domain controller, open a connection
-
-                    PCShare authSrv = new PCShare(nbName.getIPAddressString(0), "IPC$", "", "");
-                    AuthenticateSession authSess = AuthSessionFactory.OpenAuthenticateSession(authSrv,
-                            DefaultSessionTmo, null);
-                    if (authSess != null)
-                        authSess.CloseSession();
-
-                    // Save the authentication server details
-
-                    m_authSrv = authSrv;
-
-                    // DEBUG
-
-                    if (logger.isDebugEnabled() && hasDebug())
-                        logger.debug("Test connection to passthru authentication server " + domName + "\\"
-                                + dcName.getName() + " successful");
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidConfigurationException("Passthru authenticator error, " + ex.toString());
-                }
+                domainName = domNameElem.getValue();
+            }
+            
+            // If the domain name has been set initialize the passthru connection
+            
+            if (domainName != null)
+            {
+                // Initialize using the domain
+                
+                initializeDomainPassthru(domainName);
             }
         }
 
         // Check if we have an authentication server
 
         if (m_authSrv == null)
-            throw new InvalidConfigurationException("No valid authentication server found");
+            throw new AlfrescoRuntimeException("No valid authentication server found for passthru");
+    }
+
+    /**
+     * Initialize a server passthru authenticator
+     * 
+     * @param srvName String
+     */
+    private final void initializeServerPassthru(String srvName)
+    {
+        // Make a test connection to the passthru authentication server to check that it is
+        // online/valid
+
+        try
+        {
+            // DEBUG
+
+            if (logger.isDebugEnabled())
+                logger.debug("Passthru authenticator connecting to server " + srvName + " ...");
+
+            // Validate the server name, open a connection
+
+            PCShare authSrv = new PCShare(srvName, "IPC$", "", "");
+            AuthenticateSession authSess = AuthSessionFactory.OpenAuthenticateSession(authSrv, DefaultSessionTmo, null);
+            if (authSess != null)
+                authSess.CloseSession();
+
+            // Save the authentication server details
+
+            m_authSrv = authSrv;
+
+            // Debug
+
+            if (logger.isDebugEnabled())
+                logger.debug("Test connection to passthru authentication server " + srvName + " successful");
+        }
+        catch (Exception ex)
+        {
+            throw new AlfrescoRuntimeException("Passthru authenticator error, " + ex.toString());
+        }
+    }
+
+    /**
+     * Initialize a domain passthru authenticator
+     * 
+     * @param domName String
+     */
+    private final void initializeDomainPassthru(String domName)
+    {
+        try
+        {
+
+            // DEBUG
+
+            if (logger.isDebugEnabled())
+                logger.debug("Passthru authenticator finding domain controller for " + domName + " ...");
+
+            // Find a domain controller or the browse master
+
+            NetBIOSName nbName = null;
+            
+            try 
+            {
+                // Find a domain controller
+
+                nbName = NetBIOSSession.FindName(domName, NetBIOSName.DomainControllers, m_sessTmo);
+
+                // DEBUG
+
+                if (logger.isDebugEnabled())
+                    logger.debug("  Found domain controller at " + nbName.getIPAddressString(0));
+            }
+            catch (IOException ex)
+            {
+            }
+
+            //  If we did not find a domain controller look for the browse master
+            
+            if ( nbName == null) {
+                
+                try
+                {
+                    // Try and find the browse master for the workgroup
+                    
+                    nbName = NetBIOSSession.FindName( domName, NetBIOSName.MasterBrowser, m_sessTmo);
+                    
+                    // DEBUG
+
+                    if (logger.isDebugEnabled())
+                        logger.debug("  Found browse master at " + nbName.getIPAddressString(0));
+                }
+                catch (IOException ex)
+                {
+                    throw new AlfrescoRuntimeException("Failed to find domain controller or browse master for " + domName);
+                }
+            }
+
+            // Get the domain controller name
+
+            NetBIOSNameList nameList = NetBIOSSession.FindNamesForAddress(nbName.getIPAddressString(0));
+            NetBIOSName dcName = nameList.findName(NetBIOSName.FileServer, false);
+
+            if (dcName == null)
+                throw new AlfrescoRuntimeException("Domain controller not running server service");
+
+            // DEBUG
+
+            if (logger.isDebugEnabled())
+                logger.debug("  Domain controller name is " + dcName.getName());
+
+            // Validate the domain controller, open a connection
+
+            PCShare authSrv = new PCShare(nbName.getIPAddressString(0), "IPC$", "", "");
+            AuthenticateSession authSess = AuthSessionFactory.OpenAuthenticateSession(authSrv,
+                    DefaultSessionTmo, null);
+            if (authSess != null)
+                authSess.CloseSession();
+
+            // Save the authentication server details
+
+            m_authSrv = authSrv;
+
+            // DEBUG
+
+            if (logger.isDebugEnabled())
+                logger.debug("Test connection to passthru authentication server " + domName + "\\"
+                        + dcName.getName() + " successful");
+        }
+        catch (Exception ex)
+        {
+            throw new AlfrescoRuntimeException("Passthru authenticator error, " + ex.toString());
+        }
     }
 
     /**
@@ -507,7 +588,7 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 
                 // DEBUG
 
-                if (logger.isDebugEnabled() && hasDebug())
+                if (logger.isDebugEnabled())
                     logger.debug("Closed auth session, sessId=" + authSess.getSessionId());
             }
             catch (Exception ex)
@@ -569,7 +650,7 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 
                     // DEBUG
 
-                    if (logger.isDebugEnabled() && hasDebug())
+                    if (logger.isDebugEnabled())
                         logger.debug("Closed auth session, sessId=" + authSess.getSessionId());
                 }
                 catch (Exception ex)

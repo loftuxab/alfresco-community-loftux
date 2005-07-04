@@ -30,6 +30,7 @@ import org.alfresco.filesys.smb.PacketType;
 import org.alfresco.filesys.smb.SMBDate;
 import org.alfresco.filesys.smb.SMBException;
 import org.alfresco.filesys.util.DataPacker;
+import org.apache.log4j.*;
 
 /**
  * Authenticate Session Class
@@ -38,6 +39,10 @@ import org.alfresco.filesys.util.DataPacker;
  */
 public class AuthenticateSession
 {
+
+    // Debug logging
+
+    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol.auth");
 
     // Default packet size
 
@@ -54,9 +59,9 @@ public class AuthenticateSession
 
     // Debug flags
 
-    public final static int DBGPacketType = 0x0001;
-    public final static int DBGDumpPacket = 0x0002;
-    public final static int DBGHexDump = 0x0004;
+//    public final static int DBGPacketType = 0x0001;
+//    public final static int DBGDumpPacket = 0x0002;
+//    public final static int DBGHexDump = 0x0004;
 
     // Default SMB packet size to allocate
 
@@ -143,7 +148,7 @@ public class AuthenticateSession
 
     // Debug support
 
-    private static int m_debug = 0;
+//    private static int m_debug = 0;
 
     /**
      * Class constructor
@@ -600,21 +605,6 @@ public class AuthenticateSession
     }
 
     /**
-     * Determine if the specified debugging option is enabled
-     * 
-     * @param opt Debug option bit mask
-     * @return true if the debug option is enabled, else false
-     */
-    public static boolean hasDebugOption(int opt)
-    {
-        if (m_debug == 0)
-            return false;
-        if ((m_debug & opt) != 0)
-            return true;
-        return false;
-    }
-
-    /**
      * Determine if the session is valid, ie. still open.
      * 
      * @return true if the session is still active, else false.
@@ -622,16 +612,6 @@ public class AuthenticateSession
     public final boolean isActive()
     {
         return (m_netSession == null) ? false : true;
-    }
-
-    /**
-     * Determine if SMB session debugging is enabled
-     * 
-     * @return true if debugging is enabled, else false.
-     */
-    public static boolean hasDebug()
-    {
-        return m_debug != 0 ? true : false;
     }
 
     /**
@@ -711,16 +691,6 @@ public class AuthenticateSession
 
             cnt--;
         }
-    }
-
-    /**
-     * Enable/disable SMB session debugging
-     * 
-     * @param dbg Bit mask of debug options to enable, or zero to disable
-     */
-    public static void setDebug(int dbg)
-    {
-        m_debug = dbg;
     }
 
     /**

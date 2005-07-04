@@ -110,10 +110,6 @@ public final class AuthSessionFactory
     private static int m_primaryProto = Protocol.TCPNetBIOS;
     private static int m_secondaryProto = Protocol.NativeSMB;
 
-    // Session factory debug flag
-
-    private static boolean m_debug = false;
-
     // NetBIOS port to connect to when setting up a new session. The default port is 139.
 
     private static int m_netbiosPort = RFCNetBIOSProtocol.PORT;
@@ -209,22 +205,6 @@ public final class AuthSessionFactory
     protected final static int DefaultPacketSize()
     {
         return m_defPktSize;
-    }
-
-    /**
-     * Disable session factory debugging.
-     */
-    public final static void disableDebug()
-    {
-        m_debug = false;
-    }
-
-    /**
-     * Enable session factory debug output.
-     */
-    public final static void enableDebug()
-    {
-        m_debug = true;
     }
 
     /**
@@ -346,16 +326,6 @@ public final class AuthSessionFactory
     }
 
     /**
-     * Determine if session factory debugging is enabled.
-     * 
-     * @return boolean
-     */
-    public final static boolean hasDebug()
-    {
-        return m_debug;
-    }
-
-    /**
      * Determine if the NetBIOS name scope is set
      * 
      * @return boolean
@@ -363,26 +333,6 @@ public final class AuthSessionFactory
     public final static boolean hasNetBIOSNameScope()
     {
         return m_netBIOSScopeId != null ? true : false;
-    }
-
-    /**
-     * Determine if SMB session debugging is enabled.
-     * 
-     * @return true if SMB session debugging is enabled, else false.
-     */
-    public final static boolean hasSessionDebug()
-    {
-        return AuthenticateSession.hasDebug();
-    }
-
-    /**
-     * Return a version string for this software release
-     * 
-     * @return Software version number string
-     */
-    static final public String isVersion()
-    {
-        return "3.0.6b3";
     }
 
     /**
@@ -432,10 +382,10 @@ public final class AuthSessionFactory
 
         // Debug
 
-        if (logger.isDebugEnabled() && AuthenticateSession.hasDebug())
+        if (logger.isDebugEnabled())
         {
-            logger.debug("** New auth session from " + localName + " to " + shr.toString());
-            logger.debug("** os.arch = " + System.getProperty("os.arch") + ", java.version: "
+            logger.debug("New auth session from " + localName + " to " + shr.toString());
+            logger.debug("os.arch = " + System.getProperty("os.arch") + ", java.version: "
                     + System.getProperty("java.version"));
         }
 
@@ -491,8 +441,8 @@ public final class AuthSessionFactory
 
         // Debug
 
-        if (logger.isDebugEnabled() && AuthenticateSession.hasDebug())
-            logger.debug("** Connected session, protocol : " + netSession.getProtocolName());
+        if (logger.isDebugEnabled())
+            logger.debug("Connected session, protocol : " + netSession.getProtocolName());
 
         // Build a protocol negotiation SMB packet, and send it to the remote
         // file server.
@@ -521,8 +471,8 @@ public final class AuthSessionFactory
 
         // DEBUG
 
-        if (logger.isDebugEnabled() && AuthenticateSession.hasDebug())
-            logger.debug("** SessionFactory: Negotiated SMB dialect " + diaStr);
+        if (logger.isDebugEnabled())
+            logger.debug("SessionFactory: Negotiated SMB dialect " + diaStr);
 
         if (dialectId == Dialect.Unknown)
             throw new java.io.IOException("Unknown SMB dialect");
@@ -616,19 +566,6 @@ public final class AuthSessionFactory
     }
 
     /**
-     * Enable/disable SMB session debugging.
-     * 
-     * @param dbg true to enable SMB session debugging, else false.
-     */
-    public final static void setSessionDebug(boolean dbg)
-    {
-        if (dbg == true)
-            AuthenticateSession.setDebug(AuthenticateSession.DBGPacketType);
-        else
-            AuthenticateSession.setDebug(0);
-    }
-
-    /**
      * Set the subnet mask string for network broadcast requests If the subnet mask is not set a
      * default broadcast mask for the TCP/IP address class will be used.
      * 
@@ -714,10 +651,38 @@ public final class AuthSessionFactory
         }
         else
         {
+            IOException savedException = null;
 
-            // Find the remote host and get a list of the network addresses it is using
+            try
+            {
 
-            nbName = NetBIOSSession.FindName(toName, NetBIOSName.FileServer, 500);
+                // Find the remote host and get a list of the network addresses it is using
+
+                nbName = NetBIOSSession.FindName(toName, NetBIOSName.FileServer, 500);
+            }
+            catch (IOException ex)
+            {
+                savedException = ex;
+            }
+
+            // If the NetBIOS name was not found then check if the local system has the name
+
+            if (nbName == null)
+            {
+
+                // Get a list of NetBIOS names for the local system
+
+                NetBIOSNameList localList = NetBIOSSession.FindNamesForAddress(InetAddress.getLocalHost()
+                        .getHostAddress());
+                if (localList != null)
+                {
+                    nbName = localList.findName(toName, NetBIOSName.FileServer, false);
+                    if (nbName != null)
+                        nbName.addIPAddress(InetAddress.getLocalHost().getAddress());
+                    else
+                        throw savedException;
+                }
+            }
         }
 
         // Check if the NetBIOS name scope has been set, if so then update the names to add the
@@ -758,8 +723,8 @@ public final class AuthSessionFactory
 
                     // DEBUG
 
-                    if (logger.isDebugEnabled() && hasSessionDebug())
-                        logger.debug("** Server is multi-homed, trying to connect to " + ipAddr);
+                    if (logger.isDebugEnabled())
+                        logger.debug("Server is multi-homed, trying to connect to " + ipAddr);
 
                     // Open the session to the remote host
 
@@ -780,8 +745,8 @@ public final class AuthSessionFactory
                         {
                         }
                     }
-                    else if (logger.isDebugEnabled() && hasSessionDebug() && nbSession.isConnected())
-                        logger.debug("** Connected to address " + ipAddr);
+                    else if (logger.isDebugEnabled() && nbSession.isConnected())
+                        logger.debug("Connected to address " + ipAddr);
                 }
                 catch (IOException ex)
                 {
@@ -791,9 +756,9 @@ public final class AuthSessionFactory
 
         // DEBUG
 
-        if (logger.isDebugEnabled() && hasSessionDebug() && nbSession.isConnected() == false
+        if (logger.isDebugEnabled() && nbSession.isConnected() == false
                 && nbName.numberOfAddresses() > 1)
-            logger.debug("** Server is multi-homed, trying all addresses");
+            logger.debug("Server is multi-homed, trying all addresses");
 
         // Loop through the available addresses for the remote file server until we get a successful
         // connection, or all addresses have been used
@@ -813,8 +778,8 @@ public final class AuthSessionFactory
 
                 // DEBUG
 
-                if (logger.isDebugEnabled() && hasSessionDebug())
-                    logger.debug("** Trying address " + ipAddr);
+                if (logger.isDebugEnabled())
+                    logger.debug("Trying address " + ipAddr);
 
                 // Open the session to the remote host
 
@@ -835,8 +800,8 @@ public final class AuthSessionFactory
                     {
                     }
                 }
-                else if (logger.isDebugEnabled() && hasSessionDebug() && nbSession.isConnected())
-                    logger.debug("** Connected to address " + ipAddr);
+                else if (logger.isDebugEnabled() && nbSession.isConnected())
+                    logger.debug("Connected to address " + ipAddr);
             }
             catch (IOException ex)
             {

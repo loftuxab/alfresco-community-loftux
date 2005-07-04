@@ -268,6 +268,13 @@ public class Win32NetBIOS
     public static native String GetLocalNetBIOSName();
 
     /**
+     * Return the local domain name
+     * 
+     * @return String
+     */
+    public static native String GetLocalDomainName();
+    
+    /**
      * Find the TCP/IP address for a LANA
      * 
      * @param lana int
