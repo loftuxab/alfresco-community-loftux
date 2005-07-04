@@ -6,7 +6,8 @@
 
    <target name="common-init">
       <tstamp>
-         <format property="time" pattern="HH:mm"/>
+         <format property="time" pattern="HH:mm" />
+         <format property="date" pattern="ddMMyyyy" />
       </tstamp>
 
       <property environment="env" />
