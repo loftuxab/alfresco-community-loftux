@@ -407,10 +407,10 @@ public interface NodeService
      * @param nodeRef
      * @param primaryOnly true if only the primary path must be retrieved.  If true, the
      *      result will have exactly one entry.
-     * @return Returns a collection of all possible paths to the given node
+     * @return Returns a List of all possible paths to the given node
      * @throws InvalidNodeRefException if the node could not be found
      */
-    public Collection<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException;
+    public List<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException;
     
     /**
      * Select nodes using an xpath expression.

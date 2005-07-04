@@ -146,7 +146,14 @@ public abstract class Sort
          boolean bknownType = true;
          if (returnType.equals(String.class))
          {
-            this.comparator = new StringComparator();
+            if (strongStringCompare == true)
+            {
+               this.comparator = new StringComparator();
+            }
+            else
+            {
+               this.comparator = new SimpleStringComparator();
+            }
          }
          else if (returnType.equals(Date.class))
          {
@@ -193,27 +200,34 @@ public abstract class Sort
             if (obj instanceof String)
             {
                String str = (String)obj;
-               if (str.indexOf(' ') != -1)
+               if (strongStringCompare == true)
                {
-                  // quote white space characters or they will be ignored by the Collator!
-                  int iLength = str.length();
-                  StringBuilder s = new StringBuilder(iLength + 4);
-                  char c;
-                  for (int i=0; i<iLength; i++)
+                  if (str.indexOf(' ') != -1)
                   {
-                     c = str.charAt(i);
-                     if (c != ' ')
+                     // quote white space characters or they will be ignored by the Collator!
+                     int iLength = str.length();
+                     StringBuilder s = new StringBuilder(iLength + 4);
+                     char c;
+                     for (int i=0; i<iLength; i++)
                      {
-                        s.append(c);
+                        c = str.charAt(i);
+                        if (c != ' ')
+                        {
+                           s.append(c);
+                        }
+                        else
+                        {
+                           s.append('\'').append(c).append('\'');
+                        }
                      }
-                     else
-                     {
-                        s.append('\'').append(c).append('\'');
-                     }
+                     str = s.toString();
                   }
-                  str = s.toString();
+                  keys.add(collator.getCollationKey(str));
                }
-               keys.add(collator.getCollationKey(str));
+               else
+               {
+                  keys.add(str);
+               }
             }
             else if (bknownType == true)
             {
@@ -292,6 +306,20 @@ public abstract class Sort
          if (obj1 == null) return -1;
          if (obj2 == null) return 1;
          return (obj1.toString()).compareTo(obj2.toString());
+      }
+   }
+   
+   private class SimpleStringComparator implements Comparator
+   {
+      /**
+       * @see org.alfresco.web.data.IDataComparator#compare(java.lang.Object, java.lang.Object)
+       */
+      public int compare(final Object obj1, final Object obj2)
+      {
+         if (obj1 == null && obj2 == null) return 0;
+         if (obj1 == null) return -1;
+         if (obj2 == null) return 1;
+         return ((String)obj1).compareToIgnoreCase((String)obj2);
       }
    }
    
@@ -403,6 +431,10 @@ public abstract class Sort
    
    /** the comparator instance to use for comparing values when sorting */
    private Comparator comparator = null;
+   
+   // TODO: make this configurable
+   /** config value whether to use strong collation Key string comparisons */
+   private boolean strongStringCompare = false;
    
    private static Logger s_logger = Logger.getLogger(IDataContainer.class);
    

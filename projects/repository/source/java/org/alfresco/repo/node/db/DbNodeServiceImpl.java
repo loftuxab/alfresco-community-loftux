@@ -1049,13 +1049,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      */
     public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        Collection<Path> paths = getPaths(nodeRef, true);   // checks primary path count
+        List<Path> paths = getPaths(nodeRef, true);   // checks primary path count
         if (paths.size() == 1)
         {
-            for (Path path : paths)
-            {
-                return path;   // we know there is only one
-            }
+            return paths.get(0);   // we know there is only one
         }
         throw new RuntimeException("Primary path count not checked");  // checked by getPaths()
     }
@@ -1065,12 +1062,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      * one path.
      * @see #prependPaths(Node, Path, Collection<Path>, Stack<ChildAssoc>, boolean)
      */
-    public Collection<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
+    public List<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
     {
         // get the starting node
         Node node = getNodeNotNull(nodeRef);
         // create storage for the paths - only need 1 bucket if we are looking for the primary path
-        Collection<Path> paths = new ArrayList<Path>(primaryOnly ? 1 : 10);
+        List<Path> paths = new ArrayList<Path>(primaryOnly ? 1 : 10);
         // create an emtpy current path to start from
         Path currentPath = new Path();
         // create storage for touched associations
@@ -1085,7 +1082,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
         
         // done
-        return Collections.unmodifiableCollection(paths);
+        return Collections.unmodifiableList(paths);
     }
     
     /**

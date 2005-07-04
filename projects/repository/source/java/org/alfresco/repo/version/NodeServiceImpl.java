@@ -497,7 +497,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     /**
      * @throws UnsupportedOperationException always
      */
-    public Collection<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
+    public List<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);

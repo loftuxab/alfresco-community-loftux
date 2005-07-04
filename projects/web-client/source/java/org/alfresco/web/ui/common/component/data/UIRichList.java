@@ -24,9 +24,11 @@ import java.util.Map;
 import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
+import javax.transaction.UserTransaction;
 
 import org.apache.log4j.Logger;
 
+import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.renderer.data.IRichListRenderer;
 import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
@@ -297,7 +299,29 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       this.sortDescending = descending;
       
       // delegate to the data model to sort its contents
-      getDataModel().sort(column, descending, mode);
+      // place in a UserTransaction as we may need to perform a LOT of node calls to complete
+      UserTransaction tx = null;
+      try
+      {
+         if (getDataModel().size() > 64)
+         {
+            FacesContext context = FacesContext.getCurrentInstance();
+            tx = Repository.getUserTransaction(context);
+            tx.begin();
+         }
+         
+         getDataModel().sort(column, descending, mode);
+         
+         // commit the transaction
+         if (tx != null)
+         {
+            tx.commit();
+         }
+      }
+      catch (Exception err)
+      {
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+      }
    }
    
    
