@@ -54,6 +54,7 @@ import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
+import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.alfresco.web.ui.repo.component.UISimpleSearch;
 import org.apache.log4j.Logger;
@@ -302,7 +303,6 @@ public class BrowseBean implements IContextListener
     */
    public void contextUpdated()
    {
-      logger.debug("contextUpdated() listener called");
       invalidateComponents();
    }
    
@@ -628,7 +628,7 @@ public class BrowseBean implements IContextListener
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             
             // refresh UI based on node selection
-            refreshUI(ref, link);
+            updateUILocation(ref);
          }
          catch (InvalidNodeRefException refErr)
          {
@@ -671,15 +671,15 @@ public class BrowseBean implements IContextListener
          {
             // a descendant of the displayed node was selected
             // first refresh based on the parent and add to the breadcrumb
-            refreshUI(parentAssocRef.getParentRef(), event.getComponent());
+            updateUILocation(parentAssocRef.getParentRef());
             
             // now add our selected node
-            refreshUI(nodeRef, event.getComponent());
+            updateUILocation(nodeRef);
          }
          else
          {
             // else the parent ellipses i.e. the displayed node was selected
-            refreshUI(nodeRef, event.getComponent());
+            updateUILocation(nodeRef);
          }
       }
       catch (InvalidNodeRefException refErr)
@@ -797,7 +797,7 @@ public class BrowseBean implements IContextListener
             if (handler instanceof BrowseBreadcrumbHandler)
             {
                // see if the current breadcrumb location is our node 
-               if ( ((BrowseBreadcrumbHandler)handler).getNodeId().equals(node.getId()) == true )
+               if ( ((BrowseBreadcrumbHandler)handler).getNodeRef().equals(node.getNodeRef()) == true )
                {
                   location.remove(location.size() - 1);
                   
@@ -808,7 +808,7 @@ public class BrowseBean implements IContextListener
                      if (handler instanceof BrowseBreadcrumbHandler)
                      {
                         // change the current node Id
-                        navigator.setCurrentNodeId(((BrowseBreadcrumbHandler)handler).getNodeId());
+                        navigator.setCurrentNodeId(((BrowseBreadcrumbHandler)handler).getNodeRef().getId());
                      }
                      else
                      {
@@ -885,18 +885,35 @@ public class BrowseBean implements IContextListener
     * location path and also updates the list components in the UI.
     * 
     * @param ref     NodeRef of the selected space
-    * @param comp    UIComponent responsible for the UI update
     */
-   private void refreshUI(NodeRef ref, UIComponent comp)
+   /*package*/ void updateUILocation(NodeRef ref)
    {
       // get the current breadcrumb location and append a new handler to it
       // our handler know the ID of the selected node and the display label for it
       List<IBreadcrumbHandler> location = this.navigator.getLocation();
-      String name = Repository.getNameForNode(this.nodeService, ref);
-      location.add(new BrowseBreadcrumbHandler(ref.getId(), name));
+      if (location.size() != 0)
+      {
+         IBreadcrumbHandler lastLocation = location.get(location.size() - 1);
+         if (lastLocation instanceof IRepoBreadcrumbHandler)
+         {
+            NodeRef lastNodeRef = ((IRepoBreadcrumbHandler)lastLocation).getNodeRef();
+            if (ref.equals(lastNodeRef) == false)
+            {
+               String name = Repository.getNameForNode(this.nodeService, ref);
+               location.add(new BrowseBreadcrumbHandler(ref, name));
+            }
+         }
+      }
+      else
+      {
+         String name = Repository.getNameForNode(this.nodeService, ref);
+         location.add(new BrowseBreadcrumbHandler(ref, name));
+      }
       
       // set the current node Id ready for page refresh
       this.navigator.setCurrentNodeId(ref.getId());
+      
+      navigateBrowseScreen();
    }
    
    /**
@@ -945,20 +962,20 @@ public class BrowseBean implements IContextListener
    /**
     * Class to handle breadcrumb interaction for Browse pages
     */
-   private class BrowseBreadcrumbHandler implements IBreadcrumbHandler
+   private class BrowseBreadcrumbHandler implements IRepoBreadcrumbHandler
    {
       private static final long serialVersionUID = 3833183653173016630L;
       
       /**
        * Constructor
        * 
-       * @param nodeId     The nodeID for this browse navigation element
+       * @param NodeRef    The NodeRef for this browse navigation element
        * @param label      Element label
        */
-      public BrowseBreadcrumbHandler(String nodeId, String label)
+      public BrowseBreadcrumbHandler(NodeRef nodeRef, String label)
       {
          this.label = label;
-         this.nodeId = nodeId;
+         this.nodeRef = nodeRef;
       }
       
       /**
@@ -976,19 +993,19 @@ public class BrowseBean implements IContextListener
       {
          // All browse breadcrumb element relate to a Node Id - when selected we
          // set the current node id
-         getNavigator().setCurrentNodeId(this.nodeId);
+         getNavigator().setCurrentNodeId(this.nodeRef.getId());
          getNavigator().setLocation( (List)breadcrumb.getValue() );
          
          // return to browse page if required
          return (isViewCurrent() ? null : "browse"); 
       }
       
-      public String getNodeId()
+      public NodeRef getNodeRef()
       {
-         return this.nodeId;
+         return this.nodeRef;
       }
       
-      private String nodeId;
+      private NodeRef nodeRef;
       private String label;
    }
 
@@ -1016,7 +1033,7 @@ public class BrowseBean implements IContextListener
    private UIRichList spacesRichList;
    private UIRichList contentRichList;
    
-   /** Transient lists */
+   /** Transient lists of container and content nodes for display */
    private List<Node> containerNodes = null;
    private List<Node> contentNodes = null;
    

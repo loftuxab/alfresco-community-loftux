@@ -78,7 +78,6 @@ public class UIClipboardShelfItem extends UIShelfItem
       String fieldId = getHiddenFieldName();
       String value = (String)requestMap.get(fieldId);
       
-      // we encoded the value to start with our Id
       if (value != null && value.length() != 0)
       {
          // decode the values - we are expecting an action identifier and an index
@@ -151,11 +150,11 @@ public class UIClipboardShelfItem extends UIShelfItem
          out.write("<tr><td>");
          if (item.Mode == ClipboardStatus.COPY)
          {
-            out.write(Utils.buildImageTag(context, IMAGE_COPY, "", "absmiddle"));
+            out.write(Utils.buildImageTag(context, IMAGE_COPY, null, "absmiddle"));
          }
          else
          {
-            out.write(Utils.buildImageTag(context, IMAGE_CUT, "", "absmiddle"));
+            out.write(Utils.buildImageTag(context, IMAGE_CUT, null, "absmiddle"));
          }
          
          // output cropped item label - we also output with no breaks, this is ok
@@ -234,7 +233,7 @@ public class UIClipboardShelfItem extends UIShelfItem
    
    /**
     * We use a hidden field name on the assumption that only one clipboard shelf item instance
-    * be present on a single page.
+    * is present on a single page.
     * 
     * @return hidden field name
     */
@@ -330,5 +329,5 @@ public class UIClipboardShelfItem extends UIShelfItem
    private List<ClipboardItem> collections;
    
    /** action listener called when a paste action occurs */
-   private MethodBinding pasteActionListener;;
+   private MethodBinding pasteActionListener;
 }

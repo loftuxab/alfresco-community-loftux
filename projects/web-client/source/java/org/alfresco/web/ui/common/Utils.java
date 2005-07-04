@@ -434,6 +434,25 @@ public final class Utils
     */
    public static String buildImageTag(FacesContext context, String image, int width, int height, String alt, String onclick)
    {
+      return buildImageTag(context, image, width, height, alt, onclick, null);
+   }
+   
+   /**
+    * Build a context path safe image tag for the supplied image path.
+    * Image path should be supplied with a leading slash '/'.
+    * 
+    * @param context       FacesContext
+    * @param image         The local image path from the web folder with leading slash '/'
+    * @param width         Width in pixels
+    * @param height        Height in pixels
+    * @param alt           Optional alt/title text
+    * @param onclick       JavaScript onclick event handler code
+    * @param align         Optional HTML alignment value
+    * 
+    * @return Populated <code>img</code> tag
+    */
+   public static String buildImageTag(FacesContext context, String image, int width, int height, String alt, String onclick, String align)
+   {
       StringBuilder buf = new StringBuilder(200);
       
       buf.append("<img src=\"")
@@ -453,6 +472,12 @@ public final class Utils
             .append("\" title=\"")
             .append(alt)
             .append('"');
+      }
+      
+      if (align != null)
+      {
+         buf.append(" align=")
+            .append(align);
       }
       
       if (onclick != null)
@@ -506,7 +531,7 @@ public final class Utils
     * @param context       FacesContext
     * @param image         The local image path from the web folder with leading slash '/'
     * @param alt           Optional alt/title text
-    * @param align         Optional alignment value
+    * @param align         Optional HTML alignment value
     * 
     * @return Populated <code>img</code> tag
     */

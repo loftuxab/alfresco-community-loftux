@@ -23,6 +23,10 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 
 /**
+ * Beans supporting the IContextListener interface are registered against this class. Then Beans
+ * which wish to indicate that the UI should refresh itself i.e. dump all cached data and settings,
+ * call the UIContextService.notifyBeans() to inform all registered instances of the change. 
+ * 
  * @author Kevin Roast
  */
 public final class UIContextService

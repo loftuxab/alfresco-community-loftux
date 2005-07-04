@@ -15,22 +15,20 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.app.context;
+package org.alfresco.web.ui.repo.component;
+
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 
 /**
- * Interface used to allow Beans to register themselves as interested in UI context events.
- * <p>
- * Beans supporting this interface should be register against the UIContextService. Then Beans
- * which wish to indicate that the UI should refresh itself i.e. dump all cached data and settings,
- * call the UIContextService.notifyBeans() to inform all registered instances of the change. 
- * 
  * @author Kevin Roast
  */
-public interface IContextListener
+public interface IRepoBreadcrumbHandler extends IBreadcrumbHandler
 {
    /**
-    * Method called by UIContextService.notifyBeans() to inform all registered beans that
-    * all UI Beans should refresh dump all cached data and settings. 
+    * Return a NodeRef relevant to this breadcrumb element, if any 
+    * 
+    * @return a NodeRef if relevant to the breadcrumb element, null otherwise
     */
-   public void contextUpdated();
+   public NodeRef getNodeRef();
 }

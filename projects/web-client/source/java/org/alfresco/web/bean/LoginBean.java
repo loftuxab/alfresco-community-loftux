@@ -245,8 +245,9 @@ public class LoginBean
       if (user != null)
       {
          this.authenticationService.invalidate(user.getTicket());
-         session.remove(AuthenticationFilter.AUTHENTICATION_USER);
+         //session.remove(AuthenticationFilter.AUTHENTICATION_USER);
       }
+      FacesContext.getCurrentInstance().getExternalContext().getSessionMap().clear();
       
       return "logout";
    }

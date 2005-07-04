@@ -36,25 +36,26 @@
             <r:shelf id="shelf" groupPanel="ballongrey" groupBgcolor="#eeeeee" selectedGroupPanel="bluetoolbar" selectedGroupBgcolor="#e9f0f4"
                   innerGroupPanel="white" innerGroupBgcolor="#ffffff">
                <r:shelfGroup label="Clipboard" id="shelf-group-1" expanded="true">
-                  <r:clipboardShelfItem id="clipboard-shelf-item" collections="#{ClipboardBean.items}" pasteActionListener="#{ClipboardBean.pasteItem}" />
+                  <r:clipboardShelfItem id="clipboard-items" collections="#{ClipboardBean.items}" pasteActionListener="#{ClipboardBean.pasteItem}" />
                </r:shelfGroup>
                
-               <r:shelfGroup label="Shortcuts" id="shelf-group-2">
-                  <r:shelfItem id="shelf-item-2-1">
-                     
-                  </r:shelfItem>
+               <%-- NOTE: this component is exanded=true as default so the RecentSpaces managed Bean is
+                          instantied early - otherwise it will not be seen until this shelf component is
+                          first expanded. There is no config setting to do this in JSF by default --%>
+               <r:shelfGroup label="Recent Spaces" id="shelf-group-2" expanded="true">
+                  <r:recentSpacesShelfItem id="recent-items" value="#{RecentSpacesBean.recentSpaces}" navigateActionListener="#{RecentSpacesBean.navigate}" /> 
                </r:shelfGroup>
                
-               <r:shelfGroup label="Drop Zone" id="shelf-group-3">
-                  <r:shelfItem id="shelf-item-3-1">
-                     
-                  </r:shelfItem>
+               <r:shelfGroup label="Shortcuts" id="shelf-group-3">
+                  <%-- TBD --%>
                </r:shelfGroup>
                
-               <r:shelfGroup label="Actions in Progress" id="shelf-group-4">
-                  <r:shelfItem id="shelf-item-4-1">
-                     
-                  </r:shelfItem>
+               <r:shelfGroup label="Drop Zone" id="shelf-group-4">
+                  <%-- TBD --%>
+               </r:shelfGroup>
+               
+               <r:shelfGroup label="Actions in Progress" id="shelf-group-5">
+                  <%-- TBD --%>
                </r:shelfGroup>
             </r:shelf>
             

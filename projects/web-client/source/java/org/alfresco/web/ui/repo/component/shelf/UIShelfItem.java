@@ -34,5 +34,4 @@ public class UIShelfItem extends SelfRenderingComponent
    {
       return "org.alfresco.faces.Shelf";
    }
-
 }

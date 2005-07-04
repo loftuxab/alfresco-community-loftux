@@ -94,7 +94,7 @@ public class UIShelfGroup extends SelfRenderingComponent
       
       ResponseWriter out = context.getResponseWriter();
       
-      // output each shelf group in turn
+      // output each shelf item in turn
       out.write("<table cellspacing=1 cellpadding=0 border=0 width=100%>");
       for (Iterator i=this.getChildren().iterator(); i.hasNext(); /**/)
       {

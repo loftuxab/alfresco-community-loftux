@@ -63,9 +63,6 @@ public final class Repository
    public static final String ERROR_NOHOME  = "The Home Space node referenced by Id: {0} cannot be found. It may have been deleted from the database. Please contact your system administrator.";
    public static final String ERROR_SEARCH  = "Search failed due to system error: {0}";
    
-   // TODO: TEMP! Replace this once we have "users" in the system!
-   private static final String USERNAME = "admin";
-   
    private static final String IMAGE_PREFIX16 = "/images/filetypes/";
    private static final String IMAGE_PREFIX32 = "/images/filetypes32/";
    private static final String IMAGE_POSTFIX = ".gif";

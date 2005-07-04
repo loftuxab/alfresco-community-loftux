@@ -103,6 +103,27 @@
    
    <managed-bean>
       <description>
+         The bean that manages the state for the Recent Spaces Shelf components.
+      </description>
+      <managed-bean-name>RecentSpacesBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.RecentSpacesBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that holds a state for the Advanced Search screen.
       </description>
       <managed-bean-name>AdvancedSearchBean</managed-bean-name>

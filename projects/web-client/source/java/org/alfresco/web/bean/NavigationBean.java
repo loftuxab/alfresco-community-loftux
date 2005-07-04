@@ -41,6 +41,7 @@ import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
+import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.apache.log4j.Logger;
 
 /**
@@ -162,6 +163,10 @@ public class NavigationBean
    }
    
    /**
+    * Set the node Id of the current folder/space container node.
+    * <p>
+    * Setting this value causes the UI to update and display the specified node as current.
+    * 
     * @param currentNodeId    The currently browsing node Id.
     */
    public void setCurrentNodeId(String currentNodeId)
@@ -173,23 +178,46 @@ public class NavigationBean
          throw new AlfrescoRuntimeException("Can not set the current node id to null");
       }
       
+      // set the current Node Id for our UI context operations
       this.currentNodeId = currentNodeId;
+      
+      // clear other context that is based on or relevant to the Node id
+      this.currentNode = null;
       this.searchContext = null;
       
+      // inform any interested beans that the UI needs updating after this change 
       UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
    }
    
    /**
-    * @return Returns the Map of properties for the current Node. 
+    * @return The Map of properties for the current Node. 
     */
    public Map<String, Object> getNodeProperties()
    {
-      NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), 
-            this.currentNodeId);
-      Node node = new Node(nodeRef, this.nodeService);
-      this.nodeProperties = node.getProperties();
+      return getCurrentNode().getProperties();
+   }
+   
+   /**
+    * @return The current Node object for UI context operations
+    */
+   public Node getCurrentNode()
+   {
+      if (this.currentNode == null)
+      {
+         if (currentNodeId == null)
+         {
+            throw new AlfrescoRuntimeException("Cannot retrieve current Node if NodeId is null!");
+         }
+         
+         NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
+         Node node = new Node(nodeRef, this.nodeService);
+         // init properties for this node
+         node.getProperties();
+         
+         this.currentNode = node;
+      }
       
-      return this.nodeProperties;
+      return this.currentNode;
    }
    
    /**
@@ -199,7 +227,7 @@ public class NavigationBean
    {
       return this.location;
    }
-
+   
    /**
     * @param location      The UI location representation to set.
     */
@@ -279,7 +307,7 @@ public class NavigationBean
    /**
     * Class to handle breadcrumb interaction for top-level navigation pages
     */
-   public class NavigationBreadcrumbHandler implements IBreadcrumbHandler
+   public class NavigationBreadcrumbHandler implements IRepoBreadcrumbHandler
    {
       private static final long serialVersionUID = 4833194653193016638L;
       
@@ -322,6 +350,11 @@ public class NavigationBean
          }
       }
       
+      public NodeRef getNodeRef()
+      {
+         return this.ref;
+      }
+      
       private String label;
       private NodeRef ref;
    }
@@ -345,8 +378,11 @@ public class NavigationBean
    /** NamespaceService bean reference */
    private NamespaceService namespaceService;
    
-   /** Node we are currently in the context of */
+   /** Node Id we are using for UI context operations */
    private String currentNodeId;
+   
+   /** Node we are using for UI context operations */
+   private Node currentNode = null;
    
    /** Cached version of company root Id */
    private NodeRef companyRootRef = null;
@@ -356,9 +392,6 @@ public class NavigationBean
    
    /** Search context object we are currently using or null for no search */
    private SearchContext searchContext;
-   
-   /** bag of displayable properties for the current node */
-   private Map<String, Object> nodeProperties = null;
    
    /** expanded state of the Shelf panel wrapper component */
    private boolean shelfExpanded = true;
