@@ -889,7 +889,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
         catch (StackOverflowError e)
         {
-            fail("Cyclic relationship caused stack overflow");
+            throw e;
         }
     }
     
