@@ -140,11 +140,7 @@ public class RuleImpl implements Serializable, Rule
     }
     
     /**
-     * Set whether the rule is applied to all children of the associated node
-     * rather than just the node itself.
-     * 
-     * @param isAppliedToChildren   true if the rule should be applied to the children, false 
-     *                              otherwise
+     *@see org.alfresco.service.cmr.rule.Rule#applyToChildren(boolean)
      */
     public void applyToChildren(boolean isAppliedToChildren)
     {

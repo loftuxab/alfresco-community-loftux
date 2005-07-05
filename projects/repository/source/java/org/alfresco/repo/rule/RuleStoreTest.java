@@ -17,7 +17,6 @@
  */
 package org.alfresco.repo.rule;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
