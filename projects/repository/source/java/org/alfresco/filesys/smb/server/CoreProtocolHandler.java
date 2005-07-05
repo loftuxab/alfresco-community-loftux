@@ -3356,9 +3356,9 @@ class CoreProtocolHandler extends ProtocolHandler
 
         // Get the file id from the request
 
-        int fid = m_smbPkt.getParameter(0);
-        int wrtcnt = m_smbPkt.getParameter(1);
-        int wrtoff = m_smbPkt.getParameter(2) + (m_smbPkt.getParameter(3) << 16);
+        int fid     = m_smbPkt.getParameter(0);
+        int wrtcnt  = m_smbPkt.getParameter(1);
+        long wrtoff = (m_smbPkt.getParameter(2) + (m_smbPkt.getParameter(3) << 16)) & 0xFFFFFFFFL;
 
         NetworkFile netFile = conn.findFile(fid);
 
