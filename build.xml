@@ -108,14 +108,6 @@
       <subant target="run-tests">
          <filelist refid="project-build-files"/>
       </subant>
-      
-      <!-- copy the combined results into a top level results folder -->
-      <mkdir dir="${test.results.dir}" />
-      <copy todir="${test.results.dir}">
-         <fileset dir="${projects.dir.name}/core/build/test-results" />
-         <fileset dir="${projects.dir.name}/repository/build/test-results" />
-         <fileset dir="${projects.dir.name}/web-client/build/test-results" />
-      </copy>
    </target>
 
    <!-- ********************** -->
