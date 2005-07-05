@@ -275,6 +275,14 @@ public class Win32NetBIOS
     public static native String GetLocalDomainName();
     
     /**
+     * Return a comma delimeted list of WINS server TCP/IP addresses, or null if no WINS servers are
+     * configured.
+     * 
+     * @return String
+     */
+    public static native String getWINSServerList();
+    
+    /**
      * Find the TCP/IP address for a LANA
      * 
      * @param lana int

@@ -296,20 +296,36 @@ public class ServerConfiguration
 
         determinePlatformType();
 
-        // Process the CIFS server configuration
-
-        Config config = m_configService.getConfig(ConfigCIFS, configCtx);
-        processCIFSServerConfig(config);
-
-        // Process the security configuration
-
-        config = m_configService.getConfig(ConfigSecurity, configCtx);
-        processSecurityConfig(config);
-
-        // Process the filesystems configuration
-
-        config = m_configService.getConfig(ConfigFilesystems, configCtx);
-        processFilesystemsConfig(config);
+        try
+        {
+            
+            // Process the CIFS server configuration
+    
+            Config config = m_configService.getConfig(ConfigCIFS, configCtx);
+            processCIFSServerConfig(config);
+    
+            // Process the security configuration
+    
+            config = m_configService.getConfig(ConfigSecurity, configCtx);
+            processSecurityConfig(config);
+    
+            // Process the filesystems configuration
+    
+            config = m_configService.getConfig(ConfigFilesystems, configCtx);
+            processFilesystemsConfig(config);
+        }
+        catch ( UnsatisfiedLinkError ex)
+        {
+            // Error accessing the Win32NetBIOS DLL code
+            
+            logger.error("Error accessing Win32NetBIOS code, check DLL is on the path");
+            
+            // Disable the CIFS server
+            
+            setNetBIOSSMB(false);
+            setTcpipSMB(false);
+            setWin32NetBIOS(false);
+        }
     }
 
     /**
@@ -770,10 +786,45 @@ public class ServerConfiguration
             setPrimaryWINSServer(primaryWINS);
             if (secondaryWINS != null)
                 setSecondaryWINSServer(secondaryWINS);
-            
-            //  Pass the setting to the NetBIOS session class
-            
+
+            // Pass the setting to the NetBIOS session class
+
             NetBIOSSession.setWINSServer(primaryWINS);
+        }
+
+        // Check if WINS is configured, if we are running on Windows
+
+        else if (getPlatformType() == PlatformType.WINDOWS)
+        {
+            // Get the WINS server list
+
+            String winsServers = Win32NetBIOS.getWINSServerList();
+
+            if (winsServers != null)
+            {
+                // Use the first WINS server address for now
+
+                StringTokenizer tokens = new StringTokenizer(winsServers, ",");
+                String addr = tokens.nextToken();
+
+                try
+                {
+
+                    // Convert to a network address and set the primary WINS server address
+
+                    InetAddress winsAddr = InetAddress.getByName(addr);
+                    setPrimaryWINSServer(winsAddr);
+
+                    // Debug
+
+                    if (logger.isDebugEnabled())
+                        logger.debug("Configuring to use WINS server " + addr);
+                }
+                catch (UnknownHostException ex)
+                {
+                    throw new AlfrescoRuntimeException("Invalid auto WINS server address, " + addr);
+                }
+            }
         }
 
         // Check if session debug is enabled
