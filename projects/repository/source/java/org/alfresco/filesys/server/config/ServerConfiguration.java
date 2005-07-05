@@ -770,6 +770,10 @@ public class ServerConfiguration
             setPrimaryWINSServer(primaryWINS);
             if (secondaryWINS != null)
                 setSecondaryWINSServer(secondaryWINS);
+            
+            //  Pass the setting to the NetBIOS session class
+            
+            NetBIOSSession.setWINSServer(primaryWINS);
         }
 
         // Check if session debug is enabled
