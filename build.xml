@@ -53,11 +53,9 @@
       <antcall target="deploy-tomcat" />
    </target>
    
-   <!--<target name="continuous" depends="clean, test, distribute" />-->
-   <target name="continuous" depends="clean, distribute" />
+   <target name="continuous" depends="clean, test, distribute" />
    
-   <!--<target name="nightly" depends="clean, test, package-nightly-source-distribution" />-->
-   <target name="nightly" depends="clean, package-nightly-source-distribution" />
+   <target name="nightly" depends="clean, test, package-nightly-source-distribution" />
       
    <!-- ************************ -->
    <!-- ** Deployment targets ** -->
@@ -162,9 +160,9 @@
       <zip destfile="${dist.dir}/${jboss.dist.filename}.zip">
          <zipfileset dir="${installer.project.dir}" 
                      includes="alf_start_jb.bat,alf_stop_jb.bat,AlfrescoTest.pdf,db_remove.bat,db_setup.bat,
-                               license.txt,notice.txt,README_jboss_win.txt,README_war.txt,start_oo2.bat,
+                               license.txt,notice.txt,README_jboss_win.txt,start_oo2.bat,
                                stop_oo.bat,zstart_oo.bat" />
-         <zipfileset dir="${jboss.distribution.dir}" prefix="jboss" />
+         <zipfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.sh" />
          <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
       </zip>
@@ -174,8 +172,8 @@
       <mkdir dir="${dist.dir}" />
       <tar destfile="${dist.dir}/${jboss.dist.filename}.tar" longfile="gnu">
          <tarfileset dir="${installer.project.dir}" 
-                     includes="AlfrescoTest.pdf,license.txt,notice.txt,README_jboss_linux.txt,README_war.txt" />
-         <tarfileset dir="${jboss.distribution.dir}" prefix="jboss" />
+                     includes="AlfrescoTest.pdf,license.txt,notice.txt,README_jboss_linux.txt" />
+         <tarfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.bat" />
          <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
       </tar>
@@ -188,9 +186,9 @@
       <zip destfile="${dist.dir}/${tomcat.dist.filename}.zip">
          <zipfileset dir="${installer.project.dir}" 
                      includes="alf_start_tc.bat,alf_stop_tc.bat,AlfrescoTest.pdf,db_remove.bat,db_setup.bat,
-                               license.txt,notice.txt,README_tomcat_win.txt,README_war.txt,start_oo2.bat,
+                               license.txt,notice.txt,README_tomcat_win.txt,start_oo2.bat,
                                stop_oo.bat,zstart_oo.bat" />
-         <zipfileset dir="${tomcat.distribution.dir}" prefix="tomcat" />
+         <zipfileset dir="${tomcat.distribution.dir}" prefix="tomcat" excludes="**/bin/*.sh" />
          <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
       </zip>
@@ -200,8 +198,9 @@
       <mkdir dir="${dist.dir}" />
       <tar destfile="${dist.dir}/${tomcat.dist.filename}.tar" longfile="gnu">
          <tarfileset dir="${installer.project.dir}" 
-                     includes="AlfrescoTest.pdf,license.txt,notice.txt,README_tomcat_linux.txt,README_war.txt" />
-         <tarfileset dir="${tomcat.distribution.dir}" prefix="tomcat" />
+                     includes="AlfrescoTest.pdf,license.txt,notice.txt,README_tomcat_linux.txt" />
+         <tarfileset dir="${tomcat.distribution.dir}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
+         <tarfileset dir="${tomcat.distribution.dir}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
          <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
       </tar>
