@@ -3,6 +3,13 @@ rem ---------------------------------------------------------------------------
 rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
+if not "%JAVA_HOME%" == "" goto javaOk
+echo Please set the JAVA_HOME environment variable.
+pause
+goto end
+
+:javaOk
+
 rem ---------------------------------------
 rem Start DB (MySQL) in a minimised console
 rem ---------------------------------------
@@ -23,3 +30,5 @@ rem ---------------------------------------
 rem Start OpenOffice for transformations
 rem ---------------------------------------
 if exist "start_oo.bat" call "start_oo.bat"
+
+:end
