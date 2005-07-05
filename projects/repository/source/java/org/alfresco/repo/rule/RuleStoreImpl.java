@@ -557,19 +557,28 @@ public class RuleStoreImpl implements RuleStore
             this.dirtyChildrensRules();
         }
         
+        private void dirtyChildrensRules()
+        {
+            dirtyChildrensRules(new ArrayList<RuleCacheEntry>());
+        }
+        
         /**
          * 
          */
-        private void dirtyChildrensRules()
+        private void dirtyChildrensRules(List<RuleCacheEntry> dirtied)
         {
-            for (RuleCacheEntry childCacheEntry : this.childEntries)
-            {      
-                childCacheEntry.allRules = null;
-                childCacheEntry.allRulesByRuleType = null;
-                childCacheEntry.inheritableRules = null;
-                childCacheEntry.inheritedRules = null;
-                
-                childCacheEntry.dirtyChildrensRules();
+            if (dirtied.contains(this) == false)
+            {
+                dirtied.add(this);
+                for (RuleCacheEntry childCacheEntry : this.childEntries)
+                {      
+                    childCacheEntry.allRules = null;
+                    childCacheEntry.allRulesByRuleType = null;
+                    childCacheEntry.inheritableRules = null;
+                    childCacheEntry.inheritedRules = null;
+                    
+                    childCacheEntry.dirtyChildrensRules(dirtied);
+                }
             }
         }
         
@@ -685,6 +694,30 @@ public class RuleStoreImpl implements RuleStore
             }
             
             return this.inheritableRules;
-        }       
+        }    
+        
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+            {
+                return true;
+            }
+            if (obj instanceof RuleCacheEntry)
+            {
+                RuleCacheEntry that = (RuleCacheEntry) obj;
+                return (this.nodeRef.equals(that.nodeRef));
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        @Override
+        public int hashCode()
+        {
+            return this.nodeRef.hashCode();
+        }
     }
 }
