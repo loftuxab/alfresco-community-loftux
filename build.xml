@@ -133,18 +133,16 @@
    <!-- ************************** -->
    
    <target name="distribute" 
-           depends="package-jboss-binary-distribution,
-                    package-tomcat-binary-distribution, package-source-distribution" 
+           depends="package-jboss-binary-distribution,package-tomcat-binary-distribution,
+                    package-source-distribution" 
            description="Creates the distribution files for all platforms for all appservers"/>
    
    <target name="package-jboss-binary-distribution" 
-           depends="build-jboss, package-jboss-binary-distribution-windows, 
-                    package-jboss-binary-distribution-linux" 
+           depends="package-jboss-binary-distribution-windows,package-jboss-binary-distribution-linux" 
            description="Creates the distibution files for JBoss"/>
            
    <target name="package-tomcat-binary-distribution" 
-           depends="build-tomcat, package-tomcat-binary-distribution-windows, 
-                    package-tomcat-binary-distribution-linux" 
+           depends="package-tomcat-binary-distribution-windows,package-tomcat-binary-distribution-linux" 
            description="Creates the distibution files for Tomcat"/>
            
    <target name="package-jboss-binary-distribution-windows" depends="common-init">
