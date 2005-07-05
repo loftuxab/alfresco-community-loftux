@@ -35,7 +35,7 @@ import org.springframework.util.StopWatch;
  * 
  * @author Roy Wetherall
  */
-public class RuleStoreTest extends RuleBaseTest
+public class RuleStoreTest extends BaseRuleTest
 {
     /**
      * Rule id

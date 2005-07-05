@@ -30,7 +30,7 @@ import org.alfresco.service.cmr.rule.RuleCondition;
 /**
  * @author Roy Wetherall
  */
-public class RuleXMLUtilTest extends RuleBaseTest
+public class RuleXMLUtilTest extends BaseRuleTest
 {
     private static final String TITLE2 = "title<>&*"; 
     protected static final String RULE_ID = "1";

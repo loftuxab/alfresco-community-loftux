@@ -23,7 +23,7 @@ import org.alfresco.service.cmr.rule.RuleServiceException;
 /**
  * @author Roy Wetherall
  */
-public class RuleActionDefinitionImplTest extends RuleItemDefinitionImplTest
+public class RuleActionDefinitionImplTest extends BaseRuleItemDefinitionImplTest
 {
     private static final String RULE_ACTION_EXECUTOR = "ruleActionExector";
     

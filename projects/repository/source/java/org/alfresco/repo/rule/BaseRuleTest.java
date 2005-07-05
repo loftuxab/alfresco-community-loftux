@@ -47,7 +47,7 @@ import org.alfresco.util.BaseSpringTest;
  * 
  * @author Roy Wetherall
  */
-public class RuleBaseTest extends BaseSpringTest
+public class BaseRuleTest extends BaseSpringTest
 {
     /**
      * Data used in the tests
@@ -143,11 +143,6 @@ public class RuleBaseTest extends BaseSpringTest
 
     protected RuleImpl createTestRule(String id)
     {
-        return createTestRule(id, false);
-    }
-    
-    protected RuleImpl createTestRule(String id, boolean isAppliedToChildren)
-    {
         // Rule properties
         Map<String, Serializable> conditionProps = new HashMap<String, Serializable>();
         conditionProps.put(COND_PROP_NAME_1, COND_PROP_VALUE_1);
@@ -164,7 +159,6 @@ public class RuleBaseTest extends BaseSpringTest
         RuleImpl rule = new RuleImpl(id, this.ruleType);
         rule.setTitle(TITLE);
         rule.setDescription(DESCRIPTION);
-        rule.applyToChildren(isAppliedToChildren);
         rule.addRuleCondition(cond, conditionProps);
         rule.addRuleAction(action, actionProps);
 

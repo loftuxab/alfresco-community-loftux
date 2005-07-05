@@ -37,7 +37,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Roy Wetherall
  */
-public class RuleServiceImplTest extends RuleBaseTest
+public class RuleServiceImplTest extends BaseRuleTest
 {    
    
     /**

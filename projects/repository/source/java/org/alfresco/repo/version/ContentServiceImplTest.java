@@ -28,7 +28,7 @@ import org.alfresco.service.cmr.version.Version;
  * 
  * @author Roy Wetherall
  */
-public class ContentServiceImplTest extends VersionStoreBaseTest
+public class ContentServiceImplTest extends BaseVersionStoreTest
 {
     /**
      * Error message

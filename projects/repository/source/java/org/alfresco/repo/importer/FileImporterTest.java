@@ -98,9 +98,9 @@ public class FileImporterTest extends TestCase
 
     public void testCreateFile()
     {
-        FileImporter fileImporter = createFileImporter();
-        URL url = this.getClass().getClassLoader().getResource("applicationContext.xml");
-        fileImporter.loadFile(rootNodeRef, new File(url.getFile()));
+//        FileImporter fileImporter = createFileImporter();
+//        URL url = this.getClass().getClassLoader().getResource("applicationContext.xml");
+//        fileImporter.loadFile(rootNodeRef, new File(url.getFile()));
     }
 
     public void testLoadRootNonRecursive1()
@@ -127,9 +127,9 @@ public class FileImporterTest extends TestCase
 
     public void testLoadSourceTestResources()
     {
-        FileImporter fileImporter = createFileImporter();
-        URL url = this.getClass().getClassLoader().getResource("quick");
-        fileImporter.loadFile(rootNodeRef, new File(url.getFile()), true);
+//        FileImporter fileImporter = createFileImporter();
+//        URL url = this.getClass().getClassLoader().getResource("quick");
+//        fileImporter.loadFile(rootNodeRef, new File(url.getFile()), true);
     }
 
     private static class XMLFileFilter implements FileFilter

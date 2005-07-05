@@ -23,7 +23,7 @@ import org.alfresco.service.cmr.rule.RuleActionDefinition;
 /**
  * @author Roy Wetherall
  */
-public class RuleActionImplTest extends RuleItemImplTest
+public class RuleActionImplTest extends BaseRuleItemImplTest
 {
     private RuleActionDefinitionImpl ruleActionDefinition;    
 

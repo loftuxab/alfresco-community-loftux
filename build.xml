@@ -53,9 +53,9 @@
       <antcall target="deploy-tomcat" />
    </target>
    
-   <target name="continuous" depends="clean, test, distribute" />
+   <target name="continuous" depends="test, distribute" />
    
-   <target name="nightly" depends="clean, test, package-nightly-source-distribution" />
+   <target name="nightly" depends="test, package-nightly-source-distribution" />
       
    <!-- ************************ -->
    <!-- ** Deployment targets ** -->
@@ -212,11 +212,13 @@
            description="Creates the source distribution file for all platforms">
       <mkdir dir="${dist.dir}" />
       <zip destfile="${dist.dir}/${src.dist.filename}.zip">
-         <zipfileset dir="${basedir}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,**/*.classpath" />
+         <zipfileset dir="${basedir}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,
+                                                **/*.classpath,projects/repository/alfresco/**,projects/website/**" />
       </zip>
       
       <tar destfile="${dist.dir}/${src.dist.filename}.tar" longfile="gnu">
-         <tarfileset dir="${basedir}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,**/*.classpath" />
+         <tarfileset dir="${basedir}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,
+                                                **/*.classpath,projects/repository/alfresco/**,projects/website/**" />
       </tar>
       <gzip zipfile="${dist.dir}/${src.dist.filename}.tar.gz" src="${dist.dir}/${src.dist.filename}.tar" />
       <delete file="${dist.dir}/${src.dist.filename}.tar" />

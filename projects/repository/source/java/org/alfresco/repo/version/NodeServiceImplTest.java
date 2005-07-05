@@ -37,7 +37,7 @@ import org.alfresco.util.debug.NodeStoreInspector;
 /**
  * @author Roy Wetherall
  */
-public class NodeServiceImplTest extends VersionStoreBaseTest 
+public class NodeServiceImplTest extends BaseVersionStoreTest 
 {
 	/**
 	 * Light weight version store node service

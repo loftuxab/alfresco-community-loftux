@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 /**
  * @author Roy Wetherall
  */
-public abstract class RuleItemDefinitionImplTest extends TestCase
+public abstract class BaseRuleItemDefinitionImplTest extends TestCase
 {
     protected static final String NAME = "name";
     protected static final String TITLE = "title";

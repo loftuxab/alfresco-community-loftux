@@ -28,7 +28,7 @@ import org.alfresco.service.cmr.version.VersionHistory;
  * 
  * @author Roy Wetherall
  */
-public class VersionServiceImplTest extends VersionStoreBaseTest
+public class VersionServiceImplTest extends BaseVersionStoreTest
 {
 	/**
      * Tests the creation of the initial version of a versionable node

@@ -31,7 +31,7 @@ import junit.framework.TestCase;
 /**
  * @author Roy Wetherall
  */
-public abstract class RuleItemImplTest extends TestCase
+public abstract class BaseRuleItemImplTest extends TestCase
 {
     protected List<ParameterDefinition> paramDefs = new ArrayList<ParameterDefinition>();
     protected Map<String, Serializable> paramValues = new HashMap<String, Serializable>();    

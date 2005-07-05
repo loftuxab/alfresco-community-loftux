@@ -23,7 +23,7 @@ import org.alfresco.service.cmr.rule.RuleServiceException;
 /**
  * @author Roy Wetherall
  */
-public class RuleConditionDefinitionImplTest extends RuleItemDefinitionImplTest
+public class RuleConditionDefinitionImplTest extends BaseRuleItemDefinitionImplTest
 {
     /**
      * Constants used during tests

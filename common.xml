@@ -98,26 +98,44 @@
       <mkdir dir="${test.results.dir}" />
       <junit printsummary="yes" fork="yes" haltonfailure="yes" dir="${basedir}">
          <!-- TODO: Try and include the previous classpath rather than re-specify -->
-<!--         <classpath refid="java.classpath"/> -->
+         <!--       <classpath refid="java.classpath"/> -->
          <classpath>
+            <pathelement location="${src.test-resources.dir}" />  
             <fileset dir="${common.lib.dir}">
                <include name="**/*.jar" />
             </fileset>
             <fileset dir="${common.dir}/projects">
                <include name="**/build/dist/*.jar" />
             </fileset>
-            <dirset dir="${common.dir}/projects">
-               <include name="**/source/test-resources" />
-            </dirset>
          </classpath>
          <formatter type="xml"/>
-         <batchtest fork="yes" todir="${test.results.dir}">
+         <batchtest todir="${test.results.dir}">
             <fileset dir="${src.java.dir}">
                <include name="**/*Test.java" />
                <exclude name="**/Base*Test.java" />
                <exclude name="**/Abstract*Test.java" />
             </fileset>
         </batchtest>
+      </junit>
+   </target>
+
+   <target name="run-test" depends="package-jar"
+           description="Runs a single test defined in the testcase property i.e. call this target with -Dtestcase=[test]">
+      <mkdir dir="${test.results.dir}" />
+      <junit printsummary="yes" fork="yes" haltonfailure="yes" dir="${basedir}">
+         <!-- TODO: Try and include the previous classpath rather than re-specify -->
+         <!--       <classpath refid="java.classpath"/> -->
+         <classpath>
+            <pathelement location="${src.test-resources.dir}" />
+            <fileset dir="${common.lib.dir}">
+               <include name="**/*.jar" />
+            </fileset>
+            <fileset dir="${common.dir}/projects">
+               <include name="**/build/dist/*.jar" />
+            </fileset>
+         </classpath>
+         <formatter type="xml"/>
+         <test name="${testcase}" todir="${test.results.dir}" />
       </junit>
    </target>
 
