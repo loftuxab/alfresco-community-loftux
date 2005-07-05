@@ -19,6 +19,7 @@ package org.alfresco.repo.rule.action;
 
 import java.util.List;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -34,12 +35,16 @@ import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Roy Wetherall
  */
 public class TransformActionExecutor extends RuleActionExecutorAbstractBase 
 {
+    private static Log logger = LogFactory.getLog(TransformActionExecutor.class); 
+    
 	public static final String NAME = "transform";
 	public static final String PARAM_MIME_TYPE = "mime-type";
 	public static final String PARAM_DESTINATION_FOLDER = "destination-folder";
@@ -97,61 +102,72 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 			NodeRef actionableNodeRef,
 			NodeRef actionedUponNodeRef) 
 	{
-		if (this.nodeService.exists(actionedUponNodeRef) == true)
+		if (this.nodeService.exists(actionedUponNodeRef) == false)
 		{
-			// First check that the node is a sub-type of content
-			QName typeQName = this.nodeService.getType(actionedUponNodeRef);
-			if (this.dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT) == true)
-			{
-				// Get the mime type
-				String mimeType = (String)ruleAction.getParameterValue(PARAM_MIME_TYPE);
-				
-				// Get the details of the copy destination
-				NodeRef destinationParent = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-		        QName destinationAssocTypeQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
-		        QName destinationAssocQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
-		        
-				// Copy the content node
-		        NodeRef copyNodeRef = this.copyService.copy(
-		                actionedUponNodeRef, 
-		                destinationParent,
-		                destinationAssocTypeQName,
-		                destinationAssocQName,
-		                false);
-				
-				// Set the mime type on the copy
-				this.nodeService.setProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE, mimeType);
-				
-                // Adjust the name of the copy
-                String originalMimetype = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_MIME_TYPE);
-                String originalName = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
-                String newName = transformName(originalName, originalMimetype, mimeType);
-                nodeService.setProperty(copyNodeRef, ContentModel.PROP_NAME, newName);
-                String originalTitle = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_TITLE);
-                if (originalTitle != null && originalTitle.length() > 0)
-                {
-                    String newTitle = transformName(originalTitle, originalMimetype, mimeType);
-                    nodeService.setProperty(copyNodeRef, ContentModel.PROP_TITLE, newTitle);
-                }
-                
-				// Get the content reader and writer
-				ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef);
-				ContentWriter contentWriter = this.contentService.getUpdatingWriter(copyNodeRef);
-				
-				// Try and transform the content
-                try
-                {
-				    this.contentService.transform(contentReader, contentWriter);
-                }
-                catch(NoTransformerException e)
-                {
-                    // TODO: Revisit this for alternative solutions
-                    nodeService.deleteNode(copyNodeRef);
-                }
-			}	
-		}
-	}
-    
+            // node doesn't exist - can't do anything
+            return;
+        }
+		// First check that the node is a sub-type of content
+		QName typeQName = this.nodeService.getType(actionedUponNodeRef);
+		if (this.dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT) == false)
+		{
+            // it is not content, so can't transform
+            return;
+        }
+		// Get the mime type
+		String mimeType = (String)ruleAction.getParameterValue(PARAM_MIME_TYPE);
+		
+		// Get the details of the copy destination
+		NodeRef destinationParent = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+        QName destinationAssocTypeQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
+        QName destinationAssocQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
+        
+		// Copy the content node
+        NodeRef copyNodeRef = this.copyService.copy(
+                actionedUponNodeRef, 
+                destinationParent,
+                destinationAssocTypeQName,
+                destinationAssocQName,
+                false);
+		
+		// Set the mime type on the copy
+		this.nodeService.setProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE, mimeType);
+		
+        // Adjust the name of the copy
+        String originalMimetype = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_MIME_TYPE);
+        String originalName = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
+        String newName = transformName(originalName, originalMimetype, mimeType);
+        nodeService.setProperty(copyNodeRef, ContentModel.PROP_NAME, newName);
+        String originalTitle = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_TITLE);
+        if (originalTitle != null && originalTitle.length() > 0)
+        {
+            String newTitle = transformName(originalTitle, originalMimetype, mimeType);
+            nodeService.setProperty(copyNodeRef, ContentModel.PROP_TITLE, newTitle);
+        }
+        
+		// Get the content reader and writer
+		ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef);
+		ContentWriter contentWriter = this.contentService.getUpdatingWriter(copyNodeRef);
+		
+        if (contentReader == null)
+        {
+            // content has not yet been written or write is still in progress
+            throw new AlfrescoRuntimeException(
+                    "Attempting to execute content transformation rule " +
+                    "but content has not finished writing, i.e. no URL is available.");
+        }
+        
+		// Try and transform the content
+        try
+        {
+		    this.contentService.transform(contentReader, contentWriter);
+        }
+        catch(NoTransformerException e)
+        {
+            // TODO: Revisit this for alternative solutions
+            nodeService.deleteNode(copyNodeRef);
+        }
+	}	
 
     /**
      * Transform name from original extension to new extension
