@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.transaction.UserTransaction;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
@@ -35,6 +37,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseHibernateTest;
 import org.alfresco.util.GUID;
+import org.alfresco.util.transaction.SpringAwareUserTransaction;
 
 /**
  * Test persistence and retrieval of Hibernate-specific implementations of the
@@ -299,5 +302,70 @@ public class HibernateNodeTest extends BaseHibernateTest
         // check that the child now has zero parents
         parentAssocs = contentNode.getParentAssocs();
         assertEquals("Expected exactly 0 parent assocs", 0, parentAssocs.size());
+    }
+    
+    /**
+     * Allows tracing of L2 cache
+     */
+    public void testCaching() throws Exception
+    {
+        NodeKey key = new NodeKey(store.getKey(), GUID.generate());
+        
+        // make a node
+        Node node = new NodeImpl();
+        node.setKey(key);
+        node.setStore(store);
+        node.setTypeQName(ContentModel.TYPE_CONTENT);
+        getSession().save(node);
+        
+        // add some aspects to the node
+        Set<QName> aspects = node.getAspects();
+        aspects.add(ContentModel.ASPECT_AUDITABLE);
+        
+        // add some properties
+        Map<String, Serializable> properties = node.getProperties();
+        Serializable value = "ABC";
+        properties.put(ContentModel.PROP_NAME.toString(), value);
+        
+        // check that the session hands back the same instance
+        Node checkNode = (Node) getSession().get(NodeImpl.class, key);
+        assertNotNull(checkNode);
+        assertTrue("Node retrieved was not same instance", checkNode == node);
+        
+        Set<QName> checkAspects = checkNode.getAspects();
+        assertTrue("Aspect set retrieved was not the same instance", checkAspects == aspects);
+        assertEquals("Incorrect number of aspects", 1, checkAspects.size());
+        QName checkQName = (QName) checkAspects.toArray()[0];
+        assertTrue("QName retrieved was not the same instance", checkQName == ContentModel.ASPECT_AUDITABLE);
+        
+        Map<String, Serializable> checkProperties = checkNode.getProperties();
+        assertTrue("Propery map retrieved was not the same instance", checkProperties == properties);
+        assertTrue("Property not found", checkProperties.containsKey(ContentModel.PROP_NAME.toString()));
+//        assertTrue("Property value instance retrieved not the same", checkProperties)
+
+        flushAndClear();
+        // commit the transaction
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = new SpringAwareUserTransaction(transactionManager);
+        try
+        {
+            txn.begin();
+            
+            // check that the L2 cache hands back the same instance
+            checkNode = (Node) getSession().get(NodeImpl.class, key);
+            assertNotNull(checkNode);
+            checkAspects = checkNode.getAspects();
+    
+//            assertTrue("Node retrieved was not same instance", checkNode == node);
+            
+            txn.commit();
+        }
+        catch (Throwable e)
+        {
+            txn.rollback();
+        }
+        
     }
 }
