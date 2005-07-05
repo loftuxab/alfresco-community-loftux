@@ -62,7 +62,7 @@ public abstract class BaseSpringTest extends AbstractTransactionalDataSourceSpri
      */
     protected Session getSession()
     {
-        return SessionFactoryUtils.getSession(sessionFactory, false);
+        return SessionFactoryUtils.getSession(sessionFactory, true);
     }
     
     /**
