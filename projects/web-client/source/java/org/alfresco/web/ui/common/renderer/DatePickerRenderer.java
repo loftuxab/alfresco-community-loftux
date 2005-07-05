@@ -20,7 +20,9 @@ package org.alfresco.web.ui.common.renderer;
 import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -85,11 +87,8 @@ public class DatePickerRenderer extends BaseRenderer
    public Object getConvertedValue(FacesContext context, UIComponent component, Object val) throws ConverterException
    {
       int[] parts = (int[])val;
-      Date date = new Date(parts[0] - 1900,
-                           parts[1] - 1,
-                           parts[2]);
-      
-      return date;
+      Calendar date = new GregorianCalendar(parts[0], parts[1], parts[2]);
+      return date.getTime();
    }
    
    /**
@@ -144,9 +143,11 @@ public class DatePickerRenderer extends BaseRenderer
          
          // note that we build a client id for our form elements that we are then
          // able to decode() as above.
-         renderMenu(out, component, getDays(), date.getDate(), clientId + "_day");
-         renderMenu(out, component, getMonths(), date.getMonth() + 1, clientId + "_month");
-         renderMenu(out, component, getYears(nStartYear, nYearCount), date.getYear() + 1900, clientId + "_year");
+         Calendar calendar = new GregorianCalendar();
+         calendar.setTime(date);
+         renderMenu(out, component, getDays(), calendar.get(Calendar.DAY_OF_MONTH), clientId + "_day");
+         renderMenu(out, component, getMonths(), calendar.get(Calendar.MONTH) + 1, clientId + "_month");
+         renderMenu(out, component, getYears(nStartYear, nYearCount), calendar.get(Calendar.YEAR), clientId + "_year");
       }
    }
    
@@ -196,7 +197,7 @@ public class DatePickerRenderer extends BaseRenderer
    
    private List getYears(int startYear, int yearCount)
    {
-      List years = new ArrayList();
+      List<SelectItem> years = new ArrayList<SelectItem>();
       for (int i=startYear; i<startYear + yearCount; i++)
       {
          Integer year = Integer.valueOf(i);
@@ -210,7 +211,7 @@ public class DatePickerRenderer extends BaseRenderer
       // get names of the months for default locale
       DateFormatSymbols dfs = new DateFormatSymbols();
       String[] names = dfs.getMonths();
-      List months = new ArrayList(12);
+      List<SelectItem> months = new ArrayList<SelectItem>(12);
       for (int i=0; i<12; i++)
       {
          Integer key = Integer.valueOf(i + 1);
@@ -221,7 +222,7 @@ public class DatePickerRenderer extends BaseRenderer
    
    private List getDays()
    {
-      List days = new ArrayList(31);
+      List<SelectItem> days = new ArrayList<SelectItem>(31);
       for (int i=1; i<32; i++)
       {
          Integer day = Integer.valueOf(i);

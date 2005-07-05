@@ -17,7 +17,9 @@
  */
 package org.alfresco.util;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Utility helper class providing helper methods for the conversion of values.
@@ -42,16 +44,19 @@ public final class Conversion
     */
    public static String dateToXmlDate(Date date)
    {
+      Calendar calendar = new GregorianCalendar();
+      calendar.setTime(date);
+      
       StringBuilder buf = new StringBuilder(20);
 
       // perform year conversion by hand to guarentee universal format
-      String month = Integer.toString(date.getMonth() + 1);
-      String day = Integer.toString(date.getDate());
-      String hour = Integer.toString(date.getHours());
-      String minute = Integer.toString(date.getMinutes());
-      String second = Integer.toString(date.getSeconds());
+      String month = Integer.toString(calendar.get(Calendar.MONTH) + 1);
+      String day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+      String hour = Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
+      String minute = Integer.toString(calendar.get(Calendar.MINUTE));
+      String second = Integer.toString(calendar.get(Calendar.SECOND));
       
-      buf.append(date.getYear() + 1900)
+      buf.append(calendar.get(Calendar.YEAR))
          .append('-');
       
       if (month.length() == 1)
@@ -111,9 +116,9 @@ public final class Conversion
       int hours   = Integer.parseInt(xml.substring(11, 13));
       int mins    = Integer.parseInt(xml.substring(14, 16));
       int secs    = Integer.parseInt(xml.substring(17, 19));
+
+      Calendar calendar = new GregorianCalendar(year, month - 1, day, hours, mins, secs);
       
-      Date date = new Date(year - 1900, month - 1, day, hours, mins, secs);
-      
-      return date;
+      return calendar.getTime();
    }
 }

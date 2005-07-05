@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
  */
 public class UploadFileServlet extends HttpServlet
 {
+   private static final long serialVersionUID = -5482538466491052873L;
    private static Logger logger = Logger.getLogger(UploadFileServlet.class); 
    
    /**

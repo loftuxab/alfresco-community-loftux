@@ -18,6 +18,7 @@
 package org.alfresco.web.app.servlet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -54,6 +55,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class DownloadContentServlet extends HttpServlet
 {
+   private static final long serialVersionUID = -4558907921887235966L;
+   
    /**
     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
     */
@@ -103,7 +106,7 @@ public class DownloadContentServlet extends HttpServlet
             // set header based on filename - will force a Save As from the browse if it doesn't recognise it
             // this is better than the default response of the browse trying to display the contents!
             // TODO: make this configurable - and check it does not prevent streaming of large files
-            res.setHeader("Content-Disposition", "attachment;filename=\"" + URLDecoder.decode(filename) + '"');
+            res.setHeader("Content-Disposition", "attachment;filename=\"" + URLDecoder.decode(filename, "UTF-8") + '"');
          }
          
          // get the content mimetype from the node properties
@@ -157,11 +160,22 @@ public class DownloadContentServlet extends HttpServlet
     */
    public final static String generateDownloadURL(NodeRef ref, String name)
    {
-      return MessageFormat.format(DOWNLOAD_URL, new Object[] {
-            ref.getStoreRef().getProtocol(),
-            ref.getStoreRef().getIdentifier(),
-            ref.getId(),
-            URLEncoder.encode(name) } );
+      String url = null;
+      
+      try
+      {
+         url = MessageFormat.format(DOWNLOAD_URL, new Object[] {
+                  ref.getStoreRef().getProtocol(),
+                  ref.getStoreRef().getIdentifier(),
+                  ref.getId(),
+                  URLEncoder.encode(name, "UTF-8") } );
+      }
+      catch (UnsupportedEncodingException uee)
+      {
+         throw new AlfrescoRuntimeException("Failed to encode URL for node with id: " + ref.getId(), uee);
+      }
+      
+      return url;
    }
    
    /**

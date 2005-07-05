@@ -33,13 +33,13 @@
    </target>
 
    <target name="dump-properties" depends="common-init">
-      <echo>ant.project.name = ${ant.project.name}</echo>
-      <echo>basedir = ${basedir}</echo>
-      <echo>common.dir = ${common.dir}</echo>
-      <echo>common.lib.dir = ${common.lib.dir}</echo>
-      <echo>version.number = ${version.number}</echo>
-      <echo>jboss.home = ${jboss.home}</echo>
-      <echo>tomcat.home = ${tomcat.home}</echo>
+      <echo level="info">ant.project.name = ${ant.project.name}</echo>
+      <echo level="info">basedir = ${basedir}</echo>
+      <echo level="info">common.dir = ${common.dir}</echo>
+      <echo level="info">common.lib.dir = ${common.lib.dir}</echo>
+      <echo level="info">version.number = ${version.number}</echo>
+      <echo level="info">jboss.home = ${jboss.home}</echo>
+      <echo level="info">tomcat.home = ${tomcat.home}</echo>
    </target>
 
    <target name="dump-all-properties" depends="common-init">

@@ -138,11 +138,13 @@
            description="Creates the distribution files for all platforms for all appservers"/>
    
    <target name="package-jboss-binary-distribution" 
-           depends="package-jboss-binary-distribution-windows,package-jboss-binary-distribution-linux" 
+           depends="clean-war, incremental-jboss, package-jboss-binary-distribution-windows,
+                    package-jboss-binary-distribution-linux" 
            description="Creates the distibution files for JBoss"/>
            
    <target name="package-tomcat-binary-distribution" 
-           depends="package-tomcat-binary-distribution-windows,package-tomcat-binary-distribution-linux" 
+           depends="clean-war, incremental-tomcat, package-tomcat-binary-distribution-windows,
+                    package-tomcat-binary-distribution-linux" 
            description="Creates the distibution files for Tomcat"/>
            
    <target name="package-jboss-binary-distribution-windows" depends="common-init">

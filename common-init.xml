@@ -16,7 +16,7 @@
       <property file="${common.dir}/common.properties" />
       <property file="project.properties" />
 
-      <echo>${startup.message}</echo>
+      <echo level="info">${startup.message}</echo>
    </target>
 
 </project>

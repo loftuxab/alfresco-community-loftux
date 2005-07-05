@@ -33,7 +33,7 @@ public class User implements Cloneable
 {
    public User()
    {
-      setRoles(new ArrayList(4));
+      setRoles(new ArrayList<String>(4));
    }
    
    public User(String username, String password, String name, String[] roles, Date joined)
@@ -42,7 +42,7 @@ public class User implements Cloneable
       setPassword(password);
       setName(name);
       setDateJoined(joined);
-      List rolesList = new ArrayList(roles.length);
+      List<String> rolesList = new ArrayList<String>(roles.length);
       for (int i=0; i<roles.length; i++)
       {
          rolesList.add(roles[i]);
@@ -61,7 +61,7 @@ public class User implements Cloneable
       setPassword(u.getPassword());
       setName(u.getName());
       setDateJoined(u.getDateJoined());
-      setRoles(new ArrayList(u.getRoles()));
+      setRoles(new ArrayList<String>(u.getRoles()));
    }
    
    /**
@@ -118,7 +118,7 @@ public class User implements Cloneable
     *
     * @return the roles
     */
-   public List getRoles()
+   public List<String> getRoles()
    {
       return m_roles;
    }
@@ -128,7 +128,7 @@ public class User implements Cloneable
     *
     * @param roles     the roles
     */
-   public void setRoles(List roles)
+   public void setRoles(List<String> roles)
    {
       m_roles = roles;
    }
@@ -168,7 +168,7 @@ public class User implements Cloneable
     *
     * @param allRolesList     the allRolesList
     */
-   public void setAllRolesList(List allRolesList)
+   public void setAllRolesList(List<SelectItem> allRolesList)
    {
       m_allRolesList = allRolesList;
    }
@@ -195,7 +195,7 @@ public class User implements Cloneable
 
 
    /** the allRolesList enum list */
-   private static List m_allRolesList = new ArrayList(8);
+   private static List<SelectItem> m_allRolesList = new ArrayList<SelectItem>(8);
    static
    {
       m_allRolesList.add(new SelectItem("admin", "Administrator"));
@@ -216,7 +216,7 @@ public class User implements Cloneable
    private String m_name;
 
    /** the roles */
-   private List m_roles;
+   private List<String> m_roles;
    
    /** the date joined */
    private Date m_dateJoined;

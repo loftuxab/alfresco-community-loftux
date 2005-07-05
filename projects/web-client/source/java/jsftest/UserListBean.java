@@ -18,7 +18,8 @@
 package jsftest;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -49,10 +50,14 @@ public class UserListBean
    
    public UserListBean()
    {
-      m_users.add(new User("admin", "admin", "Administrator", new String[] {"admin","superuser"}, new Date(2002-1900, 5, 10)));
-      m_users.add(new User("kevinr", "kevinr", "Kevin Roast", new String[] {"admin","superuser","dev"}, new Date(2001-1900, 7, 10)));
-      m_users.add(new User("gavinc", "gavinc", "Gavin Cornwell", new String[] {"superuser","dev"}, new Date(2003-1900, 8, 15)));
-      m_users.add(new User("stever", "stever", "Steve Rigby", new String[] {"superuser","qa"}, new Date(2003-1900, 1, 1)));
+      Calendar date = new GregorianCalendar(2002, 5, 10);
+      m_users.add(new User("admin", "admin", "Administrator", new String[] {"admin","superuser"}, date.getTime()));
+      date = new GregorianCalendar(2001, 7, 10);
+      m_users.add(new User("kevinr", "kevinr", "Kevin Roast", new String[] {"admin","superuser","dev"}, date.getTime()));
+      date = new GregorianCalendar(2003, 8, 15);
+      m_users.add(new User("gavinc", "gavinc", "Gavin Cornwell", new String[] {"superuser","dev"}, date.getTime()));
+      date = new GregorianCalendar(2003, 1, 1);
+      m_users.add(new User("stever", "stever", "Steve Rigby", new String[] {"superuser","qa"}, date.getTime()));
    }
    
    
@@ -64,7 +69,7 @@ public class UserListBean
       return m_users;
    }
    
-   public void setUsers(List users)
+   public void setUsers(List<User> users)
    {
       m_users = users;
    }
@@ -286,7 +291,7 @@ public class UserListBean
    // ===========================================================================
    // Private data
    
-   private List m_users = new ArrayList();
+   private List<User> m_users = new ArrayList<User>();
    private DataModel m_usersModel = null;
    private User m_currentUser = null;
    private boolean m_isNewUser = false;
