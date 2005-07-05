@@ -92,6 +92,12 @@ public class RuleImpl implements Serializable, Rule
      * List of rule actions
      */
     private List<RuleAction> ruleActions = new ArrayList<RuleAction>();
+
+    /**
+     * Indicates whether the rule is applied to all the children of the associated node
+     * rather than just the node itself.
+     */
+    private boolean isAppliedToChildren = false;
     
 	/**
 	 * Constructor
@@ -123,6 +129,26 @@ public class RuleImpl implements Serializable, Rule
     public String getId()
     {
         return this.id;
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.rule.Rule#isAppliedToChildren()
+     */
+    public boolean isAppliedToChildren()
+    {
+        return this.isAppliedToChildren;
+    }
+    
+    /**
+     * Set whether the rule is applied to all children of the associated node
+     * rather than just the node itself.
+     * 
+     * @param isAppliedToChildren   true if the rule should be applied to the children, false 
+     *                              otherwise
+     */
+    public void applyToChildren(boolean isAppliedToChildren)
+    {
+        this.isAppliedToChildren = isAppliedToChildren;
     }
     
 	/**

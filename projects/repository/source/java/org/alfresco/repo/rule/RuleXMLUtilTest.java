@@ -42,6 +42,7 @@ public class RuleXMLUtilTest extends RuleBaseTest
         "<rule id='1' ruleType='inbound'>" +
         	"<title><![CDATA[" + TITLE2 +"]]></title>" +
         	"<description><![CDATA[description]]></description>" +
+            "<isAppliedToChildren>false</isAppliedToChildren>" +
         	"<conditions>" +
         		"<condition name='match-text'>" +
         			"<parameter name='text'><![CDATA[.doc]]></parameter>" +

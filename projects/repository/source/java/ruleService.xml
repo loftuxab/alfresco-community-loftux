@@ -31,7 +31,7 @@
    
    <!-- Rule Store -->
    
-   <bean id="ruleStore" class="org.alfresco.repo.rule.RuleStoreImpl">
+   <bean id="ruleStore" class="org.alfresco.repo.rule.RuleStoreImpl" init-method="init">
 	  <property name="nodeService">
 		 <ref bean="nodeService"/>
 	  </property>
@@ -41,6 +41,9 @@
 	  <property name="dictionaryService">
 		 <ref bean="dictionaryService"></ref>
 	  </property>
+		<property name="policyComponent">
+			<ref bean="policyComponent"/>
+		</property>	
    </bean>
    
    <!-- Definitions for beans that use the common resource -->

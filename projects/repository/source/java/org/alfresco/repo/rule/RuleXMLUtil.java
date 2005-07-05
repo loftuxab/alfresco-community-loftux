@@ -71,6 +71,8 @@ import org.dom4j.io.SAXReader;
     private static final String NODE_ACTIONS = "actions";
     private static final String NODE_ACTION = "action";
     private static final String NODE_PARAMETER = "parameter";
+    private static final String NODE_IS_APPLIED_TO_CHILDREN = "isAppliedToChildren";    
+    private static final String NODE_RULE = "rule";
     
     /**
      * Converts XML into a rule
@@ -112,6 +114,14 @@ import org.dom4j.io.SAXReader;
             // Get the description     
             String description = rootElement.elementText(NODE_DESCRIPTION);
             rule.setDescription(description);
+            
+            // Determine whether the rule should be applied to the nodes children
+            String isAppliedToChildrenString = rootElement.elementText(NODE_IS_APPLIED_TO_CHILDREN);
+            if (isAppliedToChildrenString != null && isAppliedToChildrenString.length() != 0)
+            {
+                boolean isAppliedToChildren = Boolean.parseBoolean(isAppliedToChildrenString);
+                rule.applyToChildren(isAppliedToChildren);
+            }
 
             // Get the conditions
             Element conditionsElement = rootElement.element(NODE_CONDITIONS);
@@ -225,19 +235,21 @@ import org.dom4j.io.SAXReader;
         
         // Output the basic rule details
         builder.
-            append("<rule ").append(ATT_ID).append("='").append(rule.getId()).append("' ").append(ATT_RULE_TYPE).append("='").append(rule.getRuleType().getName()).append("'>");
+            append("<").append(NODE_RULE).append(" ").append(ATT_ID).append("='").append(rule.getId()).append("' ").append(ATT_RULE_TYPE).append("='").append(rule.getRuleType().getName()).append("'>");
         
 		String title = rule.getTitle();
 		if (title != null)
 		{
-			builder.append("<title><![CDATA[").append(rule.getTitle()).append("]]></title>");
+			builder.append("<").append(NODE_TITLE).append("><![CDATA[").append(rule.getTitle()).append("]]></").append(NODE_TITLE).append(">");
 		}
 		
 		String description = rule.getDescription();
 		if (description != null)
 		{
-            builder.append("<description><![CDATA[").append(rule.getDescription()).append("]]></description>");
+            builder.append("<").append(NODE_DESCRIPTION).append("><![CDATA[").append(rule.getDescription()).append("]]></").append(NODE_DESCRIPTION).append(">");
 		}
+        
+        builder.append("<").append(NODE_IS_APPLIED_TO_CHILDREN).append(">").append(rule.isAppliedToChildren()).append("</").append(NODE_IS_APPLIED_TO_CHILDREN).append(">");
         
         // Output the details of the conditions
         builder.append("<conditions>");
@@ -262,7 +274,7 @@ import org.dom4j.io.SAXReader;
         builder.append("</actions>");
         
         // Close and return the generated XML string
-        builder.append("</rule>");        
+        builder.append("</").append(NODE_RULE).append(">");        
         return builder.toString();
     }
     

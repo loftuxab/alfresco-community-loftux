@@ -25,13 +25,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.Rule;
@@ -67,6 +69,11 @@ public class RuleStoreImpl implements RuleStore
      * The dictionary service
      */
     private DictionaryService dictionaryService;
+    
+    /**
+     * The policy component
+     */
+    private PolicyComponent policyComponent;
     
     /**
      * Rule cache entries indexed by node reference
@@ -111,6 +118,90 @@ public class RuleStoreImpl implements RuleStore
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
+    }
+    
+    /**
+     * Set the policy component
+     * 
+     * @param policyComponent  the policy component
+     */
+    public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
+    
+    /**
+     * Initilalise method
+     */
+    public void init()
+    {
+        // Register policy behaviour
+        this.policyComponent.bindAssociationBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"),
+                this,
+                new JavaBehaviour(this, "onCreateChildAssociation"));
+        this.policyComponent.bindAssociationBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onDeleteChildAssociation"),
+                this,
+                new JavaBehaviour(this, "onDeleteChildAssociation"));
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onDeleteNode"),
+                this,
+                new JavaBehaviour(this, "onDeleteNode"));
+    }
+    
+    /**
+     * OnDeleteNode policy behaviour implementation
+     * 
+     * @param childAssocRef  the child association reference
+     */
+    public void onDeleteNode(ChildAssociationRef childAssocRef)
+    {
+        // TODO we should remove the associated rules from the repo ...
+        //      should be done onBeforeDeleteNode so we can still get hold of the folder
+        
+        RuleCacheEntry deleted = this.ruleCache.get(childAssocRef.getChildRef());
+        if (deleted != null)
+        {
+            deleted.prepForDelete();
+            this.ruleCache.remove(childAssocRef.getChildRef());                        
+        }
+    }
+    
+    /**
+     * OnCreaeteChildAssociation policy behaviour implementation
+     * 
+     * @param childAssocRef  the child association reference
+     */
+    public void onCreateChildAssociation(ChildAssociationRef childAssocRef)
+    {
+        RuleCacheEntry parent = this.ruleCache.get(childAssocRef.getParentRef());
+        if (parent != null)
+        {
+            RuleCacheEntry child = this.ruleCache.get(childAssocRef.getChildRef());
+            if (child != null)
+            {
+                child.addParent(parent);
+            }
+        }
+    }
+    
+    /**
+     * OnDeleteChildAssociation policy behaviour implementation
+     * 
+     * @param childAssocRef  the child association reference
+     */
+    public void onDeleteChildAssociation(ChildAssociationRef childAssocRef)
+    {
+        RuleCacheEntry parent = this.ruleCache.get(childAssocRef.getParentRef());
+        if (parent != null)
+        {
+            RuleCacheEntry child = this.ruleCache.get(childAssocRef.getChildRef());
+            if (child != null)
+            {
+                child.removeParent(parent);
+            }
+        }
     }
     
 	/**
@@ -194,9 +285,12 @@ public class RuleStoreImpl implements RuleStore
 	 */
     public void remove(NodeRef nodeRef, RuleImpl rule)
     {
-        // Remove the entry from the cache
-        this.ruleCache.remove(nodeRef);
-        // TODO what do we do about the children
+        // Dirty the cache entry
+        RuleCacheEntry ruleCacheEntry = this.ruleCache.get(nodeRef);
+        if (ruleCacheEntry != null)
+        {
+            ruleCacheEntry.dirtyMyRules();
+        }
         
         // Delete the rule content from the repository
         NodeRef ruleContent = rule.getRuleContentNodeRef();
@@ -360,41 +454,139 @@ public class RuleStoreImpl implements RuleStore
      */
     private class RuleCacheEntry
     {
+        /**
+         * The node reference that is associated with the rule cache
+         */
         private NodeRef nodeRef;
         
+        /**
+         * The rules that origionate with this node
+         */
         private List<RuleImpl> myRules;
-        private List<RuleImpl> allRules;
+        
+        /**
+         * The rules inhertied from parent nodes
+         */
         private List<RuleImpl> inheritedRules;
+        
+        private List<RuleImpl> inheritableRules;
+        
         private List<RuleCacheEntry> parentEntries;
         private List<RuleCacheEntry> childEntries;
+        
         private Map<String, List<RuleImpl>> allRulesByRuleType;
+        private List<RuleImpl> allRules;        
         
         /**
          * Constructor
          * 
-         * @param nodeRef
+         * @param nodeRef   the node reference
          */
         public RuleCacheEntry(NodeRef nodeRef)
         {
             this.nodeRef = nodeRef;
             
-            // TODO sort out how this links up with parents (and children??)
+            this.parentEntries = new ArrayList<RuleCacheEntry>();
+            this.childEntries = new ArrayList<RuleCacheEntry>();
+            List<ChildAssociationRef> parentAssocRefs = RuleStoreImpl.this.nodeService.getParentAssocs(this.nodeRef);
+            for (ChildAssociationRef parentAssocRef : parentAssocRefs)
+            {
+                RuleCacheEntry parentCacheEntry = RuleStoreImpl.this.getRuleCacheEntry(parentAssocRef.getParentRef());
+                this.parentEntries.add(parentCacheEntry);
+                parentCacheEntry.childEntries.add(this);
+            }
         }
         
+        public void addParent(RuleCacheEntry ruleCacheEntry)
+        {
+            this.parentEntries.add(ruleCacheEntry);
+            ruleCacheEntry.childEntries.add(this);
+            
+            dirtyInheritedRules();
+        }
+        
+        public void removeParent(RuleCacheEntry ruleCacheEntry)
+        {
+            this.parentEntries.remove(ruleCacheEntry);
+            ruleCacheEntry.childEntries.remove(this);
+            
+            dirtyInheritedRules();
+        }
+        
+        public void prepForDelete()
+        {
+            // Dirty all my children inherited cache's
+            dirtyInheritedRules();
+            
+            // Remove reference for all parents
+            for (RuleCacheEntry parent : this.parentEntries)
+            {
+                parent.childEntries.remove(this);
+            }
+            
+            // Remove reference form all children
+            for (RuleCacheEntry child : this.childEntries)
+            {
+                child.parentEntries.remove(this);
+            }
+        }
+        
+        /**
+         * 
+         */
         public void dirtyMyRules()
         {
+            // Clean all the caches leaving the inherited in place
             this.myRules = null;
             this.allRules = null;
             this.allRulesByRuleType = null;
+            this.inheritableRules = null;
             
-            // TODO ... this has implications for the cached inherited rules ...
+            // Clean my children's inherited cache's            
+            dirtyChildrensRules();
         }
         
+        private void dirtyInheritedRules()
+        {
+            // Clean all the caches leaving myRules in place
+            this.allRules = null;
+            this.allRulesByRuleType = null;
+            this.inheritableRules = null;
+            this.inheritedRules = null;
+            
+            this.dirtyChildrensRules();
+        }
+        
+        /**
+         * 
+         */
+        private void dirtyChildrensRules()
+        {
+            for (RuleCacheEntry childCacheEntry : this.childEntries)
+            {      
+                childCacheEntry.allRules = null;
+                childCacheEntry.allRulesByRuleType = null;
+                childCacheEntry.inheritableRules = null;
+                childCacheEntry.inheritedRules = null;
+                
+                childCacheEntry.dirtyChildrensRules();
+            }
+        }
+        
+        /**
+         * Indicates whether there are any rules specified, including inherited.
+         * 
+         * @return  true if there are rules specified, false otherwise
+         */
         public boolean hasRules()
         {
             return (getRules().isEmpty() == false);
         }
         
+        /**
+         * 
+         * @return
+         */
         public List<RuleImpl> getRules()
         {
             if (this.allRules == null)
@@ -436,6 +628,10 @@ public class RuleStoreImpl implements RuleStore
             return result;
         }
 
+        /**
+         * 
+         * @return
+         */
         public List<RuleImpl> getMyRules()
         {
             if (this.myRules == null)
@@ -453,15 +649,42 @@ public class RuleStoreImpl implements RuleStore
             return this.myRules;
         }
         
+        /**
+         * 
+         * @return
+         */
         public List<RuleImpl> getInheritedRules()
         {
             if (this.inheritedRules == null)
             {
-                // TODO
-                
                 this.inheritedRules = new ArrayList<RuleImpl>();
+                for (RuleCacheEntry parentCacheEntry : this.parentEntries)
+                {
+                     this.inheritedRules.addAll(parentCacheEntry.getInheritableRules());
+                }
             }
             return this.inheritedRules;
         }
+        
+        /**
+         * 
+         * @return
+         */
+        public List<RuleImpl> getInheritableRules()
+        {
+            if (this.inheritableRules == null)
+            {
+                this.inheritableRules = new ArrayList<RuleImpl>();
+                for (RuleImpl rule : getRules())
+                {
+                    if (rule.isAppliedToChildren() == true)
+                    {
+                        this.inheritableRules.add(rule);
+                    }
+                }
+            }
+            
+            return this.inheritableRules;
+        }       
     }
 }

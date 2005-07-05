@@ -38,6 +38,17 @@ public interface Rule
     String getId();
     
     /**
+     * Indicates that the rule is applied to the children of the associated
+     * node, not just the node itself.
+     * <p>
+     * By default this will be set to false.
+     * 
+     * @return  true if the rule is applied to the children of the associated node,
+     *          false otherwise
+     */
+    boolean isAppliedToChildren();
+    
+    /**
      * Get the created date
      * 
      * @return  the created date
