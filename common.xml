@@ -23,6 +23,16 @@
             <include name="**/build/dist/*.jar" />
          </fileset>
       </path>
+    
+      <path id="unit.test.classpath">
+         <dirset dir="${common.dir}/projects">
+            <include name="**/build/classes" />
+         </dirset>
+         <pathelement location="${src.test-resources.dir}" />  
+         <fileset dir="${common.lib.dir}">
+            <include name="**/*.jar" />
+         </fileset>  
+      </path>  
 
       <mkdir dir="${classes.dir}" />
       <mkdir dir="${dist.dir}" />
@@ -97,17 +107,7 @@
            description="Runs the projects unit tests">
       <mkdir dir="${test.results.dir}" />
       <junit printsummary="yes" fork="yes" haltonfailure="yes" dir="${basedir}">
-         <!-- TODO: Try and include the previous classpath rather than re-specify -->
-         <!--       <classpath refid="java.classpath"/> -->
-         <classpath>
-            <pathelement location="${src.test-resources.dir}" />  
-            <fileset dir="${common.lib.dir}">
-               <include name="**/*.jar" />
-            </fileset>
-            <fileset dir="${common.dir}/projects">
-               <include name="**/build/dist/*.jar" />
-            </fileset>
-         </classpath>
+         <classpath refid="unit.test.classpath" />
          <formatter type="xml"/>
          <batchtest todir="${test.results.dir}">
             <fileset dir="${src.java.dir}">
@@ -123,17 +123,7 @@
            description="Runs a single test defined in the testcase property i.e. call this target with -Dtestcase=[test]">
       <mkdir dir="${test.results.dir}" />
       <junit printsummary="yes" fork="yes" haltonfailure="yes" dir="${basedir}">
-         <!-- TODO: Try and include the previous classpath rather than re-specify -->
-         <!--       <classpath refid="java.classpath"/> -->
-         <classpath>
-            <pathelement location="${src.test-resources.dir}" />
-            <fileset dir="${common.lib.dir}">
-               <include name="**/*.jar" />
-            </fileset>
-            <fileset dir="${common.dir}/projects">
-               <include name="**/build/dist/*.jar" />
-            </fileset>
-         </classpath>
+         <classpath refid="unit.test.classpath" />
          <formatter type="xml"/>
          <test name="${testcase}" todir="${test.results.dir}" />
       </junit>

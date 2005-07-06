@@ -98,9 +98,9 @@ public class FileImporterTest extends TestCase
 
     public void testCreateFile()
     {
-//        FileImporter fileImporter = createFileImporter();
-//        URL url = this.getClass().getClassLoader().getResource("applicationContext.xml");
-//        fileImporter.loadFile(rootNodeRef, new File(url.getFile()));
+        FileImporter fileImporter = createFileImporter();
+        URL url = this.getClass().getClassLoader().getResource("applicationContext.xml");
+        fileImporter.loadFile(rootNodeRef, new File(url.getFile()));
     }
 
     public void testLoadRootNonRecursive1()
@@ -127,9 +127,10 @@ public class FileImporterTest extends TestCase
 
     public void testLoadSourceTestResources()
     {
-//        FileImporter fileImporter = createFileImporter();
-//        URL url = this.getClass().getClassLoader().getResource("quick");
-//        fileImporter.loadFile(rootNodeRef, new File(url.getFile()), true);
+        FileImporter fileImporter = createFileImporter();
+        URL url = this.getClass().getClassLoader().getResource("quick");
+        FileFilter filter = new QuickFileFilter();
+        fileImporter.loadFile(rootNodeRef, new File(url.getFile()), filter, true);
     }
 
     private static class XMLFileFilter implements FileFilter
@@ -137,6 +138,14 @@ public class FileImporterTest extends TestCase
         public boolean accept(File file)
         {
             return file.getName().endsWith(".xml");
+        }
+    }
+    
+    private static class QuickFileFilter implements FileFilter
+    {
+        public boolean accept(File file)
+        {
+            return file.getName().startsWith("quick");
         }
     }
 
