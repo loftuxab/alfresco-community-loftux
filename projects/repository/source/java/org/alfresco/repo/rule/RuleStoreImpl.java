@@ -204,6 +204,14 @@ public class RuleStoreImpl implements RuleStore
         }
     }
     
+    /**
+     * Completely clean the rule cache
+     */
+    public void cleanRuleCache()
+    {
+        this.ruleCache.clear();
+    }
+    
 	/**
 	 * @see org.alfresco.repo.rule.RuleStore#hasRules(org.alfresco.service.cmr.repository.NodeRef)
 	 */
@@ -317,8 +325,7 @@ public class RuleStoreImpl implements RuleStore
         RuleCacheEntry ruleCacheEntry = this.ruleCache.get(nodeRef);
         if (ruleCacheEntry == null)
         {
-            ruleCacheEntry = new RuleCacheEntry(nodeRef);
-            this.ruleCache.put(nodeRef, ruleCacheEntry);
+            ruleCacheEntry = new RuleCacheEntry(nodeRef);           
         }
         return ruleCacheEntry;
     }
@@ -485,6 +492,7 @@ public class RuleStoreImpl implements RuleStore
         public RuleCacheEntry(NodeRef nodeRef)
         {
             this.nodeRef = nodeRef;
+            RuleStoreImpl.this.ruleCache.put(this.nodeRef, this);
             
             this.parentEntries = new ArrayList<RuleCacheEntry>();
             this.childEntries = new ArrayList<RuleCacheEntry>();
@@ -541,46 +549,45 @@ public class RuleStoreImpl implements RuleStore
             this.allRules = null;
             this.allRulesByRuleType = null;
             this.inheritableRules = null;
-            
-            // Clean my children's inherited cache's            
-            dirtyChildrensRules();
-        }
-        
-        private void dirtyInheritedRules()
-        {
-            // Clean all the caches leaving myRules in place
-            this.allRules = null;
-            this.allRulesByRuleType = null;
-            this.inheritableRules = null;
-            this.inheritedRules = null;
-            
-            this.dirtyChildrensRules();
-        }
-        
-        private void dirtyChildrensRules()
-        {
-            dirtyChildrensRules(new ArrayList<RuleCacheEntry>());
+           
+            List<RuleCacheEntry> dirtied = new ArrayList<RuleCacheEntry>();
+            dirtied.add(this);
+            for (RuleCacheEntry childCacheEntry : this.childEntries)
+            {
+                childCacheEntry.dirtyInheritedRules(dirtied);
+            }
         }
         
         /**
          * 
+         *
          */
-        private void dirtyChildrensRules(List<RuleCacheEntry> dirtied)
+        private void dirtyInheritedRules()
+        {
+            dirtyInheritedRules(new ArrayList<RuleCacheEntry>());
+        }
+        
+        /**
+         * 
+         * @param dirtied
+         */
+        private void dirtyInheritedRules(List<RuleCacheEntry> dirtied)
         {
             if (dirtied.contains(this) == false)
             {
+                // Clean all the caches leaving myRules in place
+                this.allRules = null;
+                this.allRulesByRuleType = null;
+                this.inheritedRules = null;
+                
                 dirtied.add(this);
+                
                 for (RuleCacheEntry childCacheEntry : this.childEntries)
-                {      
-                    childCacheEntry.allRules = null;
-                    childCacheEntry.allRulesByRuleType = null;
-                    childCacheEntry.inheritableRules = null;
-                    childCacheEntry.inheritedRules = null;
-                    
-                    childCacheEntry.dirtyChildrensRules(dirtied);
+                {
+                    childCacheEntry.dirtyInheritedRules(dirtied);
                 }
             }
-        }
+        }                      
         
         /**
          * Indicates whether there are any rules specified, including inherited.
@@ -601,7 +608,15 @@ public class RuleStoreImpl implements RuleStore
             if (this.allRules == null)
             {
                 this.allRules = new ArrayList<RuleImpl>(getMyRules());
-                this.allRules.addAll(getInheritedRules());
+                
+                // Add all the inherited rule ensuring no duplicates are added
+                for (RuleImpl rule : getInheritedRules())
+                {
+                    if (this.allRules.contains(rule) == false)
+                    {
+                        this.allRules.add(rule);
+                    }
+                }
             }
             
             return this.allRules;
@@ -666,13 +681,34 @@ public class RuleStoreImpl implements RuleStore
         {
             if (this.inheritedRules == null)
             {
+                List<RuleCacheEntry> visited = new ArrayList<RuleCacheEntry>();
+                visited.add(this);
+                
                 this.inheritedRules = new ArrayList<RuleImpl>();
                 for (RuleCacheEntry parentCacheEntry : this.parentEntries)
                 {
-                     this.inheritedRules.addAll(parentCacheEntry.getInheritableRules());
+                    parentCacheEntry.buildInheritedRules(this.inheritedRules, visited);                     
                 }
             }
             return this.inheritedRules;
+        }
+        
+        /**
+         * 
+         * @param rules
+         * @param visited
+         */
+        private void buildInheritedRules(List<RuleImpl> rules, List<RuleCacheEntry> visited)
+        {
+            if (visited.contains(this) == false)
+            {
+                visited.add(this);
+                rules.addAll(this.getInheritableRules());
+                for (RuleCacheEntry parentCacheEntry : this.parentEntries)
+                {
+                    parentCacheEntry.buildInheritedRules(rules, visited);                     
+                }
+            }
         }
         
         /**
@@ -684,7 +720,7 @@ public class RuleStoreImpl implements RuleStore
             if (this.inheritableRules == null)
             {
                 this.inheritableRules = new ArrayList<RuleImpl>();
-                for (RuleImpl rule : getRules())
+                for (RuleImpl rule : getMyRules())
                 {
                     if (rule.isAppliedToChildren() == true)
                     {
@@ -693,7 +729,7 @@ public class RuleStoreImpl implements RuleStore
                 }
             }
             
-            return this.inheritableRules;
+            return this.inheritableRules;                        
         }    
         
         @Override

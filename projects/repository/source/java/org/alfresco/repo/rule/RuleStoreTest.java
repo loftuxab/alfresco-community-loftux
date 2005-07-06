@@ -22,6 +22,7 @@ import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.repo.rule.common.RuleTypeImpl;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
@@ -45,6 +46,11 @@ public class RuleStoreTest extends BaseRuleTest
 	 * The rule store
 	 */
 	private RuleStoreImpl ruleStore;
+    
+    /**
+     * The service registry
+     */
+    private ServiceRegistry serviceRegistry;
 
     /**
      * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpInTransaction()
@@ -55,6 +61,7 @@ public class RuleStoreTest extends BaseRuleTest
         super.onSetUpInTransaction();
 		
 		this.ruleStore = (RuleStoreImpl)applicationContext.getBean("ruleStore");
+        this.serviceRegistry = (ServiceRegistry)this.applicationContext.getBean("serviceRegistry");
         
         // Make the test node actionable
         makeTestNodeActionable();
@@ -323,17 +330,17 @@ public class RuleStoreTest extends BaseRuleTest
         // Create the nodes and rules
         
         NodeRef rootWithRules = createNewNode(this.rootNodeRef, true);
-        RuleImpl rule1 = createTestRule(GUID.generate());
+        RuleImpl rule1 = createTestRule("1");
         this.ruleStore.put(rootWithRules, rule1);
-        RuleImpl rule2 = createTestRule(GUID.generate(), true);
+        RuleImpl rule2 = createTestRule("2", true);
         this.ruleStore.put(rootWithRules, rule2);
         
         NodeRef nonActionableChild = createNewNode(rootWithRules, false);
         
         NodeRef childWithRules = createNewNode(nonActionableChild, true);
-        RuleImpl rule3 = createTestRule(GUID.generate());
+        RuleImpl rule3 = createTestRule("3");
         this.ruleStore.put(childWithRules, rule3);
-        RuleImpl rule4 = createTestRule(GUID.generate(), true);
+        RuleImpl rule4 = createTestRule("4", true);
         this.ruleStore.put(childWithRules, rule4);
         
         NodeRef rootWithRules2 = createNewNode(this.rootNodeRef, true);
@@ -342,9 +349,9 @@ public class RuleStoreTest extends BaseRuleTest
                 childWithRules, 
                 ContentModel.ASSOC_CONTAINS,
                 QName.createQName("{test}testnode"));
-        RuleImpl rule5 = createTestRule(GUID.generate());
+        RuleImpl rule5 = createTestRule("5");
         this.ruleStore.put(rootWithRules2, rule5);
-        RuleImpl rule6 = createTestRule(GUID.generate(), true);
+        RuleImpl rule6 = createTestRule("6", true);
         this.ruleStore.put(rootWithRules2, rule6);
                         
         // Check that the rules are inherited in the correct way
@@ -398,7 +405,7 @@ public class RuleStoreTest extends BaseRuleTest
         
         // Take the root node and add another rule
         
-        RuleImpl rule7 = createTestRule(GUID.generate(), true);
+        RuleImpl rule7 = createTestRule("7", true);
         this.ruleStore.put(rootWithRules, rule7);
         
         List<? extends Rule> allRules5 = this.ruleStore.get(childWithRules, true);
@@ -540,5 +547,98 @@ public class RuleStoreTest extends BaseRuleTest
         assertEquals(2, allRules23.size());
         assertTrue(allRules23.contains(rule1));
         assertTrue(allRules23.contains(rule2));              
+    }
+    
+    /**
+     * Ensure that the rule store can cope with a cyclic node graph
+     * 
+     * @throws Exception
+     */
+    public void testCyclicGraphWithInheritedRules()
+        throws Exception
+    {
+        NodeRef nodeRef1 = createNewNode(this.rootNodeRef, true);
+        NodeRef nodeRef2 = createNewNode(nodeRef1, true);
+        NodeRef nodeRef3 = createNewNode(nodeRef2, true);
+        this.nodeService.addChild(nodeRef3, nodeRef1, ContentModel.ASSOC_CONTAINS, QName.createQName("{test}loop"));
+        
+        RuleImpl rule1 = createTestRule(GUID.generate(), true);
+        this.ruleStore.put(nodeRef1, rule1);
+        RuleImpl rule2 = createTestRule(GUID.generate(), true);
+        this.ruleStore.put(nodeRef2, rule2);
+        RuleImpl rule3 = createTestRule(GUID.generate(), true);
+        this.ruleStore.put(nodeRef3, rule3);
+                
+        // TODO figure out why the store is not if the correct state at this point
+        // Manually clear the cache 
+        ((RuleStoreImpl)this.ruleStore).cleanRuleCache();
+        
+        List<? extends Rule> allRules1 = this.ruleStore.get(nodeRef1, true);
+        assertNotNull(allRules1);
+        assertEquals(3, allRules1.size());
+        assertTrue(allRules1.contains(rule1));
+        assertTrue(allRules1.contains(rule2));
+        assertTrue(allRules1.contains(rule3));
+        
+        List<? extends Rule> allRules2 = this.ruleStore.get(nodeRef2, true);
+        assertNotNull(allRules2);
+        assertEquals(3, allRules2.size());
+        assertTrue(allRules2.contains(rule1));
+        assertTrue(allRules2.contains(rule2));
+        assertTrue(allRules2.contains(rule3));
+        
+        List<? extends Rule> allRules3 = this.ruleStore.get(nodeRef3, true);
+        assertNotNull(allRules3);
+        assertEquals(3, allRules3.size());
+        assertTrue(allRules3.contains(rule1));
+        assertTrue(allRules3.contains(rule2));
+        assertTrue(allRules3.contains(rule3));            
+    }
+    
+    /**
+     * Ensures that rules are not duplicated when inherited    
+     */
+    public void testRuleDuplication()
+    {
+        NodeRef nodeRef1 = createNewNode(this.rootNodeRef, true);
+        NodeRef nodeRef2 = createNewNode(nodeRef1, true);
+        NodeRef nodeRef3 = createNewNode(nodeRef2, true);
+        NodeRef nodeRef4 = createNewNode(nodeRef1, true);
+        this.nodeService.addChild(nodeRef4, nodeRef3, ContentModel.ASSOC_CONTAINS, QName.createQName("{test}test"));
+        
+        RuleImpl rule1 = createTestRule(GUID.generate(), true);
+        this.ruleStore.put(nodeRef1, rule1);
+        RuleImpl rule2 = createTestRule(GUID.generate(), true);
+        this.ruleStore.put(nodeRef2, rule2);
+        RuleImpl rule3 = createTestRule(GUID.generate(), true);
+        this.ruleStore.put(nodeRef3, rule3);
+        RuleImpl rule4 = createTestRule(GUID.generate(), true);
+        this.ruleStore.put(nodeRef4, rule4);
+        
+        List<? extends Rule> allRules1 = this.ruleStore.get(nodeRef1, true);
+        assertNotNull(allRules1);
+        assertEquals(1, allRules1.size());
+        assertTrue(allRules1.contains(rule1));
+        
+        List<? extends Rule> allRules2 = this.ruleStore.get(nodeRef2, true);
+        assertNotNull(allRules2);
+        assertEquals(2, allRules2.size());
+        assertTrue(allRules2.contains(rule1));
+        assertTrue(allRules2.contains(rule2));
+        
+        List<? extends Rule> allRules3 = this.ruleStore.get(nodeRef3, true);
+        assertNotNull(allRules3);
+        assertEquals(4, allRules3.size());
+        assertTrue(allRules3.contains(rule1));
+        assertTrue(allRules3.contains(rule2));
+        assertTrue(allRules3.contains(rule3));
+        assertTrue(allRules3.contains(rule4));
+        
+        List<? extends Rule> allRules4 = this.ruleStore.get(nodeRef4, true);
+        assertNotNull(allRules4);
+        assertEquals(2, allRules4.size());
+        assertTrue(allRules4.contains(rule1));
+        assertTrue(allRules4.contains(rule4));
+        
     }
 }
