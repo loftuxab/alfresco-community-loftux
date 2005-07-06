@@ -30,7 +30,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-digester-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-el.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-validator.jar"/>
-	<classpathentry exported="true" sourcepath="W:/software/myfaces-1.0.9-src/combined-src" kind="lib" path="lib/myfaces.jar"/>
+	<classpathentry exported="true" sourcepath="src/myfaces_src.zip" kind="lib" path="lib/myfaces.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/portlet-api-lib.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.1-dev.jar"/>
 	<classpathentry exported="true" sourcepath="src/jooconverter_src.zip" kind="lib" path="lib/jooconverter.jar"/>
