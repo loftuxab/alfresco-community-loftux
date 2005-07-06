@@ -24,20 +24,18 @@ import java.util.List;
 
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewRoot;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortalContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import javax.servlet.ServletContext;
 
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.StoreContextHolder;
+import org.alfresco.util.TempFileProvider;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.ErrorBean;
@@ -48,11 +46,9 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.log4j.Logger;
-import org.apache.myfaces.context.servlet.ServletFacesContextImpl;
 import org.apache.myfaces.portlet.MyFacesGenericPortlet;
 import org.apache.myfaces.portlet.PortletUtil;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Class to extend the MyFacesGenericPortlet to provide behaviour specific to Alfresco web client.
@@ -118,7 +114,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
                      filename = filename.substring(idx + File.separator.length());
                   }
                   
-                  File tempFile = File.createTempFile("alfresco", ".upload");
+                  File tempFile = TempFileProvider.createTempFile("alfresco", ".upload");
                   item.write(tempFile);
                   bean.setFile(tempFile);
                   bean.setFileName(filename);
