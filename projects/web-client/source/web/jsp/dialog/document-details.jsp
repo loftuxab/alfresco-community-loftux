@@ -136,7 +136,6 @@
                                                   actionListener="#{ClipboardBean.cutNode}">
                                        <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                     </a:actionLink>
-                                    
                                  </a:booleanEvaluator>
                                  
                                  <%-- copy --%>
@@ -152,6 +151,11 @@
                                        <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                     </a:actionLink>
                                  </a:booleanEvaluator>
+                                 
+                                 <%-- create shortcut --%>
+                                 <a:actionLink value="#{msg.create_shortcut}" image="/images/icons/shortcut.gif" actionListener="#{UserShortcutsBean.createShortcut}">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
                               </a:menu>
                            </td>
                         </tr>

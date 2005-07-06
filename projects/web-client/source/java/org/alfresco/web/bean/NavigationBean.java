@@ -121,6 +121,22 @@ public class NavigationBean
    }
    
    /**
+    * @return Returns the array containing the expanded state of the shelf items
+    */
+   public boolean[] getShelfItemExpanded()
+   {
+      return this.shelfItemExpanded;
+   }
+
+   /**
+    * @param shelfItemExpanded The array containing the expanded state of the shelf items
+    */
+   public void setShelfItemExpanded(boolean[] shelfItemExpanded)
+   {
+      this.shelfItemExpanded = shelfItemExpanded;
+   }
+   
+   /**
     * @return Returns the toolbar Location.
     */
    public String getToolbarLocation()
@@ -395,6 +411,9 @@ public class NavigationBean
    
    /** expanded state of the Shelf panel wrapper component */
    private boolean shelfExpanded = true;
+   
+   /** expanded state of the Shelf item components */
+   private boolean[] shelfItemExpanded = new boolean[] {true, true, false, false, false};
    
    /** list of the breadcrumb handler elements representing the location path of the UI */
    private List<IBreadcrumbHandler> location = Collections.EMPTY_LIST;

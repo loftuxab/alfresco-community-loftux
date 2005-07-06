@@ -284,28 +284,47 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
     public void makeActionable(
             NodeRef nodeRef)
     {
+        applyConfigActionAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE);
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.rule.RuleService#makeConfigurable(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void makeConfigurable(NodeRef nodeRef)
+    {
+        applyConfigActionAspect(nodeRef, ContentModel.ASPECT_CONFIGURABLE);
+    }
+    
+    /**
+     * Helper to apply a configuraction/actionable type aspect to a node
+     * 
+     * @param nodeRef       NodeRef to apply aspect too
+     * @param aspect        Aspect to apply
+     */
+    private void applyConfigActionAspect(NodeRef nodeRef, QName aspect)
+    {
         // Get the root config node
-		NodeRef rootConfigFolder = getRootConfigNodeRef(nodeRef.getStoreRef());
-		
-		// Create the configuraion folder
-		NodeRef configurationsNodeRef = this.nodeService.createNode(
-											rootConfigFolder,
-											ContentModel.ASSOC_CONTAINS,
-											QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
-											ContentModel.TYPE_CONFIGURATIONS).getChildRef();
-		
+        NodeRef rootConfigFolder = getRootConfigNodeRef(nodeRef.getStoreRef());
+        
+        // Create the configuraion folder
+        NodeRef configurationsNodeRef = this.nodeService.createNode(
+                                            rootConfigFolder,
+                                            ContentModel.ASSOC_CONTAINS,
+                                            QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
+                                            ContentModel.TYPE_CONFIGURATIONS).getChildRef();
+        
         // Apply the aspect and add the configurations folder
         this.nodeService.addAspect(
-                nodeRef, 
-                ContentModel.ASPECT_ACTIONABLE, 
-                null);
+              nodeRef, 
+              aspect, 
+              null);
         this.nodeService.createAssociation(
-                nodeRef, 
-                configurationsNodeRef, 
-                ContentModel.ASSOC_CONFIGURATIONS);	
+              nodeRef, 
+              configurationsNodeRef, 
+              ContentModel.ASSOC_CONFIGURATIONS);   
     }
 
-	/**
+   /**
 	 * Get the root config node reference
 	 * 
 	 * @param storeRef	the store reference

@@ -23,12 +23,9 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
-import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.repo.component.shelf.UIRecentSpacesShelfItem;
 import org.apache.log4j.Logger;
 
@@ -45,9 +42,6 @@ public class RecentSpacesBean implements IContextListener
    private static Logger logger = Logger.getLogger(RecentSpacesBean.class);
    
    private static final int MAX_RECENT_SPACES = 6;
-   
-   /** The NodeService to be used by the bean */
-   private NodeService nodeService;
    
    /** The NavigationBean reference */
    private NavigationBean navigator;
@@ -75,43 +69,11 @@ public class RecentSpacesBean implements IContextListener
    // Bean property getters and setters 
    
    /**
-    * @return Returns the NodeService.
-    */
-   public NodeService getNodeService()
-   {
-      return this.nodeService;
-   }
-
-   /**
-    * @param nodeService The NodeService to set.
-    */
-   public void setNodeService(NodeService nodeService)
-   {
-      this.nodeService = nodeService;
-   }
-   
-   /**
-    * @return Returns the navigation bean instance.
-    */
-   public NavigationBean getNavigator()
-   {
-      return this.navigator;
-   }
-   
-   /**
     * @param navigator The NavigationBean to set.
     */
    public void setNavigator(NavigationBean navigator)
    {
       this.navigator = navigator;
-   }
-   
-   /**
-    * @return The BrowseBean
-    */
-   public BrowseBean getBrowseBean()
-   {
-      return this.browseBean;
    }
 
    /**
@@ -138,6 +100,10 @@ public class RecentSpacesBean implements IContextListener
       this.recentSpaces = spaces;
    }
    
+   
+   // ------------------------------------------------------------------------------
+   // Action method handlers
+   
    /**
     * Action handler bound to the recent spaces Shelf component called when a Space is clicked
     */
@@ -145,7 +111,6 @@ public class RecentSpacesBean implements IContextListener
    {
       // work out which node was clicked from the event data
       UIRecentSpacesShelfItem.RecentSpacesEvent spaceEvent = (UIRecentSpacesShelfItem.RecentSpacesEvent)event;
-      UIRecentSpacesShelfItem component = (UIRecentSpacesShelfItem)event.getComponent();
       Node selectedNode = this.recentSpaces.get(spaceEvent.Index);
       // then navigate to the appropriate node in UI
       // use browse bean functionality for this as it will update the breadcrumb for us
@@ -182,6 +147,9 @@ public class RecentSpacesBean implements IContextListener
       {
          this.recentSpaces.remove(MAX_RECENT_SPACES - 1);
       }
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Inserting node: " + node.getName() + " at top of recent spaces list.");
       
       // insert our Node at the top of the list so it's most relevent
       this.recentSpaces.add(0, node);

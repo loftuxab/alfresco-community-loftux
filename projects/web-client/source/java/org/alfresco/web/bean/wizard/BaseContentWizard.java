@@ -118,7 +118,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             contentProps.put(ContentModel.PROP_MIME_TYPE, this.contentType);
             contentProps.put(ContentModel.PROP_CREATOR, this.author);
             
-            // create the node to represent the node
+            // create the node to represent the content
             String assocName = QName.createValidLocalName(this.fileName);
             ChildAssociationRef assocRef = this.nodeService.createNode(
                   containerNodeRef,

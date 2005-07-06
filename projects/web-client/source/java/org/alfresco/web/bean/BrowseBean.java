@@ -739,7 +739,16 @@ public class BrowseBean implements IContextListener
    {
       UIActionLink link = (UIActionLink)event.getComponent();
       Map<String, String> params = link.getParameterMap();
-      String id = params.get("id");
+      setupContentAction(params.get("id"));
+   }
+   
+   /**
+    * Public helper to setup action pages with content context
+    * 
+    * @param id     of the content node to setup context for
+    */
+   public void setupContentAction(String id)
+   {
       if (id != null && id.length() != 0)
       {
          if (logger.isDebugEnabled())

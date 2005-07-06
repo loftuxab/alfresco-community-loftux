@@ -85,11 +85,11 @@
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
                                  <a:actionLink value="#{msg.new_space}" image="/images/icons/create_space.gif" padding="4" action="createSpace" actionListener="#{NewSpaceDialog.startWizard}" id="link1" />
-                                 <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link2" >
+                                 <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link2">
                                     <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                  </a:actionLink>
                                  <a:actionLink value="#{msg.add_content}" image="/images/icons/add.gif" padding="4" action="addContent" actionListener="#{AddContentWizard.startWizard}" id="link3" />
-                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/more.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px" >
+                                 <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/more.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
                                     <a:actionLink value="#{msg.create_content}" image="/images/icons/new_content.gif" id="link3_1" action="createContent" actionListener="#{CreateContentWizard.startWizard}" />
                                     <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" id="link4" />
                                     <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" id="link5" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">

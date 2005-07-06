@@ -73,8 +73,12 @@ public final class Repository
    /** cache of client StoreRef */
    private static StoreRef storeRef = null;
    
-   /** reference to person folder */
+   /** reference to Person folder */
    private static NodeRef peopleRef = null;
+   
+   /** reference to System folder */
+   private static NodeRef systemRef = null;
+   
    
    /**
     * Private constructor
@@ -450,6 +454,39 @@ public final class Repository
    }
    
    /**
+    * Return a reference to the special system folder
+    * 
+    * @param context
+    * 
+    * @return NodeRef to System folder
+    */
+   public static NodeRef getSystemFolderRef(FacesContext context, NodeService nodeService)
+   {
+      if (systemRef == null)
+      {
+         // get a reference to the system types folder node
+         DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
+         resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+         
+         List<NodeRef> results = nodeService.selectNodes(
+               nodeService.getRootNode(Repository.getStoreRef()),
+               RepositoryAuthenticationDao.SYSTEM_FOLDER,
+               null,
+               resolver,
+               false);
+         
+         if (results.size() != 1)
+         {
+            throw new AlfrescoRuntimeException("Unable to find system folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
+         }
+         
+         systemRef = results.get(0);
+      }
+      
+      return systemRef;
+   }
+   
+   /**
     * Return a reference to the special system folder containing Person instances
     * 
     * @param context
@@ -460,7 +497,7 @@ public final class Repository
    {
       if (peopleRef == null)
       {
-         // get a reference to the system types folder node
+         // get a reference to the system/people folder node
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
          
@@ -473,7 +510,7 @@ public final class Repository
          
          if (results.size() != 1)
          {
-            throw new AlfrescoRuntimeException("Unable to find system types folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
+            throw new AlfrescoRuntimeException("Unable to find system/people folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
          }
          
          peopleRef = results.get(0);

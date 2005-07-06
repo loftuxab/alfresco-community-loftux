@@ -31,8 +31,10 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.web.bean.clipboard.ClipboardItem;
 import org.alfresco.web.bean.clipboard.ClipboardStatus;
+import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 
 
@@ -150,11 +152,22 @@ public class UIClipboardShelfItem extends UIShelfItem
          out.write("<tr><td>");
          if (item.Mode == ClipboardStatus.COPY)
          {
-            out.write(Utils.buildImageTag(context, IMAGE_COPY, null, "absmiddle"));
+            out.write(Utils.buildImageTag(context, IMAGE_COPY, 14, 16, null, null, "absmiddle"));
          }
          else
          {
-            out.write(Utils.buildImageTag(context, IMAGE_CUT, null, "absmiddle"));
+            out.write(Utils.buildImageTag(context, IMAGE_CUT, 13, 16, null, null, "absmiddle"));
+         }
+         out.write("</td><td>");
+         if (item.Node.getType().equals(ContentModel.TYPE_FOLDER))
+         {
+            // start row with Space icon
+            out.write(Utils.buildImageTag(context, IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
+         }
+         else if (item.Node.getType().equals(ContentModel.TYPE_CONTENT))
+         {
+            String image = Repository.getFileTypeImage(item.Node, true);
+            out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
          }
          
          // output cropped item label - we also output with no breaks, this is ok
@@ -175,7 +188,7 @@ public class UIClipboardShelfItem extends UIShelfItem
       // output general actions if any clipboard items are present
       if (items.size() != 0)
       {
-         out.write("<tr><td></td><td><nobr>");
+         out.write("<tr><td colspan=3><nobr>");
          out.write(buildActionLink(ACTION_PASTE_ALL, -1, "Paste All", null));
          out.write("&nbsp;");
          out.write(buildActionLink(ACTION_REMOVE_ALL, -1, "Remove All", null));
@@ -315,6 +328,7 @@ public class UIClipboardShelfItem extends UIShelfItem
    // ------------------------------------------------------------------------------
    // Private data
    
+   private static final String IMAGE_SPACE   = "/images/icons/space_small.gif";
    private final static String IMAGE_COPY    = "/images/icons/copy.gif";
    private final static String IMAGE_CUT     = "/images/icons/cut.gif";
    private final static String IMAGE_REMOVE  = "/images/icons/delete.gif";

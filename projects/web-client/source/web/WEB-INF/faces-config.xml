@@ -103,7 +103,7 @@
    
    <managed-bean>
       <description>
-         The bean that manages the state for the Recent Spaces Shelf components.
+         The bean that manages the state for the Recent Spaces Shelf component.
       </description>
       <managed-bean-name>RecentSpacesBean</managed-bean-name>
       <managed-bean-class>org.alfresco.web.bean.RecentSpacesBean</managed-bean-class>
@@ -116,9 +116,30 @@
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
       </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that manages the state for the User Shortcuts Shelf component.
+      </description>
+      <managed-bean-name>UserShortcutsBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.UserShortcutsBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>namespaceService</property-name>
+         <value>#{AlfNamespaceService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>ruleService</property-name>
+         <value>#{AlfRuleService}</value>
       </managed-property>
    </managed-bean>
    
@@ -445,6 +466,19 @@
       </navigation-case>
    </navigation-rule>
    
+   <!-- rules to the Details pages from anywhere (e.g. shelf components etc.) -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>showDocDetails</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>showSpaceDetails</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
    <!-- rule to get to the Advanced Search page from anywhere -->
    <navigation-rule>
       <from-view-id>/jsp/*</from-view-id>
@@ -490,14 +524,7 @@
          <from-outcome>createContent</from-outcome>
          <to-view-id>/jsp/wizard/create-content/create.jsp</to-view-id>
       </navigation-case>
-      <navigation-case>
-         <from-outcome>showDocDetails</from-outcome>
-         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>showSpaceDetails</from-outcome>
-         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
-      </navigation-case>
+      <!-- showDocDetails and showSpaceDetails moved to /jsp/* above -->
       <navigation-case>
          <from-outcome>checkoutFile</from-outcome>
          <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>

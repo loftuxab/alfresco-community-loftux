@@ -70,19 +70,6 @@ public class UIShelfGroup extends SelfRenderingComponent
    }
    
    /**
-    * @see javax.faces.component.UIComponentBase#encodeBegin(javax.faces.context.FacesContext)
-    */
-   public void encodeBegin(FacesContext context) throws IOException
-   {
-      if (isRendered() == false)
-      {
-         return;
-      }
-      
-      ResponseWriter out = context.getResponseWriter();
-   }
-   
-   /**
     * @see javax.faces.component.UIComponentBase#encodeChildren(javax.faces.context.FacesContext)
     */
    public void encodeChildren(FacesContext context) throws IOException
@@ -108,19 +95,6 @@ public class UIShelfGroup extends SelfRenderingComponent
          }
       }
       out.write("</table>");
-   }
-   
-   /**
-    * @see javax.faces.component.UIComponentBase#encodeEnd(javax.faces.context.FacesContext)
-    */
-   public void encodeEnd(FacesContext context) throws IOException
-   {
-      if (isRendered() == false)
-      {
-         return;
-      }
-      
-      ResponseWriter out = context.getResponseWriter();
    }
 
    /**

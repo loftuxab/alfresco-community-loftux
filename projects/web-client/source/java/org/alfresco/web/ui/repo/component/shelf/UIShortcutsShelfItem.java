@@ -31,15 +31,17 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 
 /**
- * JSF Component providing UI for a real-time updated list of the most recently visited Spaces.
+ * JSF Component providing UI for a list of user defined shortcuts to favorite nodes.
  * 
  * @author Kevin Roast
  */
-public class UIRecentSpacesShelfItem extends UIShelfItem
+public class UIShortcutsShelfItem extends UIShelfItem
 {
    // ------------------------------------------------------------------------------
    // Component Impl
@@ -53,7 +55,8 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
       this.value = values[1];
-      this.navigateActionListener = (MethodBinding)values[2];
+      this.clickActionListener = (MethodBinding)values[2];
+      this.removeActionListener = (MethodBinding)values[3];
    }
    
    /**
@@ -61,17 +64,18 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[3];
+      Object values[] = new Object[4];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.value;
-      values[2] = this.navigateActionListener;
+      values[2] = this.clickActionListener;
+      values[3] = this.removeActionListener;
       
       return (values);
    }
    
    /**
-    * Get the value (for this component the value is used as the List of recent Space Nodes)
+    * Get the value (for this component the value is used as the List of shortcut nodes)
     *
     * @return the value
     */
@@ -89,7 +93,7 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
    }
 
    /**
-    * Set the value (for this component the value is used as the List of recent Space Nodes)
+    * Set the value (for this component the value is used as the List of shortcut nodes)
     *
     * @param value     the value
     */
@@ -99,19 +103,35 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
    }
    
    /** 
-    * @param binding    The MethodBinding to call when Navigate is performed by the user
+    * @param binding    The MethodBinding to call when Click is performed by the user
     */
-   public void setNavigateActionListener(MethodBinding binding)
+   public void setClickActionListener(MethodBinding binding)
    {
-      this.navigateActionListener = binding;
+      this.clickActionListener = binding;
    }
    
    /** 
-    * @return The MethodBinding to call when Navigate is performed by the user
+    * @return The MethodBinding to call when Click is performed by the user
     */
-   public MethodBinding getNavigateActionListener()
+   public MethodBinding getClickActionListener()
    {
-      return this.navigateActionListener;
+      return this.clickActionListener;
+   }
+   
+   /** 
+    * @param binding    The MethodBinding to call when Remove is performed by the user
+    */
+   public void setRemoveActionListener(MethodBinding binding)
+   {
+      this.removeActionListener = binding;
+   }
+   
+   /** 
+    * @return The MethodBinding to call when Remove is performed by the user
+    */
+   public MethodBinding getRemoveActionListener()
+   {
+      return this.removeActionListener;
    }
    
    /**
@@ -131,7 +151,7 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
          int index = Integer.parseInt(value.substring(sepIndex + 1));
          
          // raise an event to process the action later in the lifecycle
-         RecentSpacesEvent event = new RecentSpacesEvent(this, action, index);
+         ShortcutEvent event = new ShortcutEvent(this, action, index);
          this.queueEvent(event);
       }
    }
@@ -153,14 +173,27 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
       {
          Node item = items.get(i);
          
-         // start row with Space icon
          out.write("<tr><td>");
-         out.write(Utils.buildImageTag(context, IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
+         if (item.getType().equals(ContentModel.TYPE_FOLDER))
+         {
+            // start row with Space icon
+            out.write(Utils.buildImageTag(context, IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
+         }
+         else if (item.getType().equals(ContentModel.TYPE_CONTENT))
+         {
+            String image = Repository.getFileTypeImage(item, true);
+            out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
+         }
          
          // output cropped item label - we also output with no breaks, this is ok
          // as the copped label will ensure a sensible maximum width
          out.write("</td><td width=100%><nobr>&nbsp;");
-         out.write(buildActionLink(ACTION_NAVIGATE_ITEM, i, item.getName()));
+         out.write(buildActionLink(ACTION_CLICK_ITEM, i, item.getName()));
+         
+         // output actions
+         out.write("</nobr></td><td align=right><nobr>");
+         out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", IMAGE_REMOVE));
+         // TODO: add view details action here?
          
          // end actions cell and end row
          out.write("</nobr></td></tr>");
@@ -174,19 +207,22 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
     */
    public void broadcast(FacesEvent event) throws AbortProcessingException
    {
-      if (event instanceof RecentSpacesEvent)
+      if (event instanceof ShortcutEvent)
       {
          // found an event we should handle
-         RecentSpacesEvent spaceEvent = (RecentSpacesEvent)event;
+         ShortcutEvent shortcutEvent = (ShortcutEvent)event;
          
          List<Node> items = (List<Node>)getValue();
-         if (items.size() > spaceEvent.Index)
+         if (items.size() > shortcutEvent.Index)
          {
             // process the action
-            switch (spaceEvent.Action)
+            switch (shortcutEvent.Action)
             {
-               case ACTION_NAVIGATE_ITEM:
-                  Utils.processActionMethod(getFacesContext(), getNavigateActionListener(), spaceEvent);
+               case ACTION_CLICK_ITEM:
+                  Utils.processActionMethod(getFacesContext(), getClickActionListener(), shortcutEvent);
+                  break;
+               case ACTION_REMOVE_ITEM:
+                  Utils.processActionMethod(getFacesContext(), getRemoveActionListener(), shortcutEvent);
                   break;
             }
          }
@@ -202,7 +238,7 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
    // Private helpers
    
    /**
-    * We use a hidden field name on the assumption that only one Recent Spaces shelf item
+    * We use a hidden field name on the assumption that only one Shortcut Shelf item
     * instance is present on a single page.
     * 
     * @return hidden field name
@@ -213,7 +249,7 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
    }
    
    /**
-    * Build HTML for an link representing a Recent Space action
+    * Build HTML for an link representing a Shortcut action
     * 
     * @param action     action indentifier to represent
     * @param index      index of the Node item this action relates too
@@ -241,6 +277,42 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
    }
    
    /**
+    * Build HTML for an link representing a clipboard action
+    * 
+    * @param action     action indentifier to represent
+    * @param index      index of the clipboard item this action relates too
+    * @param text       of the action to display
+    * @param image      image icon to display
+    * 
+    * @return HTML for action link
+    */
+   private String buildActionLink(int action, int index, String text, String image)
+   {
+      FacesContext context = getFacesContext(); 
+      
+      StringBuilder buf = new StringBuilder(256);
+      
+      buf.append("<a href='#' onclick=\"");
+      // generate JavaScript to set a hidden form field and submit
+      // a form which request attributes that we can decode
+      buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), encodeValues(action, index)));
+      buf.append("\">");
+      
+      if (image != null)
+      {
+         buf.append(Utils.buildImageTag(context, image, text));
+      }
+      else
+      {
+         buf.append(Utils.encode(text));
+      }
+      
+      buf.append("</a>");
+      
+      return buf.toString();
+   }
+   
+   /**
     * Encode the specified values for output to a hidden field
     * 
     * @param action     Action identifer
@@ -258,11 +330,11 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
    // Inner classes
    
    /**
-    * Class representing the an action relevant to the Recent Spaces element.
+    * Class representing the an action relevant to the Shortcut element.
     */
-   public static class RecentSpacesEvent extends ActionEvent
+   public static class ShortcutEvent extends ActionEvent
    {
-      public RecentSpacesEvent(UIComponent component, int action, int index)
+      public ShortcutEvent(UIComponent component, int action, int index)
       {
          super(component);
          Action = action;
@@ -277,13 +349,18 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
    // ------------------------------------------------------------------------------
    // Private data
    
-   private static final String IMAGE_SPACE = "/images/icons/space_small.gif";
+   private final static String IMAGE_SPACE   = "/images/icons/space_small.gif";
+   private final static String IMAGE_REMOVE  = "/images/icons/delete.gif";
    
-   private final static int ACTION_NAVIGATE_ITEM = 0;
+   private final static int ACTION_CLICK_ITEM = 0;
+   private final static int ACTION_REMOVE_ITEM = 1;
    
-   /** for this component the value is used as the List of recent Space Nodes */
+   /** for this component the value is used as the List of shortcut Nodes */
    private Object value = null;
    
-   /** action listener called when a Navigate action occurs */
-   private MethodBinding navigateActionListener;
+   /** action listener called when a Click action occurs */
+   private MethodBinding clickActionListener;
+   
+   /** action listener called when a Remove action occurs */
+   private MethodBinding removeActionListener;
 }

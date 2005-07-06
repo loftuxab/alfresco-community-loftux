@@ -116,6 +116,7 @@ public interface ContentModel
 
     // rules
     static final QName ASPECT_ACTIONABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "actionable");
+    static final QName ASPECT_CONFIGURABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "configurable");
     static final QName TYPE_CONFIGURATIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "configurations");
     static final QName TYPE_RULE_CONTENT = QName.createQName(NamespaceService.ALFRESCO_URI, "rulecontent");
     static final QName ASSOC_CONFIGURATIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "configurations");

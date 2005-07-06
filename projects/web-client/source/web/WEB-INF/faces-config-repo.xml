@@ -59,6 +59,11 @@
       <component-class>org.alfresco.web.ui.repo.component.shelf.UIRecentSpacesShelfItem</component-class>
    </component>
    
+   <component>
+      <component-type>org.alfresco.faces.ShortcutsShelfItem</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.shelf.UIShortcutsShelfItem</component-class>
+   </component>
+   
    
    <!-- ==================== RENDERERS ==================== -->
    <render-kit>
