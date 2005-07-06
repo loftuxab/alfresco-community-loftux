@@ -38,6 +38,51 @@ public class Win32NetBIOS
 
     protected final static int FindNameBufferLen = 33;
 
+    // Exception if the native code DLL load failed
+
+    private static Throwable m_loadDLLException;
+
+    /**
+     * Check if the native code was loaded successfully
+     * 
+     * @return boolean
+     */
+    public static final boolean isInitialized()
+    {
+        return m_loadDLLException == null ? true : false;
+    }
+
+    /**
+     * Return the native code load exception
+     * 
+     * @return Throwable
+     */
+    public static final Throwable getInitializationException()
+    {
+        return m_loadDLLException;
+    }
+
+    /**
+     * Check if NetBIOS is enabled on any network adapters
+     * 
+     * @return boolean
+     */
+    public static final boolean isAvailable() {
+        
+        // Check if the DLL was loaded successfully
+        
+        if ( isInitialized() == false)
+            return false;
+        
+        // Check if there are any valid LANAs, if not then NetBIOS is not enabled or network
+        // adapters that have NetBIOS enabled are not currently enabled
+        
+        int[] lanas = LanaEnum();
+        if ( lanas != null && lanas.length > 0)
+            return true;
+        return false;
+    }
+    
     /**
      * Add a NetBIOS name to the local name table
      * 
@@ -273,7 +318,7 @@ public class Win32NetBIOS
      * @return String
      */
     public static native String GetLocalDomainName();
-    
+
     /**
      * Return a comma delimeted list of WINS server TCP/IP addresses, or null if no WINS servers are
      * configured.
@@ -281,7 +326,7 @@ public class Win32NetBIOS
      * @return String
      */
     public static native String getWINSServerList();
-    
+
     /**
      * Find the TCP/IP address for a LANA
      * 
@@ -503,7 +548,9 @@ public class Win32NetBIOS
         }
         catch (Throwable ex)
         {
-            ex.printStackTrace(System.err);
+            // Save the native code load exception
+
+            m_loadDLLException = ex;
         }
     }
 }

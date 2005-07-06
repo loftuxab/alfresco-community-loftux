@@ -318,13 +318,15 @@ public class ServerConfiguration
         {
             // Error accessing the Win32NetBIOS DLL code
             
-            logger.error("Error accessing Win32NetBIOS code, check DLL is on the path");
+            logger.error("Error accessing Win32 NetBIOS, check DLL is on the path");
             
             // Disable the CIFS server
             
             setNetBIOSSMB(false);
             setTcpipSMB(false);
             setWin32NetBIOS(false);
+            
+            setSMBServerEnabled(false);
         }
     }
 
@@ -676,6 +678,10 @@ public class ServerConfiguration
                     && (osName.endsWith("95") == false && osName.endsWith("98") == false && osName.endsWith("ME") == false))
             {
 
+                // Call the Win32NetBIOS native code to make sure it is initialized
+                
+                Win32NetBIOS.LanaEnum();
+                
                 // Enable Win32 NetBIOS
 
                 setWin32NetBIOS(true);
