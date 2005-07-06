@@ -47,6 +47,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -749,7 +750,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     {
         purgeCommandList(command);
         commandList.add(command);
-        
+
         if (commandList.size() > getLuceneConfig().getIndexerBatchSize())
         {
             flushPending();
@@ -771,30 +772,29 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             removeFromCommandList(command, true);
         }
     }
-    
+
     private void removeFromCommandList(Command command, boolean matchExact)
     {
-       for(ListIterator<Command> it = commandList.listIterator(commandList.size()); it.hasPrevious(); /**/)
-       {
-           Command current = it.previous();
-           if(matchExact)
-           {
-               if( (current.action == command.action) && (current.nodeRef.equals(command.nodeRef)))
-               {
-                   it.remove();
-                   return;
-               }
-           }
-           else
-           {
-               if(current.nodeRef.equals(command.nodeRef))
-               {
-                   it.remove();
-               } 
-           }
-       }
+        for (ListIterator<Command> it = commandList.listIterator(commandList.size()); it.hasPrevious(); /**/)
+        {
+            Command current = it.previous();
+            if (matchExact)
+            {
+                if ((current.action == command.action) && (current.nodeRef.equals(command.nodeRef)))
+                {
+                    it.remove();
+                    return;
+                }
+            }
+            else
+            {
+                if (current.nodeRef.equals(command.nodeRef))
+                {
+                    it.remove();
+                }
+            }
+        }
     }
-   
 
     private void flushPending() throws LuceneIndexException
     {
@@ -992,24 +992,29 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         IndexWriter writer = getDeltaWriter();
 
         // avoid attempting to index nodes that don't exist
-        if (!nodeService.exists(nodeRef))
+
+        try
         {
-            return;
+            List<Document> docs = createDocuments(nodeRef, isNew);
+            for (Document doc : docs)
+            {
+                try
+                {
+                    writer.addDocument(doc /*
+                                             * TODO: Select the language based
+                                             * analyser
+                                             */);
+                }
+                catch (IOException e)
+                {
+                    throw new LuceneIndexException("Failed to add document to index", e);
+                }
+            }
         }
-        List<Document> docs = createDocuments(nodeRef, isNew);
-        for (Document doc : docs)
+        catch (InvalidNodeRefException e)
         {
-            try
-            {
-                writer.addDocument(doc /*
-                                         * TODO: Select the language based
-                                         * analyser
-                                         */);
-            }
-            catch (IOException e)
-            {
-                throw new LuceneIndexException("Failed to add document to index", e);
-            }
+            // The node does not exist
+            return;
         }
 
     }
@@ -1286,31 +1291,36 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // convert value to String
             for (String strValue : ValueConverter.getCollection(String.class, value))
             {
-                // String strValue = ValueConverter.convert(String.class,
-                // value);
-                // TODO: Need to add with the correct language based analyser
-                if (index && atomic)
+                if (strValue != null)
                 {
-                    if (propertyName.equals(contentPropertyQName))
+                    // String strValue = ValueConverter.convert(String.class,
+                    // value);
+                    // TODO: Need to add with the correct language based
+                    // analyser
+                    if (index && atomic)
                     {
-                        ContentReader reader = contentService.getReader(nodeRef);
-                        if (reader != null)
+                        if (propertyName.equals(contentPropertyQName))
                         {
-                            ContentWriter writer = contentService.getTempWriter();
-                            writer.setMimetype("text/plain");
-                            try
+                            ContentReader reader = contentService.getReader(nodeRef);
+                            if (reader != null)
                             {
-                                contentService.transform(reader, writer);
-                                doc.add(Field.Text("TEXT", new InputStreamReader(writer.getReader().getContentInputStream())));
-                            }
-                            catch (NoTransformerException e)
-                            {
-                                // if it does not convert we did not write and
-                                // text
+                                ContentWriter writer = contentService.getTempWriter();
+                                writer.setMimetype("text/plain");
+                                try
+                                {
+                                    contentService.transform(reader, writer);
+                                    doc.add(Field.Text("TEXT", new InputStreamReader(writer.getReader().getContentInputStream())));
+                                }
+                                catch (NoTransformerException e)
+                                {
+                                    // if it does not convert we did not write
+                                    // and
+                                    // text
+                                }
                             }
                         }
+                        doc.add(new Field("@" + propertyName, strValue, store, index, tokenise));
                     }
-                    doc.add(new Field("@" + propertyName, strValue, store, index, tokenise));
                 }
             }
         }
@@ -1686,8 +1696,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             buffer.append(nodeRef);
             return buffer.toString();
         }
-        
-        
+
     }
 
     private FullTextSearchIndexer luceneFullTextSearchIndexer;
