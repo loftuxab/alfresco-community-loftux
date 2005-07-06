@@ -98,8 +98,8 @@
                <multiple>true</multiple>
             </property>
          </properties>	
-		 <associations>
-			<child-association name="ver:versionMetaData">
+         <associations>
+   			<child-association name="ver:versionMetaData">
                <target>
                   <class>ver:versionMetaDataValue</class>
                </target>
@@ -114,7 +114,7 @@
                   <class>ver:versionedChildAssoc</class>
                </target>
             </child-association>
-			<child-association name="ver:versionedAssocs">
+            <child-association name="ver:versionedAssocs">
                <target>
                   <class>ver:versionedAssoc</class>
                </target>
