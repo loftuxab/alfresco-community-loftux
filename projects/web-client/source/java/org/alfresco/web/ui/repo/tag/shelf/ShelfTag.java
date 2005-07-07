@@ -17,9 +17,12 @@
  */
 package org.alfresco.web.ui.repo.tag.shelf;
 
+import javax.faces.FacesException;
 import javax.faces.component.UIComponent;
+import javax.faces.el.MethodBinding;
 
 import org.alfresco.web.ui.common.tag.BaseComponentTag;
+import org.alfresco.web.ui.repo.component.shelf.UIShelf;
 
 /**
  * @author Kevin Roast
@@ -56,6 +59,18 @@ public class ShelfTag extends BaseComponentTag
       setStringProperty(component, "selectedGroupBgcolor", this.selectedGroupBgcolor);
       setStringProperty(component, "innerGroupPanel", this.innerGroupPanel);
       setStringProperty(component, "innerGroupBgcolor", this.innerGroupBgcolor);
+      if (this.groupExpandedActionListener != null)
+      {
+         if (isValueReference(this.groupExpandedActionListener))
+         {
+            MethodBinding vb = getFacesContext().getApplication().createMethodBinding(this.groupExpandedActionListener, ACTION_CLASS_ARGS);
+            ((UIShelf)component).setGroupExpandedActionListener(vb);
+         }
+         else
+         {
+            throw new FacesException("Shelf Group Expanded Action listener method binding incorrectly specified: " + this.groupExpandedActionListener);
+         }
+      }
    }
    
    /**
@@ -71,6 +86,7 @@ public class ShelfTag extends BaseComponentTag
       this.selectedGroupBgcolor = null;
       this.innerGroupPanel = null;
       this.innerGroupBgcolor = null;
+      this.groupExpandedActionListener = null;
    }
    
    /**
@@ -132,7 +148,20 @@ public class ShelfTag extends BaseComponentTag
    {
       this.innerGroupBgcolor = innerGroupBgcolor;
    }
+   
+   /**
+    * Set the groupExpandedActionListener
+    *
+    * @param groupExpandedActionListener     the groupExpandedActionListener
+    */
+   public void setGroupExpandedActionListener(String groupExpandedActionListener)
+   {
+      this.groupExpandedActionListener = groupExpandedActionListener;
+   }
 
+
+   /** the groupExpandedActionListener */
+   private String groupExpandedActionListener;
 
    /** the groupPanel */
    private String groupPanel;

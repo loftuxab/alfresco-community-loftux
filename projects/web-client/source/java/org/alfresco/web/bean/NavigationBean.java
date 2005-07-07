@@ -42,6 +42,7 @@ import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
 import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
+import org.alfresco.web.ui.repo.component.shelf.UIShelf;
 import org.apache.log4j.Logger;
 
 /**
@@ -259,12 +260,19 @@ public class NavigationBean
    /**
     * Action handler to toggle the expanded state of the shelf.
     * The panel component wrapping the shelf area of the UI is value bound to the shelfExpanded property.
-    * 
-    * @param event
     */
    public void toggleShelf(ActionEvent event)
    {
       this.shelfExpanded = !this.shelfExpanded;
+   }
+   
+   /**
+    * Action handler called after a Shelf Group has had its expanded state toggled by the user
+    */
+   public void shelfGroupToggled(ActionEvent event)
+   {
+      UIShelf.ShelfEvent shelfEvent = (UIShelf.ShelfEvent)event;
+      this.shelfItemExpanded[shelfEvent.Index] = shelfEvent.Expanded;
    }
    
    /**
@@ -413,7 +421,7 @@ public class NavigationBean
    private boolean shelfExpanded = true;
    
    /** expanded state of the Shelf item components */
-   private boolean[] shelfItemExpanded = new boolean[] {true, true, false, false, false};
+   private boolean[] shelfItemExpanded = new boolean[] {true, true, true, false, false};
    
    /** list of the breadcrumb handler elements representing the location path of the UI */
    private List<IBreadcrumbHandler> location = Collections.EMPTY_LIST;

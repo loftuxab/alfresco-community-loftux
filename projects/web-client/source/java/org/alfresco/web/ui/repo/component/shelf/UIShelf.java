@@ -25,7 +25,11 @@ import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.faces.el.MethodBinding;
 import javax.faces.el.ValueBinding;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.ActionEvent;
+import javax.faces.event.FacesEvent;
 
 import org.alfresco.web.ui.common.PanelGenerator;
 import org.alfresco.web.ui.common.Utils;
@@ -61,6 +65,7 @@ public class UIShelf extends SelfRenderingComponent
       this.selectedGroupBgcolor = (String)values[4];
       this.innerGroupPanel = (String)values[5];
       this.innerGroupBgcolor = (String)values[6];
+      this.groupExpandedActionListener = (MethodBinding)values[7];
    }
    
    /**
@@ -68,7 +73,7 @@ public class UIShelf extends SelfRenderingComponent
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[7];
+      Object values[] = new Object[8];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.groupPanel;
@@ -77,7 +82,24 @@ public class UIShelf extends SelfRenderingComponent
       values[4] = this.selectedGroupBgcolor;
       values[5] = this.innerGroupPanel;
       values[6] = this.innerGroupBgcolor;
+      values[7] = this.groupExpandedActionListener;
       return values;
+   }
+   
+   /** 
+    * @param binding    The MethodBinding to call when the Group expand action is performed by the user
+    */
+   public void setGroupExpandedActionListener(MethodBinding binding)
+   {
+      this.groupExpandedActionListener = binding;
+   }
+   
+   /** 
+    * @return The MethodBinding to call for the Group expand action
+    */
+   public MethodBinding getGroupExpandedActionListener()
+   {
+      return this.groupExpandedActionListener;
    }
    
    /**
@@ -96,21 +118,46 @@ public class UIShelf extends SelfRenderingComponent
          int groupIndex = Integer.parseInt( value.substring(0, sepIndex) );
          boolean expanded = Boolean.parseBoolean( value.substring(sepIndex + 1) );
          
-         // TODO: should we fire an event here instead of setting state directly?!
+         // fire an event here to indicate the change that occured
+         ShelfEvent event = new ShelfEvent(this, groupIndex, expanded);
+         this.queueEvent(event);
+      }
+   }
+   
+   /**
+    * @see javax.faces.component.UIComponentBase#broadcast(javax.faces.event.FacesEvent)
+    */
+   public void broadcast(FacesEvent event) throws AbortProcessingException
+   {
+      if (event instanceof ShelfEvent)
+      {
+         ShelfEvent shelfEvent = (ShelfEvent)event;
+         
+         // set the new expanded state of the appropriate shelf item
          int index = 0;
          for (Iterator i=this.getChildren().iterator(); i.hasNext(); index++)
          {
             UIComponent child = (UIComponent)i.next();
-            if (index == groupIndex && child instanceof UIShelfGroup)
+            if (index == shelfEvent.Index && child instanceof UIShelfGroup)
             {
                // found correct child - set the new state
-               ((UIShelfGroup)child).setExpanded(expanded);
+               ((UIShelfGroup)child).setExpanded(shelfEvent.Expanded);
                break;
             }
          }
+         
+         // if an action event is registered to be notified then fire that next
+         if (getGroupExpandedActionListener() != null)
+         {
+            Utils.processActionMethod(getFacesContext(), getGroupExpandedActionListener(), shelfEvent);
+         }
+      }
+      else
+      {
+         super.broadcast(event);
       }
    }
-   
+
    /**
     * @see javax.faces.component.UIComponentBase#encodeBegin(javax.faces.context.FacesContext)
     */
@@ -412,6 +459,26 @@ public class UIShelf extends SelfRenderingComponent
    
    
    // ------------------------------------------------------------------------------
+   // Inner classes
+   
+   /**
+    * Class representing the an action event relevant to the Shelf.
+    */
+   public static class ShelfEvent extends ActionEvent
+   {
+      public ShelfEvent(UIComponent component, int index, boolean expanded)
+      {
+         super(component);
+         Expanded = expanded;
+         Index = index;
+      }
+      
+      public boolean Expanded;
+      public int Index;
+   }
+   
+   
+   // ------------------------------------------------------------------------------
    // Constants 
    
    private final static String EXPANDED_IMG  = "/images/icons/expanded.gif";
@@ -428,4 +495,5 @@ public class UIShelf extends SelfRenderingComponent
    private String selectedGroupBgcolor;
    private String innerGroupPanel;
    private String innerGroupBgcolor;
+   private MethodBinding groupExpandedActionListener;
 }

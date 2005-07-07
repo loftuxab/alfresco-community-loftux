@@ -60,7 +60,7 @@ public class ShortcutsShelfItemTag extends BaseComponentTag
       }
       else
       {
-         throw new FacesException("Navigate Action listener method binding incorrectly specified: " + this.clickActionListener);
+         throw new FacesException("Click Action listener method binding incorrectly specified: " + this.clickActionListener);
       }
       if (isValueReference(this.removeActionListener))
       {
@@ -69,7 +69,7 @@ public class ShortcutsShelfItemTag extends BaseComponentTag
       }
       else
       {
-         throw new FacesException("Navigate Action listener method binding incorrectly specified: " + this.clickActionListener);
+         throw new FacesException("Remove Action listener method binding incorrectly specified: " + this.clickActionListener);
       }
    }
    

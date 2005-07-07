@@ -34,27 +34,27 @@
             <%-- IMPORTANT NOTE: All inner components must be given an explicit ID! --%>
             <%--                 This is because they are wrapped in a Panel component --%>
             <r:shelf id="shelf" groupPanel="ballongrey" groupBgcolor="#eeeeee" selectedGroupPanel="bluetoolbar" selectedGroupBgcolor="#e9f0f4"
-                  innerGroupPanel="white" innerGroupBgcolor="#ffffff">
-               <r:shelfGroup label="Clipboard" id="shelf-group-1" expanded="true">
+                  innerGroupPanel="white" innerGroupBgcolor="#ffffff" groupExpandedActionListener="#{NavigationBean.shelfGroupToggled}">
+               <r:shelfGroup label="Clipboard" id="shelf-group-1" expanded="#{NavigationBean.shelfItemExpanded[0]}">
                   <r:clipboardShelfItem id="clipboard-shelf" collections="#{ClipboardBean.items}" pasteActionListener="#{ClipboardBean.pasteItem}" />
                </r:shelfGroup>
                
                <%-- NOTE: this component is exanded=true as default so the RecentSpaces managed Bean is
                           instantied early - otherwise it will not be seen until this shelf component is
                           first expanded. There is no config setting to do this in JSF by default --%>
-               <r:shelfGroup label="Recent Spaces" id="shelf-group-2" expanded="true">
+               <r:shelfGroup label="Recent Spaces" id="shelf-group-2" expanded="#{NavigationBean.shelfItemExpanded[1]}">
                   <r:recentSpacesShelfItem id="recent-shelf" value="#{RecentSpacesBean.recentSpaces}" navigateActionListener="#{RecentSpacesBean.navigate}" /> 
                </r:shelfGroup>
                
-               <r:shelfGroup label="Shortcuts" id="shelf-group-3" expanded="true">
+               <r:shelfGroup label="Shortcuts" id="shelf-group-3" expanded="#{NavigationBean.shelfItemExpanded[2]}">
                   <r:shortcutsShelfItem id="shortcut-shelf" value="#{UserShortcutsBean.shortcuts}" clickActionListener="#{UserShortcutsBean.click}" removeActionListener="#{UserShortcutsBean.removeShortcut}" />
                </r:shelfGroup>
                
-               <r:shelfGroup label="Drop Zone" id="shelf-group-4" expanded="false">
+               <r:shelfGroup label="Drop Zone" id="shelf-group-4" expanded="#{NavigationBean.shelfItemExpanded[3]}">
                   <%-- TBD --%>
                </r:shelfGroup>
                
-               <r:shelfGroup label="Actions in Progress" id="shelf-group-5" expanded="false">
+               <r:shelfGroup label="Actions in Progress" id="shelf-group-5" expanded="#{NavigationBean.shelfItemExpanded[4]}">
                   <%-- TBD --%>
                </r:shelfGroup>
             </r:shelf>
