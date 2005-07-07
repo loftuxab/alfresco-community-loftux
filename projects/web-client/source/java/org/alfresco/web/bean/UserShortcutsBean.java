@@ -150,6 +150,10 @@ public class UserShortcutsBean
                   }
                }
             }
+            else
+            {
+               this.shortcuts = new ArrayList<Node>(5);
+            }
             
             tx.commit();
          }
@@ -192,9 +196,9 @@ public class UserShortcutsBean
             Node node = new Node(ref, this.nodeService);
             
             boolean foundShortcut = false;
-            for (int i=0; i<this.shortcuts.size(); i++)
+            for (int i=0; i<getShortcuts().size(); i++)
             {
-               if (node.getId().equals(this.shortcuts.get(i).getId()))
+               if (node.getId().equals(getShortcuts().get(i).getId()))
                {
                   // found same node already in the list - so we don't need to add it again
                   foundShortcut = true;
@@ -225,7 +229,7 @@ public class UserShortcutsBean
                   tx.commit();
                   
                   // add our new shortcut Node to the in-memory list
-                  this.shortcuts.add(node);
+                  getShortcuts().add(node);
                   
                   if (logger.isDebugEnabled())
                      logger.debug("Added node: " + node.getName() + " to the user shortcuts list.");
@@ -320,27 +324,15 @@ public class UserShortcutsBean
          List<String> shortcuts = (List<String>)this.nodeService.getProperty(prefRef, QNAME_SHORTCUTS);
          if (shortcuts != null && shortcuts.size() > shortcutEvent.Index)
          {
+            // remove the shortcut from the saved list and persist back
             shortcuts.remove(shortcutEvent.Index);
-            
-            if (shortcuts.size() != 0)
-            {
-               this.nodeService.setProperty(prefRef, QNAME_SHORTCUTS, (Serializable)shortcuts);
-            }
-            else
-            {
-               // TODO: remove this - AndyH will fix the indexer to handle empty lists ok!
-               // TODO: NOTE: very weak solution! there is no way to clear or remove a property! And you cannot
-               //       set an empty List as a property - you get a "property is null" error!!
-               Map<QName, Serializable> props = this.nodeService.getProperties(prefRef);
-               props.remove(QNAME_SHORTCUTS);
-               this.nodeService.setProperties(prefRef, props);
-            }
+            this.nodeService.setProperty(prefRef, QNAME_SHORTCUTS, (Serializable)shortcuts);
             
             // commit the transaction
             tx.commit();
             
             // remove shortcut Node from the in-memory list
-            Node node = this.shortcuts.remove(shortcutEvent.Index);
+            Node node = getShortcuts().remove(shortcutEvent.Index);
             
             if (logger.isDebugEnabled())
                logger.debug("Removed node: " + node.getName() + " from the user shortcuts list.");
@@ -360,7 +352,7 @@ public class UserShortcutsBean
    {
       // work out which node was clicked from the event data
       UIShortcutsShelfItem.ShortcutEvent shortcutEvent = (UIShortcutsShelfItem.ShortcutEvent)event;
-      Node selectedNode = this.shortcuts.get(shortcutEvent.Index);
+      Node selectedNode = getShortcuts().get(shortcutEvent.Index);
       
       if (selectedNode.getType().equals(ContentModel.TYPE_FOLDER))
       {
