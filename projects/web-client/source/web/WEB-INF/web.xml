@@ -56,7 +56,7 @@
 
    <context-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:applicationContext.xml /WEB-INF/web-client-application-context.xml</param-value>
+      <param-value>classpath:alfresco-application-context.xml /WEB-INF/web-client-application-context.xml</param-value>
       <description>Spring config file locations</description>
    </context-param>
     

@@ -75,7 +75,7 @@ import org.springframework.util.StopWatch;
  */
 public class RuleServiceSystemTest extends TestCase
 {
-	static ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+	static ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:alfresco-application-context.xml");
 	
     private RuleService ruleService;
     private NodeService nodeService;

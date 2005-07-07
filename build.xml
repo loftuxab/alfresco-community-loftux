@@ -63,12 +63,36 @@
    
    <target name="deploy-jboss" depends="common-init" description="Deploys to JBoss">
       <copy file="${deploy.file}" todir="${jboss.deploy.dir}" />
+      <!-- push externally visible config files into conf directory -->
+      <copy todir="${jboss.deploy.dir}/../conf" >
+         <fileset dir="${repository.project.dir}/config" >
+            <include name="**/*" />
+         </fileset>
+         <fileset dir="${projects.dir.name}/netbios/dll" >
+            <include name="Win32NetBIOS.dll" />
+         </fileset>
+      </copy>
+      <!-- ensure mysql drivers are present -->
+      <copy todir="${jboss.deploy.dir}/../lib"
+            file="${3rdparty.project.dir}/lib/mysql-connector-java-3.0.16-ga-bin.jar" />
    </target>
 
    <target name="deploy-tomcat" depends="common-init" description="Deploys to Tomcat">
       <delete dir="${tomcat.deploy.dir}/${web-client.project.name}" includeEmptyDirs="true" quiet="yes" />
       <delete dir="${tomcat.home}/work/catalina/localhost/${web-client.project.name}" includeEmptyDirs="true" quiet="yes" />
       <copy file="${deploy.file}" todir="${tomcat.deploy.dir}" />
+      <!-- push externally visible config files into war file -->
+      <war warfile="${tomcat.deploy.dir}/${web-client.project.name}.war" update="true" >
+         <classes dir="${repository.project.dir}/config">
+            <include name="**/*" />
+         </classes>
+         <classes dir="${projects.dir.name}/netbios/dll" >
+            <include name="Win32NetBIOS.dll" />
+         </classes>
+      </war>
+      <!-- ensure mysql drivers are present -->
+      <copy todir="${tomcat.home}/common/lib"
+            file="${3rdparty.project.dir}/lib/mysql-connector-java-3.0.16-ga-bin.jar" />
    </target>
 
    <target name="deploy-exploded-web-client-jboss" depends="common-init">

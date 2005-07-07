@@ -73,7 +73,7 @@ public class LuceneTest extends TestCase
 {
     public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CONTAINS;
 
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco-application-context.xml");
 
     NodeService nodeService;
     DictionaryService dictionaryService;

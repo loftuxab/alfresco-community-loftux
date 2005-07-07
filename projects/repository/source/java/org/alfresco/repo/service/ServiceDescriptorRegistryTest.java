@@ -118,7 +118,7 @@ public class ServiceDescriptorRegistryTest extends TestCase
     
     public void testAppContext()
     {
-        ApplicationContext appContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ApplicationContext appContext = new ClassPathXmlApplicationContext("alfresco-application-context.xml");
 
         ServiceRegistry registry = (ServiceRegistry)appContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
         assertNotNull(registry);

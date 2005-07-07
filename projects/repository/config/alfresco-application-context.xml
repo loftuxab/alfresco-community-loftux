@@ -16,7 +16,7 @@
       <property name="ignoreUnresolvablePlaceholders"><value>true</value></property>
       <property name="locations">
 	     <list>
-			<value>classpath:repository.properties</value>
+			<value>classpath:alfresco-repository.properties</value>
 		 </list>	
       </property>
    </bean>   
@@ -1019,7 +1019,7 @@
          <ref bean="serviceRegistry" />
       </constructor-arg>
       <constructor-arg>
-         <value>org/alfresco/filesys/file-servers.xml</value>
+         <value>alfresco-file-servers.xml</value>
       </constructor-arg>
       <constructor-arg>
          <ref bean="contentDiskDriver" />

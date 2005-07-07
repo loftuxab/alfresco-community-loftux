@@ -28,6 +28,9 @@
          <dirset dir="${common.dir}/projects">
             <include name="**/build/classes" />
          </dirset>
+         <dirset dir="${common.dir}/projects">
+            <include name="**/config" />
+         </dirset>
          <pathelement location="${src.test-resources.dir}" />  
          <fileset dir="${common.lib.dir}">
             <include name="**/*.jar" />

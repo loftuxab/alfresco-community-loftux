@@ -42,7 +42,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class AuthenticationTest extends TestCase
 {
-    private static ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+    private static ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco-application-context.xml");
 
     private NodeService nodeService;
 
