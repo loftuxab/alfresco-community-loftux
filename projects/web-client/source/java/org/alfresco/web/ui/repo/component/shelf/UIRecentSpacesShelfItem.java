@@ -33,6 +33,7 @@ import javax.faces.event.FacesEvent;
 
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.repo.WebResources;
 
 /**
  * JSF Component providing UI for a real-time updated list of the most recently visited Spaces.
@@ -148,14 +149,14 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
       
       ResponseWriter out = context.getResponseWriter();
       List<Node> items = (List<Node>)getValue();
-      out.write("<table border=0 cellspacing=1 cellpadding=0 width=100% valign=top>");
+      out.write(SHELF_START);
       for (int i=0; i<items.size(); i++)
       {
          Node item = items.get(i);
          
          // start row with Space icon
          out.write("<tr><td>");
-         out.write(Utils.buildImageTag(context, IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
+         out.write(Utils.buildImageTag(context, WebResources.IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
          
          // output cropped item label - we also output with no breaks, this is ok
          // as the copped label will ensure a sensible maximum width
@@ -166,7 +167,7 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
          out.write("</nobr></td></tr>");
       }
       
-      out.write("</table>");
+      out.write(SHELF_END);
    }
    
    /**
@@ -276,8 +277,6 @@ public class UIRecentSpacesShelfItem extends UIShelfItem
    
    // ------------------------------------------------------------------------------
    // Private data
-   
-   private static final String IMAGE_SPACE = "/images/icons/space_small.gif";
    
    private final static int ACTION_NAVIGATE_ITEM = 0;
    

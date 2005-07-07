@@ -31,8 +31,6 @@ import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Bean that represents the currently logged in user
@@ -110,8 +108,7 @@ public final class User
       if (this.preferencesFolderRef == null)
       {
          FacesContext fc = FacesContext.getCurrentInstance();
-         WebApplicationContext ctx = FacesContextUtils.getRequiredWebApplicationContext(fc);
-         ServiceRegistry registry = (ServiceRegistry)ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
+         ServiceRegistry registry = Repository.getServiceRegistry(fc);
          NodeService nodeService = registry.getNodeService();
          NamespaceService namespaceService = registry.getNamespaceService();
          RuleService ruleService = registry.getRuleService();

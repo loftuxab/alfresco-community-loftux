@@ -15,27 +15,19 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.ui.repo.component.shelf;
-
-import org.alfresco.web.ui.common.component.SelfRenderingComponent;
+package org.alfresco.web.ui.repo;
 
 /**
+ * Class containing well known web resource paths for images etc.
+ * 
  * @author Kevin Roast
  */
-public class UIShelfItem extends SelfRenderingComponent
+public class WebResources extends org.alfresco.web.ui.common.WebResources
 {
-   protected final static String SHELF_START = "<table border=0 cellspacing=3 cellpadding=0 width=100% valign=top>";
-   protected final static String SHELF_END   = "</table>";
-   
-   
-   // ------------------------------------------------------------------------------
-   // Component Impl 
-
-   /**
-    * @see javax.faces.component.UIComponent#getFamily()
-    */
-   public String getFamily()
-   {
-      return "org.alfresco.faces.Shelf";
-   }
+   // Image paths
+   public static final String IMAGE_SPACE   = "/images/icons/space_small.gif";
+   public static final String IMAGE_REMOVE  = "/images/icons/delete.gif";
+   public static final String IMAGE_COPY    = "/images/icons/copy.gif";
+   public static final String IMAGE_CUT     = "/images/icons/cut.gif";
+   public static final String IMAGE_PASTE   = "/images/icons/paste.gif";
 }

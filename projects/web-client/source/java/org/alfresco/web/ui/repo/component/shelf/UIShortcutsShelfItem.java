@@ -32,9 +32,11 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.repo.WebResources;
 
 /**
  * JSF Component providing UI for a list of user defined shortcuts to favorite nodes.
@@ -168,20 +170,22 @@ public class UIShortcutsShelfItem extends UIShelfItem
       
       ResponseWriter out = context.getResponseWriter();
       List<Node> items = (List<Node>)getValue();
-      out.write("<table border=0 cellspacing=1 cellpadding=0 width=100% valign=top>");
+      out.write(SHELF_START);
       if (items != null)
       {
+         DictionaryService dd = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getDictionaryService();
+         
          for (int i=0; i<items.size(); i++)
          {
             Node item = items.get(i);
             
             out.write("<tr><td>");
-            if (item.getType().equals(ContentModel.TYPE_FOLDER))
+            if (dd.isSubClass(item.getType(), ContentModel.TYPE_FOLDER))
             {
                // start row with Space icon
-               out.write(Utils.buildImageTag(context, IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
+               out.write(Utils.buildImageTag(context, WebResources.IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
             }
-            else if (item.getType().equals(ContentModel.TYPE_CONTENT))
+            else if (dd.isSubClass(item.getType(), ContentModel.TYPE_CONTENT))
             {
                String image = Repository.getFileTypeImage(item, true);
                out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
@@ -194,7 +198,7 @@ public class UIShortcutsShelfItem extends UIShelfItem
             
             // output actions
             out.write("</nobr></td><td align=right><nobr>");
-            out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", IMAGE_REMOVE));
+            out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", WebResources.IMAGE_REMOVE));
             // TODO: add view details action here?
             
             // end actions cell and end row
@@ -202,7 +206,7 @@ public class UIShortcutsShelfItem extends UIShelfItem
          }
       }
       
-      out.write("</table>");
+      out.write(SHELF_END);
    }
    
    /**
@@ -351,9 +355,6 @@ public class UIShortcutsShelfItem extends UIShelfItem
    
    // ------------------------------------------------------------------------------
    // Private data
-   
-   private final static String IMAGE_SPACE   = "/images/icons/space_small.gif";
-   private final static String IMAGE_REMOVE  = "/images/icons/delete.gif";
    
    private final static int ACTION_CLICK_ITEM = 0;
    private final static int ACTION_REMOVE_ITEM = 1;

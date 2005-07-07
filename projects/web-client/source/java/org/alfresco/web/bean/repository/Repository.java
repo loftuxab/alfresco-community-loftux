@@ -52,9 +52,10 @@ import org.alfresco.web.ui.common.Utils;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
- * Helper class for accessing the repository
+ * Helper class for accessing repository objects, convert values, escape values and filetype icons.
  * 
  * @author gavinc
+ * @author kevinr
  */
 public final class Repository
 {

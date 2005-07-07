@@ -34,10 +34,10 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author gavinc
  */
-public class DataDictionary
+public final class DataDictionary
 {
    private DictionaryService dictionaryService;
-   private Map<QName, TypeDefinition> types = new HashMap<QName, TypeDefinition>(6, 1.0f);
+   private Map<QName, TypeDefinition> types = new HashMap<QName, TypeDefinition>(11, 1.0f);
 
    /**
     * Constructor

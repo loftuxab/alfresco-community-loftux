@@ -38,10 +38,19 @@ import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
 import org.alfresco.web.data.IDataContainer;
 
 /**
- * @author kevinr
+ * Class containing misc helper methods used by the JSF components.
+ * 
+ * @author Kevin Roast
  */
 public final class Utils
 {
+   /**
+    * Private constructor
+    */
+   private Utils()
+   {
+   }
+   
    /**
     * Encodes the given string, so that it can be used within an HTML page.
     * 

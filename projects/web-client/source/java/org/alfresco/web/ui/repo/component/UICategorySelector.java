@@ -23,6 +23,7 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.CategoryService;
@@ -78,8 +79,10 @@ public class UICategorySelector extends AbstractItemSelector
       ChildAssociationRef parentRef = getNodeService(context).getPrimaryParent(
             new NodeRef(Repository.getStoreRef(), this.navigationId));
       Node parentNode = new Node(parentRef.getParentRef(), getNodeService(context));
-      QName type = parentNode.getType(); 
-      if (type.equals(ContentModel.TYPE_CATEGORYROOT) == false)
+      
+      DictionaryService dd = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getDictionaryService();
+      
+      if (dd.isSubClass(parentNode.getType(), ContentModel.TYPE_CATEGORYROOT) == false)
       {
          id = parentRef.getParentRef().getId();
       }

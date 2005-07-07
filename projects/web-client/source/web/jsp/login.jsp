@@ -55,7 +55,7 @@
                
                <tr>
                   <td colspan=2>
-                     <h4>Enter Login details:</h4>
+                     <span class='mainSubTitle'>Enter Login details:</span>
                   </td>
                </tr>
                
@@ -87,10 +87,8 @@
                </tr>
             </table>
             
-            <p>
-            
             <%-- messages tag to show messages not handled by other specific message tags --%>
-            <h:messages style="color:red; font-size:10px" layout="table" />
+            <h:messages style="padding-top:8px; color:red; font-size:10px" layout="table" />
             
             </td><td background='<%=request.getContextPath()%>/images/parts/white_06.gif'>
             <img src='<%=request.getContextPath()%>/images/parts/white_06.gif' width=7 height=7 alt=''></td></tr>

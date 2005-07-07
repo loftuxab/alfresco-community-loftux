@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.WebResources;
 
 /**
  * @author Kevin Roast
@@ -105,18 +106,18 @@ public class UISortLink extends UICommand
          if (descending == true)
          {
             buf.append(" ")
-               .append(Utils.buildImageTag(context, IMAGE_SORTUP, 10, 6, null));
+               .append(Utils.buildImageTag(context, WebResources.IMAGE_SORTUP, 10, 6, null));
          }
          else
          {
             buf.append(" ")
-               .append(Utils.buildImageTag(context, IMAGE_SORTDOWN, 10, 6, null));
+               .append(Utils.buildImageTag(context, WebResources.IMAGE_SORTDOWN, 10, 6, null));
          }
       }
       else
       {
          buf.append(" ")
-            .append(Utils.buildImageTag(context, IMAGE_SORTNONE, 10, 7, null));
+            .append(Utils.buildImageTag(context, WebResources.IMAGE_SORTNONE, 10, 7, null));
       }
       buf.append("</a></nobr>");
       
@@ -280,10 +281,6 @@ public class UISortLink extends UICommand
    // Constants
    
    private static Logger s_logger = Logger.getLogger(IDataContainer.class);
-   
-   private final static String IMAGE_SORTUP     = "/images/icons/sort_up.gif";
-   private final static String IMAGE_SORTDOWN   = "/images/icons/sort_down.gif";
-   private final static String IMAGE_SORTNONE   = "/images/icons/sort_flat.gif";
    
    /** sorting mode */
    private String mode = IDataContainer.SORT_CASEINSENSITIVE;

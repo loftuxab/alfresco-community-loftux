@@ -33,6 +33,7 @@ import javax.faces.event.FacesEvent;
 
 import org.alfresco.web.ui.common.PanelGenerator;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.WebResources;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 
 /**
@@ -225,7 +226,7 @@ public class UIShelf extends SelfRenderingComponent
                }
                
                // output appropriate expanded icon state
-               out.write("<nobr>");
+               out.write("<div style='padding-top:2px;padding-bottom:5px'><nobr>");
                out.write("<a href='#' onclick=\"");
                // encode value as the index of the ShelfGroup clicked and the new state
                String value = Integer.toString(index) + NamingContainer.SEPARATOR_CHAR + Boolean.toString(!isExpanded);
@@ -233,11 +234,11 @@ public class UIShelf extends SelfRenderingComponent
                out.write("\">");
                if (isExpanded == true)
                {
-                  out.write(Utils.buildImageTag(context, EXPANDED_IMG, 11, 11, ""));
+                  out.write(Utils.buildImageTag(context, WebResources.IMAGE_EXPANDED, 11, 11, ""));
                }
                else
                {
-                  out.write(Utils.buildImageTag(context, COLLAPSED_IMG, 11, 11, ""));
+                  out.write(Utils.buildImageTag(context, WebResources.IMAGE_COLLAPSED, 11, 11, ""));
                }
                out.write("</a>&nbsp;");
                
@@ -249,12 +250,11 @@ public class UIShelf extends SelfRenderingComponent
                out.write('>');
                out.write(Utils.encode(label));
                out.write("</span>");
-               out.write("</nobr>");
+               out.write("</nobr></div>");
                
                if (isExpanded == true)
                {
                   // if this is the expanded group, output the inner panel 
-                  out.write("<br>");
                   String innerGroupPanel = getInnerGroupPanel();
                   String innerGroupBgcolor = getInnerGroupBgcolor();
                   if (innerGroupBgcolor == null)
@@ -476,13 +476,6 @@ public class UIShelf extends SelfRenderingComponent
       public boolean Expanded;
       public int Index;
    }
-   
-   
-   // ------------------------------------------------------------------------------
-   // Constants 
-   
-   private final static String EXPANDED_IMG  = "/images/icons/expanded.gif";
-   private final static String COLLAPSED_IMG = "/images/icons/collapsed.gif";
    
    
    // ------------------------------------------------------------------------------

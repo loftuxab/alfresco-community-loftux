@@ -30,6 +30,7 @@ import javax.faces.event.ActionEvent;
 
 import org.alfresco.web.ui.common.PanelGenerator;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.WebResources;
 
 /**
  * @author kevinr
@@ -133,11 +134,11 @@ public class UIPanel extends UICommand
          
          if (isExpanded() == true)
          {
-            out.write(Utils.buildImageTag(context, EXPANDED_IMG, 11, 11, ""));
+            out.write(Utils.buildImageTag(context, WebResources.IMAGE_EXPANDED, 11, 11, ""));
          }
          else
          {
-            out.write(Utils.buildImageTag(context, COLLAPSED_IMG, 11, 11, ""));
+            out.write(Utils.buildImageTag(context, WebResources.IMAGE_COLLAPSED, 11, 11, ""));
          }
          
          out.write("</a>&nbsp;&nbsp;");
@@ -604,8 +605,6 @@ public class UIPanel extends UICommand
    // ------------------------------------------------------------------------------
    // Constants 
    
-   private final static String EXPANDED_IMG  = "/images/icons/expanded.gif";
-   private final static String COLLAPSED_IMG = "/images/icons/collapsed.gif";
    private final static String LINK_CLICKED = "link-clicked";
    
    // ------------------------------------------------------------------------------

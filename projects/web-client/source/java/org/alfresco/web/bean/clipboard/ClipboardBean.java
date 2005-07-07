@@ -27,6 +27,7 @@ import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -248,8 +249,9 @@ public class ClipboardBean
             logger.debug("Trying to copy node ID: " + item.Node.getId() + " into node ID: " + parentRef.getId());
          
          // call the node ops service to initiate the copy
-         // TODO: what should the assoc QName be?
-         boolean copyChildren = (item.Node.getType().equals(ContentModel.TYPE_FOLDER));
+         // TODO: should the assoc qname be derived from the type...?
+         DictionaryService dd = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getDictionaryService();
+         boolean copyChildren = dd.isSubClass(item.Node.getType(), ContentModel.TYPE_FOLDER);
          NodeRef copyRef = this.nodeOperationsService.copy(
                item.Node.getNodeRef(),
                parentRef,

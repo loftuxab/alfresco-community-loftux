@@ -78,6 +78,10 @@
          <property-name>lockService</property-name>
          <value>#{AlfLockService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>dictionaryService</property-name>
+         <value>#{AlfDictionaryService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

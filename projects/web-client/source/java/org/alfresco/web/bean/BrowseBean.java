@@ -29,6 +29,7 @@ import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -82,27 +83,11 @@ public class BrowseBean implements IContextListener
    // Bean property getters and setters 
    
    /**
-    * @return Returns the NodeService.
-    */
-   public NodeService getNodeService()
-   {
-      return this.nodeService;
-   }
-
-   /**
     * @param nodeService The NodeService to set.
     */
    public void setNodeService(NodeService nodeService)
    {
       this.nodeService = nodeService;
-   }
-   
-   /**
-    * @return Returns the Searcher service.
-    */
-   public SearchService getSearchService()
-   {
-      return this.searchService;
    }
 
    /**
@@ -114,14 +99,6 @@ public class BrowseBean implements IContextListener
    }
    
    /**
-    * @return Returns the Lock Service.
-    */
-   public LockService getLockService()
-   {
-      return lockService;
-   }
-   
-   /**
     * @param lockService The Lock Service to set.
     */
    public void setLockService(LockService lockService)
@@ -130,19 +107,19 @@ public class BrowseBean implements IContextListener
    }
    
    /**
-    * @return Returns the navigation bean instance.
-    */
-   public NavigationBean getNavigator()
-   {
-      return this.navigator;
-   }
-   
-   /**
     * @param navigator The NavigationBean to set.
     */
    public void setNavigator(NavigationBean navigator)
    {
       this.navigator = navigator;
+   }
+   
+   /**
+    * @param dictionaryService The DictionaryService to set.
+    */
+   public void setDictionaryService(DictionaryService dictionaryService)
+   {
+      this.dictionaryService = dictionaryService;
    }
    
    /**
@@ -394,7 +371,7 @@ public class BrowseBean implements IContextListener
             QName type = this.nodeService.getType(nodeRef);
             
             // look for Space or File nodes
-            if (type.equals(ContentModel.TYPE_FOLDER))
+            if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER))
             {
                // TODO: Build a specific impl of a MapNode - one that matches certain props
                //       to return them dynamically - this is to reduce pulling back the entire
@@ -408,7 +385,7 @@ public class BrowseBean implements IContextListener
                
                this.containerNodes.add(node);
             }
-            else if (type.equals(ContentModel.TYPE_CONTENT))
+            else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
             {
                // create our Node representation
                MapNode node = new MapNode(nodeRef, this.nodeService, true);
@@ -485,7 +462,7 @@ public class BrowseBean implements IContextListener
                QName type = this.nodeService.getType(nodeRef);
                
                // look for Space or File nodes
-               if (type.equals(ContentModel.TYPE_FOLDER))
+               if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER))
                {
                   // create our Node representation
                   MapNode node = new MapNode(nodeRef, this.nodeService, true);
@@ -495,7 +472,7 @@ public class BrowseBean implements IContextListener
                   
                   this.containerNodes.add(node);
                }
-               else if (type.equals(ContentModel.TYPE_CONTENT))
+               else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
                {
                   // create our Node representation
                   MapNode node = new MapNode(nodeRef, this.nodeService, true);
@@ -664,7 +641,7 @@ public class BrowseBean implements IContextListener
          {
             logger.debug("Selected item getPrimaryParent().getChildRef() noderef Id:  " + parentAssocRef.getChildRef().getId());
             logger.debug("Selected item getPrimaryParent().getParentRef() noderef Id: " + parentAssocRef.getParentRef().getId());
-            logger.debug("Current value getNavigator().getCurrentNodeId() noderef Id: " + getNavigator().getCurrentNodeId());
+            logger.debug("Current value getNavigator().getCurrentNodeId() noderef Id: " + this.navigator.getCurrentNodeId());
          }
          
          if (nodeEvent.IsParent == false)
@@ -1002,8 +979,8 @@ public class BrowseBean implements IContextListener
       {
          // All browse breadcrumb element relate to a Node Id - when selected we
          // set the current node id
-         getNavigator().setCurrentNodeId(this.nodeRef.getId());
-         getNavigator().setLocation( (List)breadcrumb.getValue() );
+         navigator.setCurrentNodeId(this.nodeRef.getId());
+         navigator.setLocation( (List)breadcrumb.getValue() );
          
          // return to browse page if required
          return (isViewCurrent() ? null : "browse"); 
@@ -1035,8 +1012,11 @@ public class BrowseBean implements IContextListener
    /** The LockService to be used by the bean */
    private LockService lockService;
    
-   /** The NavigationBean reference */
+   /** The NavigationBean bean reference */
    private NavigationBean navigator;
+   
+   /** The DictionaryService bean reference */
+   private DictionaryService dictionaryService;
    
    /** Component references */
    private UIRichList spacesRichList;

@@ -28,6 +28,7 @@ import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -277,13 +278,14 @@ public class UserShortcutsBean
       
       try
       {
-         if (selectedNode.getType().equals(ContentModel.TYPE_FOLDER))
+         DictionaryService dd = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getDictionaryService();
+         if (dd.isSubClass(selectedNode.getType(), ContentModel.TYPE_FOLDER))
          {
             // then navigate to the appropriate node in UI
             // use browse bean functionality for this as it will update the breadcrumb for us
             this.browseBean.updateUILocation(selectedNode.getNodeRef());
          }
-         else if (selectedNode.getType().equals(ContentModel.TYPE_CONTENT))
+         else if (dd.isSubClass(selectedNode.getType(), ContentModel.TYPE_CONTENT))
          {
             // view details for document
             this.browseBean.setupContentAction(selectedNode.getId());

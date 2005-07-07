@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.WebResources;
 
 /**
  * @author Kevin Roast
@@ -83,12 +84,12 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(0));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, IMAGE_FIRSTPAGE, 13, 10, "First Page"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE, 13, 10, "First Page"));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, IMAGE_FIRSTPAGE_NONE, 13, 10, null));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE_NONE, 13, 10, null));
       }
       buf.append("&nbsp;");
       
@@ -98,12 +99,12 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(nCurrentPage - 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, IMAGE_PREVIOUSPAGE, 9, 10, "Previous Page"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE, 9, 10, "Previous Page"));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, IMAGE_PREVIOUSPAGE_NONE, 9, 10, null));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE_NONE, 9, 10, null));
       }
       buf.append("&nbsp;");
       
@@ -120,12 +121,12 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(nCurrentPage + 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, IMAGE_NEXTPAGE, 9, 10, "Next Page"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE, 9, 10, "Next Page"));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, IMAGE_NEXTPAGE_NONE, 9, 10, null));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE_NONE, 9, 10, null));
       }
       buf.append("&nbsp;");
       
@@ -135,12 +136,12 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(dataContainer.getPageCount() - 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, IMAGE_LASTPAGE, 13, 10, "Last Page"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE, 13, 10, "Last Page"));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, IMAGE_LASTPAGE_NONE, 13, 10, null));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE_NONE, 13, 10, null));
       }
       
       out.write(buf.toString());
@@ -239,15 +240,6 @@ public class UIDataPager extends UICommand
    
    // ------------------------------------------------------------------------------
    // Private data
-   
-   private static final String IMAGE_PREVIOUSPAGE_NONE = "/images/icons/PreviousPage_unavailable.gif";
-   private static final String IMAGE_PREVIOUSPAGE = "/images/icons/PreviousPage.gif";
-   private static final String IMAGE_FIRSTPAGE_NONE = "/images/icons/FirstPage_unavailable.gif";
-   private static final String IMAGE_FIRSTPAGE = "/images/icons/FirstPage.gif";
-   private static final String IMAGE_NEXTPAGE_NONE = "/images/icons/NextPage_unavailable.gif";
-   private static final String IMAGE_NEXTPAGE = "/images/icons/NextPage.gif";
-   private static final String IMAGE_LASTPAGE_NONE = "/images/icons/LastPage_unavailable.gif";
-   private static final String IMAGE_LASTPAGE = "/images/icons/LastPage.gif";
    
    private static final String MSG_PAGEINFO = "Page {0} of {1}";
    

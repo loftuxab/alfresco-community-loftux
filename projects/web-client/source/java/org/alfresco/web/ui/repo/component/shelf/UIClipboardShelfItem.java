@@ -32,10 +32,12 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.web.bean.clipboard.ClipboardItem;
 import org.alfresco.web.bean.clipboard.ClipboardStatus;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.repo.WebResources;
 
 
 /**
@@ -143,51 +145,54 @@ public class UIClipboardShelfItem extends UIShelfItem
       ResponseWriter out = context.getResponseWriter();
       
       List<ClipboardItem> items = getCollections();
-      out.write("<table border=0 cellspacing=1 cellpadding=0 width=100% valign=top>");
-      for (int i=0; i<items.size(); i++)
-      {
-         ClipboardItem item = items.get(i);
-         
-         // start row with cut/copy state icon
-         out.write("<tr><td>");
-         if (item.Mode == ClipboardStatus.COPY)
-         {
-            out.write(Utils.buildImageTag(context, IMAGE_COPY, 14, 16, null, null, "absmiddle"));
-         }
-         else
-         {
-            out.write(Utils.buildImageTag(context, IMAGE_CUT, 13, 16, null, null, "absmiddle"));
-         }
-         out.write("</td><td>");
-         if (item.Node.getType().equals(ContentModel.TYPE_FOLDER))
-         {
-            // start row with Space icon
-            out.write(Utils.buildImageTag(context, IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
-         }
-         else if (item.Node.getType().equals(ContentModel.TYPE_CONTENT))
-         {
-            String image = Repository.getFileTypeImage(item.Node, true);
-            out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
-         }
-         
-         // output cropped item label - we also output with no breaks, this is ok
-         // as the copped label will ensure a sensible maximum width
-         out.write("</td><td width=100%><nobr>&nbsp;");
-         out.write(Utils.cropEncode(item.Node.getName()));
-         
-         // output actions
-         out.write("</nobr></td><td align=right><nobr>");
-         out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", IMAGE_REMOVE));
-         out.write("&nbsp;");
-         out.write(buildActionLink(ACTION_PASTE_ITEM, i, "Paste Item", IMAGE_PASTE));
-         
-         // end actions cell and end row
-         out.write("</nobr></td></tr>");
-      }
-      
-      // output general actions if any clipboard items are present
+      out.write(SHELF_START);
       if (items.size() != 0)
       {
+         DictionaryService dd = Repository.getServiceRegistry(getFacesContext()).getDictionaryService();
+         
+         for (int i=0; i<items.size(); i++)
+         {
+            ClipboardItem item = items.get(i);
+            
+            // start row with cut/copy state icon
+            out.write("<tr><td>");
+            if (item.Mode == ClipboardStatus.COPY)
+            {
+               out.write(Utils.buildImageTag(context, WebResources.IMAGE_COPY, 14, 16, null, null, "absmiddle"));
+            }
+            else
+            {
+               out.write(Utils.buildImageTag(context, WebResources.IMAGE_CUT, 13, 16, null, null, "absmiddle"));
+            }
+            out.write("</td><td>");
+            
+            if (dd.isSubClass(item.Node.getType(), ContentModel.TYPE_FOLDER))
+            {
+               // start row with Space icon
+               out.write(Utils.buildImageTag(context, WebResources.IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
+            }
+            else if (dd.isSubClass(item.Node.getType(), ContentModel.TYPE_CONTENT))
+            {
+               String image = Repository.getFileTypeImage(item.Node, true);
+               out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
+            }
+            
+            // output cropped item label - we also output with no breaks, this is ok
+            // as the copped label will ensure a sensible maximum width
+            out.write("</td><td width=100%><nobr>&nbsp;");
+            out.write(Utils.cropEncode(item.Node.getName()));
+            
+            // output actions
+            out.write("</nobr></td><td align=right><nobr>");
+            out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", WebResources.IMAGE_REMOVE));
+            out.write("&nbsp;");
+            out.write(buildActionLink(ACTION_PASTE_ITEM, i, "Paste Item", WebResources.IMAGE_PASTE));
+            
+            // end actions cell and end row
+            out.write("</nobr></td></tr>");
+         }
+         
+         // output general actions if any clipboard items are present
          out.write("<tr><td colspan=3><nobr>");
          out.write(buildActionLink(ACTION_PASTE_ALL, -1, "Paste All", null));
          out.write("&nbsp;");
@@ -195,7 +200,7 @@ public class UIClipboardShelfItem extends UIShelfItem
          out.write("</nobr></td><td></td></tr>");
       }
       
-      out.write("</table>");
+      out.write(SHELF_END);
    }
    
    
@@ -327,12 +332,6 @@ public class UIClipboardShelfItem extends UIShelfItem
    
    // ------------------------------------------------------------------------------
    // Private data
-   
-   private static final String IMAGE_SPACE   = "/images/icons/space_small.gif";
-   private final static String IMAGE_COPY    = "/images/icons/copy.gif";
-   private final static String IMAGE_CUT     = "/images/icons/cut.gif";
-   private final static String IMAGE_REMOVE  = "/images/icons/delete.gif";
-   private final static String IMAGE_PASTE   = "/images/icons/paste.gif";
    
    private final static int ACTION_REMOVE_ITEM = 0;
    private final static int ACTION_REMOVE_ALL = 1;
