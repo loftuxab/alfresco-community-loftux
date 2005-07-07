@@ -49,12 +49,16 @@ public class MimeTypeConverter extends DateTimeConverter
     */
    public String getAsString(FacesContext context, UIComponent component, Object value)
    {
-      String result = value.toString();
+      String result = null;
       
       if (value instanceof String)
       {
          MimetypeService mimetypeService = Repository.getServiceRegistry(context).getMimetypeService();
          result = mimetypeService.getDisplaysByMimetype().get(value.toString());
+      }
+      else if (value != null)
+      {
+         result = value.toString();
       }
       
       return result;

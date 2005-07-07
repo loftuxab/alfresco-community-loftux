@@ -16,7 +16,7 @@
    <macrodef name="package-specific-war">
       <attribute name="for" />
       <sequential>
-         <echo>Building WAR file for @{for}</echo>
+         <echo level="info">Building WAR file for @{for}</echo>
          <mkdir dir="${dist.dir}" />
          <war warfile="${dist.dir}\${war.name}" webxml="${src.web.dir}\WEB-INF\web.xml">
             <fileset dir="${src.web.dir}" excludes="WEB-INF\web.xml" />
