@@ -20,8 +20,6 @@ package org.alfresco.web.bean;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,20 +28,14 @@ import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
-import org.alfresco.service.cmr.repository.AssociationRef;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
-import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.repo.component.shelf.UIShortcutsShelfItem;
@@ -63,12 +55,6 @@ public class UserShortcutsBean
    
    /** The BrowseBean reference */
    private BrowseBean browseBean;
-   
-   /** NamespaceService bean reference */
-   private NamespaceService namespaceService;
-   
-   /** RuleService bean reference */
-   private RuleService ruleService;
    
    /** List of shortcut nodes */
    private List<Node> shortcuts = null;
@@ -96,22 +82,6 @@ public class UserShortcutsBean
    }
    
    /**
-    * @param namespaceService The Namespace Service to set.
-    */
-   public void setNamespaceService(NamespaceService namespaceService)
-   {
-      this.namespaceService = namespaceService;
-   }
-   
-   /**
-    * @param ruleService Sets the rule service to use
-    */
-   public void setRuleService(RuleService ruleService)
-   {
-      this.ruleService = ruleService;
-   }
-   
-   /**
     * @return the List of shortcut Nodes
     */
    public List<Node> getShortcuts()
@@ -126,7 +96,7 @@ public class UserShortcutsBean
             tx.begin();
             
             // get the shortcuts from the preferences for this user
-            NodeRef prefRef = getCreateShortcutsNodeRef();
+            NodeRef prefRef = getShortcutsNodeRef();
             List<String> shortcuts = (List<String>)this.nodeService.getProperty(prefRef, QNAME_SHORTCUTS);
             if (shortcuts != null)
             {
@@ -216,7 +186,7 @@ public class UserShortcutsBean
                   tx = Repository.getUserTransaction(context);
                   tx.begin();
                   
-                  NodeRef prefRef = getCreateShortcutsNodeRef();
+                  NodeRef prefRef = getShortcutsNodeRef();
                   List<String> shortcuts = (List<String>)this.nodeService.getProperty(prefRef, QNAME_SHORTCUTS);
                   if (shortcuts == null)
                   {
@@ -249,61 +219,12 @@ public class UserShortcutsBean
    }
    
    /**
-    * Get or create the node we need to store our user preferences
+    * Get the node we need to store our user preferences
     */
-   private synchronized NodeRef getCreateShortcutsNodeRef()
+   private NodeRef getShortcutsNodeRef()
    {
-      if (this.shortcutFolderRef == null)
-      {
-         // TODO: move this to Application/Repository?
-         NodeRef person = Application.getCurrentUser(FacesContext.getCurrentInstance()).getPerson();
-         if (this.nodeService.hasAspect(person, ContentModel.ASPECT_CONFIGURABLE) == false)
-         {
-            // create the configuration folder for this Person node
-            this.ruleService.makeConfigurable(person);
-         }
-         
-         List<AssociationRef> assocs = this.nodeService.getTargetAssocs(person, ContentModel.ASSOC_CONFIGURATIONS);
-         if (assocs.size() != 1)
-         {
-            throw new IllegalStateException("Unable to find associated 'configurations' folder for node: " + person);
-         }
-         
-         // target of the assoc is the configurations folder ref
-         NodeRef configRef = assocs.get(0).getTargetRef();
-         
-         String xpath = NamespaceService.ALFRESCO_PREFIX + ":" + "preferences";
-         List<NodeRef> nodes = this.nodeService.selectNodes(
-               configRef,
-               xpath,
-               null,
-               this.namespaceService,
-               false);
-         
-         NodeRef prefRef;
-         if (nodes.size() == 1)
-         {
-            prefRef = nodes.get(0);
-         }
-         else
-         {
-            // create the preferences Node for this user
-            ChildAssociationRef childRef = this.nodeService.createNode(
-                  configRef,
-                  ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, "preferences"),
-                  ContentModel.TYPE_CMOBJECT);
-            
-            prefRef = childRef.getChildRef();
-         }
-         
-         this.shortcutFolderRef = prefRef;
-      }
-      
-      return this.shortcutFolderRef;
+      return Application.getCurrentUser(FacesContext.getCurrentInstance()).getUserPreferencesRef();
    }
-   
-   private NodeRef shortcutFolderRef = null;
    
    /**
     * Action handler bound to the user shortcuts Shelf component called when a node is removed
@@ -320,7 +241,7 @@ public class UserShortcutsBean
          tx = Repository.getUserTransaction(context);
          tx.begin();
          
-         NodeRef prefRef = getCreateShortcutsNodeRef();
+         NodeRef prefRef = getShortcutsNodeRef();
          List<String> shortcuts = (List<String>)this.nodeService.getProperty(prefRef, QNAME_SHORTCUTS);
          if (shortcuts != null && shortcuts.size() > shortcutEvent.Index)
          {
@@ -354,18 +275,25 @@ public class UserShortcutsBean
       UIShortcutsShelfItem.ShortcutEvent shortcutEvent = (UIShortcutsShelfItem.ShortcutEvent)event;
       Node selectedNode = getShortcuts().get(shortcutEvent.Index);
       
-      if (selectedNode.getType().equals(ContentModel.TYPE_FOLDER))
+      try
       {
-         // then navigate to the appropriate node in UI
-         // use browse bean functionality for this as it will update the breadcrumb for us
-         this.browseBean.updateUILocation(selectedNode.getNodeRef());
+         if (selectedNode.getType().equals(ContentModel.TYPE_FOLDER))
+         {
+            // then navigate to the appropriate node in UI
+            // use browse bean functionality for this as it will update the breadcrumb for us
+            this.browseBean.updateUILocation(selectedNode.getNodeRef());
+         }
+         else if (selectedNode.getType().equals(ContentModel.TYPE_CONTENT))
+         {
+            // view details for document
+            this.browseBean.setupContentAction(selectedNode.getId());
+            FacesContext fc = FacesContext.getCurrentInstance();
+            fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "showDocDetails");
+         }
       }
-      else if (selectedNode.getType().equals(ContentModel.TYPE_CONTENT))
+      catch (InvalidNodeRefException refErr)
       {
-         // view details for document
-         this.browseBean.setupContentAction(selectedNode.getId());
-         FacesContext fc = FacesContext.getCurrentInstance();
-         fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "showDocDetails");
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {selectedNode.getId()}) );
       }
    }
 }

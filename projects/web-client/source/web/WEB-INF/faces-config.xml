@@ -133,14 +133,6 @@
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
       </managed-property>
-      <managed-property>
-         <property-name>namespaceService</property-name>
-         <value>#{AlfNamespaceService}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>ruleService</property-name>
-         <value>#{AlfRuleService}</value>
-      </managed-property>
    </managed-bean>
    
    <managed-bean>

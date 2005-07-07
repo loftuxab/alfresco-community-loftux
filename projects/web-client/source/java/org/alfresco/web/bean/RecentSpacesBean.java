@@ -17,15 +17,20 @@
  */
 package org.alfresco.web.bean;
 
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.repo.component.shelf.UIRecentSpacesShelfItem;
 import org.apache.log4j.Logger;
 
@@ -112,9 +117,17 @@ public class RecentSpacesBean implements IContextListener
       // work out which node was clicked from the event data
       UIRecentSpacesShelfItem.RecentSpacesEvent spaceEvent = (UIRecentSpacesShelfItem.RecentSpacesEvent)event;
       Node selectedNode = this.recentSpaces.get(spaceEvent.Index);
-      // then navigate to the appropriate node in UI
-      // use browse bean functionality for this as it will update the breadcrumb for us
-      this.browseBean.updateUILocation(selectedNode.getNodeRef());
+      NodeRef nodeRef = selectedNode.getNodeRef();
+      try
+      {
+         // then navigate to the appropriate node in UI
+         // use browse bean functionality for this as it will update the breadcrumb for us
+         this.browseBean.updateUILocation(nodeRef);
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
+      }
    }
    
    
