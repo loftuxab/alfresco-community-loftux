@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
@@ -161,4 +162,9 @@ public interface ServiceRegistry
      * @return Returns the importer service or null if not present
      */
     ImporterService getImporterService();
+    
+    /**
+     * @return the rule service (or null, if one is not provided)
+     */
+    RuleService getRuleService();
 }
