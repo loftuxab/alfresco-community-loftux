@@ -152,7 +152,7 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         // check that the last modified time is correct
         long modifiedTimeCheck = readerFromWriter.getLastModified();
         assertTrue("Reader last modified is incorrect", before <= modifiedTimeCheck);
-        assertTrue("Reader last modified is incorrect", modifiedTimeCheck >= after);
+        assertTrue("Reader last modified is incorrect", modifiedTimeCheck <= after);
     }
 	
     /**
