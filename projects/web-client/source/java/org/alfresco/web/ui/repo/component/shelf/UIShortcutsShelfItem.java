@@ -169,34 +169,37 @@ public class UIShortcutsShelfItem extends UIShelfItem
       ResponseWriter out = context.getResponseWriter();
       List<Node> items = (List<Node>)getValue();
       out.write("<table border=0 cellspacing=1 cellpadding=0 width=100% valign=top>");
-      for (int i=0; i<items.size(); i++)
+      if (items != null)
       {
-         Node item = items.get(i);
-         
-         out.write("<tr><td>");
-         if (item.getType().equals(ContentModel.TYPE_FOLDER))
+         for (int i=0; i<items.size(); i++)
          {
-            // start row with Space icon
-            out.write(Utils.buildImageTag(context, IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
+            Node item = items.get(i);
+            
+            out.write("<tr><td>");
+            if (item.getType().equals(ContentModel.TYPE_FOLDER))
+            {
+               // start row with Space icon
+               out.write(Utils.buildImageTag(context, IMAGE_SPACE, 16, 16, null, null, "absmiddle"));
+            }
+            else if (item.getType().equals(ContentModel.TYPE_CONTENT))
+            {
+               String image = Repository.getFileTypeImage(item, true);
+               out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
+            }
+            
+            // output cropped item label - we also output with no breaks, this is ok
+            // as the copped label will ensure a sensible maximum width
+            out.write("</td><td width=100%><nobr>&nbsp;");
+            out.write(buildActionLink(ACTION_CLICK_ITEM, i, item.getName()));
+            
+            // output actions
+            out.write("</nobr></td><td align=right><nobr>");
+            out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", IMAGE_REMOVE));
+            // TODO: add view details action here?
+            
+            // end actions cell and end row
+            out.write("</nobr></td></tr>");
          }
-         else if (item.getType().equals(ContentModel.TYPE_CONTENT))
-         {
-            String image = Repository.getFileTypeImage(item, true);
-            out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
-         }
-         
-         // output cropped item label - we also output with no breaks, this is ok
-         // as the copped label will ensure a sensible maximum width
-         out.write("</td><td width=100%><nobr>&nbsp;");
-         out.write(buildActionLink(ACTION_CLICK_ITEM, i, item.getName()));
-         
-         // output actions
-         out.write("</nobr></td><td align=right><nobr>");
-         out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", IMAGE_REMOVE));
-         // TODO: add view details action here?
-         
-         // end actions cell and end row
-         out.write("</nobr></td></tr>");
       }
       
       out.write("</table>");
@@ -213,7 +216,7 @@ public class UIShortcutsShelfItem extends UIShelfItem
          ShortcutEvent shortcutEvent = (ShortcutEvent)event;
          
          List<Node> items = (List<Node>)getValue();
-         if (items.size() > shortcutEvent.Index)
+         if (items != null && items.size() > shortcutEvent.Index)
          {
             // process the action
             switch (shortcutEvent.Action)

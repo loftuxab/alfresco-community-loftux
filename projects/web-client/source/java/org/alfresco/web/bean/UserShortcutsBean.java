@@ -77,7 +77,8 @@ public class UserShortcutsBean
    
    
    // ------------------------------------------------------------------------------
-   // Bean property getters and setters 
+   // Bean property getters and setters
+   
    /**
     * @param nodeService The NodeService to set.
     */
