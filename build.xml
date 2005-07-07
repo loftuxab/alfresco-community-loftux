@@ -181,6 +181,8 @@
          <zipfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.sh" />
          <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
+        <zipfileset dir="${repository.project.dir}/config"
+                    prefix="jboss/server/default/conf" />
       </zip>
    </target>
    
@@ -192,6 +194,8 @@
          <tarfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.bat" />
          <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
+         <tarfileset dir="${repository.project.dir}/config"
+                    prefix="jboss/server/default/conf" />
       </tar>
       <gzip zipfile="${dist.dir}/${jboss.dist.filename}.tar.gz" src="${dist.dir}/${jboss.dist.filename}.tar" />
       <delete file="${dist.dir}/${jboss.dist.filename}.tar" />
@@ -205,7 +209,7 @@
                                license.txt,notice.txt,README_tomcat_win.txt,start_oo2.bat,
                                stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${tomcat.distribution.dir}" prefix="tomcat" excludes="**/bin/*.sh" />
-         <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
+         <zipfileset dir="${tomcat.deploy.dir}" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
       </zip>
    </target>
@@ -217,7 +221,7 @@
                      includes="AlfrescoTest.pdf,license.txt,notice.txt,README_tomcat_linux.txt" />
          <tarfileset dir="${tomcat.distribution.dir}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
          <tarfileset dir="${tomcat.distribution.dir}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
-         <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
+         <tarfileset dir="${tomcat.deploy.dir}" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
       </tar>
       <gzip zipfile="${dist.dir}/${tomcat.dist.filename}.tar.gz" src="${dist.dir}/${tomcat.dist.filename}.tar" />
