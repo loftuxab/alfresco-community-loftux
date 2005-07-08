@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -126,18 +125,6 @@ public class Node implements Serializable
       }
       
       return type;
-   }
-   
-   /**
-    * @return Returns the type name as a string.
-    */
-   public String getTypeName()
-   {
-      // ************************
-      // TODO: remove this method
-      // ************************
-      
-      return getType().getLocalName();
    }
    
    /**

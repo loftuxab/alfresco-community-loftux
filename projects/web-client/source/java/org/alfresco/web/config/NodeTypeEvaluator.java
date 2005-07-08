@@ -18,7 +18,9 @@
 package org.alfresco.web.config;
 
 import org.alfresco.config.evaluator.Evaluator;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
 
 /**
  * Evaluator that determines whether a given object has a particular node type
@@ -38,10 +40,10 @@ public class NodeTypeEvaluator implements Evaluator
       
       if (obj instanceof Node)
       {
-         String type = (String)((Node)obj).getTypeName();
+         QName type = ((Node)obj).getType();
          if (type != null)
          {
-            result = type.equalsIgnoreCase(condition);
+            result = type.equals(Repository.resolveToQName(condition));
          }
       }
       

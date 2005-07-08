@@ -146,64 +146,6 @@ public final class Repository
    }
 
    /**
-    * Return the string value of a QName property based on the supplied property name.
-    * <p>
-    * If convertNull is set, the method will convert null values to the empty string.
-    * 
-    * @param props            Property map to retrieve value from
-    * @param property         The name of the property to retrieve via QName 
-    * @param convertNull      Whether to convert null values to the empty string
-    * 
-    * @return property as string value
-    */
-   public static String getQNameProperty(Map<QName, Serializable> props, String property, boolean convertNull)
-   {
-      String value = null;
-      
-      QName propQName = QName.createQName(NamespaceService.ALFRESCO_URI, property);
-      Object obj = props.get(propQName);
-      
-      if (obj != null)
-      {
-         value = obj.toString();
-      }
-      else if (convertNull == true && obj == null)
-      {
-         value = "";
-      }
-      
-      return value;
-   }
-
-   /**
-    * Return the string value of a QName property based on the supplied property name.
-    * <p>
-    * If convertNull is set, the method will convert null values to the empty string.
-    * 
-    * @param row              ResultSetRow to retrieve value from
-    * @param property         The name of the property to retrieve via QName 
-    * @param convertNull      Whether to convert null values to the empty string
-    * 
-    * @return property as string value
-    */
-   public static String getValueProperty(ResultSetRow row, String name, boolean convertNull)
-   {
-      Serializable value = row.getValue(QName.createQName(NamespaceService.ALFRESCO_URI, name));
-      String property = null;
-      if (value != null)
-      {
-         property = ValueConverter.convert(String.class, value);
-      }
-      
-      if (convertNull == true && property == null)
-      {
-         property = "";
-      }
-      
-      return property;
-   }
-
-   /**
     * Escape a QName value so it can be used in lucene search strings
     * 
     * @param qName      QName to escape

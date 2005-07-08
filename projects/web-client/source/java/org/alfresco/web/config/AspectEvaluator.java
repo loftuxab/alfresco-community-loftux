@@ -20,9 +20,9 @@ package org.alfresco.web.config;
 import java.util.Set;
 
 import org.alfresco.config.evaluator.Evaluator;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
 
 /**
  * Evaluator that determines whether a given object has a particular aspect applied
@@ -45,8 +45,7 @@ public class AspectEvaluator implements Evaluator
          Set aspects = ((Node)obj).getAspects();
          if (aspects != null)
          {
-            // TODO: for now presume the namespace is our default one
-            QName spaceQName = QName.createQName(NamespaceService.ALFRESCO_URI, condition);
+            QName spaceQName = Repository.resolveToQName(condition);
             result = aspects.contains(spaceQName);
          }
       }

@@ -160,11 +160,7 @@ public class NewRuleWizard extends AbstractWizardBean
          Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
          if (this.action.equals(AddFeaturesActionExecutor.NAME))
          {
-            // create QName representation of the chosen feature
-            // TODO: handle namespaces, for now presume it is in alfresco namespace
-            QName aspect = QName.createQName(NamespaceService.ALFRESCO_URI, 
-                  this.actionProperties.get(PROP_ASPECT));
-            
+            QName aspect = Repository.resolveToQName(this.actionProperties.get(PROP_ASPECT));
             actionParams.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, aspect);
          }
          else if (this.action.equals(CopyActionExecutor.NAME))
