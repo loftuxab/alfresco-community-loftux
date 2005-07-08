@@ -72,6 +72,7 @@
                            <td>
                               <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
                               <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.actionSpace.name}" />'</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.location}" /> <r:nodePath value="#{BrowseBean.actionSpace.nodeRef}" breadcrumb="true" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.spacedetails_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>

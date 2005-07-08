@@ -212,6 +212,66 @@
    </tag>
    
    <tag>
+      <name>nodePath</name>
+      <tagclass>org.alfresco.web.ui.repo.tag.NodePathTag</tagclass>
+      <bodycontent>JSP</bodycontent>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>binding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>style</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>styleClass</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>action</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>actionListener</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>breadcrumb</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
+   
+   <tag>
       <name>simpleSearch</name>
       <tagclass>org.alfresco.web.ui.repo.tag.SimpleSearchTag</tagclass>
       <bodycontent>JSP</bodycontent>

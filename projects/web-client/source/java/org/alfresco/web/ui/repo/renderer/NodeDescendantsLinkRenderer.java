@@ -92,8 +92,6 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          }
          NodeRef parentRef = (NodeRef)val;
          
-         // TODO: check we have a "container" node here?!
-         
          // use Spring JSF integration to get the node service bean
          NodeService service = getNodeService(context);
          UserTransaction tx = null;
@@ -103,7 +101,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             tx.begin();
                
             // TODO: need a comparator to sort node refs (based on childref qname)
-            //       as currently the list is returned in a random order per request
+            //       as currently the list is returned in a random order per request!
             
             String separator = (String)component.getAttributes().get("separator");
             if (separator == null)
