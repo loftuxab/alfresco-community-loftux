@@ -18,12 +18,11 @@
 package org.alfresco.web.bean.repository;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -46,9 +45,8 @@ public class Node implements Serializable
    private String path;
    private String id;
    private Set<QName> aspects = null;
-   private Map<String, Object> properties = new HashMap<String, Object>(7, 1.0f);
+   private QNameMap<String, Object> properties = new QNameMap<String, Object>();
    private List<String> propertyNames = null;
-   
    private boolean propsRetrieved = false;
    private NodeService nodeService;
    
@@ -87,42 +85,17 @@ public class Node implements Serializable
    {
       if (this.propsRetrieved == false)
       {
-         // TODO: How are we going to deal with namespaces, JSF won't understand so
-         //       we will need some sort of mechanism to deal with it????
-         //       For now just get the local name of each property.
-         
          Map<QName, Serializable> props = this.nodeService.getProperties(this.nodeRef);
          
          for (QName qname: props.keySet())
          {
-            String localName = qname.getLocalName();
-            this.properties.put(localName, props.get(qname));
+            this.properties.put(qname.toString(), props.get(qname));
          }
          
          this.propsRetrieved = true;
       }
       
       return properties;
-   }
-   
-   /**
-    * @return A list of the property names currently held by this node
-    */
-   public List<String> getPropertyNames()
-   {
-      if (this.propertyNames == null)
-      {
-         // make sure the properties are available
-         this.getProperties();
-         // retrieve the list of property names
-         this.propertyNames = new ArrayList(this.properties.size());
-         for (String propName : this.properties.keySet())
-         {
-            this.propertyNames.add(propName);
-         }
-      }
-      
-      return this.propertyNames;
    }
    
    /**
@@ -160,6 +133,10 @@ public class Node implements Serializable
     */
    public String getTypeName()
    {
+      // ************************
+      // TODO: remove this method
+      // ************************
+      
       return getType().getLocalName();
    }
    
@@ -235,7 +212,7 @@ public class Node implements Serializable
       this.name = null;
       this.type = null;
       this.path = null;
-      this.properties = new HashMap<String, Object>(7, 1.0f);
+      this.properties = new QNameMap<String, Object>();
       this.propsRetrieved = false;
       this.aspects = null;
 

@@ -26,6 +26,7 @@ import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.apache.log4j.Logger;
 
 /**
  * Lighweight client side representation of the repository data dictionary. 
@@ -36,7 +37,9 @@ import org.alfresco.service.namespace.QName;
  */
 public final class DataDictionary
 {
+   private static Logger logger = Logger.getLogger(DataDictionary.class);
    private DictionaryService dictionaryService;
+   private NamespaceService namespaceService;
    private Map<QName, TypeDefinition> types = new HashMap<QName, TypeDefinition>(11, 1.0f);
 
    /**
@@ -94,8 +97,6 @@ public final class DataDictionary
     */
    public PropertyDefinition getPropertyDefinition(Node node, String property)
    {
-      // TODO: we need to deal with namespaces, for now presume it is the alfresco namespace
-      
       PropertyDefinition propDef = null;
       
       TypeDefinition typeDef = getTypeDef(node.getType(), node.getAspects());
@@ -103,7 +104,7 @@ public final class DataDictionary
       if (typeDef != null)
       {
          Map<QName, PropertyDefinition> properties = typeDef.getProperties();
-         propDef = properties.get(QName.createQName(NamespaceService.ALFRESCO_URI, property));
+         propDef = properties.get(Repository.resolveToQName(property));
       }
       
       return propDef;

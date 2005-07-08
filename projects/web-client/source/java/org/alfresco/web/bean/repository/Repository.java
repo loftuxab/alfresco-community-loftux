@@ -45,10 +45,12 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.ui.common.Utils;
+import org.apache.log4j.Logger;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -69,6 +71,8 @@ public final class Repository
    private static final String IMAGE_POSTFIX = ".gif";
    private static final String DEFAULT_FILE_IMAGE16 = IMAGE_PREFIX16 + "_default" + IMAGE_POSTFIX;
    private static final String DEFAULT_FILE_IMAGE32 = IMAGE_PREFIX32 + "_default" + IMAGE_POSTFIX;
+   
+   private static Logger logger = Logger.getLogger(Repository.class);
    private static final Map<String, String> s_fileExtensionMap = new HashMap<String, String>(89, 1.0f);
    
    /** cache of client StoreRef */
@@ -80,6 +84,8 @@ public final class Repository
    /** reference to System folder */
    private static NodeRef systemRef = null;
    
+   /** reference to the namespace service */
+   private static NamespaceService namespaceService = null;
    
    /**
     * Private constructor
@@ -518,5 +524,118 @@ public final class Repository
       }
       
       return peopleRef;
+   }
+   
+   /**
+    * Creates a QName representation for the given String.
+    * If the String has no namespace the Alfresco namespace is added.
+    * If the String has a prefix an attempt to resolve the prefix to the
+    * full URI will be made. 
+    * 
+    * @param str The string to convert
+    * @return A QName representation of the given string 
+    */
+   public static QName resolveToQName(String str)
+   {
+      QName qname = null;
+      
+      if (str == null && str.length() == 0)
+      {
+         throw new IllegalArgumentException("str parameter is mandatory");
+      }
+      
+      if (str.charAt(0) == (QName.NAMESPACE_BEGIN))
+      {
+         // create QName directly
+         qname = QName.createQName(str);
+      }
+      else if (str.indexOf(QName.NAMESPACE_PREFIX) != -1)
+      {
+         // extract the prefix and try and resolve using the 
+         // namespace service
+         int end = str.indexOf(QName.NAMESPACE_PREFIX);
+         String prefix = str.substring(0, end);
+         String localName = str.substring(end + 1);
+         NamespaceService nameSpcSvc = getNamespaceService();
+         String uri = nameSpcSvc.getNamespaceURI(prefix);
+         
+         if (uri != null)
+         {
+            qname = QName.createQName(uri, localName);
+         }
+         else
+         {
+            logger.warn("Failed to resolve prefix " + prefix);
+         }
+      }
+      else
+      {
+         // there's no namespace so prefix with Alfresco's
+         qname = QName.createQName(NamespaceService.ALFRESCO_URI, str);
+      }
+      
+      return qname;
+   }
+   
+   /**
+    * Creates a string representation of a QName for the given string.
+    * If the given string already has a namespace, either a URL or a prefix,
+    * nothing the given string is returned. If it does not have a namespace
+    * the Alfresco namespace is added.
+    * 
+    * @param str The string to convert
+    * @return A QName String representation of the given string 
+    */
+   public static String resolveToQNameString(String str)
+   {
+      String result = str;
+      
+      if (str == null && str.length() == 0)
+      {
+         throw new IllegalArgumentException("str parameter is mandatory");
+      }
+      
+      if (str.charAt(0) != QName.NAMESPACE_BEGIN && str.indexOf(QName.NAMESPACE_PREFIX) != -1)
+      {
+         // get the prefix and resolve to the uri
+         int end = str.indexOf(QName.NAMESPACE_PREFIX);
+         String prefix = str.substring(0, end);
+         String localName = str.substring(end + 1);
+         NamespaceService nameSpcSvc = getNamespaceService();
+         String uri = nameSpcSvc.getNamespaceURI(prefix);
+         
+         if (uri != null)
+         {
+            result = QName.NAMESPACE_BEGIN + uri + QName.NAMESPACE_END + localName;
+         }
+         else
+         {
+            logger.warn("Failed to resolve prefix " + prefix);
+         }
+      }
+      else if (str.charAt(0) != QName.NAMESPACE_BEGIN)
+      {
+         // there's no namespace so prefix with Alfresco's
+         result = QName.NAMESPACE_BEGIN + NamespaceService.ALFRESCO_URI + 
+                  QName.NAMESPACE_END + str;
+      }
+      
+      return result;
+   }
+   
+   /**
+    * Returns an instance of the namespace service
+    * 
+    * @return The NamespaceService
+    */
+   private static NamespaceService getNamespaceService()
+   {
+      if (namespaceService == null)
+      {
+         ServiceRegistry svcReg = getServiceRegistry(FacesContext.getCurrentInstance());
+         namespaceService = svcReg.getNamespaceService();
+      }
+      
+      return namespaceService;
    }
 }

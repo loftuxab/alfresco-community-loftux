@@ -251,12 +251,6 @@ public abstract class BaseConfigService implements ConfigService
         }
         else
         {
-            // add the section to the relevant collections
-            this.sections.add(section);
-
-            if (logger.isDebugEnabled())
-                logger.debug("Added " + section + " to the sections list");
-
             if (area != null && area.length() > 0)
             {
                 // get the list of sections for the given area name (create the
@@ -273,6 +267,14 @@ public abstract class BaseConfigService implements ConfigService
 
                 if (logger.isDebugEnabled())
                     logger.debug("Added " + section + " to the '" + area + "' area");
+            }
+            else
+            {
+                // add the section to the relevant collections
+                this.sections.add(section);
+
+                if (logger.isDebugEnabled())
+                    logger.debug("Added " + section + " to the sections list");
             }
         }
     }

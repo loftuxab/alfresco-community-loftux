@@ -319,8 +319,8 @@ public class UIProperty extends UIPanel implements NamingContainer
    {
       UIOutput control = null;
       ValueBinding vb = context.getApplication().
-                        createValueBinding("#{" + varName + ".properties." + 
-                        propDef.getName().getLocalName() + "}");
+                        createValueBinding("#{" + varName + ".properties[\"" + 
+                        propDef.getName().toString() + "\"]}");
       
       UIPropertySheet propSheet = (UIPropertySheet)this.getParent();
       
@@ -440,8 +440,8 @@ public class UIProperty extends UIPanel implements NamingContainer
                                 String varName)
    {
       ValueBinding vb = context.getApplication().
-                        createValueBinding("#{" + varName + ".properties." + 
-                        propName + "}");
+                        createValueBinding("#{" + varName + ".properties[\"" + 
+                        propName + "\"]}");
       
       UIOutput control = null;
       UIPropertySheet propSheet = (UIPropertySheet)this.getParent();

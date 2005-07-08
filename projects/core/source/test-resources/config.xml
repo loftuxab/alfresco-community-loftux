@@ -36,4 +36,8 @@
       </children>
    </config>
    
+   <config evaluator="string-compare" condition="Restricted Area Test">
+      <available>A value</available>
+   </config>
+   
 </alfresco-config>

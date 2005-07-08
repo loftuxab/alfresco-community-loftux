@@ -105,7 +105,7 @@ public class DocumentPropertiesBean
          while (iterProps.hasNext())
          {
             String propName = iterProps.next();
-            QName qname = QName.createQName(NamespaceService.ALFRESCO_URI, propName);
+            QName qname = QName.createQName(propName);
             properties.put(qname, (Serializable)this.editableNode.getProperties().get(propName));
          }
          

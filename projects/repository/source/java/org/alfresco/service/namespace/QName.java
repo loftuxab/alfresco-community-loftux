@@ -41,9 +41,9 @@ public final class QName implements QNamePattern, Serializable
     private int hashCode;
     private String prefix;
 
-    private static final char NAMESPACE_PREFIX = ':';
-    private static final char NAMESPACE_BEGIN = '{';
-    private static final char NAMESPACE_END = '}';
+    public static final char NAMESPACE_PREFIX = ':';
+    public static final char NAMESPACE_BEGIN = '{';
+    public static final char NAMESPACE_END = '}';
     private static final char[] INVALID_CHARS = { '/', '.', '{', '}' };
     public static final int MAX_LENGTH = 100;
 

@@ -94,9 +94,6 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       
       if (howManyKids == 0)
       {
-         // get the property names the current node has
-         List<String> props = node.getPropertyNames();
-         
          if (externalConfig != null && externalConfig.booleanValue())
          {
             // configure the component using the config service
@@ -139,9 +136,9 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
          {
             // show all the properties for the current node
             if (logger.isDebugEnabled())
-               logger.debug("Configuring property sheet using node's properties");   
+               logger.debug("Configuring property sheet using node's properties");
             
-            createPropertyComponentsFromNode(context, props);
+            createPropertyComponentsFromNode(context, this.node);
          }
       }
       
@@ -330,13 +327,14 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
     * Creates all the property components required to display the properties held by the node.
     * 
     * @param context JSF context
-    * @param properties List of property names held by node 
+    * @param node The Node to show all the properties for 
     * @throws IOException
     */
-   private void createPropertyComponentsFromNode(FacesContext context, List<String> properties)
+   private void createPropertyComponentsFromNode(FacesContext context, Node node)
       throws IOException
    {
-      for (String propertyName : properties)
+      Map<String, Object> props = node.getProperties();
+      for (String propertyName : props.keySet())
       {
          // create the property component
          UIProperty propComp = (UIProperty)context.getApplication().createComponent("org.alfresco.faces.Property");

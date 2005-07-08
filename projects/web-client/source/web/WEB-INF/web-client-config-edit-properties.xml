@@ -1,16 +1,5 @@
 <alfresco-config area="edit-properties">
    
-   <plug-ins>
-      <evaluators>
-         <evaluator id="node-type" class="org.alfresco.web.config.NodeTypeEvaluator" />
-         <evaluator id="aspect-name" class="org.alfresco.web.config.AspectEvaluator" />
-      </evaluators>
-      <element-readers>
-         <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
-         <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
-      </element-readers>
-   </plug-ins>
-   
    <config evaluator="aspect-name" condition="complianceable">
       <property-sheet>
          <show-property name="removeAfter" displayLabel="Remove After" />

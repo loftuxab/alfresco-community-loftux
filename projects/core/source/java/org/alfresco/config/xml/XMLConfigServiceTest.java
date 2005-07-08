@@ -246,18 +246,20 @@ public class XMLConfigServiceTest extends BaseTest
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.init();
 
-        // try and get an section defined in an area (without restricting the
-        // area)
-        Config config = svc.getConfig("Area Specific Config");
-        ConfigElement areaTest = config.getConfigElement("parent-item");
-        assertNotNull("areaTest should not be null as a global lookup was performed", areaTest);
+        // try and get a section defined in an area (without restricting the
+        // area), the result should be null
+        Config config = svc.getConfig("Restricted Area Test");
+        ConfigElement restrictedElement = config.getConfigElement("restricted");
+        ConfigElement availableElement = config.getConfigElement("available");
+        assertNull("restrictedElement should be null as a global lookup was performed for a section in an area", restrictedElement);
+        assertNotNull("availableElement should not be null as the element is available in the default area", availableElement);
 
         // try and get an section defined in an area (with an area restricted
         // search)
         ConfigLookupContext lookupContext = new ConfigLookupContext();
         lookupContext.addArea("test-area");
         config = svc.getConfig("Area Specific Config", lookupContext);
-        areaTest = config.getConfigElement("parent-item");
+        ConfigElement areaTest = config.getConfigElement("parent-item");
         assertNotNull("areaTest should not be null as it is defined in test-area", areaTest);
 
         // try and find a section defined outside an area with an area
