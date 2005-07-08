@@ -63,7 +63,7 @@ Install Alfresco Tomcat Bundle
 - Browse to http://www.alfresco.org/downloads
 - Download the "Alfresco Windows Tomcat Bundle" option
 - Create a folder 'C:\alfresco'
-- Unzip alfresco-tc.zip in C:\alfresco
+- Unzip alfresco-tomcat-xxxxx.zip in C:\alfresco
 
 Navigate to the 'C:\alfresco' folder and run 'db_setup.bat' if you did a new
 install of MySQL above.  This creates a MySQL database named 'alfresco' with a user 
@@ -115,6 +115,30 @@ Closing the Alfresco Server
 Navigate to the 'C:\alfresco' folder and run 'alf_stop_tc.bat'
 
 
+=====================
+Using the CIFS Server
+=====================
+
+The Preview release with CIFS is configured for ease of deployment.  To enable the CIFS
+server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco' needs to be copied
+into a folder on the system path, such as \windows\system32.  The Alfresco server will 
+need to be re-started once the dll has been copied.
+
+Once the Alfresco server is running, it should be possible to connect to it by mapping a
+drive to it.  The name to use for the mapping is based on the name of the server on which
+Alfresco is running, with '_A' on the end.  For example, if the PC name is 'MYPC01', then 
+the CIFS server name will be 'MYPC01_A'.  To map the drive, open Windows Explorer, go
+to the Tools menu and select 'Map Network Drive...'.  In the Map Network Drive dialog,
+choose the drive letter you wish to use.  To locate the CIFS server, click the 'Browse...' 
+button and find the server name as described above.  You should then have the option to
+select a folder within it called 'alfresco'.  Click 'OK' to select the folder, then click
+'Finish' to map the drive.  You should now have access to the Alfresco repository from
+the mapped drive.  If the CIFS server name does not show in the browse dialog, you may also
+enter the folder location directly in the dialog, for example '\\MYPC01_A\alfresco'.
+
+To check the CIFS server name and whether it is running, enter the command 'nbtstat -n'
+from a Command Prompt.  One of the listed names should be the CIFS server name.
+
 
 ====================
 Manual Installations
@@ -135,3 +159,12 @@ c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
 
 The Alfresco 'alf_start_tc.bat' starts the database and runs Tomcat's 'run.bat'.
 The 'alf_stop_tc.bat' runs Tomcat's 'shutdown.bat' and shutsdown the database.
+
+
+================
+Trouble-Shooting
+================
+
+If you have problems with your installation, please look for help on the Installation
+forum at http://www.alfresco.org/forums and ask for any additional help you may need.
+

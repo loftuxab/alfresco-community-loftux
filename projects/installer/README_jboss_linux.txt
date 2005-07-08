@@ -70,7 +70,7 @@ Install Alfresco JBoss Bundle
 - Browse to http://www.alfresco.org/downloads
 - Download the "Alfresco Linux JBoss Bundle" option
 - Create a directory named 'alfresco'
-- Unzip alfresco-jb.tar.gz in the '~/alfresco' directory
+- Tar uncompress alfresco-jboss-xxxxxx.tar.gz in the '~/alfresco' directory
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -95,7 +95,7 @@ in /opt/OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Navigate to the '~/alfresco' folder
+Navigate to the '~/alfresco' directory
 - Run 'jboss/bin/run.sh' to start JBoss
 - Open a new command window
 - If you wish to use OpenOffice document transformations, run 'start_oo.sh'
@@ -120,6 +120,47 @@ http://www.alfresco.org/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the '~/alfresco' folder and run 'jboss/bin/shutdown.sh -S'
+Navigate to the '~/alfresco' directory and run 'jboss/bin/shutdown.sh -S'
 If you started OpenOffice as above, then also run 'killall soffice.bin'
+
+
+=====================
+Using the CIFS Server
+=====================
+
+The Preview release with CIFS is configured for ease of deployment.
+Once the Alfresco server is running, it should be possible to connect to it by mapping a
+drive to it.  The name to use for the mapping is based on the name of the server on which
+Alfresco is running, with '_A' on the end.  For example, if the PC name is 'MYPC01', then 
+the CIFS server name will be 'MYPC01_A'.  To map the drive, open Windows Explorer, go
+to the Tools menu and select 'Map Network Drive...'.  In the Map Network Drive dialog,
+choose the drive letter you wish to use.  To locate the CIFS server, click the 'Browse...' 
+button and find the server name as described above.  You should then have the option to
+select a folder within it called 'alfresco'.  Click 'OK' to select the folder, then click
+'Finish' to map the drive.  You should now have access to the Alfresco repository from
+the mapped drive.  If the CIFS server name does not show in the browse dialog, you may also
+enter the folder location directly in the dialog, for example '\\MYPC01_A\alfresco'.
+
+To check the CIFS server is running, try connecting from the Alfresco server using smbclient.
+
+If you are unable to connect to the CIFS server, then depending on your network, you may need 
+to configure the domain for CIFS to use.  To set this, edit the 'file-servers.xml' file in the 
+'~/alfresco' directory and add the domain into the following line:
+   <host name="${localname}_A"/>
+so that it is something like:
+   <host name="${localname}_A" domain="MYDOMAIN"/>
+
+You then need to place this file in the org/alfresco/filesys directory within the
+repository.jar file, itself within the web-client.war file.  This should only be attempted
+if you are familiar with these things.
+
+You will need to restart the Alfresco server for this to take effect.
+
+
+================
+Trouble-Shooting
+================
+
+If you have problems with your installation, please look for help on the Installation
+forum at http://www.alfresco.org/forums and ask for any additional help you may need.
 

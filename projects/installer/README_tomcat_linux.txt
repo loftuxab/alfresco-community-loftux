@@ -71,7 +71,7 @@ Install Alfresco Tomcat Bundle
 - Browse to http://www.alfresco.org/downloads
 - Download the "Alfresco Linux Tomcat Bundle" option
 - Create a directory named 'alfresco'
-- Unzip alfresco-tc.tar.gz in the '~/alfresco' directory
+- Tar uncompress alfresco-tomcat-xxxxxx.tar.gz in the '~/alfresco' directory
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -99,7 +99,8 @@ Running the Alfresco Server
 Ensure that the MySQL server is running, then navigate to the '~/alfresco/tomcat' directory
 - Run 'bin/startup.sh' to start Tomcat
 - If you wish to use OpenOffice document transformations, run '../start_oo.sh'
-- You can now try Alfresco by visiting:
+- You can now try Alfresco by visiting:
+
 http://localhost:8080/web-client/faces/jsp/login.jsp
 
 The server is configured with a single administrative login with user name and password
@@ -118,23 +119,44 @@ Navigate to the '~/alfresco/tomcat' folder and run 'bin/shutdown.sh'
 If you started OpenOffice as above, then also run 'killall soffice.bin'
 
 
+=====================
+Using the CIFS Server
+=====================
 
-====================
-Manual Installations
-====================
+The Preview release with CIFS is configured for ease of deployment.
+Once the Alfresco server is running, it should be possible to connect to it by mapping a
+drive to it.  The name to use for the mapping is based on the name of the server on which
+Alfresco is running, with '_A' on the end.  For example, if the PC name is 'MYPC01', then 
+the CIFS server name will be 'MYPC01_A'.  To map the drive, open Windows Explorer, go
+to the Tools menu and select 'Map Network Drive...'.  In the Map Network Drive dialog,
+choose the drive letter you wish to use.  To locate the CIFS server, click the 'Browse...' 
+button and find the server name as described above.  You should then have the option to
+select a folder within it called 'alfresco'.  Click 'OK' to select the folder, then click
+'Finish' to map the drive.  You should now have access to the Alfresco repository from
+the mapped drive.  If the CIFS server name does not show in the browse dialog, you may also
+enter the folder location directly in the dialog, for example '\\MYPC01_A\alfresco'.
 
-For other operating systems or where MySQL or Tomcat are already installed,
-you may need to adjust the instructions above as appropriate, such as changing
-the Tomcat port settings.
+To check the CIFS server is running, try connecting from the Alfresco server using smbclient.
 
-The Alfresco server is packaged as a war file and can be found in:
-~/alfresco/tomcat/webapps/web-client.war
+If you are unable to connect to the CIFS server, then depending on your network, you may need 
+to configure the domain for CIFS to use.  To set this, edit the 'file-servers.xml' file in the 
+'~/alfresco' directory and add the domain into the following line:
+   <host name="${localname}_A"/>
+so that it is something like:
+   <host name="${localname}_A" domain="MYDOMAIN"/>
 
-The Alfresco 'db_setup.sh' performs the following MySQL commands:
+You then need to place this file in the following directory, creating any of the sub-
+directories as required (some will be there if you have run Alfresco already):
 
-mqslqadmin -u root -p create alfresco
-mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
-                   identified by 'alfresco' with grant option;"
+   ~/alfresco/tomcat/webapps/web-client/WEB-INF/classes/org/alfresco/filesys
 
-The Alfresco 'alf_start_tc.sh' starts the database and runs Tomcat's 'run.sh'.
-The 'alf_stop_tc.sh' runs Tomcat's 'shutdown.sh'.
+You will need to restart the Alfresco server for this to take effect.
+
+
+================
+Trouble-Shooting
+================
+
+If you have problems with your installation, please look for help on the Installation
+forum at http://www.alfresco.org/forums and ask for any additional help you may need.
+
