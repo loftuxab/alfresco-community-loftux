@@ -68,9 +68,6 @@
          <fileset dir="${repository.project.dir}/config" >
             <include name="**/*" />
          </fileset>
-         <fileset dir="${projects.dir.name}/netbios/dll" >
-            <include name="Win32NetBIOS.dll" />
-         </fileset>
       </copy>
       <!-- ensure mysql drivers are present -->
       <copy todir="${jboss.deploy.dir}/../lib"
@@ -85,9 +82,6 @@
       <war warfile="${tomcat.deploy.dir}/${web-client.project.name}.war" update="true" >
          <classes dir="${repository.project.dir}/config">
             <include name="**/*" />
-         </classes>
-         <classes dir="${projects.dir.name}/netbios/dll" >
-            <include name="Win32NetBIOS.dll" />
          </classes>
       </war>
       <!-- ensure mysql drivers are present -->
@@ -179,6 +173,7 @@
                                license.txt,notice.txt,README_jboss_win.txt,start_oo2.bat,
                                stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.sh" />
+         <zipfileset dir="${projects.dir}/netbios/dll" />
          <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
         <zipfileset dir="${repository.project.dir}/config"
@@ -209,6 +204,7 @@
                                license.txt,notice.txt,README_tomcat_win.txt,start_oo2.bat,
                                stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${tomcat.distribution.dir}" prefix="tomcat" excludes="**/bin/*.sh" />
+         <zipfileset dir="${projects.dir}/netbios/dll" />
          <zipfileset dir="${tomcat.deploy.dir}" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
       </zip>
