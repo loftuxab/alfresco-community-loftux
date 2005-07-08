@@ -37,6 +37,7 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
@@ -52,14 +53,6 @@ public class NavigationBean
 {
    // ------------------------------------------------------------------------------
    // Bean property getters and setters 
-   
-   /**
-    * @return Returns the nodeService.
-    */
-   public NodeService getNodeService()
-   {
-      return this.nodeService;
-   }
 
    /**
     * @param nodeService The nodeService to set.
@@ -67,14 +60,6 @@ public class NavigationBean
    public void setNodeService(NodeService nodeService)
    {
       this.nodeService = nodeService;
-   }
-   
-   /**
-    * @return Returns the searchService.
-    */
-   public SearchService getSearchService()
-   {
-      return searchService;
    }
 
    /**
@@ -86,19 +71,19 @@ public class NavigationBean
    }
    
    /**
-    * @return Returns the namespaceService.
-    */
-   public NamespaceService getNamespaceService()
-   {
-      return this.namespaceService;
-   }
-   
-   /**
     * @param namespaceService The namespaceService to set.
     */
    public void setNamespaceService(NamespaceService namespaceService)
    {
       this.namespaceService = namespaceService;
+   }
+   
+   /**
+    * @return the User object representing the current instance for this user 
+    */
+   public User getCurrentUser()
+   {
+      return Application.getCurrentUser(FacesContext.getCurrentInstance());
    }
 
    /**

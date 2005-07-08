@@ -106,8 +106,9 @@
                                     <a:actionLink value="#{msg.manage_rules}" image="/images/icons/rule.gif" action="manageRules" actionListener="#{BrowseBean.setupSpaceAction}" id="link10">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
                                     </a:actionLink>
-                                    <%-- TODO: add evaluator based on "admin" role --%>
-                                    <a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
+                                    <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}">
+                                       <a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
+                                    </a:booleanEvaluator>
                                  </a:menu>
                               </td>
                            </a:panel>
