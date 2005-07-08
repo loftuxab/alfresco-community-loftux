@@ -11,8 +11,9 @@
          table="node"
          dynamic-update="false"
          dynamic-insert="false"
-         select-before-update="false"
-         optimistic-lock="version" >
+         select-before-update="false" 
+         lazy="true" 
+         optimistic-lock="version"  >
       <!-- composite PK -->
       <cache usage="read-write"></cache>
       <composite-id name="key" class="org.alfresco.repo.domain.NodeKey">
@@ -25,11 +26,12 @@
       <map
             name="properties" 
             table="node_properties"
-            lazy="false"
+            lazy="false" 
             fetch="join"  
             sort="unsorted"
-            inverse="false"
-            cascade="all" >
+            inverse="false" 
+            optimistic-lock="true"
+            cascade="delete" >
          <cache usage="read-write"></cache>
          <key>
             <column name="protocol" length="100"  />
@@ -43,10 +45,11 @@
             name="aspects"
             table="node_aspects"
             lazy="true"
-            fetch="select"
             sort="unsorted"
-            inverse="false"
-            cascade="all" >
+            inverse="false" 
+            fetch="select"
+            optimistic-lock="true"
+            cascade="delete" >
          <cache usage="read-write"></cache>
          <key>
             <column name="protocol" length="100"  />
@@ -62,7 +65,8 @@
             not-null="true"
             insert="false"
             update="false" 
-            lazy="true" >
+            lazy="true" optimistic-lock="true"
+            fetch="select">
          <column name="protocol" />
          <column name="identifier" />
       </many-to-one>
@@ -70,9 +74,9 @@
       <set
             name="parentAssocs"
             lazy="true"
-            fetch="select"
             inverse="true" 
-            cascade="delete" >
+            cascade="none" optimistic-lock="true"
+            fetch="select" >
          <cache usage="read-write"></cache>
          <key>
             <column name="child_protocol" />
@@ -85,9 +89,9 @@
       <set
             name="childAssocs"
             inverse="true"
-            lazy="true"
-            fetch="select" 
-            cascade="delete" >
+            lazy="true" 
+            cascade="none" optimistic-lock="true"
+            fetch="select" >
          <cache usage="read-write"></cache>
          <key>
             <column name="parent_protocol" />
@@ -128,11 +132,15 @@
    <class
          name="org.alfresco.repo.domain.hibernate.ChildAssocImpl"
          proxy="org.alfresco.repo.domain.ChildAssoc"
+         dynamic-insert="false"
+         dynamic-update="false"
+         lazy="true"
+         optimistic-lock="version"
          table="child_assoc" >
-      <cache usage="read-write"></cache>
+         <cache usage="read-write"></cache>
       <id
             name="id"
-            column="id"
+            column="id" 
             type="long" >
          <generator class="increment" />
       </id>
@@ -145,7 +153,8 @@
       <many-to-one 
             name="parent"
             class="org.alfresco.repo.domain.hibernate.NodeImpl"
-            lazy="true" 
+            lazy="false"
+            fetch="join" optimistic-lock="true"
             not-null="true" >
          <column name="parent_protocol" />
          <column name="parent_identifier" />
@@ -154,10 +163,10 @@
       <!-- forward assoc to child node -->
       <many-to-one
             name="child" 
-            outer-join="false"
             lazy="false"
             fetch="join"
             class="org.alfresco.repo.domain.hibernate.NodeImpl"
+            optimistic-lock="true"
             not-null="true" >
          <column name="child_protocol" />
          <column name="child_identifier" />

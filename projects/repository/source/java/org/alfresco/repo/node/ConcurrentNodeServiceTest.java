@@ -193,11 +193,6 @@ public class ConcurrentNodeServiceTest extends TestCase
         assoc = nodeService.addChild(n7, n8, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname);
         ret.put(qname, assoc);
 
-        // flush and clear
-        // getSession().flush();
-        // getSession().clear();
-
-        // done
         return ret;
     }
 
@@ -205,16 +200,17 @@ public class ConcurrentNodeServiceTest extends TestCase
     {
         SpringAwareUserTransaction tx = new SpringAwareUserTransaction(transactionManager);
         tx.begin();
-        Map<QName, ChildAssociationRef> asnwer = buildNodeGraph();
+        Map<QName, ChildAssociationRef> answer = buildNodeGraph();
         tx.commit();
-        return asnwer;
+        
+        return answer;
     }
 
     public void testConcurrent() throws Exception
     {
         IndexWriter.COMMIT_LOCK_TIMEOUT = 100000;
-        int count = 5;
-        int repeats = 5;
+        int count = 4;
+        int repeats = 4;
 
         Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
         Thread runner = null;
@@ -266,13 +262,13 @@ public class ConcurrentNodeServiceTest extends TestCase
             }
             try
             {
-                //System.out.println("Start " + this.getName());
+                System.out.println("Start " + this.getName());
                 for (int i = 0; i < repeats; i++)
                 {
                     Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
-                    //System.out.println(" " + this.getName() + " " + i);
+                    System.out.println(" " + this.getName() + " " + i);
                 }
-                //System.out.println("End " + this.getName());
+                System.out.println("End " + this.getName());
             }
             catch (Exception e)
             {

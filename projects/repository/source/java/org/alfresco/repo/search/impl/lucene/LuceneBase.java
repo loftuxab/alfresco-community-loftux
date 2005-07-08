@@ -564,7 +564,8 @@ public abstract class LuceneBase implements Lockable
                     IndexReader[] readers = new IndexReader[] { reader };
                     try
                     {
-                        mainWriter.addIndexes(readers);
+                        mainWriter.mergeIndexes(readers);
+                        //mainWriter.addIndexes(readers);
                     }
                     catch (IOException e)
                     {

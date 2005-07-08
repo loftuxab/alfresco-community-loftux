@@ -41,6 +41,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.GUID;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.BooleanQuery;
 
 /**
@@ -124,6 +125,8 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private ContentService contentService;
 
     private QueryRegisterComponent queryRegister;
+
+    private int indexerMaxFieldLength;
 
     /**
      * Private constructor for the singleton TODO: FIt in with IOC
@@ -815,6 +818,18 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     {
         this.queryMaxClauses = queryMaxClauses;
         BooleanQuery.setMaxClauseCount(this.queryMaxClauses);
+    }
+    
+    
+    public int getIndexerMaxFieldLength()
+    {
+        return indexerMaxFieldLength;
+    }
+
+    public void setIndexerMaxFieldLength(int indexerMaxFieldLength)
+    {
+        this.indexerMaxFieldLength = indexerMaxFieldLength;
+        System.setProperty("org.apache.lucene.maxFieldLength", ""+indexerMaxFieldLength);
     }
 
 }

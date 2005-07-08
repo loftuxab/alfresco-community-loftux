@@ -81,7 +81,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     private static Logger s_logger = Logger.getLogger(LuceneIndexerImpl.class);
 
     private enum Action {
-        INDEX, REINDEX, DELETE
+        INDEX, REINDEX, DELETE, CASCADEREINDEX
     };
 
     /**
@@ -267,7 +267,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 addRootNodesToDeletionList();
                 s_logger.warn("Detected root node addition: deleting all nodes from the index");
             }
-            reindex(childRef);
+            index(childRef);
         }
         catch (LuceneIndexException e)
         {
@@ -291,7 +291,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     Document document = mainReader.document(doc);
                     String id = document.get("ID");
                     NodeRef ref = new NodeRef(store, id);
-                    deleteImpl(ref, false, mainReader);
+                    deleteImpl(ref, false, true, mainReader);
                 }
             }
             catch (IOException e)
@@ -324,7 +324,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         checkAbleToDoWork(false);
         try
         {
-            reindex(nodeRef);
+            reindex(nodeRef, false);
         }
         catch (LuceneIndexException e)
         {
@@ -342,7 +342,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         checkAbleToDoWork(false);
         try
         {
-            delete(relationshipRef.getChildRef(), false);
+            delete(relationshipRef.getChildRef());
         }
         catch (LuceneIndexException e)
         {
@@ -362,7 +362,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             // TODO: Optimise
             // reindex(relationshipRef.getParentRef());
-            reindex(relationshipRef.getChildRef());
+            reindex(relationshipRef.getChildRef(), true);
         }
         catch (LuceneIndexException e)
         {
@@ -385,7 +385,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             {
                 // reindex(relationshipBeforeRef.getParentRef());
             }
-            reindex(relationshipBeforeRef.getChildRef());
+            reindex(relationshipBeforeRef.getChildRef(), true);
         }
         catch (LuceneIndexException e)
         {
@@ -408,7 +408,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             {
                 // reindex(relationshipRef.getParentRef());
             }
-            reindex(relationshipRef.getChildRef());
+            reindex(relationshipRef.getChildRef(), true);
         }
         catch (LuceneIndexException e)
         {
@@ -736,14 +736,19 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * Implementation
      */
 
-    private void reindex(NodeRef nodeRef) throws LuceneIndexException
+    private void index(NodeRef nodeRef) throws LuceneIndexException
     {
-        delete(nodeRef, true);
+        addCommand(new Command(nodeRef, Action.INDEX));
     }
 
-    private void delete(NodeRef nodeRef, boolean forReindex) throws LuceneIndexException
+    private void reindex(NodeRef nodeRef, boolean cascadeReindexDirectories) throws LuceneIndexException
     {
-        addCommand(new Command(nodeRef, forReindex ? Action.REINDEX : Action.DELETE));
+        addCommand(new Command(nodeRef, cascadeReindexDirectories ? Action.CASCADEREINDEX : Action.REINDEX));
+    }
+
+    private void delete(NodeRef nodeRef) throws LuceneIndexException
+    {
+        addCommand(new Command(nodeRef, Action.DELETE));
     }
 
     private void addCommand(Command command)
@@ -768,6 +773,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             removeFromCommandList(command, true);
         }
         else if (command.action == Action.INDEX)
+        {
+            removeFromCommandList(command, true);
+        }
+        else if (command.action == Action.CASCADEREINDEX)
         {
             removeFromCommandList(command, true);
         }
@@ -814,7 +823,18 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 else if (command.action == Action.REINDEX)
                 {
                     // Reindex is a delete and then and index
-                    Set<NodeRef> set = deleteImpl(command.nodeRef, true, mainReader);
+                    Set<NodeRef> set = deleteImpl(command.nodeRef, true, false, mainReader);
+
+                    // Deleting any pending index actions
+                    // - make sure we only do at most one index
+                    forIndex.removeAll(set);
+                    // Add the nodes for index
+                    forIndex.addAll(set);
+                }
+                else if (command.action == Action.CASCADEREINDEX)
+                {
+                    // Reindex is a delete and then and index
+                    Set<NodeRef> set = deleteImpl(command.nodeRef, true, true, mainReader);
 
                     // Deleting any pending index actions
                     // - make sure we only do at most one index
@@ -825,13 +845,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 else if (command.action == Action.DELETE)
                 {
                     // Delete the nodes
-                    Set<NodeRef> set = deleteImpl(command.nodeRef, false, mainReader);
+                    Set<NodeRef> set = deleteImpl(command.nodeRef, false, true, mainReader);
                     // Remove any pending indexes
                     forIndex.removeAll(set);
                 }
             }
             commandList.clear();
-            index(forIndex, false);
+            indexImpl(forIndex, false);
         }
         finally
         {
@@ -849,16 +869,15 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex, IndexReader mainReader) throws LuceneIndexException
+    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex, boolean cascade, IndexReader mainReader) throws LuceneIndexException
     {
         // startTimer();
         getDeltaReader();
         // outputTime("Delete "+nodeRef+" size = "+getDeltaWriter().docCount());
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
 
-        refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader(), true));
-
-        refs.addAll(deleteContainerAndBelow(nodeRef, mainReader, false));
+        refs.addAll(deleteContainerAndBelow(nodeRef, getDeltaReader(), true, cascade));
+        refs.addAll(deleteContainerAndBelow(nodeRef, mainReader, false, cascade));
 
         if (!forReindex)
         {
@@ -947,7 +966,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     }
 
-    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader, boolean delete) throws LuceneIndexException
+    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader, boolean delete, boolean cascade) throws LuceneIndexException
     {
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
 
@@ -958,17 +977,20 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 int count = reader.delete(new Term("ID", nodeRef.getId()));
             }
             refs.add(nodeRef);
-            TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.getId()));
-            while (td.next())
+            if (cascade)
             {
-                int doc = td.doc();
-                Document document = reader.document(doc);
-                String id = document.get("ID");
-                NodeRef ref = new NodeRef(store, id);
-                refs.add(ref);
-                if (delete)
+                TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.getId()));
+                while (td.next())
                 {
-                    reader.delete(doc);
+                    int doc = td.doc();
+                    Document document = reader.document(doc);
+                    String id = document.get("ID");
+                    NodeRef ref = new NodeRef(store, id);
+                    refs.add(ref);
+                    if (delete)
+                    {
+                        reader.delete(doc);
+                    }
                 }
             }
         }
@@ -979,15 +1001,15 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return refs;
     }
 
-    private void index(Set<NodeRef> nodeRefs, boolean isNew) throws LuceneIndexException
+    private void indexImpl(Set<NodeRef> nodeRefs, boolean isNew) throws LuceneIndexException
     {
         for (NodeRef ref : nodeRefs)
         {
-            index(ref, isNew);
+            indexImpl(ref, isNew);
         }
     }
 
-    private void index(NodeRef nodeRef, boolean isNew) throws LuceneIndexException
+    private void indexImpl(NodeRef nodeRef, boolean isNew) throws LuceneIndexException
     {
         IndexWriter writer = getDeltaWriter();
 

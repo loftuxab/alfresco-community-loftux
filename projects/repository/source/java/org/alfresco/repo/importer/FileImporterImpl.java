@@ -119,6 +119,7 @@ public class FileImporterImpl implements FileImporter
                 ContentModel.TYPE_CONTENT, contentProps);
 
         NodeRef fileNodeRef = assocRef.getChildRef();
+        
 
         if (s_logger.isDebugEnabled())
             s_logger.debug("Created file node for file: " + file.getName());
@@ -148,7 +149,7 @@ public class FileImporterImpl implements FileImporter
         {
             throw new FileImporterException("Failed to load content (file not found) "+file.getPath(), e);
         }
-
+        
         return fileNodeRef;
     }
 

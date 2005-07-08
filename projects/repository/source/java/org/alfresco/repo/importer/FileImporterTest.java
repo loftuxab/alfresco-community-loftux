@@ -168,6 +168,10 @@ public class FileImporterTest extends TestCase
     {
         FileImporterTest test = new FileImporterTest();
         test.setUp();
+        
+        UserTransaction tx = test.serviceRegistry.getUserTransaction();
+        tx.begin();
+       
         StoreRef spacesStore = new StoreRef(args[0]);
         if (!test.nodeService.exists(spacesStore))
         {
@@ -176,9 +180,7 @@ public class FileImporterTest extends TestCase
         NodeRef storeRoot = test.nodeService.getRootNode(spacesStore);
         List<NodeRef> location = test.nodeService.selectNodes(storeRoot, args[1], null, test.namespaceService, false);
         if (location.size() > 0)
-        {
-            UserTransaction tx = test.serviceRegistry.getUserTransaction();
-            tx.begin();
+        {    
             long start = System.nanoTime();
             test.createFileImporter().loadFile(location.get(0), new File(args[2]), true);
             long end = System.nanoTime();
@@ -190,6 +192,7 @@ public class FileImporterTest extends TestCase
         }
         else
         {
+            tx.rollback();
             throw new AlfrescoRuntimeException("Can not find node for import");
         }
     }

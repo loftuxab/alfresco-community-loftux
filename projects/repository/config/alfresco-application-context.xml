@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
  
-<!-- This file must be split up once the number and spread of beans increases -->
+<!-- This file must be split up once the number and spread of beans increases qweqwe -->
 <beans>
    
    <import resource="applicationServices.xml"/>
@@ -58,7 +58,7 @@
             <prop key='hibernate.max_fetch_depth'>10</prop>
             <prop key='hibernate.cache.provider_class'>org.hibernate.cache.EhCacheProvider</prop>
             <prop key='hibernate.default_batch_fetch_size'>1</prop>
-            <prop key='hibernate.jdbc.batch_size'>1</prop>
+            <prop key='hibernate.jdbc.batch_size'>32</prop>
          </props>
       </property>
    </bean>
@@ -442,8 +442,11 @@
       <property name="indexerMaxMergeDocs">
          <value>${lucene.indexer.maxMergeDocs}</value>
       </property>
-       <property name="lockDirectory">
+      <property name="lockDirectory">
          <value>${dir.indexes.lock}</value>
+      </property>
+      <property name="indexerMaxFieldLength">
+         <value>${lucene.indexer.maxFieldLength}</value>
       </property>
    </bean>
    
