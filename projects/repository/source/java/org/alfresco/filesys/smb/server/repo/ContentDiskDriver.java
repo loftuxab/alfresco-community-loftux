@@ -28,6 +28,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.server.SrvSession;
 import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
+import org.alfresco.filesys.server.filesys.AccessDeniedException;
 import org.alfresco.filesys.server.filesys.DiskDeviceContext;
 import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.server.filesys.FileInfo;
@@ -519,6 +520,11 @@ public class ContentDiskDriver implements DiskInterface
             SrvSession sess, TreeConnection tree, NetworkFile file,
             byte[] buffer, int bufferPosition, int size, long fileOffset) throws IOException
     {
+        // Check if the file is a directory
+        
+        if(file.isDirectory())
+            throw new AccessDeniedException();
+            
         int count = file.readFile(buffer, size, bufferPosition, fileOffset);
         // done
         if (logger.isDebugEnabled())
