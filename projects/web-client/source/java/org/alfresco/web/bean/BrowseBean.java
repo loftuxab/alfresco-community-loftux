@@ -924,7 +924,8 @@ public class BrowseBean implements IContextListener
                   //newLocation.addAll(location.subList(0, i + 1));
                   //this.navigator.setLocation(newLocation);
                   // TODO: but instead for now we do this:
-                  for (int n=i+1; n<location.size(); n++)
+                  int count = location.size();
+                  for (int n=i+1; n<count; n++)
                   {
                      location.remove(i+1);
                   }
