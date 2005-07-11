@@ -328,6 +328,20 @@ public class ServerConfiguration
             
             setSMBServerEnabled(false);
         }
+        catch ( Throwable ex)
+        {
+            // Configuration error
+            
+            logger.error("CIFS server configuration error, " + ex.getMessage());
+            
+            // Disable the CIFS server
+            
+            setNetBIOSSMB(false);
+            setTcpipSMB(false);
+            setWin32NetBIOS(false);
+            
+            setSMBServerEnabled(false);
+        }
     }
 
     /**
