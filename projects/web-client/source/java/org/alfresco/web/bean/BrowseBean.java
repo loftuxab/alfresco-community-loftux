@@ -906,19 +906,36 @@ public class BrowseBean implements IContextListener
       List<IBreadcrumbHandler> location = this.navigator.getLocation();
       if (location.size() != 0)
       {
-         IBreadcrumbHandler lastLocation = location.get(location.size() - 1);
-         if (lastLocation instanceof IRepoBreadcrumbHandler)
+         // attempt to find the ID - if it's already in the breadcrumb then we
+         // navigate directly to that node - rather than add duplication to the breadcrumb path
+         boolean foundNode = false;
+         for (int i=0; i<location.size(); i++)
          {
-            NodeRef lastNodeRef = ((IRepoBreadcrumbHandler)lastLocation).getNodeRef();
-            if (ref.equals(lastNodeRef) == false)
+            IBreadcrumbHandler lastLocation = location.get(i);
+            if (lastLocation instanceof IRepoBreadcrumbHandler)
             {
-               String name = Repository.getNameForNode(this.nodeService, ref);
-               location.add(new BrowseBreadcrumbHandler(ref, name));
+               NodeRef lastNodeRef = ((IRepoBreadcrumbHandler)lastLocation).getNodeRef();
+               if (ref.equals(lastNodeRef) == true)
+               {
+                  List<IBreadcrumbHandler> newLocation = new ArrayList<IBreadcrumbHandler>(i+1);
+                  newLocation.addAll(location.subList(0, i + 1));
+                  this.navigator.setLocation(newLocation);
+                  foundNode = true;
+                  break;
+               }
             }
+         }
+         
+         // add new node to the end of the existing breadcrumb
+         if (foundNode == false)
+         {
+            String name = Repository.getNameForNode(this.nodeService, ref);
+            location.add(new BrowseBreadcrumbHandler(ref, name));
          }
       }
       else
       {
+         // special case to add first item to the location
          String name = Repository.getNameForNode(this.nodeService, ref);
          location.add(new BrowseBreadcrumbHandler(ref, name));
       }
