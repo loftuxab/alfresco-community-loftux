@@ -911,15 +911,24 @@ public class BrowseBean implements IContextListener
          boolean foundNode = false;
          for (int i=0; i<location.size(); i++)
          {
-            IBreadcrumbHandler lastLocation = location.get(i);
-            if (lastLocation instanceof IRepoBreadcrumbHandler)
+            IBreadcrumbHandler element = location.get(i);
+            if (element instanceof IRepoBreadcrumbHandler)
             {
-               NodeRef lastNodeRef = ((IRepoBreadcrumbHandler)lastLocation).getNodeRef();
-               if (ref.equals(lastNodeRef) == true)
+               NodeRef nodeRef = ((IRepoBreadcrumbHandler)element).getNodeRef();
+               if (ref.equals(nodeRef) == true)
                {
-                  List<IBreadcrumbHandler> newLocation = new ArrayList<IBreadcrumbHandler>(i+1);
-                  newLocation.addAll(location.subList(0, i + 1));
-                  this.navigator.setLocation(newLocation);
+                  // TODO: we should be able to do this - but the UIBreadcrumb component modifies
+                  //       it's own internal value when clicked - then uses that from then on!
+                  //       the other ops are using the same List object and modding it directly.
+                  //List<IBreadcrumbHandler> newLocation = new ArrayList<IBreadcrumbHandler>(i+1);
+                  //newLocation.addAll(location.subList(0, i + 1));
+                  //this.navigator.setLocation(newLocation);
+                  // TODO: but instead for now we do this:
+                  for (int n=i+1; n<location.size(); n++)
+                  {
+                     location.remove(i+1);
+                  }
+                  
                   foundNode = true;
                   break;
                }
