@@ -30,7 +30,7 @@
 				<alf:folder>
 	         		<alf:uifacets/>
 					<alf:name>Samples</alf:name>
-				    <alf:icon>space-icon-blue</alf:icon>
+				    <alf:icon>space-icon-doc</alf:icon>
 				    <alf:contains>
 						<alf:content>
 	         				<alf:uifacets/>

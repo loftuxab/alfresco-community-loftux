@@ -3,7 +3,7 @@
    <alf:folder>
        <alf:uifacets/>
        <alf:name>Alfresco Tutorial</alf:name>
-       <alf:icon>space-icon-purple</alf:icon>
+       <alf:icon>space-icon-doc</alf:icon>
        <alf:contains>
        <alf:content>
           <alf:uifacets/>
