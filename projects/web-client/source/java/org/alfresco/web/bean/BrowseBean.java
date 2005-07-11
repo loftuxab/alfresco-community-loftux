@@ -57,6 +57,7 @@ import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
+import org.alfresco.web.ui.repo.component.UINodePath;
 import org.alfresco.web.ui.repo.component.UISimpleSearch;
 import org.apache.log4j.Logger;
 
@@ -611,6 +612,24 @@ public class BrowseBean implements IContextListener
          {
             Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
          }
+      }
+   }
+   
+   /**
+    * Handler called when a path element is clicked - navigate to the appropriate Space
+    */
+   public void clickSpacePath(ActionEvent event)
+   {
+      UINodePath.PathElementEvent pathEvent = (UINodePath.PathElementEvent)event;
+      NodeRef ref = pathEvent.NodeReference;
+      try
+      {
+         // refresh UI based on node selection
+         this.updateUILocation(ref);
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {ref.getId()}) );
       }
    }
    

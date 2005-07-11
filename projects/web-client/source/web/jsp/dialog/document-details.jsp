@@ -75,7 +75,7 @@
                                  Details of '<h:outputText value="#{DocumentDetailsBean.name}" />'
                                  <h:graphicImage url="/images/icons/locked.gif" rendered="#{DocumentDetailsBean.locked == true}" />
                               </div>
-                              <div class="mainSubText"><h:outputText value="#{msg.location}" /> <r:nodePath value="#{DocumentDetailsBean.document.nodeRef}" breadcrumb="true" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.location}" /> <r:nodePath value="#{DocumentDetailsBean.document.nodeRef}" breadcrumb="true" actionListener="#{BrowseBean.clickSpacePath}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>

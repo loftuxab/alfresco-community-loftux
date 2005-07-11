@@ -145,7 +145,7 @@ public class NodePathLinkRenderer extends BaseRenderer
          
          if (elementString != null)
          {
-            buf.append(" / ");
+            buf.append("/");
             buf.append(elementString);
          }
       }
@@ -180,7 +180,7 @@ public class NodePathLinkRenderer extends BaseRenderer
          
          if (elementString != null)
          {
-            buf.append(" / ");
+            buf.append("/");
             buf.append(elementString);
          }
       }
