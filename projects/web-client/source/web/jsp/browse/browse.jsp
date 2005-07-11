@@ -106,7 +106,7 @@
                                     <a:actionLink value="#{msg.manage_rules}" image="/images/icons/rule.gif" action="manageRules" actionListener="#{BrowseBean.setupSpaceAction}" id="link10">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
                                     </a:actionLink>
-                                    <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}">
+                                    <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}" id="eval1">
                                        <a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
                                     </a:booleanEvaluator>
                                  </a:menu>
@@ -251,7 +251,7 @@
                            <f:facet name="header">
                               <a:sortLink label="Path" value="displayPath" styleClass="header"/>
                            </f:facet>
-                           <h:outputText value="#{r.displayPath}" />
+                           <r:nodePath value="#{r.path}" actionListener="#{BrowseBean.clickSpacePath}" />
                         </a:column>
                         
                         <%-- Created Date column for details view mode --%>
@@ -368,7 +368,7 @@
                            <f:facet name="header">
                               <a:sortLink label="Path" value="displayPath" styleClass="header"/>
                            </f:facet>
-                           <h:outputText value="#{r.displayPath}" />
+                           <r:nodePath value="#{r.path}" actionListener="#{BrowseBean.clickSpacePath}" />
                         </a:column>
                         
                         <%-- Size for details/icons view modes --%>

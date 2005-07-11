@@ -469,6 +469,7 @@ public class BrowseBean implements IContextListener
                   MapNode node = new MapNode(nodeRef, this.nodeService, true);
                   
                   // construct the path to this Node
+                  node.addPropertyResolver("path", this.resolverPath);
                   node.addPropertyResolver("displayPath", this.resolverDisplayPath);
                   
                   this.containerNodes.add(node);
@@ -481,6 +482,7 @@ public class BrowseBean implements IContextListener
                   setupDataBindingProperties(node);
                   
                   // construct the path to this Node
+                  node.addPropertyResolver("path", this.resolverPath);
                   node.addPropertyResolver("displayPath", this.resolverDisplayPath);
                   
                   this.contentNodes.add(node);
@@ -558,9 +560,15 @@ public class BrowseBean implements IContextListener
       }
    };
    
+   private NodePropertyResolver resolverPath = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         return nodeService.getPath(node.getNodeRef());
+      }
+   };
+   
    private NodePropertyResolver resolverDisplayPath = new NodePropertyResolver() {
       public Object get(MapNode node) {
-         return Repository.getDisplayPath( nodeService.getPath(node.getNodeRef()) );
+         return Repository.getDisplayPath( (Path)node.get("path") );
       }
    };
    

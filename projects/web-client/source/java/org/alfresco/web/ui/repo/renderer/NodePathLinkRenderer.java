@@ -79,13 +79,22 @@ public class NodePathLinkRenderer extends BaseRenderer
       
       Writer out = context.getResponseWriter();
       
-      // make sure we have a NodeRef from the 'value' property ValueBinding
+      // make sure we have a NodeRef or Path from the 'value' property ValueBinding
+      Path path = null;
+      NodeRef nodeRef = null;
       Object val = ((UINodePath)component).getValue();
-      if (val instanceof NodeRef == false)
+      if (val instanceof NodeRef == true)
       {
-         throw new IllegalArgumentException("UINodePath component 'value' property must resolve to a NodeRef!");
+         nodeRef = (NodeRef)val;
       }
-      NodeRef nodeRef = (NodeRef)val;
+      else if (val instanceof Path == true)
+      {
+         path = (Path)val;
+      }
+      else
+      {
+         throw new IllegalArgumentException("UINodePath component 'value' property must resolve to a NodeRef or Path!");
+      }
       
       boolean isBreadcrumb = false;
       Boolean breadcrumb = (Boolean)component.getAttributes().get("breadcrumb");
@@ -102,7 +111,10 @@ public class NodePathLinkRenderer extends BaseRenderer
          tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
-         Path path = service.getPath(nodeRef);
+         if (path == null)
+         {
+            path = service.getPath(nodeRef);
+         }
          
          if (isBreadcrumb == false)
          {
@@ -122,6 +134,15 @@ public class NodePathLinkRenderer extends BaseRenderer
       }
    }
    
+   /**
+    * Return the path with each element as a single clickable link e.g. breadcrumb style
+    * 
+    * @param context        FacesContext
+    * @param component      UIComponent to get display attribute from
+    * @param path           Node Path to use
+    * 
+    * @return the path with each individual element clickable
+    */
    private String buildPathAsBreadcrumb(FacesContext context, UIComponent component, Path path)
    {
       StringBuilder buf = new StringBuilder(1024);
@@ -153,6 +174,15 @@ public class NodePathLinkRenderer extends BaseRenderer
       return buf.toString();
    }
    
+   /**
+    * Return the path with the entire path as a single clickable link
+    * 
+    * @param context        FacesContext
+    * @param component      UIComponent to get display attribute from
+    * @param path           Node Path to use
+    * 
+    * @return the entire path as a single clickable link
+    */
    private String buildPathAsSingular(FacesContext context, UIComponent component, Path path)
    {
       StringBuilder buf = new StringBuilder(1024);

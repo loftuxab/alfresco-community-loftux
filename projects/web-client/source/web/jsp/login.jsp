@@ -105,4 +105,17 @@
    </h:form>
 </f:view>
 
+<script>
+
+   if (document.getElementById("loginForm:user-name").value.length == 0)
+   {
+      document.getElementById("loginForm:user-name").focus();
+   }
+   else
+   {
+      document.getElementById("loginForm:user-password").focus();
+   }
+
+</script>
+
 </r:page>
