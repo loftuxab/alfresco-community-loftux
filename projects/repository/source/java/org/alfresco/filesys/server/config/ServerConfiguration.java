@@ -318,7 +318,7 @@ public class ServerConfiguration
         {
             // Error accessing the Win32NetBIOS DLL code
             
-            logger.error("Error accessing Win32 NetBIOS, check DLL is on the path");
+            logger.error("Error accessing Win32 NetBIOS, check DLL is on the path", ex);
             
             // Disable the CIFS server
             
@@ -332,7 +332,7 @@ public class ServerConfiguration
         {
             // Configuration error
             
-            logger.error("CIFS server configuration error, " + ex.getMessage());
+            logger.error("CIFS server configuration error, " + ex.getMessage(), ex);
             
             // Disable the CIFS server
             
