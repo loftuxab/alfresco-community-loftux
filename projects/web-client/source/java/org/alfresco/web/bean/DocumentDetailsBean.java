@@ -783,6 +783,22 @@ public class DocumentDetailsBean
    }
    
    /**
+    * Steps to next item in the list of content for the current Space
+    */
+   public void nextItem()
+   {
+      
+   }
+   
+   /**
+    * Steps to the previous item in the list of content for the current Space
+    */
+   public void previousItem()
+   {
+      
+   }
+   
+   /**
     * Returns whether the current document is locked
     * 
     * @return true if the document is checked out

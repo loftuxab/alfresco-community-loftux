@@ -819,8 +819,8 @@ public class NewUserWizard extends AbstractWizardBean
             logger.debug("Created Home Space for with name: " + spaceName);
          
          // apply the uifacets aspect - icon, title and description props
-         Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
-         uiFacetsProps.put(ContentModel.PROP_ICON, "space-icon-default");
+         Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(3);
+         uiFacetsProps.put(ContentModel.PROP_ICON, NewSpaceWizard.SPACE_ICON_DEFAULT);
          uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
          this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
          

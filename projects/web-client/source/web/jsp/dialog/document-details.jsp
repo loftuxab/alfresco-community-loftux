@@ -82,7 +82,7 @@
                            <td width=100 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" />
-                                                            
+                              
                               <%-- checkin, checkout and undo checkout --%>
                               <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
                                  <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" padding="4"
@@ -158,6 +158,14 @@
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                  </a:actionLink>
                               </a:menu>
+                           </td>
+                           
+                           <%-- Navigation --%>
+                           <td bgcolor="#465F7D" width=1></td>
+                           <td width=100>
+                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.navigation}" /><br>
+                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" action="#{DocumentDetailsBean.nextItem}" />
+                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" action="#{DocumentDetailsBean.previousItem}" />
                            </td>
                         </tr>
                      </table>

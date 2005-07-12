@@ -52,6 +52,8 @@ import org.apache.log4j.Logger;
  */
 public class NewSpaceWizard extends AbstractWizardBean
 {
+   public static final String SPACE_ICON_DEFAULT = "space-icon-default";
+
    private static Logger logger = Logger.getLogger(NewSpaceWizard.class);
    
    // TODO: retrieve these from the config service
@@ -378,7 +380,7 @@ public class NewSpaceWizard extends AbstractWizardBean
       // reset all variables
       this.createFrom = "scratch";
       this.spaceType = "container";
-      this.icon = "space-icon-default";
+      this.icon = SPACE_ICON_DEFAULT;
       this.copyPolicy = "contents";
       this.existingSpaceId = null;
       this.templateSpaceId = null;

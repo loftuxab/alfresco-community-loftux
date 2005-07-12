@@ -48,6 +48,7 @@ import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.NodePropertyResolver;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.bean.wizard.NewSpaceWizard;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIActionLink;
@@ -383,6 +384,7 @@ public class BrowseBean implements IContextListener
                
                // create our Node representation
                MapNode node = new MapNode(nodeRef, this.nodeService, true);
+               node.addPropertyResolver("icon", this.resolverSpaceIcon);
                
                this.containerNodes.add(node);
             }
@@ -471,6 +473,7 @@ public class BrowseBean implements IContextListener
                   // construct the path to this Node
                   node.addPropertyResolver("path", this.resolverPath);
                   node.addPropertyResolver("displayPath", this.resolverDisplayPath);
+                  node.addPropertyResolver("icon", this.resolverSpaceIcon);
                   
                   this.containerNodes.add(node);
                }
@@ -569,6 +572,13 @@ public class BrowseBean implements IContextListener
    private NodePropertyResolver resolverDisplayPath = new NodePropertyResolver() {
       public Object get(MapNode node) {
          return Repository.getDisplayPath( (Path)node.get("path") );
+      }
+   };
+   
+   private NodePropertyResolver resolverSpaceIcon = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         String icon = (String)node.getProperties().get("icon");
+         return (icon != null ? icon : NewSpaceWizard.SPACE_ICON_DEFAULT);
       }
    };
    
