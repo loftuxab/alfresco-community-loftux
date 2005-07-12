@@ -107,4 +107,19 @@ public interface ContentService
      */
     public void transform(ContentReader reader, ContentWriter writer)
             throws NoTransformerException, ContentIOException;
+    
+    /**
+     * Returns whether a transformer exists that can read the content from
+     * the reader and write the content back out to the writer.
+     * <p>
+     * The mimetypes used for the transformation must be set both on
+     * the {@link Content#getMimetype() reader} and on the
+     * {@link Content#getMimetype() writer}.
+     * 
+     * @param reader the source content location and mimetype
+     * @param writer the target content location and mimetype
+     * 
+     * @return true if a transformer exists, false otherwise
+     */
+    public boolean isTransformable(ContentReader reader, ContentWriter writer);
 }

@@ -1328,16 +1328,22 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             {
                                 ContentWriter writer = contentService.getTempWriter();
                                 writer.setMimetype("text/plain");
-                                try
+                                if (contentService.isTransformable(reader, writer))
                                 {
-                                    contentService.transform(reader, writer);
-                                    doc.add(Field.Text("TEXT", new InputStreamReader(writer.getReader().getContentInputStream())));
+                                   try
+                                   {
+                                       contentService.transform(reader, writer);
+                                       doc.add(Field.Text("TEXT", new InputStreamReader(writer.getReader().getContentInputStream())));
+                                   }
+                                   catch (NoTransformerException e)
+                                   {
+                                       // if it does not convert we did not write
+                                       doc.add(Field.Text("TEXT", ""));
+                                   }
                                 }
-                                catch (NoTransformerException e)
+                                else
                                 {
-                                    // if it does not convert we did not write
-                                    // and
-                                    // text
+                                    doc.add(Field.Text("TEXT", ""));
                                 }
                             }
                         }

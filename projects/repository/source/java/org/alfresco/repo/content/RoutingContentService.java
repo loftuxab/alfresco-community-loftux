@@ -202,6 +202,29 @@ public class RoutingContentService implements ContentService
         transformer.transform(reader, writer);
         // done
     }
+    
+    /**
+     * @see org.alfresco.repo.content.transform.ContentTransformerRegistry
+     * @see org.alfresco.repo.content.transform.ContentTransformer
+     */
+    public boolean isTransformable(ContentReader reader, ContentWriter writer)
+    {
+        // check that source and target mimetypes are available
+        String sourceMimetype = reader.getMimetype();
+        if (sourceMimetype == null)
+        {
+            throw new AlfrescoRuntimeException("The content reader mimetype must be set: " + reader);
+        }
+        String targetMimetype = writer.getMimetype();
+        if (targetMimetype == null)
+        {
+            throw new AlfrescoRuntimeException("The content writer mimetype must be set: " + writer);
+        }
+        
+        // look for a transformer
+        ContentTransformer transformer = transformerRegistry.getTransformer(sourceMimetype, targetMimetype);
+        return (transformer != null);
+    }
 
     /**
      * Ensures that, upon closure of the output stream, the node is updated with
