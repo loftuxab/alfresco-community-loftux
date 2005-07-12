@@ -13,6 +13,7 @@
       <property environment="env" />
       <property file="${user.home}/user-override.properties" />
       <property file="project-override.properties" />
+      <property file="${common.dir}/version.properties" />
       <property file="${common.dir}/common.properties" />
       <property file="project.properties" />
 

@@ -58,7 +58,7 @@ public class LuceneCategoryTest extends TestCase
     
     private ServiceRegistry serviceRegistry;
     
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco-application-context.xml");
+    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
     NodeService nodeService;
     DictionaryService dictionaryService;
     LuceneIndexLock luceneIndexLock;

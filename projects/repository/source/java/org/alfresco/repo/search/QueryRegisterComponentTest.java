@@ -27,7 +27,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class QueryRegisterComponentTest extends TestCase
 {
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco-application-context.xml");
+    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
     private DictionaryService dictionaryService;
     private NamespaceService namespaceService;
 

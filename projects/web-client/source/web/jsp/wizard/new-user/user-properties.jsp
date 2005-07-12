@@ -47,7 +47,7 @@
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
-   <f:loadBundle basename="messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <%-- set the form name here --%>
    <h:form id="user-props">

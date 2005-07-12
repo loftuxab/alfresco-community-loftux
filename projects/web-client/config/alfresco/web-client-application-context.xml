@@ -3,11 +3,11 @@
 
 <beans>
    
-   <bean id="configSource" class="org.alfresco.config.source.WebAppConfigSource">
+   <bean id="configSource" class="org.alfresco.config.source.ClassPathConfigSource">
       <constructor-arg>
          <list>
-            <value>/WEB-INF/web-client-config.xml</value>
-            <value>/WEB-INF/web-client-config-edit-properties.xml</value>
+            <value>alfresco/web-client-config.xml</value>
+            <value>alfresco/web-client-config-edit-properties.xml</value>
          </list>
       </constructor-arg>
    </bean>

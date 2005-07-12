@@ -47,7 +47,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class FileImporterTest extends TestCase
 {
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco-application-context.xml");
+    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
 
     private NodeService nodeService;
 
@@ -99,7 +99,7 @@ public class FileImporterTest extends TestCase
     public void testCreateFile()
     {
         FileImporter fileImporter = createFileImporter();
-        URL url = this.getClass().getClassLoader().getResource("alfresco-application-context.xml");
+        URL url = this.getClass().getClassLoader().getResource("alfresco/application-context.xml");
         fileImporter.loadFile(rootNodeRef, new File(url.getFile()));
     }
 

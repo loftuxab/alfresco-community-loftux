@@ -71,7 +71,7 @@
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
-   <f:loadBundle basename="messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <h:form id="new-rule-simple-workflow">
    

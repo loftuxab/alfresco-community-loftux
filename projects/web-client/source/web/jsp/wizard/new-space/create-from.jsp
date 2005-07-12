@@ -30,7 +30,7 @@
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
-   <f:loadBundle basename="messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <%-- REPLACE ME: set the form name here --%>
    <h:form id="new-space-create-from">

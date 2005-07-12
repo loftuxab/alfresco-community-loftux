@@ -157,7 +157,7 @@ public class CIFSServer
         try
         {
             // Create the configuration service in the same way that Spring creates it
-            ApplicationContext ctx = new ClassPathXmlApplicationContext("alfresco-application-context.xml");
+            ApplicationContext ctx = new ClassPathXmlApplicationContext("alfresco/application-context.xml");
 
             // get the CIFS server bean
             CIFSServer server = (CIFSServer) ctx.getBean("cifsServer");

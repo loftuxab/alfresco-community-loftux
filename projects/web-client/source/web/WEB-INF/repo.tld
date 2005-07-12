@@ -2,16 +2,17 @@
 <!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_2.dtd">
 
 <taglib>
-   <tlibversion>1.0</tlibversion>
-   <jspversion>1.2</jspversion>
-   <shortname>r</shortname>
+
+   <tlib-version>1.0</tlib-version>
+   <jsp-version>1.2</jsp-version>
+   <short-name>r</short-name>
    <display-name>Alfresco Repository JSF Components</display-name>
    <description>Tag library consisting of Alfresco repository JSF components i.e. those that can only be used in Alfresco based projects</description>
 
    <tag>
       <name>propertySheetGrid</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.property.PropertySheetGridTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.property.PropertySheetGridTag</tag-class>
+      <body-content>JSP</body-content>
       <display-name>Property Sheet</display-name>
       <description>Displays the current properties for a node in the repository</description>
       
@@ -93,8 +94,8 @@
    
    <tag>
       <name>property</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.property.PropertyTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.property.PropertyTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -141,8 +142,8 @@
    
    <tag>
       <name>nodeDescendants</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.NodeDescendantsTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.NodeDescendantsTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -273,8 +274,8 @@
    
    <tag>
       <name>simpleSearch</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.SimpleSearchTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.SimpleSearchTag</tag-class>
+      <body-content>JSP</body-content>
       
       <description>
          Displays controls and icons as the simple search controls needed for the repo client UI.
@@ -325,8 +326,8 @@
    
    <tag>
       <name>systemError</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.SystemErrorTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.SystemErrorTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>styleClass</name>
@@ -349,8 +350,8 @@
    
    <tag>
       <name>page</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.PageTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.PageTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>title</name>
@@ -361,14 +362,14 @@
    
    <tag>
       <name>uploadForm</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.UploadFormTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.UploadFormTag</tag-class>
+      <body-content>JSP</body-content>
    </tag>
    
    <tag>
       <name>spaceSelector</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.SpaceSelectorTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.SpaceSelectorTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -439,8 +440,8 @@
    
    <tag>
       <name>categorySelector</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.CategorySelectorTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.CategorySelectorTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -511,8 +512,8 @@
    
    <tag>
       <name>shelf</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.shelf.ShelfTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.shelf.ShelfTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -577,8 +578,8 @@
    
    <tag>
       <name>shelfGroup</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.shelf.ShelfGroupTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.shelf.ShelfGroupTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -625,8 +626,8 @@
    
    <tag>
       <name>shelfItem</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.shelf.ShelfItemTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.shelf.ShelfItemTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -667,8 +668,8 @@
    
    <tag>
       <name>clipboardShelfItem</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.shelf.ClipboardShelfItemTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.shelf.ClipboardShelfItemTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -703,8 +704,8 @@
    
    <tag>
       <name>recentSpacesShelfItem</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.shelf.RecentSpacesShelfItemTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.shelf.RecentSpacesShelfItemTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>
@@ -739,8 +740,8 @@
    
    <tag>
       <name>shortcutsShelfItem</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.shelf.ShortcutsShelfItemTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.shelf.ShortcutsShelfItemTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>

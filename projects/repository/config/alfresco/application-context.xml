@@ -4,8 +4,8 @@
 <!-- This file must be split up once the number and spread of beans increases qweqwe -->
 <beans>
    
-   <import resource="applicationServices.xml"/>
-   <import resource="ruleService.xml"/>
+   <import resource="classpath:applicationServices.xml"/>
+   <import resource="classpath:ruleService.xml"/>
    
    <!--                    -->
    <!--  PERSISTENCE       -->
@@ -16,7 +16,7 @@
       <property name="ignoreUnresolvablePlaceholders"><value>true</value></property>
       <property name="locations">
 	     <list>
-			<value>classpath:alfresco-repository.properties</value>
+			<value>classpath:alfresco/repository.properties</value>
 		 </list>	
       </property>
    </bean>   
@@ -1022,7 +1022,7 @@
          <ref bean="serviceRegistry" />
       </constructor-arg>
       <constructor-arg>
-         <value>alfresco-file-servers.xml</value>
+         <value>alfresco/file-servers.xml</value>
       </constructor-arg>
       <constructor-arg>
          <ref bean="contentDiskDriver" />

@@ -34,7 +34,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  */
 public abstract class BaseSpringTest extends AbstractTransactionalDataSourceSpringContextTests
 {
-    public static final String[] CONFIG_LOCATIONS = new String[] { "classpath:alfresco-application-context.xml" };
+    public static final String[] CONFIG_LOCATIONS = new String[] { "classpath:alfresco/application-context.xml" };
     
     /** protected so that it gets populated if autowiring is done by variable name **/
     protected SessionFactory sessionFactory;

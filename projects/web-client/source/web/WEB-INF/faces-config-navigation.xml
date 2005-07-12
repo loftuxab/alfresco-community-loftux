@@ -1,0 +1,513 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE faces-config PUBLIC "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.1//EN"
+                              "http://java.sun.com/dtd/web-facesconfig_1_1.dtd">
+<faces-config>
+
+   <!-- ==================== NAVIGATION ==================== -->
+   <!-- navigation rules describe the navigation cases between views using the -->
+   <!-- outcomes from action methods or the outcome from a default action impl -->
+   <navigation-rule>
+      <description>
+         The decision rule used by the NavigationHandler to
+         determine which view must be displayed after the
+         current view, login.jsp is processed.
+      </description>
+      <from-view-id>/jsp/login.jsp</from-view-id>
+      <navigation-case>
+         <description>
+             Indicates to the NavigationHandler that the browse.jsp
+             view must be displayed if the Action referenced by a 
+             UICommand component on the login.jsp view returns 
+             the outcome "success".
+         </description>
+         <from-outcome>success</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- rule to get back to the Browse page from anywhere (e.g. breadcrumb click, finish on dialog) -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>browse</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- rules to the Details pages from anywhere (e.g. shelf components etc.) -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>showDocDetails</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>showSpaceDetails</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- rule to get to the Advanced Search page from anywhere -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>advSearch</from-outcome>
+         <to-view-id>/jsp/dialog/advanced-search.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- rule to get back to the login page from anywhere -->
+   <navigation-rule>
+      <from-view-id>/jsp/*</from-view-id>
+      <navigation-case>
+         <from-outcome>logout</from-outcome>
+         <to-view-id>/jsp/login.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- Browse screen action outcomes -->
+   <navigation-rule>
+      <from-view-id>/jsp/browse/browse.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>createSpace</from-outcome>
+         <to-view-id>/jsp/dialog/new-space.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>createAdvancedSpace</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/create-from.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteSpace</from-outcome>
+         <to-view-id>/jsp/dialog/delete-space.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteFile</from-outcome>
+         <to-view-id>/jsp/dialog/delete-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>addContent</from-outcome>
+         <to-view-id>/jsp/wizard/add-content/upload.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>createContent</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/create.jsp</to-view-id>
+      </navigation-case>
+      <!-- showDocDetails and showSpaceDetails moved to /jsp/* above -->
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>checkinFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkin-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>undoCheckoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/undocheckout-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>updateFile</from-outcome>
+         <to-view-id>/jsp/dialog/update-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editFile</from-outcome>
+         <to-view-id>/jsp/dialog/edit-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editInline</from-outcome>
+         <to-view-id>/jsp/dialog/edit-file-inline.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>manageRules</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>manageUsers</from-outcome>
+         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>showSystemInfo</from-outcome>
+         <to-view-id>/jsp/dialog/system-info.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-file.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-file-inline.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/checkout-file.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>checkoutFileLink</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file-link.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/space-details.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>editSpaceProperties</from-outcome>
+         <to-view-id>/jsp/dialog/edit-space.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>manageRules</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteSpace</from-outcome>
+         <to-view-id>/jsp/dialog/delete-space.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-space.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/document-details.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>editDocProperties</from-outcome>
+         <to-view-id>/jsp/dialog/edit-document-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>checkinFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkin-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>undoCheckoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/undocheckout-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>updateFile</from-outcome>
+         <to-view-id>/jsp/dialog/update-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteFile</from-outcome>
+         <to-view-id>/jsp/dialog/delete-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editFile</from-outcome>
+         <to-view-id>/jsp/dialog/edit-file.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editInline</from-outcome>
+         <to-view-id>/jsp/dialog/edit-file-inline.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editSimpleWorkflow</from-outcome>
+         <to-view-id>/jsp/dialog/edit-simple-workflow.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editCategory</from-outcome>
+         <to-view-id>/jsp/dialog/edit-category.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-document-properties.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-simple-workflow.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-category.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/rules.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>createRule</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editRule</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteRule</from-outcome>
+         <to-view-id>/jsp/dialog/delete-rule.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/delete-rule.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>manageRules</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>browse</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/users.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>createUser</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editUser</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rule for the new space dialog -->
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/new-space.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rule to cancel and finish from any wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/*</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/browse/browse.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the advanced space wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-space/*</from-view-id>
+      <navigation-case>
+         <from-outcome>create-from</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/create-from.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>from-scratch</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/from-scratch.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>from-existing</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/from-existing.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>from-template</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/from-template.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>details</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/new-space/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the add in-line content wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/create-content/*</from-view-id>
+      <navigation-case>
+         <from-outcome>create</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/create.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>properties</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the add content wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/add-content/*</from-view-id>
+      <navigation-case>
+         <from-outcome>upload</from-outcome>
+         <to-view-id>/jsp/wizard/add-content/upload.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>properties</from-outcome>
+         <to-view-id>/jsp/wizard/add-content/properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/add-content/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the new rule wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-rule/*</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>details</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>condition</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>in-category</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition-in-category.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>match-text</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition-contains-text.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>action</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>simple-workflow</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-simple-workflow.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>link-category</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-link-category.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>add-features</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-add-features.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>copy</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-copy.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>move</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-move.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>transform</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-transform.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>mail</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-email.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>check-in</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-check-in.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>check-out</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-check-out.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-rule/condition.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>no-condition</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-rule/action.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>no-condition</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the New User wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/new-user/*</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>person-properties</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>user-properties</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/user-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+
+</faces-config>

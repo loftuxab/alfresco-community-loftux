@@ -23,13 +23,12 @@
 
 <%@ page buffer="16kb" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
 
 <f:view>
    <%-- load a bundle of properties I18N strings here --%>
-   <f:loadBundle basename="messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <h:form id="loginForm" >
    

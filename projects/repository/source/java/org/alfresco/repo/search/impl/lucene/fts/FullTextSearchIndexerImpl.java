@@ -206,6 +206,6 @@ public class FullTextSearchIndexerImpl implements FTSIndexerAware, FullTextSearc
 
     public static void main(String[] args) throws InterruptedException
     {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco-application-context.xml");
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
     }
 }

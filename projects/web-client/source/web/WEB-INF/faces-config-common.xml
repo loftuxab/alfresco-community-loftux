@@ -93,7 +93,36 @@
       <component-type>org.alfresco.faces.Descriptions</component-type>
       <component-class>org.alfresco.web.ui.common.component.description.UIDescriptions</component-class>
    </component>
-
+   
+   <component>
+      <component-type>org.alfresco.faces.debug.HttpSessionState</component-type>
+      <component-class>org.alfresco.web.ui.common.component.debug.UIHttpSessionState</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.debug.HttpRequestState</component-type>
+      <component-class>org.alfresco.web.ui.common.component.debug.UIHttpRequestState</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.debug.HttpRequestParams</component-type>
+      <component-class>org.alfresco.web.ui.common.component.debug.UIHttpRequestParams</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.debug.HttpRequestHeaders</component-type>
+      <component-class>org.alfresco.web.ui.common.component.debug.UIHttpRequestHeaders</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.debug.HttpApplicationState</component-type>
+      <component-class>org.alfresco.web.ui.common.component.debug.UIHttpApplicationState</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.debug.SystemProperties</component-type>
+      <component-class>org.alfresco.web.ui.common.component.debug.UISystemProperties</component-class>
+   </component>
 
    <!-- ==================== CONVERTERS ==================== -->
    <converter>

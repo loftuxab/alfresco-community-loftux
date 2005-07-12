@@ -65,10 +65,12 @@
       <copy file="${deploy.file}" todir="${jboss.deploy.dir}" />
       <!-- push externally visible config files into conf directory -->
       <copy todir="${jboss.deploy.dir}/../conf" >
-         <fileset dir="${repository.project.dir}/config" >
-            <include name="**/*" />
+         <fileset dir="${repository.project.dir}/${config.dir.name}" />
+         <fileset dir="${web-client.project.dir}/${config.dir.name}" >
+            <exclude name="log4j.properties" />
          </fileset>
       </copy>
+      <copy file="${basedir}/version.properties" todir="${jboss.deploy.dir}/../conf/alfresco" />
       <!-- ensure mysql drivers are present -->
       <copy todir="${jboss.deploy.dir}/../lib"
             file="${3rdparty.project.dir}/lib/mysql-connector-java-3.0.16-ga-bin.jar" />
@@ -80,9 +82,13 @@
       <copy file="${deploy.file}" todir="${tomcat.deploy.dir}" />
       <!-- push externally visible config files into war file -->
       <war warfile="${tomcat.deploy.dir}/${web-client.project.name}.war" update="true" >
-         <classes dir="${repository.project.dir}/config">
-            <include name="**/*" />
+         <classes dir="${repository.project.dir}/${config.dir.name}" />
+         <classes dir="${web-client.project.dir}/${config.dir.name}">
+            <exclude name="alfresco/log4j.properties" />
          </classes>
+         <classes file="${web-client.project.dir}/${config.dir.name}/alfresco/log4j.properties" 
+                  prefix="WEB-INF/classes"/>
+         <classes file="${basedir}/version.properties" prefix="WEB-INF/classes/alfresco"/>
       </war>
       <!-- ensure mysql drivers are present -->
       <copy todir="${tomcat.home}/common/lib"
@@ -176,8 +182,11 @@
          <zipfileset dir="${projects.dir}/netbios/dll" />
          <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
-        <zipfileset dir="${repository.project.dir}/config"
-                    prefix="jboss/server/default/conf" />
+         <zipfileset dir="${repository.project.dir}/${config.dir.name}"
+                     prefix="jboss/server/default/conf" />
+         <zipfileset dir="${web-client.project.dir}/${config.dir.name}"
+                     prefix="jboss/server/default/conf" excludes="alfresco/log4j.properties" />
+         <zipfileset file="${basedir}/version.properties" prefix="jboss/server/default/conf/alfresco" />
       </zip>
    </target>
    
@@ -189,8 +198,11 @@
          <tarfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.bat" />
          <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
-         <tarfileset dir="${repository.project.dir}/config"
-                    prefix="jboss/server/default/conf" />
+         <tarfileset dir="${repository.project.dir}/${config.dir.name}"
+                     prefix="jboss/server/default/conf" />
+         <tarfileset dir="${web-client.project.dir}/${config.dir.name}"
+                     prefix="jboss/server/default/conf" excludes="alfresco/log4j.properties" />
+         <tarfileset file="${basedir}/version.properties" prefix="jboss/server/default/conf/alfresco" />
       </tar>
       <gzip zipfile="${dist.dir}/${jboss.dist.filename}.tar.gz" src="${dist.dir}/${jboss.dist.filename}.tar" />
       <delete file="${dist.dir}/${jboss.dist.filename}.tar" />

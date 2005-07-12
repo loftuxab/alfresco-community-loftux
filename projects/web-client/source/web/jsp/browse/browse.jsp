@@ -24,14 +24,13 @@
 
 <%@ page buffer="50kb" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
 <r:page>
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
-   <f:loadBundle basename="messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <h:form id="browse">
    
@@ -108,6 +107,7 @@
                                     </a:actionLink>
                                     <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}" id="eval1">
                                        <a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
+                                       <a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" id="link12" />
                                     </a:booleanEvaluator>
                                  </a:menu>
                               </td>

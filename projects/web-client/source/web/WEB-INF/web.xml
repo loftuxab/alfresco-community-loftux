@@ -16,7 +16,7 @@
 
    <context-param>
       <param-name>javax.faces.CONFIG_FILES</param-name>
-      <param-value>/WEB-INF/faces-config-common.xml,/WEB-INF/faces-config-repo.xml,/WEB-INF/faces-config-zoo.xml</param-value>
+      <param-value>/WEB-INF/faces-config-navigation.xml,/WEB-INF/faces-config-common.xml,/WEB-INF/faces-config-repo.xml,/WEB-INF/faces-config-zoo.xml</param-value>
    </context-param>
 
    <context-param>
@@ -56,10 +56,30 @@
 
    <context-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:alfresco-application-context.xml /WEB-INF/web-client-application-context.xml</param-value>
+      <param-value>classpath:alfresco/application-context.xml classpath:alfresco/web-client-application-context.xml</param-value>
       <description>Spring config file locations</description>
    </context-param>
-    
+   
+   <filter>
+      <filter-name>Authentication Filter</filter-name>
+      <filter-class>org.alfresco.web.app.servlet.AuthenticationFilter</filter-class>
+   </filter>
+   
+   <filter>
+      <filter-name>Mode Detection Filter</filter-name>
+      <filter-class>org.alfresco.web.app.servlet.ModeDetectionFilter</filter-class>
+   </filter>
+   
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/faces/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>Mode Detection Filter</filter-name>
+      <url-pattern>/faces/*</url-pattern>
+   </filter-mapping>
+   
    <listener>
       <listener-class>org.apache.myfaces.webapp.StartupServletContextListener</listener-class>
    </listener>
@@ -103,26 +123,6 @@
       <servlet-name>downloadContent</servlet-name>
       <url-pattern>/download/*</url-pattern>
    </servlet-mapping>
-   
-   <filter>
-      <filter-name>Authentication Filter</filter-name>
-      <filter-class>org.alfresco.web.app.servlet.AuthenticationFilter</filter-class>
-   </filter>
-   
-   <filter>
-      <filter-name>Mode Detection Filter</filter-name>
-      <filter-class>org.alfresco.web.app.servlet.ModeDetectionFilter</filter-class>
-   </filter>
-   
-   <filter-mapping>
-      <filter-name>Authentication Filter</filter-name>
-      <url-pattern>/faces/*</url-pattern>
-   </filter-mapping>
-   
-   <filter-mapping>
-      <filter-name>Mode Detection Filter</filter-name>
-      <url-pattern>/faces/*</url-pattern>
-   </filter-mapping>
    
    <session-config>
       <session-timeout>60</session-timeout>
