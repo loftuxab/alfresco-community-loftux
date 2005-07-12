@@ -144,15 +144,12 @@ enter the folder location directly in the dialog, for example '\\MYPC01_A\alfres
 To check the CIFS server is running, try connecting from the Alfresco server using smbclient.
 
 If you are unable to connect to the CIFS server, then depending on your network, you may need 
-to configure the domain for CIFS to use.  To set this, edit the 'file-servers.xml' file in the 
-'~/alfresco' directory and add the domain into the following line:
+to configure the domain for CIFS to use.  To set this, edit the 'alfresco-file-servers.xml' 
+file in the  '~/alfresco/jboss/server/default/conf' directory and add the domain into the 
+following line:
    <host name="${localname}_A"/>
 so that it is something like:
    <host name="${localname}_A" domain="MYDOMAIN"/>
-
-You then need to place this file in the org/alfresco/filesys directory within the
-repository.jar file, itself within the web-client.war file.  This should only be attempted
-if you are familiar with these things.
 
 You will need to restart the Alfresco server for this to take effect.
 
