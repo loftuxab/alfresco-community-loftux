@@ -21,7 +21,7 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
-<%@ page buffer="32kb" %>
+<%@ page buffer="64kb" %>
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
@@ -70,9 +70,9 @@
                               <img src="<%=request.getContextPath()%>/images/icons/details_large.gif" width=32 height=32>
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
-                              <div class="mainTitle">Details of '<h:outputText value="#{BrowseBean.actionSpace.name}" />'</div>
-                              <div class="mainSubText"><h:outputText value="#{msg.location}" />: <r:nodePath value="#{BrowseBean.actionSpace.nodeRef}" breadcrumb="true" actionListener="#{BrowseBean.clickSpacePath}" /></div>
+                              <div class="mainSubTitle"/><h:outputText value="#{SpaceDetailsBean.name}" /></div>
+                              <div class="mainTitle">Details of '<h:outputText value="#{SpaceDetailsBean.name}" />'</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.location}" />: <r:nodePath value="#{SpaceDetailsBean.space.nodeRef}" breadcrumb="true" actionListener="#{BrowseBean.clickSpacePath}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.spacedetails_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
@@ -81,19 +81,31 @@
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" /><br>
                               
                               <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" padding="4" actionListener="#{ClipboardBean.cutNode}">
-                                 <f:param name="id" value="#{BrowseBean.actionSpace.id}" />
+                                 <f:param name="id" value="#{SpaceDetailsBean.id}" />
                               </a:actionLink>
                               <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" padding="4" actionListener="#{ClipboardBean.copyNode}">
-                                 <f:param name="id" value="#{BrowseBean.actionSpace.id}" />
+                                 <f:param name="id" value="#{SpaceDetailsBean.id}" />
                               </a:actionLink>
                               <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}">
-                                 <f:param name="id" value="#{BrowseBean.actionSpace.id}" />
+                                 <f:param name="id" value="#{SpaceDetailsBean.id}" />
                               </a:actionLink>
                               <a:menu itemSpacing="4" label="More..." image="/images/icons/more.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
                                  <a:actionLink value="#{msg.create_shortcut}" image="/images/icons/shortcut.gif" actionListener="#{UserShortcutsBean.createShortcut}">
-                                    <f:param name="id" value="#{BrowseBean.actionSpace.id}" />
+                                    <f:param name="id" value="#{SpaceDetailsBean.id}" />
                                  </a:actionLink>
                               </a:menu>
+                           </td>
+                           
+                           <%-- Navigation --%>
+                           <td bgcolor="#465F7D" width=1></td>
+                           <td width=100>
+                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.navigation}" /><br>
+                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{SpaceDetailsBean.nextItem}">
+                                 <f:param name="id" value="#{SpaceDetailsBean.id}" />
+                              </a:actionLink>
+                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{SpaceDetailsBean.previousItem}">
+                                 <f:param name="id" value="#{SpaceDetailsBean.id}" />
+                              </a:actionLink>
                            </td>
                         </tr>
                      </table>
@@ -128,7 +140,7 @@
                                              <tr>
                                                 <td>
                                                    <div style="border: thin solid #CCCCCC; padding:4px">
-                                                      <h:graphicImage id="space-logo" url="/images/icons/#{BrowseBean.actionSpace.properties.icon}.gif" width="32" height="32" />
+                                                      <h:graphicImage id="space-logo" url="/images/icons/#{SpaceDetailsBean.space.properties.icon}.gif" width="32" height="32" />
                                                    </div>
                                                 </td>
                                                 <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
@@ -140,7 +152,7 @@
                                        </td>
                                        <td>
                                           <%-- properties for the space --%>
-                                          <r:propertySheetGrid id="space-props" value="#{BrowseBean.actionSpace}" var="spaceProps" 
+                                          <r:propertySheetGrid id="space-props" value="#{SpaceDetailsBean.space}" var="spaceProps" 
                                                          columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                          externalConfig="true" />
                                           <h:messages styleClass="errorMessage" layout="table" />

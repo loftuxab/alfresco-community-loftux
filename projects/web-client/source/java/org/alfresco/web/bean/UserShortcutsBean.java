@@ -288,7 +288,7 @@ public class UserShortcutsBean
          else if (dd.isSubClass(selectedNode.getType(), ContentModel.TYPE_CONTENT))
          {
             // view details for document
-            this.browseBean.setupContentAction(selectedNode.getId());
+            this.browseBean.setupContentAction(selectedNode.getId(), true);
             FacesContext fc = FacesContext.getCurrentInstance();
             fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "showDocDetails");
          }

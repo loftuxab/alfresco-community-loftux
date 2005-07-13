@@ -68,8 +68,8 @@ public class PropertyRenderer extends BaseRenderer
       // make sure there are exactly 2 child components
       int count = property.getChildCount();
       
-      if (logger.isDebugEnabled())
-         logger.debug("property has " + count + " children");
+      //if (logger.isDebugEnabled())
+      //   logger.debug("property has " + count + " children");
       
       if (count == 2)
       {

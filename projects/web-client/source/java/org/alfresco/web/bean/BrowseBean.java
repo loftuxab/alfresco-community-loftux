@@ -70,6 +70,9 @@ import org.apache.log4j.Logger;
  */
 public class BrowseBean implements IContextListener
 {
+   // ------------------------------------------------------------------------------
+   // Construction 
+   
    /**
     * Default Constructor
     */
@@ -243,7 +246,8 @@ public class BrowseBean implements IContextListener
          }
       }
       List<Node> result = this.containerNodes;
-      this.containerNodes = null;
+      
+      // we clear the member variable during invalidateComponents()
       
       return result;
    }
@@ -268,7 +272,8 @@ public class BrowseBean implements IContextListener
          }
       }
       List<Node> result = this.contentNodes;
-      this.contentNodes = null;
+      
+      // we clear the member variable during invalidateComponents()
       
       return result;
    }
@@ -375,12 +380,9 @@ public class BrowseBean implements IContextListener
             // look for Space or File nodes
             if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER))
             {
-               // TODO: Build a specific impl of a MapNode - one that matches certain props
-               //       to return them dynamically - this is to reduce pulling back the entire
-               //       set of props and aspects for all nodes - even if they are not displayed!
-               //       Will this help? As we need to get at least Name etc. for sorting purposes,
-               //       if the props are always needed then it's better to get them here. At least
-               //       the aspects are not always requried - e.g. only need lock info if visible.
+               // TODO: We need to get at least Name etc. for sorting purposes,
+               //       if the props are always needed then it's better to get them here...?
+               //       AH is looking at adding sorting directly to search()
                
                // create our Node representation
                MapNode node = new MapNode(nodeRef, this.nodeService, true);
@@ -714,6 +716,16 @@ public class BrowseBean implements IContextListener
       UIActionLink link = (UIActionLink)event.getComponent();
       Map<String, String> params = link.getParameterMap();
       String id = params.get("id");
+      setupSpaceAction(id, true);
+   }
+   
+   /**
+    * Public helper to setup action pages with Space context
+    * 
+    * @param id     of the Space node to setup context for
+    */
+   public void setupSpaceAction(String id, boolean invalidate)
+   {
       if (id != null && id.length() != 0)
       {
          if (logger.isDebugEnabled())
@@ -745,7 +757,10 @@ public class BrowseBean implements IContextListener
       }
       
       // clear the UI state in preparation for finishing the next action
-      invalidateComponents();
+      if (invalidate == true)
+      {
+         invalidateComponents();
+      }
    }
    
    /**
@@ -759,7 +774,7 @@ public class BrowseBean implements IContextListener
    {
       UIActionLink link = (UIActionLink)event.getComponent();
       Map<String, String> params = link.getParameterMap();
-      setupContentAction(params.get("id"));
+      setupContentAction(params.get("id"), true);
    }
    
    /**
@@ -767,7 +782,7 @@ public class BrowseBean implements IContextListener
     * 
     * @param id     of the content node to setup context for
     */
-   public void setupContentAction(String id)
+   public void setupContentAction(String id, boolean invalidate)
    {
       if (id != null && id.length() != 0)
       {
@@ -799,7 +814,10 @@ public class BrowseBean implements IContextListener
       }
       
       // clear the UI state in preparation for finishing the next action
-      invalidateComponents();
+      if (invalidate == true)
+      {
+         invalidateComponents();
+      }
    }
    
    /**
@@ -990,6 +1008,10 @@ public class BrowseBean implements IContextListener
       {
          this.spacesRichList.setValue(null);
       }
+      
+      // clear the storage of the last set of nodes
+      this.containerNodes = null;
+      this.contentNodes = null;
    }
    
    /**

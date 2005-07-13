@@ -164,8 +164,12 @@
                            <td bgcolor="#465F7D" width=1></td>
                            <td width=100>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.navigation}" /><br>
-                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" action="#{DocumentDetailsBean.nextItem}" />
-                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" action="#{DocumentDetailsBean.previousItem}" />
+                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{DocumentDetailsBean.nextItem}">
+                                 <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                              </a:actionLink>
+                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{DocumentDetailsBean.previousItem}">
+                                 <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                              </a:actionLink>
                            </td>
                         </tr>
                      </table>

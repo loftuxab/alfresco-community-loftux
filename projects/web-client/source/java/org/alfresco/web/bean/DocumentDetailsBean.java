@@ -62,6 +62,7 @@ public class DocumentDetailsBean
    private LockService lockService;
    private CopyService copyService;
    private VersionService versionService;
+   
    private Map<String, String> workflowProperties;
    
    /**
@@ -783,19 +784,82 @@ public class DocumentDetailsBean
    }
    
    /**
-    * Steps to next item in the list of content for the current Space
+    * Navigates to next item in the list of content for the current Space
     */
-   public void nextItem()
+   public void nextItem(ActionEvent event)
    {
-      
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         List<Node> nodes = this.browseBean.getContent();
+         if (nodes.size() > 1)
+         {
+            // perform a linear search - this is slow but stateless
+            // otherwise we would have to manage state of last selected node
+            // this gets very tricky as this bean is instantiated once and never
+            // reset - it does not know when the document has changed etc.
+            for (int i=0; i<nodes.size(); i++)
+            {
+               if (id.equals(nodes.get(i).getId()) == true)
+               {
+                  Node next;
+                  // found our item - navigate to next
+                  if (i != nodes.size() - 1)
+                  {
+                     next = nodes.get(i + 1);
+                  }
+                  else
+                  {
+                     // handle wrapping case
+                     next = nodes.get(0);
+                  }
+                  
+                  // show details for this node
+                  this.browseBean.setupContentAction(next.getId(), false);
+               }
+            }
+         }
+      }
    }
    
    /**
-    * Steps to the previous item in the list of content for the current Space
+    * Navigates to the previous item in the list of content for the current Space
     */
-   public void previousItem()
+   public void previousItem(ActionEvent event)
    {
-      
+      UIActionLink link = (UIActionLink)event.getComponent();
+      Map<String, String> params = link.getParameterMap();
+      String id = params.get("id");
+      if (id != null && id.length() != 0)
+      {
+         List<Node> nodes = this.browseBean.getContent();
+         if (nodes.size() > 1)
+         {
+            // see above
+            for (int i=0; i<nodes.size(); i++)
+            {
+               if (id.equals(nodes.get(i).getId()) == true)
+               {
+                  Node previous;
+                  // found our item - navigate to previous
+                  if (i != 0)
+                  {
+                     previous = nodes.get(i - 1);
+                  }
+                  else
+                  {
+                     // handle wrapping case
+                     previous = nodes.get(nodes.size() - 1);
+                  }
+                  
+                  // show details for this node
+                  this.browseBean.setupContentAction(previous.getId(), false);
+               }
+            }
+         }
+      }
    }
    
    /**

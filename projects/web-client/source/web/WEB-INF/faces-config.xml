@@ -432,6 +432,19 @@
    </managed-bean>
    
    <managed-bean>
+      <description>
+         Backing bean used by the Space details dialog
+      </description>
+      <managed-bean-name>SpaceDetailsBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.SpaceDetailsBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
       <description>Backing bean used for administration purposes</description>
       <managed-bean-name>AdminBean</managed-bean-name>
       <managed-bean-class>org.alfresco.web.bean.AdminBean</managed-bean-class>
