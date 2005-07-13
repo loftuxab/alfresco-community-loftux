@@ -3905,7 +3905,7 @@ public class NTProtocolHandler extends CoreProtocolHandler
             // Filesystem attribute information
 
             case DiskInfoPacker.InfoFsAttribute:
-                String fsType = "FAT";
+                String fsType = "FAT32";
                 if (disk instanceof NTFSStreamsInterface)
                 {
 
