@@ -121,13 +121,13 @@ public class BaseRuleTest extends BaseSpringTest
 
         // Create the node used for tests
         this.nodeRef = this.nodeService.createNode(rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
                 ContentModel.TYPE_CONTAINER).getChildRef();
 
         // Create the config folder
         this.configFolder = this.nodeService.createNode(rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}configfolder"),
                 ContentModel.TYPE_CONFIGURATIONS).getChildRef();
     }

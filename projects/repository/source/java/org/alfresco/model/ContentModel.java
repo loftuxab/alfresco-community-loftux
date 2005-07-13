@@ -43,6 +43,7 @@ public interface ContentModel
 	
     // container type constants
     static final QName TYPE_CONTAINER = QName.createQName(NamespaceService.ALFRESCO_URI, "container");
+    /** child association type supported by {@link #TYPE_CONTAINER} */
     static final QName ASSOC_CHILDREN =QName.createQName(NamespaceService.ALFRESCO_URI, "children");
 
     // roots
@@ -79,6 +80,8 @@ public interface ContentModel
     static final QName ASPECT_GEN_CLASSIFIABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "generalclassifiable");
     static final QName TYPE_CATEGORY = QName.createQName(NamespaceService.ALFRESCO_URI, "category");
     static final QName PROP_CATEGORIES = QName.createQName(NamespaceService.ALFRESCO_URI, "categories");
+    static final QName ASSOC_CATEGORIES = QName.createQName(NamespaceService.ALFRESCO_URI, "categories");
+    static final QName ASSOC_SUBCATEGORIES = QName.createQName(NamespaceService.ALFRESCO_URI, "subcategories");
 
     // lock aspect
     public final static QName ASPECT_LOCKABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "lockable");
@@ -94,6 +97,7 @@ public interface ContentModel
 
     // expected application types
     static final QName TYPE_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "folder");
+    /** child association type supported by {@link #TYPE_FOLDER} */
     static final QName ASSOC_CONTAINS = QName.createQName(NamespaceService.ALFRESCO_URI, "contains");
     
     // person

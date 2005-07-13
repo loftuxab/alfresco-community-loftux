@@ -14,8 +14,8 @@
          select-before-update="false" 
          lazy="true" 
          optimistic-lock="version"  >
-      <!-- composite PK -->
       <cache usage="read-write"></cache>
+      <!-- composite PK -->
       <composite-id name="key" class="org.alfresco.repo.domain.NodeKey">
          <key-property name="protocol" length="100" />
          <key-property name="identifier" length="100" />

@@ -167,7 +167,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         // Create node (this node has some content)
         NodeRef nodeRef = this.dbNodeService.createNode(
                 rootNodeRef, 
-                ContentModel.ASSOC_CONTAINS, 
+                ContentModel.ASSOC_CHILDREN, 
                 QName.createQName("{test}MyVersionableNode"),
                 TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();
@@ -203,7 +203,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         // Create a node that can be associated with the root node
         NodeRef assocNode = this.dbNodeService.createNode(
                 rootNodeRef,
-				ContentModel.ASSOC_CONTAINS,
+				ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}MyAssocNode"),
 				TEST_TYPE_QNAME,
                 this.nodeProperties).getChildRef();

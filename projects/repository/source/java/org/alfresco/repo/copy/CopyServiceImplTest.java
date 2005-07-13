@@ -49,7 +49,6 @@ import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
-import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * Node operations service unit tests
@@ -140,7 +139,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		// Create the node used for copying
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}test"),
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());
@@ -171,7 +170,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		// Add a child that is primary
 		ChildAssociationRef temp2 = this.nodeService.createNode(
 				rootNodeRef,
-				TEST_CHILD_ASSOC_TYPE_QNAME,
+				ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}testNonPrimaryChild"),
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());
@@ -186,7 +185,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		// Add a target assoc
 		ChildAssociationRef temp = this.nodeService.createNode(
 				rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}testAssoc"),
 				TEST_TYPE_QNAME,
 				createTypePropertyBag());
@@ -201,7 +200,7 @@ public class CopyServiceImplTest extends BaseSpringTest
         destinationProps.put(ContentModel.PROP_ENCODING, "UTF-8");
 		ChildAssociationRef temp5 = this.nodeService.createNode(
 				this.rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}testDestinationNode"),
 				TEST_TYPE_QNAME,
 				destinationProps);
@@ -286,7 +285,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		NodeRef copy = this.copyService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
-                TEST_CHILD_ASSOC_TYPE_QNAME,
+                ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}copyAssoc"));		
 		checkCopiedNode(this.sourceNodeRef, copy, true, true, false);
 		
@@ -294,7 +293,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		NodeRef copy2 = this.copyService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
-                TEST_CHILD_ASSOC_TYPE_QNAME,
+                ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}copyAssoc"),
 				true);
 		checkCopiedNode(this.sourceNodeRef, copy2, true, true, true);
@@ -303,7 +302,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		NodeRef copyOfCopy = this.copyService.copy(
 				copy,
 				this.rootNodeRef,
-                TEST_CHILD_ASSOC_TYPE_QNAME,
+                ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}copyOfCopy"));
 		checkCopiedNode(copy, copyOfCopy, true, true, false);
 		
@@ -316,7 +315,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		NodeRef copyWithContent = this.copyService.copy(
 				this.sourceNodeRef,
 				this.rootNodeRef,
-                TEST_CHILD_ASSOC_TYPE_QNAME,
+                ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}copyWithContent"));
 		checkCopiedNode(this.sourceNodeRef, copyWithContent, true, true, false);
 		ContentReader contentReader = this.contentService.getReader(copyWithContent);
@@ -347,7 +346,7 @@ public class CopyServiceImplTest extends BaseSpringTest
         NodeRef copy = this.copyService.copy(
                 this.sourceNodeRef,
                 this.rootNodeRef,
-                TEST_CHILD_ASSOC_TYPE_QNAME,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}withRulesCopy"),
                 true);
         checkCopiedNode(this.sourceNodeRef, copy, true, true, true);

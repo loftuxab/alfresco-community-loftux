@@ -20,6 +20,7 @@ package org.alfresco.repo.search.impl.lucene;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -35,10 +36,8 @@ import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
-import org.alfresco.repo.dictionary.impl.M2Aspect;
 import org.alfresco.repo.dictionary.impl.M2Model;
-import org.alfresco.repo.dictionary.impl.M2Property;
-import org.alfresco.repo.dictionary.impl.M2Type;
+import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
@@ -62,9 +61,9 @@ import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.CachingDateFormat;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author andyh
@@ -72,10 +71,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class LuceneTest extends TestCase
 {
-   
-    public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CONTAINS;
+    private static final String TEST_NAMESPACE = "http://www.alfresco.org/test/lucenetest";
+    private static final QName ASSOC_TYPE_QNAME = QName.createQName(TEST_NAMESPACE, "assoc");
 
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+    private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     NodeService nodeService;
     DictionaryService dictionaryService;
@@ -96,14 +95,11 @@ public class LuceneTest extends TestCase
     private NodeRef n13;
     private NodeRef n14;
     private DictionaryDAO dictionaryDAO;
-    private QName testType;
     private FullTextSearchIndexer luceneFTS;
-    private String TEST_NAMESPACE = "http://www.alfresco.org/test/lucenetest";
-    private QName testSuperType;
-    private M2Type testTypeSuperType;
-    private QName testAspect;
-    private QName testSuperAspect;
-    private M2Aspect testAspectSuperAspect;
+    private QName testType = QName.createQName(TEST_NAMESPACE, "testType");
+    private QName testSuperType = QName.createQName(TEST_NAMESPACE, "testSuperType");
+    private QName testAspect = QName.createQName(TEST_NAMESPACE, "testAspect");
+    private QName testSuperAspect = QName.createQName(TEST_NAMESPACE, "testSuperAspect");
     private ContentService contentService;
     private QueryRegisterComponent queryRegisterComponent;
     private NamespacePrefixResolver namespacePrefixResolver;
@@ -134,18 +130,23 @@ public class LuceneTest extends TestCase
         assertEquals(true, ctx.isSingleton("luceneIndexLock"));
         assertEquals(true, ctx.isSingleton("LuceneFullTextSearchIndexer"));
 
-        createTestTypes();
+        // load in the test model
+        ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
+        InputStream modelStream = cl.getResourceAsStream("org/alfresco/repo/search/impl/lucene/LuceneTest_model.xml");
+        assertNotNull(modelStream);
+        M2Model model = M2Model.createModel(modelStream);
+        dictionaryDAO.putModel(model);
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
 
-        n1 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}one"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"), testSuperType).getChildRef();
         nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "ValueOne");
-        n2 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}two"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n2 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}two"), testSuperType).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "valueone");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "valuetwo");
 
-        n3 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}three"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n3 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}three"), testSuperType).getChildRef();
 
         ObjectOutputStream oos;
         try
@@ -195,22 +196,22 @@ public class LuceneTest extends TestCase
         testList2.add("woof");
         testList2.add(null);
 
-        n4 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}four"), testType, testProperties).getChildRef();
+        n4 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}four"), testType, testProperties).getChildRef();
 
         nodeService.getProperties(n1);
         nodeService.getProperties(n2);
         nodeService.getProperties(n3);
         nodeService.getProperties(n4);
 
-        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), testSuperType).getChildRef();
+        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), testSuperType).getChildRef();
+        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), testSuperType).getChildRef();
+        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), testSuperType).getChildRef();
+        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), testSuperType).getChildRef();
+        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), testSuperType).getChildRef();
+        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), testSuperType).getChildRef();
+        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), testSuperType).getChildRef();
+        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), testSuperType).getChildRef();
        
 
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
@@ -227,7 +228,7 @@ public class LuceneTest extends TestCase
         // writer.putContent(is);
         writer.putContent("The quick brown fox jumped over the lazy dog");
 
-        nodeService.addChild(rootNodeRef, n8, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-0"));
+        nodeService.addChild(rootNodeRef, n8, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}eight-0"));
         nodeService.addChild(n1, n8, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-1"));
         nodeService.addChild(n2, n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}link"));
 
@@ -237,154 +238,6 @@ public class LuceneTest extends TestCase
         nodeService.addChild(n6, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n12, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n13, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
-    }
-
-    private void createTestTypes()
-    {
-        M2Model model = M2Model.createModel("test:lucenetest");
-        model.createImport(NamespaceService.ALFRESCO_DICTIONARY_URI, "d");
-        model.createNamespace(TEST_NAMESPACE, "test");
-        
-        testType = QName.createQName(TEST_NAMESPACE, "testType");
-        testSuperType = QName.createQName(TEST_NAMESPACE, "testSuperType");
-        testTypeSuperType = model.createType("test:" + testSuperType.getLocalName());
-
-        testAspect = QName.createQName(TEST_NAMESPACE, "testAspect");
-        testSuperAspect = QName.createQName(TEST_NAMESPACE, "testSuperAspect");
-        testAspectSuperAspect = model.createAspect("test:" + testSuperAspect.getLocalName());
-        M2Aspect testAspectAspect = model.createAspect("test:" + testAspect.getLocalName());
-        testAspectAspect.setParentName("test:" + testSuperAspect.getLocalName());
-
-        M2Type testTypeType = model.createType("test:" + testType.getLocalName());
-        testTypeType.setParentName("test:" + testSuperType.getLocalName());
-        testTypeType.addMandatoryAspect("test:" + testAspect.getLocalName());
-        M2Property text_indexed_stored_tokenised_atomic = testTypeType.createProperty("test:text-indexed-stored-tokenised-atomic");
-        text_indexed_stored_tokenised_atomic.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
-        text_indexed_stored_tokenised_atomic.setMandatory(true);
-        text_indexed_stored_tokenised_atomic.setMultiValued(false);
-        text_indexed_stored_tokenised_atomic.setIndexed(true);
-        text_indexed_stored_tokenised_atomic.setIndexedAtomically(true);
-        text_indexed_stored_tokenised_atomic.setStoredInIndex(true);
-        text_indexed_stored_tokenised_atomic.setTokenisedInIndex(true);
-
-        M2Property text_indexed_stored_tokenised_nonatomic = testTypeType.createProperty("test:text-indexed-stored-tokenised-nonatomic");
-        text_indexed_stored_tokenised_nonatomic.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
-        text_indexed_stored_tokenised_nonatomic.setMandatory(true);
-        text_indexed_stored_tokenised_nonatomic.setMultiValued(false);
-        text_indexed_stored_tokenised_nonatomic.setIndexed(true);
-        text_indexed_stored_tokenised_nonatomic.setIndexedAtomically(false);
-        text_indexed_stored_tokenised_nonatomic.setStoredInIndex(true);
-        text_indexed_stored_tokenised_nonatomic.setTokenisedInIndex(true);
-
-        M2Property int_ista = testTypeType.createProperty("test:int-ista");
-        int_ista.setType("d:" + PropertyTypeDefinition.INT.getLocalName());
-        int_ista.setMandatory(true);
-        int_ista.setMultiValued(false);
-        int_ista.setIndexed(true);
-        int_ista.setIndexedAtomically(true);
-        int_ista.setStoredInIndex(true);
-        int_ista.setTokenisedInIndex(true);
-
-        M2Property long_ista = testTypeType.createProperty("test:long-ista");        
-        long_ista.setType("d:" + PropertyTypeDefinition.LONG.getLocalName());
-        long_ista.setMandatory(true);
-        long_ista.setMultiValued(false);
-        long_ista.setIndexed(true);
-        long_ista.setIndexedAtomically(true);
-        long_ista.setStoredInIndex(true);
-        long_ista.setTokenisedInIndex(true);
-
-        M2Property float_ista = testTypeType.createProperty("test:float-ista");
-        float_ista.setType("d:" + PropertyTypeDefinition.FLOAT.getLocalName());
-        float_ista.setMandatory(true);
-        float_ista.setMultiValued(false);
-        float_ista.setIndexed(true);
-        float_ista.setIndexedAtomically(true);
-        float_ista.setStoredInIndex(true);
-        float_ista.setTokenisedInIndex(true);
-
-        M2Property double_ista = testTypeType.createProperty("test:double-ista");
-        double_ista.setType("d:" + PropertyTypeDefinition.DOUBLE.getLocalName());
-        double_ista.setMandatory(true);
-        double_ista.setMultiValued(false);
-        double_ista.setIndexed(true);
-        double_ista.setIndexedAtomically(true);
-        double_ista.setStoredInIndex(true);
-        double_ista.setTokenisedInIndex(true);
-
-        M2Property date_ista = testTypeType.createProperty("test:date-ista");
-        date_ista.setType("d:" + PropertyTypeDefinition.DATE.getLocalName());
-        date_ista.setMandatory(true);
-        date_ista.setMultiValued(false);
-        date_ista.setIndexed(true);
-        date_ista.setIndexedAtomically(true);
-        date_ista.setStoredInIndex(true);
-        date_ista.setTokenisedInIndex(true);
-
-        M2Property datetime_ista = testTypeType.createProperty("test:datetime-ista");
-        datetime_ista.setType("d:" + PropertyTypeDefinition.DATETIME.getLocalName());
-        datetime_ista.setMandatory(true);
-        datetime_ista.setMultiValued(false);
-        datetime_ista.setIndexed(true);
-        datetime_ista.setIndexedAtomically(true);
-        datetime_ista.setStoredInIndex(true);
-        datetime_ista.setTokenisedInIndex(true);
-
-        M2Property boolean_ista = testTypeType.createProperty("test:boolean-ista");
-        boolean_ista.setType("d:" + PropertyTypeDefinition.BOOLEAN.getLocalName());
-        boolean_ista.setMandatory(true);
-        boolean_ista.setMultiValued(false);
-        boolean_ista.setIndexed(true);
-        boolean_ista.setIndexedAtomically(true);
-        boolean_ista.setStoredInIndex(true);
-        boolean_ista.setTokenisedInIndex(true);
-
-        M2Property qname_ista = testTypeType.createProperty("test:qname-ista");
-        qname_ista.setType("d:" + PropertyTypeDefinition.QNAME.getLocalName());
-        qname_ista.setMandatory(true);
-        qname_ista.setMultiValued(false);
-        qname_ista.setIndexed(true);
-        qname_ista.setIndexedAtomically(true);
-        qname_ista.setStoredInIndex(true);
-        qname_ista.setTokenisedInIndex(true);
-
-        M2Property guid_ista = testTypeType.createProperty("test:guid-ista");
-        guid_ista.setType("d:" + PropertyTypeDefinition.GUID.getLocalName());
-        guid_ista.setMandatory(true);
-        guid_ista.setMultiValued(false);
-        guid_ista.setIndexed(true);
-        guid_ista.setIndexedAtomically(true);
-        guid_ista.setStoredInIndex(true);
-        guid_ista.setTokenisedInIndex(true);
-
-        M2Property category_ista = testTypeType.createProperty("test:category-ista");
-        category_ista.setType("d:" + PropertyTypeDefinition.CATEGORY.getLocalName());
-        category_ista.setMandatory(true);
-        category_ista.setMultiValued(false);
-        category_ista.setIndexed(true);
-        category_ista.setIndexedAtomically(true);
-        category_ista.setStoredInIndex(true);
-        category_ista.setTokenisedInIndex(true);
-
-        M2Property noderef_ista = testTypeType.createProperty("test:noderef-ista");
-        noderef_ista.setType("d:" + PropertyTypeDefinition.NODE_REF.getLocalName());
-        noderef_ista.setMandatory(true);
-        noderef_ista.setMultiValued(false);
-        noderef_ista.setIndexed(true);
-        noderef_ista.setIndexedAtomically(true);
-        noderef_ista.setStoredInIndex(true);
-        noderef_ista.setTokenisedInIndex(true);
-
-        // M2Property path_ista = testTypeType.createProperty("path-ista");
-        // path_ista.setType(metaModelDAO.getPropertyType(PropertyTypeDefinition.PATH));
-        // path_ista.setMandatory(true);
-        // path_ista.setMultiValued(false);
-        // path_ista.setIndexed(true);
-        // path_ista.setIndexedAtomically(true);
-        // path_ista.setStoredInIndex(true);
-        // path_ista.setTokenisedInIndex(true);
-    
-        dictionaryDAO.putModel(model);
     }
 
     public LuceneTest(String arg0)
@@ -505,8 +358,8 @@ public class LuceneTest extends TestCase
         ////indexer.clearIndex();
 
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}one"), n1));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}one"), n1));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2));
         indexer.updateNode(n1);
         // indexer.deleteNode(new ChildRelationshipRef(rootNode, "path",
         // newNode));
@@ -614,12 +467,12 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
         assertEquals(n2, results.getNodeRef(0));
-        assertEquals(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2), results.getChildAssocRef(0));
+        assertEquals(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2), results.getChildAssocRef(0));
         assertEquals(1, results.getChildAssocRefs().size());
         assertNotNull(results.getChildAssocRefs());
         assertEquals(0, results.getRow(0).getIndex());
         assertEquals(1.0f, results.getRow(0).getScore());
-        assertEquals(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2), results.getRow(0).getChildAssocRef());
+        assertEquals(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2), results.getRow(0).getChildAssocRef());
         assertEquals(n2, results.getRow(0).getNodeRef());
         assertEquals(QName.createQName("{namespace}two"), results.getRow(0).getQName());
         assertEquals("valuetwo", results.getRow(0).getValue(QName.createQName("{namespace}property-2")));
@@ -690,10 +543,10 @@ public class LuceneTest extends TestCase
         indexer.setContentService(contentService);
         //indexer.clearIndex();
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}one"), n1));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}three"), n3));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}four"), n4));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}one"), n1));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}three"), n3));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}four"), n4));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}five"), n5));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}six"), n6));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}seven"), n7));
@@ -1002,7 +855,7 @@ public class LuceneTest extends TestCase
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\"" + testSuperType.toString() + "\"", null, null);
-        assertEquals(1, results.length());
+        assertEquals(13, results.length());
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testAspect.toString() + "\"", null, null);

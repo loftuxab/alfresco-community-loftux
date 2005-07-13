@@ -48,7 +48,6 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
-import org.alfresco.service.cmr.repository.PropertyException;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
@@ -77,7 +76,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName ASPECT_QNAME_TEST_TITLED = QName.createQName(NAMESPACE, "titled");
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
     public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
-    public static final QName ASSOC_TYPE_QNAME_TEST_CONTAINS = ContentModel.ASSOC_CONTAINS;
+    public static final QName ASSOC_TYPE_QNAME_TEST_CHILDREN = ContentModel.ASSOC_CHILDREN;
     
     protected DictionaryService dictionaryService;
     protected NodeService nodeService;
@@ -185,12 +184,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
 
         // LEVEL 1
         qname = QName.createQName(ns, "root_p_n1");
-        assoc = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n1 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "root_p_n2");
-        assoc = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n2 = assoc.getChildRef();
 
@@ -201,27 +200,27 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         properties.put(QName.createQName(ns, "reference"), n2.toString());
         
         qname = QName.createQName(ns, "n1_p_n3");
-        assoc = nodeService.createNode(n1, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER, properties);
+        assoc = nodeService.createNode(n1, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, ContentModel.TYPE_CONTAINER, properties);
         ret.put(qname, assoc);
         NodeRef n3 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "n2_p_n4");
-        assoc = nodeService.createNode(n2, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(n2, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n4 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "n1_n4");
-        assoc = nodeService.addChild(n1, n4, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname);
+        assoc = nodeService.addChild(n1, n4, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname);
         ret.put(qname, assoc);
 
         qname = QName.createQName(ns, "n2_p_n5");
-        assoc = nodeService.createNode(n2, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(n2, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n5 = assoc.getChildRef();
 
         // LEVEL 3
         qname = QName.createQName(ns, "n3_p_n6");
-        assoc = nodeService.createNode(n3, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(n3, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n6 = assoc.getChildRef();
         nodeService.addAspect(n6,
@@ -229,11 +228,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 Collections.<QName, Serializable>emptyMap());
 
         qname = QName.createQName(ns, "n4_n6");
-        assoc = nodeService.addChild(n4, n6, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname);
+        assoc = nodeService.addChild(n4, n6, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname);
         ret.put(qname, assoc);
 
         qname = QName.createQName(ns, "n5_p_n7");
-        assoc = nodeService.createNode(n5, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(n5, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n7 = assoc.getChildRef();
 
@@ -242,12 +241,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         properties.put(PROP_QNAME_TEST_MIMETYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         properties.put(PROP_QNAME_TEST_TITLE, "node8");
         qname = QName.createQName(ns, "n6_p_n8");
-        assoc = nodeService.createNode(n6, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, TYPE_QNAME_TEST_CONTENT, properties);
+        assoc = nodeService.createNode(n6, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, TYPE_QNAME_TEST_CONTENT, properties);
         ret.put(qname, assoc);
         NodeRef n8 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "n7_n8");
-        assoc = nodeService.addChild(n7, n8, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname);
+        assoc = nodeService.addChild(n7, n8, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname);
         ret.put(qname, assoc);
 
         // flush and clear
@@ -265,12 +264,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     protected Map<QName, ChildAssociationRef> commitNodeGraph() throws Exception
     {
-        Map<QName, ChildAssociationRef> asnwer = buildNodeGraph();
+        Map<QName, ChildAssociationRef> answer = buildNodeGraph();
         // commit node so that threads can see node
         setComplete();
         endTransaction();
         // done
-        return asnwer;
+        return answer;
     }
     
     private int countNodesById(NodeRef nodeRef)
@@ -337,10 +336,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testCreateNode() throws Exception
     {
         ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
-        assertEquals("Assoc type qname not set", ASSOC_TYPE_QNAME_TEST_CONTAINS, assocRef.getTypeQName());
+        assertEquals("Assoc type qname not set", ASSOC_TYPE_QNAME_TEST_CHILDREN, assocRef.getTypeQName());
         assertEquals("Assoc qname not set", QName.createQName("pathA"), assocRef.getQName());
         NodeRef childRef = assocRef.getChildRef();
         QName checkType = nodeService.getType(childRef);
@@ -350,7 +349,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testGetType() throws Exception
     {
         ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
@@ -388,21 +387,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // create a regular base node
         ChildAssociationRef assocRef = nodeService.createNode(
                 rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName(BaseNodeServiceTest.NAMESPACE, "test-container"),
                 ContentModel.TYPE_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
         // add the content aspect to the node, but don't supply any properties
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(20);
-        try
-        {
-            nodeService.addAspect(nodeRef, BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED, properties);
-            fail("Failed to detect inadequate properties for aspect");
-        }
-        catch (PropertyException e)
-        {
-            // expected
-        }
+        nodeService.addAspect(nodeRef, BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED, properties);
+
         // get the properties required for the aspect
         fillProperties(BaseNodeServiceTest.ASPECT_QNAME_TEST_TITLED, properties);
         // get the node properties before
@@ -414,18 +406,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals("Aspect properties not added",
                 propertiesBefore.size() + 2,
                 propertiesAfter.size());
-        
-        // attempt to override node properties with insufficient properties
-        propertiesAfter.clear();
-        try
-        {
-            nodeService.setProperties(nodeRef, propertiesAfter);
-            fail("Failed to detect that required properties were missing");
-        }
-        catch (PropertyException e)
-        {
-            // expected
-        }
         
         // check that we know that the aspect is present
         Set<QName> aspects = nodeService.getAspects(nodeRef);
@@ -452,7 +432,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     {
         // flush to ensure that the pure JDBC query will work
         ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("path1"),
                 ContentModel.TYPE_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
@@ -466,26 +446,27 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     public void testCreateNodeWithProperties() throws Exception
     {
-        try
-        {
-            ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-                    ASSOC_TYPE_QNAME_TEST_CONTAINS,
-                    QName.createQName("MyContentNode"),
-                    TYPE_QNAME_TEST_CONTENT);
-            fail("Failed to detect missing properties for type");
-        }
-        catch (PropertyException e)
-        {
-            // exptected
-        }
+//        try
+//        {
+//            ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
+//                    ASSOC_TYPE_QNAME_TEST_CHILDREN,
+//                    QName.createQName("MyContentNode"),
+//                    TYPE_QNAME_TEST_CONTENT);
+//            fail("Failed to detect missing properties for type");
+//        }
+//        catch (PropertyException e)
+//        {
+//            // exptected
+//        }
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         // fill properties
         fillProperties(TYPE_QNAME_TEST_CONTENT, properties);
         fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
         
         // create node for real
-        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+        ChildAssociationRef assocRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("MyContent"),
                 TYPE_QNAME_TEST_CONTENT,
                 properties);
@@ -509,7 +490,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testDelete() throws Exception
     {
         ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("path1"),
                 ContentModel.TYPE_CONTAINER);
         NodeRef nodeRef = assocRef.getChildRef();
@@ -543,7 +524,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         NodeRef bogusChildRef = new NodeRef(rootNodeRef.getStoreRef(), "BOGUS");
         try
         {
-            nodeService.addChild(rootNodeRef, bogusChildRef, ASSOC_TYPE_QNAME_TEST_CONTAINS, QName.createQName("BOGUS_PATH"));
+            nodeService.addChild(rootNodeRef, bogusChildRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("BOGUS_PATH"));
             fail("Failed to detect invalid child node reference");
         }
         catch (InvalidNodeRefException e)
@@ -551,14 +532,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             // expected
         }
         ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
         // TODO: Fix test checks
         // int countBefore = countChildrenOfNode(rootNodeRef);
         // assertEquals("Root children count incorrect", 1, countBefore);
         // associate the two nodes
-        nodeService.addChild(rootNodeRef, assocRef.getChildRef(), ASSOC_TYPE_QNAME_TEST_CONTAINS, QName.createQName("pathB"));
+        nodeService.addChild(rootNodeRef, assocRef.getChildRef(), ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathB"));
         // there should now be 2 child assocs on the root
         // TODO: Fix test checks
         // int countAfter = countChildrenOfNode(rootNodeRef);
@@ -568,12 +549,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testRemoveChildByRef() throws Exception
     {
         ChildAssociationRef pathARef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
         NodeRef nodeRef = pathARef.getChildRef();
-        ChildAssociationRef pathBRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME_TEST_CONTAINS, QName.createQName("pathB"));
-        ChildAssociationRef pathCRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME_TEST_CONTAINS, QName.createQName("pathC"));
+        ChildAssociationRef pathBRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathB"));
+        ChildAssociationRef pathCRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathC"));
         // delete all the associations
         Collection<EntityRef> deletedRefs = nodeService.removeChild(rootNodeRef, nodeRef);
         assertTrue("Primary child not deleted", deletedRefs.contains(nodeRef));
@@ -686,7 +667,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         {
             nodeService.createNode(
                     n8Ref,
-                    ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                    ASSOC_TYPE_QNAME_TEST_CHILDREN,
                     QName.createQName(NAMESPACE, "child"),
                     TYPE_QNAME_TEST_CONTENT);
             fail("Failed to prevent adding of child nodes to non-containers");
@@ -712,7 +693,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         ChildAssociationRef assocRef = nodeService.moveNode(
                 n8Ref,
                 n5Ref,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n8"));
         // check that n6 is no longer the parent
         List<ChildAssociationRef> n6ChildRefs = nodeService.getChildAssocs(
@@ -736,18 +717,18 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
         
         ChildAssociationRef childAssocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName(null, "N1"),
-                ContentModel.TYPE_CONTAINER);
+                TYPE_QNAME_TEST_CONTENT);
         NodeRef sourceRef = childAssocRef.getChildRef();
         childAssocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CONTAINS,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName(null, "N2"),
                 TYPE_QNAME_TEST_CONTENT,
                 properties);
         NodeRef targetRef = childAssocRef.getChildRef();
         
-        QName qname = QName.createQName("next");
+        QName qname = QName.createQName(NAMESPACE, "next");
         AssociationRef assocRef = nodeService.createAssociation(sourceRef, targetRef, qname);
         // done
         return assocRef;
@@ -879,7 +860,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // check that a cyclic path is detected - make n6_n1
         try
         {
-            nodeService.addChild(n6Ref, n1Ref, ASSOC_TYPE_QNAME_TEST_CONTAINS, QName.createQName("n6_n1"));
+            nodeService.addChild(n6Ref, n1Ref, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("n6_n1"));
             nodeService.getPaths(n6Ref, false);
             fail("Cyclic relationship not detected");
         }

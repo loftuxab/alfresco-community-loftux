@@ -24,7 +24,11 @@ import org.alfresco.service.namespace.QName;
  * Thrown a <b>property</b> is not valid or not set.
  * 
  * @author Derek Hulley
+ * 
+ * @deprecated Used to be thrown before when mandatory properties were not
+ *      present where required.  This has been superceded by integrity testing.
  */
+@Deprecated
 public class PropertyException extends RuntimeException
 {
     private static final long serialVersionUID = 3976734787505631540L;

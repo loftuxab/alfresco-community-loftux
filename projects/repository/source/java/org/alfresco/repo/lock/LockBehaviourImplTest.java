@@ -116,9 +116,9 @@ public class LockBehaviourImplTest extends BaseSpringTest
         // Create node 
         this.nodeRef = this.nodeService.createNode(
                 rootNodeRef, 
-				ContentModel.ASSOC_CONTAINS, 
+				ContentModel.ASSOC_CHILDREN, 
                 QName.createQName("{}ParentNode"),
-                ContentModel.TYPE_CONTAINER,
+                ContentModel.TYPE_FOLDER,
                 nodeProperties).getChildRef();
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, new HashMap<QName, Serializable>());
         assertNotNull(this.nodeRef);
@@ -126,7 +126,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         // Create a node with no lockAspect
         this.noAspectNode = this.nodeService.createNode(
                 rootNodeRef, 
-				ContentModel.ASSOC_CONTAINS, 
+				ContentModel.ASSOC_CHILDREN, 
                 QName.createQName("{}noAspectNode"),
                 ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();

@@ -106,7 +106,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
         
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
-				ContentModel.ASSOC_CONTAINS,
+				ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}test"),
 				ContentModel.TYPE_CONTENT,
 				bagOfProps);
@@ -157,7 +157,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		NodeRef workingCopy = this.cociService.checkout(
 				this.nodeRef, 
 				this.rootNodeRef, 
-				ContentModel.ASSOC_CONTAINS, 
+				ContentModel.ASSOC_CHILDREN, 
 				QName.createQName("{test}workingCopy"));
 		assertNotNull(workingCopy);
 		
@@ -248,7 +248,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		// Create a new node 
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
-				ContentModel.ASSOC_CONTAINS,
+				ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}test"),
 				ContentModel.TYPE_CONTENT,
 				bagOfProps);

@@ -81,7 +81,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         properties.put(ContentModel.PROP_ENCODING, "UTF-16");
         ChildAssociationRef assocRef = nodeService.createNode(
                 rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName(TEST_NAMESPACE, GUID.generate()),
                 ContentModel.TYPE_CONTENT,
                 properties);

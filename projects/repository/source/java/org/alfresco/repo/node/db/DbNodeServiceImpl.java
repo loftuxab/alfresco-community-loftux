@@ -37,7 +37,6 @@ import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.node.AbstractNodeServiceImpl;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
-import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidAspectException;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
@@ -52,7 +51,6 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.InvalidStoreRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
-import org.alfresco.service.cmr.repository.PropertyException;
 import org.alfresco.service.cmr.repository.StoreExistsException;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
@@ -181,6 +179,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         return nodeRef;
     }
 
+    /**
+     * @see #createNode(NodeRef, QName, QName, QName, Map)
+     */
     public ChildAssociationRef createNode(NodeRef parentRef,
             QName assocTypeQName,
             QName assocQName,
@@ -202,7 +203,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Assert.notNull(assocTypeQName);
         Assert.notNull(assocQName);
         
-        // TODO: Check that the child association is allowed
+        // null property map is allowed
         if (properties == null)
         {
             properties = Collections.emptyMap();
@@ -220,6 +221,13 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             throw new RuntimeException("No store found for parent node: " + parentRef);
         }
         
+        // check the node type
+        TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeQName);
+        if (nodeTypeDef == null)
+        {
+            throw new InvalidTypeException(nodeTypeQName);
+        }
+        
         // create the node instance
         Node node = nodeDaoService.newNode(store, nodeTypeQName);
         NodeRef childRef = node.getNodeRef();
@@ -227,20 +235,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node parentNode = getNodeNotNull(parentRef);
         
         // create the association - invoke policy behaviour
-        //invokeBeforeCreateChildAssociation(parentRef, childRef, assocTypeQName, assocQName);
         ChildAssoc childAssoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocTypeQName, assocQName);
         ChildAssociationRef childAssocRef = childAssoc.getChildAssocRef();
-        //invokeOnCreateChildAssociation(childAssocRef);
         
         // get the mandatory aspects for the node type
-        TypeDefinition nodeTypeDef = dictionaryService.getType(nodeTypeQName);
-        if (nodeTypeDef == null)
-        {
-            throw new InvalidTypeException(nodeTypeQName);
-        }
         List<AspectDefinition> defaultAspectDefs = nodeTypeDef.getDefaultAspects();
-        // check that property requirements are met
-        checkProperties(nodeTypeDef, defaultAspectDefs, properties);
         
         // add all the aspects to the node
         Set<QName> nodeAspects = node.getAspects();
@@ -258,7 +257,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // Invoke policy behaviour
 		invokeOnCreateNode(childAssocRef);
         invokeOnUpdateNode(parentRef);
-		
+
+        // check that the dictionary wasn't violated
+        checkAssoc(parentRef, childRef, assocTypeQName, assocQName);
+        
 		// done
 		return childAssocRef;
     }
@@ -277,8 +279,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Assert.notNull(newParentRef);
         Assert.notNull(assocTypeQName);
         Assert.notNull(assocQName);
-        
-        // TODO: Check that the child association is allowed
         
         // check the node references
         Node nodeToMove = getNodeNotNull(nodeToMoveRef);
@@ -307,6 +307,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         invokeOnUpdateNode(oldParentNode.getNodeRef());
         invokeOnUpdateNode(newParentRef);
         
+        // check that the dictionary wasn't violated
+        checkAssoc(newParentRef, nodeToMoveRef, assocTypeQName, assocQName);
+        
         // done
         return newAssoc.getChildAssocRef();
     }
@@ -318,95 +321,20 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     }
     
     /**
-     * Checks that the properties required by the given classes or aspects are all present
-     * in the map given.
-     * <p>
-     * No dependencies are fetched e.g. if a <code>TypeDefinition</code> is given, the
-     * aspects for that type will not be checked.
-     * 
-     * @param classDef the primary class definition to check against
-     * @param aspectDefs additional aspects definitions to check against - may be null
-     * @param properties the properties to check
-     * @throws PropertyException if the class or aspect requires a property not present
-     *      amongst those provided
-     */
-    private void checkProperties(
-            ClassDefinition classDef,
-            List<AspectDefinition> aspectDefs,
-            Map<QName, Serializable> properties)
-            throws PropertyException
-    {
-        Map<QName,PropertyDefinition> allPropertyDefs = new HashMap<QName,PropertyDefinition>();
-
-        // add class properties
-        allPropertyDefs.putAll(classDef.getProperties()); 
-        
-        // add additional aspect properties
-        if (aspectDefs != null)
-        {
-            for (AspectDefinition aspectDef : aspectDefs)
-            {
-                Map<QName,PropertyDefinition> aspectProperties = aspectDef.getProperties();
-                allPropertyDefs.putAll(aspectProperties);
-            }
-        }
-        
-        // check that each required property is present
-        for (PropertyDefinition propertyDef : allPropertyDefs.values())
-        {
-            // ignore optional properties
-            if (!propertyDef.isMandatory())
-            {
-                continue;
-            }
-            QName qname = propertyDef.getName();
-            // is it present?
-            if (properties == null || properties.containsKey(qname) == false)
-            {
-                // not present
-                throw new PropertyException("Mandatory property value not supplied: " + qname, qname);
-            }
-            // property has a value
-        }
-        // all required properties have values
-        // done
-    }
-    
-    /**
-     * @param node
-     * @return Returns a list of all aspects (default and optional) applied to the node
-     */
-    private List<AspectDefinition> getNodeAspects(Node node)
-    {
-        Set<QName> aspectQNames = node.getAspects();
-        List<AspectDefinition> aspectDefs = new ArrayList<AspectDefinition>(aspectQNames.size());
-        for (QName qname : aspectQNames)
-        {
-            AspectDefinition aspectDef = dictionaryService.getAspect(qname);
-            aspectDefs.add(aspectDef);
-        }
-        // done
-        return aspectDefs;
-    }
-    
-    /**
-     * @see #checkProperties(ClassDefinition, List<AspectDefinition>, Map<QName,Serializable>)
      * @see Node#getAspects()
      */
     public void addAspect(
             NodeRef nodeRef,
             QName aspectTypeQName,
             Map<QName, Serializable> aspectProperties)
-            throws InvalidNodeRefException, InvalidAspectException, PropertyException
+            throws InvalidNodeRefException, InvalidAspectException
     {
-        // get the aspect
+        // check that the aspect is legal
         AspectDefinition aspectDef = dictionaryService.getAspect(aspectTypeQName);
         if (aspectDef == null)
         {
             throw new InvalidAspectException(aspectTypeQName);
         }
-        // check that the properties supplied are adequate for the aspect
-        checkProperties(aspectDef, null, aspectProperties);
         
         // Invoke policy behaviours
         invokeBeforeUpdateNode(nodeRef);
@@ -529,11 +457,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 
     public ChildAssociationRef addChild(NodeRef parentRef, NodeRef childRef, QName assocTypeQName, QName assocQName)
     {
-		// Invoke policy behaviours
+        // Invoke policy behaviours
 		invokeBeforeUpdateNode(parentRef);
         invokeBeforeCreateChildAssociation(parentRef, childRef, assocTypeQName, assocQName);
 		
-        // TODO: Check that the child association is allowed
         // check that both nodes belong to the same store
         if (!parentRef.getStoreRef().equals(childRef.getStoreRef()))
         {
@@ -555,6 +482,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         invokeOnCreateChildAssociation(assoc.getChildAssocRef());
 		invokeOnUpdateNode(parentRef);
 		
+        // check that the dictionary wasn't violated
+        checkAssoc(parentRef, childRef, assocTypeQName, assocQName);
+        
         return assoc.getChildAssocRef();
     }
 
@@ -653,7 +583,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      * If any of the values are null, a marker object is put in to mimic nulls.  They will be turned back into
      * a real nulls when the properties are requested again.
      * 
-     * @see #checkProperties(ClassDefinition, List<AspectDefinition>, Map<QName,Serializable>)
      * @see Node#getProperties()
      */
     public void setProperties(NodeRef nodeRef, Map<QName, Serializable> properties) throws InvalidNodeRefException
@@ -665,15 +594,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             throw new IllegalArgumentException("Properties may not be null");
         }
+        // find the node
         Node node = getNodeNotNull(nodeRef);
+        // get the properties before
+        Map<QName, Serializable> propertiesBefore = getProperties(nodeRef);
 
-        // check that the properties fulfill all the requirements of the node type
-        // and any additional aspects
-        QName nodeClassRef = getType(nodeRef);
-        ClassDefinition nodeClassDef = dictionaryService.getClass(nodeClassRef);
-        List<AspectDefinition> nodeAspectDefs = getNodeAspects(node);
-        checkProperties(nodeClassDef, nodeAspectDefs, properties);  // confirms that properties are valid
-        
         // copy properties onto node
         Map<String, Serializable> nodeProperties = node.getProperties();
         nodeProperties.clear();
@@ -688,9 +613,13 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             }
             nodeProperties.put(qname.toString(), value);
         }
+        
+        // store the properties after the change
+        Map<QName, Serializable> propertiesAfter = Collections.unmodifiableMap(properties);
 
 		// Invoke policy behaviours
 		invokeOnUpdateNode(nodeRef);
+        invokeOnUpdateProperties(nodeRef, propertiesBefore, propertiesAfter);
     }
 
     /**
@@ -715,12 +644,20 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		// Invoke policy behaviours
 		invokeBeforeUpdateNode(nodeRef);
 		
+        // get the node
         Node node = getNodeNotNull(nodeRef);
+        // get properties before
+        Map<QName, Serializable> propertiesBefore = getProperties(nodeRef);
+        
         Map<String, Serializable> properties = node.getProperties();
         properties.put(qname.toString(), value);
 
+        // get properties after the change
+        Map<QName, Serializable> propertiesAfter = getProperties(nodeRef);
+        
 		// Invoke policy behaviours
 		invokeOnUpdateNode(nodeRef);
+        invokeOnUpdateProperties(nodeRef, propertiesBefore, propertiesAfter);
     }
 
     /**
@@ -828,10 +765,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     public AssociationRef createAssociation(NodeRef sourceRef, NodeRef targetRef, QName assocTypeQName)
             throws InvalidNodeRefException, AssociationExistsException
     {
-		// Invoke policy behaviours
+        // Invoke policy behaviours
 		invokeBeforeUpdateNode(sourceRef);
 		
-        // TODO: Check that the association is allowed
         Node sourceNode = getNodeNotNull(sourceRef);
         Node targetNode = getNodeNotNull(targetRef);
         // see if it exists
@@ -846,7 +782,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 
 		// Invoke policy behaviours
 		invokeOnUpdateNode(sourceRef);
+        invokeOnCreateAssociation(assocRef);
 		
+        // check that the dictionary wasn't violated
+        checkAssoc(sourceRef, targetRef, assocTypeQName, null);
+        
         return assocRef;
     }
 
@@ -860,11 +800,13 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node targetNode = getNodeNotNull(targetRef);
         // get the association
         NodeAssoc assoc = nodeDaoService.getNodeAssoc(sourceNode, targetNode, assocTypeQName);
+        AssociationRef assocRef = assoc.getNodeAssocRef();
         // delete it
         nodeDaoService.deleteNodeAssoc(assoc);
 		
 		// Invoke policy behaviours
 		invokeOnUpdateNode(sourceRef);
+        invokeOnDeleteAssociation(assocRef);
     }
 
     /**

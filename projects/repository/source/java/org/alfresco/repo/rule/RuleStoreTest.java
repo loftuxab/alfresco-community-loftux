@@ -76,13 +76,14 @@ public class RuleStoreTest extends BaseRuleTest
     private NodeRef createNewNode(NodeRef parent, boolean isActionable)
     {
         NodeRef newNodeRef = this.nodeService.createNode(parent,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
                 ContentModel.TYPE_CONTAINER).getChildRef();
 
         // Create the config folder
-        NodeRef newConfigFolder = this.nodeService.createNode(rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+        NodeRef newConfigFolder = this.nodeService.createNode(
+                rootNodeRef,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}configfolder"),
                 ContentModel.TYPE_CONFIGURATIONS).getChildRef();
         
@@ -347,7 +348,7 @@ public class RuleStoreTest extends BaseRuleTest
         this.nodeService.addChild(
                 rootWithRules2, 
                 childWithRules, 
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"));
         RuleImpl rule5 = createTestRule("5");
         this.ruleStore.put(rootWithRules2, rule5);
@@ -498,7 +499,7 @@ public class RuleStoreTest extends BaseRuleTest
         this.nodeService.addChild(
                 rootWithRules2, 
                 childWithRules, 
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"));
         
         List<? extends Rule> allRules17 = this.ruleStore.get(childWithRules, true);
@@ -560,7 +561,7 @@ public class RuleStoreTest extends BaseRuleTest
         NodeRef nodeRef1 = createNewNode(this.rootNodeRef, true);
         NodeRef nodeRef2 = createNewNode(nodeRef1, true);
         NodeRef nodeRef3 = createNewNode(nodeRef2, true);
-        this.nodeService.addChild(nodeRef3, nodeRef1, ContentModel.ASSOC_CONTAINS, QName.createQName("{test}loop"));
+        this.nodeService.addChild(nodeRef3, nodeRef1, ContentModel.ASSOC_CHILDREN, QName.createQName("{test}loop"));
         
         RuleImpl rule1 = createTestRule(GUID.generate(), true);
         this.ruleStore.put(nodeRef1, rule1);
@@ -604,7 +605,7 @@ public class RuleStoreTest extends BaseRuleTest
         NodeRef nodeRef2 = createNewNode(nodeRef1, true);
         NodeRef nodeRef3 = createNewNode(nodeRef2, true);
         NodeRef nodeRef4 = createNewNode(nodeRef1, true);
-        this.nodeService.addChild(nodeRef4, nodeRef3, ContentModel.ASSOC_CONTAINS, QName.createQName("{test}test"));
+        this.nodeService.addChild(nodeRef4, nodeRef3, ContentModel.ASSOC_CHILDREN, QName.createQName("{test}test"));
         
         RuleImpl rule1 = createTestRule(GUID.generate(), true);
         this.ruleStore.put(nodeRef1, rule1);

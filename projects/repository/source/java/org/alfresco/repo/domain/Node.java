@@ -31,8 +31,6 @@ import org.alfresco.service.namespace.QName;
  */
 public interface Node
 {
-    public static final String QUERY_GET_CHILD_ASSOCS = "node.GetChildAssocs";
-    
     /**
      * @return Returns the unique key for this node
      */

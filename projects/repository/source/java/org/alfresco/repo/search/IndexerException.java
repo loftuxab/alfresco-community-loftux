@@ -23,14 +23,9 @@ import org.alfresco.error.AlfrescoRuntimeException;
  * Indexer related exceptions
  * 
  * @author andyh
- * 
  */
 public class IndexerException extends AlfrescoRuntimeException
 {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3257286911646447666L;
 
     public IndexerException(String message)
@@ -42,6 +37,4 @@ public class IndexerException extends AlfrescoRuntimeException
     {
         super(message, cause);
     }
-
-
 }

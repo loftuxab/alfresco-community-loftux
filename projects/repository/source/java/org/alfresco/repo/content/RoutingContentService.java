@@ -140,11 +140,11 @@ public class RoutingContentService implements ContentService
         return writer;
     }
 
-	 /**
-	  * Add a listener to the plain writer
-	  * 
-	  * @see #getWriter(NodeRef)
-	  */
+   /**
+    * Add a listener to the plain writer
+    * 
+    * @see #getWriter(NodeRef)
+    */
     public ContentWriter getUpdatingWriter(NodeRef nodeRef)
     {
         // ensure that the node exists and is of type content

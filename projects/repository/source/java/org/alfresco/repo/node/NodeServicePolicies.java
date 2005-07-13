@@ -17,6 +17,9 @@
  */
 package org.alfresco.repo.node;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -101,7 +104,22 @@ public interface NodeServicePolicies
 		 */
 		public void onUpdateNode(NodeRef nodeRef);
 	}
-	
+    
+    public interface OnUpdatePropertiesPolicy extends ClassPolicy
+    {
+        /**
+         * Called after a node's properties have been changed.
+         * 
+         * @param nodeRef reference to the updated node
+         * @param before the node's properties before the change
+         * @param after the node's properties after the change 
+         */
+        public void onUpdateProperties(
+                NodeRef nodeRef,
+                Map<QName, Serializable> before,
+                Map<QName, Serializable> after);
+    }
+    
 	public interface BeforeDeleteNodePolicy extends ClassPolicy
 	{
 		/**
@@ -215,28 +233,23 @@ public interface NodeServicePolicies
         public void onDeleteChildAssociation(ChildAssociationRef childAssocRef);
     }
 
-    public interface BeforeCreateAssociationPolicy extends AssociationPolicy
+    public interface OnCreateAssociationPolicy extends AssociationPolicy
     {
         /**
-         * Called before a regular node association is created.
+         * Called after a regular node association is created.
          * 
-         * @param sourceNodeRef source of the node association
-         * @param targetNodeRef target of the node association
-         * @param assocTypeQName association type
+         * @param nodeAssocRef the regular node association that was created
          */
-        public void beforeCreateAssociation(
-                NodeRef sourceNodeRef,
-                NodeRef targetNodeRef,
-                QName assocTypeQName);
+        public void onCreateAssociation(AssociationRef nodeAssocRef);
     }
     
-    public interface BeforeDeleteAssociationPolicy extends AssociationPolicy
+    public interface OnDeleteAssociationPolicy extends AssociationPolicy
     {
         /**
-         * Called before a regular node association is deleted.
+         * Called after a regular node association is deleted.
          * 
-         * @param nodeAssocRef the regular node association to be removed
+         * @param nodeAssocRef the regular node association that was removed
          */
-        public void beforeDeleteAssociation(AssociationRef nodeAssocRef);
+        public void onDeleteAssociation(AssociationRef nodeAssocRef);
     }
 }

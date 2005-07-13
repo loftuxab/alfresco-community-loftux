@@ -34,34 +34,31 @@ import javax.transaction.UserTransaction;
 import junit.framework.TestCase;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class FileImporterTest extends TestCase
 {
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+    static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     private NodeService nodeService;
-
+    private DictionaryService dictionaryService;
     private ContentService contentService;
-
     private AuthenticationService authenticationService;
-
-    private MimetypeService mimetypeServide;
-
-    private NodeRef rootNodeRef;
-
+    private MimetypeService mimetypeService;
     private NamespaceService namespaceService;
-    
     private ServiceRegistry serviceRegistry;
+    private NodeRef rootNodeRef;
 
     public FileImporterTest()
     {
@@ -75,12 +72,13 @@ public class FileImporterTest extends TestCase
 
     public void setUp()
     {
-        nodeService = (NodeService) ctx.getBean("dbNodeService");
-        contentService = (ContentService) ctx.getBean("contentService");
-        authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
-        mimetypeServide = (MimetypeService) ctx.getBean("mimetypeMap");
-        namespaceService = (NamespaceService) ctx.getBean("namespaceService");
         serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+        nodeService = serviceRegistry.getNodeService();
+        dictionaryService = serviceRegistry.getDictionaryService();
+        contentService = serviceRegistry.getContentService();
+        authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
+        mimetypeService = serviceRegistry.getMimetypeService();
+        namespaceService = serviceRegistry.getNamespaceService();
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
@@ -91,16 +89,17 @@ public class FileImporterTest extends TestCase
         FileImporterImpl fileImporter = new FileImporterImpl();
         fileImporter.setAuthenticationService(authenticationService);
         fileImporter.setContentService(contentService);
-        fileImporter.setMimetypeService(mimetypeServide);
+        fileImporter.setMimetypeService(mimetypeService);
         fileImporter.setNodeService(nodeService);
+        fileImporter.setDictionaryService(dictionaryService);
         return fileImporter;
     }
 
-    public void testCreateFile()
+    public void testCreateFile() throws Exception
     {
         FileImporter fileImporter = createFileImporter();
-        URL url = this.getClass().getClassLoader().getResource("alfresco/application-context.xml");
-        fileImporter.loadFile(rootNodeRef, new File(url.getFile()));
+        File file = AbstractContentTransformerTest.loadQuickTestFile("xml");
+        fileImporter.loadFile(rootNodeRef, file);
     }
 
     public void testLoadRootNonRecursive1()

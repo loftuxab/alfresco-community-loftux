@@ -18,7 +18,6 @@
 package org.alfresco.repo.node.db.hibernate;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,9 +34,7 @@ import org.alfresco.repo.domain.hibernate.NodeAssocImpl;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
 import org.alfresco.repo.domain.hibernate.StoreImpl;
 import org.alfresco.repo.node.db.NodeDaoService;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
-import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
 import org.hibernate.ObjectDeletedException;
@@ -59,16 +56,13 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public static final String QUERY_GET_NODE_ASSOC_TARGETS = "node.GetNodeAssocTargets";
     public static final String QUERY_GET_NODE_ASSOC_SOURCES = "node.GetNodeAssocSources";
 
-    private DictionaryService dictionaryService;
-    
     /**
-     * @param dictionaryService the dictionary service to use
+     * All dependencies go into base class
      */
-    public void setDictionaryService(DictionaryService dictionaryService)
+    public HibernateNodeDaoServiceImpl()
     {
-        this.dictionaryService = dictionaryService;
     }
-
+    
     public void evict(Node node)
     {
         getHibernateTemplate().evict(node);
@@ -116,12 +110,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
 
     public Node newNode(Store store, QName nodeTypeQName) throws InvalidTypeException
     {
-        TypeDefinition typeDef = dictionaryService.getType(nodeTypeQName);
-        if (typeDef == null)
-        {
-            throw new InvalidTypeException(nodeTypeQName);
-        }
-        boolean allowedChildren = typeDef.getChildAssociations().size() > 0;
         // build a concrete node based on a bootstrap type
         Node node = new NodeImpl();
         // set other required properties

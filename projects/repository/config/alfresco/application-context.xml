@@ -6,6 +6,7 @@
    
    <import resource="classpath:applicationServices.xml"/>
    <import resource="classpath:ruleService.xml"/>
+   <import resource="classpath:alfresco/integrityService.xml"/>
    
    <!--                    -->
    <!--  PERSISTENCE       -->
@@ -46,6 +47,7 @@
          <list>
             <value>org/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
             <value>org/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
+            <value>org/alfresco/repo/domain/hibernate/Integrity.hbm.xml</value>
          </list>
       </property>
       <property name='hibernateProperties' >
@@ -74,6 +76,11 @@
 	  <property name="serviceRegistry">
 		 <ref bean="serviceRegistry"/>
 	  </property>
+     <!--
+	  <property name="integrityService">
+		 <ref bean="integrityService"/>
+	  </property>
+     -->
    </bean>
    
    <!-- factory for UserTransaction instances -->
@@ -140,9 +147,6 @@
             <property name="sessionFactory">
                <ref bean="sessionFactory" />
             </property>
-            <property name="dictionaryService">
-               <ref bean="dictionaryService" />
-            </property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -150,6 +154,7 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
+      <!-- only enable for debugging
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
@@ -160,6 +165,7 @@
             </bean>
          </list>
       </property>
+      -->
    </bean>   
    
    <!--                    -->
@@ -191,18 +197,15 @@
       </property>
       <property name="target">
          <bean class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init">
-			<constructor-arg>
-				<ref bean="policyComponent"/>
-			</constructor-arg>
-			<constructor-arg>
+            <constructor-arg>
+               <ref bean="policyComponent"/>
+            </constructor-arg>
+            <constructor-arg>
                <ref bean="dictionaryService" />
             </constructor-arg>
             <constructor-arg>
                <ref bean="nodeDaoService" />
             </constructor-arg>
-            <property name="indexer">
-               <ref bean="indexerComponent" />
-            </property>
              <property name="searcher">
                <ref bean="searcherComponent" />
             </property>
@@ -213,6 +216,7 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
+      <!-- only enable for debugging
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
@@ -223,6 +227,7 @@
             </bean>
          </list>
       </property>
+      -->
    </bean>   
    
    <!-- Handles policy callbacks to ensure that node hierarchy gets indexed -->

@@ -71,7 +71,7 @@ public class AuditableAspectTest extends BaseSpringTest
         // Create a folder
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{alf}testfolder"),
                 ContentModel.TYPE_FOLDER);
 
@@ -93,7 +93,7 @@ public class AuditableAspectTest extends BaseSpringTest
         
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{alf}testperson"),
                 ContentModel.TYPE_PERSON,
                 personProps);
@@ -117,7 +117,7 @@ public class AuditableAspectTest extends BaseSpringTest
         
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{alf}testperson"),
                 ContentModel.TYPE_PERSON,
                 personProps);
@@ -153,7 +153,7 @@ public class AuditableAspectTest extends BaseSpringTest
         
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
-                ContentModel.ASSOC_CONTAINS,
+                ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{alf}testperson"),
                 ContentModel.TYPE_PERSON,
                 personProps);

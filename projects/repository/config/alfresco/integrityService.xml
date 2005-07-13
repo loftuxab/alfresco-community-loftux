@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+	
+   <bean id='integrityDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
+      <property name='proxyInterfaces'>
+         <value>org.alfresco.repo.integrity.db.IntegrityDaoService</value>
+      </property>
+      <property name='transactionManager'>
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="org.alfresco.repo.integrity.db.hibernate.HibernateIntegrityDaoServiceImpl" >
+            <property name="sessionFactory">
+               <ref bean="sessionFactory" />
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+      <!-- only enable for debugging
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
+               <constructor-arg>
+                  <value>integrityDaoService</value>
+               </constructor-arg>
+            </bean>
+         </list>
+      </property>
+      -->
+   </bean>   
+   
+   <!-- IntegrityService implemented to persist to Database -->
+   <bean id="integrityService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.repo.integrity.IntegrityService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="org.alfresco.repo.integrity.db.DbIntegrityServiceImpl" init-method="init">
+            <property name="policyComponent">
+				   <ref bean="policyComponent"/>
+            </property>
+            <property name="dictionaryService">
+               <ref bean="dictionaryService" />
+            </property>
+            <property name="nodeService">
+               <ref bean="nodeService" />
+            </property>
+            <property name="integrityDaoService">
+               <ref bean="integrityDaoService" />
+            </property>
+            <property name="enabled">
+               <value>true</value>  <!-- on/off switch -->
+            </property>
+            <property name="traceOn">
+               <value>false</value>  <!-- use only to trace problems -->
+            </property>
+            <property name="failOnViolation" >
+               <value>true</value>  <!-- set to true to generate runtime exceptions upon violation -->
+            </property>
+            <property name="maxErrorsPerTransaction" >
+               <value>5</value>  <!-- limit output (exception and log) to the first N violation messages -->
+            </property>
+            <property name="flushSize" >
+               <value>1000</value>  <!-- number of nodes to process before clearing caches -->
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+      <!-- only enable for debugging
+      <property name="postInterceptors">
+         <list>
+            <ref bean="methodCallLogAdvice" />
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
+               <constructor-arg>
+                  <value>integrityService</value>
+               </constructor-arg>
+            </bean>
+         </list>
+      </property>
+      -->
+   </bean>   
+   
+</beans>

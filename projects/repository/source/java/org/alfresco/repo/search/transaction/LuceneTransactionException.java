@@ -19,12 +19,11 @@ package org.alfresco.repo.search.transaction;
 
 import org.springframework.transaction.TransactionException;
 
+/**
+ * @author Andy Hind
+ */
 public class LuceneTransactionException extends TransactionException
 {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3978985453464335925L;
 
     public LuceneTransactionException(String arg0)
@@ -36,5 +35,4 @@ public class LuceneTransactionException extends TransactionException
     {
         super(arg0, arg1);
     }
-
 }

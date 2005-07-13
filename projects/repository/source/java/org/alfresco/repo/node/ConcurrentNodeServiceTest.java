@@ -42,10 +42,10 @@ import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.transaction.SpringAwareUserTransaction;
 import org.apache.lucene.index.IndexWriter;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class ConcurrentNodeServiceTest extends TestCase
 {
@@ -62,9 +62,7 @@ public class ConcurrentNodeServiceTest extends TestCase
 
     public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
 
-    public static final QName ASSOC_TYPE_QNAME_TEST_CONTAINS = ContentModel.ASSOC_CONTAINS;
-
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+    static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     private DictionaryComponent dictionaryService;
 
@@ -129,12 +127,12 @@ public class ConcurrentNodeServiceTest extends TestCase
 
         // LEVEL 1
         qname = QName.createQName(ns, "root_p_n1");
-        assoc = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n1 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "root_p_n2");
-        assoc = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n2 = assoc.getChildRef();
 
@@ -145,37 +143,37 @@ public class ConcurrentNodeServiceTest extends TestCase
         properties.put(QName.createQName(ns, "reference"), n2.toString());
 
         qname = QName.createQName(ns, "n1_p_n3");
-        assoc = nodeService.createNode(n1, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER, properties);
+        assoc = nodeService.createNode(n1, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER, properties);
         ret.put(qname, assoc);
         NodeRef n3 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "n2_p_n4");
-        assoc = nodeService.createNode(n2, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(n2, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n4 = assoc.getChildRef();
 
         qname = QName.createQName(ns, "n1_n4");
-        assoc = nodeService.addChild(n1, n4, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname);
+        assoc = nodeService.addChild(n1, n4, ContentModel.ASSOC_CHILDREN, qname);
         ret.put(qname, assoc);
 
         qname = QName.createQName(ns, "n2_p_n5");
-        assoc = nodeService.createNode(n2, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(n2, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n5 = assoc.getChildRef();
 
         // LEVEL 3
         qname = QName.createQName(ns, "n3_p_n6");
-        assoc = nodeService.createNode(n3, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(n3, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n6 = assoc.getChildRef();
         nodeService.addAspect(n6, ContentModel.ASPECT_ROOT, Collections.<QName, Serializable> emptyMap());
 
         qname = QName.createQName(ns, "n4_n6");
-        assoc = nodeService.addChild(n4, n6, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname);
+        assoc = nodeService.addChild(n4, n6, ContentModel.ASSOC_CHILDREN, qname);
         ret.put(qname, assoc);
 
         qname = QName.createQName(ns, "n5_p_n7");
-        assoc = nodeService.createNode(n5, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, ContentModel.TYPE_CONTAINER);
+        assoc = nodeService.createNode(n5, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
         ret.put(qname, assoc);
         NodeRef n7 = assoc.getChildRef();
 
@@ -184,13 +182,13 @@ public class ConcurrentNodeServiceTest extends TestCase
         properties.put(PROP_QNAME_TEST_MIMETYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         properties.put(PROP_QNAME_TEST_TITLE, "node8");
         qname = QName.createQName(ns, "n6_p_n8");
-        assoc = nodeService.createNode(n6, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname, TYPE_QNAME_TEST_CONTENT, properties);
+        assoc = nodeService.createNode(n6, ContentModel.ASSOC_CHILDREN, qname, TYPE_QNAME_TEST_CONTENT, properties);
         ret.put(qname, assoc);
         NodeRef n8 = assoc.getChildRef();
         nodeService.getPaths(n8, false);
 
         qname = QName.createQName(ns, "n7_n8");
-        assoc = nodeService.addChild(n7, n8, ASSOC_TYPE_QNAME_TEST_CONTAINS, qname);
+        assoc = nodeService.addChild(n7, n8, ContentModel.ASSOC_CHILDREN, qname);
         ret.put(qname, assoc);
 
         return ret;

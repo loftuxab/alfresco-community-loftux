@@ -1,6 +1,6 @@
-<model name="test:nodeservice" xmlns="http://www.alfresco.org/dictionary/0.1">
+<model name="test:integrity" xmlns="http://www.alfresco.org/dictionary/0.1">
 
-   <description>Test Model for NodeService tests</description>
+   <description>Test Model for Integrity tests</description>
    <author>Alfresco</author>
    <published>2005-06-05</published>
    <version>0.1</version>
@@ -11,36 +11,22 @@
    </imports>
    
    <namespaces>
-      <namespace uri="http://www.alfresco.org/test/BaseNodeServiceTest" prefix="test"/>
+      <namespace uri="http://www.alfresco.org/test/IntegrityTest" prefix="test"/>
    </namespaces>
 
    <types>
-      <type name="test:content">
+      <type name="test:folder">
          <title>Content</title>
          <parent>alf:base</parent>
          <properties>
-            <property name="test:contentUrl">
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
-            <property name="test:mimetype">
+            <property name="test:name">
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
+            <property name="test:reference">
+               <type>d:text</type>
+            </property>
          </properties>
-         <associations>
-            <association name="test:next">
-               <source>
-                  <mandatory>false</mandatory>
-                  <many>false</many>
-               </source>
-               <target>
-                  <class>test:content</class>
-                  <mandatory>false</mandatory>
-                  <many>false</many>
-               </target>
-            </association>
-         </associations>
          <mandatory-aspects>
             <aspect>test:titled</aspect>
          </mandatory-aspects>

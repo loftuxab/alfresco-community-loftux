@@ -49,16 +49,14 @@ import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class LuceneCategoryTest extends TestCase
 {    
-    public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CHILDREN;
-    
     private ServiceRegistry serviceRegistry;
     
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+    static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
     NodeService nodeService;
     DictionaryService dictionaryService;
     LuceneIndexLock luceneIndexLock;
@@ -129,55 +127,55 @@ public class LuceneCategoryTest extends TestCase
                 "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
         
-        n1 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}one"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"), ContentModel.TYPE_CONTAINER).getChildRef();
         nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "value-1");
-        n2 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}two"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n2 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}two"), ContentModel.TYPE_CONTAINER).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "value-1");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "value-2");
-        n3 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}three"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n4 = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName("{namespace}four"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), ContentModel.TYPE_CONTAINER).getChildRef();
-        n14 = nodeService.createNode(n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}fourteen"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n3 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}three"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n4 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}four"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n5 = nodeService.createNode(n1, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}five"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n6 = nodeService.createNode(n1, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}six"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n7 = nodeService.createNode(n2, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}seven"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n8 = nodeService.createNode(n2, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}eight-2"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n9 = nodeService.createNode(n5, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}nine"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n10 = nodeService.createNode(n5, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}ten"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n11 = nodeService.createNode(n5, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}eleven"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n12 = nodeService.createNode(n5, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}twelve"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n13 = nodeService.createNode(n12, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}thirteen"), ContentModel.TYPE_CONTAINER).getChildRef();
+        n14 = nodeService.createNode(n13, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}fourteen"), ContentModel.TYPE_CONTAINER).getChildRef();
         
-        nodeService.addChild(rootNodeRef, n8, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-0"));
-        nodeService.addChild(n1, n8, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-1"));
-        nodeService.addChild(n2, n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}link"));
+        nodeService.addChild(rootNodeRef, n8, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}eight-0"));
+        nodeService.addChild(n1, n8, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}eight-1"));
+        nodeService.addChild(n2, n13, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}link"));
         
-        nodeService.addChild(n1, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
-        nodeService.addChild(n2, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
-        nodeService.addChild(n5, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
-        nodeService.addChild(n6, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
-        nodeService.addChild(n12, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
-        nodeService.addChild(n13, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
+        nodeService.addChild(n1, n14, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}common"));
+        nodeService.addChild(n2, n14, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}common"));
+        nodeService.addChild(n5, n14, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}common"));
+        nodeService.addChild(n6, n14, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}common"));
+        nodeService.addChild(n12, n14, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}common"));
+        nodeService.addChild(n13, n14, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}common"));
         
         // Categories
         
-        catContainer = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryContainer"), ContentModel.TYPE_CONTAINER).getChildRef();
-        catRoot = nodeService.createNode(catContainer, ASSOC_TYPE_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryRoot"), ContentModel.TYPE_CATEGORYROOT).getChildRef();
+        catContainer = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryContainer"), ContentModel.TYPE_CONTAINER).getChildRef();
+        catRoot = nodeService.createNode(catContainer, ContentModel.ASSOC_CHILDREN, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryRoot"), ContentModel.TYPE_CATEGORYROOT).getChildRef();
        
        
         
-        catRBase = nodeService.createNode(catRoot, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Region"), ContentModel.TYPE_CATEGORY).getChildRef();
-        catROne = nodeService.createNode(catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Europe"), ContentModel.TYPE_CATEGORY).getChildRef();
-        catRTwo = nodeService.createNode(catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), ContentModel.TYPE_CATEGORY).getChildRef();
-        catRThree = nodeService.createNode(catRTwo, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "US"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catRBase = nodeService.createNode(catRoot, ContentModel.ASSOC_CATEGORIES, QName.createQName(TEST_NAMESPACE, "Region"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catROne = nodeService.createNode(catRBase, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(TEST_NAMESPACE, "Europe"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catRTwo = nodeService.createNode(catRBase, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catRThree = nodeService.createNode(catRTwo, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(TEST_NAMESPACE, "US"), ContentModel.TYPE_CATEGORY).getChildRef();
         
-        nodeService.addChild(catRoot, catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "InvestmentRegion"));
-        nodeService.addChild(catRoot, catRBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "MarketingRegion"));
+        nodeService.addChild(catRoot, catRBase, ContentModel.ASSOC_CATEGORIES, QName.createQName(TEST_NAMESPACE, "InvestmentRegion"));
+        nodeService.addChild(catRoot, catRBase, ContentModel.ASSOC_CATEGORIES, QName.createQName(TEST_NAMESPACE, "MarketingRegion"));
         
         
-        catACBase = nodeService.createNode(catRoot, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "AssetClass"), ContentModel.TYPE_CATEGORY).getChildRef();
-        catACOne = nodeService.createNode(catACBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Fixed"), ContentModel.TYPE_CATEGORY).getChildRef();
-        catACTwo = nodeService.createNode(catACBase, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "Equity"), ContentModel.TYPE_CATEGORY).getChildRef();
-        catACThree = nodeService.createNode(catACTwo, ASSOC_TYPE_QNAME, QName.createQName(TEST_NAMESPACE, "SpecialEquity"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catACBase = nodeService.createNode(catRoot, ContentModel.ASSOC_CATEGORIES, QName.createQName(TEST_NAMESPACE, "AssetClass"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catACOne = nodeService.createNode(catACBase, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(TEST_NAMESPACE, "Fixed"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catACTwo = nodeService.createNode(catACBase, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(TEST_NAMESPACE, "Equity"), ContentModel.TYPE_CATEGORY).getChildRef();
+        catACThree = nodeService.createNode(catACTwo, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(TEST_NAMESPACE, "SpecialEquity"), ContentModel.TYPE_CATEGORY).getChildRef();
         
         
        
@@ -317,33 +315,33 @@ public class LuceneCategoryTest extends TestCase
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         //indexer.clearIndex();
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}one"), n1));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}two"), n2));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}three"), n3));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}four"), n4));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}one"), n1));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}three"), n3));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}four"), n4));
         
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, QName.createQName("{namespace}categoryContainer"), catContainer));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catContainer, QName.createQName("{cat}categoryRoot"), catRoot));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRoot, QName.createQName(TEST_NAMESPACE, "AssetClass"), catACBase));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catACBase, QName.createQName(TEST_NAMESPACE, "Fixed"), catACOne));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catACBase, QName.createQName(TEST_NAMESPACE, "Equity"), catACTwo));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catACTwo, QName.createQName(TEST_NAMESPACE, "SpecialEquity"), catACThree));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}categoryContainer"), catContainer));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, catContainer, QName.createQName("{cat}categoryRoot"), catRoot));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, catRoot, QName.createQName(TEST_NAMESPACE, "AssetClass"), catACBase));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_SUBCATEGORIES, catACBase, QName.createQName(TEST_NAMESPACE, "Fixed"), catACOne));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_SUBCATEGORIES, catACBase, QName.createQName(TEST_NAMESPACE, "Equity"), catACTwo));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_SUBCATEGORIES, catACTwo, QName.createQName(TEST_NAMESPACE, "SpecialEquity"), catACThree));
         
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRoot, QName.createQName(TEST_NAMESPACE, "Region"), catRBase));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRBase, QName.createQName(TEST_NAMESPACE, "Europe"), catROne));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRBase, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), catRTwo));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, catRTwo, QName.createQName(TEST_NAMESPACE, "US"), catRThree));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, catRoot, QName.createQName(TEST_NAMESPACE, "Region"), catRBase));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_SUBCATEGORIES, catRBase, QName.createQName(TEST_NAMESPACE, "Europe"), catROne));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_SUBCATEGORIES, catRBase, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), catRTwo));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_SUBCATEGORIES, catRTwo, QName.createQName(TEST_NAMESPACE, "US"), catRThree));
         
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}five"), n5));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}six"), n6));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}seven"), n7));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}eight"), n8));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}nine"), n9));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}ten"), n10));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}eleven"), n11));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}twelve"), n12));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n12, QName.createQName("{namespace}thirteen"), n13));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n13, QName.createQName("{namespace}fourteen"), n14));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n1, QName.createQName("{namespace}five"), n5));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n1, QName.createQName("{namespace}six"), n6));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n2, QName.createQName("{namespace}seven"), n7));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n2, QName.createQName("{namespace}eight"), n8));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n5, QName.createQName("{namespace}nine"), n9));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n5, QName.createQName("{namespace}ten"), n10));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n5, QName.createQName("{namespace}eleven"), n11));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n5, QName.createQName("{namespace}twelve"), n12));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n12, QName.createQName("{namespace}thirteen"), n13));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CATEGORIES, n13, QName.createQName("{namespace}fourteen"), n14));
         indexer.prepare();
         indexer.commit();
     }

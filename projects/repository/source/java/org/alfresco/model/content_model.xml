@@ -24,8 +24,48 @@
    
    <types>
    
+      <!-- system level -->
+
+      <type name="alf:base">
+         <title>Base</title>
+      </type>
+
+      <type name="alf:container">
+         <title>Container</title>
+         <parent>alf:base</parent>
+         <associations>
+            <child-association name="alf:children">
+               <target>
+                  <class>alf:base</class>
+               </target>
+            </child-association>
+         </associations>
+      </type>
+
+      <type name="alf:store_root">
+         <title>Store Root</title>
+         <parent>alf:container</parent>
+         <mandatory-aspects>
+            <aspect>alf:aspect_root</aspect>
+         </mandatory-aspects>
+      </type>
+
+      <type name="alf:reference">
+         <title>Reference</title>
+         <parent>alf:base</parent>
+         <properties>
+            <property name="alf:reference">
+               <type>d:noderef</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+      </type>
+
+      <!-- application level -->
+
       <type name="alf:cmobject">
          <title>Object</title>
+         <parent>alf:base</parent>
          <properties>
             <property name="alf:name">
                <type>d:text</type>
@@ -51,7 +91,7 @@
                   <many>false</many>
                </source>
                <target>
-                  <class>alf:cmobject</class>
+                  <class>alf:base</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -102,6 +142,7 @@
       
       <type name="alf:person">
          <title>Person</title>
+         <parent>alf:base</parent>
          <properties>
             <property name="alf:userName">
                <type>d:text</type>
@@ -129,44 +170,6 @@
                <type>d:text</type>
             </property>
          </properties>
-      </type>
-
-
-      <!-- system level ??? -->
-
-      <type name="alf:base">
-         <title>Base</title>
-      </type>
-
-      <type name="alf:reference">
-         <title>Reference</title>
-         <parent>alf:base</parent>
-         <properties>
-            <property name="alf:reference">
-               <type>d:noderef</type>
-               <mandatory>true</mandatory>
-            </property>
-         </properties>
-      </type>
-
-      <type name="alf:container">
-         <title>Container</title>
-         <parent>alf:base</parent>
-         <associations>
-            <child-association name="alf:children">
-               <target>
-                  <class>alf:base</class>
-               </target>
-            </child-association>
-         </associations>
-      </type>
-
-      <type name="alf:store_root">
-         <title>Store Root</title>
-         <parent>alf:container</parent>
-         <mandatory-aspects>
-            <aspect>alf:aspect_root</aspect>
-         </mandatory-aspects>
       </type>
 
       <type name="alf:category_root">
@@ -321,6 +324,7 @@
       </type>
       
       <type name="alf:valuefloat">
+         <title>Float Value</title>
          <parent>alf:propertyvalue</parent>
          <properties>
             <property name="alf:floatvalue">
@@ -331,6 +335,7 @@
    
       <type name="alf:user">
          <title>Temporary User Type</title>
+         <parent>alf:base</parent>
          <properties>
             <property name="alf:username">
                <type>d:text</type>

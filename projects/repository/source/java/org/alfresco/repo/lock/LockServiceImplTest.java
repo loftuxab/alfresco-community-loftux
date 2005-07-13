@@ -86,7 +86,7 @@ public class LockServiceImplTest extends BaseSpringTest
         // Create node 
         this.parentNode = this.nodeService.createNode(
                 rootNodeRef, 
-				ContentModel.ASSOC_CONTAINS, 
+				ContentModel.ASSOC_CHILDREN, 
                 QName.createQName("{}ParentNode"),
                 ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
@@ -96,7 +96,7 @@ public class LockServiceImplTest extends BaseSpringTest
         // Add some children to the node
         this.childNode1 = this.nodeService.createNode(
                 this.parentNode,
-				ContentModel.ASSOC_CONTAINS,
+				ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{}ChildNode1"),
                 ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
@@ -104,7 +104,7 @@ public class LockServiceImplTest extends BaseSpringTest
         assertNotNull(this.childNode1);
         this.childNode2 = this.nodeService.createNode(
                 this.parentNode,
-				ContentModel.ASSOC_CONTAINS,
+				ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{}ChildNode2"),
                 ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
@@ -114,7 +114,7 @@ public class LockServiceImplTest extends BaseSpringTest
         // Create a node with no lockAspect
         this.noAspectNode = this.nodeService.createNode(
                 rootNodeRef, 
-				ContentModel.ASSOC_CONTAINS, 
+				ContentModel.ASSOC_CHILDREN, 
                 QName.createQName("{}noAspectNode"),
                 ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();

@@ -132,6 +132,8 @@
       </type>
       
       <type name="ver:versionHistory">
+         <parent>alf:base</parent>
+         
          <properties>
             <property name="ver:versionedNodeId">
                <type>d:guid</type>

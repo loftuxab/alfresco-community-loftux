@@ -20,8 +20,8 @@ package org.alfresco.service.cmr.dictionary;
 import org.alfresco.service.namespace.QName;
 
 /**
- * Thrown when an operation cannot be performed because the <b>node</b> reference
- * no longer exists.
+ * Thrown when an operation cannot be performed because a type is not recognised
+ * by the data dictionary
  * 
  * @author Derek Hulley
  */

@@ -76,7 +76,7 @@ public interface NodeService
             QName assocTypeQName,
             QName assocQName,
             QName nodeTypeQName)
-            throws InvalidNodeRefException, InvalidTypeException, PropertyException;
+            throws InvalidNodeRefException, InvalidTypeException;
     
     /**
      * Creates a new, non-abstract, real node as a primary child of the given parent node.
@@ -90,7 +90,6 @@ public interface NodeService
      * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent reference is invalid
      * @throws InvalidTypeException if the node type reference is not recognised
-     * @throws PropertyException if a mandatory property was not set
      * 
      * @see org.alfresco.service.cmr.dictionary.DictionaryService
      */
@@ -100,7 +99,7 @@ public interface NodeService
             QName assocQName,
             QName nodeTypeQName,
             Map<QName, Serializable> properties)
-            throws InvalidNodeRefException, InvalidTypeException, PropertyException;
+            throws InvalidNodeRefException, InvalidTypeException;
     
     /**
      * Moves the primary location of the given node.
@@ -144,8 +143,6 @@ public interface NodeService
      *      the aspect
      * @throws InvalidNodeRefException
      * @throws InvalidAspectException if the class reference is not to a valid aspect
-     * @throws PropertyException if one of the aspect's required
-     *      properties have not been provided
      *
      * @see org.alfresco.service.cmr.dictionary.DictionaryService#getAspect(QName)
      * @see org.alfresco.service.cmr.dictionary.ClassDefinition#getProperties()
@@ -154,7 +151,7 @@ public interface NodeService
             NodeRef nodeRef,
             QName aspectRef,
             Map<QName, Serializable> aspectProperties)
-            throws InvalidNodeRefException, InvalidAspectException, PropertyException;
+            throws InvalidNodeRefException, InvalidAspectException;
     
     /**
      * Remove an aspect and all related properties from a node

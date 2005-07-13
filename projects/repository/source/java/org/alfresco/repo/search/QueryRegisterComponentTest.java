@@ -22,12 +22,13 @@ import junit.framework.TestCase;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class QueryRegisterComponentTest extends TestCase
 {
-    static ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+    static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+
     private DictionaryService dictionaryService;
     private NamespaceService namespaceService;
 

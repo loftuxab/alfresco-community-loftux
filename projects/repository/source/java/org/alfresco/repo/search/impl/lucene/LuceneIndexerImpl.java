@@ -1163,6 +1163,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         }
                         qNameBuffer.append(qNameRef.getQName().toString());
                         xdoc.add(new Field("PARENT", qNameRef.getParentRef().getId(), true, true, false));
+                        xdoc.add(new Field("TYPEQNAME", qNameRef.getTypeQName().toString(), true, false, false));
                         xdoc.add(new Field("LINKASPECT", (pair.getSecond() == null) ? "" : pair.getSecond().toString(), true, true, false));
                     }
                 }

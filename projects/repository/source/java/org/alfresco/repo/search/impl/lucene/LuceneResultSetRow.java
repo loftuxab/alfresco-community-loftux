@@ -20,7 +20,6 @@ package org.alfresco.repo.search.impl.lucene;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.AbstractResultSetRow;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -36,8 +35,6 @@ import org.apache.lucene.document.Document;
  */
 public class LuceneResultSetRow extends AbstractResultSetRow
 {
-    public static final QName ASSOC_TYPE_QNAME = ContentModel.ASSOC_CONTAINS;
-    
     /**
      * The current document - cached so we do not get it for each value
      */
@@ -90,13 +87,19 @@ public class LuceneResultSetRow extends AbstractResultSetRow
         String qname = getDocument().getField("QNAME").stringValue();
         return QName.createQName(qname);
     }
+    
+    public QName getTypeQName()
+    {
+        String qname = getDocument().getField("TYPEQNAME").stringValue();
+        return QName.createQName(qname);
+    }
 
     public ChildAssociationRef getChildAssocRef()
     {
         String primaryParent = getDocument().getField("PRIMARYPARENT").stringValue();
         NodeRef childNodeRef = getNodeRef();
         NodeRef paretnNodeRef = new NodeRef(childNodeRef.getStoreRef(), primaryParent);
-        return new ChildAssociationRef(ASSOC_TYPE_QNAME, paretnNodeRef, getQName(), childNodeRef);
+        return new ChildAssociationRef(getTypeQName(), paretnNodeRef, getQName(), childNodeRef);
     }
 
 }
