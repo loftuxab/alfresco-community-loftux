@@ -67,7 +67,7 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="32">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/details_large.gif" />
+                              <img src="<%=request.getContextPath()%>/images/icons/details_large.gif" width=32 height=32>
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
@@ -206,10 +206,34 @@
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
                                        actionListener="#{EditDocPropsDialog.setupDocumentForAction}"
                                        linkTooltip="Modify" rendered="#{DocumentDetailsBean.locked == false}">
-                                 <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
+                                 
+                                 <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                                    <tr>
+                                       <td width=80 align=center>
+                                          <%-- icon image for the doc --%>
+                                          <table cellspacing=0 cellpadding=0 border=0>
+                                             <tr>
+                                                <td>
+                                                   <div style="border: thin solid #CCCCCC; padding:4px">
+                                                      <h:graphicImage id="doc-logo" url="#{DocumentDetailsBean.document.properties.fileType32}" width="32" height="32" />
+                                                   </div>
+                                                </td>
+                                                <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
+                                             </tr>
+                                             <tr>
+                                                <td colspan=2><img src="<%=request.getContextPath()%>/images/parts/bottomShadow42.gif" width=48 height=5></td>
+                                             </tr>
+                                          </table>
+                                       </td>
+                                       <td>
+                                          <%-- properties for the doc --%>
+                                          <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
-                                 <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
+                                          <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
+                                       </td>
+                                    </tr>
+                                 </table>
                               </a:panel>
                               <a:panel label="Properties" id="properties-panel-locked" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"

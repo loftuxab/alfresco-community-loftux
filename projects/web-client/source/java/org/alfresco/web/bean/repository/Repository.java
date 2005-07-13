@@ -264,8 +264,6 @@ public final class Repository
                // not found create for first time
                image = (small ? IMAGE_PREFIX16 : IMAGE_PREFIX32) + ext + IMAGE_POSTFIX;
                
-               // TODO: add support for Large filetype icons also!
-               
                // does this image exist on the web-server?
                if (FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(image) != null)
                {

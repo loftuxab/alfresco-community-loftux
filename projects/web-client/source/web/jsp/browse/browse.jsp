@@ -70,7 +70,7 @@
                            <%-- actions for browse mode --%>
                            <a:panel id="browse-actions" rendered="#{NavigationBean.searchContext == null}">
                               <td width=32>
-                                 <img src="<%=request.getContextPath()%>/images/icons/space.gif" width=32 height=32>
+                                 <h:graphicImage id="space-logo" url="/images/icons/#{NavigationBean.nodeProperties.icon}.gif" width="32" height="32" />
                               </td>
                               <td>
                                  <%-- Summary --%>
@@ -105,6 +105,7 @@
                                     <a:actionLink value="#{msg.manage_rules}" image="/images/icons/rule.gif" action="manageRules" actionListener="#{BrowseBean.setupSpaceAction}" id="link10">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
                                     </a:actionLink>
+                                    <%-- admin user only actions --%>
                                     <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}" id="eval1">
                                        <a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
                                        <a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" id="link12" />

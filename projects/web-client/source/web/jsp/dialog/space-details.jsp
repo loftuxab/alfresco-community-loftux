@@ -67,7 +67,7 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="32">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/details_large.gif" />
+                              <img src="<%=request.getContextPath()%>/images/icons/details_large.gif" width=32 height=32>
                            </td>
                            <td>
                               <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
@@ -120,10 +120,33 @@
                                        progressive="true" action="editSpaceProperties" linkTooltip="Modify"
                                        actionListener="#{EditSpaceDialog.startWizardForEdit}"
                                        linkIcon="/images/icons/Change_details.gif">
-                                 <r:propertySheetGrid id="space-props" value="#{BrowseBean.actionSpace}" var="spaceProps" 
-                                                      columns="1" mode="view" labelStyleClass="propertiesLabel" 
-                                                      externalConfig="true" />
-                                 <h:messages styleClass="errorMessage" layout="table" />
+                                 <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                                    <tr>
+                                       <td width=80 align=center>
+                                          <%-- icon image for the space --%>
+                                          <table cellspacing=0 cellpadding=0 border=0>
+                                             <tr>
+                                                <td>
+                                                   <div style="border: thin solid #CCCCCC; padding:4px">
+                                                      <h:graphicImage id="space-logo" url="/images/icons/#{BrowseBean.actionSpace.properties.icon}.gif" width="32" height="32" />
+                                                   </div>
+                                                </td>
+                                                <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
+                                             </tr>
+                                             <tr>
+                                                <td colspan=2><img src="<%=request.getContextPath()%>/images/parts/bottomShadow42.gif" width=48 height=5></td>
+                                             </tr>
+                                          </table>
+                                       </td>
+                                       <td>
+                                          <%-- properties for the space --%>
+                                          <r:propertySheetGrid id="space-props" value="#{BrowseBean.actionSpace}" var="spaceProps" 
+                                                         columns="1" mode="view" labelStyleClass="propertiesLabel" 
+                                                         externalConfig="true" />
+                                          <h:messages styleClass="errorMessage" layout="table" />
+                                       </td>
+                                    </tr>
+                                 </table>
                               </a:panel>
                               <br/>
                               <a:panel label="Rules" id="rules-panel" progressive="true" expanded="false"

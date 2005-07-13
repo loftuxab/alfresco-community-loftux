@@ -724,6 +724,12 @@ public class BrowseBean implements IContextListener
             // create the node ref, then our node representation
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             Node node = new Node(ref, this.nodeService);
+            // early init properties for this node (by getProperties() call)
+            // resolve icon in-case one has not been set
+            if (node.getProperties().get("icon") == null)
+            {
+               node.getProperties().put("icon", NewSpaceWizard.SPACE_ICON_DEFAULT);
+            }
             
             // prepare a node for the action context
             setActionSpace(node);
@@ -777,6 +783,7 @@ public class BrowseBean implements IContextListener
             // store the URL to for downloading the content
             String name = node.getName();
             node.getProperties().put("url", DownloadContentServlet.generateDownloadURL(ref, name));
+            node.getProperties().put("fileType32", Repository.getFileTypeImage(node, false));
             
             // remember the document
             setDocument(node);

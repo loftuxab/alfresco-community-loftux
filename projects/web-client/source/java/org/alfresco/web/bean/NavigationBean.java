@@ -38,6 +38,7 @@ import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
+import org.alfresco.web.bean.wizard.NewSpaceWizard;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
@@ -213,8 +214,12 @@ public class NavigationBean
          
          NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
          Node node = new Node(nodeRef, this.nodeService);
-         // init properties for this node
-         node.getProperties();
+         // early init properties for this node (by getProperties() call)
+         // resolve icon in-case one has not been set
+         if (node.getProperties().get("icon") == null)
+         {
+            node.getProperties().put("icon", NewSpaceWizard.SPACE_ICON_DEFAULT);
+         }
          
          this.currentNode = node;
       }
