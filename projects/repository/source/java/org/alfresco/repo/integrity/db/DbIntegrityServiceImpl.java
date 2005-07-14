@@ -257,13 +257,16 @@ public class DbIntegrityServiceImpl
      */
     private void setTrace(IntegrityEvent event)
     {
-       // get a stack trace
-       Throwable t = new Throwable();
-       t.fillInStackTrace();
-       StackTraceElement[] trace = t.getStackTrace();
-       
-       event.setTrace(trace);
-       // done
+        if (traceOn)
+        {
+            // get a stack trace
+            Throwable t = new Throwable();
+            t.fillInStackTrace();
+            StackTraceElement[] trace = t.getStackTrace();
+            
+            event.setTrace(trace);
+            // done
+        }
     }
 
     /**
