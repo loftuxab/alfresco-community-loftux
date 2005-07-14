@@ -85,7 +85,7 @@
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
                                  <a:actionLink value="#{msg.new_space}" image="/images/icons/create_space.gif" padding="4" action="createSpace" actionListener="#{NewSpaceDialog.startWizard}" id="link1" />
                                  <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" padding="4" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}" id="link5">
-                                    <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param2" />
+                                    <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param6" />
                                  </a:actionLink>
                                  <a:actionLink value="#{msg.add_content}" image="/images/icons/add.gif" padding="4" action="addContent" actionListener="#{AddContentWizard.startWizard}" id="link3" />
                                  <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/more.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
