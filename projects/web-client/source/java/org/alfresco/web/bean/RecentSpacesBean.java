@@ -127,6 +127,9 @@ public class RecentSpacesBean implements IContextListener
       catch (InvalidNodeRefException refErr)
       {
          Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
+         
+         // remove invalid node from recent spaces list
+         this.recentSpaces.remove(spaceEvent.Index);
       }
    }
    
