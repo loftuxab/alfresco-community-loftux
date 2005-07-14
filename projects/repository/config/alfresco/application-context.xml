@@ -73,14 +73,12 @@
       <property name="luceneIndexerAndSearchFactory">
          <ref bean="luceneIndexerAndSearcherFactory"/>
       </property>
-	  <property name="serviceRegistry">
-		 <ref bean="serviceRegistry"/>
-	  </property>
-     <!--
-	  <property name="integrityService">
-		 <ref bean="integrityService"/>
-	  </property>
-     -->
+      <property name="serviceRegistry">
+         <ref bean="serviceRegistry"/>
+      </property>
+      <property name="integrityService">
+         <ref bean="integrityService"/>
+      </property>
    </bean>
    
    <!-- factory for UserTransaction instances -->

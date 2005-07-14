@@ -67,7 +67,7 @@ public class IntegrityTest extends TestCase
         integrityService = (IntegrityService) ctx.getBean("integrityService");
         integrityService.setEnabled(true);
         integrityService.setFailOnViolation(true);
-        integrityService.setTraceOn(true);
+        integrityService.setTraceOn(false);
         
         serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
         nodeService = serviceRegistry.getNodeService();
@@ -93,20 +93,20 @@ public class IntegrityTest extends TestCase
         assertNotNull("Static IntegrityService not created", integrityService);
     }
     
-    /**
-     * Create a node with a mandatory aspect and then remove it
-     */
-    public void testMissingAspect() throws Exception
-    {
-        // create node with mandatory aspect
-        nodeService.createNode(
-                rootNodeRef,
-                ContentModel.ASSOC_CHILDREN,
-                QName.createQName(NAMESPACE, "abc"),
-                TYPE_QNAME_TEST_FOLDER);
-        // check that it has the mandatory aspect
-    }
-    
+//    /**
+//     * Create a node with a mandatory aspect and then remove it
+//     */
+//    public void testMissingAspect() throws Exception
+//    {
+//        // create node with mandatory aspect
+//        nodeService.createNode(
+//                rootNodeRef,
+//                ContentModel.ASSOC_CHILDREN,
+//                QName.createQName(NAMESPACE, "abc"),
+//                TYPE_QNAME_TEST_FOLDER);
+//        // check that it has the mandatory aspect
+//    }
+//    
     /**
      * Create a new node without a mandatory property
      */
@@ -131,6 +131,10 @@ public class IntegrityTest extends TestCase
             // expected - check that it has the correct errors
             assertEquals("Incorrect number of error records", 2, e.getRecords().size());
         }
+        
+        // repeat the process - since integrity MUST remove all the events,
+        // there should be no errors
+        integrityService.checkIntegrity(txnId);
         
         // add mandatory properties
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);

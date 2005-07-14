@@ -19,11 +19,13 @@ package org.alfresco.repo.transaction;
 
 import javax.transaction.UserTransaction;
 
+import junit.framework.TestCase;
+
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.util.ApplicationContextHelper;
+import org.alfresco.util.transaction.SpringAwareUserTransaction;
 import org.springframework.context.ApplicationContext;
-
-import junit.framework.TestCase;
+import org.springframework.transaction.TransactionDefinition;
 
 /**
  * Tests integration between our <tt>UserTransaction</tt> implementation and
@@ -69,9 +71,29 @@ public class AlfrescoTransactionManagerTest extends TestCase
         String txnIdCheck = AlfrescoTransactionManager.getTransactionId();
         assertEquals("Transaction ID changed on same thread", txnId, txnIdCheck);
         
-        // commit
-        txn.commit();
-        assertNull("Thread shouldn't have a txn ID after commit", AlfrescoTransactionManager.getTransactionId());
+        // begin a new, inner transaction
+        {
+            SpringAwareUserTransaction txnInner = (SpringAwareUserTransaction) serviceRegistry.getUserTransaction();
+            txnInner.setPropogationBehviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            
+            String txnIdInner = AlfrescoTransactionManager.getTransactionId();
+            assertEquals("Inner transaction not started, so txn ID should not change", txnId, txnIdInner);
+            
+            // begin the nested txn
+            txnInner.begin();
+            // check the ID for the outer transaction
+            txnIdInner = AlfrescoTransactionManager.getTransactionId();
+            assertNotSame("Inner txn ID must be different from outer txn ID", txnIdInner, txnId);
+            
+            // rollback the nested txn
+            txnInner.rollback();
+            txnIdCheck = AlfrescoTransactionManager.getTransactionId();
+            assertEquals("Txn ID not popped inner txn completion", txnId, txnIdCheck);
+        }
+        
+        // rollback
+        txn.rollback();
+        assertNull("Thread shouldn't have a txn ID after rollback", AlfrescoTransactionManager.getTransactionId());
         
         // start a new transaction
         txn = serviceRegistry.getUserTransaction();

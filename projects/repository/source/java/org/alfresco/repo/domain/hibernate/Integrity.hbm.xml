@@ -27,11 +27,32 @@
       <property name="aspectTypeQName" column="aspect_type_qname" length="250" not-null="false"/>
       <property name="assocTypeQName" column="assoc_type_qname" length="250" not-null="false"/>
       <property name="assocQName" column="assoc_qname" length="250" not-null="false"/>
-      <property name="trace" column="trace" type="serializable" length="16383" not-null="false"/>
+      <property name="trace" column="trace" type="serializable" length="16384" not-null="false"/>
    </class>
 
-   <!-- get all events for a transaction, but exclude all nodes that were deleted -->
+   <!-- get all events -->
+   <query name="integrity.GetAllEvents">
+      select
+         event
+      from
+         org.alfresco.repo.domain.hibernate.IntegrityEventImpl as event
+   </query>
+   
+   <!-- get all events for a transaction, including deletion events -->
    <query name="integrity.GetTxnEvents">
+      select
+         event
+      from
+         org.alfresco.repo.domain.hibernate.IntegrityEventImpl as event
+      where
+         event.transactionId = :transactionId
+      order by
+         event.primaryNodeRef,
+         event.eventType
+   </query>
+
+   <!-- get all events for a transaction, but exclude all nodes that were deleted -->
+   <query name="integrity.GetTxnEventsExDeleted">
       select
          event
       from
@@ -48,33 +69,9 @@
                deleted.transactionId = event.transactionId and
                deleted.eventType = 'nodeDeleted'
          )
-      group by
+      order by
          event.primaryNodeRef,
          event.eventType
-   </query>
-   
-   <query name="integrity.GetNodesToCheckForProperties">
-      select distinct
-         event.primaryNodeRef
-      from
-         org.alfresco.repo.domain.hibernate.IntegrityEventImpl as event
-      where
-         event.transactionId = :transactionId and
-         (
-            event.eventType = 'propertiesChanged' or
-            event.eventType = 'aspectAdded' or
-            event.eventType = 'nodeCreated'
-         ) and
-         event.primaryNodeRef not in
-         (
-            select
-               deleted.primaryNodeRef
-            from
-               org.alfresco.repo.domain.hibernate.IntegrityEventImpl as deleted
-            where
-               deleted.transactionId = event.transactionId and
-               deleted.eventType = 'nodeDeleted'
-         )
    </query>
    
 </hibernate-mapping>

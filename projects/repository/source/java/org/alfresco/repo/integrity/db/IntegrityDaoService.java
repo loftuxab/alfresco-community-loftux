@@ -43,6 +43,15 @@ public interface IntegrityDaoService
     public IntegrityEvent newEvent(String txnId, String eventType, NodeRef primaryNodeRef);
     
     /**
+     * Retrieves all events, paged appropriately.
+     * 
+     * @param firstResult
+     * @param maxResults
+     * @return Returns 
+     */
+    public List<IntegrityEvent> getEvents(int firstResult, int maxResults);
+    
+    /**
      * Retrieves all events that arose in the given transaction.
      * <p>
      * This method forces pagination as the number of results returned can easily
@@ -58,14 +67,6 @@ public interface IntegrityDaoService
     public List<IntegrityEvent> getEvents(String txnId, int firstResult, int maxResults);
     
     /**
-     * Retrieves all nodes that should have their properties checked
-     * 
-     * @param txnId the transaction ID to search against
-     * @return Returns all applicable node references (as strings)
-     */
-    public List<String> getNodesToCheckForProperties(final String txnId);
-    
-    /**
      * Deletes a specific event.
      * 
      * @param id the unique ID of the event
@@ -76,6 +77,7 @@ public interface IntegrityDaoService
      * Removes all events associated with the given transaction ID.
      * 
      * @param txnId the transaction ID
+     * @param flushSize the number of events to allow in memory before flushing
      */
-    public void deleteEvents(String txnId);
+    public void deleteEvents(String txnId, int flushSize);
 }

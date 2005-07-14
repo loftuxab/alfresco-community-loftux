@@ -103,10 +103,10 @@ public class AlfrescoTransactionManager extends HibernateTransactionManager
     }
 
     /**
-     * Retrieves the current transaction id
+     * Retrieves the current transaction id.
      * 
-     * @return Returns the transaction ID assigned to the thread, or null if a transaction was
-     *      not started, or if the transaction wasn't started by this transaction manager.
+     * @return Returns the transaction ID, or null if a transaction was not started,
+     *      or if the transaction wasn't started by this transaction manager.
      */
     public static String getTransactionId()
     {
@@ -167,18 +167,19 @@ public class AlfrescoTransactionManager extends HibernateTransactionManager
         }
         
         // check integrity if the integrity service is available
-        if (integrityService != null)
+        if (integrityService == null)
         {
-            try
-            {
-                integrityService.checkIntegrity(getTransactionId());
-            }
-            catch (IntegrityException e)
-            {
-                // integrity failure - rollback
-                doRollback(status);
-                throw new AlfrescoTransactionException("Integrity violation prevented transaction commit", e);
-            }
+            throw new AlfrescoTransactionException("IntegrityService is not optional");
+        }
+        try
+        {
+            integrityService.checkIntegrity(getTransactionId());
+        }
+        catch (IntegrityException e)
+        {
+            // integrity failure - rollback
+            doRollback(status);
+            throw new AlfrescoTransactionException("Integrity violation prevented transaction commit", e);
         }
         
         try

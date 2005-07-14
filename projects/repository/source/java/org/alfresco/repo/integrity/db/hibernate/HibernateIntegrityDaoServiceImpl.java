@@ -23,6 +23,8 @@ import org.alfresco.repo.domain.IntegrityEvent;
 import org.alfresco.repo.domain.hibernate.IntegrityEventImpl;
 import org.alfresco.repo.integrity.db.IntegrityDaoService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -36,8 +38,11 @@ import org.springframework.util.Assert;
  */
 public class HibernateIntegrityDaoServiceImpl extends HibernateDaoSupport implements IntegrityDaoService
 {
-    public static final String QUERY_GET_EVENTS = "integrity.GetTxnEvents";
-    public static final String QUERY_GET_NODES_FOR_PROPERTIES_CHECK = "integrity.GetNodesToCheckForProperties";
+    private static Log logger = LogFactory.getLog(HibernateIntegrityDaoServiceImpl.class);
+    
+    private static final String QUERY_GET_ALL_EVENTS = "integrity.GetAllEvents";
+    private static final String QUERY_GET_TXN_EVENTS = "integrity.GetTxnEvents";
+    private static final String QUERY_GET_TXN_EVENTS_EX_DEL = "integrity.GetTxnEventsExDeleted";
     
     /**
      * Just flush and clear the hibernate session.
@@ -74,13 +79,30 @@ public class HibernateIntegrityDaoServiceImpl extends HibernateDaoSupport implem
         // done
     }
     
+    public List<IntegrityEvent> getEvents(final int firstResult, final int maxResults)
+    {
+        HibernateCallback callback = new HibernateCallback()
+        {
+            public Object doInHibernate(Session session)
+            {
+                Query query = session.getNamedQuery(HibernateIntegrityDaoServiceImpl.QUERY_GET_ALL_EVENTS);
+                query.setFirstResult(firstResult);
+                query.setMaxResults(maxResults);
+                return query.list();
+            }
+        };
+        List<IntegrityEvent> queryResults = (List) getHibernateTemplate().execute(callback);
+        // done
+        return queryResults;
+    }
+
     public List<IntegrityEvent> getEvents(final String txnId, final int firstResult, final int maxResults)
     {
         HibernateCallback callback = new HibernateCallback()
         {
             public Object doInHibernate(Session session)
             {
-                Query query = session.getNamedQuery(HibernateIntegrityDaoServiceImpl.QUERY_GET_EVENTS);
+                Query query = session.getNamedQuery(HibernateIntegrityDaoServiceImpl.QUERY_GET_TXN_EVENTS_EX_DEL);
                 query.setString("transactionId", txnId);
                 query.setFirstResult(firstResult);
                 query.setMaxResults(maxResults);
@@ -91,25 +113,61 @@ public class HibernateIntegrityDaoServiceImpl extends HibernateDaoSupport implem
         // done
         return queryResults;
     }
-    
-    public List<String> getNodesToCheckForProperties(final String txnId)
+
+    /**
+     * Helper method to step through all events for deletion purposes
+     */
+    private List<IntegrityEvent> getEventsForDeletion(
+            Session session,
+            String txnId,
+            int firstResult,
+            int maxResults)
+    {
+        Query query = session.getNamedQuery(HibernateIntegrityDaoServiceImpl.QUERY_GET_TXN_EVENTS);
+        query.setString("transactionId", txnId);
+        query.setFirstResult(firstResult);
+        query.setMaxResults(maxResults);
+        return query.list();
+    }
+
+    public void deleteEvents(final String txnId, final int flushSize)
     {
         HibernateCallback callback = new HibernateCallback()
         {
             public Object doInHibernate(Session session)
             {
-                Query query = session.getNamedQuery(HibernateIntegrityDaoServiceImpl.QUERY_GET_NODES_FOR_PROPERTIES_CHECK);
-                query.setString("transactionId", txnId);
-                return query.list();
+                int currentRow = 0;
+                while (true)
+                {
+                    List<IntegrityEvent> events = getEventsForDeletion(session, txnId, currentRow, flushSize);
+                    for (IntegrityEvent event : events)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Deleting event: " + event);
+                        }
+                        session.delete(event);
+                    }
+                    // flush and clear the caches after each batch
+                    session.flush();
+                    session.clear();
+
+                    // break or get next batch of results
+                    if (events.size() < flushSize)
+                    {
+                        // retrieved fewer events than the maximum
+                        break;
+                    }
+                    else
+                    {
+                        // may be more rows to fetch
+                        currentRow += flushSize;
+                    }
+                }
+                return null;
             }
         };
-        List<String> queryResults = (List) getHibernateTemplate().execute(callback);
+        getHibernateTemplate().execute(callback);
         // done
-        return queryResults;
-    }
-
-    public void deleteEvents(String txnId)
-    {
-        throw new UnsupportedOperationException();
     }
 }

@@ -275,6 +275,12 @@ public class DbIntegrityServiceImpl
     public void onCreateNode(ChildAssociationRef childAssocRef)
     {
         String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
         IntegrityEvent event = integrityDaoService.newEvent(
                 txnId,
                 IntegrityEvent.EVENT_TYPE_NODE_CREATED,
@@ -295,6 +301,12 @@ public class DbIntegrityServiceImpl
             Map<QName, Serializable> after)
     {
         String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
         IntegrityEvent event = integrityDaoService.newEvent(
                 txnId,
                 IntegrityEvent.EVENT_TYPE_PROPERTIES_CHANGED,
@@ -306,6 +318,12 @@ public class DbIntegrityServiceImpl
     public void onDeleteNode(ChildAssociationRef childAssocRef)
     {
         String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
         IntegrityEvent event = integrityDaoService.newEvent(
                 txnId,
                 IntegrityEvent.EVENT_TYPE_NODE_DELETED,
@@ -322,6 +340,12 @@ public class DbIntegrityServiceImpl
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
         String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
         IntegrityEvent event = integrityDaoService.newEvent(
                 txnId,
                 IntegrityEvent.EVENT_TYPE_ASPECT_ADDED,
@@ -337,6 +361,12 @@ public class DbIntegrityServiceImpl
     public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
         String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
         IntegrityEvent event = integrityDaoService.newEvent(
                 txnId,
                 IntegrityEvent.EVENT_TYPE_ASPECT_REMOVED,
@@ -348,27 +378,100 @@ public class DbIntegrityServiceImpl
 
     public void onCreateChildAssociation(ChildAssociationRef childAssocRef)
     {
+        String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
 //        throw new UnsupportedOperationException();
     }
 
     public void onDeleteChildAssociation(ChildAssociationRef childAssocRef)
     {
+        String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
 //        throw new UnsupportedOperationException();
     }
 
     public void onCreateAssociation(AssociationRef nodeAssocRef)
     {
+        String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
 //        throw new UnsupportedOperationException();
     }
 
     public void onDeleteAssociation(AssociationRef nodeAssocRef)
     {
+        String txnId = AlfrescoTransactionManager.getTransactionId();
+        if (txnId == null)
+        {
+            // management of transaction not under our control - do nothing 
+            return;
+        }
+        
 //        throw new UnsupportedOperationException();
+    }
+    
+    /**
+     * Dumps any remaining integrity events to the log debug out.  This method
+     * should only be used if DEBUG is on.
+     */
+    private void dumpVisibleEvents(String txnId)
+    {
+        logger.debug("Dumping visible events in current Txn...");
+        int currentRow = 0;
+        while (true)
+        {
+            List<IntegrityEvent> events = integrityDaoService.getEvents(currentRow, flushSize);
+            for (IntegrityEvent event : events)
+            {
+                if (!event.getTransactionId().equals(txnId))
+                {
+                    continue;
+                }
+                // transfer to a record for nice output
+                IntegrityRecord record = new IntegrityRecord(event.toString());
+                if (event.getTrace() != null)
+                {
+                    record.addTrace(event.getTrace());
+                }
+                logger.debug(record);
+            }
+            // flush and clear the caches after each batch
+            integrityDaoService.flushAndClear();
+
+            // break or get next batch of results
+            if (events.size() < flushSize)
+            {
+                // retrieved fewer events than the maximum
+                break;
+            }
+            else
+            {
+                // may be more rows to fetch
+                currentRow += flushSize;
+            }
+        }
     }
 
     /**
      * Runs several types of checks, querying specifically for events that
      * will necessitate each type of test.
+     * <p>
+     * The interface contracts also requires that all events for the transaction
+     * get cleaned up.
      */
     public void checkIntegrity(String txnId) throws IntegrityException
     {
@@ -381,6 +484,13 @@ public class DbIntegrityServiceImpl
         
         // check properties
         List<IntegrityRecord> failures = processAllEvents(txnId);
+
+        // clean out any remaining events regardless of if there are errors or not
+        integrityDaoService.deleteEvents(txnId, flushSize);
+        if (logger.isDebugEnabled())
+        {
+            dumpVisibleEvents(txnId);
+        }
         
         // drop out quickly if there are no failures
         if (failures.isEmpty())
@@ -517,7 +627,18 @@ public class DbIntegrityServiceImpl
                 results.addAll(eventResults);
                 // clear the event results
                 eventResults.clear();
+                
+                // Clean out the event.  We do this regardless of whether the transaction will be
+                // rolled back or not.  We have to be sure that no events are left lying around.
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Deleting event: " + event);
+                }
+                integrityDaoService.deleteEvent(event.getId());
             }
+            
+            // flush and clear the caches after each batch
+            integrityDaoService.flushAndClear();
             
             if (results.size() >= maxErrorsPerTransaction)
             {
@@ -533,8 +654,6 @@ public class DbIntegrityServiceImpl
             {
                 // may be more rows to fetch
                 currentRow += flushSize;
-                // flush and clear the caches in preparation
-                integrityDaoService.flushAndClear();
             }
         }
         // done

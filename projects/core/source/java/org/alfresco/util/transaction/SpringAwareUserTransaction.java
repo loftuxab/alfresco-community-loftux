@@ -79,13 +79,30 @@ public class SpringAwareUserTransaction implements UserTransaction
     private int status = Status.STATUS_NO_TRANSACTION;
     
     /**
+     * Creates a user transaction that defaults to {@link TransactionDefinition#PROPAGATION_REQUIRED}.
+     * 
      * @param transactionManager the transaction manager to use
+     * 
+     * @see #setPropogationBehviour(int)
      */
     public SpringAwareUserTransaction(PlatformTransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;
         transactionDef = new DefaultTransactionDefinition();
         transactionDef.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+    }
+    
+    /**
+     * Set the propogation mode for when the transaction is started.  The constants are
+     * defined by the {@link TransactionDefinition SpringFramework}. 
+     * 
+     * @param propogationBehaviour the type of transaction propogation required
+     * 
+     * @see TransactionDefinition#PROPAGATION_REQUIRED
+     */
+    public void setPropogationBehviour(int propogationBehaviour)
+    {
+        transactionDef.setPropagationBehavior(propogationBehaviour);
     }
 
     public synchronized int getStatus() throws SystemException
