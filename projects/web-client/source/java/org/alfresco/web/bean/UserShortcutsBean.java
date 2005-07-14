@@ -117,9 +117,19 @@ public class UserShortcutsBean
                   catch (InvalidNodeRefException nodeErr)
                   {
                      // ignore this shortcut node - no longer exists in the system!
-                     // TODO: correct this error in the node list and save back
+                     // we write the node list back again afterwards to correct this
+                     if (logger.isDebugEnabled())
+                        logger.debug("Found invalid shortcut node Id: " + node.getId());
                   }
                }
+               
+               // write the valid shortcut IDs back to correct invalid node refs
+               shortcuts = new ArrayList<String>(this.shortcuts.size());
+               for (int i=0; i<this.shortcuts.size(); i++)
+               {
+                  shortcuts.add(this.shortcuts.get(i).getId());
+               }
+               this.nodeService.setProperty(prefRef, QNAME_SHORTCUTS, (Serializable)shortcuts);
             }
             else
             {
@@ -296,6 +306,37 @@ public class UserShortcutsBean
       catch (InvalidNodeRefException refErr)
       {
          Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {selectedNode.getId()}) );
+         
+         // remove item from the shortcut list
+         UserTransaction tx = null;
+         try
+         {
+            FacesContext context = FacesContext.getCurrentInstance();
+            tx = Repository.getUserTransaction(context);
+            tx.begin();
+            
+            NodeRef prefRef = getShortcutsNodeRef();
+            List<String> shortcuts = (List<String>)this.nodeService.getProperty(prefRef, QNAME_SHORTCUTS);
+            if (shortcuts != null && shortcuts.size() > shortcutEvent.Index)
+            {
+               // remove the shortcut from the saved list and persist back
+               shortcuts.remove(shortcutEvent.Index);
+               this.nodeService.setProperty(prefRef, QNAME_SHORTCUTS, (Serializable)shortcuts);
+               
+               // commit the transaction
+               tx.commit();
+               
+               // remove shortcut Node from the in-memory list
+               Node node = getShortcuts().remove(shortcutEvent.Index);
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Removed deleted node: " + node.getName() + " from the user shortcuts list.");
+            }
+         }
+         catch (Exception err)
+         {
+            try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+         }
       }
    }
 }

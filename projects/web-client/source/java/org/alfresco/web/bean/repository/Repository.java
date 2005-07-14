@@ -61,7 +61,7 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public final class Repository
 {
-   public static final String ERROR_NODEREF = "Unable to find the repository node referenced by Id: {0} - the node has probably been deleted from the database.";
+   public static final String ERROR_NODEREF = "Unable to find the repository item referenced by Id: {0} - the record has probably been deleted from the database.";
    public static final String ERROR_GENERIC = "A system error occured during the operation: {0}";
    public static final String ERROR_NOHOME  = "The Home Space node referenced by Id: {0} cannot be found. It may have been deleted from the database. Please contact your system administrator.";
    public static final String ERROR_SEARCH  = "Search failed due to system error: {0}";
