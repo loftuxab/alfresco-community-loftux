@@ -31,9 +31,9 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.NodeStoreInspector;
 
-
 /**
- * Node operations service unit tests
+ * Checks that the behaviour of the {@link org.alfresco.repo.audit.AuditableAspect auditable aspect}
+ * is correct.
  * 
  * @author Roy Wetherall
  */
