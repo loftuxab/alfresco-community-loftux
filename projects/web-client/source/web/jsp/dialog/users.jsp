@@ -114,11 +114,11 @@
                               
                               <a:panel id="users-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.users}">
                               
-                              <a:richList id="users-list" binding="#{NewUserWizard.usersRichList}" viewMode="details" pageSize="10"
+                              <a:richList id="users-list" binding="#{UsersBean.usersRichList}" viewMode="details" pageSize="10"
                                     styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
-                                    value="#{NewUserWizard.users}" var="r" initialSortColumn="name" initialSortDescending="true">
+                                    value="#{UsersBean.users}" var="r" initialSortColumn="name" initialSortDescending="true">
                                  
-                                 <%-- Primary column for details view mode --%>
+                                 <%-- Primary column with full name --%>
                                  <a:column primary="true" width="200" style="padding:2px;text-align:left">
                                     <f:facet name="header">
                                        <a:sortLink label="Name" value="fullName" mode="case-insensitive" styleClass="header"/>
@@ -129,12 +129,20 @@
                                     <h:outputText value="#{r.fullName}" />
                                  </a:column>
                                  
-                                 <%-- Description column for all view modes --%>
+                                 <%-- Username column --%>
                                  <a:column style="text-align:left">
                                     <f:facet name="header">
                                        <a:sortLink label="User Name" value="userName" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.userName}" />
+                                 </a:column>
+                                 
+                                 <%-- Home Space Path column --%>
+                                 <a:column style="text-align:left">
+                                    <f:facet name="header">
+                                       <h:outputText value="#{msg.homespace}"/>
+                                    </f:facet>
+                                    <r:nodePath value="#{r.homeSpace}" disabled="true" showLeaf="true" />
                                  </a:column>
                                  
                                  <%-- Actions column --%>

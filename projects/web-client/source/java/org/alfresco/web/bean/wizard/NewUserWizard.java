@@ -42,6 +42,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -77,9 +78,6 @@ public class NewUserWizard extends AbstractWizardBean
    private String companyId = null;
    private String homeSpaceName = null;
    private String homeSpaceLocation = null;
-   
-   /** Component references */
-   private UIRichList usersRichList;
    
    /** AuthenticationService bean reference */
    private AuthenticationService authenticationService;
@@ -129,16 +127,22 @@ public class NewUserWizard extends AbstractWizardBean
       this.password = ""; 
       this.email = (String)props.get("email");
       this.companyId = (String)props.get("organizationId");
-      // TODO: calculate home space name and parent space Id from homeFolderId
+      
+      // calculate home space name and parent space Id from homeFolderId
+      this.homeSpaceLocation = null;        // default to Company root space
+      this.homeSpaceName = "";              // default to none set below root
       String homeFolderId = (String)props.get("homeFolder");
-      if (this.nodeService.exists(new NodeRef(Repository.getStoreRef(), homeFolderId)) == false)
+      NodeRef homeFolderRef = new NodeRef(Repository.getStoreRef(), homeFolderId);
+      if (this.nodeService.exists(homeFolderRef) == true)
       {
-         // couldn't find home space - revert to company space
-         homeFolderId = null;
+         ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(homeFolderRef);
+         NodeRef parentRef = childAssocRef.getParentRef();
+         if (parentRef != null)
+         {
+            this.homeSpaceLocation = parentRef.getId();
+         }
+         this.homeSpaceName = Repository.getNameForNode(nodeService, homeFolderRef);
       }
-      this.homeSpaceName = "";
-      // TODO: this is wrong at present!
-      this.homeSpaceLocation = homeFolderId;
    }
    
    /**
@@ -381,7 +385,7 @@ public class NewUserWizard extends AbstractWizardBean
          tx.commit();
          
          // reset the richlist component so it rebinds to the users list
-         this.usersRichList.setValue(null);
+         invalidateUserList();
       }
       catch (Exception e)
       {
@@ -398,9 +402,15 @@ public class NewUserWizard extends AbstractWizardBean
     */
    public String getSummary()
    {
+      String homeSpaceLabel = this.homeSpaceName;
+      if ((this.homeSpaceName == null || this.homeSpaceName.length() == 0) && this.homeSpaceLocation != null)
+      {
+         homeSpaceLabel = Repository.getNameForNode(this.nodeService, new NodeRef(Repository.getStoreRef(), this.homeSpaceLocation));
+      }
+      
       return buildSummary(
             new String[] {"Name", "User Name", "Password", "Home Space"},
-            new String[] {this.firstName + " " + this.lastName, this.userName, "********", this.homeSpaceName});
+            new String[] {this.firstName + " " + this.lastName, this.userName, "********", homeSpaceLabel});
    }
    
    /**
@@ -408,10 +418,7 @@ public class NewUserWizard extends AbstractWizardBean
     */
    public void setupUsers(ActionEvent event)
    {
-      if (this.usersRichList != null)
-      {
-         this.usersRichList.setValue(null);
-      }
+      invalidateUserList();
    }
    
    /**
@@ -439,7 +446,7 @@ public class NewUserWizard extends AbstractWizardBean
             setPerson(node);
             
             // clear the UI state in preparation for finishing the action and returning to the main page
-            this.usersRichList.setValue(null);
+            invalidateUserList();
          }
          catch (InvalidNodeRefException refErr)
          {
@@ -481,7 +488,7 @@ public class NewUserWizard extends AbstractWizardBean
             populate();
             
             // clear the UI state in preparation for finishing the action and returning to the main page
-            this.usersRichList.setValue(null);
+            invalidateUserList();
             
             if (logger.isDebugEnabled())
                logger.debug("Started wizard : " + getWizardTitle() + " for editing");
@@ -495,14 +502,6 @@ public class NewUserWizard extends AbstractWizardBean
       {
          setPerson(null);
       }
-   }
-   
-   /**
-    * @return the list of user Nodes to display
-    */
-   public List<Node> getUsers()
-   {
-      return Repository.getUsers(FacesContext.getCurrentInstance(), this.nodeService);
    }
 
    /**
@@ -631,22 +630,6 @@ public class NewUserWizard extends AbstractWizardBean
    public void setPassword(String password)
    {
       this.password = password;
-   }
-
-   /**
-    * @return Returns the usersRichList.
-    */
-   public UIRichList getUsersRichList()
-   {
-      return this.usersRichList;
-   }
-   
-   /**
-    * @param usersRichList The usersRichList to set.
-    */
-   public void setUsersRichList(UIRichList usersRichList)
-   {
-      this.usersRichList = usersRichList;
    }
    
    /**
@@ -829,5 +812,10 @@ public class NewUserWizard extends AbstractWizardBean
       }
       
       return homeSpaceId;
+   }
+   
+   private void invalidateUserList()
+   {
+      UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
    }
 }

@@ -376,6 +376,11 @@ public final class Repository
                // it is much better for performance to do this now rather than during page bind
                Map<String, Object> props = node.getProperties(); 
                props.put("fullName", ((String)props.get("firstName")) + ' ' + ((String)props.get("lastName")));
+               String homeFolderId = (String)props.get("homeFolder");
+               if (homeFolderId != null)
+               {
+                  props.put("homeSpace", new NodeRef(Repository.getStoreRef(), homeFolderId));
+               }
                
                personNodes.add(node);
             }

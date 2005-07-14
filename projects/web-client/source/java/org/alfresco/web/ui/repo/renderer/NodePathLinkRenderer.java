@@ -27,6 +27,7 @@ import javax.faces.context.FacesContext;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
@@ -103,6 +104,20 @@ public class NodePathLinkRenderer extends BaseRenderer
          isBreadcrumb = breadcrumb.booleanValue();
       }
       
+      boolean isDisabled = false;
+      Boolean disabled = (Boolean)component.getAttributes().get("disabled");
+      if (disabled != null)
+      {
+         isDisabled = disabled.booleanValue();
+      }
+      
+      boolean showLeaf = false;
+      Boolean showLeafBool = (Boolean)component.getAttributes().get("showLeaf");
+      if (showLeafBool != null)
+      {
+         showLeaf = showLeafBool.booleanValue();
+      }
+      
       // use Spring JSF integration to get the node service bean
       NodeService service = getNodeService(context);
       UserTransaction tx = null;
@@ -116,16 +131,21 @@ public class NodePathLinkRenderer extends BaseRenderer
             path = service.getPath(nodeRef);
          }
          
-         if (isBreadcrumb == false)
+         if (isBreadcrumb == false || isDisabled == true)
          {
-            out.write(buildPathAsSingular(context, component, path));
+            out.write(buildPathAsSingular(context, component, path, showLeaf, isDisabled));
          }
          else
          {
-            out.write(buildPathAsBreadcrumb(context, component, path));
+            out.write(buildPathAsBreadcrumb(context, component, path, showLeaf));
          }
          
          tx.commit();
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         // this error simple means we cannot output the path
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
       catch (Throwable err)
       {
@@ -143,10 +163,12 @@ public class NodePathLinkRenderer extends BaseRenderer
     * 
     * @return the path with each individual element clickable
     */
-   private String buildPathAsBreadcrumb(FacesContext context, UIComponent component, Path path)
+   private String buildPathAsBreadcrumb(FacesContext context, UIComponent component, Path path, boolean showLeaf)
    {
       StringBuilder buf = new StringBuilder(1024);
-      for (int i=0; i<path.size()-1; i++)
+      
+      int size = (showLeaf ? path.size() : path.size() - 1);
+      for (int i=0; i<size; i++)
       {
          Path.Element element = path.get(i);
          String elementString = null;
@@ -183,11 +205,13 @@ public class NodePathLinkRenderer extends BaseRenderer
     * 
     * @return the entire path as a single clickable link
     */
-   private String buildPathAsSingular(FacesContext context, UIComponent component, Path path)
+   private String buildPathAsSingular(FacesContext context, UIComponent component, Path path, boolean showLeaf, boolean disabled)
    {
-      StringBuilder buf = new StringBuilder(1024);
+      StringBuilder buf = new StringBuilder(512);
+      
       NodeRef lastElementRef = null;
-      for (int i=0; i<path.size()-1; i++)
+      int size = (showLeaf ? path.size() : path.size() - 1);
+      for (int i=0; i<size; i++)
       {
          Path.Element element = path.get(i);
          String elementString = null;
@@ -215,7 +239,14 @@ public class NodePathLinkRenderer extends BaseRenderer
          }
       }
       
-      return renderPathElement(context, component, lastElementRef, buf.toString());
+      if (disabled == false)
+      {
+         return renderPathElement(context, component, lastElementRef, buf.toString());
+      }
+      else
+      {
+         return buf.toString();
+      }
    }
    
    /**

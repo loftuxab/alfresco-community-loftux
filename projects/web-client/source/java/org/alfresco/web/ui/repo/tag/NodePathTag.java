@@ -55,6 +55,8 @@ public class NodePathTag extends HtmlComponentTag
       setActionProperty((UICommand)component, this.action);
       setActionListenerProperty((UICommand)component, this.actionListener);
       setBooleanProperty(component, "breadcrumb", this.breadcrumb);
+      setBooleanProperty(component, "disabled", this.disabled);
+      setBooleanProperty(component, "showLeaf", this.disabled);
       setStringBindingProperty(component, "value", this.value);
    }
    
@@ -68,6 +70,9 @@ public class NodePathTag extends HtmlComponentTag
       this.action = null;
       this.actionListener = null;
       this.value = null;
+      this.disabled = null;
+      this.breadcrumb = null;
+      this.showLeaf = null;
    }
    
    /**
@@ -109,9 +114,35 @@ public class NodePathTag extends HtmlComponentTag
    {
       this.breadcrumb = breadcrumb;
    }
+   
+   /**
+    * Set whether the component is disabled
+    *
+    * @param disabled     whether the component is disabled
+    */
+   public void setDisabled(String disabled)
+   {
+      this.disabled = disabled;
+   }
+   
+   /**
+    * Set whether the final leaf node is shown as part of the path
+    *
+    * @param showLeaf     whether the final leaf node is shown as part of the path
+    */
+   public void setShowLeaf(String showLeaf)
+   {
+      this.showLeaf = showLeaf;
+   }
 
 
-   /** the breadcrumb */
+   /** the showLeaf boolean */
+   private String showLeaf;
+
+   /** the disabled boolean */
+   private String disabled;
+
+   /** the breadcrumb boolean */
    private String breadcrumb;
 
    /** the action */

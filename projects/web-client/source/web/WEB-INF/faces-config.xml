@@ -158,6 +158,19 @@
    
    <managed-bean>
       <description>
+         The bean that holds state for the Users screen.
+      </description>
+      <managed-bean-name>UsersBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.users.UsersBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the New Space Wizard
       </description>
       <managed-bean-name>NewSpaceWizard</managed-bean-name>

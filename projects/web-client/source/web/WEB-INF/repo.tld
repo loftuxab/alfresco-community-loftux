@@ -255,6 +255,18 @@
       </attribute>
 
       <attribute>
+         <name>disabled</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
+         <name>showLeaf</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+
+      <attribute>
          <name>action</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
