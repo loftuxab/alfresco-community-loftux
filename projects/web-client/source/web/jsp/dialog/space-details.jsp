@@ -154,7 +154,7 @@
                                           <%-- properties for the space --%>
                                           <r:propertySheetGrid id="space-props" value="#{SpaceDetailsBean.space}" var="spaceProps" 
                                                          columns="1" mode="view" labelStyleClass="propertiesLabel" 
-                                                         externalConfig="true" />
+                                                         externalConfig="true" binding="#{SpaceDetailsBean.propertySheet}" />
                                           <h:messages styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>

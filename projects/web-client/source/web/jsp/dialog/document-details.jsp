@@ -210,7 +210,6 @@
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
                                        actionListener="#{EditDocPropsDialog.setupDocumentForAction}"
                                        linkTooltip="Modify" rendered="#{DocumentDetailsBean.locked == false}">
-                                 
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
                                        <td width=80 align=center>
@@ -219,7 +218,7 @@
                                              <tr>
                                                 <td>
                                                    <div style="border: thin solid #CCCCCC; padding:4px">
-                                                      <h:graphicImage id="doc-logo" url="#{DocumentDetailsBean.document.properties.fileType32}" width="32" height="32" />
+                                                      <h:graphicImage id="doc-logo1" url="#{DocumentDetailsBean.document.properties.fileType32}" width="32" height="32" />
                                                    </div>
                                                 </td>
                                                 <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
@@ -233,7 +232,7 @@
                                           <%-- properties for the doc --%>
                                           <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
-                                                      externalConfig="true" />
+                                                      externalConfig="true" binding="#{DocumentDetailsBean.propertySheetLocked}" />
                                           <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>
@@ -242,10 +241,32 @@
                               <a:panel label="Properties" id="properties-panel-locked" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.locked}">
-                                 <r:propertySheetGrid id="document-props-locked" value="#{DocumentDetailsBean.document}" var="documentProps" 
+                                 <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                                    <tr>
+                                       <td width=80 align=center>
+                                          <%-- icon image for the doc --%>
+                                          <table cellspacing=0 cellpadding=0 border=0>
+                                             <tr>
+                                                <td>
+                                                   <div style="border: thin solid #CCCCCC; padding:4px">
+                                                      <h:graphicImage id="doc-logo2" url="#{DocumentDetailsBean.document.properties.fileType32}" width="32" height="32" />
+                                                   </div>
+                                                </td>
+                                                <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
+                                             </tr>
+                                             <tr>
+                                                <td colspan=2><img src="<%=request.getContextPath()%>/images/parts/bottomShadow42.gif" width=48 height=5></td>
+                                             </tr>
+                                          </table>
+                                       </td>
+                                       <td>
+                                          <r:propertySheetGrid id="document-props-locked" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
-                                                      externalConfig="true" />
-                                 <h:messages id="props-locked-msgs" styleClass="errorMessage" layout="table" />
+                                                      externalConfig="true" binding="#{DocumentDetailsBean.propertySheet}" />
+                                          <h:messages id="props-locked-msgs" styleClass="errorMessage" layout="table" />
+                                       </td>
+                                    </tr>
+                                 </table>
                               </a:panel>
                               <br/>
                               <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"

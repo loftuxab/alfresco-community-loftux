@@ -31,6 +31,13 @@
       </attribute>
       
       <attribute>
+         <name>binding</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+         <description>The value binding expression linking this component to a property in a backing bean</description>
+      </attribute>
+      
+      <attribute>
          <name>rendered</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
