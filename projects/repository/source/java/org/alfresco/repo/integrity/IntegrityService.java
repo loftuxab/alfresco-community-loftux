@@ -55,6 +55,9 @@ public interface IntegrityService
     /**
      * Performs an integrity check for all integrity events that occured during the transaction
      * with the given ID.
+     * <p>
+     * This process will also perform any cleanup.  It can therefore only be run
+     * <b>once per transaction</b>.
      * 
      * @param txnId the ID of the transaction to check
      * @throws IntegrityException with a list of integrity violations
