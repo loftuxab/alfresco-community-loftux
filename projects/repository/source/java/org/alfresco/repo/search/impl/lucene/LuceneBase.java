@@ -30,6 +30,9 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MultiSearcher;
+import org.apache.lucene.search.Searchable;
+import org.apache.lucene.search.Searcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -273,6 +276,28 @@ public abstract class LuceneBase implements Lockable
         try
         {
             return new IndexSearcher(getMainPath());
+        }
+        catch (IOException e)
+        {
+            throw new LuceneIndexException("Failed to open IndexSarcher for " + getMainPath(), e);
+        }
+    }
+
+    
+    protected Searcher getSearcher(LuceneIndexer luceneIndexer) throws LuceneIndexException
+    {
+        // If we know the delta id we should do better
+        try
+        {
+            if( luceneIndexer == null)
+            {
+               return new IndexSearcher(getMainPath());
+            }
+            else
+            {
+                luceneIndexer.flushPending();
+                return new MultiSearcher(new IndexSearcher[]{new IndexSearcher(getMainPath()), new IndexSearcher(getDeltaPath())});
+            }
         }
         catch (IOException e)
         {
@@ -564,8 +589,8 @@ public abstract class LuceneBase implements Lockable
                     IndexReader[] readers = new IndexReader[] { reader };
                     try
                     {
-                        mainWriter.mergeIndexes(readers);
-                        //mainWriter.addIndexes(readers);
+                        //mainWriter.mergeIndexes(readers);
+                        mainWriter.addIndexes(readers);
                     }
                     catch (IOException e)
                     {
@@ -865,5 +890,9 @@ public abstract class LuceneBase implements Lockable
         return config;
     }
 
+    public String getDeltaId()
+    {
+        return deltaId;
+    }
     
 }
