@@ -25,6 +25,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 /**
+ * Interface for persistent <b>node</b> objects.
+ * <p>
  * Specific instances of nodes are unique, but may share GUIDs across stores.
  * 
  * @author Derek Hulley

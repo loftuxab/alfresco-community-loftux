@@ -27,8 +27,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
  */
 public interface Store
 {
-    public static final String QUERY_FIND_BY_PROTOCOL_AND_IDENTIFIER = "store.FindByProtocolAndIdentifier";
-    
     /**
      * @return Returns the key for the class
      */
