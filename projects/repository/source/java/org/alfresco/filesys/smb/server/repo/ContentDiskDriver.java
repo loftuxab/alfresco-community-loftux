@@ -30,7 +30,6 @@ import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.filesys.AccessDeniedException;
 import org.alfresco.filesys.server.filesys.DiskDeviceContext;
-import org.alfresco.filesys.server.filesys.DiskInfo;
 import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileName;
@@ -145,7 +144,6 @@ public class ContentDiskDriver implements DiskInterface
         DiskDeviceContext context = new DiskDeviceContext(rootNodeRef.toString());
 
         //  Default the filesystem to look like an 80Gb sized disk with 90% free space
-        
         context.setDiskInformation(new SrvDiskInfo(2560, 64, 512, 2304));
         
         // set parameters
