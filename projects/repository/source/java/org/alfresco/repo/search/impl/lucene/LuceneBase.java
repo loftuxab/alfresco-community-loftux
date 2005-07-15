@@ -295,8 +295,9 @@ public abstract class LuceneBase implements Lockable
             }
             else
             {
-                luceneIndexer.flushPending();
-                return new MultiSearcher(new IndexSearcher[]{new IndexSearcher(getMainPath()), new IndexSearcher(getDeltaPath())});
+                //luceneIndexer.flushPending();
+                //return new MultiSearcher(new IndexSearcher[]{new IndexSearcher(getMainPath()), new IndexSearcher(getDeltaPath())});
+                throw new LuceneIndexException("Failed to open IndexSarcher for " + getMainPath());
             }
         }
         catch (IOException e)
