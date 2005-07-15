@@ -21,17 +21,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.SocketException;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Session Socket Handler Abstract Class
  */
 public abstract class SessionSocketHandler implements Runnable
 {
-
     // Debug logging
 
-    protected static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    protected static Log logger = LogFactory.getLog(SessionSocketHandler.class);
 
     // Define the listen backlog for the server socket
 

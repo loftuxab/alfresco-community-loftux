@@ -24,7 +24,8 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.NavigationBean;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract bean used as the base class for all wizard backing beans.
@@ -33,7 +34,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractWizardBean
 {
-   private static Logger logger = Logger.getLogger(AbstractWizardBean.class);
+   private static Log logger = LogFactory.getLog(AbstractWizardBean.class);
    
    protected static final String FINISH_OUTCOME = "finish";
    protected static final String CANCEL_OUTCOME = "cancel";

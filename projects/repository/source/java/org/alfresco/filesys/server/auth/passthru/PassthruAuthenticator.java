@@ -17,11 +17,11 @@
  */
 package org.alfresco.filesys.server.auth.passthru;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.Hashtable;
 
 import org.alfresco.config.ConfigElement;
-import org.alfresco.error.*;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.netbios.NetBIOSName;
 import org.alfresco.filesys.netbios.NetBIOSNameList;
 import org.alfresco.filesys.netbios.NetBIOSSession;
@@ -37,7 +37,8 @@ import org.alfresco.filesys.smb.PCShare;
 import org.alfresco.filesys.smb.server.SMBServer;
 import org.alfresco.filesys.smb.server.SMBSrvSession;
 import org.alfresco.filesys.util.HexDump;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Passthru Authenticator Class
@@ -49,7 +50,7 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
 {
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol.auth");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol.auth");
 
     // Constants
 

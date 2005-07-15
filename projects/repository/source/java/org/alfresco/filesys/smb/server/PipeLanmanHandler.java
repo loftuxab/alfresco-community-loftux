@@ -27,14 +27,15 @@ import org.alfresco.filesys.smb.PacketType;
 import org.alfresco.filesys.smb.SMBStatus;
 import org.alfresco.filesys.smb.TransactBuffer;
 import org.alfresco.filesys.util.DataBuffer;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * IPC$ Transaction handler for \PIPE\LANMAN requests.
  */
 class PipeLanmanHandler
 {
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Server capability flags
 

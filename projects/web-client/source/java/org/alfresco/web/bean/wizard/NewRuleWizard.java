@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -59,7 +58,8 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -87,7 +87,7 @@ public class NewRuleWizard extends AbstractWizardBean
    public static final String PROP_SUBJECT = "subject";
    public static final String PROP_TO = "to";
    
-   private static Logger logger = Logger.getLogger(NewRuleWizard.class);
+   private static Log logger = LogFactory.getLog(NewRuleWizard.class);
    
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "New Rule Wizard";

@@ -17,20 +17,25 @@
  */
 package org.alfresco.filesys.server.config;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Provider;
 import java.security.Security;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.filesys.netbios.*;
-import org.alfresco.filesys.netbios.win32.*;
+import org.alfresco.filesys.netbios.NetBIOSName;
+import org.alfresco.filesys.netbios.NetBIOSNameList;
+import org.alfresco.filesys.netbios.NetBIOSSession;
+import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.NetworkServerList;
 import org.alfresco.filesys.server.auth.LocalAuthenticator;
@@ -58,7 +63,8 @@ import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.util.IPAddress;
 import org.alfresco.service.ServiceRegistry;
-import org.apache.log4j.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -70,7 +76,7 @@ public class ServerConfiguration
 {
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Filesystem configuration constants
     private static final String ConfigArea = "file-servers";

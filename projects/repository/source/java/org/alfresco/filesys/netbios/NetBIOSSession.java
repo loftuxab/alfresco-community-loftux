@@ -32,14 +32,15 @@ import org.alfresco.filesys.smb.NetworkSession;
 import org.alfresco.filesys.util.DataPacker;
 import org.alfresco.filesys.util.HexDump;
 import org.alfresco.filesys.util.StringList;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * NetBIOS session class.
  */
 public final class NetBIOSSession implements NetworkSession
 {
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol.netbios");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol.netbios");
 
     // Constants
     //

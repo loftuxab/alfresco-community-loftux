@@ -26,7 +26,8 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.alfresco.web.app.Application;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A non-JSF tag library that outputs the form tag for uploading files, this tag
@@ -36,7 +37,9 @@ import org.apache.log4j.Logger;
  */
 public class UploadFormTag extends TagSupport
 {
-   private static Logger logger = Logger.getLogger(UploadFormTag.class);
+   private static final long serialVersionUID = 4064734856565167835L;
+    
+   private static Log logger = LogFactory.getLog(UploadFormTag.class);
    
    /**
     * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()

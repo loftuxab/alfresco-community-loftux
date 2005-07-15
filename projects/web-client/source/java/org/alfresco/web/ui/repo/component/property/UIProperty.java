@@ -39,7 +39,8 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.converter.XMLDateConverter;
 import org.alfresco.web.ui.repo.component.UICategorySelector;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -49,7 +50,7 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public class UIProperty extends UIPanel implements NamingContainer
 {
-   private static Logger logger = Logger.getLogger(UIProperty.class);
+   private static Log logger = LogFactory.getLog(UIProperty.class);
    
    private String name;
    private String displayLabel;

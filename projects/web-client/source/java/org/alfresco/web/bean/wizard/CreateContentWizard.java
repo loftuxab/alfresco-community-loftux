@@ -20,7 +20,8 @@ package org.alfresco.web.bean.wizard;
 import javax.faces.context.FacesContext;
 
 import org.alfresco.web.bean.repository.Repository;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Handler class used by the Create In-line Content Wizard 
@@ -29,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class CreateContentWizard extends BaseContentWizard
 {
-   private static Logger logger = Logger.getLogger(CreateContentWizard.class);
+   private static Log logger = LogFactory.getLog(CreateContentWizard.class);
 
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "Create Content Wizard";

@@ -27,14 +27,15 @@ import org.alfresco.filesys.smb.server.NTTransPacket;
 import org.alfresco.filesys.smb.server.SMBSrvPacket;
 import org.alfresco.filesys.smb.server.SMBSrvSession;
 import org.alfresco.filesys.util.DataPacker;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Notify Change Handler Class
  */
 public class NotifyChangeHandler implements Runnable
 {
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Change notification request list and global filter mask
 

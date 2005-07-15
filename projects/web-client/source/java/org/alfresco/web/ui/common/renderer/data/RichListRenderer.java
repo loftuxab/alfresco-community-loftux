@@ -31,7 +31,8 @@ import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.data.UIColumn;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author kevinr
@@ -715,5 +716,5 @@ public class RichListRenderer extends BaseRenderer
    }
    
    
-   private static Logger logger = Logger.getLogger(RichListRenderer.class);
+   private static Log logger = LogFactory.getLog(RichListRenderer.class);
 }

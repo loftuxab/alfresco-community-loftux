@@ -23,7 +23,8 @@ import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
 import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.smb.mailslot.Win32NetBIOSHostAnnouncer;
 import org.alfresco.filesys.smb.server.SMBServer;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Win32 NetBIOS LANA Monitor Class
@@ -36,7 +37,7 @@ public class Win32NetBIOSLanaMonitor extends Thread
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Global LANA monitor
 

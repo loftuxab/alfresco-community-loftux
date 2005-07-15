@@ -25,7 +25,8 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.alfresco.web.app.Application;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A non-JSF tag library that adds the HTML begin and end tags if running in servlet mode
@@ -34,12 +35,14 @@ import org.apache.log4j.Logger;
  */
 public class PageTag extends TagSupport
 {
+   private static final long serialVersionUID = 8142765393181557228L;
+   
    private final static String SCRIPTS_1 = "<script language=\"JavaScript1.2\" src=\"";
    private final static String SCRIPTS_2 = "/scripts/menu.js\"></script>\n";
    private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
    private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
    
-   private static Logger logger = Logger.getLogger(PageTag.class);
+   private static Log logger = LogFactory.getLog(PageTag.class);
    
    private long startTime = 0;
    private String title;

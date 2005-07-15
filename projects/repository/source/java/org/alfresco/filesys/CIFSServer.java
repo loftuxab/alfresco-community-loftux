@@ -30,7 +30,8 @@ import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.smb.server.SMBServer;
 import org.alfresco.service.ServiceRegistry;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -43,7 +44,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class CIFSServer
 {
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.server");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.server");
 
     private ServiceRegistry serviceRegistry;
     private String configLocation;

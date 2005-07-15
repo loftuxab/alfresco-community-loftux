@@ -43,7 +43,8 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -54,7 +55,7 @@ public class NewSpaceWizard extends AbstractWizardBean
 {
    public static final String SPACE_ICON_DEFAULT = "space-icon-default";
 
-   private static Logger logger = Logger.getLogger(NewSpaceWizard.class);
+   private static Log logger = LogFactory.getLog(NewSpaceWizard.class);
    
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "New Space Wizard";

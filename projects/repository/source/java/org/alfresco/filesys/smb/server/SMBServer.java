@@ -43,7 +43,8 @@ import org.alfresco.filesys.smb.mailslot.HostAnnouncer;
 import org.alfresco.filesys.smb.server.win32.Win32NetBIOSLanaMonitor;
 import org.alfresco.filesys.smb.server.win32.Win32NetBIOSSessionSocketHandler;
 import org.alfresco.service.ServiceRegistry;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -57,7 +58,7 @@ public class SMBServer extends NetworkFileServer implements Runnable
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Server version
 

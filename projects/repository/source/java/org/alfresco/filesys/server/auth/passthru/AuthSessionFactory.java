@@ -36,7 +36,8 @@ import org.alfresco.filesys.smb.Protocol;
 import org.alfresco.filesys.smb.SMBException;
 import org.alfresco.filesys.util.IPAddress;
 import org.alfresco.filesys.util.StringList;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -49,7 +50,7 @@ public final class AuthSessionFactory
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol.auth");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol.auth");
 
     // Constants
 

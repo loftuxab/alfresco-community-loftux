@@ -49,7 +49,8 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -62,7 +63,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ContextListener implements ServletContextListener, HttpSessionListener
 {
-   private static Logger logger = Logger.getLogger(ContextListener.class);
+   private static Log logger = LogFactory.getLog(ContextListener.class);
    private static final String ADMIN = "admin";
    private static final String ADMIN_FIRSTNAME = "Repository";
    private static final String ADMIN_LASTNAME = "Administrator";

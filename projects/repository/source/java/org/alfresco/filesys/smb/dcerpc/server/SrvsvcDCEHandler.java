@@ -37,7 +37,8 @@ import org.alfresco.filesys.smb.dcerpc.info.ShareInfoList;
 import org.alfresco.filesys.smb.server.SMBServer;
 import org.alfresco.filesys.smb.server.SMBSrvException;
 import org.alfresco.filesys.smb.server.SMBSrvSession;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Srvsvc DCE/RPC Handler Class
@@ -47,7 +48,7 @@ public class SrvsvcDCEHandler implements DCEHandler
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     /**
      * Process a SrvSvc DCE/RPC request

@@ -33,7 +33,7 @@ import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ServerConfigElement;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.jsf.FacesContextUtils;
@@ -93,7 +93,7 @@ public class Application
     * @param logger The logger
     */
    public static void handleServletError(ServletContext servletContext, HttpServletRequest request,
-         HttpServletResponse response, Throwable error, Logger logger, String returnPage)
+         HttpServletResponse response, Throwable error, Log logger, String returnPage)
       throws IOException, ServletException
    {
       // get the error bean from the session and set the error that occurred.

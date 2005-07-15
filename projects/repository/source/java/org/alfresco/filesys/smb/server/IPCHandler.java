@@ -30,7 +30,8 @@ import org.alfresco.filesys.smb.dcerpc.server.DCEPipeFile;
 import org.alfresco.filesys.smb.dcerpc.server.DCEPipeHandler;
 import org.alfresco.filesys.util.DataBuffer;
 import org.alfresco.filesys.util.DataPacker;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -42,7 +43,7 @@ class IPCHandler
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     /**
      * Process a request made on the IPC$ remote admin named pipe.

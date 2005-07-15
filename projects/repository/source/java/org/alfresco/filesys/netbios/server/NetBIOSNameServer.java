@@ -34,14 +34,15 @@ import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.ServerListener;
 import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.service.ServiceRegistry;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * NetBIOS name server class.
  */
 public class NetBIOSNameServer extends NetworkServer implements Runnable
 {
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol.netbios");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol.netbios");
 
     // Server version
 

@@ -21,7 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Mock NodeService API
@@ -30,7 +31,7 @@ import org.apache.log4j.Logger;
  */
 public class NodeService
 {
-   private static Logger logger = Logger.getLogger(NodeService.class);
+   private static Log logger = LogFactory.getLog(NodeService.class);
    
    public static NodeRef getNodeRef(String path)
    {

@@ -25,7 +25,8 @@ import java.util.Set;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Lighweight client side representation of a node held in the repository. 
@@ -36,7 +37,7 @@ public class Node implements Serializable
 {
    private static final long serialVersionUID = 3544390322739034169L;
 
-   private static Logger logger = Logger.getLogger(Node.class);
+   private static Log logger = LogFactory.getLog(Node.class);
    
    private NodeRef nodeRef;
    private String name;

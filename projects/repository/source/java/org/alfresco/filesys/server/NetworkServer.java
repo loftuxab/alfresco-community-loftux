@@ -27,7 +27,8 @@ import org.alfresco.filesys.server.core.ShareMapper;
 import org.alfresco.filesys.server.core.SharedDevice;
 import org.alfresco.filesys.server.core.SharedDeviceList;
 import org.alfresco.service.ServiceRegistry;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Network Server Base Class
@@ -36,7 +37,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class NetworkServer
 {
-    private static final Logger logger = Logger.getLogger("org.alfresco.filesys");
+    private static final Log logger = LogFactory.getLog("org.alfresco.filesys");
 
     // Protocol name
 

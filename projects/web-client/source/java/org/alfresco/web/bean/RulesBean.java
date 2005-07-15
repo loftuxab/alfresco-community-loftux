@@ -27,7 +27,8 @@ import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIModeList;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Backing bean for the manage content rules dialog
@@ -36,7 +37,7 @@ import org.apache.log4j.Logger;
  */
 public class RulesBean
 {
-   private static Logger logger = Logger.getLogger(RulesBean.class);
+   private static Log logger = LogFactory.getLog(RulesBean.class);
    
    private String viewMode = "local";
    private BrowseBean browseBean;

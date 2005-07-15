@@ -42,7 +42,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Simple import of content into the repository
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public class FileImporterImpl implements FileImporter
 {
-    private static Logger logger = Logger.getLogger(FileImporterImpl.class);
+    private static Log logger = LogFactory.getLog(FileImporterImpl.class);
 
     private AuthenticationService authenticationService;
     private NodeService nodeService;

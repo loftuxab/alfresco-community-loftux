@@ -21,7 +21,8 @@ import org.alfresco.filesys.netbios.NetBIOSName;
 import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.smb.TransactionNames;
 import org.alfresco.filesys.util.StringList;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -33,7 +34,7 @@ public abstract class HostAnnouncer extends Thread
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol.mailslot");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol.mailslot");
 
     // Shutdown announcement interval and message count
 

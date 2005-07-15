@@ -27,7 +27,8 @@ import org.alfresco.config.source.FileConfigSource;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
 import org.alfresco.web.config.PropertySheetConfigElement.PropertyConfig;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * JUnit tests to exercise the capabilities added to the web client config
@@ -37,7 +38,7 @@ import org.apache.log4j.Logger;
  */
 public class WebClientConfigTest extends BaseTest
 {
-   private static Logger logger = Logger.getLogger(WebClientConfigTest.class);
+   private static Log logger = LogFactory.getLog(WebClientConfigTest.class);
 
    /**
     * @see junit.framework.TestCase#setUp()

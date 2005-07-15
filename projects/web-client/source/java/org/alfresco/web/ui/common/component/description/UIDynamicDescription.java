@@ -28,7 +28,8 @@ import javax.faces.el.ValueBinding;
 
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Dynamic description component that switches text based on the events
@@ -38,7 +39,7 @@ import org.apache.log4j.Logger;
  */
 public class UIDynamicDescription extends SelfRenderingComponent
 {
-   private Logger logger = Logger.getLogger(UIDynamicDescription.class);
+   private Log logger = LogFactory.getLog(UIDynamicDescription.class);
    private String selected;
    private String functionName;
    

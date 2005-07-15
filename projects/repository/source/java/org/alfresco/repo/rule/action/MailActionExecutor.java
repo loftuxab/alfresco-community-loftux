@@ -24,7 +24,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -35,7 +36,7 @@ import org.springframework.mail.javamail.JavaMailSender;
  */
 public class MailActionExecutor extends RuleActionExecutorAbstractBase 
 {
-    private static Logger logger = Logger.getLogger(MailActionExecutor.class);
+    private static Log logger = LogFactory.getLog(MailActionExecutor.class);
     
 	/**
 	 * Action executor constants

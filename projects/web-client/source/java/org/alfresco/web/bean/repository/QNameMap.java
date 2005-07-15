@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A Map that holds as it's key a QName stored in it's internal String representation.
@@ -15,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class QNameMap<K,V> implements Map
 {
-   private Logger logger = Logger.getLogger(QNameMap.class);
+   private Log logger = LogFactory.getLog(QNameMap.class);
    private Map<String, Object> contents = new HashMap<String, Object>(7, 1.0f);
    
    /**

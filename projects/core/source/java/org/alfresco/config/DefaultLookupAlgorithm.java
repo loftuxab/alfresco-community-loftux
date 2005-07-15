@@ -20,7 +20,8 @@ package org.alfresco.config;
 import java.util.List;
 
 import org.alfresco.config.evaluator.Evaluator;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The default algorithm used to determine whether a section applies to the object being looked up
@@ -29,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class DefaultLookupAlgorithm implements ConfigLookupAlgorithm
 {
-   private static final Logger logger = Logger.getLogger(DefaultLookupAlgorithm.class);
+   private static final Log logger = LogFactory.getLog(DefaultLookupAlgorithm.class);
    
    /**
     * @see org.alfresco.config.ConfigLookupAlgorithm#process(org.alfresco.config.ConfigSection, org.alfresco.config.evaluator.Evaluator, java.lang.Object, org.alfresco.config.Config)

@@ -37,15 +37,14 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Kevin Roast
@@ -217,7 +216,7 @@ public class CheckinCheckoutBean
    {
       if (this.fileName != null)
       {
-         return this.COPYLOCATION_OTHER;
+         return CheckinCheckoutBean.COPYLOCATION_OTHER;
       }
       else
       {
@@ -822,7 +821,7 @@ public class CheckinCheckoutBean
    // ------------------------------------------------------------------------------
    // Private data
    
-   private static Logger logger = Logger.getLogger(CheckinCheckoutBean.class);
+   private static Log logger = LogFactory.getLog(CheckinCheckoutBean.class);
    
    //private static final String WORKING_COPY = " (working copy)";
    

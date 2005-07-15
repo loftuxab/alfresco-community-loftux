@@ -20,7 +20,8 @@ package org.alfresco.web.ui.common.component;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Component to represent a selectable list of images 
@@ -29,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class UIImagePicker extends UIInput
 {   
-   private static Logger logger = Logger.getLogger(UIImagePicker.class);
+   private static Log logger = LogFactory.getLog(UIImagePicker.class);
    
    /**
     * Default constructor

@@ -38,7 +38,8 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -198,7 +199,7 @@ public class DownloadContentServlet extends HttpServlet
    }
    
    
-   private static Logger logger = Logger.getLogger(DownloadContentServlet.class);
+   private static Log logger = LogFactory.getLog(DownloadContentServlet.class);
    
    private static final String DOWNLOAD_URL  = "/download/attach/{0}/{1}/{2}/{3}";
    private static final String BROWSER_URL   = "/download/direct/{0}/{1}/{2}/{3}";

@@ -30,7 +30,8 @@ import org.alfresco.filesys.smb.PacketType;
 import org.alfresco.filesys.smb.SMBDate;
 import org.alfresco.filesys.smb.SMBException;
 import org.alfresco.filesys.util.DataPacker;
-import org.apache.log4j.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Authenticate Session Class
@@ -42,7 +43,7 @@ public class AuthenticateSession
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol.auth");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol.auth");
 
     // Default packet size
 

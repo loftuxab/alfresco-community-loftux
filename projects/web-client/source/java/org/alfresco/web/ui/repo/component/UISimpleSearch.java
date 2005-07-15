@@ -31,8 +31,8 @@ import javax.faces.event.FacesEvent;
 
 import org.alfresco.web.bean.SearchContext;
 import org.alfresco.web.ui.common.Utils;
-import org.apache.log4j.Logger;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 /**
  * @author Kevin Roast
  */
@@ -288,7 +288,7 @@ public class UISimpleSearch extends UICommand
    // ------------------------------------------------------------------------------
    // Private data
    
-   private static Logger logger = Logger.getLogger(UISimpleSearch.class);
+   private static Log logger = LogFactory.getLog(UISimpleSearch.class);
    
    private static final String OPTION_PARAM = "_option";
    private static final String ADVSEARCH_PARAM = "_advsearch";

@@ -23,7 +23,8 @@ import javax.faces.context.FacesContext;
 
 import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.repository.Repository;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Handler class used by the Add Content Wizard 
@@ -32,7 +33,7 @@ import org.apache.log4j.Logger;
  */
 public class AddContentWizard extends BaseContentWizard
 {
-   private static Logger logger = Logger.getLogger(AddContentWizard.class);
+   private static Log logger = LogFactory.getLog(AddContentWizard.class);
 
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "Add Content Wizard";

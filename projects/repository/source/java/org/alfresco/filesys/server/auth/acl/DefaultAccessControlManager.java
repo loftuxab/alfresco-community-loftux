@@ -24,7 +24,8 @@ import org.alfresco.filesys.server.SrvSession;
 import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.server.core.SharedDevice;
 import org.alfresco.filesys.server.core.SharedDeviceList;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Default Access Control Manager Class
@@ -38,7 +39,7 @@ public class DefaultAccessControlManager implements AccessControlManager
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Access control factory
 

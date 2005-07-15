@@ -96,7 +96,7 @@ public class MatchTextEvaluator extends RuleConditionEvaluatorAbstractBase
 	}
 
 	/**
-     * @see org.alfresco.repo.rule.condition.RuleConditionEvaluatorAbstractBase#evaluateImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+     * @see RuleConditionEvaluatorAbstractBase#evaluateImpl(RuleCondition, NodeRef, NodeRef)
 	 */
 	public boolean evaluateImpl(
 			RuleCondition ruleCondition,

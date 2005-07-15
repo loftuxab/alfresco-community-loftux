@@ -183,7 +183,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     }
 	
     /**
-     * @see org.alfresco.repo.version.VersionService#createVersion(NodeRef, Map<String, Serializable>)
+     * @see VersionCounterDaoService#nextVersionNumber(StoreRef)
      */
     public Version createVersion(
             NodeRef nodeRef, 
@@ -201,8 +201,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      * The version's are created from the children upwards with the parent being created first.  This will
      * ensure that the child version references in the version node will point to the version history nodes
      * for the (possibly) newly created version histories.
-     * 
-     * @see org.alfresco.repo.version.VersionService#createVersion(NodeRef, Map<String, Serializable>, boolean)
      */
     public Collection<Version> createVersion(
             NodeRef nodeRef, 
@@ -267,8 +265,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      * Note:  we can't control the order of the list, so if we have children and parents in the list and the
      * parents get versioned before the children and the children are not already versioned then the parents 
      * child references will be pointing to the node ref, rather than the verison history.
-     * 
-     * @see org.alfresco.repo.version.VersionService#createVersion(List<NodeRef>, Map<String, Serializable>)
      */
     public Collection<Version> createVersion(
             Collection<NodeRef> nodeRefs, 

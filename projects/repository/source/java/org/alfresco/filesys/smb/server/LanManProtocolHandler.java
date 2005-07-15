@@ -54,7 +54,8 @@ import org.alfresco.filesys.smb.SMBDate;
 import org.alfresco.filesys.smb.SMBStatus;
 import org.alfresco.filesys.util.DataBuffer;
 import org.alfresco.filesys.util.DataPacker;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * LanMan SMB Protocol Handler Class.
@@ -67,7 +68,7 @@ class LanManProtocolHandler extends CoreProtocolHandler
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Locking type flags
 

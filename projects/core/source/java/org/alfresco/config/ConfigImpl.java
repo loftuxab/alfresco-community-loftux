@@ -22,7 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Default implementation of the Config interface, this should be used as the
@@ -32,7 +33,7 @@ import org.apache.log4j.Logger;
  */
 public class ConfigImpl implements Config
 {
-   private static final Logger logger = Logger.getLogger(ConfigImpl.class);
+   private static final Log logger = LogFactory.getLog(ConfigImpl.class);
 
    private Map<String, Object> configElements;
 

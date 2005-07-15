@@ -19,7 +19,8 @@ package jsftest;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Object that can be used as a backing bean for components in the zoo
@@ -28,7 +29,7 @@ import org.apache.log4j.Logger;
  */
 public class DummyBean
 {
-   private static Logger logger = Logger.getLogger(DummyBean.class);
+   private static Log logger = LogFactory.getLog(DummyBean.class);
    
    private String name;
    private Properties properties;

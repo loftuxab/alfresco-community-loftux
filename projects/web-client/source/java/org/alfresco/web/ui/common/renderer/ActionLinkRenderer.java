@@ -28,13 +28,16 @@ import javax.faces.event.ActionEvent;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIMenu;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author kevinr
  */
 public class ActionLinkRenderer extends BaseRenderer
 {
+   private static Log logger = LogFactory.getLog(ActionLinkRenderer.class);
+   
    // ------------------------------------------------------------------------------
    // Renderer implementation 
    
@@ -316,7 +319,4 @@ public class ActionLinkRenderer extends BaseRenderer
       }
       return (parent != null);
    }
-   
-   
-   private static Logger logger = Logger.getLogger(ActionLinkRenderer.class);
 }

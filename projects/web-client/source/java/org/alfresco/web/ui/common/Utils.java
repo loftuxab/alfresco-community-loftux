@@ -32,10 +32,10 @@ import javax.faces.el.MethodBinding;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 
-import org.apache.log4j.Logger;
-import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
-
 import org.alfresco.web.data.IDataContainer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
 
 /**
  * Class containing misc helper methods used by the JSF components.
@@ -725,5 +725,5 @@ public final class Utils
       }
    }
    
-   private static Logger logger = Logger.getLogger(Utils.class);
+   private static Log logger = LogFactory.getLog(Utils.class);
 }

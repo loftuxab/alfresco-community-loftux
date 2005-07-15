@@ -27,7 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.app.Application;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Wrapper around standard faces servlet to provide error handling
@@ -36,7 +37,7 @@ import org.apache.log4j.Logger;
  */
 public class AlfrescoFacesServlet extends FacesServlet
 {
-   private static Logger logger = Logger.getLogger(AlfrescoFacesServlet.class);
+   private static Log logger = LogFactory.getLog(AlfrescoFacesServlet.class);
    
    /**
     * @see javax.servlet.Servlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)

@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.config.evaluator.Evaluator;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for all config service implementations. This class implements the
@@ -45,7 +46,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class BaseConfigService implements ConfigService
 {
-    private static final Logger logger = Logger.getLogger(BaseConfigService.class);
+    private static final Log logger = LogFactory.getLog(BaseConfigService.class);
 
     protected ConfigSource configSource;
     protected ConfigImpl globalConfig;

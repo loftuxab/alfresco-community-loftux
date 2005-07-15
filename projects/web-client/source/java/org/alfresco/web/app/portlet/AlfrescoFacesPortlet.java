@@ -45,7 +45,8 @@ import org.alfresco.web.bean.repository.User;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.myfaces.portlet.MyFacesGenericPortlet;
 import org.apache.myfaces.portlet.PortletUtil;
 import org.springframework.web.context.WebApplicationContext;
@@ -67,7 +68,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
    private static final String ERROR_PAGE_PARAM = "error-page";
    private static final String ERROR_OCCURRED = "error-occurred";
    
-   private static Logger logger = Logger.getLogger(AlfrescoFacesPortlet.class);
+   private static Log logger = LogFactory.getLog(AlfrescoFacesPortlet.class);
 
    private String loginPage = null;
    private String errorPage = null;

@@ -27,7 +27,8 @@ import javax.faces.context.ResponseWriter;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
 import org.alfresco.web.ui.repo.component.property.UIProperty;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Renderer for the UIProperty component
@@ -36,7 +37,7 @@ import org.apache.log4j.Logger;
  */
 public class PropertyRenderer extends BaseRenderer
 {
-   private static Logger logger = Logger.getLogger(PropertyRenderer.class);
+   private static Log logger = LogFactory.getLog(PropertyRenderer.class);
    
    /**
     * @see javax.faces.render.Renderer#encodeBegin(javax.faces.context.FacesContext, javax.faces.component.UIComponent)

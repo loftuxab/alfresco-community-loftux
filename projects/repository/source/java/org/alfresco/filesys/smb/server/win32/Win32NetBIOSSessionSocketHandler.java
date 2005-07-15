@@ -26,7 +26,8 @@ import org.alfresco.filesys.smb.server.PacketHandler;
 import org.alfresco.filesys.smb.server.SMBServer;
 import org.alfresco.filesys.smb.server.SMBSrvSession;
 import org.alfresco.filesys.smb.server.SessionSocketHandler;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Win32 NetBIOS Session Socket Handler Class
@@ -39,7 +40,7 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler
 
     // Debug logging
 
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Constants
     //

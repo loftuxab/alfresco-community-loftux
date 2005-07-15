@@ -52,7 +52,8 @@ import org.alfresco.filesys.smb.server.notify.NotifyRequest;
 import org.alfresco.filesys.smb.server.notify.NotifyRequestList;
 import org.alfresco.filesys.util.DataPacker;
 import org.alfresco.filesys.util.StringList;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -63,10 +64,8 @@ import org.apache.log4j.Logger;
  */
 public class SMBSrvSession extends SrvSession implements Runnable
 {
-
     // Debug logging
-
-    private static final Logger logger = Logger.getLogger("org.alfresco.smb.protocol");
+    private static Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Define the default receive buffer size to allocate.
 

@@ -29,7 +29,8 @@ import javax.faces.context.ResponseWriter;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIImagePicker;
 import org.alfresco.web.ui.common.component.UIListItem;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Renderer for the image picker component that outputs the list of images
@@ -39,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 public class ImagePickerRadioRenderer extends BaseRenderer
 {
-   private static Logger logger = Logger.getLogger(ImagePickerRadioRenderer.class);
+   private static Log logger = LogFactory.getLog(ImagePickerRadioRenderer.class);
    
    // ------------------------------------------------------------------------------
    // Renderer implemenation

@@ -29,7 +29,8 @@ import org.alfresco.config.ConfigSectionImpl;
 import org.alfresco.config.ConfigSource;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
 import org.alfresco.config.xml.elementreader.GenericElementReader;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -41,7 +42,7 @@ import org.dom4j.io.SAXReader;
  */
 public class XMLConfigService extends BaseConfigService implements XMLConfigConstants
 {
-    private static final Logger logger = Logger.getLogger(XMLConfigService.class);
+    private static final Log logger = LogFactory.getLog(XMLConfigService.class);
 
     private Map<String, ConfigElementReader> elementReaders;
     private String currentArea;

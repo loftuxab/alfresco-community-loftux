@@ -40,7 +40,8 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.repo.component.shelf.UIClipboardShelfItem;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Kevin Roast
@@ -314,7 +315,7 @@ public class ClipboardBean
    // ------------------------------------------------------------------------------
    // Private data
    
-   private static Logger logger = Logger.getLogger(ClipboardBean.class);
+   private static Log logger = LogFactory.getLog(ClipboardBean.class);
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;

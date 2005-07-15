@@ -24,7 +24,8 @@ import java.util.List;
 
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.ConfigSource;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for ConfigSource implementations, provides support for parsing
@@ -34,7 +35,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class BaseConfigSource implements ConfigSource
 {
-    private static final Logger logger = Logger.getLogger(BaseConfigSource.class);
+    private static final Log logger = LogFactory.getLog(BaseConfigSource.class);
 
     private List<String> sourceStrings;
 

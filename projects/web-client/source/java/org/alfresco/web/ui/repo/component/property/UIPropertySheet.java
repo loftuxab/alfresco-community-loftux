@@ -34,7 +34,8 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.config.PropertySheetConfigElement;
 import org.alfresco.web.config.PropertySheetConfigElement.PropertyConfig;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -47,7 +48,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
    public static final String VIEW_MODE = "view";
    public static final String EDIT_MODE = "edit";
    
-   private static Logger logger = Logger.getLogger(UIPropertySheet.class);
+   private static Log logger = LogFactory.getLog(UIPropertySheet.class);
    private static String DEFAULT_VAR_NAME = "node";
    
    private String variable;

@@ -34,7 +34,8 @@ import org.alfresco.web.bean.FileUploadBean;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Servlet that takes a file uploaded via a browser and represents it as an
@@ -45,7 +46,7 @@ import org.apache.log4j.Logger;
 public class UploadFileServlet extends HttpServlet
 {
    private static final long serialVersionUID = -5482538466491052873L;
-   private static Logger logger = Logger.getLogger(UploadFileServlet.class); 
+   private static Log logger = LogFactory.getLog(UploadFileServlet.class); 
    
    /**
     * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)

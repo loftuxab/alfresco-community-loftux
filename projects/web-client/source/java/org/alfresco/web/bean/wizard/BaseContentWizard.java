@@ -42,7 +42,8 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base Handler class used by the Content Wizards 
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class BaseContentWizard extends AbstractWizardBean
 {
-   private static Logger logger = Logger.getLogger(BaseContentWizard.class);
+   private static Log logger = LogFactory.getLog(BaseContentWizard.class);
 
    protected static final String FINISH_INSTRUCTION = "To add the content to this space click Finish.<br/>" +
                                                       "To review or change your selections click Back.";

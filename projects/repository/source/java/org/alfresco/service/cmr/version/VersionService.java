@@ -63,7 +63,7 @@ public interface VersionService
      * @throws ReservedVersionNameException
      *                              thrown if a reserved property name is used int he version properties 
      *                              provided
-     * @thrown AspectMissingException
+     * @throws AspectMissingException
      *                              thrown if the version aspect is missing                              
      */
     public Version createVersion(
@@ -92,7 +92,7 @@ public interface VersionService
      * @throws ReservedVersionNameException
      *                              thrown if a reserved property name is used int he version properties 
      *                              provided
-     * @thrown AspectMissingException
+     * @throws AspectMissingException
      *                              thrown if the version aspect is missing
      */
     public Collection<Version> createVersion(
@@ -110,7 +110,7 @@ public interface VersionService
      * @throws ReservedVersionNameException
      *                              thrown if a reserved property name is used int he version properties 
      *                              provided
-     * @thrown AspectMissingException
+     * @throws AspectMissingException
      *                              thrown if the version aspect is missing
      */
     public Collection<Version> createVersion(
@@ -128,7 +128,7 @@ public interface VersionService
      * 
      * @param  nodeRef  a node reference
      * @return          the version history information
-     * @thrown AspectMissingException
+     * @throws AspectMissingException
      *                  thrown if the version aspect is missing
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef)
