@@ -441,6 +441,7 @@ public class BrowseBean implements IContextListener
       String query = searchContext.buildQuery();
       
       UserTransaction tx = null;
+      ResultSet results = null;
       try
       {
          tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
@@ -448,7 +449,7 @@ public class BrowseBean implements IContextListener
          
          if (logger.isDebugEnabled())
             logger.debug("Searching using query: " + query);
-         ResultSet results = this.searchService.query(
+         results = this.searchService.query(
                Repository.getStoreRef(), 
                "lucene", query, null, null);
          if (logger.isDebugEnabled())
@@ -505,6 +506,13 @@ public class BrowseBean implements IContextListener
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+      }
+      finally
+      {
+          if(results != null)
+          {
+              results.close();
+          }
       }
       
       if (logger.isDebugEnabled())
