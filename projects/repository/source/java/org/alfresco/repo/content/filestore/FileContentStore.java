@@ -91,7 +91,7 @@ public class FileContentStore implements ContentStore
     {
         Calendar calendar = new GregorianCalendar();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;  // 0-based
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         // create the directory
         StringBuilder sb = new StringBuilder(20);
