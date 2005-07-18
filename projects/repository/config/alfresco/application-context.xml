@@ -48,6 +48,7 @@
             <value>org/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
             <value>org/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
             <value>org/alfresco/repo/domain/hibernate/Integrity.hbm.xml</value>
+            <value>org/alfresco/repo/domain/hibernate/VersionCount.hbm.xml</value>
          </list>
       </property>
       <property name='hibernateProperties' >
@@ -586,9 +587,9 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.version.common.counter.db.DbVersionCounterDaoServiceImpl" init-method="initialise">
-            <property name="dataSource">
-               <ref bean="dataSource" />
+         <bean class="org.alfresco.repo.version.common.counter.hibernate.HibernateVersionCounterDaoServiceImpl" >
+            <property name="sessionFactory">
+               <ref bean="sessionFactory" />
             </property>
          </bean>
       </property>
@@ -603,8 +604,7 @@
    <!-- Data Dictionary -->
    <!--                 -->
    
-   <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.impl.NamespaceDAOImpl">
-   </bean>
+   <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.impl.NamespaceDAOImpl" />
 
    <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.impl.DictionaryDAOImpl" init-method="bootstrap">
       <constructor-arg index="0">

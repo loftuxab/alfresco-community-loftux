@@ -34,7 +34,7 @@ public class NodeAssocImpl implements NodeAssoc
     private Node target;
     private String typeNamespaceUri;
     private String typeLocalName;
-    private AssociationRef nodeAssocRef;
+    private transient AssociationRef nodeAssocRef;
 
     public NodeAssocImpl()
     {

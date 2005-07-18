@@ -17,8 +17,7 @@
  */
 package org.alfresco.repo.version.common.counter;
 
-import javax.sql.DataSource;
-
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseSpringTest;
 
@@ -27,43 +26,27 @@ import org.alfresco.util.BaseSpringTest;
  */
 public class VersionCounterDaoServiceTest extends BaseSpringTest
 {
-    /**
+    /*
      * Test store id's
      */
     private final static String STORE_ID_1 = "test1_" + System.currentTimeMillis();
     private final static String STORE_ID_2 = "test2_" + System.currentTimeMillis();
     private static final String STORE_NONE = "test3_" + System.currentTimeMillis();;
     
-    /**
-     * Version counter DAO service
-     */
-    private VersionCounterDaoService counter = null;
+    private NodeService nodeService;
+    private VersionCounterDaoService counter;
     
-    /**
-     * Datasource object
-     */
-    private DataSource dataSource = null;
-        
-    /**
-     * Set the version counter DAO service
-     * 
-     * @param counter 
-     *          the version counter DAO service
-     */
-    public void setCounter(VersionCounterDaoService counter)
+    @Override
+    public void onSetUpInTransaction()
     {
-        this.counter = counter;
-    }   
+        nodeService = (NodeService) applicationContext.getBean("dbNodeService");
+        counter = (VersionCounterDaoService) applicationContext.getBean("versionCounterDaoService");
+    }
     
-    /**
-     * Set the datasource
-     * 
-     * @param dataSource
-     *          a data source
-     */
-    public void setDataSource(DataSource dataSource)
+    public void testSetUp() throws Exception
     {
-        this.dataSource = dataSource;
+        assertNotNull(nodeService);
+        assertNotNull(counter);
     }
     
     /**
@@ -74,6 +57,7 @@ public class VersionCounterDaoServiceTest extends BaseSpringTest
         // Create the store references
         StoreRef store1 = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, VersionCounterDaoServiceTest.STORE_ID_1);
         StoreRef store2 = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, VersionCounterDaoServiceTest.STORE_ID_2);
+        StoreRef storeNone = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, VersionCounterDaoServiceTest.STORE_NONE);
         
         int store1Version0 = this.counter.nextVersionNumber(store1);
         assertEquals(store1Version0, 1);
@@ -96,7 +80,6 @@ public class VersionCounterDaoServiceTest extends BaseSpringTest
         int store2Current = this.counter.currentVersionNumber(store2);
         assertEquals(store2Current, 2);
         
-        StoreRef storeNone = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, VersionCounterDaoServiceTest.STORE_NONE);
         int storeNoneCurrent = this.counter.currentVersionNumber(storeNone);
         assertEquals(storeNoneCurrent, 0);
         

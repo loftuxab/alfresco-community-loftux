@@ -52,7 +52,7 @@ public class NodeImpl implements Node
     private Set<ChildAssoc> parentAssocs;
     private Set<ChildAssoc> childAssocs;
     private Map<String, Serializable> properties;
-    private NodeRef nodeRef;
+    private transient NodeRef nodeRef;
 
     public NodeImpl()
     {

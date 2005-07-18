@@ -18,23 +18,24 @@
 package org.alfresco.repo.domain.hibernate;
 
 import org.alfresco.repo.domain.Node;
-import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
+import org.alfresco.repo.domain.VersionCount;
 import org.alfresco.service.cmr.repository.StoreRef;
 
 /**
- * Hibernate-specific implementation of the domain entity <b>store</b>.
+ * Hibernate-specific implementation of the domain entity <b>versioncounter</b>.
  * 
  * @author Derek Hulley
  */
-public class StoreImpl implements Store
+public class VersionCountImpl implements VersionCount
 {
 	private StoreKey key;
-    private Node rootNode;
+    private int versionCount;
     private transient StoreRef storeRef;
 
-    public StoreImpl()
+    public VersionCountImpl()
     {
+        versionCount = 0;
     }
     
     /**
@@ -67,11 +68,11 @@ public class StoreImpl implements Store
     }
     
     /**
-     * @see #getStoreRef()()
+     * @see #getKey()
      */
     public String toString()
     {
-        return getStoreRef().toString();
+        return getKey().toString();
     }
 
     public StoreKey getKey() {
@@ -82,26 +83,30 @@ public class StoreImpl implements Store
 		this.key = key;
         this.storeRef = null;
 	}
-
-    public Node getRootNode()
-    {
-        return rootNode;
-    }
-
-    public void setRootNode(Node rootNode)
-    {
-        this.rootNode = rootNode;
-    }
     
     /**
-     * Lazily constructs <code>StoreRef</code> instance referencing this entity
+     * For Hibernate use
      */
-    public synchronized StoreRef getStoreRef()
+    private void setVersionCount(int versionCount)
     {
-        if (storeRef == null && key != null)
-        {
-            storeRef = new StoreRef(key.getProtocol(), key.getIdentifier());
-        }
-        return storeRef;
+        this.versionCount = versionCount;
+    }
+
+    public int incrementVersionCount()
+    {
+        return ++versionCount;
+    }
+
+    /**
+     * Reset back to 0
+     */
+    public void resetVersionCount()
+    {
+        setVersionCount(0);
+    }
+
+    public int getVersionCount()
+    {
+        return versionCount;
     }
 }

@@ -36,7 +36,7 @@ public class ChildAssocImpl implements ChildAssoc
     private String namespaceUri;
     private String localName;
     private boolean isPrimary;
-    private ChildAssociationRef childAssocRef;
+    private transient ChildAssociationRef childAssocRef;
 
     public void buildAssociation(Node parentNode, Node childNode)
     {
