@@ -57,6 +57,7 @@ public class ContentTransformerRegistry
     private short accessCount;
     /** Controls read access to the transformation cache */
     private Lock transformationCacheReadLock;
+    /** controls write access to the transformation cache */
     private Lock transformationCacheWriteLock;
     
     /**
