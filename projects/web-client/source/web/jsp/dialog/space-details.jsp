@@ -226,7 +226,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
+                                       <h:commandButton value="Close" action="#{SpaceDetailsBean.closeDialog}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

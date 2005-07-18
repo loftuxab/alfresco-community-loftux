@@ -91,7 +91,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
       }
       
       // force retrieval of node info
-      getNode();
+      Node node = getNode();
       
       if (howManyKids == 0)
       {
@@ -107,12 +107,12 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
             Config configProps = null;
             if (getConfigArea() == null)
             {
-               configProps = configSvc.getConfig(this.node);
+               configProps = configSvc.getConfig(node);
             }
             else
             {
                // only look within the given area
-               configProps = configSvc.getConfig(this.node, new ConfigLookupContext(getConfigArea()));
+               configProps = configSvc.getConfig(node, new ConfigLookupContext(getConfigArea()));
             }
             
             PropertySheetConfigElement propsToDisplay = (PropertySheetConfigElement)configProps.
@@ -139,16 +139,16 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
             if (logger.isDebugEnabled())
                logger.debug("Configuring property sheet using node's properties");
             
-            createPropertyComponentsFromNode(context, this.node);
+            createPropertyComponentsFromNode(context, node);
          }
       }
       
       // put the node in the session if it is not there already
       Map sessionMap = getFacesContext().getExternalContext().getSessionMap();
-      sessionMap.put(this.variable, this.node);
+      sessionMap.put(this.variable, node);
 
       if (logger.isDebugEnabled())
-         logger.debug("Put node into session with key '" + this.variable + "': " + this.node);
+         logger.debug("Put node into session with key '" + this.variable + "': " + node);
 
       super.encodeBegin(context);
    }
@@ -191,9 +191,11 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
     */
    public Node getNode()
    {
-      // use the value to get hold of the actual object
+      Node node = null;
+      
       if (this.node == null)
       {
+         // use the value to get hold of the actual object
          Object value = getAttributes().get("value");
          
          if (value == null)
@@ -208,11 +210,15 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
          // TODO: for now we presume the object is a Node, but we need to support id's too
          if (value instanceof Node)
          {
-            this.node = (Node)value;
+            node = (Node)value;
          }
       }
+      else
+      {
+         node = this.node;
+      }
       
-      return this.node;
+      return node;
    }
    
    /**

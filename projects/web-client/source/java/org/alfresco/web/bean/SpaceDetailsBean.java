@@ -36,6 +36,9 @@ public class SpaceDetailsBean
    /** BrowseBean instance */
    private BrowseBean browseBean;
    
+   /** The NavigationBean bean reference */
+   private NavigationBean navigator;
+   
    /** UIPropertySheet component binding reference */
    private UIPropertySheet propertySheet;
    
@@ -51,6 +54,14 @@ public class SpaceDetailsBean
    public void setBrowseBean(BrowseBean browseBean)
    {
       this.browseBean = browseBean;
+   }
+   
+   /**
+    * @param navigator The NavigationBean to set.
+    */
+   public void setNavigator(NavigationBean navigator)
+   {
+      this.navigator = navigator;
    }
    
    /**
@@ -186,5 +197,15 @@ public class SpaceDetailsBean
             }
          }
       }
+   }
+   
+   /**
+    * Action handler to clear the current Space properties before returning to the browse screen,
+    * as the user may have modified the properties! 
+    */
+   public String closeDialog()
+   {
+      this.navigator.resetCurrentNodeProperties();
+      return "browse";
    }
 }

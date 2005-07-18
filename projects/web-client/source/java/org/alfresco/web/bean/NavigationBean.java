@@ -190,6 +190,18 @@ public class NavigationBean
       
       // inform any interested beans that the UI needs updating after this change 
       UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
+      
+      // clear current node context after the notify - this is to ensure that if any delegates
+      // performed operations on the current node, that we have fresh data for the next View
+      this.currentNode = null;
+   }
+   
+   /**
+    * Clear state so that the current node properties cache for the next time they are requested
+    */
+   public void resetCurrentNodeProperties()
+   {
+      this.currentNode = null;
    }
    
    /**
@@ -211,6 +223,9 @@ public class NavigationBean
          {
             throw new AlfrescoRuntimeException("Cannot retrieve current Node if NodeId is null!");
          }
+         
+         if (s_logger.isDebugEnabled())
+            s_logger.debug("Caching properties for node id: " + this.currentNodeId);
          
          NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
          Node node = new Node(nodeRef, this.nodeService);

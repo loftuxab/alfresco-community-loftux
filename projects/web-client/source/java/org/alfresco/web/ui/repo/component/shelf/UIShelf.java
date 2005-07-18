@@ -226,7 +226,7 @@ public class UIShelf extends SelfRenderingComponent
                }
                
                // output appropriate expanded icon state
-               out.write("<div style='padding-top:2px;padding-bottom:5px'><nobr>");
+               out.write("<div style='padding-top:2px;padding-bottom:4px'><nobr>");
                out.write("<a href='#' onclick=\"");
                // encode value as the index of the ShelfGroup clicked and the new state
                String value = Integer.toString(index) + NamingContainer.SEPARATOR_CHAR + Boolean.toString(!isExpanded);
