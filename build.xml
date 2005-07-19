@@ -227,7 +227,7 @@
       <tar destfile="${dist.dir}/${tomcat.dist.filename}.tar" longfile="gnu">
          <tarfileset dir="${installer.project.dir}" 
                      includes="AlfrescoTest.pdf,license.txt,notice.txt,README_tomcat_linux.txt" />
-         <tarfileset dir="${tomcat.distribution.dir}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
+         <tarfileset dir="${tomcat.distribution.dir}" prefix="tomcat" excludes="**/bin/*.bat" />
          <tarfileset dir="${tomcat.distribution.dir}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
          <tarfileset dir="${tomcat.deploy.dir}" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
