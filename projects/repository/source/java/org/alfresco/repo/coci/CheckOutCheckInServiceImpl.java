@@ -18,6 +18,7 @@
 package org.alfresco.repo.coci;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.acegisecurity.Authentication;
@@ -55,7 +56,6 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	 */
 	private static final String ERR_BAD_COPY = "The original node can not be found.  Perhaps the copy has " +
 											   "been corrupted or the origional has been deleted or moved.";
-	private static final String ERR_NOT_WORKING_COPY = "The node provided is not a working copy.";
 	
 	/**
 	 * The node service
@@ -204,11 +204,16 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 				destinationAssocTypeQName,
 				destinationAssocQName);
 		
+		// Get the user 
+		NodeRef userNodeRef = getUserNodeRef();
+		
 		// Apply the working copy aspect to the working copy
+		Map<QName, Serializable> workingCopyProperties = new HashMap<QName, Serializable>(1);
+		workingCopyProperties.put(ContentModel.PROP_WORKING_COPY_OWNER, userNodeRef);
 		this.nodeService.addAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY, null);
 		
 		// Lock the origional node
-		this.lockService.lock(nodeRef, getUserNodeRef(), LockType.READ_ONLY_LOCK);
+		this.lockService.lock(nodeRef, userNodeRef, LockType.READ_ONLY_LOCK);
 		
 		// Return the working copy
 		return workingCopy;

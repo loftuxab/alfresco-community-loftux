@@ -40,6 +40,7 @@ public interface ContentModel
 	
     // working copy aspect contants
     static final QName ASPECT_WORKING_COPY = QName.createQName(NamespaceService.ALFRESCO_URI, "workingcopy");
+    static final QName PROP_WORKING_COPY_OWNER = QName.createQName(NamespaceService.ALFRESCO_URI, "workingCopyOwner");
 	
     // container type constants
     static final QName TYPE_CONTAINER = QName.createQName(NamespaceService.ALFRESCO_URI, "container");
@@ -133,5 +134,4 @@ public interface ContentModel
 	static final QName PROP_REJECT_STEP = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectStep");
 	static final QName PROP_REJECT_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectFolder");
 	static final QName PROP_REJECT_MOVE = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectMove");
-    
 }

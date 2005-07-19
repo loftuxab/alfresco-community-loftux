@@ -649,6 +649,13 @@
       
       <aspect name="alf:workingcopy">
          <title>Working Copy</title>
+         <properties>
+            <property name="alf:workingCopyOwner">
+               <type>d:noderef</type>
+               <protected>true</protected>
+               <mandatory>true</mandatory>
+            </property>
+       	</properties>
       </aspect>
    
       <aspect name="alf:versionable">

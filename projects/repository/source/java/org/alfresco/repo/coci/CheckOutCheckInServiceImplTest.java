@@ -34,7 +34,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;
-import org.alfresco.service.cmr.version.VersionHistory;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.NamespaceService;
@@ -64,6 +63,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private StoreRef storeRef;
 	private NodeRef rootNodeRef;	
 	private NodeRef nodeRef;
+	private NodeRef userNodeRef;
 	
 	/**
 	 * Types and properties used by the tests
@@ -123,6 +123,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
         // Create and authenticate the user
         TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
         TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);
+        this.userNodeRef = TestWithUserUtils.getCurrentUserRef(this.authenticationService);
         
 	}
 	
@@ -164,6 +165,9 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		// Ensure that the working copy and copy aspect has been applied
 		assertTrue(this.nodeService.hasAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY));	
 		assertTrue(this.nodeService.hasAspect(workingCopy, ContentModel.ASPECT_COPIEDFROM));
+		
+		// Check that the working copy owner has been set correctly
+		assertEquals(this.userNodeRef, this.nodeService.getProperty(workingCopy, ContentModel.PROP_WORKING_COPY_OWNER));
 		
 		// Ensure that the content has been copied correctly
 		ContentReader contentReader = this.contentService.getReader(this.nodeRef);
@@ -238,6 +242,9 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		this.cociService.checkin(workingCopy2, new HashMap<String, Serializable>(), null, true);	
 	}
 	
+	/**
+	 * Test when the aspect is not set when check-in is performed
+	 */
 	public void testVersionAspectNotSetOnCheckIn()
 	{
 		// Create a bag of props
@@ -261,7 +268,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		try
 		{
 			// Check that the origional node has no version history dispite sending verion props
-			VersionHistory versionHistory = this.versionService.getVersionHistory(noVersionNodeRef);
+			this.versionService.getVersionHistory(noVersionNodeRef);
 			fail("aspect should be missing");
 		}
 		catch (AspectMissingException exception)
