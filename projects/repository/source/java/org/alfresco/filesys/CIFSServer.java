@@ -68,10 +68,19 @@ public class CIFSServer
      * 
      * @return ServerConfiguration
      */
-    public final ServerConfiguration getConfiguration() {
+    public final ServerConfiguration getConfiguration()
+    {
         return filesysConfig;
     }
     
+    /**
+     * @return Returns true if the server started up without any errors
+     */
+    public boolean isStarted()
+    {
+        return (filesysConfig != null && filesysConfig.isSMBServerEnabled());
+    }
+
     /**
      * Start the CIFS server components
      * 
@@ -118,6 +127,7 @@ public class CIFSServer
             filesysConfig = null;
             throw new AlfrescoRuntimeException("Failed to start CIFS Server", e);
         }
+        // success
     }
 
     /**
@@ -142,6 +152,7 @@ public class CIFSServer
             // Start the server
             server.shutdownServer(false);
         }
+        filesysConfig = null;
     }
 
     /**

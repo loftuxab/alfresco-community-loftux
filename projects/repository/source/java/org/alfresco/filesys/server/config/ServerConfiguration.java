@@ -221,6 +221,9 @@ public class ServerConfiguration
 
     private String m_localName;
     private String m_localDomain;
+    
+    /** flag indicating successful initialisation */
+    private boolean initialised;
 
     /**
      * Class constructor
@@ -289,11 +292,20 @@ public class ServerConfiguration
     }
 
     /**
+     * @return Returns true if the configuration was fully initialised
+     */
+    public boolean isInitialised()
+    {
+        return initialised;
+    }
+
+    /**
      * Initialize the configuration using the configuration service
      */
     public void init()
     {
-
+        initialised = false;
+        
         // Create the configuration context
 
         ConfigLookupContext configCtx = new ConfigLookupContext(ConfigArea);
@@ -319,12 +331,15 @@ public class ServerConfiguration
     
             config = m_configService.getConfig(ConfigFilesystems, configCtx);
             processFilesystemsConfig(config);
+            
+            // successful initialisation 
+            initialised = true;
         }
         catch ( UnsatisfiedLinkError ex)
         {
             // Error accessing the Win32NetBIOS DLL code
             
-            logger.error("Error accessing Win32 NetBIOS, check DLL is on the path", ex);
+            logger.error("Error accessing Win32 NetBIOS, check DLL is on the path");
             
             // Disable the CIFS server
             

@@ -22,7 +22,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -248,7 +250,7 @@ public abstract class AbstractContentReader extends AbstractContent implements C
                     e);
         }
     }
-
+    
     /**
      * Makes use of the encoding, if available, to convert bytes to a string.
      * 
@@ -256,15 +258,44 @@ public abstract class AbstractContentReader extends AbstractContent implements C
      */
     public final String getContentString() throws ContentIOException
     {
+        return getContentString(-1);
+    }
+
+    /**
+     * Makes use of the encoding, if available, to convert bytes to a string.
+     * 
+     * @see Content#getEncoding()
+     */
+    public final String getContentString(int length) throws ContentIOException
+    {
         try
         {
+            // get the encoding for the string
+            String encoding = getEncoding();
+            
+            Reader reader = null;
+            if (encoding == null)
+            {
+                // use default encoding
+                reader = new InputStreamReader(getContentInputStream());
+            }
+            else
+            {
+                // use the encoding specified
+                reader = new InputStreamReader(getContentInputStream(), encoding);
+            }
+            // if we have a fixed length, we might as well read it all directly into a buffer
+            char[] buffer = null;
+            if (length < 0)
+            {
+//                buffer = 
+            }
+            // loop through until we have read n characters of the stream is exhausted
             // read from the stream into a byte[]
             InputStream is = getContentInputStream();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             FileCopyUtils.copy(is, os);  // both streams are closed
             byte[] bytes = os.toByteArray();
-            // get the encoding for the string
-            String encoding = getEncoding();
             // create the string from the byte[] using encoding if necessary
             String content = (encoding == null) ? new String(bytes) : new String(bytes, encoding);
             // done
