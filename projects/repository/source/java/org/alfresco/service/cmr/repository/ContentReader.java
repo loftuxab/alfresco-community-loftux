@@ -161,8 +161,30 @@ public interface ContentReader extends Content
      * @return Returns a String representation of the content
      * @throws ContentIOException
      * 
+     * @see #getContentString(int)
      * @see #getContentInputStream()
      * @see String#String(byte[])
      */
     public String getContentString() throws ContentIOException;
+    
+    /**
+     * Gets content from the repository direct to <code>String</code>, but limiting
+     * the string size to a given number of characters.
+     * <p>
+     * If the {@link Content#getEncoding() encoding } is known then it will be used
+     * otherwise the default system <tt>byte[]</tt> to <tt>String</tt> conversion
+     * will be used.
+     * <p>
+     * All resources will be closed automatically.
+     *
+     * @param length the maximum number of characters to retrieve
+     * @return Returns a truncated String representation of the content
+     * @throws ContentIOException
+     * @throws java.lang.IllegalArgumentException if the length is < 0 or > {@link Integer#MAX_VALUE}
+     * 
+     * @see #getContentString()
+     * @see #getContentInputStream()
+     * @see String#String(byte[])
+     */
+    public String getContentString(int length) throws ContentIOException;
 }

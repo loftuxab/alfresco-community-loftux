@@ -251,51 +251,63 @@ public abstract class AbstractContentReader extends AbstractContent implements C
         }
     }
     
+    public final String getContentString(int length) throws ContentIOException
+    {
+        if (length < 0 || length > Integer.MAX_VALUE)
+        {
+            throw new IllegalArgumentException("Character count must be positive and within range");
+        }
+        try
+        {
+            // just create buffer of the required size
+            char[] buffer = new char[length];
+            
+            String encoding = getEncoding();
+            // create a reader from the input stream
+            Reader reader = null;
+            if (encoding == null)
+            {
+                reader = new InputStreamReader(getContentInputStream());  // use default encoding                
+            }
+            else
+            {
+                reader = new InputStreamReader(getContentInputStream(), encoding);  // specific encoding
+            }
+            // read it all, if possible
+            int count = reader.read(buffer, 0, length);
+            // there may have been fewer characters - create a new string
+            String result = new String(buffer, 0, count);
+            // done
+            return result;
+        }
+        catch (IOException e)
+        {
+            throw new ContentIOException("Failed to copy content to string: \n" +
+                    "   accessor: " + this + "\n" +
+                    "   length: " + length,
+                    e);
+        }
+    }
+
     /**
      * Makes use of the encoding, if available, to convert bytes to a string.
+     * <p>
+     * All the content is streamed into memory.  So, like the interface said,
+     * be careful with this method.
      * 
      * @see Content#getEncoding()
      */
     public final String getContentString() throws ContentIOException
     {
-        return getContentString(-1);
-    }
-
-    /**
-     * Makes use of the encoding, if available, to convert bytes to a string.
-     * 
-     * @see Content#getEncoding()
-     */
-    public final String getContentString(int length) throws ContentIOException
-    {
         try
         {
-            // get the encoding for the string
-            String encoding = getEncoding();
-            
-            Reader reader = null;
-            if (encoding == null)
-            {
-                // use default encoding
-                reader = new InputStreamReader(getContentInputStream());
-            }
-            else
-            {
-                // use the encoding specified
-                reader = new InputStreamReader(getContentInputStream(), encoding);
-            }
-            // if we have a fixed length, we might as well read it all directly into a buffer
-            char[] buffer = null;
-            if (length < 0)
-            {
-//                buffer = 
-            }
-            // loop through until we have read n characters of the stream is exhausted
             // read from the stream into a byte[]
             InputStream is = getContentInputStream();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             FileCopyUtils.copy(is, os);  // both streams are closed
             byte[] bytes = os.toByteArray();
+            // get the encoding for the string
+            String encoding = getEncoding();
             // create the string from the byte[] using encoding if necessary
             String content = (encoding == null) ? new String(bytes) : new String(bytes, encoding);
             // done
