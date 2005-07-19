@@ -617,6 +617,12 @@
       </attribute>
       
       <attribute>
+         <name>target</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
          <name>style</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>

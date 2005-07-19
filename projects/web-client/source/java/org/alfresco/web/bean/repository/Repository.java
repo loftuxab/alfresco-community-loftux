@@ -182,9 +182,31 @@ public final class Repository
       Boolean locked = Boolean.FALSE;
       if (node.hasAspect(ContentModel.ASPECT_LOCKABLE))
       {
-         // TODO: replace username with real user name ref here!
          LockStatus lockStatus = lockService.getLockStatus(node.getNodeRef());
          if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
+         {
+            locked = Boolean.TRUE;
+         }
+      }
+      
+      return locked;
+   }
+   
+   /**
+    * Return whether a Node is current Locked and this user is the owner of the lock
+    * 
+    * @param node             The Node wrapper to test against
+    * @param lockService      The LockService to use
+    * 
+    * @return whether a Node is current Locked
+    */
+   public static Boolean isNodeLockOwner(Node node, LockService lockService)
+   {
+      Boolean locked = Boolean.FALSE;
+      if (node.hasAspect(ContentModel.ASPECT_LOCKABLE))
+      {
+         LockStatus lockStatus = lockService.getLockStatus(node.getNodeRef());
+         if (lockStatus == LockStatus.LOCK_OWNER)
          {
             locked = Boolean.TRUE;
          }
@@ -231,6 +253,68 @@ public final class Repository
             buf.append('/');
          }
          buf.append(elementString);
+      }
+      
+      return buf.toString();
+   }
+   
+   /**
+    * Resolve a Path by converting each element into its display NAME attribute
+    * 
+    * @param path       Path to convert
+    * @param separator  Separator to user between path elements
+    * @param prefix     To prepend to the path
+    * 
+    * @return Path converted using NAME attribute on each element
+    */
+   public static String getNamePath(NodeService nodeService, Path path, NodeRef rootNode, String separator, String prefix)
+   {
+      StringBuilder buf = new StringBuilder(128);
+      
+      // ignore root node check if not passed in
+      boolean foundRoot = (rootNode == null);
+      
+      buf.append(prefix);
+      
+      // skip first element as it represents repo root '/'
+      for (int i=1; i<path.size(); i++)
+      {
+         Path.Element element = path.get(i);
+         String elementString = null;
+         if (element instanceof Path.ChildAssocElement)
+         {
+            ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
+            if (elementRef.getParentRef() != null)
+            {
+               // only append if we've found the root already
+               if (foundRoot == true)
+               {
+                  Object nameProp = nodeService.getProperty(elementRef.getChildRef(), ContentModel.PROP_NAME);
+                  if (nameProp != null)
+                  {
+                     elementString = nameProp.toString();
+                  }
+                  else
+                  {
+                     elementString = element.getElementString();
+                  }
+               }
+               
+               // either we've found root already or may have now
+               // check after as we want to skip the root as it represents the CIFS share name
+               foundRoot = (foundRoot || elementRef.getChildRef().equals(rootNode));
+            }
+         }
+         else
+         {
+            elementString = element.getElementString();
+         }
+         
+         if (elementString != null)
+         {
+            buf.append(separator);
+            buf.append(elementString);
+         }
       }
       
       return buf.toString();
@@ -291,15 +375,15 @@ public final class Repository
     * @param context       FacesContext
     * @param filename      Non-null filename to process
     * 
-    * @return mimetype for the specified filename - falls back to 'text/plain' if not found.
+    * @return mimetype for the specified filename - falls back to 'application/octet-stream' if not found.
     */
    public static String getMimeTypeForFileName(FacesContext context, String filename)
    {
       // base the mimetype from the file extension
       MimetypeService mimetypeService = (MimetypeService)getServiceRegistry(context).getMimetypeService();
       
-      // fall back if mimetype not found
-      String mimetype = "text/plain";
+      // fall back to binary mimetype if no match found
+      String mimetype = "application/octet-stream";
       int extIndex = filename.lastIndexOf('.');
       if (extIndex != -1)
       {

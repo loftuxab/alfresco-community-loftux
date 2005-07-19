@@ -118,7 +118,7 @@ public class DownloadContentServlet extends HttpServlet
          if (mimetype == null || mimetype.length() == 0)
          {
             MimetypeMap mimetypeMap = (MimetypeMap)context.getBean("mimetypeMap");
-            mimetype = "text/plain";
+            mimetype = "application/octet-stream";
             int extIndex = filename.lastIndexOf('.');
             if (extIndex != -1)
             {

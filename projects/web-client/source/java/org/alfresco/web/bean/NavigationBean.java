@@ -27,9 +27,12 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.filesys.CIFSServer;
+import org.alfresco.filesys.smb.server.repo.ContentDiskInterface;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -77,6 +80,22 @@ public class NavigationBean
    public void setNamespaceService(NamespaceService namespaceService)
    {
       this.namespaceService = namespaceService;
+   }
+   
+   /**
+    * @param cifsServer The cifsServer to set.
+    */
+   public void setCifsServer(CIFSServer cifsServer)
+   {
+      this.cifsServer = cifsServer;
+   }
+
+   /**
+    * @param contentDiskDriver The contentDiskDriver to set.
+    */
+   public void setContentDiskDriver(ContentDiskInterface contentDiskDriver)
+   {
+      this.contentDiskDriver = contentDiskDriver;
    }
    
    /**
@@ -231,10 +250,23 @@ public class NavigationBean
          Node node = new Node(nodeRef, this.nodeService);
          // early init properties for this node (by getProperties() call)
          // resolve icon in-case one has not been set
-         if (node.getProperties().get("icon") == null)
+         Map<String, Object> props = node.getProperties();
+         if (props.get("icon") == null)
          {
-            node.getProperties().put("icon", NewSpaceWizard.SPACE_ICON_DEFAULT);
+            props.put("icon", NewSpaceWizard.SPACE_ICON_DEFAULT);
          }
+         Path path = this.nodeService.getPath(nodeRef);
+         
+         NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
+         String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
+         
+         // TODO: PHH to remove next line of code
+         //       once he removes the JavaScript output in browse.jsp after adding FireFox plugin
+         //       because the JavaScript string escaping of the '\' character will not be required :)
+         cifsPath = Utils.replace(cifsPath, "\\", "\\\\");
+         
+         node.getProperties().put("cifsPath", cifsPath);
+         node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
          
          this.currentNode = node;
       }
@@ -329,6 +361,27 @@ public class NavigationBean
    // ------------------------------------------------------------------------------
    // Private helpers
    
+   private String getCIFSServerPath()
+   {
+      if (this.cifsServerPath == null)
+      {
+         StringBuilder buf = new StringBuilder(24);
+         
+         String serverName = this.cifsServer.getConfiguration().getServerName();
+         if (serverName != null && serverName.length() != 0)
+         {
+            buf.append("\\\\")
+               .append(serverName)
+               .append("\\");
+            buf.append(this.contentDiskDriver.getShareName());
+         }
+         
+         this.cifsServerPath = buf.toString();
+      }
+      
+      return this.cifsServerPath;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Inner classes
@@ -406,6 +459,15 @@ public class NavigationBean
    
    /** NamespaceService bean reference */
    private NamespaceService namespaceService;
+   
+   /** CIFSServer bean reference */
+   private CIFSServer cifsServer;
+   
+   /** CIFS content disk driver bean reference */
+   private ContentDiskInterface contentDiskDriver;
+   
+   /** Cached path to our CIFS server and top level node DIR */
+   private String cifsServerPath;
    
    /** Node Id we are using for UI context operations */
    private String currentNodeId;

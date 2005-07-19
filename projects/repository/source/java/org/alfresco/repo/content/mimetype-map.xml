@@ -33,6 +33,16 @@
             <extension>avi</extension>
             <extension>qvi</extension>
          </mimetype>
+         <mimetype mimetype="video/x-ms-asf" display="MS Streaming Video">
+            <extension>asf</extension>
+            <extension>asx</extension>
+         </mimetype>
+         <mimetype mimetype="video/x-ms-wmv" display="MS Streaming Video">
+            <extension>wmv</extension>
+         </mimetype>
+         <mimetype mimetype="video/x-ms-wma" display="MS Streaming Audio">
+            <extension>wma</extension>
+         </mimetype>
          <mimetype mimetype="video/x-rad-screenplay" display="RAD Screen Display">
             <extension>avx</extension>
          </mimetype>

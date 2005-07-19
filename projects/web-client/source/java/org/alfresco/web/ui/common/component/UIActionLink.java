@@ -66,6 +66,7 @@ public class UIActionLink extends UICommand
       this.params = (Map)values[4];
       this.href = (String)values[5];
       this.tooltip = (String)values[6];
+      this.target = (String)values[7];
    }
    
    /**
@@ -73,7 +74,7 @@ public class UIActionLink extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[7];
+      Object values[] = new Object[8];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.padding;
@@ -82,6 +83,7 @@ public class UIActionLink extends UICommand
       values[4] = this.params;
       values[5] = this.href;
       values[6] = this.tooltip;
+      values[7] = this.target;
       return (values);
    }
 
@@ -250,6 +252,32 @@ public class UIActionLink extends UICommand
       this.tooltip = tooltip;
    }
    
+   /**
+    * Get the target
+    *
+    * @return the target
+    */
+   public String getTarget()
+   {
+      ValueBinding vb = getValueBinding("target");
+      if (vb != null)
+      {
+         this.target = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.target;
+   }
+
+   /**
+    * Set the target
+    *
+    * @param target     the target
+    */
+   public void setTarget(String target)
+   {
+      this.target = target;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Private data
@@ -268,6 +296,9 @@ public class UIActionLink extends UICommand
    
    /** tooltip title text to display on the action link */
    private String tooltip = null;
+   
+   /** the target reference */
+   private String target = null;
    
    /** Map of child param name/values pairs */
    private Map<String, String> params = null;

@@ -56,6 +56,7 @@ public class ActionLinkTag extends HtmlComponentTag
       setIntProperty(component, "padding", this.padding);
       setStringProperty(component, "href", this.href);
       setStringProperty(component, "value", this.value);
+      setStringProperty(component, "target", this.target);
       
       // TODO: Add image width/height properties
    }
@@ -74,6 +75,7 @@ public class ActionLinkTag extends HtmlComponentTag
       this.verticalAlign = null;
       this.padding = null;
       this.href = null;
+      this.target = null;
    }
    
    /**
@@ -156,6 +158,19 @@ public class ActionLinkTag extends HtmlComponentTag
       this.href = href;
    }
    
+   /**
+    * Set the target
+    *
+    * @param target     the target
+    */
+   public void setTarget(String target)
+   {
+      this.target = target;
+   }
+
+
+   /** the target */
+   private String target;
 
    /** the padding in pixels */
    private String padding;

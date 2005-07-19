@@ -53,6 +53,14 @@
          <property-name>namespaceService</property-name>
          <value>#{AlfNamespaceService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>cifsServer</property-name>
+         <value>#{cifsServer}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>contentDiskDriver</property-name>
+         <value>#{contentDiskDriver}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

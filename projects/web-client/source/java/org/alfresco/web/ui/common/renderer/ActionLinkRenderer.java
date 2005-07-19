@@ -110,7 +110,7 @@ public class ActionLinkRenderer extends BaseRenderer
       Map attrs = link.getAttributes();
       StringBuilder linkBuf = new StringBuilder(256);
       
-      if (attrs.get("href") == null)
+      if (link.getHref() == null)
       {
          linkBuf.append("<a href='#' onclick=\"");
          // generate JavaScript to set a hidden form field and submit
@@ -120,8 +120,8 @@ public class ActionLinkRenderer extends BaseRenderer
       }
       else
       {
-         String href = (String)attrs.get("href");
-         if (href.startsWith("http") == false)
+         String href = link.getHref();
+         if (href.startsWith("http") == false && href.startsWith("file") == false)
          {
             href = context.getExternalContext().getRequestContextPath() + href;
          }
@@ -129,7 +129,13 @@ public class ActionLinkRenderer extends BaseRenderer
                 .append(href)
                 .append('"');
          
-         // TODO: support 'target' attribute?
+         // output href 'target' attribute if supplied
+         if (link.getTarget() != null)
+         {
+            linkBuf.append(" target=\"")
+                   .append(link.getTarget())
+                   .append("\"");
+         }
       }
       
       if (attrs.get("style") != null)

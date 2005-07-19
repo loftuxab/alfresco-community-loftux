@@ -537,6 +537,7 @@ public class BrowseBean implements IContextListener
    {
       // special properties to be used by the value binding components on the page
       node.addPropertyResolver("locked", this.resolverlocked);
+      node.addPropertyResolver("lockOwner", this.resolverlockOwner);
       node.addPropertyResolver("workingCopy", this.resolverWorkingCopy);
       node.addPropertyResolver("url", this.resolverUrl);
       node.addPropertyResolver("fileType16", this.resolverFileType16);
@@ -546,6 +547,12 @@ public class BrowseBean implements IContextListener
    private NodePropertyResolver resolverlocked = new NodePropertyResolver() {
       public Object get(MapNode node) {
          return Repository.isNodeLocked(node, lockService);
+      }
+   };
+   
+   private NodePropertyResolver resolverlockOwner = new NodePropertyResolver() {
+      public Object get(MapNode node) {
+         return Repository.isNodeLockOwner(node, lockService);
       }
    };
    
@@ -581,6 +588,7 @@ public class BrowseBean implements IContextListener
    
    private NodePropertyResolver resolverDisplayPath = new NodePropertyResolver() {
       public Object get(MapNode node) {
+         // TODO: replace this with a method that shows the full display name - not QNames
          return Repository.getDisplayPath( (Path)node.get("path") );
       }
    };
