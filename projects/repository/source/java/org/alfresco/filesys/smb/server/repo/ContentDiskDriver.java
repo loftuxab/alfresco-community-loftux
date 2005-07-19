@@ -30,7 +30,6 @@ import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.filesys.AccessDeniedException;
 import org.alfresco.filesys.server.filesys.DiskDeviceContext;
-import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileName;
 import org.alfresco.filesys.server.filesys.FileOpenParams;
@@ -59,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Derek Hulley
  */
-public class ContentDiskDriver implements DiskInterface
+public class ContentDiskDriver implements ContentDiskInterface
 {
     private static final String KEY_STORE = "store";
     private static final String KEY_ROOT_PATH = "rootPath";
@@ -74,6 +73,9 @@ public class ContentDiskDriver implements DiskInterface
     private ContentService contentService;
     private MimetypeService mimetypeService;
 
+    private String shareName;
+    private NodeRef rootNodeRef;
+    
     /**
      * @param serviceRegistry to connect to the repository services
      */
@@ -94,6 +96,9 @@ public class ContentDiskDriver implements DiskInterface
         nodeService = serviceRegistry.getNodeService();
         contentService = serviceRegistry.getContentService();
         mimetypeService = serviceRegistry.getMimetypeService();
+        
+        // get the name of the share
+        shareName = cfg.getAttribute("name");
         
         // get the store
         ConfigElement storeElement = cfg.getChild(KEY_STORE);
@@ -121,7 +126,6 @@ public class ContentDiskDriver implements DiskInterface
         // find the root node for this device
         List<NodeRef> nodeRefs = nodeService.selectNodes(
                 storeRootNodeRef, rootPath, null, namespaceService, false);
-        NodeRef rootNodeRef = null;
         if (nodeRefs.size() > 1)
         {
             throw new DeviceContextException("Multiple possible roots for device: \n" +
@@ -151,6 +155,16 @@ public class ContentDiskDriver implements DiskInterface
         
         // done
         return context;
+    }
+
+    public String getShareName()
+    {
+        return shareName;
+    }
+
+    public NodeRef getContextRootNodeRef()
+    {
+        return rootNodeRef;
     }
 
     /**

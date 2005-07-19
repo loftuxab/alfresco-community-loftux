@@ -1034,7 +1034,7 @@
    
    <bean id="contentDiskDriver" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.filesys.server.filesys.DiskInterface</value>
+         <value>org.alfresco.filesys.smb.server.repo.ContentDiskInterface</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
@@ -1052,6 +1052,7 @@
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
+      <!-- only enable for debugging
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
@@ -1062,6 +1063,7 @@
             </bean>
          </list>
       </property>
+      -->
    </bean>
 
    <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper">

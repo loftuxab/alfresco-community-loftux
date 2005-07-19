@@ -109,7 +109,8 @@ public class CIFSServer
                     logger.info("Starting server " + server.getProtocolName() + " ...");
 
                 // Start the server
-                filesysConfig.getServer(i).startServer();
+                String serverName = server.getConfiguration().getServerName();
+                server.startServer();
             }
         }
         catch (Throwable e)
@@ -139,7 +140,7 @@ public class CIFSServer
                 logger.info("Shutting server " + server.getProtocolName() + " ...");
 
             // Start the server
-            filesysConfig.getServer(i).shutdownServer(false);
+            server.shutdownServer(false);
         }
     }
 
