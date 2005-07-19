@@ -210,7 +210,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		// Apply the working copy aspect to the working copy
 		Map<QName, Serializable> workingCopyProperties = new HashMap<QName, Serializable>(1);
 		workingCopyProperties.put(ContentModel.PROP_WORKING_COPY_OWNER, userNodeRef);
-		this.nodeService.addAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY, null);
+		this.nodeService.addAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY, workingCopyProperties);
 		
 		// Lock the origional node
 		this.lockService.lock(nodeRef, userNodeRef, LockType.READ_ONLY_LOCK);
