@@ -16,7 +16,7 @@ rem ---------------------------------------
 
 echo Starting MySQL...
 start "MySQL Server" /min cmd /c c:\mysql\bin\mysqld-nt --console
-sleep 3
+rem sleep 3
 
 rem ---------------------------------------
 rem Start Tomcat
