@@ -14,10 +14,37 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author gavinc
  */
-public class QNameMap<K,V> implements Map
+public final class QNameMap<K,V> implements Map
 {
    private Log logger = LogFactory.getLog(QNameMap.class);
    private Map<String, Object> contents = new HashMap<String, Object>(7, 1.0f);
+   private Node parent;
+   private Map<String, NodePropertyResolver> resolvers = new HashMap<String, NodePropertyResolver>(7, 1.0f);
+   
+   /**
+    * Constructor
+    * 
+    * @param parent     Parent Node of the QNameMap
+    */
+   public QNameMap(Node parent)
+   {
+      if (parent == null)
+      {
+         throw new IllegalArgumentException("Parent Node cannot be null!");
+      }
+      this.parent = parent;
+   }
+   
+   /**
+    * Register a property resolver for the named property.
+    * 
+    * @param name       Name of the property this resolver is for
+    * @param resolver   Property resolver to register
+    */
+   public void addPropertyResolver(String name, NodePropertyResolver resolver)
+   {
+      this.resolvers.put(name, resolver);
+   }
    
    /**
     * @see java.util.Map#size()
@@ -55,6 +82,32 @@ public class QNameMap<K,V> implements Map
     * @see java.util.Map#get(java.lang.Object)
     */
    public Object get(Object key)
+   {
+      String qnameKey = Repository.resolveToQNameString((String)key);
+      Object obj = this.contents.get(qnameKey);
+      if (obj == null)
+      {
+         // if a property resolver exists for this property name then invoke it
+         NodePropertyResolver resolver = this.resolvers.get((String)key);
+         if (resolver != null)
+         {
+            obj = resolver.get(this.parent);
+            // cache the result
+            // obviously the cache is useless if the result is null, in most cases it shouldn't be
+            this.contents.put(qnameKey, obj);
+         }
+      }
+      
+      return obj;
+   }
+   
+   /**
+    * Perform a get without using property resolvers
+    * 
+    * @param key    item key
+    * @return object
+    */
+   public Object getRaw(Object key)
    {
       return this.contents.get(Repository.resolveToQNameString((String)key));
    }
@@ -116,5 +169,13 @@ public class QNameMap<K,V> implements Map
    public Set entrySet()
    {
       return this.contents.entrySet();
+   }
+   
+   /**
+    * Override Object.toString() to provide useful debug output
+    */
+   public String toString()
+   {
+      return this.contents.toString();
    }
 }

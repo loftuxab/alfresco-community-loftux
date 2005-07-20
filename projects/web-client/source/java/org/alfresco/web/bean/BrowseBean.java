@@ -47,6 +47,7 @@ import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.NodePropertyResolver;
+import org.alfresco.web.bean.repository.QNameMap;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewSpaceWizard;
 import org.alfresco.web.ui.common.Utils;
@@ -545,57 +546,58 @@ public class BrowseBean implements IContextListener
    }
    
    private NodePropertyResolver resolverlocked = new NodePropertyResolver() {
-      public Object get(MapNode node) {
+      public Object get(Node node) {
          return Repository.isNodeLocked(node, lockService);
       }
    };
    
    private NodePropertyResolver resolverlockOwner = new NodePropertyResolver() {
-      public Object get(MapNode node) {
+      public Object get(Node node) {
          return Repository.isNodeLockOwner(node, lockService);
       }
    };
    
    private NodePropertyResolver resolverWorkingCopy = new NodePropertyResolver() {
-      public Object get(MapNode node) {
+      public Object get(Node node) {
          return node.hasAspect(ContentModel.ASPECT_WORKING_COPY);
       }
    };
    
    private NodePropertyResolver resolverUrl = new NodePropertyResolver() {
-      public Object get(MapNode node) {
+      public Object get(Node node) {
          return DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName());
       }
    };
    
    private NodePropertyResolver resolverFileType16 = new NodePropertyResolver() {
-      public Object get(MapNode node) {
+      public Object get(Node node) {
          return Repository.getFileTypeImage(node, true);
       }
    };
    
    private NodePropertyResolver resolverFileType32 = new NodePropertyResolver() {
-      public Object get(MapNode node) {
+      public Object get(Node node) {
          return Repository.getFileTypeImage(node, false);
       }
    };
    
    private NodePropertyResolver resolverPath = new NodePropertyResolver() {
-      public Object get(MapNode node) {
+      public Object get(Node node) {
          return nodeService.getPath(node.getNodeRef());
       }
    };
    
    private NodePropertyResolver resolverDisplayPath = new NodePropertyResolver() {
-      public Object get(MapNode node) {
+      public Object get(Node node) {
          // TODO: replace this with a method that shows the full display name - not QNames
-         return Repository.getDisplayPath( (Path)node.get("path") );
+         return Repository.getDisplayPath( (Path)node.getProperties().get("path") );
       }
    };
    
    private NodePropertyResolver resolverSpaceIcon = new NodePropertyResolver() {
-      public Object get(MapNode node) {
-         String icon = (String)node.getProperties().get("icon");
+      public Object get(Node node) {
+         QNameMap props = (QNameMap)node.getProperties();
+         String icon = (String)props.getRaw("icon");
          return (icon != null ? icon : NewSpaceWizard.SPACE_ICON_DEFAULT);
       }
    };
@@ -752,12 +754,9 @@ public class BrowseBean implements IContextListener
             // create the node ref, then our node representation
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
             Node node = new Node(ref, this.nodeService);
-            // early init properties for this node (by getProperties() call)
+            
             // resolve icon in-case one has not been set
-            if (node.getProperties().get("icon") == null)
-            {
-               node.getProperties().put("icon", NewSpaceWizard.SPACE_ICON_DEFAULT);
-            }
+            node.addPropertyResolver("icon", this.resolverSpaceIcon);
             
             // prepare a node for the action context
             setActionSpace(node);
@@ -813,8 +812,8 @@ public class BrowseBean implements IContextListener
             
             // store the URL to for downloading the content
             String name = node.getName();
-            node.getProperties().put("url", DownloadContentServlet.generateDownloadURL(ref, name));
-            node.getProperties().put("fileType32", Repository.getFileTypeImage(node, false));
+            node.addPropertyResolver("url", this.resolverUrl);
+            node.addPropertyResolver("fileType32", this.resolverFileType32);
             
             // remember the document
             setDocument(node);

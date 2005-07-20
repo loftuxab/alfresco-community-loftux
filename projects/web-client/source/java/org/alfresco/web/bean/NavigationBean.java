@@ -246,8 +246,10 @@ public class NavigationBean
          if (s_logger.isDebugEnabled())
             s_logger.debug("Caching properties for node id: " + this.currentNodeId);
          
+         // build a node which components on the JSP page can bind too
          NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
          Node node = new Node(nodeRef, this.nodeService);
+         
          // early init properties for this node (by getProperties() call)
          // resolve icon in-case one has not been set
          Map<String, Object> props = node.getProperties();
@@ -257,6 +259,7 @@ public class NavigationBean
          }
          Path path = this.nodeService.getPath(nodeRef);
          
+         // resolve CIFS network folder location for this node
          NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
          String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
          

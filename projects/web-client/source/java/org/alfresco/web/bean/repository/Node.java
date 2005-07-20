@@ -45,7 +45,7 @@ public class Node implements Serializable
    private String path;
    private String id;
    private Set<QName> aspects = null;
-   private QNameMap<String, Object> properties = new QNameMap<String, Object>();
+   private QNameMap<String, Object> properties = null;
    private List<String> propertyNames = null;
    private boolean propsRetrieved = false;
    private NodeService nodeService;
@@ -76,6 +76,8 @@ public class Node implements Serializable
       {
          throw new IllegalArgumentException("The NodeRef id must not be null to create a Node.");
       }
+      
+      this.properties = new QNameMap<String, Object>(this);
    }
 
    /**
@@ -96,6 +98,17 @@ public class Node implements Serializable
       }
       
       return properties;
+   }
+   
+   /**
+    * Register a property resolver for the named property.
+    * 
+    * @param name       Name of the property this resolver is for
+    * @param resolver   Property resolver to register
+    */
+   public void addPropertyResolver(String name, NodePropertyResolver resolver)
+   {
+      this.properties.addPropertyResolver(name, resolver);
    }
    
    /**
@@ -200,14 +213,29 @@ public class Node implements Serializable
       this.name = null;
       this.type = null;
       this.path = null;
-      this.properties = new QNameMap<String, Object>();
+      this.properties.clear();
       this.propsRetrieved = false;
       this.aspects = null;
-
+      
       if (this.propertyNames != null)
       {
          this.propertyNames.clear();
       }
       this.propertyNames = null;
+   }
+   
+   /**
+    * Override Object.toString() to provide useful debug output
+    */
+   public String toString()
+   {
+      if (this.nodeService != null)
+      {
+         return "Node Properties: " + this.getProperties().toString() + "\nNode Aspects: " + this.getAspects().toString();
+      }
+      else
+      {
+         return super.toString();
+      }
    }
 }

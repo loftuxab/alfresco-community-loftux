@@ -36,7 +36,6 @@ public class MapNode extends Node implements Map<String, Object>
    private static final long serialVersionUID = 4051322327734433079L;
    
    private boolean propsInitialised = false;
-   private Map<String, NodePropertyResolver> resolvers = new HashMap<String, NodePropertyResolver>(7, 1.0f);
    
    
    /**
@@ -64,17 +63,6 @@ public class MapNode extends Node implements Map<String, Object>
       {
          getProperties();
       }
-   }
-   
-   /**
-    * Register a property resolver for the named property.
-    * 
-    * @param name       Name of the property this resolver is for
-    * @param resolver   Property resolver to register
-    */
-   public void addPropertyResolver(String name, NodePropertyResolver resolver)
-   {
-      this.resolvers.put(name, resolver);
    }
    
    
@@ -127,28 +115,13 @@ public class MapNode extends Node implements Map<String, Object>
       {
          // well known properties required as publically accessable map attributes
          props.put("id", this.getId());
-         props.put("name", this.getName());     // TODO: try pulling back single prop!
+         props.put("name", this.getName());     // TODO: perf test pulling back single prop here instead of all!
          props.put("nodeRef", this.getNodeRef());
          
          propsInitialised = true;
       }
       
-      obj = props.get(key);
-      
-      if (obj == null)
-      {
-         // if a property resolver exists for this property name then invoke it
-         NodePropertyResolver resolver = this.resolvers.get((String)key);
-         if (resolver != null)
-         {
-            obj = resolver.get(this);
-            // cache the result
-            // obviously the cache is useless if the result is null, in most cases it shouldn't be
-            props.put((String)key, obj);
-         }
-      }
-      
-      return obj; 
+      return props.get(key);
    }
 
    /**
