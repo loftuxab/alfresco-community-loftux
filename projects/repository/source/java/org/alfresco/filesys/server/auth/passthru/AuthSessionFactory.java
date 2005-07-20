@@ -384,11 +384,7 @@ public final class AuthSessionFactory
         // Debug
 
         if (logger.isDebugEnabled())
-        {
             logger.debug("New auth session from " + localName + " to " + shr.toString());
-            logger.debug("os.arch = " + System.getProperty("os.arch") + ", java.version: "
-                    + System.getProperty("java.version"));
-        }
 
         // Connect to the requested server
 

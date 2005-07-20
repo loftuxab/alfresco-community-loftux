@@ -550,8 +550,7 @@ public final class NetBIOSSession implements NetworkSession
             return null;
 
         // If a WINS server has been configured the request is sent directly to the WINS server, if
-        // not then
-        // a broadcast is done on the local subnet.
+        // not then a broadcast is done on the local subnet.
 
         InetAddress destAddr = null;
 
@@ -679,14 +678,33 @@ public final class NetBIOSSession implements NetworkSession
         if (dotIdx == -1)
             return null;
 
-        // Check if the subnet mask has been set, if not then generate a subnet mask
+        // If a WINS server has been configured the request is sent directly to the WINS server, if
+        // not then a broadcast is done on the local subnet.
 
-        if (getSubnetMask() == null)
-            GenerateSubnetMask(null);
+        InetAddress destAddr = null;
 
-        // Build a broadcast destination address
+        if (hasWINSServer() == false)
+        {
 
-        InetAddress destAddr = InetAddress.getByName(getSubnetMask());
+            // Check if the subnet mask has been set, if not then generate a subnet mask
+
+            if (getSubnetMask() == null)
+                GenerateSubnetMask(null);
+
+            // Build a broadcast destination address
+
+            destAddr = InetAddress.getByName(getSubnetMask());
+        }
+        else
+        {
+
+            // Use the WINS server address
+
+            destAddr = getWINSServer();
+        }
+
+        // Build the request datagram
+
         DatagramPacket dgram = new DatagramPacket(nbpkt.getBuffer(), nbpkt.getLength(), destAddr,
                 RFCNetBIOSProtocol.NAME_PORT);
 
@@ -875,6 +893,17 @@ public final class NetBIOSSession implements NetworkSession
                 // Get the received name list
 
                 nameList = rxpkt.getAdapterStatusNameList();
+                
+                // If the name list is valid update the names with the original address that was connected to
+                
+                if( nameList != null)
+                {
+                    for ( int i = 0; i < nameList.numberOfNames(); i++)
+                    {
+                        NetBIOSName nbName = nameList.getName(i);
+                        nbName.addIPAddress(destAddr.getAddress());
+                    }
+                }
             }
         }
         catch (java.io.IOException ex)

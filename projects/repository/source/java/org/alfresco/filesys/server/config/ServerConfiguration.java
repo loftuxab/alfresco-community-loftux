@@ -27,10 +27,13 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import net.sf.acegisecurity.AuthenticationManager;
+
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigLookupContext;
-import org.alfresco.config.ConfigService;
+import org.alfresco.config.source.ClassPathConfigSource;
+import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.netbios.NetBIOSName;
 import org.alfresco.filesys.netbios.NetBIOSNameList;
@@ -49,6 +52,7 @@ import org.alfresco.filesys.server.auth.acl.AccessControlManager;
 import org.alfresco.filesys.server.auth.acl.AccessControlParser;
 import org.alfresco.filesys.server.auth.acl.DefaultAccessControlManager;
 import org.alfresco.filesys.server.auth.acl.InvalidACLTypeException;
+import org.alfresco.filesys.server.auth.passthru.AcegiPassthruAuthenticator;
 import org.alfresco.filesys.server.auth.passthru.PassthruAuthenticator;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.core.ShareMapper;
@@ -81,6 +85,7 @@ public class ServerConfiguration
     // Filesystem configuration constants
     private static final String ConfigArea = "file-servers";
     private static final String ConfigCIFS = "CIFS Server";
+    private static final String ConfigFTP = "FTP Server";
     private static final String ConfigFilesystems = "Filesystems";
     private static final String ConfigSecurity = "Filesystem Security";
 
@@ -90,6 +95,11 @@ public class ServerConfiguration
     private static final String m_sessDbgStr[] = { "NETBIOS", "STATE", "NEGOTIATE", "TREE", "SEARCH", "INFO", "FILE",
             "FILEIO", "TRANSACT", "ECHO", "ERROR", "IPC", "LOCK", "PKTTYPE", "DCERPC", "STATECACHE", "NOTIFY",
             "STREAMS", "SOCKET" };
+
+    // FTP server debug type strings
+
+    private static final String m_ftpDebugStr[] = { "STATE", "SEARCH", "INFO", "FILE", "FILEIO", "ERROR", "PKTTYPE",
+            "TIMING", "DATAPORT", "DIRECTORY" };
 
     // Platform types
 
@@ -101,18 +111,26 @@ public class ServerConfiguration
     // Token name to substitute current server name into the CIFS server name
     private static final String TokenLocalName = "${localname}";
 
+    // Acegi authentication manager
+    private AuthenticationManager acegiAuthMgr;
+
+    // Path to configuration file
+    private String configLocation;
+
     /** connection to database */
     private ServiceRegistry serviceRegistry;
-    /** Configuration service used to read the configuration from */
-    private ConfigService m_configService;
+
     /** the device to connect use */
     private DiskInterface diskInterface;
 
     // Runtime platform type
+
     private PlatformType m_platform = PlatformType.Unknown;
 
     // Main server enable flags, to enable SMB, FTP and/or NFS server components
+
     private boolean m_smbEnable = true;
+    private boolean m_ftpEnable = true;
 
     // Server name
     private String m_name;
@@ -208,6 +226,27 @@ public class ServerConfiguration
     private int m_win32NBAnnounceInterval;
 
     // --------------------------------------------------------------------------------
+    // FTP specific configuration parameters
+    //
+    // Bind address and FTP server port.
+
+    private InetAddress m_ftpBindAddress;
+    private int m_ftpPort = -1;
+
+    // Allow anonymous FTP access and anonymous FTP account name
+
+    private boolean m_ftpAllowAnonymous;
+    private String m_ftpAnonymousAccount;
+
+    // FTP root path, if not specified defaults to listing all shares as the root
+
+    private String m_ftpRootPath;
+
+    // FTP server debug flags
+
+    private int m_ftpDebug;
+
+    // --------------------------------------------------------------------------------
     // Global server configuration
     //
     // Timezone name and offset from UTC in minutes
@@ -221,7 +260,7 @@ public class ServerConfiguration
 
     private String m_localName;
     private String m_localDomain;
-    
+
     /** flag indicating successful initialisation */
     private boolean initialised;
 
@@ -230,14 +269,18 @@ public class ServerConfiguration
      * 
      * @param config ConfigService
      */
-    public ServerConfiguration(ServiceRegistry serviceRegistry, ConfigService config, DiskInterface diskInterface)
+    public ServerConfiguration(ServiceRegistry serviceRegistry, AuthenticationManager authMgr, String configPath,
+            DiskInterface diskInterface)
     {
+        // Save details
+
         this.serviceRegistry = serviceRegistry;
         this.diskInterface = diskInterface;
-        // Save the configuration service
-        m_configService = config;
+        this.acegiAuthMgr = authMgr;
+        this.configLocation = configPath;
 
         // Allocate the shared device list
+
         m_shareList = new SharedDeviceList();
 
         // Allocate the SMB dialect selector, and initialize using the default
@@ -305,7 +348,13 @@ public class ServerConfiguration
     public void init()
     {
         initialised = false;
-        
+
+        // Create the configuration source
+
+        ClassPathConfigSource classPathConfigSource = new ClassPathConfigSource(configLocation);
+        XMLConfigService xmlConfigService = new XMLConfigService(classPathConfigSource);
+        xmlConfigService.init();
+
         // Create the configuration context
 
         ConfigLookupContext configCtx = new ConfigLookupContext(ConfigArea);
@@ -316,51 +365,56 @@ public class ServerConfiguration
 
         try
         {
-            
+
             // Process the CIFS server configuration
-    
-            Config config = m_configService.getConfig(ConfigCIFS, configCtx);
+
+            Config config = xmlConfigService.getConfig(ConfigCIFS, configCtx);
             processCIFSServerConfig(config);
-    
+
+            // Process the FTP server configuration
+
+            config = xmlConfigService.getConfig(ConfigFTP, configCtx);
+            processFTPServerConfig(config);
+
             // Process the security configuration
-    
-            config = m_configService.getConfig(ConfigSecurity, configCtx);
+
+            config = xmlConfigService.getConfig(ConfigSecurity, configCtx);
             processSecurityConfig(config);
-    
+
             // Process the filesystems configuration
-    
-            config = m_configService.getConfig(ConfigFilesystems, configCtx);
+
+            config = xmlConfigService.getConfig(ConfigFilesystems, configCtx);
             processFilesystemsConfig(config);
-            
-            // successful initialisation 
+
+            // successful initialisation
             initialised = true;
         }
-        catch ( UnsatisfiedLinkError ex)
+        catch (UnsatisfiedLinkError ex)
         {
             // Error accessing the Win32NetBIOS DLL code
-            
+
             logger.error("Error accessing Win32 NetBIOS, check DLL is on the path");
-            
+
             // Disable the CIFS server
-            
+
             setNetBIOSSMB(false);
             setTcpipSMB(false);
             setWin32NetBIOS(false);
-            
+
             setSMBServerEnabled(false);
         }
-        catch ( Throwable ex)
+        catch (Throwable ex)
         {
             // Configuration error
-            
+
             logger.error("CIFS server configuration error, " + ex.getMessage(), ex);
-            
+
             // Disable the CIFS server
-            
+
             setNetBIOSSMB(false);
             setTcpipSMB(false);
             setWin32NetBIOS(false);
-            
+
             setSMBServerEnabled(false);
         }
     }
@@ -714,9 +768,9 @@ public class ServerConfiguration
             {
 
                 // Call the Win32NetBIOS native code to make sure it is initialized
-                
+
                 Win32NetBIOS.LanaEnum();
-                
+
                 // Enable Win32 NetBIOS
 
                 setWin32NetBIOS(true);
@@ -917,6 +971,16 @@ public class ServerConfiguration
     }
 
     /**
+     * Process the FTP server configuration
+     * 
+     * @param config Config
+     */
+    private final void processFTPServerConfig(Config config)
+    {
+
+    }
+
+    /**
      * Process the filesystems configuration
      * 
      * @param config Config
@@ -1052,6 +1116,8 @@ public class ServerConfiguration
                 auth = new LocalAuthenticator();
             else if (authType.equalsIgnoreCase("passthru"))
                 auth = new PassthruAuthenticator();
+            else if (authType.equalsIgnoreCase("acegi"))
+                auth = new AcegiPassthruAuthenticator();
             else
                 throw new AlfrescoRuntimeException("Invalid authenticator type, " + authType);
 
@@ -1365,6 +1431,16 @@ public class ServerConfiguration
     }
 
     /**
+     * Return the associated Acegi authentication manager
+     * 
+     * @return AuthenticationManager
+     */
+    public final AuthenticationManager getAuthenticationManager()
+    {
+        return acegiAuthMgr;
+    }
+
+    /**
      * Check if the global access control list is configured
      * 
      * @return boolean
@@ -1475,6 +1551,16 @@ public class ServerConfiguration
         return m_srvType;
     }
 
+    /**
+     * Return the service registry
+     * 
+     * @return ServiceRegistry
+     */
+    public final ServiceRegistry getServiceRegistry()
+    {
+        return serviceRegistry;
+    }
+    
     /**
      * Return the server debug flags.
      * 
@@ -2214,5 +2300,145 @@ public class ServerConfiguration
     public final void setSecondaryWINSServer(InetAddress addr)
     {
         m_winsSecondary = addr;
+    }
+
+    /**
+     * Check if the FTP server is enabled
+     * 
+     * @return boolean
+     */
+    public final boolean isFTPServerEnabled()
+    {
+        return m_ftpEnable;
+    }
+
+    /**
+     * Return the FTP server bind address, may be null to indicate bind to all available addresses
+     * 
+     * @return InetAddress
+     */
+    public final InetAddress getFTPBindAddress()
+    {
+        return m_ftpBindAddress;
+    }
+
+    /**
+     * Return the FTP server port to use for incoming connections
+     * 
+     * @return int
+     */
+    public final int getFTPPort()
+    {
+        return m_ftpPort;
+    }
+
+    /**
+     * Determine if anonymous FTP access is allowed
+     * 
+     * @return boolean
+     */
+    public final boolean allowAnonymousFTP()
+    {
+        return m_ftpAllowAnonymous;
+    }
+
+    /**
+     * Return the anonymous FTP account name
+     * 
+     * @return String
+     */
+    public final String getAnonymousFTPAccount()
+    {
+        return m_ftpAnonymousAccount;
+    }
+
+    /**
+     * Return the FTP debug flags
+     * 
+     * @return int
+     */
+    public final int getFTPDebug()
+    {
+        return m_ftpDebug;
+    }
+
+    /**
+     * Check if an FTP root path has been configured
+     * 
+     * @return boolean
+     */
+    public final boolean hasFTPRootPath()
+    {
+        return m_ftpRootPath != null ? true : false;
+    }
+
+    /**
+     * Return the FTP root path
+     * 
+     * @return String
+     */
+    public final String getFTPRootPath()
+    {
+        return m_ftpRootPath;
+    }
+
+    /**
+     * Set the FTP server bind address, may be null to indicate bind to all available addresses
+     * 
+     * @param addr InetAddress
+     */
+    public final void setFTPBindAddress(InetAddress addr)
+    {
+        m_ftpBindAddress = addr;
+    }
+
+    /**
+     * Set the FTP server port to use for incoming connections, -1 indicates disable the FTP server
+     * 
+     * @param port int
+     */
+    public final void setFTPPort(int port)
+    {
+        m_ftpPort = port;
+    }
+
+    /**
+     * Set the FTP root path
+     * 
+     * @param path String
+     */
+    public final void setFTPRootPath(String path)
+    {
+        m_ftpRootPath = path;
+    }
+
+    /**
+     * Enable/disable anonymous FTP access
+     * 
+     * @param ena boolean
+     */
+    public final void setAllowAnonymousFTP(boolean ena)
+    {
+        m_ftpAllowAnonymous = ena;
+    }
+
+    /**
+     * Set the anonymous FTP account name
+     * 
+     * @param acc String
+     */
+    public final void setAnonymousFTPAccount(String acc)
+    {
+        m_ftpAnonymousAccount = acc;
+    }
+
+    /**
+     * Set the FTP debug flags
+     * 
+     * @param dbg int
+     */
+    public final void setFTPDebug(int dbg)
+    {
+        m_ftpDebug = dbg;
     }
 }

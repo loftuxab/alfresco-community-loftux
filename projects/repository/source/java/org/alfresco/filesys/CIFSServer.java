@@ -21,15 +21,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.SocketException;
 
-import org.alfresco.config.source.ClassPathConfigSource;
-import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.netbios.server.NetBIOSNameServer;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.config.ServerConfiguration;
-import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.smb.server.SMBServer;
-import org.alfresco.service.ServiceRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -37,8 +33,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * CIFS Server Class
- * <p>
- * Create and start the various server components required to run the CIFS server.
+ * 
+ * <p>Create and start the various server components required to run the CIFS server.
  * 
  * @author GKSpencer
  */
@@ -46,21 +42,17 @@ public class CIFSServer
 {
     private static final Log logger = LogFactory.getLog("org.alfresco.smb.server");
 
-    private ServiceRegistry serviceRegistry;
-    private String configLocation;
-    private DiskInterface diskInterface;
+    // Server configuration
     private ServerConfiguration filesysConfig;
 
     /**
-     * @param serviceRegistry connects to the repository
-     * @param configService
-     * @param diskInterface
+     * Class constructor
+     *
+     * @param serverConfig ServerConfiguration
      */
-    public CIFSServer(ServiceRegistry serviceRegistry, String configLocation, DiskInterface diskInterface)
+    public CIFSServer(ServerConfiguration serverConfig)
     {
-        this.serviceRegistry = serviceRegistry;
-        this.configLocation = configLocation;
-        this.diskInterface = diskInterface;
+        this.filesysConfig = serverConfig;
     }
 
     /**
@@ -72,7 +64,7 @@ public class CIFSServer
     {
         return filesysConfig;
     }
-    
+
     /**
      * @return Returns true if the server started up without any errors
      */
@@ -91,21 +83,15 @@ public class CIFSServer
     {
         try
         {
-            ClassPathConfigSource classPathConfigSource = new ClassPathConfigSource(configLocation);
-            XMLConfigService xmlConfigService = new XMLConfigService(classPathConfigSource);
-            xmlConfigService.init();
-            filesysConfig = new ServerConfiguration(serviceRegistry, xmlConfigService, diskInterface);
-            filesysConfig.init();
-
             // Create the SMB server and NetBIOS name server, if enabled
             if (filesysConfig.isSMBServerEnabled())
             {
                 // Create the NetBIOS name server if NetBIOS SMB is enabled
                 if (filesysConfig.hasNetBIOSSMB())
-                    filesysConfig.addServer(new NetBIOSNameServer(serviceRegistry, filesysConfig));
+                    filesysConfig.addServer(new NetBIOSNameServer(filesysConfig.getServiceRegistry(), filesysConfig));
 
                 // Create the SMB server
-                filesysConfig.addServer(new SMBServer(serviceRegistry, filesysConfig));
+                filesysConfig.addServer(new SMBServer(filesysConfig.getServiceRegistry(), filesysConfig));
             }
 
             // Start the configured servers

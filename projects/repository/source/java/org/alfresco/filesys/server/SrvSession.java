@@ -74,6 +74,10 @@ public abstract class SrvSession
 
     private String m_remoteName;
 
+    // Authentication token, used during logon
+    
+    private Object m_authToken;
+    
     /**
      * Class constructor
      * 
@@ -92,29 +96,25 @@ public abstract class SrvSession
     }
 
     /**
-     * Output a string to the debug device
+     * Return the authentication token
      * 
-     * @param str
+     * @return Object
      */
-    /*
-     * public final void debugPrint(String str) { Debug.print(str); }
-     */
+    public final Object getAuthenticationToken()
+    {
+        return m_authToken;
+    }
+    
     /**
-     * Output a string and a newline to the debug device
+     * Determine if the authentication token is set
      * 
-     * @param str String
+     * @return boolean
      */
-    /*
-     * public final void debugPrintln(String str) { Debug.print(m_dbgPrefix); Debug.println(str); }
-     */
-    /**
-     * Output an exception stack trace to the debug device
-     * 
-     * @param ex Exception
-     */
-    /*
-     * public final void debugPrintln(Exception ex) { Debug.println(ex); }
-     */
+    public final boolean hasAuthenticationToken()
+    {
+        return m_authToken != null ? true : false;
+    }
+    
     /**
      * Return the session challenge key
      * 
@@ -275,6 +275,16 @@ public abstract class SrvSession
         return false;
     }
 
+    /**
+     * Set the authentication token
+     * 
+     * @param authToken Object
+     */
+    public final void setAuthenticationToken(Object authToken)
+    {
+        m_authToken = authToken;
+    }
+    
     /**
      * Set the client information
      * 

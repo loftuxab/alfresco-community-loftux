@@ -58,12 +58,6 @@ public class AuthenticateSession
 
     protected final static int Closed = -1;
 
-    // Debug flags
-
-//    public final static int DBGPacketType = 0x0001;
-//    public final static int DBGDumpPacket = 0x0002;
-//    public final static int DBGHexDump = 0x0004;
-
     // Default SMB packet size to allocate
 
     public static final int DEFAULT_BUFSIZE = 4096;
@@ -146,10 +140,6 @@ public class AuthenticateSession
     // Multiplex id
 
     private static int m_multiplexId = 1;
-
-    // Debug support
-
-//    private static int m_debug = 0;
 
     /**
      * Class constructor

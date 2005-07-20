@@ -7,6 +7,7 @@
    <import resource="classpath:applicationServices.xml"/>
    <import resource="classpath:ruleService.xml"/>
    <import resource="classpath:alfresco/integrityService.xml"/>
+   <import resource="classpath:alfresco/networkProtocolServices.xml"/>
    
    <!--                    -->
    <!--  PERSISTENCE       -->
@@ -889,6 +890,7 @@
    <bean id="authenticationManager" class="net.sf.acegisecurity.providers.ProviderManager">
       <property name="providers">
          <list>
+            <ref bean="ntlmAuthenticationProvider"/>
             <ref bean="daoAuthenticationProvider"/>
          </list>
       </property>
@@ -962,7 +964,29 @@
   
    <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter" abstract="false" singleton="true" lazy-init="default" autowire="default" dependency-check="default" /> 
 
-
+   <bean id="ntlmAuthenticationProvider" class="org.alfresco.repo.security.authentication.ntlm.NTLMAuthenticationProvider">
+		  <property name="JCEProvider">
+				 <value>cryptix.jce.provider.CryptixCrypto</value>
+			</property>
+         <property name="useLocalServer">
+            <value>true</value>
+         </property>
+<!--
+  			<property name="servers">
+				 <value>TEST02</value>
+			</property>
+         <property name="domain">
+            <value>ALFRESCO</value>
+         </property>
+-->
+			<property name="guestAccess">
+				 <value>true</value>
+			</property>
+			<property name="sessionTimeout">
+				 <value>30</value>
+			</property>
+	 </bean>
+	 
    <!-- Importer -->
 
    <bean id="viewParser" class="org.alfresco.repo.importer.view.ViewParser">
@@ -1019,67 +1043,6 @@
       <property name="authenticationService"><ref bean="authenticationService"/></property>
    </bean>
    
-   <!-- CIFS Server -->
-   <bean id="cifsServer" class="org.alfresco.filesys.CIFSServer" init-method="startServer" depends-on="importerBootstrap">
-      <constructor-arg>
-         <ref bean="serviceRegistry" />
-      </constructor-arg>
-      <constructor-arg>
-         <value>alfresco/file-servers.xml</value>
-      </constructor-arg>
-      <constructor-arg>
-         <ref bean="contentDiskDriver" />
-      </constructor-arg>
-   </bean>
-   
-   <bean id="contentDiskDriver" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.filesys.smb.server.repo.ContentDiskInterface</value>
-      </property>
-      <property name="transactionManager"><ref bean="transactionManager"/></property>
-      <property name="target">
-         <bean class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
-            <constructor-arg>
-               <ref bean="serviceRegistry" />
-            </constructor-arg>
-            <constructor-arg>
-               <ref bean="cifsHelper" />
-            </constructor-arg>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-      <!-- only enable for debugging
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
-               <constructor-arg>
-                  <value>contentDiskDriver</value>
-               </constructor-arg>
-            </bean>
-         </list>
-      </property>
-      -->
-   </bean>
-
-   <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper">
-      <property name="nodeService"><ref bean="nodeService" /></property>
-      <property name="dictionaryService"><ref bean="dictionaryService" /></property>
-      <property name="namespaceService"><ref bean="namespaceService" /></property>
-      <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
-      <property name="filePathCache">
-         <bean class="org.alfresco.filesys.server.filesys.cache.FilePathCache" >
-            <constructor-arg>
-               <ref bean="policyComponent" />
-            </constructor-arg>
-         </bean>
-      </property>
-   </bean>
-
    <!-- Service Registry -->
    <bean id="serviceRegistry" class="org.alfresco.repo.service.ServiceDescriptorRegistry">
    </bean>

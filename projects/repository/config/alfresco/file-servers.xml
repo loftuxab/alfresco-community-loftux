@@ -47,6 +47,10 @@
       </authenticator>
 
 <!--
+		<authenticator type="acegi">
+		  	<allowGuest/>
+		</authenticator>
+		  
       <authenticator type="passthru">
         	<NOallowGuest/>
          <LocalServer/>
