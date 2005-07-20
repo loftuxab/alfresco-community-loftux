@@ -154,6 +154,22 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         assertTrue("Reader last modified is incorrect", before <= modifiedTimeCheck);
         assertTrue("Reader last modified is incorrect", modifiedTimeCheck <= after);
     }
+    
+    public void testStringTruncation() throws Exception
+    {
+        String content = "1234567890";
+        
+        ContentWriter writer = getWriter();
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");  // shorter format i.t.o. bytes used
+        // write the content
+        writer.putContent(content);
+        
+        // get a reader - get it in a larger format i.t.o. bytes
+        ContentReader reader = writer.getReader();
+        String checkContent = reader.getContentString(5);
+        assertEquals("Truncated strings don't match", "12345", checkContent);
+    }
 	
     /**
      * The simplest test.  Write a string and read it again, checking that we receive the same values.

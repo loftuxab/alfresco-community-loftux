@@ -257,6 +257,7 @@ public abstract class AbstractContentReader extends AbstractContent implements C
         {
             throw new IllegalArgumentException("Character count must be positive and within range");
         }
+        Reader reader = null;
         try
         {
             // just create buffer of the required size
@@ -264,14 +265,13 @@ public abstract class AbstractContentReader extends AbstractContent implements C
             
             String encoding = getEncoding();
             // create a reader from the input stream
-            Reader reader = null;
             if (encoding == null)
             {
-                reader = new InputStreamReader(getContentInputStream());  // use default encoding                
+                reader = new InputStreamReader(getContentInputStream());
             }
             else
             {
-                reader = new InputStreamReader(getContentInputStream(), encoding);  // specific encoding
+                reader = new InputStreamReader(getContentInputStream(), encoding);
             }
             // read it all, if possible
             int count = reader.read(buffer, 0, length);
@@ -286,6 +286,13 @@ public abstract class AbstractContentReader extends AbstractContent implements C
                     "   accessor: " + this + "\n" +
                     "   length: " + length,
                     e);
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                try { reader.close(); } catch (Throwable e) { logger.error(e); }
+            }
         }
     }
 

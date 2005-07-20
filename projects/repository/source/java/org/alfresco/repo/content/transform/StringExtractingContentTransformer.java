@@ -17,6 +17,11 @@
  */
 package org.alfresco.repo.content.transform;
 
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -35,10 +40,6 @@ public class StringExtractingContentTransformer extends AbstractContentTransform
     public static final String PREFIX_TEXT = "text/";
     
     private static final Log logger = LogFactory.getLog(StringExtractingContentTransformer.class);
-
-    public StringExtractingContentTransformer()
-    {
-    }
     
     /**
      * Gives a high reliability for all translations from <i>text/sometype</i> to
@@ -74,18 +75,61 @@ public class StringExtractingContentTransformer extends AbstractContentTransform
      * encoding into account.  The text produced from this will, if the encoding was correct,
      * be unformatted but valid. 
      */
-    public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+    @Override
+    protected void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
     {
         // is this a straight text-text transformation
         transformText(reader, writer);
     }
     
-    private void transformText(ContentReader reader, ContentWriter writer)
+    /**
+     * Transformation optimized for text-to-text conversion
+     */
+    private void transformText(ContentReader reader, ContentWriter writer) throws Exception
     {
-        // just read the text directly from the reader, which will handle encoding
-        String text = reader.getContentString();
-        // transfer it directly to the writer, which will handle encoding
-        writer.putContent(text);
+        // get a char reader and writer
+        Reader charReader = null;
+        Writer charWriter = null;
+        try
+        {
+            if (reader.getEncoding() == null)
+            {
+                charReader = new InputStreamReader(reader.getContentInputStream());
+            }
+            else
+            {
+                charReader = new InputStreamReader(reader.getContentInputStream(), reader.getEncoding());
+            }
+            if (writer.getEncoding() == null)
+            {
+                charWriter = new OutputStreamWriter(writer.getContentOutputStream());
+            }
+            else
+            {
+                charWriter = new OutputStreamWriter(writer.getContentOutputStream(), writer.getEncoding());
+            }
+            // copy from the one to the other
+            char[] buffer = new char[1024];
+            int readCount = 0;
+            while (readCount > -1)
+            {
+                // write the last read count number of bytes
+                charWriter.write(buffer, 0, readCount);
+                // fill the buffer again
+                readCount = charReader.read(buffer);
+            }
+        }
+        finally
+        {
+            if (charReader != null)
+            {
+                try { charReader.close(); } catch (Throwable e) { logger.error(e); }
+            }
+            if (charWriter != null)
+            {
+                try { charWriter.close(); } catch (Throwable e) { logger.error(e); }
+            }
+        }
         // done
     }
 }

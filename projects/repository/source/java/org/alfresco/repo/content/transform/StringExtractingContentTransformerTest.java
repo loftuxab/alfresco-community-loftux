@@ -17,8 +17,15 @@
  */
 package org.alfresco.repo.content.transform;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Random;
 
+import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.content.filestore.FileContentReader;
 import org.alfresco.repo.content.filestore.FileContentWriter;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -114,5 +121,43 @@ public class StringExtractingContentTransformerTest extends AbstractContentTrans
         ContentReader checkReader = targetWriter.getReader();
         String checkContent = checkReader.getContentString();
         assertEquals("Content check failed", SOME_CONTENT, checkContent);
+    }
+    
+    /**
+     * Generate a large file and then transform it using the text extractor.
+     * We are not creating super-large file (1GB) in order to test the transform
+     * as it takes too long to create the file in the first place.  Rather,
+     * this test can be used during profiling to ensure that memory is not
+     * being consumed.
+     */
+    public void testLargeFileStreaming() throws Exception
+    {
+        File sourceFile = TempFileProvider.createTempFile(getName(), ".txt");
+        
+        int chars = 1000000;  // a million characters should do the trick
+        Random random = new Random();
+        
+        Writer charWriter = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(sourceFile)));
+        for (int i = 0; i < chars; i++)
+        {
+            char next = (char)(random.nextDouble() * 93D + 32D);
+            charWriter.write(next);
+        }
+        charWriter.close();
+        
+        // get a reader and a writer
+        ContentReader reader = new FileContentReader(sourceFile);
+        reader.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        
+        File outputFile = TempFileProvider.createTempFile(getName(), ".txt");
+        ContentWriter writer = new FileContentWriter(outputFile);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        
+        // transform
+        transformer.transform(reader, writer);
+        
+        // delete files
+        sourceFile.delete();
+        outputFile.delete();
     }
 }
