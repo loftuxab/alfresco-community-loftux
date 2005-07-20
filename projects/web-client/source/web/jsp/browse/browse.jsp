@@ -88,7 +88,7 @@
                                        }
                                        else
                                        {
-                                          document.write('<h:outputText value="#{NavigationBean.nodeProperties.cifsPathLabel}" />');
+                                          document.write('<h:outputText value="#{NavigationBean.nodeProperties.cifsPathLabel}" id="cifs2" />');
                                        }
                                     </script>
                                   </div>
