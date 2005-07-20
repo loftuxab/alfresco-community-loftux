@@ -421,7 +421,7 @@
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
-                           <a:booleanEvaluator value="#{r.locked == false}">
+                           <a:booleanEvaluator value="#{(r.locked == false && r.workingCopy == false) || r.owner == true}">
                               <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.editFile}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
@@ -437,7 +437,7 @@
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </a:booleanEvaluator>
-                           <a:booleanEvaluator value="#{r.workingCopy == true}">
+                           <a:booleanEvaluator value="#{r.owner == true}">
                               <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkinFile">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
@@ -447,7 +447,7 @@
                            </a:actionLink>
                            <%-- More actions menu --%>
                            <a:menu itemSpacing="4" image="/images/icons/more.gif" tooltip="More Actions" menuStyleClass="moreActionsMenu">
-                              <a:booleanEvaluator value="#{r.locked == false}">
+                              <a:booleanEvaluator value="#{(r.locked == false && r.workingCopy == false) || r.owner == true}">
                                  <a:actionLink value="#{msg.update}" image="/images/icons/update.gif" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
@@ -457,7 +457,7 @@
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
-                              <a:booleanEvaluator value="#{r.workingCopy == true}"> <%-- TODO: add "|| r.locked == true" later if possible to do --%>
+                              <a:booleanEvaluator value="#{r.owner == true}">
                                  <a:actionLink value="#{msg.undocheckout}" image="/images/icons/undo_checkout.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>

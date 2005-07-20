@@ -538,7 +538,7 @@ public class BrowseBean implements IContextListener
    {
       // special properties to be used by the value binding components on the page
       node.addPropertyResolver("locked", this.resolverlocked);
-      node.addPropertyResolver("lockOwner", this.resolverlockOwner);
+      node.addPropertyResolver("owner", this.resolverOwner);
       node.addPropertyResolver("workingCopy", this.resolverWorkingCopy);
       node.addPropertyResolver("url", this.resolverUrl);
       node.addPropertyResolver("fileType16", this.resolverFileType16);
@@ -551,9 +551,9 @@ public class BrowseBean implements IContextListener
       }
    };
    
-   private NodePropertyResolver resolverlockOwner = new NodePropertyResolver() {
+   private NodePropertyResolver resolverOwner = new NodePropertyResolver() {
       public Object get(Node node) {
-         return Repository.isNodeLockOwner(node, lockService);
+         return Repository.isNodeOwner(node, lockService);
       }
    };
    

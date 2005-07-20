@@ -925,7 +925,7 @@ public class DocumentDetailsBean
     * 
     * @return true if the document is checked out
     */
-   public boolean getLocked()
+   public boolean isLocked()
    {
       return Repository.isNodeLocked(getDocument(), this.lockService);
    }
@@ -935,9 +935,19 @@ public class DocumentDetailsBean
     * 
     * @return true if the document is a working copy
     */
-   public boolean getWorkingCopy()
+   public boolean isWorkingCopy()
    {
       return getDocument().hasAspect(ContentModel.ASPECT_WORKING_COPY);
+   }
+   
+   /**
+    * Returns whether the current document is a working copy owned by the current User
+    * 
+    * @return true if the document is a working copy owner by the current User
+    */
+   public boolean isOwner()
+   {
+      return Repository.isNodeOwner(getDocument(), this.lockService);
    }
    
    /**

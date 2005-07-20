@@ -199,7 +199,7 @@ public class LoginBean
             RepositoryUserDetails principal = (RepositoryUserDetails)auth.getPrincipal();
             
             // setup User object and Home space ID etc.
-            User user = new User(this.username, this.authenticationService.getCurrentTicket(), principal.getPersonNodeRef());
+            User user = new User(principal.getUserNodeRef(), this.username, this.authenticationService.getCurrentTicket(), principal.getPersonNodeRef());
             String homeSpaceId = (String)this.nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
             user.setHomeSpaceId(homeSpaceId);
             

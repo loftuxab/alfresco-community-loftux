@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
+import javax.swing.text.StyledEditorKit.BoldAction;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -193,22 +194,26 @@ public final class Repository
    }
    
    /**
-    * Return whether a Node is current Locked and this user is the owner of the lock
+    * Return whether a WorkingCopy Node is owned by the current User
     * 
     * @param node             The Node wrapper to test against
     * @param lockService      The LockService to use
     * 
-    * @return whether a Node is current Locked
+    * @return whether a WorkingCopy Node is owned by the current User
     */
-   public static Boolean isNodeLockOwner(Node node, LockService lockService)
+   public static Boolean isNodeOwner(Node node, LockService lockService)
    {
       Boolean locked = Boolean.FALSE;
-      if (node.hasAspect(ContentModel.ASPECT_LOCKABLE))
+      if (node.hasAspect(ContentModel.ASPECT_WORKING_COPY))
       {
-         LockStatus lockStatus = lockService.getLockStatus(node.getNodeRef());
-         if (lockStatus == LockStatus.LOCK_OWNER)
+         Object obj = node.getProperties().get("workingCopyOwner");
+         if (obj instanceof NodeRef)
          {
-            locked = Boolean.TRUE;
+            User user = Application.getCurrentUser(FacesContext.getCurrentInstance());
+            if ( ((NodeRef)obj).equals(user.getUserNodeRef()) )
+            {
+               locked = Boolean.TRUE;
+            }
          }
       }
       

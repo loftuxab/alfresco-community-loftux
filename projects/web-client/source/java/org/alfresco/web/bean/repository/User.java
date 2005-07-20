@@ -42,6 +42,7 @@ public final class User
    private String homeSpaceId;
    private String userName;
    private String ticket;
+   private NodeRef user;
    private NodeRef person;
    
    /** cached ref to our user preferences node */
@@ -52,8 +53,14 @@ public final class User
     * 
     * @param userName constructor for the user
     */
-   public User(String userName, String ticket, NodeRef person)
+   public User(NodeRef user, String userName, String ticket, NodeRef person)
    {
+      if (user == null || userName == null || ticket == null || person == null)
+      {
+         throw new IllegalArgumentException("All user details are mandatory!");
+      }
+      
+      this.user = user;
       this.userName = userName;  
       this.ticket = ticket;
       this.person = person;
@@ -91,6 +98,14 @@ public final class User
       return this.ticket;
    }
 
+   /**
+    * @return The NodeRef representing this User
+    */
+   public NodeRef getUserNodeRef()
+   {
+      return this.user;
+   }
+   
    /**
     * @return Returns the person.
     */
