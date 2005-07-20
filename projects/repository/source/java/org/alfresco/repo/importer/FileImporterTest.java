@@ -43,6 +43,7 @@ import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -50,15 +51,17 @@ import org.springframework.context.ApplicationContext;
 public class FileImporterTest extends TestCase
 {
     static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
-
     private NodeService nodeService;
     private DictionaryService dictionaryService;
     private ContentService contentService;
     private AuthenticationService authenticationService;
     private MimetypeService mimetypeService;
     private NamespaceService namespaceService;
+
     private ServiceRegistry serviceRegistry;
     private NodeRef rootNodeRef;
+
+    private SearchService searcher;
 
     public FileImporterTest()
     {
@@ -73,6 +76,8 @@ public class FileImporterTest extends TestCase
     public void setUp()
     {
         serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+
+        searcher = serviceRegistry.getSearchService();
         nodeService = serviceRegistry.getNodeService();
         dictionaryService = serviceRegistry.getDictionaryService();
         contentService = serviceRegistry.getContentService();
@@ -139,7 +144,7 @@ public class FileImporterTest extends TestCase
             return file.getName().endsWith(".xml");
         }
     }
-    
+
     private static class QuickFileFilter implements FileFilter
     {
         public boolean accept(File file)
@@ -154,45 +159,101 @@ public class FileImporterTest extends TestCase
      *            <li>StoreRef
      *            <li>Store Path
      *            <li>Directory
+     *            <li>Optional maximum time in seconds for node loading
      *            </ol>
-     * @throws SystemException 
-     * @throws NotSupportedException 
-     * @throws HeuristicRollbackException 
-     * @throws HeuristicMixedException 
-     * @throws RollbackException 
-     * @throws IllegalStateException 
-     * @throws SecurityException 
+     * @throws SystemException
+     * @throws NotSupportedException
+     * @throws HeuristicRollbackException
+     * @throws HeuristicMixedException
+     * @throws RollbackException
+     * @throws IllegalStateException
+     * @throws SecurityException
      */
     public static final void main(String[] args) throws Exception
     {
-        FileImporterTest test = new FileImporterTest();
-        test.setUp();
-        
-        UserTransaction tx = test.serviceRegistry.getUserTransaction();
-        tx.begin();
-       
-        StoreRef spacesStore = new StoreRef(args[0]);
-        if (!test.nodeService.exists(spacesStore))
+
+        int count = 0;
+        int target = 1;
+        while (count < target)
         {
-            test.nodeService.createStore(spacesStore.getProtocol(), spacesStore.getIdentifier());
-        }
-        NodeRef storeRoot = test.nodeService.getRootNode(spacesStore);
-        List<NodeRef> location = test.nodeService.selectNodes(storeRoot, args[1], null, test.namespaceService, false);
-        if (location.size() > 0)
-        {    
-            long start = System.nanoTime();
-            test.createFileImporter().loadFile(location.get(0), new File(args[2]), true);
-            long end = System.nanoTime();
-            System.out.println("Created in "+((end-start)/1000000.0));
-            start = System.nanoTime();
-            tx.commit();
-            end = System.nanoTime();
-            System.out.println("Commit in "+((end-start)/1000000.0));
-        }
-        else
-        {
-            tx.rollback();
-            throw new AlfrescoRuntimeException("Can not find node for import");
+            count++;
+            FileImporterTest test = new FileImporterTest();
+            test.setUp();
+
+            UserTransaction tx = test.serviceRegistry.getUserTransaction();
+            tx.begin();
+
+            StoreRef spacesStore = new StoreRef(args[0]);
+            if (!test.nodeService.exists(spacesStore))
+            {
+                test.nodeService.createStore(spacesStore.getProtocol(), spacesStore.getIdentifier());
+            }
+            NodeRef storeRoot = test.nodeService.getRootNode(spacesStore);
+            List<NodeRef> location = test.nodeService.selectNodes(storeRoot, args[1], null, test.namespaceService, false);
+            if (location.size() > 0)
+            {
+                long start = System.nanoTime();
+                test.createFileImporter().loadFile(location.get(0), new File(args[2]), true);
+                long end = System.nanoTime();
+                long first = end-start;
+                System.out.println("Created in " + ((end - start) / 1000000.0));
+                start = System.nanoTime();
+//                
+//                SearchParameters sp = new SearchParameters();
+//                sp.addStore(spacesStore);
+//                sp.setQuery("lucene", "PATH:\"//.\"");
+//                sp.addSort("ID", true);
+//                sp.excludeDataInTheCurrentTransaction(false);
+//                start = System.nanoTime();
+//                ResultSet results = test.searcher.query(sp);
+//               
+//                end = System.nanoTime();
+//                 
+//                System.out.println("Found(TX) "+results.length());
+//                System.out.println(" in " + ((end - start) / 1000000.0));
+//                results.close();
+//                
+                tx.commit();
+                end = System.nanoTime();
+                long second = end-start;
+                System.out.println("Commit in " + ((end - start) / 1000000.0));
+                System.out.println("Total "+((first+second)/1000000.0));
+//                
+//                
+//                
+//              
+//                start = System.nanoTime();
+//                results = test.searcher.query(sp);
+//               
+//                end = System.nanoTime();
+//                 
+//                System.out.println("Found (noTX)"+results.length());
+//                System.out.println(" in " + ((end - start) / 1000000.0));
+//
+//                start = System.nanoTime();
+//                String current = null;
+//                for (ResultSetRow row : results)
+//                {
+//                    String id = row.getNodeRef().getId();
+//
+//                    if (current != null)
+//                    {
+//                        if (current.compareTo(id) > 0)
+//                        {
+//                            fail();
+//                        }
+//                    }
+//                    current = id;
+//                }
+//                results.close();
+//                end = System.nanoTime();
+//                System.out.println(" Checked order in  " + ((end - start) / 1000000.0));
+            }
+            else
+            {
+                tx.rollback();
+                throw new AlfrescoRuntimeException("Can not find node for import");
+            }
         }
     }
 }

@@ -108,4 +108,10 @@ public interface SearchService
      * @return Returns the query results
      */
     public ResultSet query(StoreRef store, QName queryId,  QueryParameter[] queryParameters);
+    
+    /**
+     * Search using the given SearchParameters
+     */
+    
+    public ResultSet query(SearchParameters searchParameters);
 }

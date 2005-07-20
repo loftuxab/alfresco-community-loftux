@@ -23,6 +23,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -45,6 +46,12 @@ public class JCR170Searcher extends AbstractSearcherComponent
     }
 
     public ResultSet query(StoreRef store, QName queryId, QueryParameter[] queryParameters)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public ResultSet query(SearchParameters searchParameters)
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();

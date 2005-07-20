@@ -22,6 +22,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 
@@ -57,6 +58,17 @@ public class SearcherComponent extends AbstractSearcherComponent
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
+    }
+
+    public ResultSet query(SearchParameters searchParameters)
+    {
+        if(searchParameters.getStores().size() != 1)
+        {
+            throw new IllegalStateException("Only one store can be searched at present");
+        }
+        StoreRef storeRef = searchParameters.getStores().get(0);
+        SearchService searcher = indexerAndSearcherFactory.getSearcher(storeRef, !searchParameters.excludeDataInTheCurrentTransaction());
+        return searcher.query(searchParameters);
     }
 
    

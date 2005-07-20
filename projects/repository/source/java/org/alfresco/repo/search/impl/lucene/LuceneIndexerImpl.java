@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -805,7 +806,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    private void flushPending() throws LuceneIndexException
+    public void flushPending() throws LuceneIndexException
     {
         IndexReader mainReader = null;
         try
@@ -866,6 +867,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     throw new LuceneIndexException("Filed to close main reader", e);
                 }
             }
+            closeDeltaWriter();
         }
     }
 
@@ -1504,7 +1506,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             LuceneResultSet results = null;
             try
             {
-                searcher = getSearcher();
+                searcher = getSearcher(null);
                 Hits hits;
                 try
                 {
@@ -1733,5 +1735,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     public void setLuceneFullTextSearchIndexer(FullTextSearchIndexer luceneFullTextSearchIndexer)
     {
         this.luceneFullTextSearchIndexer = luceneFullTextSearchIndexer;
+    }
+    
+    public Set<NodeRef> getDeletions()
+    {
+        return Collections.unmodifiableSet(deletions);
     }
 }

@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiSearcher;
@@ -282,8 +283,7 @@ public abstract class LuceneBase implements Lockable
             throw new LuceneIndexException("Failed to open IndexSarcher for " + getMainPath(), e);
         }
     }
-
-    
+  
     protected Searcher getSearcher(LuceneIndexer luceneIndexer) throws LuceneIndexException
     {
         // If we know the delta id we should do better
@@ -295,9 +295,11 @@ public abstract class LuceneBase implements Lockable
             }
             else
             {
+                // TODO: Create appropriate reader that lies about deletions from the first 
+                //
                 //luceneIndexer.flushPending();
-                //return new MultiSearcher(new IndexSearcher[]{new IndexSearcher(getMainPath()), new IndexSearcher(getDeltaPath())});
-                throw new LuceneIndexException("Failed to open IndexSarcher for " + getMainPath());
+                //
+                throw new UnsupportedOperationException("Querying aginats the index delta is not currently suported");
             }
         }
         catch (IOException e)
@@ -590,8 +592,8 @@ public abstract class LuceneBase implements Lockable
                     IndexReader[] readers = new IndexReader[] { reader };
                     try
                     {
-                        //mainWriter.mergeIndexes(readers);
-                        mainWriter.addIndexes(readers);
+                        mainWriter.mergeIndexes(readers);
+                        //mainWriter.addIndexes(readers);
                     }
                     catch (IOException e)
                     {

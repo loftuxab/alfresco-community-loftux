@@ -32,6 +32,7 @@ import org.alfresco.repo.search.EmptyResultSet;
 import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.SearcherException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -39,11 +40,19 @@ import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryFilter;
 import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TermQuery;
 import org.saxpath.SAXPathException;
 
 import com.werken.saxpath.XPathReader;
@@ -79,54 +88,122 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
 
     private QueryRegisterComponent queryRegister;
 
+    private LuceneIndexer indexer;
+
     /*
      * Searcher implementation
      */
 
     public ResultSet query(StoreRef store, String language, String queryString, Path[] queryOptions, QueryParameterDefinition[] queryParameterDefinitions) throws SearcherException
     {
+        SearchParameters sp = new SearchParameters();
+        sp.addStore(store);
+        sp.setQuery(language, queryString);
+        if (queryOptions != null)
+        {
+            for (Path path : queryOptions)
+            {
+                sp.addAttrbutePath(path);
+            }
+        }
+        if (queryParameterDefinitions != null)
+        {
+            for (QueryParameterDefinition qpd : queryParameterDefinitions)
+            {
+                sp.addQueryParameterDefinition(qpd);
+            }
+        }
+        sp.excludeDataInTheCurrentTransaction(true);
+
+        return query(sp);
+    }
+
+    public ResultSet query(SearchParameters searchParameters)
+    {
+        if (searchParameters.getStores().size() != 1)
+        {
+            throw new IllegalStateException("Only one store can be searched at present");
+        }
+        StoreRef store = searchParameters.getStores().get(0);
+
         if (indexExists())
         {
             String parameterisedQueryString;
-            if (queryParameterDefinitions != null)
+            if (searchParameters.getQueryParameterDefinitions().size() > 0)
             {
                 Map<QName, QueryParameterDefinition> map = new HashMap<QName, QueryParameterDefinition>();
-                if (queryParameterDefinitions != null)
+
+                for (QueryParameterDefinition qpd : searchParameters.getQueryParameterDefinitions())
                 {
-                    for (QueryParameterDefinition qpd : queryParameterDefinitions)
-                    {
-                        map.put(qpd.getQName(), qpd);
-                    }
+                    map.put(qpd.getQName(), qpd);
                 }
-                parameterisedQueryString = parameterise(queryString, map, null, namespacePrefixResolver);
+
+                parameterisedQueryString = parameterise(searchParameters.getQuery(), map, null, namespacePrefixResolver);
             }
             else
             {
-                parameterisedQueryString = queryString;
+                parameterisedQueryString = searchParameters.getQuery();
             }
-            
-            if (language.equalsIgnoreCase(LUCENE))
+
+            if (searchParameters.getLanguage().equalsIgnoreCase(LUCENE))
             {
                 try
                 {
 
-                    Query query = LuceneQueryParser.parse(parameterisedQueryString, DEFAULT_FIELD, new LuceneAnalyser(dictionaryService), namespacePrefixResolver, dictionaryService);
-                    Searcher searcher = getSearcher();
+                    Query query = LuceneQueryParser.parse(parameterisedQueryString, DEFAULT_FIELD, new LuceneAnalyser(dictionaryService), namespacePrefixResolver,
+                            dictionaryService);
+                    Searcher searcher = getSearcher(indexer);
 
-                    Hits hits = searcher.search(query);
-                    return new LuceneResultSet(store, hits, searcher, nodeService, queryOptions);
+                    Hits hits;
+                    if (searchParameters.excludeDataInTheCurrentTransaction() || (indexer == null))
+                    {
+                        if (searchParameters.getSortDefinitions().size() > 0)
+                        {
+                            int index = 0;
+                            SortField[] fields = new SortField[searchParameters.getSortDefinitions().size()];
+                            for (SearchParameters.SortDefinition sd : searchParameters.getSortDefinitions())
+                            {
+                                fields[index++] = new SortField(sd.getField(), !sd.isAscending());
+                            }
+                            hits = searcher.search(query, new Sort(fields));
+                        }
+                        else
+                        {
+                            hits = searcher.search(query);
+                        }
+                    }
+                    else
+                    {
+                        Query filterQuery = getFilterQuery();
+                        Filter filter = new QueryFilter(filterQuery);
+                        if (searchParameters.getSortDefinitions().size() > 0)
+                        {
+                            int index = 0;
+                            SortField[] fields = new SortField[searchParameters.getSortDefinitions().size()];
+                            for (SearchParameters.SortDefinition sd : searchParameters.getSortDefinitions())
+                            {
+                                fields[index++] = new SortField(sd.getField(), !sd.isAscending());
+                            }
+                            hits = searcher.search(query, filter, new Sort(fields));
+                        }
+                        else
+                        {
+                            hits = searcher.search(query, filter);
+                        }
+                    }
+                    return new LuceneResultSet(store, hits, searcher, nodeService, searchParameters.getAttributePaths().toArray(new Path[0]));
 
                 }
                 catch (ParseException e)
                 {
-                    throw new SearcherException("Failed to parse query: " + queryString, e);
+                    throw new SearcherException("Failed to parse query: " + parameterisedQueryString, e);
                 }
                 catch (IOException e)
                 {
                     throw new SearcherException("IO exception during search", e);
                 }
             }
-            else if (language.equalsIgnoreCase(XPATH))
+            else if (searchParameters.getLanguage().equalsIgnoreCase(XPATH))
             {
                 try
                 {
@@ -134,18 +211,20 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     LuceneXPathHandler handler = new LuceneXPathHandler();
                     handler.setNamespacePrefixResolver(namespacePrefixResolver);
                     handler.setDictionaryService(dictionaryService);
-                    // TODO: Handler should have the query parameters to use in building its lucene query
-                    // At the moment xpath style parameters in the PATH expression are not supported.
+                    // TODO: Handler should have the query parameters to use in
+                    // building its lucene query
+                    // At the moment xpath style parameters in the PATH
+                    // expression are not supported.
                     reader.setXPathHandler(handler);
                     reader.parse(parameterisedQueryString);
                     Query query = handler.getQuery();
-                    Searcher searcher = getSearcher();
+                    Searcher searcher = getSearcher(null);
                     Hits hits = searcher.search(query);
-                    return new LuceneResultSet(store, hits, searcher, nodeService, queryOptions);
+                    return new LuceneResultSet(store, hits, searcher, nodeService, searchParameters.getAttributePaths().toArray(new Path[0]));
                 }
                 catch (SAXPathException e)
                 {
-                    throw new SearcherException("Failed to parse query: " + queryString, e);
+                    throw new SearcherException("Failed to parse query: " + searchParameters.getQuery(), e);
                 }
                 catch (IOException e)
                 {
@@ -154,7 +233,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             }
             else
             {
-                throw new SearcherException("Unknown query language: " + language);
+                throw new SearcherException("Unknown query language: " + searchParameters.getLanguage());
             }
         }
         else
@@ -162,6 +241,31 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             // no index return an empty result set
             return new EmptyResultSet();
         }
+    }
+
+    private Query getFilterQuery()
+    {
+       if(indexer == null)
+       {
+           throw new IllegalStateException("There must be an index writer to generate the filter");
+       }
+       
+       // In the current transaction or not in the deletion list
+       BooleanQuery query = new BooleanQuery();
+       query.add(new TermQuery(new Term("TX", indexer.getDeltaId())), false, false);
+       
+       BooleanQuery idQuery = new BooleanQuery();
+       for(NodeRef node : indexer.getDeletions())
+       {
+           idQuery.add(new TermQuery(new Term("ID", node.getId())), false, false);
+       }
+       BooleanQuery notIdQuery = new BooleanQuery();
+       notIdQuery.add(new TermQuery(new Term("ISNODE", "T")), false, false);
+       notIdQuery.add(new TermQuery(new Term("ISCONTAINER", "T")), false, false);
+       notIdQuery.add(idQuery, false, true);
+       
+       query.add(notIdQuery, false, false);
+       return query;
     }
 
     /**
@@ -173,13 +277,14 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      * @param deltaId
      * @return
      */
-    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, String deltaId, LuceneConfig config)
+    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, LuceneIndexer indexer, LuceneConfig config)
     {
         LuceneSearcherImpl searcher = new LuceneSearcherImpl();
         searcher.setLuceneConfig(config);
         try
         {
-            searcher.initialise(storeRef, deltaId, false);
+            searcher.initialise(storeRef, indexer == null ? null : indexer.getDeltaId(), false);
+            searcher.indexer = indexer;
         }
         catch (LuceneIndexException e)
         {
@@ -196,7 +301,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      * @param storeRef
      * @return
      */
-    public static LuceneSearcherImpl getSearcher(StoreRef storeRef,  LuceneConfig config)
+    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, LuceneConfig config)
     {
         return getSearcher(storeRef, null, config);
     }

@@ -62,5 +62,4 @@ public interface FileImporter
      * @throws FileImporterException
      */
     public void loadFile(NodeRef container, File file) throws FileImporterException;
-    
 }

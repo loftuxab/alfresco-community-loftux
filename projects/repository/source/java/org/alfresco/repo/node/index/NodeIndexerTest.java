@@ -81,6 +81,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
         rootNodeRef = localRootNode;
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"" + BaseNodeServiceTest.TEST_PREFIX + ":root_p_n1\"", null, null);
         assertEquals(1, results.length());
+        results.close();
     }
     
     public void testLikeAndContains() throws Exception

@@ -269,7 +269,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
             LuceneIndexer indexer = indexers.get(storeRef);
             if (indexer == null)
             {
-                indexer = createIndexer(storeRef, getTransactionId(tx));
+                indexer = createIndexer(storeRef, getTransactionId(tx, storeRef));
                 indexers.put(storeRef, indexer);
             }
             return indexer;
@@ -277,21 +277,26 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         else
         // A thread local transaction
         {
-            Map<StoreRef, LuceneIndexer> indexers = threadLocalIndexers.get();
-            if (indexers == null)
-            {
-                indexers = new HashMap<StoreRef, LuceneIndexer>();
-                threadLocalIndexers.set(indexers);
-            }
-            LuceneIndexer indexer = indexers.get(storeRef);
-            if (indexer == null)
-            {
-                indexer = createIndexer(storeRef, GUID.generate());
-                indexers.put(storeRef, indexer);
-            }
-            return indexer;
+            return getThreadLocalIndexer(storeRef);
         }
 
+    }
+
+    private LuceneIndexer getThreadLocalIndexer(StoreRef storeRef)
+    {
+        Map<StoreRef, LuceneIndexer> indexers = threadLocalIndexers.get();
+        if (indexers == null)
+        {
+            indexers = new HashMap<StoreRef, LuceneIndexer>();
+            threadLocalIndexers.set(indexers);
+        }
+        LuceneIndexer indexer = indexers.get(storeRef);
+        if (indexer == null)
+        {
+            indexer = createIndexer(storeRef, GUID.generate());
+            indexers.put(storeRef, indexer);
+        }
+        return indexer;
     }
 
     /**
@@ -300,7 +305,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      * @param tx
      * @return
      */
-    private static String getTransactionId(Transaction tx)
+    private static String getTransactionId(Transaction tx, StoreRef storeRef)
     {
         if (tx instanceof SimpleTransaction)
         {
@@ -309,7 +314,16 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         }
         else
         {
-            return tx.toString();
+            Map<StoreRef, LuceneIndexer> indexers = threadLocalIndexers.get();
+            if (indexers != null)
+            {
+                LuceneIndexer indexer = indexers.get(storeRef);
+                if (indexer != null)
+                {
+                    return indexer.getDeltaId();
+                }
+            }
+            return null;
         }
     }
 
@@ -337,11 +351,16 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     public LuceneSearcher getSearcher(StoreRef storeRef, boolean searchDelta) throws SearcherException
     {
         String deltaId = null;
+        LuceneIndexer indexer = null;
         if (searchDelta)
         {
-            deltaId = getTransactionId(getTransaction());
+            deltaId = getTransactionId(getTransaction(), storeRef);
+            if(deltaId != null)
+            {
+                indexer = getIndexer(storeRef);
+            }
         }
-        LuceneSearcher searcher = getSearcher(storeRef, deltaId);
+        LuceneSearcher searcher = getSearcher(storeRef, indexer);
         return searcher;
     }
 
@@ -353,9 +372,9 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      * @return
      * @throws SearcherException
      */
-    private LuceneSearcher getSearcher(StoreRef storeRef, String deltaId) throws SearcherException
+    private LuceneSearcher getSearcher(StoreRef storeRef,  LuceneIndexer indexer) throws SearcherException
     {
-        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, deltaId, this);
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, indexer, this);
         searcher.setNamespacePrefixResolver(nameSpaceService);
         searcher.setLuceneIndexLock(luceneIndexLock);
         searcher.setNodeService(nodeService);
@@ -647,6 +666,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
             if (threadLocalIndexers.get() != null)
             {
                 threadLocalIndexers.get().clear();
+                threadLocalIndexers.set(null);
             }
         }
     }
@@ -719,6 +739,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         if (threadLocalIndexers.get() != null)
         {
             threadLocalIndexers.get().clear();
+            threadLocalIndexers.set(null);
         }
 
     }
@@ -819,8 +840,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         this.queryMaxClauses = queryMaxClauses;
         BooleanQuery.setMaxClauseCount(this.queryMaxClauses);
     }
-    
-    
+
     public int getIndexerMaxFieldLength()
     {
         return indexerMaxFieldLength;
@@ -829,7 +849,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     public void setIndexerMaxFieldLength(int indexerMaxFieldLength)
     {
         this.indexerMaxFieldLength = indexerMaxFieldLength;
-        System.setProperty("org.apache.lucene.maxFieldLength", ""+indexerMaxFieldLength);
+        System.setProperty("org.apache.lucene.maxFieldLength", "" + indexerMaxFieldLength);
     }
 
 }

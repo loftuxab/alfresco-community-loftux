@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
@@ -57,6 +59,7 @@ import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
@@ -245,6 +248,68 @@ public class LuceneTest extends TestCase
         super(arg0);
     }
 
+    
+    public void testSort() throws Exception
+    {
+        UserTransaction tx = serviceRegistry.getUserTransaction();
+        tx.begin();
+        luceneFTS.pause();
+        buildBaseIndex();
+        runBaseTests();
+
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
+        searcher.setNodeService(nodeService);
+        searcher.setDictionaryService(dictionaryService);
+        searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
+
+        SearchParameters sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.addSort("ID", true);
+        ResultSet results = searcher.query(sp);
+
+        String current = null;
+        for (ResultSetRow row : results)
+        {
+            String id = row.getNodeRef().getId();
+
+            if (current != null)
+            {
+                if (current.compareTo(id) > 0)
+                {
+                    fail();
+                }
+            }
+            current = id;
+        }
+        results.close();
+        
+        SearchParameters sp2 = new SearchParameters();
+        sp2.addStore(rootNodeRef.getStoreRef());
+        sp2.setQuery("lucene", "PATH:\"//.\"");
+        sp2.addSort("ID", false);
+        results = searcher.query(sp2);
+
+        current = null;
+        for (ResultSetRow row : results)
+        {
+            String id = row.getNodeRef().getId();
+            System.out.println(current + "             " + id);
+            if (current != null)
+            {
+                if (current.compareTo(id) < 0)
+                {
+                    fail();
+                }
+            }
+            current = id;
+        }
+        results.close();
+
+        luceneFTS.resume();
+        tx.rollback();
+    }
+    
     public void test1() throws Exception
     {
         UserTransaction tx = serviceRegistry.getUserTransaction();
@@ -1911,6 +1976,118 @@ public class LuceneTest extends TestCase
     }
 
     
+    public void testIssueAR47() throws Exception
+    {
+        // This bug arose from repeated deletes and adds creating empty index segments.
+        // Two segements each containing one deletyed entry were merged together producing a single empty entry.
+        // This seemed to be bad for lucene - I am not sure why
+        
+        // So we add something, add and delete someting repeatedly and then check we can still do the search.
+
+        // Running in autocommit against the index
+        
+        ChildAssociationRef testFind = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}testFind"), testSuperType);
+        
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
+        searcher.setNodeService(nodeService);
+        searcher.setDictionaryService(dictionaryService);
+        searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
+        searcher.setQueryRegister(queryRegisterComponent);
+        
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(),  "lucene", "QNAME:\"namespace:testFind\"");
+        assertEquals(1, results.length());
+        results.close();
+        
+        for(int i = 0; i < 100; i++)
+        {
+           ChildAssociationRef test = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}test"), testSuperType);
+           nodeService.deleteNode(test.getChildRef());
+        }
+        
+        results = searcher.query(rootNodeRef.getStoreRef(),  "lucene", "QNAME:\"namespace:testFind\"");
+        assertEquals(1, results.length());
+        results.close();
+    }
+    
+    // Ignore the following test until implementation is completed
+    
+//    public void testReadAgainstDelta() throws Exception
+//    {
+//        UserTransaction tx = serviceRegistry.getUserTransaction();
+//        tx.begin();
+//        luceneFTS.pause();
+//        buildBaseIndex();
+//        runBaseTests();
+//        tx.commit();
+//        
+//        // Delete
+//        
+//        tx = serviceRegistry.getUserTransaction();
+//        tx.begin();
+//        
+//        runBaseTests();
+//        
+//        serviceRegistry.getNodeService().deleteNode(n1);
+//       
+//
+//        SearchParameters sp = new SearchParameters();
+//        sp.addStore(rootNodeRef.getStoreRef());
+//        sp.setQuery("lucene", "PATH:\"//.\"");
+//        sp.excludeDataInTheCurrentTransaction(false);
+//        ResultSet results = serviceRegistry.getSearchService().query(sp);
+//        assertEquals(5, results.length());
+//        results.close();
+//        
+//        sp = new SearchParameters();
+//        sp.addStore(rootNodeRef.getStoreRef());
+//        sp.setQuery("lucene", "PATH:\"//.\"");
+//        sp.excludeDataInTheCurrentTransaction(true);
+//        results = serviceRegistry.getSearchService().query(sp);
+//        assertEquals(15, results.length());
+//        results.close();
+//        
+//        tx.rollback();
+//        
+//        sp = new SearchParameters();
+//        sp.addStore(rootNodeRef.getStoreRef());
+//        sp.setQuery("lucene", "PATH:\"//.\"");
+//        sp.addSort("ID", true);
+//        results = serviceRegistry.getSearchService().query(sp);
+//        assertEquals(15, results.length());
+//        results.close();
+//        
+//        // Create
+//        
+//        tx = serviceRegistry.getUserTransaction();
+//        tx.begin();
+//        
+//        runBaseTests();
+//        
+//        assertEquals(5, serviceRegistry.getNodeService().getChildAssocs(rootNodeRef).size());
+//        serviceRegistry.getNodeService().createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}texas"), testSuperType).getChildRef();
+//        assertEquals(6, serviceRegistry.getNodeService().getChildAssocs(rootNodeRef).size());
+//        
+//        sp = new SearchParameters();
+//        sp.addStore(rootNodeRef.getStoreRef());
+//        sp.setQuery("lucene", "PATH:\"//.\"");
+//        sp.excludeDataInTheCurrentTransaction(false);
+//        results = serviceRegistry.getSearchService().query(sp);
+//        assertEquals(16, results.length());
+//        results.close();
+//        
+//        tx.rollback();
+//        
+//        sp = new SearchParameters();
+//        sp.addStore(rootNodeRef.getStoreRef());
+//        sp.setQuery("lucene", "PATH:\"//.\"");
+//        sp.addSort("ID", true);
+//        results = serviceRegistry.getSearchService().query(sp);
+//        assertEquals(15, results.length());
+//        results.close();
+//        
+//        
+//    }
+    
     private void runPerformanceTest(double time, boolean clear)
     {
         LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
@@ -1967,9 +2144,8 @@ public class LuceneTest extends TestCase
         test.setUp();
         //test.testForKev();
         //test.testDeleteContainer();
-        UserTransaction tx = test.serviceRegistry.getUserTransaction();
-        tx.begin();
-        test.testDeleteAndAddReference();
-        tx.rollback();
+       
+        //test.testReadAgainstDelta();
+        
     }
 }
