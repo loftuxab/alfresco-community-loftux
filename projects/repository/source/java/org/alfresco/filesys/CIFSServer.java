@@ -20,6 +20,7 @@ package org.alfresco.filesys;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.SocketException;
+import java.util.Vector;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.netbios.server.NetBIOSNameServer;
@@ -43,8 +44,13 @@ public class CIFSServer
     private static final Log logger = LogFactory.getLog("org.alfresco.smb.server");
 
     // Server configuration
+    
     private ServerConfiguration filesysConfig;
 
+    // List of CIFS server components
+    
+    private Vector<NetworkServer> serverList = new Vector<NetworkServer>();
+    
     /**
      * Class constructor
      *
@@ -84,26 +90,35 @@ public class CIFSServer
         try
         {
             // Create the SMB server and NetBIOS name server, if enabled
+            
             if (filesysConfig.isSMBServerEnabled())
             {
                 // Create the NetBIOS name server if NetBIOS SMB is enabled
+                
                 if (filesysConfig.hasNetBIOSSMB())
-                    filesysConfig.addServer(new NetBIOSNameServer(filesysConfig.getServiceRegistry(), filesysConfig));
+                    serverList.add(new NetBIOSNameServer(filesysConfig.getServiceRegistry(), filesysConfig));
 
                 // Create the SMB server
-                filesysConfig.addServer(new SMBServer(filesysConfig.getServiceRegistry(), filesysConfig));
+                
+                serverList.add(new SMBServer(filesysConfig.getServiceRegistry(), filesysConfig));
+                
+                // Add the servers to the configuration
+                
+                for (NetworkServer server : serverList)
+                {
+                    filesysConfig.addServer(server);
+                }
             }
 
-            // Start the configured servers
-            for (int i = 0; i < filesysConfig.numberOfServers(); i++)
-            {
-                // Get the current server
-                NetworkServer server = filesysConfig.getServer(i);
+            // Start the CIFS server(s)
 
+            for (NetworkServer server : serverList)
+            {
                 if (logger.isInfoEnabled())
                     logger.info("Starting server " + server.getProtocolName() + " ...");
 
                 // Start the server
+                
                 String serverName = server.getConfiguration().getServerName();
                 server.startServer();
             }
@@ -126,18 +141,26 @@ public class CIFSServer
             // initialisation failed
             return;
         }
-        // Shutdown the servers
-        for (int i = 0; i < filesysConfig.numberOfServers(); i++)
-        {
-            // Get the current server
-            NetworkServer server = filesysConfig.getServer(i);
+        
+        // Shutdown the CIFs server components
 
+        for ( NetworkServer server : serverList)
+        {
             if (logger.isInfoEnabled())
                 logger.info("Shutting server " + server.getProtocolName() + " ...");
 
-            // Start the server
+            // Stop the server
+            
             server.shutdownServer(false);
+            
+            // Remove the server from the global list
+            
+            getConfiguration().removeServer(server.getProtocolName());
         }
+        
+        // Clear the server list and configuration
+        
+        serverList.clear();
         filesysConfig = null;
     }
 
@@ -156,15 +179,25 @@ public class CIFSServer
         try
         {
             // Create the configuration service in the same way that Spring creates it
+            
             ApplicationContext ctx = new ClassPathXmlApplicationContext("alfresco/application-context.xml");
 
-            // get the CIFS server bean
+            // Get the CIFS server bean
+            
             CIFSServer server = (CIFSServer) ctx.getBean("cifsServer");
             if (server == null)
             {
                 throw new AlfrescoRuntimeException("Server bean 'cifsServer' not defined");
             }
 
+            // Stop the FTP server, if running
+            
+            server.getConfiguration().setFTPServerEnabled(false);
+            
+            NetworkServer srv = server.getConfiguration().findServer("FTP");
+            if ( srv != null)
+                srv.shutdownServer(true);
+            
             // Only wait for shutdown if the SMB/CIFS server is enabled
             
             if ( server.getConfiguration().isSMBServerEnabled())

@@ -35,6 +35,8 @@ import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.filesys.ftp.FTPPath;
+import org.alfresco.filesys.ftp.InvalidPathException;
 import org.alfresco.filesys.netbios.NetBIOSName;
 import org.alfresco.filesys.netbios.NetBIOSNameList;
 import org.alfresco.filesys.netbios.NetBIOSSession;
@@ -83,11 +85,11 @@ public class ServerConfiguration
     private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Filesystem configuration constants
-    private static final String ConfigArea = "file-servers";
-    private static final String ConfigCIFS = "CIFS Server";
-    private static final String ConfigFTP = "FTP Server";
+    private static final String ConfigArea        = "file-servers";
+    private static final String ConfigCIFS        = "CIFS Server";
+    private static final String ConfigFTP         = "FTP Server";
     private static final String ConfigFilesystems = "Filesystems";
-    private static final String ConfigSecurity = "Filesystem Security";
+    private static final String ConfigSecurity    = "Filesystem Security";
 
     // SMB/CIFS session debug type strings
     //
@@ -101,6 +103,14 @@ public class ServerConfiguration
     private static final String m_ftpDebugStr[] = { "STATE", "SEARCH", "INFO", "FILE", "FILEIO", "ERROR", "PKTTYPE",
             "TIMING", "DATAPORT", "DIRECTORY" };
 
+    // Default FTP server port
+    
+    private static final int DefaultFTPServerPort = 21;
+    
+    // Default FTP anonymous account name
+    
+    private static final String DefaultFTPAnonymousAccount = "anonymous";
+    
     // Platform types
 
     public enum PlatformType
@@ -231,7 +241,7 @@ public class ServerConfiguration
     // Bind address and FTP server port.
 
     private InetAddress m_ftpBindAddress;
-    private int m_ftpPort = -1;
+    private int m_ftpPort = DefaultFTPServerPort;
 
     // Allow anonymous FTP access and anonymous FTP account name
 
@@ -977,7 +987,164 @@ public class ServerConfiguration
      */
     private final void processFTPServerConfig(Config config)
     {
+        // If the configuration section is not valid then FTP is disabled
+        
+        if ( config == null)
+        {
+            setFTPServerEnabled(false);
+            return;
+        }
+            
+        //  Check for a bind address
+        
+        ConfigElement elem = config.getConfigElement("bindto");
+        if ( elem != null) {
+        
+            //  Validate the bind address
 
+            String bindText = elem.getValue();
+        
+            try {
+            
+                //  Check the bind address
+            
+                InetAddress bindAddr = InetAddress.getByName(bindText);
+        
+                //  Set the bind address for the FTP server
+            
+                setFTPBindAddress(bindAddr);
+            }
+            catch (UnknownHostException ex) {
+                throw new AlfrescoRuntimeException("Invalid FTP bindto address, " + elem.getValue());
+            }
+        }
+
+        //  Check for an FTP server port
+    
+        elem = config.getConfigElement("port");
+        if ( elem != null) {
+            try {
+                setFTPPort(Integer.parseInt(elem.getValue()));
+                if ( getFTPPort() <= 0 || getFTPPort() >= 65535)
+                    throw new AlfrescoRuntimeException("FTP server port out of valid range");
+            }
+            catch (NumberFormatException ex) {
+                throw new AlfrescoRuntimeException("Invalid FTP server port");
+            }
+        }
+        else {
+        
+            //  Use the default FTP port
+        
+            setFTPPort(DefaultFTPServerPort);
+        }
+    
+        //  Check if anonymous login is allowed
+    
+        elem = config.getConfigElement("allowAnonymous");
+        if ( elem != null) {
+        
+            //  Enable anonymous login to the FTP server
+        
+            setAllowAnonymousFTP(true);
+        
+            //  Check if an anonymous account has been specified
+        
+            String anonAcc = elem.getAttribute("user");
+            if ( anonAcc != null && anonAcc.length() > 0) {
+            
+                //  Set the anonymous account name
+            
+                setAnonymousFTPAccount(anonAcc);
+            
+                //  Check if the anonymous account name is valid
+            
+                if ( getAnonymousFTPAccount() == null || getAnonymousFTPAccount().length() == 0)
+                    throw new AlfrescoRuntimeException("Anonymous FTP account invalid");
+            }
+            else {
+            
+                //  Use the default anonymous account name
+            
+                setAnonymousFTPAccount(DefaultFTPAnonymousAccount);
+            }
+        }
+        else {
+        
+            //  Disable anonymous logins
+        
+            setAllowAnonymousFTP(false);
+        }
+
+        //  Check if a root path has been specified
+        
+        elem = config.getConfigElement("rootDirectory");
+        if ( elem != null) {
+
+            //  Get the root path
+            
+            String rootPath = elem.getValue();
+                        
+            //  Validate the root path
+            
+            try {
+                
+                //  Parse the path
+                
+                FTPPath ftpPath = new FTPPath(rootPath);
+                
+                //  Set the root path
+                
+                setFTPRootPath(rootPath);
+            }
+            catch (InvalidPathException ex) {
+                throw new AlfrescoRuntimeException("Invalid FTP root directory, " + rootPath);
+            }
+        }
+
+        //  Check if FTP debug is enabled
+        
+        elem = config.getConfigElement("debug");
+        if (elem != null) {
+        
+            //  Check for FTP debug flags
+        
+            String flags = elem.getAttribute("flags");
+            int ftpDbg = 0;
+        
+            if ( flags != null) {
+            
+                //  Parse the flags
+            
+                flags = flags.toUpperCase();
+                StringTokenizer token = new StringTokenizer(flags,",");
+            
+                while ( token.hasMoreTokens()) {
+                
+                    //  Get the current debug flag token
+                
+                    String dbg = token.nextToken().trim();
+                
+                    //  Find the debug flag name
+                
+                    int idx = 0;
+                
+                    while ( idx < m_ftpDebugStr.length && m_ftpDebugStr[idx].equalsIgnoreCase(dbg) == false)
+                        idx++;
+                    
+                    if ( idx >= m_ftpDebugStr.length)
+                        throw new AlfrescoRuntimeException("Invalid FTP debug flag, " + dbg);
+                    
+                    //  Set the debug flag
+                
+                    ftpDbg += 1 << idx;
+                }
+            }
+
+            //  Set the FTP debug flags
+        
+            setFTPDebug(ftpDbg);
+        }
     }
 
     /**
@@ -1362,7 +1529,7 @@ public class ServerConfiguration
      * 
      * @param srv NetworkServer
      */
-    public final void addServer(NetworkServer srv)
+    public synchronized final void addServer(NetworkServer srv)
     {
         m_serverList.addServer(srv);
     }
@@ -1967,6 +2134,16 @@ public class ServerConfiguration
         m_smbEnable = ena;
     }
 
+    /**
+     * Set the FTP server enabled state
+     * 
+     * @param ena boolean
+     */
+    public final void setFTPServerEnabled(boolean ena)
+    {
+        m_ftpEnable = ena;
+    }
+    
     /**
      * Set the authenticator to be used to authenticate users and share connections.
      * 

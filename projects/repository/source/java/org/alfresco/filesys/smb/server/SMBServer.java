@@ -30,7 +30,6 @@ import org.alfresco.filesys.server.SrvSessionList;
 import org.alfresco.filesys.server.auth.SrvAuthenticator;
 import org.alfresco.filesys.server.auth.UserAccountList;
 import org.alfresco.filesys.server.config.ServerConfiguration;
-import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.InvalidDeviceInterfaceException;
 import org.alfresco.filesys.server.core.ShareType;
 import org.alfresco.filesys.server.core.SharedDevice;
@@ -289,43 +288,6 @@ public class SMBServer extends NetworkFileServer implements Runnable
     }
 
     /**
-     * Close the device contexts
-     */
-    protected final void closeDevices()
-    {
-
-        // Enumerate the shares and close each device to release resources
-
-        Enumeration<SharedDevice> enm = getShareList(getServerName(), null).enumerateShares();
-
-        while (enm.hasMoreElements())
-        {
-
-            // Get the current shared device
-
-            SharedDevice share = enm.nextElement();
-            DeviceContext context = share.getContext();
-
-            if (context != null)
-            {
-
-                // Close the current device
-
-                context.CloseContext();
-
-                // Debug
-
-                if (logger.isInfoEnabled())
-                    logger.info("[SMB] Closed device " + share.toString());
-            }
-        }
-
-        // Close the share mapper
-
-        getConfiguration().getShareMapper().closeMapper();
-    }
-
-    /**
      * Close the host announcer, if enabled
      */
     protected void closeHostAnnouncers()
@@ -360,12 +322,11 @@ public class SMBServer extends NetworkFileServer implements Runnable
 
         // Close the session handlers
 
-        for (int i = 0; i < m_sessionHandlers.size(); i++)
+        for (SessionSocketHandler handler : m_sessionHandlers)
         {
 
-            // Get the current session handler and request the handler to shutdown
+            // Request the handler to shutdown
 
-            SessionSocketHandler handler = (SessionSocketHandler) m_sessionHandlers.elementAt(i);
             handler.shutdownRequest();
         }
 
@@ -652,9 +613,8 @@ public class SMBServer extends NetworkFileServer implements Runnable
         if (logger.isInfoEnabled())
             logger.info("[SMB] SMB Server shutting down ...");
 
-        // Close the shared devices, host announcer and session handlers
+        // Close the host announcer and session handlers
 
-        closeDevices();
         closeHostAnnouncers();
         closeSessionHandlers();
 

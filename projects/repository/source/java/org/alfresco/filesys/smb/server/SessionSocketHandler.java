@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Session Socket Handler Abstract Class
+ * 
+ * @author GKSpencer
  */
 public abstract class SessionSocketHandler implements Runnable
 {
@@ -207,7 +209,7 @@ public abstract class SessionSocketHandler implements Runnable
     /**
      * Request the socket handler to shutdown
      */
-    public final void shutdownRequest()
+    public void shutdownRequest()
     {
 
         // Indicate that the server is closing

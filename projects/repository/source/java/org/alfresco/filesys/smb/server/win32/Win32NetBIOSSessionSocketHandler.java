@@ -201,8 +201,7 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler
     {
 
         // Enumerate the LAN adapters, use the first available if the LANA has not been specified in
-        // the
-        // configuration
+        // the configuration
 
         int[] lanas = Win32NetBIOS.LanaEnum();
         if (lanas.length > 0)
@@ -302,6 +301,17 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler
         return m_lanaValid;
     }
 
+    @Override
+    public void shutdownRequest()
+    {
+        super.shutdownRequest();
+        
+        // Reset the LANA, if valid, to wake the main session listener thread
+
+        if ( isLANAValid())
+            Win32NetBIOS.Reset(m_lana);
+    }
+
     /**
      * Run the NetBIOS session socket handler
      */
@@ -342,6 +352,11 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler
 
                     int lsn = Win32NetBIOS.Listen(m_lana, m_nbName, m_acceptClient, callerNameBuf);
 
+                    // Check if the session listener has been shutdown
+                    
+                    if ( hasShutdown())
+                        continue;
+                    
                     // Get the caller name, if available
 
                     if (callerNameBuf[0] != '\0')
@@ -435,8 +450,7 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler
                     }
 
                     // Check if the network adapter/LANA is back online, if so then re-initialize
-                    // the LANA
-                    // to start accepting sessions again
+                    // the LANA to start accepting sessions again
 
                     try
                     {
