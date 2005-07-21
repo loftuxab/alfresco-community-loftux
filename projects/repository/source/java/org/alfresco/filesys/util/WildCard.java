@@ -24,6 +24,8 @@ package org.alfresco.filesys.util;
  * wildcard rules.
  * <p>
  * A number of static convenience methods are also provided.
+ * 
+ * @author GKSpencer
  */
 public final class WildCard
 {
@@ -636,26 +638,4 @@ public final class WildCard
 
         return sb.toString();
     }
-
-    /**
-     * Test Code
-     * 
-     * @param args String[]
-     */
-    /**
-     * public static final void main(String[] args) { // Test file names String[] names = {
-     * "TEST.TXT", "TEST.OUT", "NOTEPAD.EXE", "Notepad.com", "notepad.exe", "test.txt", "test.out" }; //
-     * Wildcard strings String[] wildcards = { "*.*", "*", "TEST.*", "*.TXT", "????.*",
-     * "N??????.???" }; // Run the wildcard tests java.io.PrintStream out = System.out; try { //
-     * Loop though the wildcards for ( int i = 0; i < wildcards.length; i++) { // Create a wildcard,
-     * case insensitive check WildCard wcard = new WildCard(wildcards[i], false); out.println(wcard +
-     * ":"); // Test the file names for ( int j = 0; j < names.length; j++) { out.print(" ");
-     * out.print(names[j]); out.print(": "); out.println(wcard.matchesPattern(names[j]) ? "Match" :
-     * "NoMatch"); } out.println(); // Create a wildcard, case sensitive check wcard = new
-     * WildCard(wildcards[i], true); out.println(wcard + ":"); // Test the file names for ( int j =
-     * 0; j < names.length; j++) { out.print(" "); out.print(names[j]); out.print(": ");
-     * out.println(wcard.matchesPattern(names[j]) ? "Match" : "NoMatch"); }
-     * out.println("----------------------------------------"); } } catch ( Exception ex) {
-     * out.println("Error: " + ex.toString()); } }
-     */
 }

@@ -98,6 +98,12 @@ public class ContentNetworkFile extends NetworkFile
         {
             netFile.setAttributes(FileAttribute.Directory);
         }
+        else
+        {
+            // Set the current size
+            
+            netFile.setFileSize(fileInfo.getSize());
+        }
         
         // done
         if (logger.isDebugEnabled())
