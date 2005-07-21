@@ -790,14 +790,14 @@
             <property name="jobDataAsMap">
                <map>
                   <entry key="protectHours">
-                     <value>24</value>
+                     <value>1</value>
                   </entry>
                </map>
             </property>
          </bean>
       </property>
       <property name="startDelay">
-         <value>60000</value>                     <!-- start after a minute -->
+         <value>3600000</value>                     <!-- start after an hour -->
       </property>
       <property name="repeatInterval">
          <value>3600000</value>                    <!-- repeat every hour -->
