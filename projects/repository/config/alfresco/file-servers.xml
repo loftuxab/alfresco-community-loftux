@@ -25,7 +25,11 @@
       <sessionDebug flags="Negotiate,Socket"/>
    </config>
 
-
+   <config evaluator="string-compare" condition="FTP Server">
+      <allowAnonymous/>
+<!--      <debug flags="File,Search,Error,Directory,Info,DataPort"/> -->
+   </config>
+   
    <config evaluator="string-compare" condition="Filesystems">
       <filesystem name="Alfresco">
          <store>workspace://SpacesStore</store>

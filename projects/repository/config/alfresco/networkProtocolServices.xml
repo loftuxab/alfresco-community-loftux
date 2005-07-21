@@ -25,6 +25,14 @@
       </constructor-arg>
    </bean>
    
+   <!-- FTP Server -->
+   <bean id="ftpServer" class="org.alfresco.filesys.FTPServer" init-method="startServer" depends-on="importerBootstrap">
+      <constructor-arg>
+         <ref bean="fileServerConfiguration"/>
+      </constructor-arg>
+   </bean>
+
+   <!-- Filesystem Interface -->   
    <bean id="contentDiskDriver" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.filesys.smb.server.repo.ContentDiskInterface</value>
