@@ -304,7 +304,7 @@ public class PolicyScope extends AspectDetails
 	 * @param qName		the qualified name of the property
 	 * @param value		the value of the property
 	 */
-	protected void addProperty(QName qName, Serializable value) 
+	public void addProperty(QName qName, Serializable value) 
 	{
 		this.properties.put(qName, value);			
 	}
@@ -314,7 +314,7 @@ public class PolicyScope extends AspectDetails
 	 * 
 	 * @param qName		the qualified name of the property
 	 */
-	protected void removeProperty(QName qName) 
+	public void removeProperty(QName qName) 
 	{
 		this.properties.remove(qName);			
 	}

@@ -866,7 +866,7 @@ public class RuleServiceSystemTest extends TestCase
             addContentToNode(newNodeRef2);
             fail("An exception should have been thrown since a mandatory parameter was missing from the condition.");
         }
-        catch (RuleServiceException ruleServiceException)
+        catch (Exception ruleServiceException)
         {
             // Success since we where expecting the exception
         }

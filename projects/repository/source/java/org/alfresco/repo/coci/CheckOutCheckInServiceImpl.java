@@ -17,6 +17,7 @@
  */
 package org.alfresco.repo.coci;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +57,11 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	 */
 	private static final String ERR_BAD_COPY = "The original node can not be found.  Perhaps the copy has " +
 											   "been corrupted or the origional has been deleted or moved.";
+
+	/**
+	 * Extension character, used to recalculate the working copy names
+	 */
+	private static final String EXTENSION_CHARACTER = ".";
 	
 	/**
 	 * The node service
@@ -86,6 +92,11 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
      * The authentication service
      */
     private AuthenticationService authenticationService;
+    
+    /**
+     * The label used to indicate that a node is a working copy by modifying the name
+     */
+    private String workingCopyLabel;
 	
 	/**
 	 * Set the node service
@@ -148,6 +159,26 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
     {
         this.authenticationService = authenticationService;
     }
+    
+    /**
+     * Set the working copy label
+     * 
+     * @param workingCopyLabel  the working copy label
+     */
+    public void setWorkingCopyLabel(String workingCopyLabel) 
+    {
+		this.workingCopyLabel = workingCopyLabel;
+    }
+    
+    /**
+     * Get the working copy label.
+     * 
+     * @return	the working copy label
+     */
+    public String getWorkingCopyLabel() 
+    {
+		return workingCopyLabel;
+	}
 	
 	/**
 	 * Initialise method
@@ -173,7 +204,13 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
             boolean copyToNewNode,
             PolicyScope copyDetails)
 	{
-		// Do nothing to ensure that the working copy aspect does not appear on the copy
+		if (copyToNewNode == false)
+		{
+			// Make sure that the name of the node is not updated with the working copy name
+			copyDetails.removeProperty(ContentModel.PROP_NAME);
+		}
+		
+		// NOTE: the working copy aspect is not added since it should not be copyied
 	}
 	
 	/**
@@ -203,6 +240,28 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 				destinationParentNodeRef,
 				destinationAssocTypeQName,
 				destinationAssocQName);
+		
+		// Rename the working copy
+		if (this.workingCopyLabel != null && this.workingCopyLabel.length() != 0)
+		{
+			String modified = "";
+			String name = (String)this.nodeService.getProperty(workingCopy, ContentModel.PROP_NAME);
+			if (name != null && name.length() != 0)
+			{
+				int index = name.lastIndexOf(EXTENSION_CHARACTER);
+				if (index > 0)
+				{
+					// Insert the working copy label before the file extension
+					modified = name.substring(0, index) + " " + this.workingCopyLabel + name.substring(index);
+				}
+				else
+				{
+					// Simply append the working copy label onto the end of the existing name
+					modified = name + " " + this.workingCopyLabel;
+				}
+				this.nodeService.setProperty(workingCopy, ContentModel.PROP_NAME, modified);
+			}
+		}
 		
 		// Get the user 
 		NodeRef userNodeRef = getUserNodeRef();

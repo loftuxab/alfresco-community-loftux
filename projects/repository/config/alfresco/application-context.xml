@@ -725,32 +725,37 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.coci.CheckOutCheckInServiceImpl" init-method="init">
-            <property name="nodeService">
-               <ref bean="nodeService" />
-            </property>
-            <property name="versionService">
-               <ref bean="versionService" />
-            </property>
-            <property name="lockService">
-               <ref bean="lockService" />
-            </property>
-            <property name="copyService">
-               <ref bean="copyService" />
-            </property>			
-            <property name="policyComponent">
-               <ref bean="policyComponent" />
-            </property>		
-            <property name="authenticationService">
-               <ref bean="authenticationService" />
-            </property>
-         </bean>
+         <ref bean="checkOutCheckInServiceImpl"/>
       </property>
       <property name="transactionAttributes">
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
       </property>
+   </bean>
+   
+   <bean id="checkOutCheckInServiceImpl" class="org.alfresco.repo.coci.CheckOutCheckInServiceImpl" init-method="init">
+	    <property name="nodeService">
+	       <ref bean="nodeService" />
+	    </property>
+	    <property name="versionService">
+	       <ref bean="versionService" />
+	    </property>
+	    <property name="lockService">
+	       <ref bean="lockService" />
+	    </property>
+	    <property name="copyService">
+	       <ref bean="copyService" />
+	    </property>			
+	    <property name="policyComponent">
+	       <ref bean="policyComponent" />
+	    </property>		
+	    <property name="authenticationService">
+	       <ref bean="authenticationService" />
+	    </property>
+	    <property name="workingCopyLabel">
+	       <value>${workingcopy.label}</value>
+	    </property>
    </bean>
    
    <!-- Policy Support -->

@@ -40,6 +40,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.TestWithUserUtils;
+import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
 
 /**
  * Version operations service implementation unit tests
@@ -68,10 +69,11 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	/**
 	 * Types and properties used by the tests
 	 */
-	private static final String TEST_VALUE_1 = "testValue1";
-	private static final String TEST_VALUE_2 = "testValue2";
-	private static final QName PROP1_QNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
-	private static final QName PROP2_QNAME = QName.createQName("{test}prop2");
+	private static final String TEST_VALUE_1 = "myDocument.doc";
+	private static final String TEST_VALUE_2 = "UTF8";
+	private static final String TEST_VALUE_3 = "UTF16";
+	private static final QName PROP_NAME_QNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
+	private static final QName PROP2_QNAME = ContentModel.PROP_ENCODING;
 	private static final String CONTENT_1 = "This is some content";
 	private static final String CONTENT_2 = "This is the cotent modified.";
     
@@ -102,7 +104,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		// Create the node used for tests
         Map<QName, Serializable> bagOfProps = createTypePropertyBag();
         bagOfProps.put(ContentModel.PROP_MIME_TYPE, "text/plain");
-        bagOfProps.put(ContentModel.PROP_ENCODING, "UTF-8");
+        bagOfProps.put(ContentModel.PROP_ENCODING, TEST_VALUE_2);
         
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
@@ -135,8 +137,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private Map<QName, Serializable> createTypePropertyBag()
 	{
 		Map<QName, Serializable> result = new HashMap<QName, Serializable>();
-		result.put(PROP1_QNAME, TEST_VALUE_1);
-		result.put(PROP2_QNAME, TEST_VALUE_2);
+		result.put(PROP_NAME_QNAME, TEST_VALUE_1);
 		return result;
 	}
 	
@@ -169,6 +170,20 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		// Check that the working copy owner has been set correctly
 		assertEquals(this.userNodeRef, this.nodeService.getProperty(workingCopy, ContentModel.PROP_WORKING_COPY_OWNER));
 		
+		// Check that the working copy name has been set correctly
+		String workingCopyLabel = ((CheckOutCheckInServiceImpl)this.applicationContext.getBean("checkOutCheckInServiceImpl")).getWorkingCopyLabel();
+		String workingCopyName = (String)this.nodeService.getProperty(workingCopy, PROP_NAME_QNAME);
+		if (workingCopyLabel == null || workingCopyLabel.length() == 0)
+		{
+			assertEquals("myDocument.doc", workingCopyName);
+		}
+		else
+		{
+			assertEquals(
+					"myDocument " + workingCopyLabel + ".doc",
+					workingCopyName);
+		}
+		
 		// Ensure that the content has been copied correctly
 		ContentReader contentReader = this.contentService.getReader(this.nodeRef);
 		assertNotNull(contentReader);
@@ -196,7 +211,8 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		
 		// Test check-in with content
         NodeRef workingCopy3 = checkout();
-		this.nodeService.setProperty(workingCopy3, PROP1_QNAME, TEST_VALUE_2);
+		this.nodeService.setProperty(workingCopy3, PROP_NAME_QNAME, TEST_VALUE_2);
+		this.nodeService.setProperty(workingCopy3, PROP2_QNAME, TEST_VALUE_3);
         ContentWriter tempWriter = this.contentService.getWriter(workingCopy3);
 		assertNotNull(tempWriter);
 		tempWriter.putContent(CONTENT_2);
@@ -225,11 +241,13 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		assertNotNull(versionContentReader);
 		assertEquals(CONTENT_1, versionContentReader.getContentString());		
 		
-		// Check the versioned values and the checked in values
-		String versionedValue = (String)this.nodeService.getProperty(versionNodeRef, PROP1_QNAME);
-		assertEquals(TEST_VALUE_1, versionedValue);
-		String checkedInValue = (String)this.nodeService.getProperty(origNodeRef, PROP1_QNAME);
-		assertEquals(TEST_VALUE_2, checkedInValue);
+		// Check that the name is not updated during the check-in
+		assertEquals(TEST_VALUE_1, this.nodeService.getProperty(versionNodeRef, PROP_NAME_QNAME));
+		assertEquals(TEST_VALUE_1, this.nodeService.getProperty(origNodeRef, PROP_NAME_QNAME));
+		
+		// Check that the other properties are updated during the check-in
+		assertEquals(TEST_VALUE_2, this.nodeService.getProperty(versionNodeRef, PROP2_QNAME));
+		assertEquals(TEST_VALUE_3, this.nodeService.getProperty(origNodeRef, PROP2_QNAME));
 		
 		// Cancel the check out after is has been left checked out
 		this.cociService.cancelCheckout(workingCopy3);
