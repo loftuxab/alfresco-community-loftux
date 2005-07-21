@@ -183,7 +183,7 @@ public class NavigationBean
    {
       return this.currentNodeId;
    }
-   
+
    /**
     * Set the node Id of the current folder/space container node.
     * <p>
@@ -242,14 +242,14 @@ public class NavigationBean
          {
             throw new AlfrescoRuntimeException("Cannot retrieve current Node if NodeId is null!");
          }
-         
+
          if (s_logger.isDebugEnabled())
             s_logger.debug("Caching properties for node id: " + this.currentNodeId);
-         
+
          // build a node which components on the JSP page can bind too
          NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
          Node node = new Node(nodeRef, this.nodeService);
-         
+
          // early init properties for this node (by getProperties() call)
          // resolve icon in-case one has not been set
          Map<String, Object> props = node.getProperties();
@@ -258,25 +258,25 @@ public class NavigationBean
             props.put("icon", NewSpaceWizard.SPACE_ICON_DEFAULT);
          }
          Path path = this.nodeService.getPath(nodeRef);
-         
+
          // resolve CIFS network folder location for this node
          NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
          String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
-         
+
          // TODO: PHH to remove next line of code
          //       once he removes the JavaScript output in browse.jsp after adding FireFox plugin
          //       because the JavaScript string escaping of the '\' character will not be required :)
-         cifsPath = Utils.replace(cifsPath, "\\", "\\\\");
-         
+         //cifsPath = Utils.replace(cifsPath, "\\", "\\\\");
+
          node.getProperties().put("cifsPath", cifsPath);
          node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
-         
+
          this.currentNode = node;
       }
-      
+
       return this.currentNode;
    }
-   
+
    /**
     * @return Returns the breadcrumb handler elements representing the location path of the UI.
     */
@@ -443,7 +443,7 @@ public class NavigationBean
       private String label;
       private NodeRef ref;
    }
-   
+
    
    // ------------------------------------------------------------------------------
    // Private data

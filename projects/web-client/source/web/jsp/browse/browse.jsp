@@ -36,7 +36,7 @@
    
    <%-- Main outer table --%>
    <table cellspacing=0 cellpadding=2>
-      
+
       <%-- Title bar --%>
       <tr>
          <td colspan=2>
@@ -81,16 +81,19 @@
                                  <div class="mainSubText"><h:outputText value="#{msg.network_folder}" id="msg41" />:
                                     <%-- TODO: PHH to add plugin for file:// click handler in FireFox --%>
                                     <%--       then remove the javascript and just leave the <actionlink> tag inside the <div> as normal --%>
+                                    <%--  tmp PHH
                                     <script>
                                        if (document.all)
                                        {
-                                          document.write('<a:actionLink value="#{NavigationBean.nodeProperties.cifsPathLabel}" href="#{NavigationBean.nodeProperties.cifsPath}" target="new" id="cifs1" />');
+                                          document.write('   --%>
+                                          <a:actionLink value="#{NavigationBean.nodeProperties.cifsPathLabel}" href="#{NavigationBean.nodeProperties.cifsPath}" target="new" id="cifs1" />
+                                          <%-- ');
                                        }
                                        else
                                        {
                                           document.write('<h:outputText value="#{NavigationBean.nodeProperties.cifsPathLabel}" id="cifs2" />');
                                        }
-                                    </script>
+                                    </script>          --%>
                                   </div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
