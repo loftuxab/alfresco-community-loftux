@@ -195,7 +195,7 @@
       <tar destfile="${dist.dir}/${jboss.dist.filename}.tar" longfile="gnu">
          <tarfileset dir="${installer.project.dir}" 
                      includes="AlfrescoTest.pdf,license.txt,notice.txt,README_jboss_linux.txt,start_oo.sh,stop_oo.sh" />
-         <tarfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.sh,**/bin/*.bat" />
+         <tarfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.bat" />
          <tarfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
          <tarfileset dir="${repository.project.dir}/${config.dir.name}"
