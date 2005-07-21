@@ -20,9 +20,9 @@
             type="long" >
          <generator class="increment" />
       </id>
-      <property name="transactionId" column="txn_id" length="36" not-null="true"/>
-      <property name="eventType" column="event_type" length="36" not-null="true" />
-      <property name="primaryNodeRef" column="primary_noderef" length="250" not-null="true"/>
+      <property name="transactionId" column="txn_id" index="idx_txn_events" length="36" not-null="true"/>
+      <property name="primaryNodeRef" column="primary_noderef" index="idx_txn_events" length="250" not-null="true"/>
+      <property name="eventType" column="event_type" index="idx_txn_events" length="36" not-null="true" />
       <property name="secondaryNodeRef" column="secondary_noderef" length="250" not-null="false"/>
       <property name="aspectTypeQName" column="aspect_type_qname" length="250" not-null="false"/>
       <property name="assocTypeQName" column="assoc_type_qname" length="250" not-null="false"/>
