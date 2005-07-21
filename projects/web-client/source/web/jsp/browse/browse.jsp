@@ -79,22 +79,8 @@
                                  <div class="mainSubText"><h:outputText value="#{msg.view_description}" id="msg3" /></div>
                                  <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
                                  <div class="mainSubText"><h:outputText value="#{msg.network_folder}" id="msg41" />:
-                                    <%-- TODO: PHH to add plugin for file:// click handler in FireFox --%>
-                                    <%--       then remove the javascript and just leave the <actionlink> tag inside the <div> as normal --%>
-                                    <%--  tmp PHH
-                                    <script>
-                                       if (document.all)
-                                       {
-                                          document.write('   --%>
                                           <a:actionLink value="#{NavigationBean.nodeProperties.cifsPathLabel}" href="#{NavigationBean.nodeProperties.cifsPath}" target="new" id="cifs1" />
-                                          <%-- ');
-                                       }
-                                       else
-                                       {
-                                          document.write('<h:outputText value="#{NavigationBean.nodeProperties.cifsPathLabel}" id="cifs2" />');
-                                       }
-                                    </script>          --%>
-                                  </div>
+                                 </div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
                               <td width=100 style="padding-left:2px">

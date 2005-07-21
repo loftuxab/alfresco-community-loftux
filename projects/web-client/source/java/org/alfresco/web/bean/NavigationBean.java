@@ -263,11 +263,6 @@ public class NavigationBean
          NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
          String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
 
-         // TODO: PHH to remove next line of code
-         //       once he removes the JavaScript output in browse.jsp after adding FireFox plugin
-         //       because the JavaScript string escaping of the '\' character will not be required :)
-         //cifsPath = Utils.replace(cifsPath, "\\", "\\\\");
-
          node.getProperties().put("cifsPath", cifsPath);
          node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
 
