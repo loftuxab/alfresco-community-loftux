@@ -256,7 +256,6 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
     {
         // Create a new versionable node
         NodeRef versionableNode = createNewVersionableNode();
-        Set<QName> origAspects = this.dbNodeService.getAspects(versionableNode);
         
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
@@ -278,7 +277,6 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
     {
         // Create a new versionable node
         NodeRef versionableNode = createNewVersionableNode();
-        Set<QName> origAspects = this.dbNodeService.getAspects(versionableNode);
         
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);

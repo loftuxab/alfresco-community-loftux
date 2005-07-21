@@ -29,13 +29,7 @@ import org.alfresco.service.cmr.version.Version;
  * @author Roy Wetherall
  */
 public class ContentServiceImplTest extends BaseVersionStoreTest
-{
-    /**
-     * Error message
-     */
-    private final static String MSG_ERR = 
-        "This operation is not supported by a version store implementation of the content service.";
-    
+{   
     /**
      * Test content data
      */

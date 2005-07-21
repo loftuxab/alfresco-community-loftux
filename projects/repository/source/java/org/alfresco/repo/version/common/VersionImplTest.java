@@ -179,7 +179,7 @@ public class VersionImplTest extends TestCase
     {
         try
         {
-            VersionImpl badVersion = new VersionImpl(this.versionProperties, null);
+            new VersionImpl(this.versionProperties, null);
             fail("It is invalid to create a version object without a node ref specified.");
         }
         catch (VersionServiceException exception)

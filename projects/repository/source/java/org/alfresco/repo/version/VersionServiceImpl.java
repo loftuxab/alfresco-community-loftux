@@ -21,12 +21,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.version.common.AbstractVersionServiceImpl;
@@ -38,7 +38,6 @@ import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
 import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -50,6 +49,8 @@ import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.version.VersionServiceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.ParameterCheck;
 
 /**
  * The version service implementation.
@@ -79,17 +80,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     /**
      * The repository searcher
      */
-    private SearchService searcher;       
-	
-    /**
-     * The generic content service
-     */
-    private ContentService contentService;
-    
-    /**
-     * The version store content store
-     */
-    private ContentStore versionContentStore;		
+    private SearchService searcher;       	
     
     /**
      * The version cache
@@ -125,27 +116,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     {
         this.versionCounterService = versionCounterService;
     }    
-    
-    /**
-     * Set the generic content service
-     * 
-     * @param contentService  the content service
-     */
-    public void setContentService(ContentService contentService)
-    {
-        this.contentService = contentService;
-    }
-    
-    /**
-     * Sets the version content store 
-     * 
-     * @param versionContentStore  the version content store
-     */
-    public void setVersionContentStore(
-            ContentStore versionContentStore)
-    {
-        this.versionContentStore = versionContentStore;
-    }
     
 	/**
 	 * Initialise method
@@ -528,7 +498,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             properties.put(PROP_QNAME_META_DATA_NAME, entry.getKey());
             properties.put(PROP_QNAME_META_DATA_VALUE, entry.getValue());
             
-            ChildAssociationRef newRef = this.dbNodeService.createNode(
+            this.dbNodeService.createNode(
                     versionNodeRef,
                     CHILD_QNAME_VERSION_META_DATA, 
                     CHILD_QNAME_VERSION_META_DATA, 
@@ -568,21 +538,11 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             // Set the qname of the association
             properties.put(PROP_QNAME_ASSOC_TYPE_QNAME, targetAssoc.getTypeQName());
             
-            // Need to determine whether the target is versioned or not
-            NodeRef versionHistoryRef = getVersionHistoryNodeRef(targetAssoc.getTargetRef());
-            if (versionHistoryRef == null)
-            {
-                // Set the reference property to point to the child node
-                properties.put(ContentModel.PROP_REFERENCE, targetAssoc.getTargetRef());
-            }
-            else
-            {
-                // Set the reference property to point to the version history
-                properties.put(ContentModel.PROP_REFERENCE, versionHistoryRef);
-            }
+            // Set the reference property to point to the child node
+            properties.put(ContentModel.PROP_REFERENCE, targetAssoc.getTargetRef());
             
             // Create child version reference
-            ChildAssociationRef newRef = this.dbNodeService.createNode(
+            this.dbNodeService.createNode(
                     versionNodeRef,
 					CHILD_QNAME_VERSIONED_ASSOCS, 
                     CHILD_QNAME_VERSIONED_ASSOCS, 
@@ -608,21 +568,11 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             properties.put(PROP_QNAME_IS_PRIMARY, Boolean.valueOf(childAssocRef.isPrimary()));
             properties.put(PROP_QNAME_NTH_SIBLING, Integer.valueOf(childAssocRef.getNthSibling()));
             
-            // Need to determine whether the child is versioned or not
-            NodeRef versionHistoryRef = getVersionHistoryNodeRef(childAssocRef.getChildRef());
-            if (versionHistoryRef == null)
-            {
-                // Set the reference property to point to the child node
-                properties.put(ContentModel.PROP_REFERENCE, childAssocRef.getChildRef());
-            }
-            else
-            {
-                // Set the reference property to point to the version history
-                properties.put(ContentModel.PROP_REFERENCE, versionHistoryRef);
-            }
+            // Set the reference property to point to the child node
+            properties.put(ContentModel.PROP_REFERENCE, childAssocRef.getChildRef());
             
             // Create child version reference
-            ChildAssociationRef newRef = this.dbNodeService.createNode(
+            this.dbNodeService.createNode(
                     versionNodeRef,
 					CHILD_QNAME_VERSIONED_CHILD_ASSOCS,
                     CHILD_QNAME_VERSIONED_CHILD_ASSOCS, 
@@ -850,5 +800,122 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             // Raise exception to indicate version aspect is not present
             throw new AspectMissingException(aspectRef, nodeRef);
         }
-    }
+    }	
+    
+    /**
+     * @see org.alfresco.cms.version.VersionService#revert(NodeRef)
+     */
+    public void revert(NodeRef nodeRef) 
+    	throws AspectMissingException 
+    {
+		// First check that the versionable aspect is present
+		checkForVersionAspect(nodeRef);
+		
+		revert(nodeRef, getCurrentVersion(nodeRef));
+	}
+
+    /**
+     * @see org.alfresco.cms.version.VersionService#revert(NodeRef, Version)
+     */
+	public void revert(NodeRef nodeRef, Version version) 
+		throws AspectMissingException 
+	{
+		// Check the mandatory parameters
+		ParameterCheck.mandatory("nodeRef", nodeRef);
+		ParameterCheck.mandatory("version", version);
+		
+		// First check that the versionable aspect is present
+		checkForVersionAspect(nodeRef);
+		
+		NodeRef versionNodeRef = version.getNodeRef();
+		
+		// Revert the property values
+		this.nodeService.setProperties(nodeRef, this.nodeService.getProperties(versionNodeRef));
+		
+		// Apply/remove the aspects as required
+		Set<QName> aspects = new HashSet<QName>(this.nodeService.getAspects(nodeRef));
+		for (QName versionAspect : this.nodeService.getAspects(versionNodeRef)) 
+		{
+			if (aspects.contains(versionAspect) == false)
+			{
+				this.nodeService.addAspect(nodeRef, versionAspect, null);
+			}
+			else
+			{
+				aspects.remove(versionAspect);
+			}
+		}
+		for (QName aspect : aspects) 
+		{
+			this.nodeService.removeAspect(nodeRef, aspect);
+		}
+		// TODO do we need to manually re-apply the versionable aspect (since it is not versioned)
+		
+		// Add/remove the child nodes
+		List<ChildAssociationRef> children = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(nodeRef));
+		for (ChildAssociationRef versionedChild : this.nodeService.getChildAssocs(versionNodeRef)) 
+		{
+			if (children.contains(versionedChild) == false)
+			{			
+				if (this.nodeService.exists(versionedChild.getChildRef()) == true)
+				{
+					// The node was a primary child of the parent, but that is no longer the case.  Dispite this
+					// the node still exits so this means it has been moved.
+					// The best thing to do in this situation will be to re-add the node as a child, but it will not
+					// be a primary child.
+					this.nodeService.addChild(nodeRef, versionedChild.getChildRef(), versionedChild.getTypeQName(), versionedChild.getQName());
+				}
+				else
+				{
+					// TODO if the node no longer exists it would be nice to be able to recover the node from the
+					//      version store (if it was versioned)
+				}
+			}
+			else
+			{
+				children.remove(versionedChild);
+			}
+		}
+		for (ChildAssociationRef ref : children) 
+		{
+			this.nodeService.removeChild(nodeRef, ref.getChildRef());
+		}
+		
+		// TODO currently causes hibernate integrity error?
+		// Add/remove the target associations
+		//for (AssociationRef assocRef : this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL)) 
+		//{
+		//	this.nodeService.removeAssociation(assocRef.getSourceRef(), assocRef.getTargetRef(), assocRef.getTypeQName());
+		//}		
+		//for (AssociationRef versionedAssoc : this.nodeService.getTargetAssocs(versionNodeRef, RegexQNamePattern.MATCH_ALL)) 
+		//{
+		//	if (this.nodeService.exists(versionedAssoc.getTargetRef()) == true)
+		//	{
+		//		this.nodeService.createAssociation(nodeRef, versionedAssoc.getTargetRef(), versionedAssoc.getTypeQName());
+		//	}
+		//	else
+		//	{
+		//		// TODO we should restore this from the version service if possible
+		//	}
+		//}	
+		
+		// TODO what do we do about the version label (do we reset it the reverted label??)
+	}
+
+	/**
+	 * @see org.alfresco.cms.version.VersionService#deleteVersionHistory(NodeRef)
+	 */
+	public void deleteVersionHistory(NodeRef nodeRef) 
+		throws AspectMissingException 
+	{
+		// First check that the versionable aspect is present
+		checkForVersionAspect(nodeRef);
+		
+		// Get the version history node for the node is question and delete it
+		NodeRef versionHistoryNodeRef = getVersionHistoryNodeRef(nodeRef);
+		this.dbNodeService.deleteNode(versionHistoryNodeRef);
+		
+		// Reset the version label property on the versionable node
+		this.nodeService.setProperty(nodeRef, ContentModel.PROP_VERSION_LABEL, null);
+	}
 }

@@ -22,14 +22,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
+import junit.framework.TestCase;
+
 import org.alfresco.repo.version.VersionStoreConst;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionDoesNotExistException;
 import org.alfresco.service.cmr.version.VersionServiceException;
-
-import junit.framework.TestCase;
 
 /**
  * VersionHistoryImpl Unit Test Class
@@ -103,7 +103,7 @@ public class VersionHistoryImplTest extends TestCase
     {
         try
         {
-            VersionHistoryImpl vh = new VersionHistoryImpl(null);
+            new VersionHistoryImpl(null);
             fail();
         }
         catch(VersionServiceException exception)
@@ -209,7 +209,6 @@ public class VersionHistoryImplTest extends TestCase
         assertNotNull(versions1);
         assertEquals(versions1.size(), 2);
         
-        boolean isFirst = true;
         for (Version version : versions1)
         {
             String versionLabel = version.getVersionLabel();
@@ -246,7 +245,7 @@ public class VersionHistoryImplTest extends TestCase
         
         try
         {
-            Version version = vh.getVersion("invalidLabel");
+            vh.getVersion("invalidLabel");
             fail("An exception should have been thrown if the version can not be retrieved.");
         }
         catch (VersionDoesNotExistException exception)

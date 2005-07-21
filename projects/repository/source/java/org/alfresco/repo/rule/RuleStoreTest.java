@@ -22,7 +22,6 @@ import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.repo.rule.common.RuleTypeImpl;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
@@ -46,11 +45,6 @@ public class RuleStoreTest extends BaseRuleTest
 	 * The rule store
 	 */
 	private RuleStoreImpl ruleStore;
-    
-    /**
-     * The service registry
-     */
-    private ServiceRegistry serviceRegistry;
 
     /**
      * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpInTransaction()
@@ -61,7 +55,6 @@ public class RuleStoreTest extends BaseRuleTest
         super.onSetUpInTransaction();
 		
 		this.ruleStore = (RuleStoreImpl)applicationContext.getBean("ruleStore");
-        this.serviceRegistry = (ServiceRegistry)this.applicationContext.getBean("serviceRegistry");
         
         // Make the test node actionable
         makeTestNodeActionable();
@@ -260,7 +253,7 @@ public class RuleStoreTest extends BaseRuleTest
             for (int i = 0; i < 100; i++)
             {
                 NodeRef nodeRef = nodes[i];
-                List<RuleImpl> rules = (List<RuleImpl>)this.ruleStore.get(nodeRef, true);
+                List<? extends Rule> rules = this.ruleStore.get(nodeRef, true);
                 assertNotNull(rules);
                 assertEquals(10, rules.size());
             }

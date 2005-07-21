@@ -143,4 +143,50 @@ public interface VersionService
 	 * @return			the version object for the current version
 	 */
 	public Version getCurrentVersion(NodeRef nodeRef);
+	
+	/**
+	 * The node reference will be reverted to the current version.
+	 * 
+	 * @see VersionService#revert(NodeRef, Version)
+	 * 
+	 * @param 	nodeRef					the node reference
+	 * @throws	AspectMissingException	thrown if the version aspect is missing
+	 */
+	public void revert(NodeRef nodeRef)
+		throws AspectMissingException;
+	
+	/**
+	 * Revert the state of the node to the specified version.  
+	 * <p>
+	 * Any changes made to the node will be lost and the state of the node will reflect
+	 * that of the node when the node was versioned.
+	 * <p>
+	 * The version label property on the node reference will be changed to reflect the 
+	 * associated version. ???
+	 * <p>
+	 * If the node is further versioned then the new version will be created at the head of 
+	 * the version history graph.  A branch will not be created.
+	 * 
+	 * @param 	nodeRef			the node reference
+	 * @param 	version			the version to revert to
+	 * @throws 	AspectMissingException
+	 * 							thrown if the version aspect is missing
+	 */
+	public void revert(NodeRef nodeRef, Version version)
+		throws AspectMissingException;
+	
+	/**
+	 * Delete the version history associated with a node reference.
+	 * <p>
+	 * This operation is perminant, all versions in the version history are
+	 * deleted and cannot be retrieved.
+	 * <p>
+	 * The current version label for the node reference is reset and any subsequent versions
+	 * of the node will result in a new version history being created.
+	 * 
+	 * @param 	nodeRef					the node reference
+	 * @throws	AspectMissingException	thrown if the version aspect is missing
+	 */
+	public void deleteVersionHistory(NodeRef nodeRef)
+		throws AspectMissingException;
 }

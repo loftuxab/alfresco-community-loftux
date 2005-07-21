@@ -36,7 +36,6 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
-import org.alfresco.service.cmr.repository.PropertyException;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
@@ -231,7 +230,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     /**
      * @throws UnsupportedOperationException always
      */
-    public void addAspect(NodeRef nodeRef, QName aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException, PropertyException
+    public void addAspect(NodeRef nodeRef, QName aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
@@ -377,16 +376,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
             QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_QNAME);
             
             if (qnamePattern.isMatch(qName) == true)
-            {
-                // Check to see if the versioned node is a version history
-                QName classRef = this.dbNodeService.getType(referencedNode);
-                if (TYPE_QNAME_VERSION_HISTORY.equals(classRef) == true)
-                {
-                    // Return a reference to the node in the correct workspace
-                    String childRefId = (String)this.dbNodeService.getProperty(referencedNode, PROP_QNAME_VERSIONED_NODE_ID);
-                    childRef = new NodeRef(nodeRef.getStoreRef(), childRefId);                                                
-                }
-                
+            {               
                 // Retrieve the isPrimary and nthSibling values of the forzen child association
                 QName assocType = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_TYPE_QNAME);
                 boolean isPrimary = ((Boolean)this.dbNodeService.getProperty(childRef, PROP_QNAME_IS_PRIMARY)).booleanValue();
@@ -458,17 +448,8 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
             QName qName = (QName)this.dbNodeService.getProperty(childRef, PROP_QNAME_ASSOC_TYPE_QNAME);
             
             if (qnamePattern.isMatch(qName) == true)
-            {
-                // Check to see if the versioned node is a version history
-                QName classRef = this.dbNodeService.getType(referencedNode);
-                if (TYPE_QNAME_VERSION_HISTORY.equals(classRef) == true)
-                {
-                    // Return a reference to the node in the correct workspace
-                    String childRefId = (String)this.dbNodeService.getProperty(referencedNode, PROP_QNAME_VERSIONED_NODE_ID);
-                    childRef = new NodeRef(sourceRef.getStoreRef(), childRefId);                    
-                }
-                
-                AssociationRef newAssocRef = new AssociationRef(sourceRef, qName, childRef);
+            {               
+                AssociationRef newAssocRef = new AssociationRef(sourceRef, qName, referencedNode);
                 result.add(newAssocRef);
             }
         }
