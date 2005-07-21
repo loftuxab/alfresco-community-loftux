@@ -38,9 +38,10 @@ public interface FileImporter
      * @param container - the node into which to insert the file or directory
      * @param file - the start point for the import
      * @param recurse - if the start point is a directoty then recurse
+     * @return Returns the number of successfully imported files and directories
      * @throws FileImporterException
      */
-    public void loadFile(NodeRef container, File file, boolean recurse) throws FileImporterException;
+    public int loadFile(NodeRef container, File file, boolean recurse) throws FileImporterException;
     
     /**
      * Load all files or directories that match the file filter in the given directory
@@ -49,9 +50,10 @@ public interface FileImporter
      * @param file
      * @param filter
      * @param recurse
+     * @return Returns the number of successfully imported files and directories
      * @throws FileImporterException
      */
-    public void loadFile(NodeRef container, File file, FileFilter filter, boolean recurse) throws FileImporterException;
+    public int loadFile(NodeRef container, File file, FileFilter filter, boolean recurse) throws FileImporterException;
     
     
     /**
@@ -59,7 +61,8 @@ public interface FileImporter
      * 
      * @param container
      * @param file
+     * @return Returns the number of successfully imported files and directories
      * @throws FileImporterException
      */
-    public void loadFile(NodeRef container, File file) throws FileImporterException;
+    public int loadFile(NodeRef container, File file) throws FileImporterException;
 }

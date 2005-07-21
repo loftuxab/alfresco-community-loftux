@@ -65,33 +65,54 @@ public class FileImporterImpl implements FileImporter
         super();
     }
 
-    public void loadFile(NodeRef container, File file, boolean recurse) throws FileImporterException
+    public int loadFile(NodeRef container, File file, boolean recurse) throws FileImporterException
     {
-        create(container, file, null, recurse);
+        Counter counter = new Counter();
+        create(counter, container, file, null, recurse);
+        return counter.getCount();
     }
 
-    public void loadFile(NodeRef container, File file, FileFilter filter, boolean recurse) throws FileImporterException
+    public int loadFile(NodeRef container, File file, FileFilter filter, boolean recurse) throws FileImporterException
     {
-        create(container, file, filter, recurse);
+        Counter counter = new Counter();
+        create(counter, container, file, filter, recurse);
+        return counter.getCount();
     }
 
-    public void loadFile(NodeRef container, File file) throws FileImporterException
+    public int loadFile(NodeRef container, File file) throws FileImporterException
     {
-        create(container, file, null, false);
+        Counter counter = new Counter();
+        create(counter, container, file, null, false);
+        return counter.getCount();
+    }
+    
+    /** Helper class for mutable int */
+    private static class Counter
+    {
+        private int count = 0;
+        public void increment()
+        {
+            count++;
+        }
+        public int getCount()
+        {
+            return count;
+        }
     }
 
-    private NodeRef create(NodeRef container, File file, FileFilter filter, boolean recurse)
+    private NodeRef create(Counter counter, NodeRef container, File file, FileFilter filter, boolean recurse)
     {
         if (file.isDirectory())
         {
             NodeRef directoryNodeRef = createDirectory(container, file);
+            counter.increment();
             
             if(recurse)
             {
                 File[] files = ((filter == null) ? file.listFiles() : file.listFiles(filter));
                 for(int i = 0; i < files.length; i++)
                 {
-                    create(directoryNodeRef, files[i], filter, recurse);
+                    create(counter, directoryNodeRef, files[i], filter, recurse);
                 }
             }
             
@@ -99,6 +120,7 @@ public class FileImporterImpl implements FileImporter
         }
         else
         {
+            counter.increment();
             return createFile(container, file);
         }
     }

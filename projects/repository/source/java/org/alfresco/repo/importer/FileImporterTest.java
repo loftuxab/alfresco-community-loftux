@@ -33,7 +33,6 @@ import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
@@ -111,14 +110,18 @@ public class FileImporterTest extends TestCase
     {
         FileImporter fileImporter = createFileImporter();
         URL url = this.getClass().getClassLoader().getResource("");
-        fileImporter.loadFile(rootNodeRef, new File(url.getFile()));
+        File root = new File(url.getFile());
+        int count = fileImporter.loadFile(rootNodeRef, new File(url.getFile()));
+        assertEquals("Expected to load a single file", 1, count);
     }
 
     public void testLoadRootNonRecursive2()
     {
         FileImporter fileImporter = createFileImporter();
         URL url = this.getClass().getClassLoader().getResource("");
-        fileImporter.loadFile(rootNodeRef, new File(url.getFile()), null, false);
+        File root = new File(url.getFile());
+        int count = fileImporter.loadFile(rootNodeRef, root, null, false);
+        assertEquals("Expected to load a single file", 1, count);
     }
 
     public void testLoadXMLFiles()
@@ -171,6 +174,7 @@ public class FileImporterTest extends TestCase
      */
     public static final void main(String[] args) throws Exception
     {
+        int exitCode = 0;
 
         int count = 0;
         int target = 1;
@@ -183,20 +187,25 @@ public class FileImporterTest extends TestCase
             UserTransaction tx = test.serviceRegistry.getUserTransaction();
             tx.begin();
 
-            StoreRef spacesStore = new StoreRef(args[0]);
-            if (!test.nodeService.exists(spacesStore))
+            try
             {
-                test.nodeService.createStore(spacesStore.getProtocol(), spacesStore.getIdentifier());
-            }
-            NodeRef storeRoot = test.nodeService.getRootNode(spacesStore);
-            List<NodeRef> location = test.nodeService.selectNodes(storeRoot, args[1], null, test.namespaceService, false);
-            if (location.size() > 0)
-            {
+                StoreRef spacesStore = new StoreRef(args[0]);
+                if (!test.nodeService.exists(spacesStore))
+                {
+                    test.nodeService.createStore(spacesStore.getProtocol(), spacesStore.getIdentifier());
+                }
+
+                NodeRef storeRoot = test.nodeService.getRootNode(spacesStore);
+                List<NodeRef> location = test.nodeService.selectNodes(storeRoot, args[1], null, test.namespaceService, false);
+                if (location.size() == 0)
+                {
+                }
+
                 long start = System.nanoTime();
-                test.createFileImporter().loadFile(location.get(0), new File(args[2]), true);
+                int importCount = test.createFileImporter().loadFile(location.get(0), new File(args[2]), true);
                 long end = System.nanoTime();
                 long first = end-start;
-                System.out.println("Created in " + ((end - start) / 1000000.0));
+                System.out.println("Created in: " + ((end - start) / 1000000.0) + "ms");
                 start = System.nanoTime();
 //                
 //                SearchParameters sp = new SearchParameters();
@@ -216,8 +225,11 @@ public class FileImporterTest extends TestCase
                 tx.commit();
                 end = System.nanoTime();
                 long second = end-start;
-                System.out.println("Commit in " + ((end - start) / 1000000.0));
-                System.out.println("Total "+((first+second)/1000000.0));
+                System.out.println("Committed in: " + ((end - start) / 1000000.0) + "ms");
+                double total = ((first+second)/1000000.0);
+                System.out.println("Total: "+ total + "ms");
+                System.out.println("Imported: " + importCount + " files or directories");
+                System.out.println("Average: " + (importCount / (total / 1000.0)) + " files per second");
 //                
 //                
 //                
@@ -249,11 +261,13 @@ public class FileImporterTest extends TestCase
 //                end = System.nanoTime();
 //                System.out.println(" Checked order in  " + ((end - start) / 1000000.0));
             }
-            else
+            catch (Throwable e)
             {
                 tx.rollback();
-                throw new AlfrescoRuntimeException("Can not find node for import");
+                e.printStackTrace();
+                exitCode = 1;
             }
+            System.exit(exitCode);
         }
     }
 }
