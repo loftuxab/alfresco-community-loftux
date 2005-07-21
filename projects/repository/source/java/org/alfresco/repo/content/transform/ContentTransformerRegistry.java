@@ -363,27 +363,4 @@ public class ContentTransformerRegistry
             return key.hashCode();
         }
     }
-
-    /**
-     * Resets the {@link ContentTransformerRegistry#resetCache() cache}.
-     * <p>
-     * It takes a <b>contentTransformerRegistry</b> job parameter.
-     * 
-     * @author Derek Hulley
-     */
-    public static class CacheResetJob implements Job
-    {
-        public static final String KEY_REGISTRY = "contentTransformerRegistry";
-        
-        public void execute(JobExecutionContext context) throws JobExecutionException
-        {
-            Object registryObj = context.getJobDetail().getJobDataMap().get(KEY_REGISTRY);
-            if (registryObj == null || !(registryObj instanceof ContentTransformerRegistry))
-            {
-                throw new AlfrescoRuntimeException("Job data must contain valid 'contentTransformerRegistry' reference");
-            }
-            ContentTransformerRegistry registry = (ContentTransformerRegistry) registryObj;
-            registry.resetCache();
-        }
-    }
 }
