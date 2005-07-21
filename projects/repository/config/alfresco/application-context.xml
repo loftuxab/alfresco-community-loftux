@@ -280,19 +280,22 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.content.RoutingContentService" >
-            <constructor-arg>
+         <bean class="org.alfresco.repo.content.RoutingContentService">
+            <property name="serviceRegistry">
+               <ref bean="serviceRegistry" />
+            </property>
+            <property name="dictionaryService">
                <ref bean="dictionaryService" />
-            </constructor-arg>
-            <constructor-arg>
+            </property>
+            <property name="nodeService">
                <ref bean="nodeService" />
-            </constructor-arg>
-            <constructor-arg>
+            </property>
+            <property name="transformerRegistry">
                <ref bean="contentTransformerRegistry" />
-            </constructor-arg>
-            <constructor-arg>
+            </property>
+            <property name="store">
                <ref bean="fileContentStore" />
-            </constructor-arg>
+            </property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -300,6 +303,7 @@
             <prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
          </props>
       </property>
+      <!-- use only for debugging
       <property name="postInterceptors">
          <list>
             <ref bean="methodCallLogAdvice" />
@@ -310,6 +314,7 @@
             </bean>
          </list>
       </property>
+      -->
    </bean>
       
    <!--                         -->

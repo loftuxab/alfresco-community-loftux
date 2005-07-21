@@ -71,9 +71,12 @@ public interface ContentService
     /**
      * Gets a writer for the content associated with the given node.
      * <p>
-     * When the writer output stream is closed the node will automatically
+     * When the writer output channel is closed the node will automatically
      * be updated to point to the new
-     * {@link ContentWriter#getContentUrl() content URL}.
+     * {@link ContentWriter#getContentUrl() content URL}.  The <b>size</b>
+     * property will also be set.  The callback operation occurs within
+     * a transaction that will propogate from any transaction present on
+     * the thread responsible for closing the channel.
      * 
      * @param nodeRef a reference to a node with the <b>content</b> aspect.
      * @return Returns a writer for the content associated with the node.

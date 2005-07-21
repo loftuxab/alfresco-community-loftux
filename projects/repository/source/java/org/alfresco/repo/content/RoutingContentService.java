@@ -17,11 +17,16 @@
  */
 package org.alfresco.repo.content;
 
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.filestore.FileContentStore;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.content.transform.ContentTransformerRegistry;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -44,6 +49,7 @@ import org.alfresco.util.TempFileProvider;
  */
 public class RoutingContentService implements ContentService
 {
+    private ServiceRegistry serviceRegistry;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
     /** a registry of all available content transformers */
@@ -54,25 +60,35 @@ public class RoutingContentService implements ContentService
     private ContentStore tempStore;
     
     /**
-     * @param dictionaryService used to check the validity of content node references
-     * @param nodeService the node service that will be used to update nodes after
-     *      content writes
-     * @param store temporary measure to set a working store
+     * Default constructor sets up a temporary store 
      */
-    public RoutingContentService(
-            DictionaryService dictionaryService,
-            NodeService nodeService,
-            ContentTransformerRegistry transformerRegistry,
-            ContentStore store)
+    public RoutingContentService()
     {
-        // TODO: The store root should be set on the store directly and via a config file
-        this.dictionaryService = dictionaryService;
-        this.nodeService = nodeService;
-        this.transformerRegistry = transformerRegistry;
-        this.store = store;
         this.tempStore = new FileContentStore(TempFileProvider.getTempDir().getAbsolutePath());
     }
 
+    // setter for injection
+    public void setServiceRegistry(ServiceRegistry serviceRegistry)
+    {
+        this.serviceRegistry = serviceRegistry;
+    }
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+    public void setTransformerRegistry(ContentTransformerRegistry transformerRegistry)
+    {
+        this.transformerRegistry = transformerRegistry;
+    }
+    public void setStore(ContentStore store)
+    {
+        this.store = store;
+    }
+    
     public ContentReader getReader(NodeRef nodeRef)
     {
         // ensure that the node exists and is of type content
@@ -160,7 +176,7 @@ public class RoutingContentService implements ContentService
         String contentUrl = writer.getContentUrl();
         // need a listener to update the node when the stream closes
         WriteStreamListener listener = new WriteStreamListener(nodeRef, writer);
-        listener.setNodeService(nodeService);
+        listener.setServiceRegistry(serviceRegistry);
         writer.addListener(listener);
         // give back to the client
         return writer;
@@ -234,7 +250,7 @@ public class RoutingContentService implements ContentService
      */
     private static class WriteStreamListener implements ContentStreamListener
     {
-        private NodeService nodeService;
+        private ServiceRegistry serviceRegistry;
         private NodeRef nodeRef;
         private ContentWriter writer;
         
@@ -244,27 +260,51 @@ public class RoutingContentService implements ContentService
             this.writer = writer;
         }
         
-        public void setNodeService(NodeService nodeService)
+        public void setServiceRegistry(ServiceRegistry serviceRegistry)
         {
-            // TODO: Issue - The listener should get the node service from a registry
-            this.nodeService = nodeService;
+            this.serviceRegistry = serviceRegistry;
         }
 
         public void contentStreamClosed() throws ContentIOException
         {
-            // change the content URL property of the node we are listening for
-            String contentUrl = writer.getContentUrl();
-            nodeService.setProperty(
-                    nodeRef,
-                    ContentModel.PROP_CONTENT_URL,
-                    contentUrl);
-            // get the size of the document
-            ContentReader reader = writer.getReader();
-            long length = reader.getLength();
-            nodeService.setProperty(
-                    nodeRef,
-                    ContentModel.PROP_SIZE,
-                    new Long(length));
+            NodeService nodeService = serviceRegistry.getNodeService();
+            
+            // begin a txn
+            UserTransaction txn = serviceRegistry.getUserTransaction();
+            try
+            {
+                txn.begin();
+                // change the content URL property of the node we are listening for
+                String contentUrl = writer.getContentUrl();
+                nodeService.setProperty(
+                        nodeRef,
+                        ContentModel.PROP_CONTENT_URL,
+                        contentUrl);
+                // get the size of the document
+                ContentReader reader = writer.getReader();
+                long length = reader.getLength();
+                nodeService.setProperty(
+                        nodeRef,
+                        ContentModel.PROP_SIZE,
+                        new Long(length));
+                // commit
+                txn.commit();
+            }
+            catch (Throwable e)
+            {
+                try
+                {
+                    if (txn.getStatus() == Status.STATUS_ACTIVE)
+                    {
+                        txn.rollback();
+                    }
+                }
+                catch (SystemException ee)
+                {
+                    ee.printStackTrace();
+                }
+                throw new ContentIOException("Failed to set URL and size upon stream closure", e);
+            }
         }
     }
 }
