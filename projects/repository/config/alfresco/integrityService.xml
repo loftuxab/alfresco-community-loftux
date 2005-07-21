@@ -29,7 +29,7 @@
          <ref bean="integrityDaoService" />
       </property>
       <property name="enabled">
-         <value>true</value>  <!-- on/off switch -->
+         <value>false</value>  <!-- on/off switch -->
       </property>
       <property name="traceOn">
          <value>false</value>  <!-- use only to trace problems -->
@@ -41,7 +41,7 @@
          <value>5</value>  <!-- limit output (exception and log) to the first N violation messages -->
       </property>
       <property name="flushSize" >
-         <value>1000</value>  <!-- number of nodes to process before clearing caches -->
+         <value>100000</value>  <!-- number of nodes to process before clearing caches -->
       </property>
    </bean>
    
