@@ -50,33 +50,78 @@ var alfrescoext =
     {
       if (linkHref.substring(0,5) == "file:")
       {
-			try {
-				var len = 1;
-				var exargs = new Array();
-                                exargs[0] = linkHref;
+         try {
+            var len = 1;
+            var exargs = new Array();
+            exargs[0] = linkHref;
 
-				var lfile = Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
-				lfile.initWithPath("c:\\windows\\explorer.exe");
+            var lfile = Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
 
-				if (lfile.isFile() && lfile.isExecutable()) {
-					try {
-						var process = Components.classes['@mozilla.org/process/util;1'].createInstance(Components.interfaces.nsIProcess);
-						process.init(lfile);
-						exargs = process.run(false, exargs, len);
-						return false;
-					} catch (e) {
-						// foobar!
-					}
-				}
-			}
-			catch(e) {
-				// foobar!
-			}
-			
-                              }
-                              
-    }
-  }
+            // Find path for filemgr exe
+            var prefservice = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+            var prefs = prefservice.getBranch("");
+            var exloc = null;
+
+            if (prefs.getPrefType("alfrescoext.exapp") == prefs.PREF_STRING)
+            {
+              exloc = prefs.getCharPref("alfrescoext.exapp");
+            }
+            if (exloc == null || exloc.length == 0) exloc = "c:\\windows\\explorer.exe";
+
+            // Try launching
+            lfile.initWithPath(exloc);
+
+            if (lfile.isFile() && lfile.isExecutable()) {
+               try {
+                  var process = Components.classes['@mozilla.org/process/util;1'].createInstance(Components.interfaces.nsIProcess);
+                  process.init(lfile);
+                  exargs = process.run(false, exargs, len);
+                  return false;
+               } catch (e) {
+                  // foobar!
+               }
+            }
+            else {
+               alert("Unable to find explorer, please check current options");
+            }
+         }
+         catch(e) {
+            alert("Unable to find explorer, please check current options");
+            // foobar!
+         }
+       }
+     }
+   }, /* end mousedown */
+
+   setOptions: function()
+   {
+      var prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+      var prefs = prefService.getBranch("");
+
+      prefs.setCharPref("alfrescoext.exapp", document.getElementById('exloc').value);
+
+      //window.close();
+      return true;
+   },   /* end setOptions */
+
+   initOptions: function()
+   {
+       var prefservice = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+       var prefs = prefservice.getBranch("");
+       var exloc = null;
+
+       if (prefs.getPrefType("alfrescoext.exapp") == prefs.PREF_STRING)
+       {
+         exloc = prefs.getCharPref("alfrescoext.exapp");
+       }
+
+       if ((exloc != null) && (exloc.length > 0))
+       {
+           document.getElementById('exloc').value = exloc;
+       }
+       return true;
+   } /* end initOptions */
+
 }
 
 window.addEventListener("load",alfrescoext.init,false);

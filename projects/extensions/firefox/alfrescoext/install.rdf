@@ -19,7 +19,7 @@
     <em:description>Adds Alfresco functions.</em:description>
     <em:creator>Paul Holmes-Higgin</em:creator>
     <em:homepageURL>http://www.alfresco.org</em:homepageURL>
-
+    <em:optionsURL>chrome://alfrescoext/content/alfrescoextOptions.xul</em:optionsURL>  
     <em:iconURL>chrome://alfrescoext/content/alf.png</em:iconURL>
 
     <em:file>
