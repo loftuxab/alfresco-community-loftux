@@ -63,6 +63,9 @@
 	  <property name="policyComponent">
 		<ref bean="policyComponent"/>
 	  </property>
+	  <property name="nodeService">
+	  	<ref bean="nodeService"/>
+	  </property>
    </bean>
    
    <bean id="inbound" class="org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter" parent="rule-type-adapter"/>		

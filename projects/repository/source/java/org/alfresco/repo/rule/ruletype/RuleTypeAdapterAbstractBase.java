@@ -24,7 +24,9 @@ import org.alfresco.repo.rule.CommonResourceAbstractBase;
 import org.alfresco.repo.rule.RuleExecution;
 import org.alfresco.repo.rule.RuleRegistration;
 import org.alfresco.repo.rule.common.RuleTypeImpl;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
@@ -50,6 +52,11 @@ public abstract class RuleTypeAdapterAbstractBase extends CommonResourceAbstract
 	 * The rule service
 	 */
     private RuleService ruleService;
+    
+    /**
+     * The node service
+     */
+    private NodeService nodeService;
 	
 	/**
 	 * Get the rule type
@@ -64,16 +71,40 @@ public abstract class RuleTypeAdapterAbstractBase extends CommonResourceAbstract
 		return this.ruleType;
 	}
 
+	/**
+	 * Set the policy component
+	 * 
+	 * @param policyComponent  the policy component
+	 */
 	public void setPolicyComponent(PolicyComponent policyComponent) 
 	{
 		this.policyComponent = policyComponent;
 	}
 	
+	/**
+	 * Set the node service
+	 * 
+	 * @param nodeService  the node service
+	 */
+	public void setNodeService(NodeService nodeService) 
+	{
+		this.nodeService = nodeService;
+	}
+	
+	/**
+	 * Set the rule service
+	 * @param ruleService
+	 */
 	public void setRuleService(RuleService ruleService) 
 	{
 		this.ruleService = ruleService;
 	}
 	
+	/**
+	 * Gets the display label for the rule type
+	 * 
+	 * @return  the display label
+	 */
 	protected abstract String getDisplayLabel();
 	
 	public void init()
@@ -85,8 +116,25 @@ public abstract class RuleTypeAdapterAbstractBase extends CommonResourceAbstract
 		registerPolicyBehaviour();
 	}
 	
+	/**
+	 * Registers the policy behaviour that triggers the rule execution
+	 */
 	protected abstract void registerPolicyBehaviour();
     
+	/**
+	 * Execute the rules of the parents of the actioned upon node
+	 * 
+	 * @param actionedUponNodeRef	the actioned upon node reference
+	 */
+	protected void executeParentRules(NodeRef actionedUponNodeRef)
+	{
+		List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(actionedUponNodeRef);
+		for (ChildAssociationRef assoc : assocs) 
+		{
+			executeRules(assoc.getParentRef(), actionedUponNodeRef);
+		}
+	}
+	
 	/**
 	 * Execute rules that relate to the actionable node for this type on the
 	 * actioned upon node reference.

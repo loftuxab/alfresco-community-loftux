@@ -77,6 +77,9 @@ public class RuleServiceSystemTest extends TestCase
 {
 	static ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
 	
+	/**
+	 * Services used during the tests
+	 */
     private RuleService ruleService;
     private NodeService nodeService;
     private StoreRef testStoreRef;
@@ -102,18 +105,21 @@ public class RuleServiceSystemTest extends TestCase
     private NodeRef catROne;
     private NodeRef catRTwo;
     private NodeRef catRThree;
+    
+    /**
+     * Standard content text
+     */
+    private static final String STANDARD_TEXT_CONTENT = "standardTextContent";
 
+    /**
+     * Test user name and password
+     */
     private static final String USER_NAME = "userName";
     private static final String PWD = "password";  
     
-    /**
-     * 
-     */
-    public RuleServiceSystemTest()
-    {
-        super();
-    }
-	
+	/**
+	 * Setup method
+	 */
 	@Override
     protected void setUp() throws Exception 
     {
@@ -145,6 +151,9 @@ public class RuleServiceSystemTest extends TestCase
         TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);        
     }
     
+	/**
+	 * Create the categories used in the tests
+	 */
     private void createTestCategories()
     {
         // Create the test model
@@ -211,7 +220,8 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
-                getContentProperties()).getChildRef();            
+                getContentProperties()).getChildRef();         
+        addContentToNode(newNodeRef);
         assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));   
         
         Map<QName, Serializable> aspectProps = new HashMap<QName, Serializable>();
@@ -222,6 +232,7 @@ public class RuleServiceSystemTest extends TestCase
         params2.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, ContentModel.ASPECT_SIMPLE_WORKFLOW);
         params2.put(AddFeaturesActionExecutor.PARAM_ASPECT_PROPERTIES, (Serializable)aspectProps);
         
+        // Test that rule can be updated and execute correctly
         rule.removeAllRuleActions();
         rule.addRuleAction(action, params2);
         this.ruleService.addRule(this.nodeRef, rule);
@@ -231,7 +242,8 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
-                getContentProperties()).getChildRef();            
+                getContentProperties()).getChildRef();           
+        addContentToNode(newNodeRef2);
         assertTrue(this.nodeService.hasAspect(newNodeRef2, ContentModel.ASPECT_SIMPLE_WORKFLOW));
         assertEquals("approveStep", this.nodeService.getProperty(newNodeRef2, ContentModel.PROP_APPROVE_STEP));
         assertEquals(false, this.nodeService.getProperty(newNodeRef2, ContentModel.PROP_APPROVE_MOVE));
@@ -281,7 +293,8 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
-                getContentProperties()).getChildRef();        
+                getContentProperties()).getChildRef();     
+		addContentToNode(newNodeRef);
         
 		assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW));   
 		assertEquals("approveStep", this.nodeService.getProperty(newNodeRef, ContentModel.PROP_APPROVE_STEP));
@@ -329,7 +342,9 @@ public class RuleServiceSystemTest extends TestCase
                     this.nodeRef,
                     QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                     QName.createQName(NamespaceService.ALFRESCO_URI, "noAspect"),
-                    ContentModel.TYPE_CONTAINER).getChildRef(); 
+                    ContentModel.TYPE_CONTENT,
+                    getContentProperties()).getChildRef(); 
+            addContentToNode(newNodeRef2);
             assertFalse(this.nodeService.hasAspect(newNodeRef2, ContentModel.ASPECT_VERSIONABLE));
             
             // Check rule gets fired when node contains category value
@@ -339,7 +354,9 @@ public class RuleServiceSystemTest extends TestCase
                     this.nodeRef,
                     QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                     QName.createQName(NamespaceService.ALFRESCO_URI, "hasAspectAndValue"),
-                    ContentModel.TYPE_CONTAINER).getChildRef();  
+                    ContentModel.TYPE_CONTENT,
+                    getContentProperties()).getChildRef();
+            addContentToNode(newNodeRef);
             Map<QName, Serializable> catProps = new HashMap<QName, Serializable>();
             catProps.put(CAT_PROP_QNAME, this.catROne);
             this.nodeService.addAspect(newNodeRef, this.regionCategorisationQName, catProps);
@@ -353,7 +370,9 @@ public class RuleServiceSystemTest extends TestCase
                     this.nodeRef,
                     QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                     QName.createQName(NamespaceService.ALFRESCO_URI, "hasAspectAndValue"),
-                    ContentModel.TYPE_CONTAINER).getChildRef();  
+                    ContentModel.TYPE_CONTENT,
+                    getContentProperties()).getChildRef();  
+            addContentToNode(newNodeRef3);
             Map<QName, Serializable> catProps3 = new HashMap<QName, Serializable>();
             catProps3.put(CAT_PROP_QNAME, this.catRTwo);
             this.nodeService.addAspect(newNodeRef3, this.regionCategorisationQName, catProps3);
@@ -392,13 +411,13 @@ public class RuleServiceSystemTest extends TestCase
         
         this.ruleService.addRule(this.nodeRef, rule);
                 
-        // Check rule does not get fired when a node without the aspect is added
         NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "noAspect"),
                 ContentModel.TYPE_CONTENT,
-                getContentProperties()).getChildRef(); 
+                getContentProperties()).getChildRef();
+        addContentToNode(newNodeRef2);
         
         // Check that the category value has been set
         NodeRef setValue = (NodeRef)this.nodeService.getProperty(newNodeRef2, CAT_PROP_QNAME);
@@ -479,6 +498,7 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef(); 
+        addContentToNode(newNodeRef);
         
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
         
@@ -618,6 +638,7 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef(); 
+        addContentToNode(newNodeRef);
         
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
         
@@ -658,13 +679,27 @@ public class RuleServiceSystemTest extends TestCase
         
         this.ruleService.addRule(this.nodeRef, rule);
          
-        // Create a new node
-        NodeRef newNodeRef = this.nodeService.createNode(
-                this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"),
-                ContentModel.TYPE_CONTENT,
-                getContentProperties()).getChildRef();
+        NodeRef newNodeRef = null;
+        UserTransaction tx = this.serviceRegistry.getUserTransaction();
+        try
+        {
+        	tx.begin();     
+        	
+	        // Create a new node
+	        newNodeRef = this.nodeService.createNode(
+	                this.nodeRef,
+	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+	                QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"),
+	                ContentModel.TYPE_CONTENT,
+	                getContentProperties()).getChildRef();
+	        addContentToNode(newNodeRef);
+	        
+	        tx.commit();
+        }
+        catch (Exception exception)
+        {
+        	throw new RuntimeException(exception);
+        }
         
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
         
@@ -764,7 +799,8 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
-                getContentProperties()).getChildRef();            
+                getContentProperties()).getChildRef();         
+        addContentToNode(newNodeRef);
         assertFalse(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));      
         
         this.ruleService.enableRules(this.nodeRef);
@@ -774,8 +810,23 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
-                getContentProperties()).getChildRef();            
+                getContentProperties()).getChildRef();        
+        addContentToNode(newNodeRef2);
         assertTrue(this.nodeService.hasAspect(newNodeRef2, ContentModel.ASPECT_VERSIONABLE));       
+    }
+    
+    /**
+     * Adds content to a given node. 
+     * <p>
+     * Used to trigger rules of type of incomming.
+     * 
+     * @param nodeRef  the node reference
+     */
+    private void addContentToNode(NodeRef nodeRef)
+    {
+    	ContentWriter contentWriter = this.contentService.getUpdatingWriter(nodeRef);
+    	assertNotNull(contentWriter);
+    	contentWriter.putContent(STANDARD_TEXT_CONTENT);
     }
     
     /**
@@ -804,14 +855,15 @@ public class RuleServiceSystemTest extends TestCase
         try
         {
             // Try and create a node .. should fail since the rule is invalid
-            Map<QName, Serializable> props2 = new HashMap<QName, Serializable>();
+            Map<QName, Serializable> props2 = getContentProperties();
             props2.put(ContentModel.PROP_NAME, "bobbins.doc");
             NodeRef newNodeRef2 = this.nodeService.createNode(
                     this.nodeRef,
                     QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                     QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                    ContentModel.TYPE_CMOBJECT,
+                    ContentModel.TYPE_CONTENT,
                     props2).getChildRef();
+            addContentToNode(newNodeRef2);
             fail("An exception should have been thrown since a mandatory parameter was missing from the condition.");
         }
         catch (RuleServiceException ruleServiceException)
@@ -860,6 +912,7 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
                 props1).getChildRef();   
+		addContentToNode(newNodeRef);
         
         Map<QName, Serializable> map = this.nodeService.getProperties(newNodeRef);
         String value = (String)this.nodeService.getProperty(newNodeRef, ContentModel.PROP_NAME);
@@ -876,6 +929,7 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
                 props2).getChildRef();        
+		addContentToNode(newNodeRef2);
         assertTrue(this.nodeService.hasAspect(
                 newNodeRef2, 
                 ContentModel.ASPECT_VERSIONABLE)); 
@@ -888,7 +942,8 @@ public class RuleServiceSystemTest extends TestCase
 	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
 	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
 	                ContentModel.TYPE_CONTENT,
-                    getContentProperties()).getChildRef();        
+                    getContentProperties()).getChildRef();      
+			addContentToNode(newNodeRef3);
 		}
 		catch (RuleServiceException exception)
 		{
@@ -910,6 +965,7 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
                 propsx).getChildRef();   
+        addContentToNode(newNodeRefx);
         assertFalse(this.nodeService.hasAspect(newNodeRefx, ContentModel.ASPECT_VERSIONABLE));  
         Map<QName, Serializable> propsy = new HashMap<QName, Serializable>();
         propsy.put(ContentModel.PROP_NAME, "bobbins.doc");
@@ -919,7 +975,8 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
-                propsy).getChildRef();        
+                propsy).getChildRef();   
+        addContentToNode(newNodeRefy);
         assertTrue(this.nodeService.hasAspect(
                 newNodeRefy, 
                 ContentModel.ASPECT_VERSIONABLE)); 
@@ -938,7 +995,8 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
-                propsa).getChildRef();   
+                propsa).getChildRef(); 
+        addContentToNode(newNodeRefa);
         assertFalse(this.nodeService.hasAspect(newNodeRefa, ContentModel.ASPECT_VERSIONABLE));  
         Map<QName, Serializable> propsb = new HashMap<QName, Serializable>();
         propsb.put(ContentModel.PROP_NAME, "bobbins.doc");
@@ -948,7 +1006,8 @@ public class RuleServiceSystemTest extends TestCase
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
                 ContentModel.TYPE_CONTENT,
-                propsb).getChildRef();        
+                propsb).getChildRef();   
+        addContentToNode(newNodeRefb);
         assertTrue(this.nodeService.hasAspect(
                 newNodeRefb, 
                 ContentModel.ASPECT_VERSIONABLE)); 
@@ -1055,6 +1114,7 @@ public class RuleServiceSystemTest extends TestCase
 						QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
 						QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
 	                    ContentModel.TYPE_CONTAINER).getChildRef();
+	            addContentToNode(nodeRef);
 				nodeRefs[i] = nodeRef;
 				
 				// Check that the versionable aspect has not yet been applied
