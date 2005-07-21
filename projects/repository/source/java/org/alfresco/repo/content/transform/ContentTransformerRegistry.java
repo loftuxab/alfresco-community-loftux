@@ -61,19 +61,16 @@ public class ContentTransformerRegistry
     private Lock transformationCacheWriteLock;
     
     /**
-     * @param transformers all the available transformers that the registry can
-     *      work with
      * @param mimetypeMap all the mimetypes available to the system
      */
-    public ContentTransformerRegistry(
-            List<ContentTransformer> transformers,
-            MimetypeMap mimetypeMap)
+    public ContentTransformerRegistry(MimetypeMap mimetypeMap)
     {
-        Assert.notEmpty(transformers, "At least one content transformer must be supplied");
         Assert.notNull(mimetypeMap, "The MimetypeMap is mandatory");
-        this.transformers = transformers;
         this.mimetypeMap = mimetypeMap;
+        
+        this.transformers = Collections.emptyList();   // just in case it isn't set
         transformationCache = new HashMap<TransformationKey, List<ContentTransformer>>(17);
+        
         accessCount = 0;
         // create lock objects for access to the cache
         ReadWriteLock transformationCacheLock = new ReentrantReadWriteLock();
@@ -81,6 +78,53 @@ public class ContentTransformerRegistry
         transformationCacheWriteLock = transformationCacheLock.writeLock();
     }
     
+    /**
+     * Provides a list of explicit transformers to use.
+     * 
+     * @param transformations list of ( list of ( (from-mimetype)(to-mimetype)(transformer) ) )
+     */
+    public void setExplicitTransformations(List<List<Object>> transformations)
+    {
+        for (List<Object> list : transformations)
+        {
+            if (list.size() != 3)
+            {
+                throw new AlfrescoRuntimeException(
+                        "Explicit transformation is 'from-mimetype', 'to-mimetype' and 'transformer': \n" +
+                        "   list: " + list);
+            }
+            try
+            {
+                String sourceMimetype = (String) list.get(0);
+                String targetMimetype = (String) list.get(1);
+                ContentTransformer transformer = (ContentTransformer) list.get(2);
+                // create the transformation
+                TransformationKey key = new TransformationKey(sourceMimetype, targetMimetype);
+                // bypass all discovery and plug this directly into the cache
+                transformationCache.put(key, Collections.singletonList(transformer));
+            }
+            catch (ClassCastException e)
+            {
+                throw new AlfrescoRuntimeException(
+                        "Explicit transformation is 'from-mimetype', 'to-mimetype' and 'transformer': \n" +
+                        "   list: " + list);
+            }
+        }
+    }
+    
+    /**
+     * Provides a list of self-discovering transformers that the registry will fall
+     * back on if a transformation is not available from the explicitly set
+     * transformations.
+     * 
+     * @param transformers all the available transformers that the registry can
+     *      work with
+     */
+    public void setTransformers(List<ContentTransformer> transformers)
+    {
+        this.transformers = transformers;
+    }
+
     /**
      * Resets the transformation cache.  This allows a fresh analysis of the best
      * conversions based on actual average performance of the transformers.

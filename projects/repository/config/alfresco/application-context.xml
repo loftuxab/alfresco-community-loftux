@@ -246,24 +246,47 @@
       </constructor-arg>
    </bean>
    
+   <!-- Content Transformations -->
+   <bean id="transformer.StringExtracter" class="org.alfresco.repo.content.transform.StringExtractingContentTransformer" />
+   <bean id="transformer.BinaryPassThrough" class="org.alfresco.repo.content.transform.BinaryPassThroughContentTransformer" />
+   <bean id="transformer.PdfBox" class="org.alfresco.repo.content.transform.PdfBoxContentTransformer" />
+   <bean id="transformer.Poi" class="org.alfresco.repo.content.transform.PoiHssfContentTransformer" />
+   <bean id="transformer.TextMining" class="org.alfresco.repo.content.transform.TextMiningContentTransformer" />
+
    <bean id="contentTransformerRegistry" class="org.alfresco.repo.content.transform.ContentTransformerRegistry" >
       <constructor-arg>
+         <ref bean="mimetypeMap" />
+      </constructor-arg>
+      <!-- explicit transformations to use -->
+      <property name="explicitTransformations">
+         <list>
+            <list>
+               <value>application/msword</value>   <!-- from mimetype -->
+               <value>text/plain</value>           <!-- to mimetype -->
+               <ref bean="transformer.TextMining" />
+            </list>
+            <list>
+               <value>application/pdf</value>
+               <value>text/plain</value>
+               <ref bean="transformer.PdfBox" />
+            </list>
+         </list>
+      </property>
+      <!-- transformers to fall back on in the event that an explicit transformation isn't defined -->
+      <property name="transformers">
          <list>
             <bean class="org.alfresco.repo.content.transform.UnoContentTransformer">
                <constructor-arg>
                   <ref bean="mimetypeMap" />
                </constructor-arg>
             </bean>
-            <bean class="org.alfresco.repo.content.transform.StringExtractingContentTransformer" />
-            <bean class="org.alfresco.repo.content.transform.BinaryPassThroughContentTransformer" />
-            <bean class="org.alfresco.repo.content.transform.PdfBoxContentTransformer" />
-            <bean class="org.alfresco.repo.content.transform.PoiHssfContentTransformer" />
-            <bean class="org.alfresco.repo.content.transform.TextMiningContentTransformer" />
+            <ref bean="transformer.StringExtracter" />
+            <ref bean="transformer.BinaryPassThrough" />
+            <ref bean="transformer.PdfBox" />
+            <ref bean="transformer.Poi" />
+            <ref bean="transformer.TextMining" />
          </list>
-      </constructor-arg>
-      <constructor-arg>
-         <ref bean="mimetypeMap" />
-      </constructor-arg>
+      </property>
    </bean>
    
    <bean id="fileContentStore" class="org.alfresco.repo.content.filestore.FileContentStore">
@@ -831,44 +854,20 @@
          </bean>
       </property>
       <property name="startDelay">
-         <value>10000</value>                     <!-- start after an hour -->
+         <value>60000</value>                     <!-- start after 10 minutes -->
       </property>
       <property name="repeatInterval">
-         <value>10000</value>                      <!-- repeat every 24 hour -->
+         <value>3600000</value>                      <!-- repeat every hour -->
       </property>
    </bean>
 
-   <bean id="contentTransformerCacheResetTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
-      <property name="jobDetail">
-         <bean id="contentTransformerCacheResetJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
-            <property name="jobClass">
-               <value>org.alfresco.repo.content.transform.ContentTransformerRegistry$CacheResetJob</value>
-            </property>
-            <property name="jobDataAsMap">
-               <map>
-                  <entry key="contentTransformerRegistry">
-                     <ref bean="contentTransformerRegistry" />
-                  </entry>
-               </map>
-            </property>
-         </bean>
-      </property>
-      <property name="startDelay">
-         <value>600000</value>                     <!-- start after 10 minutes -->
-      </property>
-      <property name="repeatInterval">
-         <value>600000</value>                      <!-- repeat every 10 minutes -->
-      </property>
-   </bean>
-
-   <!-- passing a list to the SchedulerFactoryBean only instantiates the first one -->   
+   <!-- Scheduled tasks -->   
    <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
       <property name="triggers">
          <list>
             <ref local="tempFileCleanerTrigger"/>
            <!-- <ref local="fileContentStoreCleanerTrigger"/> -->
-            <ref local="contentTransformerCacheResetTrigger"/>
-			<ref local="ftsIndexerTrigger"/>
+            <ref local="ftsIndexerTrigger"/>
          </list>
        </property>
    </bean>  

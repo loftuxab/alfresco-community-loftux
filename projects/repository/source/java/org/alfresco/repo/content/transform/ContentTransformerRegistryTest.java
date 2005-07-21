@@ -18,6 +18,7 @@
 package org.alfresco.repo.content.transform;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.alfresco.repo.content.MimetypeMap;
@@ -84,7 +85,8 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         transformers.add(new DummyTransformer(A, D, 1.0, 20L));
         transformers.add(new DummyTransformer(A, D, 1.0, 20L));
         // create the dummyRegistry
-        dummyRegistry = new ContentTransformerRegistry(transformers, mimetypeMap);
+        dummyRegistry = new ContentTransformerRegistry(mimetypeMap);
+        dummyRegistry.setTransformers(transformers);
     }
 
     /**
@@ -153,6 +155,32 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         assertNotNull("No transformer found", transformer);
         assertEquals("Incorrect reliability", 1.0, transformer.getReliability(A, C));
         assertEquals("Incorrect reliability", 0.0, transformer.getReliability(C, A));
+    }
+    
+    /**
+     * Set an explicit, and bizarre, transformation.  Check that it is used.
+     *
+     */
+    public void testExplicitTransformation()
+    {
+        ContentTransformer dummyTransformer = new DummyTransformer(
+                MimetypeMap.MIMETYPE_FLASH, MimetypeMap.MIMETYPE_EXCEL, 1.0, 12345);
+        
+        List<Object> transform = new ArrayList<Object>(3);
+        transform.add(MimetypeMap.MIMETYPE_FLASH);
+        transform.add(MimetypeMap.MIMETYPE_EXCEL);
+        transform.add(dummyTransformer);
+        
+        List<List<Object>> explicitTransformers = Collections.singletonList(transform);
+        // add it to the registry
+        dummyRegistry.setExplicitTransformations(explicitTransformers);
+        
+        // get the appropriate transformer for the bizarre mapping
+        ContentTransformer checkTransformer = dummyRegistry.getTransformer(
+                MimetypeMap.MIMETYPE_FLASH, MimetypeMap.MIMETYPE_EXCEL);
+        
+        assertNotNull("No explicit transformer found", checkTransformer);
+        assertTrue("Expected explicit transformer", dummyTransformer == checkTransformer);
     }
     
     /**
