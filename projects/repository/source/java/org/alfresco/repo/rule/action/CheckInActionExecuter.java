@@ -37,7 +37,7 @@ import org.alfresco.service.cmr.version.Version;
  * 
  * @author Roy Wetherall
  */
-public class CheckInActionExecutor extends RuleActionExecutorAbstractBase
+public class CheckInActionExecuter extends RuleActionExecuterAbstractBase
 {
     public static final String NAME = "check-in";
     public static final String PARAM_DESCRIPTION = "description";
@@ -73,7 +73,7 @@ public class CheckInActionExecutor extends RuleActionExecutorAbstractBase
 	}
 
     /**
-     * @see org.alfresco.repo.rule.action.RuleActionExecutor#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
     public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {

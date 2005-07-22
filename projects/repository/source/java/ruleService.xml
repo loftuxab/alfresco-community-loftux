@@ -110,19 +110,19 @@
    
    <!-- Rule actions -->
    
-   <bean id="rule-condition-executor" parent="common-resource" init-method="init">
+   <bean id="rule-condition-executer" parent="common-resource" init-method="init">
 	  <property name="ruleService">
 	     <ref bean="ruleService"/>
 	  </property>
    </bean>
    
-   <bean id="add-features" class="org.alfresco.repo.rule.action.AddFeaturesActionExecutor" parent="rule-condition-executor">
+   <bean id="add-features" class="org.alfresco.repo.rule.action.AddFeaturesActionExecuter" parent="rule-condition-executer">
 	  <property name="nodeService">
          <ref bean="nodeService"/>
 	  </property>
    </bean>
      
-   <bean id="link-category" class="org.alfresco.repo.rule.action.LinkCategoryActionExecutor" parent="rule-condition-executor">
+   <bean id="link-category" class="org.alfresco.repo.rule.action.LinkCategoryActionExecuter" parent="rule-condition-executer">
 	  <property name="nodeService">
          <ref bean="nodeService"/>
 	  </property>
@@ -134,13 +134,13 @@
 	  </property>
    </bean>
 
-   <bean id="simple-workflow" class="org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor" parent="rule-condition-executor">
+   <bean id="simple-workflow" class="org.alfresco.repo.rule.action.SimpleWorkflowActionExecuter" parent="rule-condition-executer">
 	  <property name="nodeService">
          <ref bean="nodeService"/>
 	  </property>
    </bean>
 
-	<bean id="transform" class="org.alfresco.repo.rule.action.TransformActionExecutor" parent="rule-condition-executor">
+	<bean id="transform" class="org.alfresco.repo.rule.action.TransformActionExecuter" parent="rule-condition-executer">
 	  <property name="nodeService">
 		 <ref bean="nodeService"/>
 	  </property>
@@ -158,7 +158,7 @@
 	  </property>	  
 	</bean>
 	
-	<bean id="copy" class="org.alfresco.repo.rule.action.CopyActionExecutor" parent="rule-condition-executor">
+	<bean id="copy" class="org.alfresco.repo.rule.action.CopyActionExecuter" parent="rule-condition-executer">
 	  <property name="nodeService">
 		 <ref bean="nodeService"/>
 	  </property>
@@ -167,13 +167,13 @@
 	  </property>
    </bean>
 	   
-	<bean id="move" class="org.alfresco.repo.rule.action.MoveActionExecutor" parent="rule-condition-executor">
+	<bean id="move" class="org.alfresco.repo.rule.action.MoveActionExecuter" parent="rule-condition-executer">
 	  <property name="nodeService">
 		 <ref bean="nodeService"/>
 	  </property>
    </bean>
 	
-	<bean id="check-in" class="org.alfresco.repo.rule.action.CheckInActionExecutor" parent="rule-condition-executor">
+	<bean id="check-in" class="org.alfresco.repo.rule.action.CheckInActionExecuter" parent="rule-condition-executer">
 	  <property name="nodeService">
 		 <ref bean="nodeService"/>
 	  </property>
@@ -182,7 +182,7 @@
 	  </property>
    </bean>
 	
-	<bean id="check-out" class="org.alfresco.repo.rule.action.CheckOutActionExecutor" parent="rule-condition-executor">
+	<bean id="check-out" class="org.alfresco.repo.rule.action.CheckOutActionExecuter" parent="rule-condition-executer">
 	  <property name="nodeService">
 		 <ref bean="nodeService"/>
 	  </property>
@@ -191,7 +191,7 @@
 	  </property>
    </bean>
    
-   <bean id="mail" class="org.alfresco.repo.rule.action.MailActionExecutor" parent="rule-condition-executor">
+   <bean id="mail" class="org.alfresco.repo.rule.action.MailActionExecuter" parent="rule-condition-executer">
 	  <property name="mailService">
 		 <ref bean="mailService"></ref>
 	  </property>

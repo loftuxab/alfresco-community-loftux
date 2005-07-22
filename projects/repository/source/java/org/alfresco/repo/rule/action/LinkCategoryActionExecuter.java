@@ -40,7 +40,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Roy Wetherall
  */
-public class LinkCategoryActionExecutor extends RuleActionExecutorAbstractBase 
+public class LinkCategoryActionExecuter extends RuleActionExecuterAbstractBase 
 {
 	/**
 	 * Rule constants

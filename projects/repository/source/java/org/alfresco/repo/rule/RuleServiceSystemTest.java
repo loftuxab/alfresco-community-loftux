@@ -34,14 +34,14 @@ import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Aspect;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.M2Property;
-import org.alfresco.repo.rule.action.AddFeaturesActionExecutor;
-import org.alfresco.repo.rule.action.CheckInActionExecutor;
-import org.alfresco.repo.rule.action.CheckOutActionExecutor;
-import org.alfresco.repo.rule.action.LinkCategoryActionExecutor;
-import org.alfresco.repo.rule.action.MailActionExecutor;
-import org.alfresco.repo.rule.action.MoveActionExecutor;
-import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
-import org.alfresco.repo.rule.action.TransformActionExecutor;
+import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
+import org.alfresco.repo.rule.action.CheckInActionExecuter;
+import org.alfresco.repo.rule.action.CheckOutActionExecuter;
+import org.alfresco.repo.rule.action.LinkCategoryActionExecuter;
+import org.alfresco.repo.rule.action.MailActionExecuter;
+import org.alfresco.repo.rule.action.MoveActionExecuter;
+import org.alfresco.repo.rule.action.SimpleWorkflowActionExecuter;
+import org.alfresco.repo.rule.action.TransformActionExecuter;
 import org.alfresco.repo.rule.condition.InCategoryEvaluator;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.repo.rule.condition.NoConditionEvaluator;
@@ -75,6 +75,9 @@ import org.springframework.util.StopWatch;
  */
 public class RuleServiceSystemTest extends TestCase
 {
+	/**
+	 * Application context used during the test
+	 */
 	static ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
 	
 	/**
@@ -229,8 +232,8 @@ public class RuleServiceSystemTest extends TestCase
         aspectProps.put(ContentModel.PROP_APPROVE_MOVE, false);
         
         Map<String, Serializable> params2 = new HashMap<String, Serializable>(2);
-        params2.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, ContentModel.ASPECT_SIMPLE_WORKFLOW);
-        params2.put(AddFeaturesActionExecutor.PARAM_ASPECT_PROPERTIES, (Serializable)aspectProps);
+        params2.put(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_SIMPLE_WORKFLOW);
+        params2.put(AddFeaturesActionExecuter.PARAM_ASPECT_PROPERTIES, (Serializable)aspectProps);
         
         // Test that rule can be updated and execute correctly
         rule.removeAllRuleActions();
@@ -272,15 +275,15 @@ public class RuleServiceSystemTest extends TestCase
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
         RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition(SimpleWorkflowActionExecutor.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition(SimpleWorkflowActionExecuter.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_STEP, "approveStep");
-		params.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER, this.rootNodeRef);
-		params.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_MOVE, true);
-		params.put(SimpleWorkflowActionExecutor.PARAM_REJECT_STEP, "rejectStep");
-		params.put(SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER, this.rootNodeRef);
-		params.put(SimpleWorkflowActionExecutor.PARAM_REJECT_MOVE, false);
+        params.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_STEP, "approveStep");
+		params.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_FOLDER, this.rootNodeRef);
+		params.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_MOVE, true);
+		params.put(SimpleWorkflowActionExecuter.PARAM_REJECT_STEP, "rejectStep");
+		params.put(SimpleWorkflowActionExecuter.PARAM_REJECT_FOLDER, this.rootNodeRef);
+		params.put(SimpleWorkflowActionExecuter.PARAM_REJECT_MOVE, false);
         
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, null);
@@ -322,7 +325,7 @@ public class RuleServiceSystemTest extends TestCase
             
             RuleType ruleType = this.ruleService.getRuleType("inbound");
             RuleConditionDefinition cond = this.ruleService.getConditionDefinition(InCategoryEvaluator.NAME);
-            RuleActionDefinition action = this.ruleService.getActionDefinition(AddFeaturesActionExecutor.NAME);
+            RuleActionDefinition action = this.ruleService.getActionDefinition(AddFeaturesActionExecuter.NAME);
             
             Map<String, Serializable> params = new HashMap<String, Serializable>(1);
             params.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, this.regionCategorisationQName);
@@ -399,11 +402,11 @@ public class RuleServiceSystemTest extends TestCase
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
         RuleConditionDefinition cond = this.ruleService.getConditionDefinition(NoConditionEvaluator.NAME);
-        RuleActionDefinition action = this.ruleService.getActionDefinition(LinkCategoryActionExecutor.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition(LinkCategoryActionExecuter.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(LinkCategoryActionExecutor.PARAM_CATEGORY_ASPECT, this.regionCategorisationQName);
-        params.put(LinkCategoryActionExecutor.PARAM_CATEGORY_VALUE, this.catROne); 
+        params.put(LinkCategoryActionExecuter.PARAM_CATEGORY_ASPECT, this.regionCategorisationQName);
+        params.put(LinkCategoryActionExecuter.PARAM_CATEGORY_VALUE, this.catROne); 
         
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, null);
@@ -442,12 +445,12 @@ public class RuleServiceSystemTest extends TestCase
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
         RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition(MailActionExecutor.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition(MailActionExecuter.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(MailActionExecutor.PARAM_TO, "alfresco.test@gmail.com");
-        params.put(MailActionExecutor.PARAM_SUBJECT, "Unit test");
-        params.put(MailActionExecutor.PARAM_TEXT, "This is a test to check that the mail action is working.");
+        params.put(MailActionExecuter.PARAM_TO, "alfresco.test@gmail.com");
+        params.put(MailActionExecuter.PARAM_SUBJECT, "Unit test");
+        params.put(MailActionExecuter.PARAM_TEXT, "This is a test to check that the mail action is working.");
         
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, null);
@@ -482,9 +485,9 @@ public class RuleServiceSystemTest extends TestCase
         RuleActionDefinition action = this.ruleService.getActionDefinition("copy");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(MoveActionExecutor.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
-        params.put(MoveActionExecutor.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
-        params.put(MoveActionExecutor.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+        params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
+        params.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
+        params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
         
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, null);
@@ -539,13 +542,13 @@ public class RuleServiceSystemTest extends TestCase
 	        
 	        RuleType ruleType = this.ruleService.getRuleType("inbound");
 	        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-	        RuleActionDefinition action = this.ruleService.getActionDefinition(TransformActionExecutor.NAME);
+	        RuleActionDefinition action = this.ruleService.getActionDefinition(TransformActionExecuter.NAME);
 	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-			params.put(TransformActionExecutor.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
-	        params.put(TransformActionExecutor.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
-	        params.put(TransformActionExecutor.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
-	        params.put(TransformActionExecutor.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+			params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+	        params.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
+	        params.put(TransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
+	        params.put(TransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
 	        
 	        Rule rule = this.ruleService.createRule(ruleType);
 	        rule.addRuleCondition(cond, null);
@@ -622,9 +625,9 @@ public class RuleServiceSystemTest extends TestCase
         RuleActionDefinition action = this.ruleService.getActionDefinition("move");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(MoveActionExecutor.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
-        params.put(MoveActionExecutor.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
-        params.put(MoveActionExecutor.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+        params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
+        params.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
+        params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
         
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, null);
@@ -671,7 +674,7 @@ public class RuleServiceSystemTest extends TestCase
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
         RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition(CheckOutActionExecutor.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition(CheckOutActionExecuter.NAME);
         
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, null);
@@ -737,10 +740,10 @@ public class RuleServiceSystemTest extends TestCase
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
         RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition(CheckInActionExecutor.NAME);
+        RuleActionDefinition action = this.ruleService.getActionDefinition(CheckInActionExecuter.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(CheckInActionExecutor.PARAM_DESCRIPTION, "The version description.");
+        params.put(CheckInActionExecuter.PARAM_DESCRIPTION, "The version description.");
         
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(cond, null);

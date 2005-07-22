@@ -33,15 +33,15 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.rule.action.AddFeaturesActionExecutor;
-import org.alfresco.repo.rule.action.CheckInActionExecutor;
-import org.alfresco.repo.rule.action.CheckOutActionExecutor;
-import org.alfresco.repo.rule.action.CopyActionExecutor;
-import org.alfresco.repo.rule.action.LinkCategoryActionExecutor;
-import org.alfresco.repo.rule.action.MailActionExecutor;
-import org.alfresco.repo.rule.action.MoveActionExecutor;
-import org.alfresco.repo.rule.action.SimpleWorkflowActionExecutor;
-import org.alfresco.repo.rule.action.TransformActionExecutor;
+import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
+import org.alfresco.repo.rule.action.CheckInActionExecuter;
+import org.alfresco.repo.rule.action.CheckOutActionExecuter;
+import org.alfresco.repo.rule.action.CopyActionExecuter;
+import org.alfresco.repo.rule.action.LinkCategoryActionExecuter;
+import org.alfresco.repo.rule.action.MailActionExecuter;
+import org.alfresco.repo.rule.action.MoveActionExecuter;
+import org.alfresco.repo.rule.action.SimpleWorkflowActionExecuter;
+import org.alfresco.repo.rule.action.TransformActionExecuter;
 import org.alfresco.repo.rule.condition.InCategoryEvaluator;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -158,43 +158,43 @@ public class NewRuleWizard extends AbstractWizardBean
          
          // set up parameters maps for the action
          Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
-         if (this.action.equals(AddFeaturesActionExecutor.NAME))
+         if (this.action.equals(AddFeaturesActionExecuter.NAME))
          {
             QName aspect = Repository.resolveToQName(this.actionProperties.get(PROP_ASPECT));
-            actionParams.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, aspect);
+            actionParams.put(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, aspect);
          }
-         else if (this.action.equals(CopyActionExecutor.NAME))
+         else if (this.action.equals(CopyActionExecuter.NAME))
          {
             // add the destination space id to the action properties
             NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_DESTINATION));
-            actionParams.put(CopyActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+            actionParams.put(CopyActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
             
             // add the type and name of the association to create when the copy
             // is performed
-            actionParams.put(CopyActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+            actionParams.put(CopyActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                   ContentModel.ASSOC_CONTAINS);
-            actionParams.put(CopyActionExecutor.PARAM_ASSOC_QNAME, 
+            actionParams.put(CopyActionExecuter.PARAM_ASSOC_QNAME, 
                   QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
          }
-         else if (this.action.equals(MoveActionExecutor.NAME))
+         else if (this.action.equals(MoveActionExecuter.NAME))
          {
             // add the destination space id to the action properties
             NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_DESTINATION));
-            actionParams.put(MoveActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+            actionParams.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
             
             // add the type and name of the association to create when the move
             // is performed
-            actionParams.put(MoveActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+            actionParams.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                   ContentModel.ASSOC_CONTAINS);
-            actionParams.put(MoveActionExecutor.PARAM_ASSOC_QNAME, 
+            actionParams.put(MoveActionExecuter.PARAM_ASSOC_QNAME, 
                   QName.createQName(NamespaceService.ALFRESCO_URI, "move"));
          }
-         else if (this.action.equals(SimpleWorkflowActionExecutor.NAME))
+         else if (this.action.equals(SimpleWorkflowActionExecuter.NAME))
          {
             // add the approve step name
-            actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_STEP,
+            actionParams.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_STEP,
                   this.actionProperties.get(PROP_APPROVE_STEP_NAME));
             
             // add whether the approve step will copy or move the content
@@ -205,13 +205,13 @@ public class NewRuleWizard extends AbstractWizardBean
                approveMove = false;
             }
             
-            actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_MOVE,
+            actionParams.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_MOVE,
                   new Boolean(approveMove));
             
             // add the destination folder of the content
             NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_APPROVE_FOLDER));
-            actionParams.put(SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER, 
+            actionParams.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_FOLDER, 
                   approveDestNodeRef);
             
             // determine whether we have a reject step or not
@@ -225,7 +225,7 @@ public class NewRuleWizard extends AbstractWizardBean
             if (requireReject)
             {
                // add the reject step name
-               actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_STEP,
+               actionParams.put(SimpleWorkflowActionExecuter.PARAM_REJECT_STEP,
                      this.actionProperties.get(PROP_REJECT_STEP_NAME));
             
                // add whether the reject step will copy or move the content
@@ -236,79 +236,79 @@ public class NewRuleWizard extends AbstractWizardBean
                   rejectMove = false;
                }
                
-               actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_MOVE,
+               actionParams.put(SimpleWorkflowActionExecuter.PARAM_REJECT_MOVE,
                      new Boolean(rejectMove));
                
                // add the destination folder of the content
                NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(), 
                      this.actionProperties.get(PROP_REJECT_FOLDER));
-               actionParams.put(SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER, 
+               actionParams.put(SimpleWorkflowActionExecuter.PARAM_REJECT_FOLDER, 
                      rejectDestNodeRef);
             }
          }
-         else if (this.action.equals(LinkCategoryActionExecutor.NAME))
+         else if (this.action.equals(LinkCategoryActionExecuter.NAME))
          {
             // add the classifiable aspect
-            actionParams.put(LinkCategoryActionExecutor.PARAM_CATEGORY_ASPECT,
+            actionParams.put(LinkCategoryActionExecuter.PARAM_CATEGORY_ASPECT,
                   ContentModel.ASPECT_GEN_CLASSIFIABLE);
             
             // put the selected category in the action params
             NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_CATEGORY));
-            actionParams.put(LinkCategoryActionExecutor.PARAM_CATEGORY_VALUE, 
+            actionParams.put(LinkCategoryActionExecuter.PARAM_CATEGORY_VALUE, 
                   catNodeRef);
          }
-         else if (this.action.equals(CheckOutActionExecutor.NAME))
+         else if (this.action.equals(CheckOutActionExecuter.NAME))
          {
             // specify the location the checked out working copy should go
             // add the destination space id to the action properties
             NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_DESTINATION));
-            actionParams.put(CheckOutActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+            actionParams.put(CheckOutActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
             
             // add the type and name of the association to create when the 
             // check out is performed
-            actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+            actionParams.put(CheckOutActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                   ContentModel.ASSOC_CONTAINS);
-            actionParams.put(CheckOutActionExecutor.PARAM_ASSOC_QNAME, 
+            actionParams.put(CheckOutActionExecuter.PARAM_ASSOC_QNAME, 
                   QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"));
          }
-         else if (this.action.equals(CheckInActionExecutor.NAME))
+         else if (this.action.equals(CheckInActionExecuter.NAME))
          {
             // add the description for the checkin to the action params
-            actionParams.put(CheckInActionExecutor.PARAM_DESCRIPTION, 
+            actionParams.put(CheckInActionExecuter.PARAM_DESCRIPTION, 
                   this.actionProperties.get(PROP_CHECKIN_DESC));
          }
-         else if (this.action.equals(TransformActionExecutor.NAME))
+         else if (this.action.equals(TransformActionExecuter.NAME))
          {
             // add the transformer to use
-            actionParams.put(TransformActionExecutor.PARAM_MIME_TYPE,
+            actionParams.put(TransformActionExecuter.PARAM_MIME_TYPE,
                   this.actionProperties.get(PROP_TRANSFORMER));
             
             // add the destination space id to the action properties
             NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
                   this.actionProperties.get(PROP_DESTINATION));
-            actionParams.put(TransformActionExecutor.PARAM_DESTINATION_FOLDER, destNodeRef);
+            actionParams.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
             
             // add the type and name of the association to create when the copy
             // is performed
-            actionParams.put(TransformActionExecutor.PARAM_ASSOC_TYPE_QNAME, 
+            actionParams.put(TransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                   ContentModel.ASSOC_CONTAINS);
-            actionParams.put(TransformActionExecutor.PARAM_ASSOC_QNAME, 
+            actionParams.put(TransformActionExecuter.PARAM_ASSOC_QNAME, 
                   QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
          }
-         else if (this.action.equals(MailActionExecutor.NAME))
+         else if (this.action.equals(MailActionExecuter.NAME))
          {
             // add the actual email text to send
-            actionParams.put(MailActionExecutor.PARAM_TEXT, 
+            actionParams.put(MailActionExecuter.PARAM_TEXT, 
                   this.actionProperties.get(PROP_MESSAGE));
                
             // add the person it's going to
-            actionParams.put(MailActionExecutor.PARAM_TO, 
+            actionParams.put(MailActionExecuter.PARAM_TO, 
                   this.actionProperties.get(PROP_TO));
             
             // add the subject for the email
-            actionParams.put(MailActionExecutor.PARAM_SUBJECT,
+            actionParams.put(MailActionExecuter.PARAM_SUBJECT,
                   this.actionProperties.get(PROP_SUBJECT));
          }
 
@@ -661,32 +661,32 @@ public class NewRuleWizard extends AbstractWizardBean
       
       // populate the action property bag with the relevant values
       Map<String, Serializable> actionProps = rule.getRuleActions().get(0).getParameterValues();
-      if (this.action.equals(AddFeaturesActionExecutor.NAME))
+      if (this.action.equals(AddFeaturesActionExecuter.NAME))
       {
-         QName aspect = (QName)actionProps.get(AddFeaturesActionExecutor.PARAM_ASPECT_NAME);
+         QName aspect = (QName)actionProps.get(AddFeaturesActionExecuter.PARAM_ASPECT_NAME);
          this.actionProperties.put(PROP_ASPECT, aspect.getLocalName());
       }
-      else if (this.action.equals(CopyActionExecutor.NAME))
+      else if (this.action.equals(CopyActionExecuter.NAME))
       {
-         NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecutor.PARAM_DESTINATION_FOLDER);
+         NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
-      else if (this.action.equals(MoveActionExecutor.NAME))
+      else if (this.action.equals(MoveActionExecuter.NAME))
       {
-         NodeRef destNodeRef = (NodeRef)actionProps.get(MoveActionExecutor.PARAM_DESTINATION_FOLDER);
+         NodeRef destNodeRef = (NodeRef)actionProps.get(MoveActionExecuter.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
-      else if (this.action.equals(SimpleWorkflowActionExecutor.NAME))
+      else if (this.action.equals(SimpleWorkflowActionExecuter.NAME))
       {
-         String approveStep = (String)actionProps.get(SimpleWorkflowActionExecutor.PARAM_APPROVE_STEP);
-         Boolean approveMove = (Boolean)actionProps.get(SimpleWorkflowActionExecutor.PARAM_APPROVE_MOVE);
+         String approveStep = (String)actionProps.get(SimpleWorkflowActionExecuter.PARAM_APPROVE_STEP);
+         Boolean approveMove = (Boolean)actionProps.get(SimpleWorkflowActionExecuter.PARAM_APPROVE_MOVE);
          NodeRef approveFolderNode = (NodeRef)actionProps.get(
-               SimpleWorkflowActionExecutor.PARAM_APPROVE_FOLDER);
+               SimpleWorkflowActionExecuter.PARAM_APPROVE_FOLDER);
          
-         String rejectStep = (String)actionProps.get(SimpleWorkflowActionExecutor.PARAM_REJECT_STEP);
-         Boolean rejectMove = (Boolean)actionProps.get(SimpleWorkflowActionExecutor.PARAM_REJECT_MOVE);
+         String rejectStep = (String)actionProps.get(SimpleWorkflowActionExecuter.PARAM_REJECT_STEP);
+         Boolean rejectMove = (Boolean)actionProps.get(SimpleWorkflowActionExecuter.PARAM_REJECT_MOVE);
          NodeRef rejectFolderNode = (NodeRef)actionProps.get(
-               SimpleWorkflowActionExecutor.PARAM_REJECT_FOLDER);
+               SimpleWorkflowActionExecuter.PARAM_REJECT_FOLDER);
          
          this.actionProperties.put(PROP_APPROVE_STEP_NAME, approveStep);
          this.actionProperties.put(PROP_APPROVE_ACTION, approveMove ? "move" : "copy");
@@ -704,38 +704,38 @@ public class NewRuleWizard extends AbstractWizardBean
             this.actionProperties.put(PROP_REJECT_FOLDER, rejectFolderNode.getId());
          }
       }
-      else if (this.action.equals(LinkCategoryActionExecutor.NAME))
+      else if (this.action.equals(LinkCategoryActionExecuter.NAME))
       {
-         NodeRef catNodeRef = (NodeRef)actionProps.get(LinkCategoryActionExecutor.PARAM_CATEGORY_VALUE);
+         NodeRef catNodeRef = (NodeRef)actionProps.get(LinkCategoryActionExecuter.PARAM_CATEGORY_VALUE);
          this.actionProperties.put(PROP_CATEGORY, catNodeRef.getId());
       }
-      else if (this.action.equals(CheckOutActionExecutor.NAME))
+      else if (this.action.equals(CheckOutActionExecuter.NAME))
       {
-         NodeRef destNodeRef = (NodeRef)actionProps.get(CheckOutActionExecutor.PARAM_DESTINATION_FOLDER);
+         NodeRef destNodeRef = (NodeRef)actionProps.get(CheckOutActionExecuter.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
-      else if (this.action.equals(CheckInActionExecutor.NAME))
+      else if (this.action.equals(CheckInActionExecuter.NAME))
       {
-         String checkDesc = (String)actionProps.get(CheckInActionExecutor.PARAM_DESCRIPTION);
+         String checkDesc = (String)actionProps.get(CheckInActionExecuter.PARAM_DESCRIPTION);
          this.actionProperties.put(PROP_CHECKIN_DESC, checkDesc);
       }
-      else if (this.action.equals(TransformActionExecutor.NAME))
+      else if (this.action.equals(TransformActionExecuter.NAME))
       {
-         String transformer = (String)actionProps.get(TransformActionExecutor.PARAM_MIME_TYPE);
+         String transformer = (String)actionProps.get(TransformActionExecuter.PARAM_MIME_TYPE);
          this.actionProperties.put(PROP_TRANSFORMER, transformer);
          
-         NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecutor.PARAM_DESTINATION_FOLDER);
+         NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
-      else if (this.action.equals(MailActionExecutor.NAME))
+      else if (this.action.equals(MailActionExecuter.NAME))
       {
-         String subject = (String)actionProps.get(MailActionExecutor.PARAM_SUBJECT);
+         String subject = (String)actionProps.get(MailActionExecuter.PARAM_SUBJECT);
          this.actionProperties.put(PROP_SUBJECT, subject);
          
-         String message = (String)actionProps.get(MailActionExecutor.PARAM_TEXT);
+         String message = (String)actionProps.get(MailActionExecuter.PARAM_TEXT);
          this.actionProperties.put(PROP_MESSAGE, message);
          
-         String to = (String)actionProps.get(MailActionExecutor.PARAM_TO);
+         String to = (String)actionProps.get(MailActionExecuter.PARAM_TO);
          this.actionProperties.put(PROP_TO, to);
       }
    }

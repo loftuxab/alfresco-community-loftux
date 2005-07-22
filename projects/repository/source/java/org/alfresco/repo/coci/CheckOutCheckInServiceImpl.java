@@ -17,7 +17,6 @@
  */
 package org.alfresco.repo.coci;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

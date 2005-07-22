@@ -40,9 +40,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * @author Roy Wetherall
  */
-public class TransformActionExecutor extends RuleActionExecutorAbstractBase 
+public class TransformActionExecuter extends RuleActionExecuterAbstractBase 
 {
-    private static Log logger = LogFactory.getLog(TransformActionExecutor.class); 
+    private static Log logger = LogFactory.getLog(TransformActionExecuter.class); 
     
 	public static final String NAME = "transform";
 	public static final String PARAM_MIME_TYPE = "mime-type";
@@ -93,7 +93,7 @@ public class TransformActionExecutor extends RuleActionExecutorAbstractBase
 	}
 
 	/**
-	 * @see org.alfresco.repo.rule.action.RuleActionExecutorAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+	 * @see org.alfresco.repo.rule.action.RuleActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
 	 */
 	@Override
 	protected void executeImpl(

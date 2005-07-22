@@ -34,7 +34,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Roy Wetherall
  */
-public class MoveActionExecutor extends RuleActionExecutorAbstractBase
+public class MoveActionExecuter extends RuleActionExecuterAbstractBase
 {
     public static final String NAME = "move";
     public static final String PARAM_DESTINATION_FOLDER = "destination-folder";
@@ -60,7 +60,7 @@ public class MoveActionExecutor extends RuleActionExecutorAbstractBase
 	}
 
     /**
-     * @see org.alfresco.repo.rule.action.RuleActionExecutor#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
     public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {

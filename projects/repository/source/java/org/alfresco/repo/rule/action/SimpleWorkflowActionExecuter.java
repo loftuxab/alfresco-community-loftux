@@ -36,7 +36,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Roy Wetherall
  */
-public class SimpleWorkflowActionExecutor extends RuleActionExecutorAbstractBase 
+public class SimpleWorkflowActionExecuter extends RuleActionExecuterAbstractBase 
 {
 	public static final String NAME = "simple-workflow";
 	public static final String PARAM_APPROVE_STEP = "approve-step";
@@ -65,7 +65,7 @@ public class SimpleWorkflowActionExecutor extends RuleActionExecutorAbstractBase
 	}
 
 	/**
-	 * @see org.alfresco.repo.rule.action.RuleActionExecutorAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+	 * @see org.alfresco.repo.rule.action.RuleActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
 	 */
 	@Override
 	protected void executeImpl(

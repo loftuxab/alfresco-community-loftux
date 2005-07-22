@@ -15,13 +15,15 @@
  * language governing permissions and limitations under the
  * License.
  */
+/**
+ * 
+ */
 package org.alfresco.repo.rule.action;
 
 import java.util.List;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
-import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
@@ -30,85 +32,70 @@ import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.namespace.QName;
 
 /**
- * Check out action executor
+ * Copy action executor.
+ * <p>
+ * Copies the actioned upon node to a specified location.
  * 
  * @author Roy Wetherall
  */
-public class CheckOutActionExecutor extends RuleActionExecutorAbstractBase
+public class CopyActionExecuter extends RuleActionExecuterAbstractBase
 {
-    public static final String NAME = "check-out";
+    public static final String NAME = "copy";
     public static final String PARAM_DESTINATION_FOLDER = "destination-folder";
     public static final String PARAM_ASSOC_TYPE_QNAME = "assoc-type";
     public static final String PARAM_ASSOC_QNAME = "assoc-name";
-
+    public static final String PARAM_DEEP_COPY = "deep-copy";
+    
     /**
-     * The version operations service
+     * Node operations service
      */
-    private CheckOutCheckInService cociService;
+    private CopyService copyService;
 	
 	/**
 	 * The node service
 	 */
 	private NodeService nodeService;
 	
-	/**
-	 * Set the node service
-	 * 
-	 * @param nodeService  the node service
-	 */
 	public void setNodeService(NodeService nodeService) 
 	{
 		this.nodeService = nodeService;
 	}
 	
-	/**
-	 * Set the coci service
-	 * 
-	 * @param cociService  the coci service
-	 */
-	public void setCociService(CheckOutCheckInService cociService) 
+	public void setCopyService(CopyService copyService) 
 	{
-		this.cociService = cociService;
+		this.copyService = copyService;
 	}
     
-	/**
-	 * Add the parameter defintions
-	 */
+
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, ParameterType.NODE_REF, false, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, ParameterType.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, ParameterType.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, ParameterType.NODE_REF, true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_DEEP_COPY, ParameterType.BOOLEAN, false, getParamDisplayLabel(PARAM_DEEP_COPY)));		
 	}
 
     /**
-     * @see org.alfresco.repo.rule.action.RuleActionExecutor#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
+     * @see org.alfresco.repo.rule.action.RuleActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
     public void executeImpl(RuleAction ruleAction, NodeRef actionableNodeRef, NodeRef actionedUponNodeRef)
     {
-		if (this.nodeService.exists(actionedUponNodeRef) == true &&
-			this.nodeService.hasAspect(actionedUponNodeRef, ContentModel.ASPECT_WORKING_COPY) == false)
+		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
-	        // Get the destination details
 	        NodeRef destinationParent = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
 	        QName destinationAssocTypeQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
 	        QName destinationAssocQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
 	        
-	        if (destinationParent == null || destinationAssocTypeQName == null || destinationAssocQName == null)
-	        {
-	            // Check the node out to the current location
-	            this.cociService.checkout(actionedUponNodeRef);
-	        }
-	        else
-	        {
-	            // Check the node out to the specified location
-	            this.cociService.checkout(
-	                    actionedUponNodeRef, 
-	                    destinationParent, 
-	                    destinationAssocTypeQName, 
-	                    destinationAssocQName);
-	        }
+	        // TODO get this from a parameter value
+	        boolean deepCopy = false;
+	        
+	        this.copyService.copy(
+	                actionedUponNodeRef, 
+	                destinationParent,
+	                destinationAssocTypeQName,
+	                destinationAssocQName,
+	                deepCopy);
 		}
     }
 }

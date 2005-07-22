@@ -34,9 +34,9 @@ import org.springframework.mail.javamail.JavaMailSender;
  * 
  * @author Roy Wetherall
  */
-public class MailActionExecutor extends RuleActionExecutorAbstractBase 
+public class MailActionExecuter extends RuleActionExecuterAbstractBase 
 {
-    private static Log logger = LogFactory.getLog(MailActionExecutor.class);
+    private static Log logger = LogFactory.getLog(MailActionExecuter.class);
     
 	/**
 	 * Action executor constants

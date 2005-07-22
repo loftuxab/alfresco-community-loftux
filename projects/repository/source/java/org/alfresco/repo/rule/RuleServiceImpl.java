@@ -29,7 +29,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
-import org.alfresco.repo.rule.action.RuleActionExecutor;
+import org.alfresco.repo.rule.action.RuleActionExecuter;
 import org.alfresco.repo.rule.common.RuleActionDefinitionImpl;
 import org.alfresco.repo.rule.common.RuleConditionDefinitionImpl;
 import org.alfresco.repo.rule.common.RuleImpl;
@@ -572,7 +572,7 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 			
 		// Get the single action
 	    RuleAction action = actions.get(0);
-	    RuleActionExecutor executor = getActionExecutor(action);
+	    RuleActionExecuter executor = getActionExecutor(action);
 	      
 		// Evaluate the condition
 	    if (evaluator.evaluate(cond, actionableNodeRef, actionedUponNodeRef) == true)
@@ -592,10 +592,10 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
      * @param action	the action
      * @return			the action executor
      */
-    private RuleActionExecutor getActionExecutor(RuleAction action)
+    private RuleActionExecuter getActionExecutor(RuleAction action)
     {
         String executorString = ((RuleActionDefinitionImpl)action.getRuleActionDefinition()).getRuleActionExecutor();
-        return (RuleActionExecutor)applicationContext.getBean(executorString);
+        return (RuleActionExecuter)applicationContext.getBean(executorString);
     }
 
 	/**
@@ -637,7 +637,7 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 * 
 	 * @param ruleActionExecutor	the rule action executor
 	 */
-	public void registerRuleActionExecutor(RuleActionExecutor ruleActionExecutor) 
+	public void registerRuleActionExecutor(RuleActionExecuter ruleActionExecutor) 
 	{
 		RuleActionDefinition action = ruleActionExecutor.getRuleActionDefinition();
 		this.actionDefinitions.put(action.getName(), action);

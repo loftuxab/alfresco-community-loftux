@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.rule.action.AddFeaturesActionExecutor;
+import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
 import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
@@ -57,8 +57,8 @@ public class BaseRuleTest extends BaseSpringTest
     /**
      * Action used in tests
      */
-    protected static final String ACTION_DEF_NAME = AddFeaturesActionExecutor.NAME;
-    protected static final String ACTION_PROP_NAME_1 = AddFeaturesActionExecutor.PARAM_ASPECT_NAME;
+    protected static final String ACTION_DEF_NAME = AddFeaturesActionExecuter.NAME;
+    protected static final String ACTION_PROP_NAME_1 = AddFeaturesActionExecuter.PARAM_ASPECT_NAME;
     protected static final QName ACTION_PROP_VALUE_1 = ContentModel.ASPECT_LOCKABLE;
 
     /**

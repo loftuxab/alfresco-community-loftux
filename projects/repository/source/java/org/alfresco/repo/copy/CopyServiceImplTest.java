@@ -30,7 +30,7 @@ import org.alfresco.repo.dictionary.impl.M2ChildAssociation;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.M2Property;
 import org.alfresco.repo.dictionary.impl.M2Type;
-import org.alfresco.repo.rule.action.AddFeaturesActionExecutor;
+import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
 import org.alfresco.repo.rule.condition.NoConditionEvaluator;
 import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
@@ -338,8 +338,8 @@ public class CopyServiceImplTest extends BaseSpringTest
         Rule rule = this.ruleService.createRule(ruleType);
         rule.addRuleCondition(this.ruleService.getConditionDefinition(NoConditionEvaluator.NAME), null);
         Map<String, Serializable> props = new HashMap<String, Serializable>(1);
-        props.put(AddFeaturesActionExecutor.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
-        rule.addRuleAction(this.ruleService.getActionDefinition(AddFeaturesActionExecutor.NAME), props);
+        props.put(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
+        rule.addRuleAction(this.ruleService.getActionDefinition(AddFeaturesActionExecuter.NAME), props);
         this.ruleService.addRule(this.sourceNodeRef, rule);
         
         // Now copy the node that has rules associated with it
