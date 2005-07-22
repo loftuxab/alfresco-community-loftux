@@ -335,7 +335,6 @@
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType16}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" />
-                           <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
                            <h:graphicImage url="/images/icons/locked.gif" align="absmiddle" width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
@@ -345,7 +344,6 @@
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="header" />
-                           <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
                            <h:graphicImage url="/images/icons/locked.gif" align="absmiddle"  width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
@@ -355,7 +353,6 @@
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="title" />
-                           <h:outputText value="&nbsp; #{msg.workingcopy}" rendered="#{r.workingCopy == true}" escape="false" />
                            <h:graphicImage url="/images/icons/locked.gif" align="absmiddle" width="16" height="16" rendered="#{r.locked == true}" />
                         </a:column>
                         
