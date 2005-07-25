@@ -12,6 +12,7 @@
       <filelist id="project-build-files" dir="."
                 files="${projects.dir.name}/core/${project.build.file} 
                        ${projects.dir.name}/repository/${project.build.file}
+                       ${projects.dir.name}/remote-api/${project.build.file}  
                        ${projects.dir.name}/web-client/${project.build.file}" />
                        
       <!-- TODO: Add some checking for tomcat / jboss pre-requesties -->

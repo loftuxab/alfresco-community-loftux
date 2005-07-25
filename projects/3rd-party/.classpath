@@ -42,8 +42,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/unoil.jar"/>
 	<classpathentry exported="true" sourcepath="src/pdfbox_src.zip" kind="lib" path="lib/pdfbox-0.7.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xpp3.jar"/>
-	<classpathentry kind="lib" path="lib/jibx/jibx-bind.jar"/>
-	<classpathentry kind="lib" path="lib/bcel.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-bind.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bcel.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-run.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-2.5.1.jar"/>
@@ -55,5 +55,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cryptix-jce-provider.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.5H3.jar"/>
+	<classpathentry exported="true" sourcepath="src/axis_src.zip" kind="lib" path="lib/axis.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-discovery-0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/saaj.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/tlddoc.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/wsdl4j-1.5.1.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

@@ -30,6 +30,8 @@
                         includes="core.jar" />
             <zipfileset dir="${common.dir}/projects/repository/build/dist" prefix="WEB-INF/lib"
                         includes="repository.jar" />
+            <zipfileset dir="${common.dir}/projects/remote-api/build/dist" prefix="WEB-INF/lib"/>
+            <zipfileset dir="${common.dir}/projects/remote-api/source/web/WEB-INF" prefix="WEB-INF"/>
          </war>
       </sequential>
    </macrodef>

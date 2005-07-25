@@ -56,10 +56,14 @@
 
    <context-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:alfresco/application-context.xml classpath:alfresco/web-client-application-context.xml</param-value>
+      <param-value>
+         classpath:alfresco/application-context.xml 
+         classpath:alfresco/web-client-application-context.xml
+         classpath:web-services-application-context.xml
+      </param-value>
       <description>Spring config file locations</description>
    </context-param>
-   
+    
    <filter>
       <filter-name>Authentication Filter</filter-name>
       <filter-class>org.alfresco.web.app.servlet.AuthenticationFilter</filter-class>
@@ -109,6 +113,12 @@
       <servlet-class>org.alfresco.web.app.servlet.DownloadContentServlet</servlet-class>
    </servlet>
    
+   <servlet>
+		<servlet-name>axis</servlet-name>
+		<servlet-class>org.apache.axis.transport.http.AxisServlet</servlet-class>
+		<load-on-startup>5</load-on-startup>
+	</servlet>
+   
    <servlet-mapping>
       <servlet-name>Faces Servlet</servlet-name>
       <url-pattern>/faces/*</url-pattern>
@@ -123,6 +133,11 @@
       <servlet-name>downloadContent</servlet-name>
       <url-pattern>/download/*</url-pattern>
    </servlet-mapping>
+   
+   <servlet-mapping>
+		<servlet-name>axis</servlet-name>
+		<url-pattern>/remote-api/*</url-pattern>
+	</servlet-mapping>
    
    <session-config>
       <session-timeout>60</session-timeout>

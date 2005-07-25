@@ -1,0 +1,27 @@
+<project name="remote-api" default="build">
+
+   <path id="common.path" path="${basedir}/../.." />
+   <property name="common.dir" refid="common.path" />
+   <import file="${common.dir}/common.xml" />
+   
+   <target name="package-jar" depends="common.package-jar" description="Packages the JAR file">
+      <jar jarfile="${dist.dir}\${jar.name}" update="true">
+         <metainf dir="${src.metainf.dir}"/>
+      </jar>  
+   </target>
+      
+   <target name="generate-axis-client" depends="init">
+      <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
+         <classpath refid="java.classpath"/>
+      </taskdef>
+      <wsdl2java url="http://localhost:8080/web-client/remote-api/NodeService?wsdl"
+                 output="${src.java.dir}"
+                 serverSide="no"
+                 typeMappingVersion="1.1"
+                 testcase="no">
+         <mapping namespace="http://node.webservice.repo.alfresco.org" package="client.axis"/>
+         <mapping namespace="http://www.alfresco.org/ws/1.0/NodeService" package="client.axis"/>
+      </wsdl2java>  
+   </target>
+      
+</project>
