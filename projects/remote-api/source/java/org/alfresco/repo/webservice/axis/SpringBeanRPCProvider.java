@@ -108,7 +108,7 @@ public class SpringBeanRPCProvider extends RPCProvider
       
       if (this.webAppCtx == null)
       {
-         throw new AxisFault("Failed to retrive the Spring web application context");
+         throw new AxisFault("Failed to retrieve the Spring web application context");
       }
       
       return this.webAppCtx;

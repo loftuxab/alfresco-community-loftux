@@ -7,6 +7,7 @@
 		<parameter name="sendXMLDeclaration" value="true"/>
 		<parameter name="axis.sendMinimizedElements" value="true"/>
 		<parameter name="axis.servicesPath" value="/remote-api/"/>
+		<parameter name="axis.disableServiceList" value="true"/>
 		<requestFlow>
 			<handler type="java:org.apache.axis.handlers.JWSHandler">
 				<parameter name="scope" value="session"/>
