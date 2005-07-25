@@ -55,6 +55,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cryptix-jce-provider.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.5H3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/JMagick.jar"/>
 	<classpathentry exported="true" sourcepath="src/axis_src.zip" kind="lib" path="lib/axis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-discovery-0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>

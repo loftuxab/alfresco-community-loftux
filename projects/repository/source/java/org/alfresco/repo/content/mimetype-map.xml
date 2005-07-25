@@ -111,6 +111,9 @@
          <mimetype mimetype="image/ief" display="IEF Image">
             <extension>ief</extension>
          </mimetype>
+         <mimetype mimetype="image/bmp" display="Bitmap Image">
+            <extension>bmp</extension>
+         </mimetype>
          <mimetype mimetype="image/jpeg" display="JPEG Image">
             <extension default="true">jpg</extension>
             <extension>jpeg</extension>

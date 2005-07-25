@@ -49,6 +49,9 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_BINARY = "application/octet-stream";
     public static final String MIMETYPE_PPT = "application/vnd.powerpoint";
     public static final String MIMETYPE_FLASH = "application/x-shockwave-flash";
+    public static final String MIMETYPE_IMAGE_GIF = "image/gif";
+    public static final String MIMETYPE_IMAGE_JPEG = "image/jpeg";
+    public static final String MIMETYPE_IMAGE_RGB = "image/x-rgb";
     
     private static final String CONFIG_AREA = "mimetype-map";
     private static final String CONFIG_CONDITION = "Mimetype Map";

@@ -99,6 +99,8 @@
          <transformer id="text/plain" description="Text" />
          <transformer id="text/xml" description="XML" />
          <transformer id="application/x-shockwave-flash" description="Flash" />
+         <transformer id="image/gif" description="GIF" />
+         <transformer id="image/jpeg" description="JPEG" />
       </transformers>
    </config>
    

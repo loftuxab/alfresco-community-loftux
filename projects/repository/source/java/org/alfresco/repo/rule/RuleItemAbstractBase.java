@@ -52,6 +52,19 @@ public abstract class RuleItemAbstractBase extends CommonResourceAbstractBase
 	 * Rule service
 	 */
 	protected RuleService ruleService;
+    
+    /**
+     * @return Return a short title and description string
+     */
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(60);
+        sb.append("RuleItem")
+          .append("[ title='").append(getTitle()).append("'")
+          .append(", description='").append(getDescription()).append("'")
+          .append("]");
+        return sb.toString();
+    }
 	
 	/**
 	 * Gets a list containing the parameter definitions for this rule item.

@@ -141,16 +141,18 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
                     ContentTransformer transformer = getTransformer(sourceMimetype, targetMimetype);
                     if (transformer == null)
                     {
-                        continue;   // test is not required
+                        break;   // test is not required
                     }
                     else if (transformer.getReliability(sourceMimetype, targetMimetype) <= 0.0)
                     {
-                        continue;   // not reliable for this transformation
+                        break;   // not reliable for this transformation
                     }
                     
                     // make a writer for the target file
                     String targetExtension = mimetypeMap.getExtension(targetMimetype);
-                    File targetFile = TempFileProvider.createTempFile(getName(), "." + targetExtension);
+                    File targetFile = TempFileProvider.createTempFile(
+                            getClass().getSimpleName() + "_" + getName() + "_" + sourceExtension + "_",
+                            "." + targetExtension);
                     targetWriter = new FileContentWriter(targetFile);
                     
                     // do the transformation

@@ -19,6 +19,7 @@ package org.alfresco.repo.rule.action;
 
 import java.util.List;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -150,13 +151,9 @@ public class TransformActionExecuter extends RuleActionExecuterAbstractBase
 		
         if (contentReader == null)
         {
-            nodeService.deleteNode(copyNodeRef);
-            return;
-            // TODO: enable this failure once the rules fire only when the content is available
-//            // content has not yet been written or write is still in progress
-//            throw new AlfrescoRuntimeException(
-//                    "Attempting to execute content transformation rule " +
-//                    "but content has not finished writing, i.e. no URL is available.");
+            throw new AlfrescoRuntimeException(
+                    "Attempting to execute content transformation rule " +
+                    "but content has not finished writing, i.e. no URL is available.");
         }
         
 		// Try and transform the content
@@ -166,6 +163,13 @@ public class TransformActionExecuter extends RuleActionExecuterAbstractBase
         }
         catch(NoTransformerException e)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("No transformer found to execute rule: \n" +
+                        "   reader: " + contentReader + "\n" +
+                        "   writer: " + contentWriter + "\n" +
+                        "   action: " + this);
+            }
             // TODO: Revisit this for alternative solutions
             nodeService.deleteNode(copyNodeRef);
         }
