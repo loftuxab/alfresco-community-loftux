@@ -3,7 +3,10 @@
  
 <beans>
    <!-- File Server Configuration -->
-   <bean id="fileServerConfiguration" class="org.alfresco.filesys.server.config.ServerConfiguration" init-method="init">
+   <bean id="fileServerConfiguration"
+         class="org.alfresco.filesys.server.config.ServerConfiguration"
+         init-method="init"
+         depends-on="importerBootstrap">
       <constructor-arg>
          <ref bean="serviceRegistry" />
       </constructor-arg>
