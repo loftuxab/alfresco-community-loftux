@@ -1,4 +1,4 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 <?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
 
 <dialog xmlns:html="http://www.w3.org/1999/xhtml"
@@ -26,7 +26,7 @@
 			Set the full path and name of the application you wish to launch on 'file://' links.
 		</description>
 
-		<hbox align="center"> 
+		<hbox align="center">
 			<label control="exloc" value="Explorer location"/>
 
 			<textbox id="exloc"
@@ -35,6 +35,16 @@
 				prefstring="alfrescoext.exapp"
 				size="50"
 			 /> 
+		
+		</hbox>
+		<hbox align="center">
+
+			<checkbox id="exfil" control="exloc"
+			        label="Include 'file:///"
+				pref="true"
+				preftype="boolean"
+				prefstring="alfrescoext.exfil"
+			 />
 		
 		</hbox>
 	</groupbox>

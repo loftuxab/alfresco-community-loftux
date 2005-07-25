@@ -8,8 +8,8 @@
 </RDF:Seq>
 
   <RDF:Description about="urn:mozilla:package:alfrescoext"
-        chrome:displayName="Alfresco Extension 1.0"
-        chrome:author="Paul Holmes-Higgin"
+        chrome:displayName="Alfresco Extension 0.8"
+        chrome:author="Team Alfresco"
         chrome:authorURL="http://www.alfresco.org"
         chrome:name="alfrescoext"
         chrome:extension="true"

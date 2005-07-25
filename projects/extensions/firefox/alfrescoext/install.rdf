@@ -14,10 +14,10 @@
     </em:targetApplication>
     
     <em:id>{FF380879-E2AA-4E2D-A348-99B9CBD7D3C0}</em:id>
-    <em:version>1.0</em:version>    
+    <em:version>0.8</em:version>
     <em:name>Alfresco Extension</em:name>
     <em:description>Adds Alfresco functions.</em:description>
-    <em:creator>Paul Holmes-Higgin</em:creator>
+    <em:creator>Team Alfresco</em:creator>
     <em:homepageURL>http://www.alfresco.org</em:homepageURL>
     <em:optionsURL>chrome://alfrescoext/content/alfrescoextOptions.xul</em:optionsURL>  
     <em:iconURL>chrome://alfrescoext/content/alf.png</em:iconURL>
