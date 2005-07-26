@@ -174,10 +174,11 @@ public class FileImporterTest extends TestCase
      */
     public static final void main(String[] args) throws Exception
     {
+
         int exitCode = 0;
 
         int count = 0;
-        int target = 1;
+        int target = 100;
         while (count < target)
         {
             count++;

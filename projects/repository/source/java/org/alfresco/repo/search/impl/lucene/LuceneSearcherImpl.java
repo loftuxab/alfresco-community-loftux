@@ -155,42 +155,22 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     Searcher searcher = getSearcher(indexer);
 
                     Hits hits;
-                    if (searchParameters.excludeDataInTheCurrentTransaction() || (indexer == null))
+
+                    if (searchParameters.getSortDefinitions().size() > 0)
                     {
-                        if (searchParameters.getSortDefinitions().size() > 0)
+                        int index = 0;
+                        SortField[] fields = new SortField[searchParameters.getSortDefinitions().size()];
+                        for (SearchParameters.SortDefinition sd : searchParameters.getSortDefinitions())
                         {
-                            int index = 0;
-                            SortField[] fields = new SortField[searchParameters.getSortDefinitions().size()];
-                            for (SearchParameters.SortDefinition sd : searchParameters.getSortDefinitions())
-                            {
-                                fields[index++] = new SortField(sd.getField(), !sd.isAscending());
-                            }
-                            hits = searcher.search(query, new Sort(fields));
+                            fields[index++] = new SortField(sd.getField(), !sd.isAscending());
                         }
-                        else
-                        {
-                            hits = searcher.search(query);
-                        }
+                        hits = searcher.search(query, new Sort(fields));
                     }
                     else
                     {
-                        Query filterQuery = getFilterQuery();
-                        Filter filter = new QueryFilter(filterQuery);
-                        if (searchParameters.getSortDefinitions().size() > 0)
-                        {
-                            int index = 0;
-                            SortField[] fields = new SortField[searchParameters.getSortDefinitions().size()];
-                            for (SearchParameters.SortDefinition sd : searchParameters.getSortDefinitions())
-                            {
-                                fields[index++] = new SortField(sd.getField(), !sd.isAscending());
-                            }
-                            hits = searcher.search(query, filter, new Sort(fields));
-                        }
-                        else
-                        {
-                            hits = searcher.search(query, filter);
-                        }
+                        hits = searcher.search(query);
                     }
+
                     return new LuceneResultSet(store, hits, searcher, nodeService, searchParameters.getAttributePaths().toArray(new Path[0]));
 
                 }
@@ -241,31 +221,6 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             // no index return an empty result set
             return new EmptyResultSet();
         }
-    }
-
-    private Query getFilterQuery()
-    {
-       if(indexer == null)
-       {
-           throw new IllegalStateException("There must be an index writer to generate the filter");
-       }
-       
-       // In the current transaction or not in the deletion list
-       BooleanQuery query = new BooleanQuery();
-       query.add(new TermQuery(new Term("TX", indexer.getDeltaId())), false, false);
-       
-       BooleanQuery idQuery = new BooleanQuery();
-       for(NodeRef node : indexer.getDeletions())
-       {
-           idQuery.add(new TermQuery(new Term("ID", node.getId())), false, false);
-       }
-       BooleanQuery notIdQuery = new BooleanQuery();
-       notIdQuery.add(new TermQuery(new Term("ISNODE", "T")), false, false);
-       notIdQuery.add(new TermQuery(new Term("ISCONTAINER", "T")), false, false);
-       notIdQuery.add(idQuery, false, true);
-       
-       query.add(notIdQuery, false, false);
-       return query;
     }
 
     /**

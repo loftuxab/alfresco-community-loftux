@@ -283,23 +283,24 @@ public abstract class LuceneBase implements Lockable
             throw new LuceneIndexException("Failed to open IndexSarcher for " + getMainPath(), e);
         }
     }
-  
+
     protected Searcher getSearcher(LuceneIndexer luceneIndexer) throws LuceneIndexException
     {
         // If we know the delta id we should do better
         try
         {
-            if( luceneIndexer == null)
+            if (luceneIndexer == null)
             {
-               return new IndexSearcher(getMainPath());
+                return new IndexSearcher(getMainPath());
             }
             else
             {
-                // TODO: Create appropriate reader that lies about deletions from the first 
+                // TODO: Create appropriate reader that lies about deletions
+                // from the first
                 //
-                //luceneIndexer.flushPending();
-                //
-                throw new UnsupportedOperationException("Querying aginats the index delta is not currently suported");
+                luceneIndexer.flushPending();
+                return new ClosingIndexSearcher(new MultiReader(new IndexReader[] { new FilterIndexReaderByNodeRefs(IndexReader.open(getMainPath()), luceneIndexer.getDeletions()),
+                        IndexReader.open(getDeltaPath()) }));
             }
         }
         catch (IOException e)
@@ -502,11 +503,11 @@ public abstract class LuceneBase implements Lockable
      */
     protected void mergeDeltaIntoMain(Set<Term> terms) throws LuceneIndexException
     {
-        if(writeLockCount < 1)
+        if (writeLockCount < 1)
         {
             throw new LuceneIndexException("Muist hold the write lock to merge");
         }
-        
+
         if (!indexExists(baseDir))
         {
 
@@ -593,7 +594,7 @@ public abstract class LuceneBase implements Lockable
                     try
                     {
                         mainWriter.mergeIndexes(readers);
-                        //mainWriter.addIndexes(readers);
+                        // mainWriter.addIndexes(readers);
                     }
                     catch (IOException e)
                     {
@@ -887,7 +888,7 @@ public abstract class LuceneBase implements Lockable
     {
         this.config = config;
     }
-    
+
     public LuceneConfig getLuceneConfig()
     {
         return config;
@@ -897,5 +898,5 @@ public abstract class LuceneBase implements Lockable
     {
         return deltaId;
     }
-    
+
 }

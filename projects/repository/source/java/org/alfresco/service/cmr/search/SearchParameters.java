@@ -99,10 +99,6 @@ public class SearchParameters
      */
     public void excludeDataInTheCurrentTransaction(boolean excludeDataInTheCurrentTransaction)
     {
-        if(!excludeDataInTheCurrentTransaction)
-        {
-            throw new IllegalStateException("This option is not currently supported ");
-        }
         this.excludeDataInTheCurrentTransaction = excludeDataInTheCurrentTransaction;
     }
     
