@@ -776,6 +776,9 @@
             <ref local="ftsIndexerTrigger"/>
          </list>
        </property>
+       <property name="waitForJobsToCompleteOnShutdown">
+           <value>true</value>
+       </property>
    </bean>  
    
    <!-- Query Register Component -->
