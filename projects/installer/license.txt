@@ -19,11 +19,12 @@ http://www.opensource.org/licenses/lgpl-license.php
 
 Some portions of the Alfresco Software are provided by third parties and thus are not
 available under LGPL, but are available under other licensing terms.  In this distribution, 
-they are: Junit module, available at www.junit.org, is licensed under the terms of the 
-Common Public License.  You can find the terms of the CPL here:
+they are: Junit module, available at www.junit.org, and wsdl4j, available at http://sourceforge.net/projects/wsdl4j, are licensed under the terms of the Common Public 
+License.  You can find the terms of the CPL here:
 http://www.opensource.org/licenses/cpl1.0.php 
 
-Jsp, jva, and servlet are available under Sun’s binary license, which you can find here: 
+Jsp, jva, servlet, saaj and jax-rpc are available under Sun’s binary license, which you can 
+find here: 
 http://java.sun.com/j2se/1.5.0/jdk-1_5_0_01-license.txt
 
 If you have questions about the licensing terms for the Alfresco Software, please contact 

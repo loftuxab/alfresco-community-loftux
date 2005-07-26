@@ -14,8 +14,8 @@ Copyright 2001-2004 The OpenSymphony Group
 Copyright 2003-2005 www.pdfbox.org
 Copyright 1999 E. Wray Johnson. 
 Copyright 2001-2005 MetaStuff, Ltd. 
-Copyright  2003 The Werken Company
-Copyright  2002 Vlad Roubtsov 
+Copyright 2003 The Werken Company
+Copyright 2002 Vlad Roubtsov 
 Copyright 2002 Extreme! Lab, Indiana University
 Copyright 2003-2004, Dennis M. Sosnoski
 Copyright 2005 Moxiecode Systems AB
