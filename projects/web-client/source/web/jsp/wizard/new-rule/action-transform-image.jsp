@@ -124,6 +124,12 @@
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
+                                 <tr>
+                                    <td>Description:</td>
+                                    <td>
+                                       <h:inputText value="#{NewRuleWizard.actionProperties.imageTransformDesc}" size="35" maxlength="1024" />
+                                    </td>
+                                 </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
                                     <td>Destination:</td>

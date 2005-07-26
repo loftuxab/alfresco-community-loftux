@@ -84,6 +84,7 @@ public class NewRuleWizard extends AbstractWizardBean
    public static final String PROP_CHECKIN_DESC = "checkinDescription";
    public static final String PROP_TRANSFORMER = "transformer";
    public static final String PROP_IMAGE_TRANSFORMER = "imageTransformer";
+   public static final String PROP_IMAGE_TRANSFORM_DESC = "imageTransformDesc";
    public static final String PROP_MESSAGE = "message";
    public static final String PROP_SUBJECT = "subject";
    public static final String PROP_TO = "to";
@@ -304,6 +305,11 @@ public class NewRuleWizard extends AbstractWizardBean
             // add the transformer to use
             actionParams.put(TransformActionExecuter.PARAM_MIME_TYPE,
                   this.actionProperties.get(PROP_IMAGE_TRANSFORMER));
+            
+            // add the description
+            // TODO: Use the proper description parameter when Roy adds it
+            //actionParams.put("description", 
+            //      this.actionProperties.get(PROP_IMAGE_TRANSFORM_DESC));
             
             // add the destination space id to the action properties
             NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
@@ -751,6 +757,10 @@ public class NewRuleWizard extends AbstractWizardBean
       {
          String transformer = (String)actionProps.get(TransformActionExecuter.PARAM_MIME_TYPE);
          this.actionProperties.put(PROP_IMAGE_TRANSFORMER, transformer);
+         
+         // TODO: use the proper parameter defined by Roy
+         String desc = (String)actionProps.get("description");
+         this.actionProperties.put(PROP_IMAGE_TRANSFORM_DESC, desc);
          
          NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
