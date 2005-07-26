@@ -13,8 +13,8 @@
       </Description>
     </em:targetApplication>
     
-    <em:id>{FF380879-E2AA-4E2D-A348-99B9CBD7D3C0}</em:id>
-    <em:version>0.8</em:version>
+    <em:id>{FA9D1131-4AF2-4b83-9440-30DAFB770371}</em:id>
+    <em:version>1.0</em:version>
     <em:name>Alfresco Extension</em:name>
     <em:description>Adds Alfresco functions.</em:description>
     <em:creator>Team Alfresco</em:creator>
