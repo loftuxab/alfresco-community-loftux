@@ -125,7 +125,7 @@ Using the CIFS Server
 =====================
 
 The Preview release with CIFS is configured for ease of deployment.  To enable the CIFS
-server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco' needs to be copied
+server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin' needs to be copied
 into a folder on the system path, such as \windows\system32.  The Alfresco server will 
 need to be re-started once the dll has been copied.
 

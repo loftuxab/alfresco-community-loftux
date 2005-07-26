@@ -180,7 +180,8 @@
                                license.txt,notice.txt,README_jboss_win.txt,start_oo2.bat,
                                stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${jboss.distribution.dir}" prefix="jboss" excludes="**/bin/*.sh" />
-         <zipfileset dir="${projects.dir}/netbios/dll" />
+         <zipfileset dir="${installer.project.dir}/bin-win" prefix="bin"/>
+         <zipfileset dir="${projects.dir}/netbios/dll" prefix="bin"/>
          <zipfileset dir="${web-client.project.dir}/build/dist" includes="${web-client.project.name}.war"
                      prefix="jboss/server/default/deploy" />
          <zipfileset dir="${repository.project.dir}/${config.dir.name}"
@@ -208,7 +209,7 @@
       <gzip zipfile="${dist.dir}/${jboss.dist.filename}.tar.gz" src="${dist.dir}/${jboss.dist.filename}.tar" />
       <delete file="${dist.dir}/${jboss.dist.filename}.tar" />
    </target>
-   
+
    <target name="package-tomcat-binary-distribution-windows" depends="common-init">
       <mkdir dir="${dist.dir}" />
       <zip destfile="${dist.dir}/${tomcat.dist.filename}.zip">
@@ -217,7 +218,8 @@
                                license.txt,notice.txt,README_tomcat_win.txt,start_oo2.bat,
                                stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${tomcat.distribution.dir}" prefix="tomcat" excludes="**/bin/*.sh" />
-         <zipfileset dir="${projects.dir}/netbios/dll" />
+         <zipfileset dir="${installer.project.dir}/bin-win" prefix="bin"/>
+         <zipfileset dir="${projects.dir}/netbios/dll" prefix="bin"/>
          <zipfileset dir="${tomcat.deploy.dir}" includes="${web-client.project.name}.war"
                      prefix="tomcat/webapps" />
       </zip>
