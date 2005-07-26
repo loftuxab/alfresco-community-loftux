@@ -123,7 +123,7 @@
                                     <td>Name:</td>
                                     <td>
                                        <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" maxlength="1024" 
-                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
+                                                    onkeyup="javascript:checkButtonState();" onchange="javascript:checkButtonState();"/>&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
