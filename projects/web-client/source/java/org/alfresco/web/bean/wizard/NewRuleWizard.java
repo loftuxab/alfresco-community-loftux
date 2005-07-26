@@ -83,6 +83,7 @@ public class NewRuleWizard extends AbstractWizardBean
    public static final String PROP_REJECT_FOLDER = "rejectFolder";
    public static final String PROP_CHECKIN_DESC = "checkinDescription";
    public static final String PROP_TRANSFORMER = "transformer";
+   public static final String PROP_IMAGE_TRANSFORMER = "imageTransformer";
    public static final String PROP_MESSAGE = "message";
    public static final String PROP_SUBJECT = "subject";
    public static final String PROP_TO = "to";
@@ -114,6 +115,7 @@ public class NewRuleWizard extends AbstractWizardBean
    private List<SelectItem> conditions;
    private List<SelectItem> actions;
    private List<SelectItem> transformers;
+   private List<SelectItem> imageTransformers;
    private List<SelectItem> aspects;
    private List<SelectItem> users;
    private Map<String, String> conditionDescriptions;
@@ -284,6 +286,24 @@ public class NewRuleWizard extends AbstractWizardBean
             // add the transformer to use
             actionParams.put(TransformActionExecuter.PARAM_MIME_TYPE,
                   this.actionProperties.get(PROP_TRANSFORMER));
+            
+            // add the destination space id to the action properties
+            NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
+                  this.actionProperties.get(PROP_DESTINATION));
+            actionParams.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
+            
+            // add the type and name of the association to create when the copy
+            // is performed
+            actionParams.put(TransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
+                  ContentModel.ASSOC_CONTAINS);
+            actionParams.put(TransformActionExecuter.PARAM_ASSOC_QNAME, 
+                  QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+         }
+         else if (this.action.equals("transform-image"))
+         {
+            // add the transformer to use
+            actionParams.put(TransformActionExecuter.PARAM_MIME_TYPE,
+                  this.actionProperties.get(PROP_IMAGE_TRANSFORMER));
             
             // add the destination space id to the action properties
             NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
@@ -727,6 +747,14 @@ public class NewRuleWizard extends AbstractWizardBean
          NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
+      else if (this.action.equals("transform-image"))
+      {
+         String transformer = (String)actionProps.get(TransformActionExecuter.PARAM_MIME_TYPE);
+         this.actionProperties.put(PROP_IMAGE_TRANSFORMER, transformer);
+         
+         NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
+         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+      }
       else if (this.action.equals(MailActionExecuter.NAME))
       {
          String subject = (String)actionProps.get(MailActionExecuter.PARAM_SUBJECT);
@@ -1010,6 +1038,48 @@ public class NewRuleWizard extends AbstractWizardBean
       }
       
       return this.transformers;
+   }
+   
+   /**
+    * Returns the image transformers that are available
+    * 
+    * @return List of SelectItem objects representing the available image transformers
+    */
+   public List<SelectItem> getImageTransformers()
+   {
+      if (this.imageTransformers == null)
+      {
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config wizardCfg = svc.getConfig("New Rule Wizard");
+         if (wizardCfg != null)
+         {
+            ConfigElement transformersCfg = wizardCfg.getConfigElement("image-transformers");
+            if (transformersCfg != null)
+            {               
+               this.imageTransformers = new ArrayList<SelectItem>();
+               for (ConfigElement child : transformersCfg.getChildren())
+               {
+                  this.imageTransformers.add(new SelectItem(child.getAttribute("id"), 
+                        child.getAttribute("description")));
+               }
+               
+               // make sure the list is sorted by the label
+               QuickSort sorter = new QuickSort(this.imageTransformers, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+               sorter.sort();
+            }
+            else
+            {
+               logger.warn("Could not find image-transformers configuration element");
+            }
+         }
+         else
+         {
+            logger.warn("Could not find New Rule Wizard configuration section");
+         }
+      }
+      
+      return this.imageTransformers;
    }
    
    /**

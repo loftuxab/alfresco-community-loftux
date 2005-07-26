@@ -32,7 +32,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form id="new-rule-transform">
+   <h:form id="new-rule-transform-image">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -119,8 +119,8 @@
                                  <tr>
                                     <td>Required&nbsp;format:</td>
                                     <td width="90%">
-                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.transformer}">
-                                          <f:selectItems value="#{NewRuleWizard.transformers}" />
+                                       <h:selectOneMenu value="#{NewRuleWizard.actionProperties.imageTransformer}">
+                                          <f:selectItems value="#{NewRuleWizard.imageTransformers}" />
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>

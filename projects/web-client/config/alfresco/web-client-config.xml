@@ -102,6 +102,11 @@
          <transformer id="image/gif" description="GIF" />
          <transformer id="image/jpeg" description="JPEG" />
       </transformers>
+      <image-transformers>
+         <transformer id="image/gif" description="GIF" />
+         <transformer id="image/jpeg" description="JPG" />
+         <transformer id="image/png" description="PNG" />
+      </image-transformers>
    </config>
    
 </alfresco-config>
