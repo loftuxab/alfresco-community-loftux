@@ -22,14 +22,14 @@
    </bean>
    
    <!-- CIFS Server -->
-   <bean id="cifsServer" class="org.alfresco.filesys.CIFSServer" init-method="startServer" depends-on="importerBootstrap">
+   <bean id="cifsServer" class="org.alfresco.filesys.CIFSServer" init-method="startServer" destroy-method="stopServer" depends-on="importerBootstrap">
       <constructor-arg>
          <ref bean="fileServerConfiguration"/>
       </constructor-arg>
    </bean>
    
    <!-- FTP Server -->
-   <bean id="ftpServer" class="org.alfresco.filesys.FTPServer" init-method="startServer" depends-on="importerBootstrap">
+   <bean id="ftpServer" class="org.alfresco.filesys.FTPServer" init-method="startServer" destroy-method="stopServer" depends-on="importerBootstrap">
       <constructor-arg>
          <ref bean="fileServerConfiguration"/>
       </constructor-arg>

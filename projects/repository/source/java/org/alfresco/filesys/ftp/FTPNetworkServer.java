@@ -578,7 +578,6 @@ public class FTPNetworkServer extends NetworkFileServer implements Runnable
         // Create a seperate thread to run the FTP server
 
         m_srvThread = new Thread(this);
-        m_srvThread.setDaemon(true);
         m_srvThread.setName("FTP Server");
         m_srvThread.start();
 
