@@ -56,7 +56,7 @@
    
    <target name="continuous" depends="test, distribute" />
    
-   <target name="nightly" depends="test, package-nightly-source-distribution" />
+   <target name="nightly" depends="test, package-source-distribution" />
       
    <!-- ************************ -->
    <!-- ** Deployment targets ** -->
@@ -253,12 +253,6 @@
       </tar>
       <gzip zipfile="${dist.dir}/${src.dist.filename}.tar.gz" src="${dist.dir}/${src.dist.filename}.tar" />
       <delete file="${dist.dir}/${src.dist.filename}.tar" />
-   </target>
-   
-   <target name="package-nightly-source-distribution" depends="package-source-distribution"
-           description="Creates the source distribution file for all platforms for a nightly build">
-      <move file="${dist.dir}/${src.dist.filename}.zip" tofile="${dist.dir}/${src.nightly.dist.filename}.zip" />
-      <move file="${dist.dir}/${src.dist.filename}.tar.gz" tofile="${dist.dir}/${src.nightly.dist.filename}.tar.gz" />
    </target>
 
 </project>
