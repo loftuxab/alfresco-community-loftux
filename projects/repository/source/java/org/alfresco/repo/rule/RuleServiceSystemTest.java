@@ -37,6 +37,7 @@ import org.alfresco.repo.dictionary.impl.M2Property;
 import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
 import org.alfresco.repo.rule.action.CheckInActionExecuter;
 import org.alfresco.repo.rule.action.CheckOutActionExecuter;
+import org.alfresco.repo.rule.action.ImageTransformActionExecuter;
 import org.alfresco.repo.rule.action.LinkCategoryActionExecuter;
 import org.alfresco.repo.rule.action.MailActionExecuter;
 import org.alfresco.repo.rule.action.MoveActionExecuter;
@@ -458,7 +459,7 @@ public class RuleServiceSystemTest extends TestCase
         
         this.ruleService.addRule(this.nodeRef, rule);
                 
-        NodeRef newNodeRef = this.nodeService.createNode(
+        this.nodeService.createNode(
                 this.nodeRef,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
                 QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
@@ -603,6 +604,79 @@ public class RuleServiceSystemTest extends TestCase
 	        // Check the transformed content
 			assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE));
 			
+		}
+		catch (Exception exception)
+		{
+			throw new RuntimeException(exception);
+		}
+    }
+    
+    public void testImageTransformAction()
+    {
+		try
+		{
+	        this.ruleService.makeActionable(this.nodeRef);
+	        
+	        RuleType ruleType = this.ruleService.getRuleType("inbound");
+	        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
+	        RuleActionDefinition action = this.ruleService.getActionDefinition(ImageTransformActionExecuter.NAME);
+	        
+	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+			params.put(ImageTransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
+	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
+	        params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_JPEG);
+	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+	        params.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, "imconvert -negate ${source} ${target}");
+	        
+	        Rule rule = this.ruleService.createRule(ruleType);
+	        rule.addRuleCondition(cond, null);
+	        rule.addRuleAction(action, params);
+	        
+	        this.ruleService.addRule(this.nodeRef, rule);
+	
+	        UserTransaction tx = serviceRegistry.getUserTransaction();
+			tx.begin();
+			
+			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
+	        props.put(ContentModel.PROP_NAME, "test.gif");
+			props.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_GIF);
+			
+			// Create the node at the root
+	        NodeRef newNodeRef = this.nodeService.createNode(
+	                this.nodeRef,
+	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
+	                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
+	                ContentModel.TYPE_CONTENT,
+	                props).getChildRef(); 
+			
+			// Set some content on the origional
+			ContentWriter contentWriter = this.contentService.getUpdatingWriter(newNodeRef);
+			File testFile = AbstractContentTransformerTest.loadQuickTestFile("gif");
+			contentWriter.putContent(testFile);
+			
+			tx.commit();
+	        
+	        //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+	        
+	        // Check that the created node is still there
+	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
+	                this.nodeRef, 
+	                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"));
+	        assertNotNull(origRefs);
+	        assertEquals(1, origRefs.size());
+	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
+	        assertEquals(newNodeRef, origNodeRef);
+	
+	        // Check that the created node has been copied
+	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
+	                                                    this.rootNodeRef, 
+	                                                    QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+	        assertNotNull(copyChildAssocRefs);
+	        assertEquals(1, copyChildAssocRefs.size());
+	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
+	        assertTrue(this.nodeService.hasAspect(copyNodeRef, ContentModel.ASPECT_COPIEDFROM));
+	        NodeRef source = (NodeRef)this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_COPY_REFERENCE);
+	        assertEquals(newNodeRef, source);
 		}
 		catch (Exception exception)
 		{

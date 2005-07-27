@@ -39,12 +39,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * Transfor action executer
+ * 
  * @author Roy Wetherall
  */
 public class TransformActionExecuter extends RuleActionExecuterAbstractBase 
 {
-    private static Log logger = LogFactory.getLog(TransformActionExecuter.class); 
+    /**
+     * The logger
+     */
+	private static Log logger = LogFactory.getLog(TransformActionExecuter.class); 
     
+    /**
+     * Action constants
+     */
 	public static final String NAME = "transform";
 	public static final String PARAM_MIME_TYPE = "mime-type";
 	public static final String PARAM_DESTINATION_FOLDER = "destination-folder";
@@ -57,33 +65,59 @@ public class TransformActionExecuter extends RuleActionExecuterAbstractBase
 	private CopyService copyService;
     private MimetypeService mimetypeService;
     
-
+    /**
+     * Set the mime type service
+     * 
+     * @param mimetypeService  the mime type service
+     */
     public void setMimetypeService(MimetypeService mimetypeService) 
     {
         this.mimetypeService = mimetypeService;
     }
     
+    /**
+     * Set the node service
+     * 
+     * @param nodeService  set the node service
+     */
     public void setNodeService(NodeService nodeService) 
 	{
 		this.nodeService = nodeService;
 	}
 	
+    /**
+     * Set the dictionary service
+     * 
+     * @param dictionaryService  the dictionary service
+     */
 	public void setDictionaryService(DictionaryService dictionaryService) 
 	{
 		this.dictionaryService = dictionaryService;
 	}
 	
+	/**
+	 * Set the content service
+	 * 
+	 * @param contentService  the content service
+	 */
 	public void setContentService(ContentService contentService) 
 	{
 		this.contentService = contentService;
 	}
 	
+	/**
+	 * Set the copy service
+	 * 
+	 * @param copyService  the copy service
+	 */
 	public void setCopyService(CopyService copyService) 
 	{
 		this.copyService = copyService;
 	}
 	
-
+	/**
+	 * Add parameter definitions
+	 */
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
@@ -159,7 +193,7 @@ public class TransformActionExecuter extends RuleActionExecuterAbstractBase
 		// Try and transform the content
         try
         {
-		    this.contentService.transform(contentReader, contentWriter);
+        	doTransform(ruleAction, contentReader, contentWriter);
         }
         catch(NoTransformerException e)
         {
@@ -172,9 +206,14 @@ public class TransformActionExecuter extends RuleActionExecuterAbstractBase
             }
             // TODO: Revisit this for alternative solutions
             nodeService.deleteNode(copyNodeRef);
-        }
+        }        
 	}	
-
+	
+	protected void doTransform(RuleAction ruleAction, ContentReader contentReader, ContentWriter contentWriter)	
+	{
+		this.contentService.transform(contentReader, contentWriter);
+	}
+	
     /**
      * Transform name from original extension to new extension
      * 
