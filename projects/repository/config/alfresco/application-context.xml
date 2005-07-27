@@ -188,7 +188,26 @@
       </property>
    </bean>
    
+   
+   
+   
    <!-- NodeService implemented to persist to Database -->
+
+   <bean id="dbNodeServiceImpl" class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init" >
+      <constructor-arg>
+         <ref bean="policyComponent"/>
+      </constructor-arg>
+      <constructor-arg>
+         <ref bean="dictionaryService" />
+      </constructor-arg>
+      <constructor-arg>
+         <ref bean="nodeDaoService" />
+      </constructor-arg>
+      <property name="searcher">
+         <ref bean="searcherComponent" />
+      </property>
+   </bean>
+
    <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.repository.NodeService</value>
@@ -197,20 +216,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init">
-            <constructor-arg>
-               <ref bean="policyComponent"/>
-            </constructor-arg>
-            <constructor-arg>
-               <ref bean="dictionaryService" />
-            </constructor-arg>
-            <constructor-arg>
-               <ref bean="nodeDaoService" />
-            </constructor-arg>
-             <property name="searcher">
-               <ref bean="searcherComponent" />
-            </property>
-         </bean>
+         <ref bean="dbNodeServiceImpl" />     
       </property>
       <property name="transactionAttributes">
          <props>
@@ -232,7 +238,7 @@
    </bean>   
    
    <!-- Handles policy callbacks to ensure that node hierarchy gets indexed -->
-   <bean id="nodeIndexer" class="org.alfresco.repo.node.index.NodeIndexer" >
+   <bean id="nodeIndexer" class="org.alfresco.repo.node.index.NodeIndexer"  init-method="init">
       <constructor-arg>
          <ref bean="policyComponent" />
       </constructor-arg>
@@ -912,8 +918,8 @@
       <property name="nodeService"><ref bean="nodeService"/></property>
       <property name="contentService"><ref bean="contentService"/></property>
    </bean>
-
-   <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap" init-method="bootstrap">
+   
+   <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap" init-method="bootstrap"  depends-on="nodeIndexer">
       <property name="serviceRegistry"><ref bean="serviceRegistry"/></property>
       <property name="storeUrl"><value>workspace://SpacesStore</value></property>
       <property name="configuration">

@@ -54,9 +54,6 @@ public class NodeIndexer
     {
         this.policyComponent = policyComponent;
         this.indexer = indexer;
-        
-        // initialise
-        init();
     }
     
     /**
