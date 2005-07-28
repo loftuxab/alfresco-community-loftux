@@ -105,6 +105,17 @@ public class ContentNetworkFile extends NetworkFile
             netFile.setFileSize(fileInfo.getSize());
         }
         
+        // Set the file timestamps
+        
+        if ( fileInfo.hasCreationDateTime())
+            netFile.setCreationDate( fileInfo.getCreationDateTime());
+        
+        if ( fileInfo.hasModifyDateTime())
+            netFile.setModifyDate(fileInfo.getModifyDateTime());
+        
+        if ( fileInfo.hasAccessDateTime())
+            netFile.setAccessDate(fileInfo.getAccessDateTime());
+        
         // done
         if (logger.isDebugEnabled())
         {
@@ -269,8 +280,9 @@ public class ContentNetworkFile extends NetworkFile
     @Override
     public synchronized int readFile(byte[] buffer, int length, int position, long fileOffset) throws IOException
     {
-        // open the channel for reading
-        openContent(false);
+        // open the channel for reading, open for read/write access if that is how the file was opened
+        openContent(getGrantedAccess() == NetworkFile.READWRITE);
+        
         // read from the channel
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, position, length);
         int count = channel.read(byteBuffer, fileOffset);

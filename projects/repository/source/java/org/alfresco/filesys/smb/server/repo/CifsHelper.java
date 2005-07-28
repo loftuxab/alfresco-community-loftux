@@ -202,7 +202,13 @@ public class CifsHelper
                 size = ValueConverter.longValue(propSize);
             }
             fileInfo.setSize(size);
+            
+            // Set the allocation size by rounding up the size to a 512 byte block boundary
+
+            if ( size > 0)
+                fileInfo.setAllocationSize((size + 512L) & 0xFFFFFFFFFFFFFE00L);
         }
+        
         // created
         Object propCreated = nodeProperties.get(ContentModel.PROP_CREATED);
         if (propCreated != null)

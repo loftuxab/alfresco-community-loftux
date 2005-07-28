@@ -403,13 +403,17 @@ public class ContentDiskDriver implements ContentDiskInterface
 
     public void flushFile(SrvSession sess, TreeConnection tree, NetworkFile file) throws IOException
     {
-        throw new UnsupportedOperationException("Unsupported: " + file);
+        // Flush the file data
+        
+        file.flushFile();
     }
 
     public void closeFile(SrvSession sess, TreeConnection tree, NetworkFile file) throws IOException
     {
-        // defer to the network file to close the stream and remove the content
+        // Defer to the network file to close the stream and remove the content
+           
         file.closeFile();
+        
         // remove the node if necessary
         if (file.hasDeleteOnClose())
         {
