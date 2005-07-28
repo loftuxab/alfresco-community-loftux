@@ -4,60 +4,8 @@
    <!-- ** Initialisation/Configuration targets ** -->
    <!-- ****************************************** -->
 
-   <property name="common.dir" value="${basedir}" />
-   <import file="${common.dir}/common-init.xml" />
-
-   <target name="setup" depends="common-init" description="Creates the initial directory structure for a project">
-      <mkdir dir="${src.java.dir}" />
-      <mkdir dir="${src.webinf.dir}" />
-      <mkdir dir="${local.lib.dir}" />
-      <mkdir dir="${classes.dir}" />
-   </target>
-
-   <target name="init" depends="common-init">
-      <path id="java.classpath">
-         <fileset dir="${common.lib.dir}">
-            <include name="**/*.jar" />
-         </fileset>
-         <fileset dir="${common.dir}/projects">
-            <include name="**/build/dist/*.jar" />
-         </fileset>
-      </path>
-    
-      <path id="unit.test.classpath">
-         <dirset dir="${common.dir}/projects">
-            <include name="**/build/classes" />
-         </dirset>
-         <dirset dir="${common.dir}/projects">
-            <include name="**/config" />
-         </dirset>
-         <pathelement location="${src.test-resources.dir}" />  
-         <fileset dir="${common.lib.dir}">
-            <include name="**/*.jar" />
-         </fileset>  
-      </path>  
-
-      <mkdir dir="${classes.dir}" />
-      <mkdir dir="${dist.dir}" />
-
-      <!-- load the JIBX target -->
-      <taskdef name="bind" classname="org.jibx.binding.ant.CompileTask"
-               classpath="${common.lib.dir}/jibx/jibx-bind.jar;${common.lib.dir}/bcel.jar;${common.lib.dir}/xpp3.jar"/>
-   </target>
-
-   <target name="dump-properties" depends="common-init">
-      <echo level="info">ant.project.name = ${ant.project.name}</echo>
-      <echo level="info">basedir = ${basedir}</echo>
-      <echo level="info">common.dir = ${common.dir}</echo>
-      <echo level="info">common.lib.dir = ${common.lib.dir}</echo>
-      <echo level="info">version.number = ${version.number}</echo>
-      <echo level="info">jboss.home = ${jboss.home}</echo>
-      <echo level="info">tomcat.home = ${tomcat.home}</echo>
-   </target>
-
-   <target name="dump-all-properties" depends="common-init">
-      <echoproperties/>
-   </target>
+   <property name="dir.common" value="${basedir}" />
+   <import file="${dir.common}/common-init.xml" />
 
    <!-- *********************** -->
    <!-- ** Composite targets ** -->
@@ -74,14 +22,14 @@
    <!-- ************************* -->
 
    <target name="compile-java" depends="init" description="Compiles the Java source code">
-      <mkdir dir="${classes.dir}"/>
-      <javac destdir="${classes.dir}" fork="true" deprecation="on" debug="on" target="1.5" source="1.5">
-         <src path="${src.java.dir}"/>
-         <classpath refid="java.classpath"/>
+      <mkdir dir="${dir.classes}"/>
+      <javac destdir="${dir.classes}" fork="true" deprecation="on" debug="on" target="1.5" source="1.5">
+         <src path="${dir.src.java}"/>
+         <classpath refid="classpath.compile"/>
       </javac>
 
-      <copy todir="${classes.dir}">
-         <fileset dir="${src.java.dir}">
+      <copy todir="${dir.classes}">
+         <fileset dir="${dir.src.java}">
             <patternset>
                 <exclude name="**/*.java"/>
             </patternset>
@@ -91,32 +39,38 @@
    
    <target name="compile-javadocs" depends="init"
            description="Creates the JavaDocs for the project">
-      <mkdir dir="${javadoc.dir}" />
-      <javadoc sourcepath="${src.java.dir}" destdir="${javadoc.dir}" 
-               packagenames="${javadoc.packages}" author="true" version="true" 
-               windowtitle="${javadoc.title}" />
+      <mkdir dir="${dir.javadoc}" />
+      <javadoc sourcepath="${dir.src.java}" destdir="${dir.javadoc}" 
+               packagenames="${javadoc.packages.include}" excludepackagenames="${javadoc.packages.exclude}"
+               author="true" version="true" doctitle="${javadoc.title.document}" 
+               windowtitle="${javadoc.title.window}" classpathref="classpath.compile">
+         <bottom>${javadoc.copyright}</bottom>
+      </javadoc>  
    </target>
 
    <target name="compile-taglibdocs" depends="init" 
            description="Creates the tag library docs for the project">
-      <mkdir dir="${taglibdoc.dir}" />
-      <java fork="true" jar="${common.lib.dir}/tlddoc.jar" failonerror="true">
-        <arg line="-d ${taglibdoc.dir}"/>
-        <arg value="${src.webinf.dir}/*.tld"/>
+      <mkdir dir="${dir.taglibdoc}" />
+      <java fork="true" jar="${dir.common.lib}/tlddoc.jar" failonerror="true">  
+        <arg line="-d ${dir.taglibdoc}"/>
+        <arg line="-doctitle '${taglibdoc.title.document}'"/>
+        <arg line="-windowtitle '${taglibdoc.title.window}'"/>
+        <arg value="${dir.src.webinf}/*.tld"/>
       </java>
    </target>
    
    <target name="run-tests" depends="package-jar"
            description="Runs the projects unit tests">
-      <mkdir dir="${test.results.dir}" />
+      <mkdir dir="${dir.test.results}" />
       <junit printsummary="yes" fork="yes" haltonfailure="yes" dir="${basedir}">
-         <classpath refid="unit.test.classpath" />
+         <classpath refid="classpath.unit.test" />
          <formatter type="xml"/>
-         <batchtest todir="${test.results.dir}">
-            <fileset dir="${src.java.dir}">
+         <batchtest todir="${dir.test.results}">
+            <fileset dir="${dir.src.java}">
                <include name="**/*Test.java" />
                <exclude name="**/Base*Test.java" />
                <exclude name="**/Abstract*Test.java" />
+               <exclude name="**/*SystemTest.java" />
             </fileset>
         </batchtest>
       </junit>
@@ -124,11 +78,11 @@
 
    <target name="run-test" depends="package-jar"
            description="Runs a single test defined in the testcase property i.e. call this target with -Dtestcase=[test]">
-      <mkdir dir="${test.results.dir}" />
+      <mkdir dir="${dir.test.results}" />
       <junit printsummary="yes" fork="yes" haltonfailure="yes" dir="${basedir}">
-         <classpath refid="unit.test.classpath" />
+         <classpath refid="classpath.unit.test" />
          <formatter type="xml"/>
-         <test name="${testcase}" todir="${test.results.dir}" />
+         <test name="${testcase}" todir="${dir.test.results}" />
       </junit>
    </target>
 
@@ -140,31 +94,30 @@
    <target name="package" depends="package-jar" description="Packages the archive files" />
       
    <target name="package-jar" depends="compile-java" description="Packages the JAR file">
-      <mkdir dir="${dist.dir}"/>
-      <jar jarfile="${dist.dir}\${jar.name}" basedir="${classes.dir}"/>
+      <mkdir dir="${dir.dist}"/>
+      <jar jarfile="${dir.dist}/${file.name.jar}" basedir="${dir.classes}"/>
    </target>
 
    <target name="package-war" depends="package-jar" description="Packages the WAR file">
-      <mkdir dir="${dist.dir}" />
-      <!-- manifest="${src.metainf.dir}\manifest.mf" -->
-      <war warfile="${dist.dir}\${war.name}" webxml="${src.web.dir}\WEB-INF\web.xml">
-         <fileset dir="${src.web.dir}" excludes="WEB-INF\web.xml" />
-         <zipfileset dir="${common.lib.dir}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}" 
-                     prefix="WEB-INF/lib" />
-         <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="WEB-INF/lib" />
+      <mkdir dir="${dir.dist}"/>
+      <war warfile="${dir.dist}/${file.name.war}" webxml="${dir.src.webinf}/web.xml">
+         <fileset dir="${dir.src.web}" excludes="WEB-INF/**"/>
+         <webinf dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes}"/> 
+         <lib dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}"/>
+         <lib dir="${dir.dist}" includes="${file.name.jar}"/>
       </war>
    </target>
 
    <target name="assemble-ear" depends="package-war">
-      <copy todir="${assemble.dir}">
-         <fileset dir="${dist.dir}" includes="*.war" />
+      <copy todir="${dir.assemble}">
+         <fileset dir="${dir.dist}" includes="*.war" />
       </copy>
    </target>
    
    <target name="package-ear" depends="assemble-ear" description="Packages the EAR file">
-      <mkdir dir="${assemble.dir}"/>
-      <ear earfile="${dist.dir}\${ear.name}" appxml="${src.metainf.dir}\application.xml">
-         <fileset dir="${assemble.dir}"/>
+      <mkdir dir="${dir.assemble}"/>
+      <ear earfile="${dir.dist}/${file.name.ear}" appxml="${dir.src.metainf}/application.xml">
+         <fileset dir="${dir.assemble}"/>
       </ear>
    </target>
 
@@ -173,11 +126,11 @@
    <!-- ********************** -->
 
    <target name="clean" depends="init" description="Cleans the project">
-      <delete includeEmptyDirs="true" quiet="yes" dir="${classes.dir}"/>
-      <delete includeEmptyDirs="true" quiet="yes" dir="${dist.dir}"/>
-      <delete includeEmptyDirs="true" quiet="yes" dir="${assemble.dir}"/>
-      <delete includeEmptyDirs="true" quiet="yes" dir="${test.results.dir}"/>
-      <delete includeEmptyDirs="true" quiet="yes" dir="${docs.dir}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${dir.classes}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${dir.dist}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${dir.assemble}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${dir.test.results}"/>
+      <delete includeEmptyDirs="true" quiet="yes" dir="${dir.docs}"/>
    </target>
 
 </project>

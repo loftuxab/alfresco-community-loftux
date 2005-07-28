@@ -1,7 +1,7 @@
 <project name="core" default="build">
 
-   <path id="common.path" path="${basedir}/../.." />
-   <property name="common.dir" refid="common.path" />
-   <import file="${common.dir}/common.xml" />
+   <path id="path.common" path="${basedir}/../.."/>
+   <property name="dir.common" refid="path.common"/>
+   <import file="${dir.common}/common.xml"/>
    
 </project>

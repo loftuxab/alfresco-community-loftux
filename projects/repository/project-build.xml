@@ -1,16 +1,16 @@
 <project name="repository" default="build">
 
-   <path id="common.path" path="${basedir}/../.." />
-   <property name="common.dir" refid="common.path" />
-   <import file="${common.dir}/common.xml" />
+   <path id="path.common" path="${basedir}/../.."/>
+   <property name="dir.common" refid="path.common"/>
+   <import file="${dir.common}/common.xml"/>
 
    <target name="compile-java" depends="common.compile-java">
       <antcall target="compile-jibx" />
    </target>
 
    <target name="compile-jibx" depends="init">
-      <bind verbose="false" load="true" binding="${jibx.binding.file}">
-         <classpathset dir="${classes.dir}"/>
+      <bind verbose="false" load="true" binding="${file.jibx.binding}">
+         <classpathset dir="${dir.classes}"/>
       </bind>
    </target>
 

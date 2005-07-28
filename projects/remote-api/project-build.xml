@@ -1,21 +1,28 @@
 <project name="remote-api" default="build">
 
-   <path id="common.path" path="${basedir}/../.." />
-   <property name="common.dir" refid="common.path" />
-   <import file="${common.dir}/common.xml" />
+   <path id="path.common" path="${basedir}/../.."/>
+   <property name="dir.common" refid="path.common"/>
+   <import file="${dir.common}/common.xml"/>
    
    <target name="package-jar" depends="common.package-jar" description="Packages the JAR file">
-      <jar jarfile="${dist.dir}\${jar.name}" update="true">
-         <metainf dir="${src.metainf.dir}"/>
+      <jar jarfile="${dir.dist}/${file.name.jar}" update="true">
+         <metainf dir="${dir.src.metainf}"/>
       </jar>  
    </target>
+ 
+   <target name="package-war">
+      <echo>
+         This project can not produce a WAR file, the Remote API functionality is currently
+         packaged within the Web Client WAR file.
+      </echo>  
+   </target>  
       
-   <target name="generate-axis-client" depends="init">
+   <target name="generate-axis-client" depends="init" description="Generates Axis client side objects">
       <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
-         <classpath refid="java.classpath"/>
+         <classpath refid="classpath.compile"/>
       </taskdef>
       <wsdl2java url="http://localhost:8080/web-client/remote-api/NodeService?wsdl"
-                 output="${src.java.dir}"
+                 output="${dir.src.java}"
                  serverSide="no"
                  typeMappingVersion="1.1"
                  testcase="no">
@@ -24,12 +31,12 @@
       </wsdl2java>  
    </target>
  
-   <target name="generate-axis-server" depends="init">
+   <target name="generate-axis-server" depends="init" description="Generates Axis server side objects">
          <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
-            <classpath refid="java.classpath"/>
+            <classpath refid="classpath.compile"/>
          </taskdef>
          <wsdl2java url="http://localhost:8080/web-client/remote-api/NodeService?wsdl"
-                    output="${src.java.dir}"
+                    output="${dir.src.java}"
                     serverSide="yes"
                     typeMappingVersion="1.1"
                     testcase="no">
