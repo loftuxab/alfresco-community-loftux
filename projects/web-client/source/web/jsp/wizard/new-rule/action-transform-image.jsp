@@ -125,9 +125,9 @@
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Description:</td>
+                                    <td>Options:</td>
                                     <td>
-                                       <h:inputText value="#{NewRuleWizard.actionProperties.imageTransformDesc}" size="35" maxlength="1024" />
+                                       <h:inputText value="#{NewRuleWizard.actionProperties.transformOptions}" size="50" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>

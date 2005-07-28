@@ -41,7 +41,6 @@
          document.getElementById("user-props:next-button").disabled = false;
       }
    }
-   updateButtonState();
 </script>
 
 <f:view>

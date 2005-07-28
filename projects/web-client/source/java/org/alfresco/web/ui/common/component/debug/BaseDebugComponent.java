@@ -77,6 +77,8 @@ public abstract class BaseDebugComponent extends SelfRenderingComponent
          }
          else
          {
+            // replace any ; characters with ;<space> as that will help break up long lines
+            value = value.replaceAll(";", "; ");
             out.write(value);
          }
          out.write("</td></tr>");

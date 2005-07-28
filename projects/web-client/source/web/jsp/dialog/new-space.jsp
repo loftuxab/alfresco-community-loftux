@@ -25,7 +25,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page title="Alfresco Web Client - Create Space">
 
 <script language="JavaScript1.2">
    function checkButtonState()

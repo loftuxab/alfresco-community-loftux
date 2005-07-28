@@ -37,6 +37,7 @@ import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
 import org.alfresco.repo.rule.action.CheckInActionExecuter;
 import org.alfresco.repo.rule.action.CheckOutActionExecuter;
 import org.alfresco.repo.rule.action.CopyActionExecuter;
+import org.alfresco.repo.rule.action.ImageTransformActionExecuter;
 import org.alfresco.repo.rule.action.LinkCategoryActionExecuter;
 import org.alfresco.repo.rule.action.MailActionExecuter;
 import org.alfresco.repo.rule.action.MoveActionExecuter;
@@ -84,7 +85,7 @@ public class NewRuleWizard extends AbstractWizardBean
    public static final String PROP_CHECKIN_DESC = "checkinDescription";
    public static final String PROP_TRANSFORMER = "transformer";
    public static final String PROP_IMAGE_TRANSFORMER = "imageTransformer";
-   public static final String PROP_IMAGE_TRANSFORM_DESC = "imageTransformDesc";
+   public static final String PROP_TRANSFORM_OPTIONS = "transformOptions";
    public static final String PROP_MESSAGE = "message";
    public static final String PROP_SUBJECT = "subject";
    public static final String PROP_TO = "to";
@@ -300,16 +301,15 @@ public class NewRuleWizard extends AbstractWizardBean
             actionParams.put(TransformActionExecuter.PARAM_ASSOC_QNAME, 
                   QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
          }
-         else if (this.action.equals("transform-image"))
+         else if (this.action.equals(ImageTransformActionExecuter.NAME))
          {
             // add the transformer to use
-            actionParams.put(TransformActionExecuter.PARAM_MIME_TYPE,
+            actionParams.put(ImageTransformActionExecuter.PARAM_MIME_TYPE,
                   this.actionProperties.get(PROP_IMAGE_TRANSFORMER));
             
-            // add the description
-            // TODO: Use the proper description parameter when Roy adds it
-            //actionParams.put("description", 
-            //      this.actionProperties.get(PROP_IMAGE_TRANSFORM_DESC));
+            // add the options
+            actionParams.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, 
+                  this.actionProperties.get(PROP_TRANSFORM_OPTIONS));
             
             // add the destination space id to the action properties
             NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
@@ -753,14 +753,13 @@ public class NewRuleWizard extends AbstractWizardBean
          NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
-      else if (this.action.equals("transform-image"))
+      else if (this.action.equals(ImageTransformActionExecuter.NAME))
       {
          String transformer = (String)actionProps.get(TransformActionExecuter.PARAM_MIME_TYPE);
          this.actionProperties.put(PROP_IMAGE_TRANSFORMER, transformer);
          
-         // TODO: use the proper parameter defined by Roy
-         String desc = (String)actionProps.get("description");
-         this.actionProperties.put(PROP_IMAGE_TRANSFORM_DESC, desc);
+         String options = (String)actionProps.get(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND);
+         this.actionProperties.put(PROP_TRANSFORM_OPTIONS, options);
          
          NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
          this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
