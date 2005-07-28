@@ -611,7 +611,11 @@ public class RuleServiceSystemTest extends TestCase
 		}
     }
     
-    public void xtestImageTransformAction()
+    /**
+     * Test image transformation
+     *
+     */
+    public void testImageTransformAction()
     {
 		try
 		{
@@ -626,7 +630,7 @@ public class RuleServiceSystemTest extends TestCase
 	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
 	        params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_JPEG);
 	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
-	        params.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, "imconvert -negate ${source} ${target}");
+	        params.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, "-negate");
 	        
 	        Rule rule = this.ruleService.createRule(ruleType);
 	        rule.addRuleCondition(cond, null);

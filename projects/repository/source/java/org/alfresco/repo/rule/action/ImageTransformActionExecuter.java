@@ -39,6 +39,9 @@ public class ImageTransformActionExecuter extends TransformActionExecuter
      */
 	public static final String NAME = "transform-image";
 	public static final String PARAM_CONVERT_COMMAND = "convert-command";
+	
+	private static final String IMCOVERT = "imconvert ";
+	private static final String SOURCE_TARGET =  " ${source} ${target}";
     
 	private ImageMagickContentTransformer imageMagickContentTransformer;
 	
@@ -59,85 +62,19 @@ public class ImageTransformActionExecuter extends TransformActionExecuter
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
 		super.addParameterDefintions(paramList);
-		//paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, ParameterType.NODE_REF, true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
-		//paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
-		//paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
 		paramList.add(new ParameterDefinitionImpl(PARAM_CONVERT_COMMAND, ParameterType.STRING, false, getParamDisplayLabel(PARAM_CONVERT_COMMAND)));
 	}
-
-//	/**
-//	 * @see org.alfresco.repo.rule.action.RuleActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
-//	 */
-//	@Override
-//	protected void executeImpl(
-//			RuleAction ruleAction,
-//			NodeRef actionableNodeRef,
-//			NodeRef actionedUponNodeRef) 
-//	{
-//		if (this.nodeService.exists(actionedUponNodeRef) == false)
-//		{
-//            // node doesn't exist - can't do anything
-//            return;
-//        }
-//		// First check that the node is a sub-type of content
-//		QName typeQName = this.nodeService.getType(actionedUponNodeRef);
-//		if (this.dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT) == false)
-//		{
-//            // it is not content, so can't transform
-//            return;
-//        }
-//		// Get the mime type
-//		String mimeType = (String)ruleAction.getParameterValue(PARAM_MIME_TYPE);
-//		
-//		// Get the details of the copy destination
-//		NodeRef destinationParent = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-//        QName destinationAssocTypeQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_TYPE_QNAME);
-//        QName destinationAssocQName = (QName)ruleAction.getParameterValue(PARAM_ASSOC_QNAME);
-//        
-//		// Copy the content node
-//        NodeRef copyNodeRef = this.copyService.copy(
-//                actionedUponNodeRef, 
-//                destinationParent,
-//                destinationAssocTypeQName,
-//                destinationAssocQName,
-//                false);
-//        
-////      Set the mime type on the copy
-//		this.nodeService.setProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE, mimeType);
-//		
-//        // Adjust the name of the copy
-//        String originalMimetype = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_MIME_TYPE);
-//        String originalName = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
-//        String newName = transformName(originalName, originalMimetype, mimeType);
-//        nodeService.setProperty(copyNodeRef, ContentModel.PROP_NAME, newName);
-//        String originalTitle = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_TITLE);
-//        if (originalTitle != null && originalTitle.length() > 0)
-//        {
-//            String newTitle = transformName(originalTitle, originalMimetype, mimeType);
-//            nodeService.setProperty(copyNodeRef, ContentModel.PROP_TITLE, newTitle);
-//        }
-//		
-//		// Get the content reader and writer
-//		ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef);
-//		ContentWriter contentWriter = this.contentService.getUpdatingWriter(copyNodeRef);
-//		
-//        if (contentReader == null)
-//        {
-//            throw new AlfrescoRuntimeException(
-//                    "Attempting to execute content transformation rule " +
-//                    "but content has not finished writing, i.e. no URL is available.");
-//        }
-//        
-//		    
-//	}	
 	
+	/**
+	 * @see org.alfresco.repo.rule.action.TransformActionExecuter#doTransform(org.alfresco.service.cmr.rule.RuleAction, org.alfresco.service.cmr.repository.ContentReader, org.alfresco.service.cmr.repository.ContentWriter)
+	 */
 	protected void doTransform(RuleAction ruleAction, ContentReader contentReader, ContentWriter contentWriter)
 	{
 		// Try and transform the content
         String convertCommand = (String)ruleAction.getParameterValue(PARAM_CONVERT_COMMAND);
         if (convertCommand != null && convertCommand.length() != 0)
         {
-        	this.imageMagickContentTransformer.setConvertCommand(convertCommand);
+        	this.imageMagickContentTransformer.setConvertCommand(IMCOVERT + convertCommand + SOURCE_TARGET);
         }
         this.imageMagickContentTransformer.transform(contentReader, contentWriter);    
 	}
