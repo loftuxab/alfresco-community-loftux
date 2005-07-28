@@ -42,7 +42,6 @@
          document.getElementById("create-content-props:finish-button").disabled = false;
       }
    }
-   checkButtonState();
 </script>
 
 <f:view>
@@ -228,5 +227,9 @@
     </h:form>
     
 </f:view>
+
+<script>
+   checkButtonState();
+</script>
 
 </r:page>
