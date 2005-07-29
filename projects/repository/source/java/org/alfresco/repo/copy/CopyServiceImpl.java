@@ -480,7 +480,8 @@ public class CopyServiceImpl implements CopyService
 					if (childAssoc.isPrimary() == true)
 					{
                         // Do not recurse further, if we've already copied this node
-                        if (copiedChildren.containsKey(childAssoc.getChildRef()) == false)
+                        if (copiedChildren.containsKey(childAssoc.getChildRef()) == false &&
+                        	copiedChildren.containsValue(childAssoc.getChildRef()) == false)
                         {
     						// Copy the child
     						recursiveCopy(

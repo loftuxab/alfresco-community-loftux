@@ -33,6 +33,7 @@ import org.alfresco.repo.dictionary.impl.M2Type;
 import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
 import org.alfresco.repo.rule.condition.NoConditionEvaluator;
 import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -66,6 +67,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 	private DictionaryDAO dictionaryDAO;
 	private ContentService contentService;
     private RuleService ruleService;
+    private ConfigurableService configurableService;
 	
 	/**
 	 * Data used by the tests
@@ -129,6 +131,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		this.copyService = (CopyService)this.applicationContext.getBean("copyService");
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
         this.ruleService = (RuleService)this.applicationContext.getBean("ruleService");
+        this.configurableService = (ConfigurableService)this.applicationContext.getBean("configurableService");
 		
 		// Create the test model
 		createTestModel();
@@ -343,9 +346,9 @@ public class CopyServiceImplTest extends BaseSpringTest
         rule.addRuleAction(this.ruleService.getActionDefinition(AddFeaturesActionExecuter.NAME), props);
         this.ruleService.addRule(this.sourceNodeRef, rule);
         
-        System.out.println(
-                NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
-        System.out.println(" ------------------------------ ");
+        //System.out.println(
+        //        NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        //System.out.println(" ------------------------------ ");
         
         // Now copy the node that has rules associated with it
         NodeRef copy = this.copyService.copy(
@@ -356,6 +359,10 @@ public class CopyServiceImplTest extends BaseSpringTest
                 true);
         checkCopiedNode(this.sourceNodeRef, copy, true, true, true);
         
+        assertTrue(this.configurableService.isConfigurable(copy));
+        assertNotNull(this.configurableService.getConfigurationFolder(copy));
+        assertFalse(this.configurableService.getConfigurationFolder(this.sourceNodeRef) == this.configurableService.getConfigurationFolder(copy));
+        
         assertTrue(this.ruleService.isActionable(copy));
         assertTrue(this.ruleService.hasRules(copy));
         assertTrue(this.ruleService.rulesEnabled(copy));
@@ -364,10 +371,29 @@ public class CopyServiceImplTest extends BaseSpringTest
         Rule copiedRule = copiedRules.get(0);
         assertEquals(rule.getId(), copiedRule.getId());
         
-        // TODO double check that the cofiguration folder is being copied
+        // Now copy the node without copying the children and check that the rules have been copied
+        NodeRef copy2 = this.copyService.copy(
+        		this.sourceNodeRef,
+        		this.rootNodeRef,
+        		ContentModel.ASSOC_CHILDREN,
+        		QName.createQName("{test}withRuleCopyNoChildren"),
+        		false);
+        checkCopiedNode(this.sourceNodeRef, copy2, true, true, false);
         
-        System.out.println(
-                      NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        assertTrue(this.configurableService.isConfigurable(copy2));
+        assertNotNull(this.configurableService.getConfigurationFolder(copy2));
+        assertFalse(this.configurableService.getConfigurationFolder(this.sourceNodeRef) == this.configurableService.getConfigurationFolder(copy2));
+        
+        assertTrue(this.ruleService.isActionable(copy2));
+        assertTrue(this.ruleService.hasRules(copy2));
+        assertTrue(this.ruleService.rulesEnabled(copy2));
+        List<Rule> copiedRules2 = this.ruleService.getRules(copy2);
+        assertEquals(1, copiedRules.size());
+        Rule copiedRule2 = copiedRules2.get(0);
+        assertEquals(rule.getId(), copiedRule2.getId());
+        
+        //System.out.println(
+        //         NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
         
     }
 	
@@ -386,6 +412,35 @@ public class CopyServiceImplTest extends BaseSpringTest
 		
 		//System.out.println(
 		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+	}
+	
+	/**
+	 * Test a potentially recursive copy
+	 */
+	public void testRecursiveCopy()
+	{
+		// Need to create a potentially recursive node structure
+		NodeRef nodeOne = this.nodeService.createNode(
+				this.rootNodeRef,
+				ContentModel.ASSOC_CHILDREN,
+				ContentModel.ASSOC_CHILDREN,
+				ContentModel.TYPE_CONTAINER).getChildRef();
+		NodeRef nodeTwo = this.nodeService.createNode(
+				nodeOne,
+				ContentModel.ASSOC_CHILDREN,
+				ContentModel.ASSOC_CHILDREN,
+				ContentModel.TYPE_CONTAINER).getChildRef();
+		NodeRef nodeThree = this.nodeService.createNode(
+				nodeTwo,
+				ContentModel.ASSOC_CHILDREN,
+				ContentModel.ASSOC_CHILDREN,
+				ContentModel.TYPE_CONTAINER).getChildRef();
+		
+		// Issue a potentialy recursive copy
+		this.copyService.copy(nodeOne, nodeThree, ContentModel.ASSOC_CHILDREN, ContentModel.ASSOC_CHILDREN, true);
+		
+		System.out.println(
+                 NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 	}
 	
 	/**
@@ -463,8 +518,16 @@ public class CopyServiceImplTest extends BaseSpringTest
 			{
 				if (copyChildren == false)
 				{
-					assertFalse(ref.isPrimary());
-					assertEquals(this.childNodeRef, ref.getChildRef());
+					if (ref.getTypeQName().equals(ContentModel.ASSOC_CONFIGURATIONS) == true)
+					{
+						assertTrue(ref.isPrimary());
+						assertTrue(this.childNodeRef.equals(ref.getChildRef()) == false);
+					}
+					else
+					{
+						assertFalse(ref.isPrimary());
+						assertEquals(this.childNodeRef, ref.getChildRef());
+					}
 				}
 				else
 				{
