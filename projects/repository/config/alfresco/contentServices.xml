@@ -30,7 +30,7 @@
          <ref bean="mimetypeMap" />
       </property>
       <property name="convertCommand">
-         <value>imconvert ${source} ${target}</value>
+         <value>imconvert "${source}" "${target}"</value>
       </property>
    </bean>
 

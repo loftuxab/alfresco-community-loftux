@@ -22,6 +22,7 @@ import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.repo.rule.common.RuleTypeImpl;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
@@ -54,6 +55,7 @@ public class RuleStoreTest extends BaseRuleTest
     {
         super.onSetUpInTransaction();
 		
+        
 		this.ruleStore = (RuleStoreImpl)applicationContext.getBean("ruleStore");
         
         // Make the test node actionable
@@ -72,25 +74,12 @@ public class RuleStoreTest extends BaseRuleTest
                 ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
                 ContentModel.TYPE_CONTAINER).getChildRef();
-
-        // Create the config folder
-        NodeRef newConfigFolder = this.nodeService.createNode(
-                rootNodeRef,
-                ContentModel.ASSOC_CHILDREN,
-                QName.createQName("{test}configfolder"),
-                ContentModel.TYPE_CONFIGURATIONS).getChildRef();
         
         if (isActionable == true)
         {
-            // Manually make the test node actionable
-            this.nodeService.addAspect(
-                    newNodeRef,
-                    ContentModel.ASPECT_ACTIONABLE, 
-                    null);
-            this.nodeService.createAssociation(
-                    newNodeRef, 
-                    newConfigFolder,
-                    ContentModel.ASSOC_CONFIGURATIONS);
+            // Make the node actionable
+        	this.configService.makeConfigurable(newNodeRef);
+        	this.nodeService.addAspect(newNodeRef, ContentModel.ASPECT_ACTIONABLE, null);        	
         }
         
         return newNodeRef;

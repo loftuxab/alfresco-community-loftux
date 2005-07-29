@@ -967,5 +967,27 @@
       <property name="namespaceService"><ref local="namespaceService"/></property>
       <property name="namespace"><value>http://www.alfresco.org/1.0</value></property>
    </bean>
+   
+   <!-- Configurable service -->
+   <bean id='configurableService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.service.cmr.configuration.ConfigurableService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="org.alfresco.repo.configuration.ConfigurableServiceImpl">
+            <property name="nodeService">
+                <ref bean="nodeService" />
+            </property>     
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
 
 </beans>

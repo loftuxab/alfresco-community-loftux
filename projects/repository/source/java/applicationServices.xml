@@ -259,5 +259,22 @@
          <idref bean="AlfImporterService"/>
       </property>
    </bean>
+   
+   <alias alias="AlfConfigurableService" name="configurableService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <value>ConfigurableService</value>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.configuration.ConfigurableService</value>
+      </property>
+      <property name="description">
+         <value>Configurable Service</value>
+      </property>
+      <property name="implementation">
+         <idref bean="AlfConfigurableService"/>
+      </property>
+   </bean>
 
 </beans>

@@ -74,7 +74,7 @@ import org.springframework.util.StopWatch;
 /**
  * @author Roy Wetherall
  */
-public class RuleServiceSystemTest extends TestCase
+public class RuleServiceCoverageTest extends TestCase
 {
 	/**
 	 * Application context used during the test
@@ -787,7 +787,7 @@ public class RuleServiceSystemTest extends TestCase
         // Check that the new node has been checked out
         List<ChildAssociationRef> children = this.nodeService.getChildAssocs(this.nodeRef);
         assertNotNull(children);
-        assertEquals(2, children.size());
+        assertEquals(3, children.size()); // includes the rule folder
         for (ChildAssociationRef child : children)
         {
             NodeRef childNodeRef = child.getChildRef();

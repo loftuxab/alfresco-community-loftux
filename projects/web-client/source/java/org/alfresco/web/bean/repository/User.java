@@ -23,6 +23,7 @@ import javax.faces.context.FacesContext;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -126,23 +127,21 @@ public final class User
          ServiceRegistry registry = Repository.getServiceRegistry(fc);
          NodeService nodeService = registry.getNodeService();
          NamespaceService namespaceService = registry.getNamespaceService();
-         RuleService ruleService = registry.getRuleService();
+         ConfigurableService configurableService = registry.getConfigurableService();
          
          NodeRef person = Application.getCurrentUser(fc).getPerson();
          if (nodeService.hasAspect(person, ContentModel.ASPECT_CONFIGURABLE) == false)
          {
             // create the configuration folder for this Person node
-            ruleService.makeConfigurable(person);
-         }
-         
-         List<AssociationRef> assocs = nodeService.getTargetAssocs(person, ContentModel.ASSOC_CONFIGURATIONS);
-         if (assocs.size() != 1)
-         {
-            throw new IllegalStateException("Unable to find associated 'configurations' folder for node: " + person);
+        	 configurableService.makeConfigurable(person);
          }
          
          // target of the assoc is the configurations folder ref
-         NodeRef configRef = assocs.get(0).getTargetRef();
+         NodeRef configRef = configurableService.getConfigurationFolder(person);
+         if (configRef == null)
+         {
+            throw new IllegalStateException("Unable to find associated 'configurations' folder for node: " + person);
+         }
          
          String xpath = NamespaceService.ALFRESCO_PREFIX + ":" + "preferences";
          List<NodeRef> nodes = nodeService.selectNodes(

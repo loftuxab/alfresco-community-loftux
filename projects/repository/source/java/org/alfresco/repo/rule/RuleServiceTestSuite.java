@@ -52,7 +52,7 @@ public class RuleServiceTestSuite extends TestSuite
         suite.addTestSuite(RuleXMLUtilTest.class);
         suite.addTestSuite(RuleStoreTest.class);
         suite.addTestSuite(RuleServiceImplTest.class);
-        suite.addTestSuite(RuleServiceSystemTest.class);
+        suite.addTestSuite(RuleServiceCoverageTest.class);
         return suite;
     }
 }

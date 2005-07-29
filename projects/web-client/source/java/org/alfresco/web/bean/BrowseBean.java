@@ -379,7 +379,8 @@ public class BrowseBean implements IContextListener
             QName type = this.nodeService.getType(nodeRef);
             
             // look for Space or File nodes
-            if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER))
+            if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) == true && 
+            	this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYTEM_FOLDER) == false)
             {
                // TODO: We need to get at least Name etc. for sorting purposes,
                //       if the props are always needed then it's better to get them here...?
@@ -469,7 +470,8 @@ public class BrowseBean implements IContextListener
                QName type = this.nodeService.getType(nodeRef);
                
                // look for Space or File nodes
-               if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER))
+               if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) && 
+                   this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYTEM_FOLDER) == false)
                {
                   // create our Node representation
                   MapNode node = new MapNode(nodeRef, this.nodeService, true);

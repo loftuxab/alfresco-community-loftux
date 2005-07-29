@@ -28,6 +28,7 @@ import org.alfresco.repo.importer.ImporterService;
 import org.alfresco.service.ServiceDescriptor;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -232,5 +233,13 @@ public class ServiceDescriptorRegistry
     public RuleService getRuleService()
     {
         return (RuleService)getService(RULE_SERVICE);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getConfigurableService()
+     */
+    public ConfigurableService getConfigurableService()
+    {
+    	return (ConfigurableService)getService(CONFIGURABLE_SERVICE);
     }
 }

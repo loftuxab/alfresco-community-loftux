@@ -41,7 +41,7 @@ public class ImageTransformActionExecuter extends TransformActionExecuter
 	public static final String PARAM_CONVERT_COMMAND = "convert-command";
 	
 	private static final String IMCOVERT = "imconvert ";
-	private static final String SOURCE_TARGET =  " ${source} ${target}";
+	private static final String SOURCE_TARGET =  " \"${source}\" \"${target}\"";
     
 	private ImageMagickContentTransformer imageMagickContentTransformer;
 	

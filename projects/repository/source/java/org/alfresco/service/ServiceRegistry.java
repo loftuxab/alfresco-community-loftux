@@ -23,6 +23,7 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.importer.ImporterService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -66,6 +67,7 @@ public interface ServiceRegistry
     static final QName COCI_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CheckoutCheckinService");
     static final QName RULE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "RuleService");
     static final QName IMPORTER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ImporterService");
+    static final QName CONFIGURABLE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ConfigurableService");
     
     /**
      * Get Services provided by Repository
@@ -167,4 +169,9 @@ public interface ServiceRegistry
      * @return the rule service (or null, if one is not provided)
      */
     RuleService getRuleService();
+    
+    /**
+     * @return the configurable service (or null if one is not provided)
+     */
+    ConfigurableService getConfigurableService();
 }

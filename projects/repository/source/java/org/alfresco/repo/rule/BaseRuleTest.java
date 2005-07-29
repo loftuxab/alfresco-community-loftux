@@ -27,6 +27,7 @@ import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
 import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.repo.rule.condition.MatchTextEvaluator;
 import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -80,6 +81,7 @@ public class BaseRuleTest extends BaseSpringTest
     protected NodeService nodeService;
     protected ContentService contentService;
     protected RuleService ruleService;
+	protected ConfigurableService configService;
 
     /**
      * Rule type used in tests
@@ -99,9 +101,7 @@ public class BaseRuleTest extends BaseSpringTest
      */
     @Override
     protected void onSetUpInTransaction() throws Exception
-    {
-        
-        
+    {               
         // Get the services
         this.nodeService = (NodeService) this.applicationContext
                 .getBean("nodeService");
@@ -109,6 +109,8 @@ public class BaseRuleTest extends BaseSpringTest
                 .getBean("contentService");
         this.ruleService = (RuleService) this.applicationContext
                 .getBean("ruleService");
+        this.configService = (ConfigurableService)this.applicationContext
+        		.getBean("configurableService");
 
         // Get the rule type
         this.ruleType = this.ruleService.getRuleType(RULE_TYPE_NAME);
@@ -124,21 +126,13 @@ public class BaseRuleTest extends BaseSpringTest
                 ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
                 ContentModel.TYPE_CONTAINER).getChildRef();
-
-        // Create the config folder
-        this.configFolder = this.nodeService.createNode(rootNodeRef,
-                ContentModel.ASSOC_CHILDREN,
-                QName.createQName("{test}configfolder"),
-                ContentModel.TYPE_CONFIGURATIONS).getChildRef();
     }
 
     protected void makeTestNodeActionable()
     {
-        // Manually make the test node actionable
-        this.nodeService.addAspect(this.nodeRef,
-                ContentModel.ASPECT_ACTIONABLE, null);
-        this.nodeService.createAssociation(this.nodeRef, configFolder,
-                ContentModel.ASSOC_CONFIGURATIONS);
+    	// Make the node actionable
+    	this.configService.makeConfigurable(this.nodeRef);
+    	this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_ACTIONABLE, null); 
     }
 
     protected RuleImpl createTestRule(String id)

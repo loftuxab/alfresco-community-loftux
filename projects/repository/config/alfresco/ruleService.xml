@@ -6,9 +6,6 @@
    <!-- Rules Service -->
    
    <bean id="ruleService" class="org.alfresco.repo.rule.RuleServiceImpl" init-method="init">
-		<property name="configService">
-			<ref bean="repoConfigService"/>
-		</property>
 		<property name="nodeService">
 			<ref bean="nodeService"/>
 		</property>
@@ -27,6 +24,9 @@
 		<property name="ruleStore">
 			<ref bean="ruleStore"/>
 		</property>
+		<property name="configService">
+			<ref bean="configurableService"/>
+		</property>
    </bean>
    
    <!-- Rule Store -->
@@ -41,9 +41,12 @@
 	  <property name="dictionaryService">
 		 <ref bean="dictionaryService"></ref>
 	  </property>
-		<property name="policyComponent">
-			<ref bean="policyComponent"/>
-		</property>	
+	  <property name="policyComponent">
+		 <ref bean="policyComponent"/>
+	  </property>	
+	  <property name="configService">
+		 <ref bean="configurableService"/>
+	  </property>
    </bean>
    
    <!-- Definitions for beans that use the common resource -->

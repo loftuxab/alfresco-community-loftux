@@ -86,14 +86,7 @@ public interface RuleService
      * @param nodeRef the node reference
      * @return true if the node is actionable, false otherwise
      */
-    public boolean isActionable(NodeRef nodeRef);
-    
-    /**
-     * Makes a specified node Configurable.
-     * 
-     * @param nodeRef the node reference
-     */
-    public void makeConfigurable(NodeRef nodeRef);
+    public boolean isActionable(NodeRef nodeRef);    
     
     /**
      * Indicates wether the rules for a given node are enabled or not.  If the 

@@ -36,6 +36,7 @@ import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.repo.rule.condition.RuleConditionEvaluator;
 import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -70,11 +71,6 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 * The application context
 	 */
 	private ApplicationContext applicationContext;
-	
-    /**
-     * The config service
-     */
-    private ConfigService configService;
     
     /**
      * The node service
@@ -100,6 +96,8 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
      * The policy component
      */
     private PolicyComponent policyComponent;
+    
+    private ConfigurableService configService;
     
     /**
      * The rule store
@@ -143,10 +141,10 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
     private void init()
     {
         // Register the copy policy behaviour
-        this.policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
-                ContentModel.ASPECT_ACTIONABLE,
-                new JavaBehaviour(this, "onCopyNode"));
+        //this.policyComponent.bindClassBehaviour(
+        //        QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
+        //        ContentModel.ASPECT_ACTIONABLE,
+        //        new JavaBehaviour(this, "onCopyNode"));
     }
     
 	/**
@@ -169,16 +167,6 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 		this.ruleStore = ruleStore;
 		((RuleStoreImpl)this.ruleStore).setRuleService(this);
 	}
-	
-    /**
-     * Set the config service
-     * 
-     * @param configService     the config service
-     */
-    public void setConfigService(ConfigService configService)
-    {
-        this.configService = configService;
-    }
     
     /**
      * Set the node service 
@@ -245,6 +233,11 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
     {
         return this.ruleTypes.get(name);
     }
+    
+    public void setConfigService(ConfigurableService configService)
+	{
+		this.configService = configService;
+	}
 
     /**
      * @see org.alfresco.repo.rule.RuleService#getConditionDefinitions()
@@ -284,76 +277,15 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
     public void makeActionable(
             NodeRef nodeRef)
     {
-        applyConfigActionAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE);
+        // Make the node configurable
+    	if (this.configService.isConfigurable(nodeRef) == false)
+    	{
+    		this.configService.makeConfigurable(nodeRef);
+    	}
+    	
+    	// Apply the actionable aspect
+    	this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE, null);
     }
-    
-    /**
-     * @see org.alfresco.service.cmr.rule.RuleService#makeConfigurable(org.alfresco.service.cmr.repository.NodeRef)
-     */
-    public void makeConfigurable(NodeRef nodeRef)
-    {
-        applyConfigActionAspect(nodeRef, ContentModel.ASPECT_CONFIGURABLE);
-    }
-    
-    /**
-     * Helper to apply a configuraction/actionable type aspect to a node
-     * 
-     * @param nodeRef       NodeRef to apply aspect too
-     * @param aspect        Aspect to apply
-     */
-    private void applyConfigActionAspect(NodeRef nodeRef, QName aspect)
-    {
-        // Get the root config node
-        NodeRef rootConfigFolder = getRootConfigNodeRef(nodeRef.getStoreRef());
-        
-        // Create the configuraion folder
-        NodeRef configurationsNodeRef = this.nodeService.createNode(
-                                            rootConfigFolder,
-                                            ContentModel.ASSOC_CONTAINS,
-                                            QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
-                                            ContentModel.TYPE_CONFIGURATIONS).getChildRef();
-        
-        // Apply the aspect and add the configurations folder
-        this.nodeService.addAspect(
-              nodeRef, 
-              aspect, 
-              null);
-        this.nodeService.createAssociation(
-              nodeRef, 
-              configurationsNodeRef, 
-              ContentModel.ASSOC_CONFIGURATIONS);   
-    }
-
-   /**
-	 * Get the root config node reference
-	 * 
-	 * @param storeRef	the store reference
-	 * @return			the root config node reference
-	 */
-	private NodeRef getRootConfigNodeRef(StoreRef storeRef) 
-	{
-		// TODO maybe this should be cached ...
-		// TODO the QNames should be put in the DicitionaryBootstrap
-		
-		NodeRef rootConfigFolder = null;
-		NodeRef rootNode = this.nodeService.getRootNode(storeRef);
-		List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(
-							  					rootNode, 
-												QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"));
-		if (childAssocRefs.size() == 0)
-		{
-			rootConfigFolder = this.nodeService.createNode(
-												rootNode,
-												ContentModel.ASSOC_CHILDREN,
-												QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"),
-												ContentModel.TYPE_SYTEM_FOLDER).getChildRef();
-		}
-		else
-		{
-			rootConfigFolder = childAssocRefs.get(0).getChildRef();
-		}
-		return rootConfigFolder;
-	}
 
     /**
      * @see org.alfresco.repo.rule.RuleService#isActionable(org.alfresco.repo.ref.NodeRef)
@@ -648,40 +580,40 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
      *
      * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, PolicyScope)
      */
-    public void onCopyNode(
-            QName classRef,
-            NodeRef sourceNodeRef,
-            StoreRef destinationStoreRef,
-            boolean copyToNewNode,
-            PolicyScope copyDetails)
-    {
+  //  public void onCopyNode(
+  //          QName classRef,
+   //         NodeRef sourceNodeRef,
+  //          StoreRef destinationStoreRef,
+  //          boolean copyToNewNode,
+  //          PolicyScope copyDetails)
+  //  {
         // The source node reference is configurable so get the config folder node
-        NodeRef rootConfigFolder = getRootConfigNodeRef(destinationStoreRef);
-        
-        // Get the config folder from the actionable node
-        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
-                                                sourceNodeRef, 
-                                                ContentModel.ASSOC_CONFIGURATIONS);
-        if (nodeAssocRefs.size() == 0)
-        {
-            throw new RuleServiceException("The configuration folder has not been set for this actionable node.");
-        }
-        
-        NodeRef sourceConfigFolder = nodeAssocRefs.get(0).getTargetRef();
-        
-        // Copy the source config folder into the destination root config folder
-        CopyService copyService = this.serviceRegistry.getCopyService();
-        NodeRef newConfigFolder = copyService.copy(
-                sourceConfigFolder, 
-                rootConfigFolder,
-                ContentModel.ASSOC_CONTAINS,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
-                true);
-        
-        // Add the aspect and add the reference to the copied config folder
-        copyDetails.addAspect(classRef);
-        copyDetails.addAssociation(classRef, new AssociationRef(sourceNodeRef, ContentModel.ASSOC_CONFIGURATIONS, newConfigFolder));
-    }
+//        NodeRef rootConfigFolder = getRootConfigNodeRef(destinationStoreRef);
+//        
+//        // Get the config folder from the actionable node
+//        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
+//                                                sourceNodeRef, 
+//                                                ContentModel.ASSOC_CONFIGURATIONS);
+//        if (nodeAssocRefs.size() == 0)
+//        {
+//            throw new RuleServiceException("The configuration folder has not been set for this actionable node.");
+//        }
+//        
+//        NodeRef sourceConfigFolder = nodeAssocRefs.get(0).getTargetRef();
+//        
+//        // Copy the source config folder into the destination root config folder
+//        CopyService copyService = this.serviceRegistry.getCopyService();
+//        NodeRef newConfigFolder = copyService.copy(
+//                sourceConfigFolder, 
+//                rootConfigFolder,
+//                ContentModel.ASSOC_CONTAINS,
+//                QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
+//                true);
+//        
+//        // Add the aspect and add the reference to the copied config folder
+//        copyDetails.addAspect(classRef);
+//        copyDetails.addAssociation(classRef, new AssociationRef(sourceNodeRef, ContentModel.ASSOC_CONFIGURATIONS, newConfigFolder));
+ //   }
     
     /**
      * Helper class to contain the information about a rule that is executed

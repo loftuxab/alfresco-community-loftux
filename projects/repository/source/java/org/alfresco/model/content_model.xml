@@ -265,7 +265,7 @@
 
       <type name="alf:configurations">
          <title>Configurations</title>
-         <parent>alf:folder</parent>
+         <parent>alf:systemfolder</parent>
       </type>
 
       <type name="alf:propertyvalue">
@@ -785,7 +785,7 @@
       <aspect name="alf:configurable">
          <title>Configurable</title>
          <associations>
-            <association name="alf:configurations">
+            <child-association name="alf:configurations">
                <source>
                   <mandatory>false</mandatory>
                   <many>false</many>
@@ -795,7 +795,7 @@
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>
-            </association>
+            </child-association>
          </associations>
       </aspect>
    

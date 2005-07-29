@@ -1,0 +1,76 @@
+/*
+ * Copyright (C) 2005 Alfresco, Inc.
+ *
+ * Licensed under the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.gnu.org/licenses/lgpl.txt
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ */
+package org.alfresco.repo.configuration;
+
+import java.util.List;
+
+import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+
+/**
+ * @author Roy Wetherall
+ */
+public class ConfigurableServiceImpl implements ConfigurableService
+{
+	private NodeService nodeService;
+	
+	public void setNodeService(NodeService nodeService)
+	{
+		this.nodeService = nodeService;
+	}
+
+	public boolean isConfigurable(NodeRef nodeRef)
+	{
+		return this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_CONFIGURABLE);
+	}
+
+	public void makeConfigurable(NodeRef nodeRef)
+	{
+		if (isConfigurable(nodeRef) == false)
+		{
+			// First apply the aspect
+			this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_CONFIGURABLE, null);
+			
+			// Next create and add the configurations folder
+			this.nodeService.createNode(
+					nodeRef,
+					ContentModel.ASSOC_CONFIGURATIONS,
+					ContentModel.ASSOC_CONFIGURATIONS,
+					ContentModel.TYPE_CONFIGURATIONS);
+		}		
+	}
+	
+	public NodeRef getConfigurationFolder(NodeRef nodeRef)
+	{
+		NodeRef result = null;
+		if (isConfigurable(nodeRef) == true)
+		{
+			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONFIGURATIONS);
+			if (assocs.size() != 0)
+			{
+				ChildAssociationRef assoc = assocs.get(0);
+				result = assoc.getChildRef();
+			}
+		}		
+		return result;
+	}
+
+}

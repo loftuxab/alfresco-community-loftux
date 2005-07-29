@@ -24,10 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -74,6 +76,11 @@ public class RuleStoreImpl implements RuleStore
      * The policy component
      */
     private PolicyComponent policyComponent;
+    
+    /**
+     * The configurable service
+     */
+    private ConfigurableService configService;
     
     /**
      * Rule cache entries indexed by node reference
@@ -129,6 +136,11 @@ public class RuleStoreImpl implements RuleStore
     {
         this.policyComponent = policyComponent;
     }
+    
+    public void setConfigService(ConfigurableService configService)
+	{
+		this.configService = configService;
+	}
     
     /**
      * Initilalise method
@@ -421,18 +433,9 @@ public class RuleStoreImpl implements RuleStore
         
 		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
-	        // Get the configurations folder
-	        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
-	                                               nodeRef, 
-	                                               ContentModel.ASSOC_CONFIGURATIONS);
-	        if (nodeAssocRefs.size() == 0)
-	        {
-	            throw new RuleServiceException("The configuration folder has not been set for this actionable node.");
-	        }
-	        else
-	        {
-	            NodeRef configFolder = nodeAssocRefs.get(0).getTargetRef();
-				
+            NodeRef configFolder = this.configService.getConfigurationFolder(nodeRef);
+			if (configFolder != null)
+			{
 				List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(
 														configFolder, 
 														QName.createQName(NamespaceService.ALFRESCO_URI, "rules"));
@@ -448,7 +451,7 @@ public class RuleStoreImpl implements RuleStore
 				{
 					ruleFolder = childAssocRefs.get(0).getChildRef();
 				}
-	        }
+			}
 		}
 		
         return ruleFolder;

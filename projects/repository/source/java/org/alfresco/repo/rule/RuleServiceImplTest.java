@@ -21,15 +21,13 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.rule.common.RuleTypeImpl;
-import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
 import org.alfresco.service.cmr.rule.RuleCondition;
 import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleType;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 
 
 /**
@@ -75,17 +73,10 @@ public class RuleServiceImplTest extends BaseRuleTest
     {
         this.ruleService.makeActionable(this.nodeRef);
         assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_ACTIONABLE));
-        
-        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
-                                               nodeRef, 
-                                               ContentModel.ASSOC_CONFIGURATIONS);
-        assertEquals(1, nodeAssocRefs.size());
-		
-		assertNotNull(this.nodeService.createNode(
-							this.rootNodeRef,
-							ContentModel.ASSOC_CHILDREN,
-							QName.createQName(NamespaceService.ALFRESCO_URI, "systemconfiguration"),
-							ContentModel.TYPE_SYTEM_FOLDER));
+        assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_CONFIGURABLE));
+        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(this.nodeRef, ContentModel.ASSOC_CONFIGURATIONS);
+        assertNotNull(assocs);
+        assertEquals(1, assocs.size());
     }
     
     /**
