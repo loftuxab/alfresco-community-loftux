@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT permissions (namespaces+, permissionSet*, nodePermissions)>
+<!ELEMENT namespaces (namespace+)>
+<!ELEMENT namespace EMPTY>
+<!ATTLIST namespace uri CDATA #REQUIRED>
+<!ATTLIST namespace prefix CDATA #REQUIRED>
+<!ATTLIST permissions defaultPermission (allow | deny ) "deny" >
+<!ELEMENT permissionGroup (includePermissionGroup*)>
+<!ATTLIST permissionGroup name CDATA #REQUIRED>
+<!ATTLIST permissionGroup allowFullControl (allow | deny) "deny" >
+<!ELEMENT includePermissionGroup EMPTY>
+<!ATTLIST includePermissionGroup type CDATA #IMPLIED>
+<!ATTLIST includePermissionGroup permissionGroup CDATA #REQUIRED>
+<!ELEMENT permissionSet (permissionGroup*, permission*)>
+<!ATTLIST permissionSet type CDATA #REQUIRED>
+<!ELEMENT permission (grantedToGroup*, requiredPermission* )>
+<!ATTLIST permission name CDATA #REQUIRED>
+<!ATTLIST permission default (allow | deny) "deny" >
+<!ELEMENT requiredPermission EMPTY>
+<!ATTLIST requiredPermission name CDATA #REQUIRED>
+<!ATTLIST requiredPermission type CDATA #IMPLIED>
+<!ATTLIST requiredPermission on (node | parent) #REQUIRED>
+<!ELEMENT grantedToGroup EMPTY >
+<!ATTLIST grantedToGroup type CDATA #IMPLIED>
+<!ATTLIST grantedToGroup permissionGroup CDATA #REQUIRED>
+<!ELEMENT nodePermissions (nodePermission*) >
+<!ATTLIST nodePermissions nodeRef CDATA #IMPLIED >
+<!ELEMENT nodePermission (permissionReference) >
+<!ATTLIST nodePermission recipient CDATA #IMPLIED >
+<!ATTLIST nodePermission parentPermissions (inherited | blocked ) "inherited" >
+<!ATTLIST nodePermission access (allow | deny) "allow" >
+<!ELEMENT permissionReference EMPTY>
+<!ATTLIST permissionReference name CDATA #REQUIRED>
+<!ATTLIST permissionReference type CDATA #REQUIRED>

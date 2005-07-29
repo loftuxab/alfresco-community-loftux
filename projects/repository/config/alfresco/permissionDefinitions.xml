@@ -1,0 +1,110 @@
+<!DOCTYPE permissions>
+<permissions>
+    
+   <namespaces>
+      <!-- TODO: Change this URI to something like http://www.alfresco.org/content/1.0 -->
+      <namespace uri="http://www.alfresco.org/1.0" prefix="alf"/>
+   </namespaces>
+    
+   <permissionSet type="alf:base">
+    
+      <permissionGroup name="FullControl" allowFullControl="allow" />
+      <permissionGroup name="Read" allowFullControl="deny" />  
+      <permissionGroup name="Write" allowFullControl="deny" />  
+      <permissionGroup name="Delete" allowFullControl="deny" />  
+      <permissionGroup name="AddChildren" allowFullControl="deny" />  
+    
+      <permission name="ReadProperties">
+         <grantedToGroup permissionGroup="Read" />
+         <requiredPermission on="parent" name="ReadChildren"/>
+      </permission>
+      
+      <permission name="ReadChildren">
+         <grantedToGroup permissionGroup="Read" />
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="WriteProperties">
+         <grantedToGroup permissionGroup="Write" />
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="DeleteNode">
+         <grantedToGroup permissionGroup="Delete" />
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="DeleteChildren">
+         <grantedToGroup permissionGroup="Delete" />
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="CreateChildren">
+         <grantedToGroup permissionGroup="AddChildren" />
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="LinkChildren">
+         <grantedToGroup permissionGroup="AddChildren" />
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+     
+      <permission name="DeleteAssociations" >
+        <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="ReadAssociations" >
+        <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="CreateAssociations">
+        <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      
+      <permission name="ReadPermissions" >
+        <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="ChangePermissions" >
+        <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+   </permissionSet>
+   
+   <permissionSet type="alf:content">
+      <!-- Extend some base permissions -->
+      <permissionGroup name="Read"/>
+      <permissionGroup name="Write" />
+      <!-- Add some new -->
+      <permissionGroup name="Execute" allowFullControl="deny" />
+      
+      <permission name="ReadContent">
+         <grantedToGroup permissionGroup="Read"/>
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="WriteContent">
+         <grantedToGroup permissionGroup="Write" />
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+      <permission name="ExecuteContent">
+         <grantedToGroup permissionGroup="Execute" />
+         <requiredPermission on="parent" name="ReadChildren" />
+      </permission>
+   </permissionSet>
+   
+   <permissionSet type="alf:ownable">
+      <!-- Read is controlled by the node -->
+      <permissionGroup name="Owner" >
+        <includePermissionGroup permissionGroup="FullControl" />
+      </permissionGroup>
+      <permissionGroup name="TakeOwnership" />
+      <permission name="SetOwner">
+        <grantedToGroup permissionGroup="TakeOwnership" />
+        <grantedToGroup permissionGroup="Owner" />
+        <requiredPermission on="parent" name="ReadChildren" />
+        <requiredPermission on="node" name="DeleteChildren" />
+        <requiredPermission on="node" name="AddChildren" />
+      </permission>
+   </permissionSet>
+   
+   <!-- Set the permissions for the root node -->
+   
+   <nodePermissions>
+      <!-- Everyone has full control -->
+      <nodePermission access="allow">
+        <permissionReference type="alf:base" name="FullControl"/>
+      </nodePermission>
+   </nodePermissions>
+   
+</permissions>

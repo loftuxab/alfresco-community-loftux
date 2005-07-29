@@ -814,6 +814,24 @@
          </properties>
       </aspect>
    
+   
+      <aspect name="alf:ownable">
+         <title>Ownable</title>
+         <associations>
+            <child-association name="alf:owner">
+               <source>
+                  <mandatory>true</mandatory>
+                  <many>false</many>
+               </source>
+               <target>
+                  <class>alf:person</class>
+                  <mandatory>true</mandatory>
+                  <many>false</many>
+               </target>
+            </child-association>
+         </associations>
+      </aspect>
+      
    </aspects>
 
 </model>
