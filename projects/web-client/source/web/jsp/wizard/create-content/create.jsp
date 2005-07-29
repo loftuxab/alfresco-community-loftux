@@ -65,17 +65,7 @@
    <h:form id="create-file">
    
    <%-- Main outer table --%>
-   <%--If the browse is IE, we can support variable IFrame height --%>
-   <script>
-   if (isIE)
-   {
-      document.write("<table cellspacing='0' cellpadding='2' height='99%'>");
-   }
-   else
-   {
-      document.write("<table cellspacing='0' cellpadding='2'>");
-   }
-   </script>
+   <table cellspacing="0" cellpadding="2">
       
       <%-- Title bar --%>
       <tr>
@@ -92,8 +82,8 @@
          </td>
          
          <%-- Work Area --%>
-         <td width="100%" height="100%">
-            <table cellspacing="0" cellpadding="0" width="100%" height="100%">
+         <td width="100%">
+            <table cellspacing="0" cellpadding="0" width="100%">
                <%-- Breadcrumb --%>
                <%@ include file="../../parts/breadcrumb.jsp" %>
                
@@ -132,7 +122,7 @@
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td height="100%">
-                     <table cellspacing="0" cellpadding="3" border="0" width="100%" height="100%">
+                     <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
@@ -150,18 +140,7 @@
                               
                               <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
                               
-                              <%-- handle the size of the editor area based on the browser support
-                                   in IE we can scale the DIV, but FireFox doesn't seem to handle it --%>
-                              <script>
-                              if (isIE)
-                              {
-                                 document.write("<div id='editor' style='width:100%; height:100%'>");
-                              }
-                              else
-                              {
-                                 document.write("<div id='editor' style='width:100%; height:360px'>");
-                              }
-                              </script>
+                              <div id='editor' style='width:100%; height:360px'>
                                  <h:outputText value="#{CreateContentWizard.content}" escape="false" />
                               </div>
                               <h:inputHidden id="editorOutput" value="#{CreateContentWizard.content}" />
