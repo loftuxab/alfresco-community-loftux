@@ -49,6 +49,7 @@ import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * Node operations service unit tests
@@ -342,6 +343,10 @@ public class CopyServiceImplTest extends BaseSpringTest
         rule.addRuleAction(this.ruleService.getActionDefinition(AddFeaturesActionExecuter.NAME), props);
         this.ruleService.addRule(this.sourceNodeRef, rule);
         
+        System.out.println(
+                NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        System.out.println(" ------------------------------ ");
+        
         // Now copy the node that has rules associated with it
         NodeRef copy = this.copyService.copy(
                 this.sourceNodeRef,
@@ -361,8 +366,8 @@ public class CopyServiceImplTest extends BaseSpringTest
         
         // TODO double check that the cofiguration folder is being copied
         
-        //System.out.println(
-        //              NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        System.out.println(
+                      NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
         
     }
 	
@@ -439,7 +444,13 @@ public class CopyServiceImplTest extends BaseSpringTest
 		// Check all the child associations have been copied
 		List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(destinationNodeRef);
 		assertNotNull(childAssocRefs);
-		assertEquals(2, childAssocRefs.size());
+		int expectedSize = 2;
+		if (this.nodeService.hasAspect(destinationNodeRef, ContentModel.ASPECT_CONFIGURABLE) == true)
+		{
+			expectedSize = expectedSize + 1;
+		}
+		
+		assertEquals(expectedSize, childAssocRefs.size());
 		for (ChildAssociationRef ref : childAssocRefs) 
 		{
 			if (ref.getQName().equals(TEST_CHILD_ASSOC_QNAME2) == true)

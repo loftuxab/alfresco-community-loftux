@@ -148,9 +148,7 @@ public class CopyServiceImpl implements CopyService
             QName destinationQName, 
             boolean copyChildren)
     {
-		NodeRef destinationNodeRef = null;
-        
-        // Check that all the passed values are not null
+		// Check that all the passed values are not null
         ParameterCheck.mandatory("Source Node", sourceNodeRef);
         ParameterCheck.mandatory("Destination Parent", destinationParent);
         ParameterCheck.mandatory("Destination Association Name", destinationQName);
@@ -164,7 +162,8 @@ public class CopyServiceImpl implements CopyService
         }
 
         // Recursively copy node
-        Set<NodeRef> copiedChildren = new HashSet<NodeRef>();
+        //Set<NodeRef> copiedChildren = new HashSet<NodeRef>();
+        Map<NodeRef, NodeRef> copiedChildren = new HashMap<NodeRef, NodeRef>();
         return recursiveCopy(sourceNodeRef, destinationParent, destinationAssocTypeQName, destinationQName, copyChildren, copiedChildren);
     }
     
@@ -175,7 +174,7 @@ public class CopyServiceImpl implements CopyService
               QName destinationAssocTypeQName,
               QName destinationQName, 
               boolean copyChildren,
-              Set<NodeRef> copiedChildren)
+              Map<NodeRef, NodeRef> copiedChildren)
     {
         // Extract Type Definition
 		QName sourceTypeRef = this.nodeService.getType(sourceNodeRef);
@@ -212,7 +211,7 @@ public class CopyServiceImpl implements CopyService
                 sourceTypeRef,
                 properties);
         NodeRef destinationNodeRef = destinationChildAssocRef.getChildRef();
-        copiedChildren.add(destinationNodeRef);
+        copiedChildren.put(sourceNodeRef, destinationNodeRef);
 		
         // Prevent any rules being fired on the new destination node
         this.ruleService.disableRules(destinationNodeRef);
@@ -408,7 +407,11 @@ public class CopyServiceImpl implements CopyService
 	 * @param copyChildren			indicates whether the primary children are copied or not
      * @param copiedChildren        set of children already copied
 	 */
-	private void copyAssociations(NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren, Set<NodeRef> copiedChildren)
+	private void copyAssociations(
+			NodeRef destinationNodeRef, 
+			PolicyScope copyDetails, 
+			boolean copyChildren, 
+			Map<NodeRef, NodeRef> copiedChildren)
 	{
 		QName classRef = this.nodeService.getType(destinationNodeRef);
 		copyChildAssociations(classRef, destinationNodeRef, copyDetails, copyChildren, copiedChildren);
@@ -460,7 +463,12 @@ public class CopyServiceImpl implements CopyService
 	 * @param copyDetails			the copy details
 	 * @param copyChildren			indicates whether to copy the primary children
 	 */
-	private void copyChildAssociations(QName classRef, NodeRef destinationNodeRef, PolicyScope copyDetails, boolean copyChildren, Set<NodeRef> copiedChildren)
+	private void copyChildAssociations(
+			QName classRef, 
+			NodeRef destinationNodeRef, 
+			PolicyScope copyDetails, 
+			boolean copyChildren, 
+			Map<NodeRef, NodeRef> copiedChildren)
 	{
 		List<ChildAssociationRef> childAssocs = copyDetails.getChildAssociations(classRef);
 		if (childAssocs != null)
@@ -471,11 +479,11 @@ public class CopyServiceImpl implements CopyService
 				{
 					if (childAssoc.isPrimary() == true)
 					{
-                        // Do not recurse further, if we've already copied the child
-                        if (copiedChildren.contains(childAssoc.getChildRef()) == false)
+                        // Do not recurse further, if we've already copied this node
+                        if (copiedChildren.containsKey(childAssoc.getChildRef()) == false)
                         {
     						// Copy the child
-    						NodeRef childCopy = recursiveCopy(
+    						recursiveCopy(
                                     childAssoc.getChildRef(), 
     								destinationNodeRef, 
                                     childAssoc.getTypeQName(), 
@@ -493,9 +501,28 @@ public class CopyServiceImpl implements CopyService
 				}
 				else
 				{
-					// Add the child (will not be primary reguardless of its origional state)
 					NodeRef childRef = childAssoc.getChildRef();
-					this.nodeService.addChild(destinationNodeRef, childRef, childAssoc.getTypeQName(), childAssoc.getQName());
+					QName childType = this.nodeService.getType(childRef);
+					
+					if (this.dictionaryService.isSubClass(childType, ContentModel.TYPE_CONFIGURATIONS) == true)
+					{
+						if (copiedChildren.containsKey(childRef) == false)
+                        {
+							// Always recursivly copy configuration folders
+							recursiveCopy(
+	                                childRef, 
+									destinationNodeRef, 
+	                                childAssoc.getTypeQName(), 
+	                                childAssoc.getQName(),
+									true,
+									copiedChildren);
+                        }
+					}
+					else
+					{
+						// Add the child (will not be primary reguardless of its origional state)
+						this.nodeService.addChild(destinationNodeRef, childRef, childAssoc.getTypeQName(), childAssoc.getQName());
+					}
 				}							
 			}
 		}
