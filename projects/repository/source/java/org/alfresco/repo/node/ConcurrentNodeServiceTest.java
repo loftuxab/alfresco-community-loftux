@@ -225,6 +225,9 @@ public class ConcurrentNodeServiceTest extends TestCase
         results.close();
     }
 
+    /**
+     * Daemon thread
+     */
     class Nester extends Thread
     {
         Thread waiter;
@@ -234,6 +237,7 @@ public class ConcurrentNodeServiceTest extends TestCase
         Nester(String name, Thread waiter, int repeats)
         {
             super(name);
+            this.setDaemon(true);
             this.waiter = waiter;
             this.repeats = repeats;
         }
