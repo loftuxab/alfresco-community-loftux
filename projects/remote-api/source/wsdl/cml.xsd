@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.alfresco.org/cml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cml="http://www.alfresco.org/cml" xmlns:alf="http://www.alfresco.org/cms">
+
+    <xsd:annotation>
+    	<xsd:documentation>
+    		Alfresco Web Services for Content Management. CML - Content Manipulation Language - Draft.
+    		NOTE: Placeholder file for now.
+    	</xsd:documentation>
+    </xsd:annotation>
+
+	<xsd:import namespace="http://www.alfresco.org/cms" schemaLocation="types.xsd"></xsd:import>
+
+</xsd:schema>
