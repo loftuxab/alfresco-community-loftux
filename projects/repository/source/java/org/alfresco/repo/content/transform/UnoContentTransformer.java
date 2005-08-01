@@ -79,6 +79,9 @@ public class UnoContentTransformer extends AbstractContentTransformer
                 new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_PPT, MimetypeMap.MIMETYPE_FLASH),
                 new DocumentFormatWrapper(DocumentFormat.FLASH_IMPRESS, 1.0));
         formatsByConversion.put(
+                new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_PPT, MimetypeMap.MIMETYPE_PDF),
+                new DocumentFormatWrapper(DocumentFormat.PDF_IMPRESS, 1.0));
+        formatsByConversion.put(
                 new ContentTransformerRegistry.TransformationKey(MimetypeMap.MIMETYPE_WORD, MimetypeMap.MIMETYPE_HTML),
                 new DocumentFormatWrapper(DocumentFormat.HTML_WRITER, 1.0));
         formatsByConversion.put(

@@ -38,6 +38,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
@@ -64,6 +65,7 @@ public class ImporterComponent
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
+    private SearchService searchService;
     private ContentService contentService;
 
     
@@ -81,6 +83,14 @@ public class ImporterComponent
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+
+    /**
+     * @param searchService the service to perform path searches
+     */
+    public void setSearchService(SearchService searchService)
+    {
+        this.searchService = searchService;
     }
 
     /**
@@ -131,7 +141,7 @@ public class ImporterComponent
             // Create a valid path and search
             path = bindPlaceHolder(path, configuration);
             path = createValidPath(path);
-            List<NodeRef> nodeRefs = nodeService.selectNodes(nodeRef, path, null, namespaceService, false);
+            List<NodeRef> nodeRefs = searchService.selectNodes(nodeRef, path, null, namespaceService, false);
             if (nodeRefs.size() == 0)
             {
                 throw new ImporterException("Path " + path + " with node " + nodeRef + " does not exist - the path must resolve to a valid location");

@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -39,12 +38,6 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
         return (NodeService) applicationContext.getBean("dbNodeService");
     }
 
-    @Override
-    protected ContentService getContentService()
-    {
-        return (ContentService) applicationContext.getBean("contentService");
-    }
-    
     /**
      * Deletes a child node and then iterates over the children of the parent node,
      * getting the QName.  This caused some issues after we did some optimization
@@ -52,7 +45,11 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
      */
     public void testLazyLoadIssue() throws Exception
     {
-        Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
+        // commit results
+        setComplete();
+        endTransaction();
+
         ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
         NodeRef n6Ref = n6pn8Ref.getParentRef();
         NodeRef n8Ref = n6pn8Ref.getChildRef();

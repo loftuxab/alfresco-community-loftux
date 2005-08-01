@@ -122,7 +122,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             }
 
             String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(rootPath);
-            List<NodeRef> nodes = nodeService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
+            List<NodeRef> nodes = searchService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
             if (nodes.size() == 0)
             {
                 throw new AlfrescoRuntimeException("Root path not created prior to application startup: " + rootPath);
@@ -180,20 +180,21 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
                 // Create the person under the special people system folder
                 // This is required to allow authenticate() to succeed during
                 // login
-                List<NodeRef> results = nodeService.selectNodes(rootNodeRef, RepositoryAuthenticationDao.PEOPLE_FOLDER, null, namespaceService, false);
+                List<NodeRef> results = searchService.selectNodes(
+                        rootNodeRef,
+                        RepositoryAuthenticationDao.PEOPLE_FOLDER,
+                        null,
+                        namespaceService,
+                        false);
                 if (results.size() != 1)
                 {
                     throw new Exception("Unable to find system types folder path: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
                 }
 
-                nodeService.createNode(results.get(0), ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON, // expecting
-                                                                                                                // this
-                                                                                                                // qname
-                                                                                                                // path
-                                                                                                                // in
-                                                                                                                // the
-                                                                                                                // authentication
-                                                                                                                // methods
+                nodeService.createNode(
+                        results.get(0),
+                        ContentModel.ASSOC_CHILDREN,
+                        ContentModel.TYPE_PERSON, // expecting this qname path in the authentication methods
                         ContentModel.TYPE_PERSON, props);
             }
 

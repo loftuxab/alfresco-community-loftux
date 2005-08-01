@@ -176,7 +176,7 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
                         ContentReader targetReader = targetWriter.getReader();
                         String checkContent = targetReader.getContentString();
                         // essentially check that FTS indexing can use the conversion properly
-                        for (int word = 0; word < QUICK_WORDS.length; i++)
+                        for (int word = 0; word < QUICK_WORDS.length; word++)
                         {
                             assertTrue("Quick phrase word not present in document converted to text: \n" +
                                     "   transformer: " + transformer + "\n" +

@@ -22,6 +22,7 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
@@ -35,6 +36,8 @@ public class UsersBean implements IContextListener
 {
    /** NodeService bean reference */
    private NodeService nodeService;
+   /** SearchService bean reference */
+   private SearchService searchService;
    
    /** Component reference for Users RichList control */
    private UIRichList usersRichList;
@@ -64,6 +67,14 @@ public class UsersBean implements IContextListener
    }
    
    /**
+    * @param searchService the search service
+    */
+   public void setSearchService(SearchService searchService)
+   {
+      this.searchService = searchService;
+   }
+   
+   /**
     * @return Returns the usersRichList.
     */
    public UIRichList getUsersRichList()
@@ -84,7 +95,7 @@ public class UsersBean implements IContextListener
     */
    public List<Node> getUsers()
    {
-      return Repository.getUsers(FacesContext.getCurrentInstance(), this.nodeService);
+      return Repository.getUsers(FacesContext.getCurrentInstance(), this.nodeService, this.searchService);
    }
    
    

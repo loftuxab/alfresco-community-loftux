@@ -1,4 +1,4 @@
-package org.alfresco.repo.integrity;
+package org.alfresco.repo.node.integrity;
 
 import java.util.List;
 

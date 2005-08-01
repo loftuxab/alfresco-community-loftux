@@ -34,22 +34,20 @@ import org.alfresco.service.namespace.QName;
 public interface NodeDaoService
 {
     /**
-     * Evicts the persistent entity from the first level cache. 
+     * Flush resources to the persistent store.  The underlying implementation
+     * may or may not actually perform the flush.  It is therefore advisable that
+     * this method be called whenever a logical unit of work has been <b>completed</b>.
      * <p>
-     * Use this method to ensure that the cache size doesn't grow too much
-     * 
-     * @param node an entity no longer required
-     */
-    public void evict(Node node);
-    
-    /**
-     * Evicts the persistent entity from the first level cache.
+     * For the most part, the transaction mechanisms will ensure
+     * that this method gets called at the end of the transactions.  However,
+     * long-running processes should find well-known points at which to call this
+     * in order to ensure that resources are freed up correctly, allowing the
+     * transactions to run indefinitely.  
      * <p>
-     * Use this method to ensure that the cache size doesn't grow too much
-     * 
-     * @param assoc an entity no longer required
+     * While data <u>may</u> be flushed to the persistent stores, no data will be
+     * committed until the transaction has completed.
      */
-    public void evict(ChildAssoc assoc);
+    public void flush();
     
     /**
      * Creates a unique store for the given protocol and identifier combination

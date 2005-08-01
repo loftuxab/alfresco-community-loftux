@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<!-- Beans pertinent to node persistence and services --> 
+<beans>
+	
+   <bean id="nodeDaoServiceImpl" class="org.alfresco.repo.node.db.hibernate.HibernateNodeDaoServiceImpl" >
+      <property name="sessionFactory">
+         <ref bean="sessionFactory" />
+      </property>
+      <property name="maxEntityCount" >
+         <value>5000</value>     <!-- entity count above which the session will clear on flush() -->
+      </property>
+   </bean>
+   
+   <bean id="dbNodeDaoServiceTxnRegistration" class="org.alfresco.repo.transaction.NodeDaoServiceTransactionInterceptor" >
+      <property name="nodeDaoService">
+         <ref bean="nodeDaoServiceImpl" />
+      </property>
+   </bean>
+
+   <bean id='nodeDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
+      <property name='proxyInterfaces'>
+         <value>org.alfresco.repo.node.db.NodeDaoService</value>
+      </property>
+      <property name='transactionManager'>
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <ref bean="nodeDaoServiceImpl" />
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+      <property name="postInterceptors">
+         <list>
+            <ref bean="dbNodeDaoServiceTxnRegistration" />
+            <!-- only enable for debugging
+            <ref bean="methodCallLogAdvice" />
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
+               <constructor-arg>
+                  <value>nodeDaoService</value>
+               </constructor-arg>
+            </bean>
+            -->
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="nodeService" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
+      <property name="proxyInterface">
+         <value>org.alfresco.service.cmr.repository.NodeService</value>
+      </property>
+      <property name="defaultBinding">
+         <ref bean="dbNodeService"></ref>
+      </property>
+      <property name="redirectedProtocolBindings">
+         <map>
+            <entry key="workspace"><ref bean="dbNodeService"></ref></entry>
+            <entry key="versionStore"><ref bean="versionNodeService"></ref></entry>
+         </map>
+      </property>
+   </bean>
+   
+   <!-- NodeService implemented to persist to Database -->
+
+   <bean id="dbNodeServiceImpl" class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init" >
+      <constructor-arg>
+         <ref bean="policyComponent"/>
+      </constructor-arg>
+      <constructor-arg>
+         <ref bean="dictionaryService" />
+      </constructor-arg>
+      <constructor-arg>
+         <ref bean="nodeDaoService" />
+      </constructor-arg>
+   </bean>
+   
+   <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.service.cmr.repository.NodeService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <ref bean="dbNodeServiceImpl" />     
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+      <property name="postInterceptors">
+         <list>
+            <!-- only enable for debugging
+            <ref bean="methodCallLogAdvice" />
+            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
+               <constructor-arg>
+                  <value>dbNodeService</value>
+               </constructor-arg>
+            </bean>
+            -->
+         </list>
+      </property>
+   </bean>   
+   
+   <!-- Handles policy callbacks to ensure that node hierarchy gets indexed -->
+   <bean id="nodeIndexer" class="org.alfresco.repo.node.index.NodeIndexer" init-method="init">
+      <property name="policyComponent">
+         <ref bean="policyComponent" />
+      </property>
+      <property name="indexer">
+         <ref bean="indexerComponent" />
+      </property>
+   </bean>
+
+   <!-- ensures model-compliance of node structures -->   
+   <bean id="integrityChecker" class="org.alfresco.repo.node.integrity.IntegrityChecker" init-method="init">
+      <property name="policyComponent">
+         <ref bean="policyComponent"/>
+      </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService" />
+      </property>
+      <property name="nodeService">
+         <ref bean="nodeService" />
+      </property>
+      <property name="enabled">
+         <value>true</value>  <!-- on/off switch -->
+      </property>
+      <property name="traceOn">
+         <value>false</value>  <!-- use only to trace problems -->
+      </property>
+      <property name="failOnViolation" >
+         <value>true</value>  <!-- set to true to generate runtime exceptions upon violation -->
+      </property>
+      <property name="maxErrorsPerTransaction" >
+         <value>5</value>  <!-- limit output (exception and log) to the first N violation messages -->
+      </property>
+   </bean>
+   
+</beans>

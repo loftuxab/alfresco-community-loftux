@@ -1137,8 +1137,10 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.users == null)
       {
-         List<Node> userNodes = Repository.getUsers(FacesContext.getCurrentInstance(),
-               this.nodeService);
+         List<Node> userNodes = Repository.getUsers(
+               FacesContext.getCurrentInstance(),
+               this.nodeService,
+               this.searchService);
          this.users = new ArrayList<SelectItem>();
          for (Node user : userNodes)
          {

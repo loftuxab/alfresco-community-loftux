@@ -40,6 +40,7 @@ import org.alfresco.util.GUID;
 import org.hibernate.ObjectDeletedException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.stat.SessionStatistics;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -55,22 +56,81 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public static final String QUERY_GET_NODE_ASSOC = "node.GetNodeAssoc";
     public static final String QUERY_GET_NODE_ASSOC_TARGETS = "node.GetNodeAssocTargets";
     public static final String QUERY_GET_NODE_ASSOC_SOURCES = "node.GetNodeAssocSources";
+    
+    /** a uuid identifying this unique instance */
+    private String uuid;
+    /** maximum number of entities to keep in a session (L1 cache) */
+    private int maxEntityCount;
 
     /**
-     * All dependencies go into base class
+     * 
      */
     public HibernateNodeDaoServiceImpl()
     {
-    }
-    
-    public void evict(Node node)
-    {
-        getHibernateTemplate().evict(node);
+        this.uuid = GUID.generate();
+        this.maxEntityCount = 5000; 
     }
 
-    public void evict(ChildAssoc assoc)
+    /**
+     * @param maxEntityCount the approximate maximum number of entities
+     *      to allow in the L1 cache (session)
+     */
+    public void setMaxEntityCount(int maxEntityCount)
     {
-        getHibernateTemplate().evict(assoc);
+        this.maxEntityCount = maxEntityCount;
+    }
+
+    /**
+     * Checks equality by type and uuid
+     */
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        else if (!(obj instanceof HibernateNodeDaoServiceImpl))
+        {
+            return false;
+        }
+        HibernateNodeDaoServiceImpl that = (HibernateNodeDaoServiceImpl) obj;
+        return this.uuid.equals(that.uuid);
+    }
+    
+    /**
+     * @see #uuid
+     */
+    public int hashCode()
+    {
+        return uuid.hashCode();
+    }
+
+    /**
+     * Flushes the Hibernate session and, depending on the size, clears the session.
+     */
+    public void flush()
+    {
+        // create a callback for the task
+        HibernateCallback callback = new HibernateCallback()
+        {
+            public Object doInHibernate(Session session)
+            {
+                SessionStatistics stats = session.getStatistics();
+                // have we exceeded the maximum entity count
+                int entityCount = stats.getEntityCount();
+                if (entityCount > maxEntityCount)
+                {
+                    // too many entities - flush and clear
+                    session.flush();
+                    session.clear();
+                }
+                // done
+                return null;
+            }
+        };
+        // execute the callback
+        getHibernateTemplate().execute(callback);
+        // done
     }
 
     /**
@@ -294,6 +354,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return assoc;
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<Node> getNodeAssocTargets(final Node sourceNode, final QName assocTypeQName)
     {
         final NodeKey sourceKey = sourceNode.getKey();
@@ -315,6 +376,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return queryResults;
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<Node> getNodeAssocSources(final Node targetNode, final QName assocTypeQName)
     {
         final NodeKey targetKey = targetNode.getKey();

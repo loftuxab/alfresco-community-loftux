@@ -175,6 +175,10 @@
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>
@@ -187,6 +191,10 @@
       <managed-property>
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -218,6 +226,10 @@
          <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
       </managed-property>
@@ -241,6 +253,10 @@
       <managed-property>
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -268,6 +284,10 @@
          <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
       </managed-property>
@@ -291,6 +311,10 @@
       <managed-property>
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>
@@ -335,6 +359,10 @@
          <value>#{AlfNodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
       </managed-property>
@@ -362,6 +390,10 @@
       <managed-property>
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>

@@ -35,7 +35,7 @@ public abstract class RuleActionExecuterAbstractBase extends RuleItemAbstractBas
 	
 	public void init()
 	{
-		((RuleRegistration)this.ruleService).registerRuleActionExecutor(this);
+		((RuleRegistration)this.ruleService).registerRuleActionExecuter(this);
 	}
 	
 	public RuleActionDefinition getRuleActionDefinition() 

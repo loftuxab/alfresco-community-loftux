@@ -37,6 +37,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
@@ -50,8 +51,34 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     private NodeService nodeService;
     private NamespacePrefixResolver namespacePrefixResolver;
     private DictionaryService dictionaryService;
+    private SearchService searchService;
     private PasswordEncoder passwordEncoder;
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
     
+    public void setNamespaceService(NamespacePrefixResolver namespacePrefixResolver)
+    {
+        this.namespacePrefixResolver = namespacePrefixResolver;
+    }
+
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
+    {
+        this.passwordEncoder = passwordEncoder;
+    }
+    
+    public void setSearchService(SearchService searchService)
+    {
+        this.searchService = searchService;
+    }
+
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException, DataAccessException
     {
         //System.out.println("Getting user: "+userName);
@@ -87,7 +114,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         PropertyTypeDefinition text = dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT);
         defs[0] = new QueryParameterDefImpl(QName.createQName("alf", "var", namespacePrefixResolver), text, true, userName);
-        List<NodeRef> results = nodeService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:person[@alf:userName = $alf:var ]", defs, namespacePrefixResolver, false);
+        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:person[@alf:userName = $alf:var ]", defs, namespacePrefixResolver, false);
         if(results.size() != 1)
         {
             return null;
@@ -101,7 +128,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         PropertyTypeDefinition text = dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT);
         defs[0] = new QueryParameterDefImpl(QName.createQName("alf", "var", namespacePrefixResolver), text, true, userName);
-        List<NodeRef> results = nodeService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:user[@alf:username = $alf:var ]", defs, namespacePrefixResolver, false);
+        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:user[@alf:username = $alf:var ]", defs, namespacePrefixResolver, false);
         if(results.size() != 1)
         {
             return null;
@@ -177,30 +204,4 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         }
         nodeService.deleteNode(userRef);
     }
-
-    public void setDictionaryService(DictionaryService dictionaryService)
-    {
-        this.dictionaryService = dictionaryService;
-    }
-    
-
-    public void setNamespaceService(NamespacePrefixResolver namespacePrefixResolver)
-    {
-        this.namespacePrefixResolver = namespacePrefixResolver;
-    }
-    
-
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-    
-
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
-    {
-        this.passwordEncoder = passwordEncoder;
-    }
-    
-
-    
 }

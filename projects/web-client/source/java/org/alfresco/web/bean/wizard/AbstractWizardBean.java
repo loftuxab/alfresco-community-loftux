@@ -21,6 +21,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.NavigationBean;
@@ -46,6 +47,7 @@ public abstract class AbstractWizardBean
    protected int currentStep = 1;
    protected boolean editMode = false;
    protected NodeService nodeService;
+   protected SearchService searchService;
    protected NavigationBean navigator;
    protected BrowseBean browseBean;
    
@@ -221,8 +223,16 @@ public abstract class AbstractWizardBean
    {
       this.nodeService = nodeService;
    }
-   
+
    /**
+    * @param searchService the service used to find nodes
+    */
+   public void setSearchService(SearchService searchService)
+   {
+      this.searchService = searchService;
+   }
+
+/**
     * @return Returns the navigation bean instance.
     */
    public NavigationBean getNavigator()

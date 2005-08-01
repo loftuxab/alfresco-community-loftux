@@ -29,30 +29,31 @@ import java.util.Set;
 
 import org.alfresco.repo.search.CannedQueryDef;
 import org.alfresco.repo.search.EmptyResultSet;
+import org.alfresco.repo.search.Indexer;
 import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.SearcherException;
+import org.alfresco.repo.search.impl.NodeSearcher;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.XPathException;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
+import org.alfresco.util.SearchLanguageConversion;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryFilter;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.TermQuery;
 import org.saxpath.SAXPathException;
 
 import com.werken.saxpath.XPathReader;
@@ -93,6 +94,69 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
     /*
      * Searcher implementation
      */
+
+    /**
+     * Get an intialised searcher for the store and transaction Normally we do
+     * not search againsta a store and delta. Currently only gets the searcher
+     * against the main index.
+     * 
+     * @param storeRef
+     * @param deltaId
+     * @return
+     */
+    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, LuceneIndexer indexer, LuceneConfig config)
+    {
+        LuceneSearcherImpl searcher = new LuceneSearcherImpl();
+        searcher.setLuceneConfig(config);
+        try
+        {
+            searcher.initialise(storeRef, indexer == null ? null : indexer.getDeltaId(), false);
+            searcher.indexer = indexer;
+        }
+        catch (LuceneIndexException e)
+        {
+            throw new SearcherException(e);
+        }
+        return searcher;
+    }
+
+    /**
+     * Get an intialised searcher for the store. No transactional ammendsmends
+     * are searched.
+     * 
+     * 
+     * @param storeRef
+     * @return
+     */
+    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, LuceneConfig config)
+    {
+        return getSearcher(storeRef, null, config);
+    }
+
+    public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
+    {
+        this.namespacePrefixResolver = namespacePrefixResolver;
+    }
+
+    public boolean indexExists()
+    {
+        return mainIndexExists();
+    }
+
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+
+    public void setQueryRegister(QueryRegisterComponent queryRegister)
+    {
+        this.queryRegister = queryRegister;
+    }
 
     public ResultSet query(StoreRef store, String language, String queryString, Path[] queryOptions, QueryParameterDefinition[] queryParameterDefinitions) throws SearcherException
     {
@@ -221,69 +285,6 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             // no index return an empty result set
             return new EmptyResultSet();
         }
-    }
-
-    /**
-     * Get an intialised searcher for the store and transaction Normally we do
-     * not search againsta a store and delta. Currently only gets the searcher
-     * against the main index.
-     * 
-     * @param storeRef
-     * @param deltaId
-     * @return
-     */
-    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, LuceneIndexer indexer, LuceneConfig config)
-    {
-        LuceneSearcherImpl searcher = new LuceneSearcherImpl();
-        searcher.setLuceneConfig(config);
-        try
-        {
-            searcher.initialise(storeRef, indexer == null ? null : indexer.getDeltaId(), false);
-            searcher.indexer = indexer;
-        }
-        catch (LuceneIndexException e)
-        {
-            throw new SearcherException(e);
-        }
-        return searcher;
-    }
-
-    /**
-     * Get an intialised searcher for the store. No transactional ammendsmends
-     * are searched.
-     * 
-     * 
-     * @param storeRef
-     * @return
-     */
-    public static LuceneSearcherImpl getSearcher(StoreRef storeRef, LuceneConfig config)
-    {
-        return getSearcher(storeRef, null, config);
-    }
-
-    public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
-    {
-        this.namespacePrefixResolver = namespacePrefixResolver;
-    }
-
-    public boolean indexExists()
-    {
-        return mainIndexExists();
-    }
-
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-
-    public void setDictionaryService(DictionaryService dictionaryService)
-    {
-        this.dictionaryService = dictionaryService;
-    }
-
-    public void setQueryRegister(QueryRegisterComponent queryRegister)
-    {
-        this.queryRegister = queryRegister;
     }
 
     public ResultSet query(StoreRef store, String language, String query)
@@ -461,6 +462,132 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         while (it.hasPrevious())
         {
             it.previous();
+        }
+    }
+
+    /**
+     * @see org.alfresco.repo.search.impl.NodeSearcher
+     */
+    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    {
+        NodeSearcher nodeSearcher = new NodeSearcher(nodeService, dictionaryService, this);
+        return nodeSearcher.selectNodes(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks);
+    }
+
+    /**
+     * @see org.alfresco.repo.search.impl.NodeSearcher
+     */
+    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    {
+        NodeSearcher nodeSearcher = new NodeSearcher(nodeService, dictionaryService, this);
+        return nodeSearcher.selectProperties(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks);
+    }
+
+    /**
+     * @return Returns true if the pattern is present, otherwise false.
+     */
+    public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern)
+    {
+        ResultSet resultSet = null;
+        try
+        {
+            // build Lucene search string specific to the node
+            StringBuilder sb = new StringBuilder();
+            sb.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(googleLikePattern).append(") ");
+            if (propertyQName != null)
+            {
+                sb.append("@").append(LuceneQueryParser.escape(propertyQName.toString()));
+                sb.append(":(").append(googleLikePattern).append(")");
+            }
+            else
+            {
+                for (QName key : nodeService.getProperties(nodeRef).keySet())
+                {
+                    sb.append("@").append(LuceneQueryParser.escape(key.toString()));
+                    sb.append(":(").append(googleLikePattern).append(")");
+                }
+            }
+            sb.append(")");
+
+            resultSet = this.query(nodeRef.getStoreRef(), "lucene", sb.toString());
+            boolean answer = resultSet.length() > 0;
+            return answer;
+        }
+        finally
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
+        }
+    }
+
+    /**
+     * @return Returns true if the pattern is present, otherwise false.
+     * 
+     * @see #setIndexer(Indexer)
+     * @see #setSearcher(SearchService)
+     */
+    public boolean like(NodeRef nodeRef, QName propertyQName, String sqlLikePattern, boolean includeFTS)
+    {
+        if (propertyQName == null)
+        {
+            throw new IllegalArgumentException("Property QName is mandatory for the like expression");
+        }
+        
+        StringBuilder sb = new StringBuilder(sqlLikePattern.length() * 3);
+        
+        if (includeFTS)
+        {
+            // convert the SQL-like pattern into a Lucene-compatible string
+            String pattern = SearchLanguageConversion.convertXPathLikeToLucene(sqlLikePattern);
+
+            // build Lucene search string specific to the node
+            sb = new StringBuilder();
+            sb.append("+ID:").append(nodeRef.getId()).append(" +(");
+            // FTS or attribute matches
+            if (includeFTS)
+            {
+                sb.append("TEXT:(").append(pattern).append(") ");
+            }
+            if (propertyQName != null)
+            {
+                sb.append(" @").append(LuceneQueryParser.escape(propertyQName.toString())).append(":(").append(pattern).append(")");
+            }
+            sb.append(")");
+
+            ResultSet resultSet = null;
+            try
+            {
+                resultSet = this.query(nodeRef.getStoreRef(), "lucene", sb.toString());
+                boolean answer = resultSet.length() > 0;
+                return answer;
+            }
+            finally
+            {
+                if (resultSet != null)
+                {
+                    resultSet.close();
+                }
+            }
+        }
+        else
+        {
+            // convert the SQL-like pattern into a Lucene-compatible string
+            String pattern = SearchLanguageConversion.convertXPathLikeToRegex(sqlLikePattern);
+
+            Serializable property = nodeService.getProperty(nodeRef, propertyQName);
+            if(property == null)
+            {
+                return false;
+            }
+            else
+            {
+                String propertyString = ValueConverter.convert(
+                        String.class,
+                        nodeService.getProperty(nodeRef, propertyQName));
+                return propertyString.matches(pattern);
+            }
         }
     }
 }

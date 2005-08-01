@@ -30,5 +30,5 @@ public interface RuleRegistration
 	
 	void registerRuleConditionEvaluator(RuleConditionEvaluator ruleConditionEvaluator);
 	
-	void registerRuleActionExecutor(RuleActionExecuter ruleActionExecutor);
+	void registerRuleActionExecuter(RuleActionExecuter ruleActionExecuter);
 }

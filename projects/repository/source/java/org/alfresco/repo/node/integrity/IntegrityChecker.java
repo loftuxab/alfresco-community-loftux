@@ -15,7 +15,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.integrity.db;
+package org.alfresco.repo.node.integrity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,14 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.domain.IntegrityEvent;
-import org.alfresco.repo.integrity.IntegrityException;
-import org.alfresco.repo.integrity.IntegrityRecord;
-import org.alfresco.repo.integrity.IntegrityService;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.transaction.AlfrescoTransactionManager;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -45,7 +41,6 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.Assert;
 
 /**
  * Implementation of the {@link org.alfresco.repo.integrity.IntegrityService integrity service}
@@ -78,9 +73,8 @@ import org.springframework.util.Assert;
  * 
  * @author Derek Hulley
  */
-public class DbIntegrityServiceImpl
-        implements  IntegrityService,
-                    NodeServicePolicies.OnCreateNodePolicy,
+public class IntegrityChecker
+        implements  NodeServicePolicies.OnCreateNodePolicy,
                     NodeServicePolicies.OnUpdatePropertiesPolicy,
                     NodeServicePolicies.OnDeleteNodePolicy,
                     NodeServicePolicies.OnAddAspectPolicy,
@@ -90,53 +84,50 @@ public class DbIntegrityServiceImpl
                     NodeServicePolicies.OnCreateAssociationPolicy,
                     NodeServicePolicies.OnDeleteAssociationPolicy
 {
-    private static Log logger = LogFactory.getLog(DbIntegrityServiceImpl.class);
+    private static Log logger = LogFactory.getLog(IntegrityChecker.class);
+    
+    /** key against which the event list is stored in the current transaction */
+    private static final String KEY_EVENT_LIST = "IntegrityChecker.EventList";
     
     // build sets of event names particular to a type of integrity check
-    public static final List<String> CHECK_ALL_PROPERTIES = new ArrayList<String>(4);
+    public static final List<IntegrityEvent.EventType> CHECK_ALL_PROPERTIES = new ArrayList<IntegrityEvent.EventType>(4);
     static
     {
         // check that all required properties are present
-        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EVENT_TYPE_PROPERTIES_CHANGED);
-        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EVENT_TYPE_NODE_CREATED);
-        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EVENT_TYPE_ASPECT_ADDED);
+        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EventType.PROPERTIES_CHANGED);
+        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EventType.NODE_CREATED);
+        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EventType.ASPECT_ADDED);
         // TODO: Further checks for associations required
     }
 
     private PolicyComponent policyComponent;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
-    private IntegrityDaoService integrityDaoService;
     private boolean enabled;
-    private boolean traceOn;
     private boolean failOnViolation;
     private int maxErrorsPerTransaction;
-    /**
-     * parameter controlling flush size during processing of events
-     */
-    private int flushSize;
+    private boolean traceOn;
     
     /**
      */
-    public DbIntegrityServiceImpl()
+    public IntegrityChecker()
     {
         this.enabled = true;
-        this.traceOn = false;
         this.failOnViolation = false;
-        maxErrorsPerTransaction = 10;
-        flushSize = 5000;
+        this.maxErrorsPerTransaction = 10;
+        this.traceOn = false;
     }
 
     /**
-     * @param policyComponent the component with which to register behaviour
+     * @param policyComponent the component to register behaviour with
      */
     public void setPolicyComponent(PolicyComponent policyComponent)
     {
         this.policyComponent = policyComponent;
     }
-    
+
     /**
-     * @param dictionaryService used to get the model data
+     * @param dictionaryService the dictionary against which to confirm model details
      */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -144,19 +135,11 @@ public class DbIntegrityServiceImpl
     }
 
     /**
-     * @param nodeService allows access to the nodes and associations
+     * @param nodeService the node service to use for browsing node structures
      */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
-    }
-
-    /**
-     * @param integrityDaoService provides access to the persistent store
-     */
-    public void setIntegrityDaoService(IntegrityDaoService integrityDaoService)
-    {
-        this.integrityDaoService = integrityDaoService;
     }
 
     /**
@@ -195,22 +178,13 @@ public class DbIntegrityServiceImpl
     }
 
     /**
-     * @param flushSize the number of nodes to process before flushing and clearing
-     *      the session cache.  Increasing this number implies the potential use
-     *      of more memory during long-running transactions.
-     */
-    public void setFlushSize(int flushSize)
-    {
-        this.flushSize = flushSize;
-    }
-
-    /**
      * Registers the system-level policy behaviours
      */
     public void init()
     {
         if (enabled)  // only register behaviour if integrity checking is on
         {
+            // register behaviour
             policyComponent.bindClassBehaviour(
                     QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
                     this,
@@ -268,204 +242,131 @@ public class DbIntegrityServiceImpl
             // done
         }
     }
-
+    
     /**
-     * @see IntegrityEvent#EVENT_TYPE_NODE_CREATED
+     * Ensures that this service is registered with the transaction and saves the event
+     * 
+     * @param event
      */
-    public void onCreateNode(ChildAssociationRef childAssocRef)
+    @SuppressWarnings("unchecked")
+    private void save(IntegrityEvent event)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
+        // register this service
+        AlfrescoTransactionSupport.bindIntegrityChecker(this);
+        
+        // get the event list
+        List<IntegrityEvent> events = (List<IntegrityEvent>) AlfrescoTransactionSupport.getResource(KEY_EVENT_LIST);
+        if (events == null)
         {
-            // management of transaction not under our control - do nothing 
-            return;
+            events = new ArrayList<IntegrityEvent>(100);
+            AlfrescoTransactionSupport.bindResource(KEY_EVENT_LIST, events);
         }
-        
-        IntegrityEvent event = integrityDaoService.newEvent(
-                txnId,
-                IntegrityEvent.EVENT_TYPE_NODE_CREATED,
-                childAssocRef.getChildRef());
-        event.setSecondaryNodeRef(childAssocRef.getParentRef().toString());
-        event.setAssocTypeQName(childAssocRef.getTypeQName().toString());
-        event.setAssocQName(childAssocRef.getQName().toString());
-        
-        setTrace(event);
+        // add event
+        events.add(event);
     }
 
     /**
-     * @see IntegrityEvent#EVENT_TYPE_PROPERTIES_CHANGED
+     * @see IntegrityEvent#EventType.NODE_CREATED
+     */
+    public void onCreateNode(ChildAssociationRef childAssocRef)
+    {
+        IntegrityEvent event = new IntegrityEvent(
+                IntegrityEvent.EventType.NODE_CREATED,
+                childAssocRef.getChildRef());
+        event.setSecondaryNodeRef(childAssocRef.getParentRef());
+        event.setAssocTypeQName(childAssocRef.getTypeQName());
+        event.setAssocQName(childAssocRef.getQName());
+        
+        // set optional tracing
+        setTrace(event);
+        // save event
+        save(event);
+    }
+
+    /**
+     * @see IntegrityEvent#EventType.PROPERTIES_CHANGED
      */
     public void onUpdateProperties(
             NodeRef nodeRef,
             Map<QName, Serializable> before,
             Map<QName, Serializable> after)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
-        {
-            // management of transaction not under our control - do nothing 
-            return;
-        }
-        
-        IntegrityEvent event = integrityDaoService.newEvent(
-                txnId,
-                IntegrityEvent.EVENT_TYPE_PROPERTIES_CHANGED,
+        IntegrityEvent event = new IntegrityEvent(
+                IntegrityEvent.EventType.PROPERTIES_CHANGED,
                 nodeRef);
-        
+
+        // set optional tracing
         setTrace(event);
+        // save event
+        save(event);
     }
 
     public void onDeleteNode(ChildAssociationRef childAssocRef)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
-        {
-            // management of transaction not under our control - do nothing 
-            return;
-        }
-        
-        IntegrityEvent event = integrityDaoService.newEvent(
-                txnId,
-                IntegrityEvent.EVENT_TYPE_NODE_DELETED,
+        IntegrityEvent event = new IntegrityEvent(
+                IntegrityEvent.EventType.NODE_DELETED,
                 childAssocRef.getChildRef());
-        event.setAssocTypeQName(childAssocRef.getTypeQName().toString());
-        event.setAssocQName(childAssocRef.getQName().toString());
+        event.setAssocTypeQName(childAssocRef.getTypeQName());
+        event.setAssocQName(childAssocRef.getQName());
         
+        // set optional tracing
         setTrace(event);
+        // save event
+        save(event);
     }
 
     /**
-     * @see IntegrityEvent#EVENT_TYPE_ASPECT_ADDED
+     * @see IntegrityEvent#EventType.ASPECT_ADDED
      */
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
-        {
-            // management of transaction not under our control - do nothing 
-            return;
-        }
-        
-        IntegrityEvent event = integrityDaoService.newEvent(
-                txnId,
-                IntegrityEvent.EVENT_TYPE_ASPECT_ADDED,
+        IntegrityEvent event = new IntegrityEvent(
+                IntegrityEvent.EventType.ASPECT_ADDED,
                 nodeRef);
-        event.setAspectTypeQName(aspectTypeQName.toString());
+        event.setAspectTypeQName(aspectTypeQName);
         
+        // set optional tracing
         setTrace(event);
+        // save event
+        save(event);
     }
 
     /**
-     * @see IntegrityEvent#EVENT_TYPE_ASPECT_REMOVED
+     * @see IntegrityEvent#EventType.ASPECT_REMOVED
      */
     public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
-        {
-            // management of transaction not under our control - do nothing 
-            return;
-        }
-        
-        IntegrityEvent event = integrityDaoService.newEvent(
-                txnId,
-                IntegrityEvent.EVENT_TYPE_ASPECT_REMOVED,
+        IntegrityEvent event = new IntegrityEvent(
+                IntegrityEvent.EventType.ASPECT_REMOVED,
                 nodeRef);
-        event.setAspectTypeQName(aspectTypeQName.toString());
+        event.setAspectTypeQName(aspectTypeQName);
         
+        // set optional tracing
         setTrace(event);
+        // save event
+        save(event);
     }
 
     public void onCreateChildAssociation(ChildAssociationRef childAssocRef)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
-        {
-            // management of transaction not under our control - do nothing 
-            return;
-        }
-        
 //        throw new UnsupportedOperationException();
     }
 
     public void onDeleteChildAssociation(ChildAssociationRef childAssocRef)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
-        {
-            // management of transaction not under our control - do nothing 
-            return;
-        }
-        
 //        throw new UnsupportedOperationException();
     }
 
     public void onCreateAssociation(AssociationRef nodeAssocRef)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
-        {
-            // management of transaction not under our control - do nothing 
-            return;
-        }
-        
 //        throw new UnsupportedOperationException();
     }
 
     public void onDeleteAssociation(AssociationRef nodeAssocRef)
     {
-        String txnId = AlfrescoTransactionManager.getTransactionId();
-        if (txnId == null)
-        {
-            // management of transaction not under our control - do nothing 
-            return;
-        }
-        
 //        throw new UnsupportedOperationException();
     }
     
-    /**
-     * Dumps any remaining integrity events to the log debug out.  This method
-     * should only be used if DEBUG is on.
-     */
-    private void dumpVisibleEvents(String txnId)
-    {
-        logger.debug("Dumping visible events in current Txn...");
-        int currentRow = 0;
-        while (true)
-        {
-            List<IntegrityEvent> events = integrityDaoService.getEvents(currentRow, flushSize);
-            for (IntegrityEvent event : events)
-            {
-                if (!event.getTransactionId().equals(txnId))
-                {
-                    continue;
-                }
-                // transfer to a record for nice output
-                IntegrityRecord record = new IntegrityRecord(event.toString());
-                if (event.getTrace() != null)
-                {
-                    record.addTrace(event.getTrace());
-                }
-                logger.debug(record);
-            }
-            // flush and clear the caches after each batch
-            integrityDaoService.flushAndClear();
-
-            // break or get next batch of results
-            if (events.size() < flushSize)
-            {
-                // retrieved fewer events than the maximum
-                break;
-            }
-            else
-            {
-                // may be more rows to fetch
-                currentRow += flushSize;
-            }
-        }
-    }
-
     /**
      * Runs several types of checks, querying specifically for events that
      * will necessitate each type of test.
@@ -473,24 +374,17 @@ public class DbIntegrityServiceImpl
      * The interface contracts also requires that all events for the transaction
      * get cleaned up.
      */
-    public void checkIntegrity(String txnId) throws IntegrityException
+    public void checkIntegrity() throws IntegrityException
     {
         if (!enabled)
         {
             return;
         }
         
-        Assert.notNull(txnId, "The Transaction ID is mandatory");
-        
-        // check properties
-        List<IntegrityRecord> failures = processAllEvents(txnId);
-
-        // clean out any remaining events regardless of if there are errors or not
-        integrityDaoService.deleteEvents(txnId, flushSize);
-        if (logger.isDebugEnabled())
-        {
-            dumpVisibleEvents(txnId);
-        }
+        // process events and check for failures
+        List<IntegrityRecord> failures = processAllEvents();
+        // clear out all events
+        AlfrescoTransactionSupport.unbindResource(KEY_EVENT_LIST);
         
         // drop out quickly if there are no failures
         if (failures.isEmpty())
@@ -536,124 +430,88 @@ public class DbIntegrityServiceImpl
      * processing each node.  Flushing and clearing happens between each page
      * cycle.
      * 
-     * @param txnId
      * @return Returns a list of integrity violations, up to the
      *      {@link #maxErrorsPerTransaction the maximum defined
      */
-    private List<IntegrityRecord> processAllEvents(String txnId)
+    @SuppressWarnings("unchecked")
+    private List<IntegrityRecord> processAllEvents()
     {
         // the results
         ArrayList<IntegrityRecord> results = new ArrayList<IntegrityRecord>(0); // generally unused
-        
-        // keep a count of the number of events processed
-        int currentRow = 0;
 
-        // page through query results
-        while(true)  // will break once all results have been read
+        List<IntegrityEvent> events = (List<IntegrityEvent>) AlfrescoTransactionSupport.getResource(KEY_EVENT_LIST);
+        if (events == null)
         {
-            List<IntegrityEvent> events = integrityDaoService.getEvents(txnId, currentRow, flushSize);
+            // no events were registered - nothing of significance happened
+            return results;
+        }
 
-            // the current node reference
-            NodeRef currentNodeRef = null;
-            String currentNodeRefStr = null;
-            // the current event type
-            String currentEventType = null;
-            // results requiring trace additions
-            List<IntegrityRecord> traceResults = new ArrayList<IntegrityRecord>(0);
-            // failure results for the event
-            List<IntegrityRecord> eventResults = new ArrayList<IntegrityRecord>(0);
+        // the current node reference
+        NodeRef currentNodeRef = null;
+        String currentNodeRefStr = null;
+        // the current event type
+        IntegrityEvent.EventType currentEventType = null;
+        // failure results for the event
+        List<IntegrityRecord> eventResults = new ArrayList<IntegrityRecord>(0);
 
-            // keep tabs on what we have done with each node
-            boolean checkAllProperties = false;
+        // keep tabs on what we have done with each node
+        boolean checkAllProperties = false;
+        
+        // cycle through the events, performing various integrity checks
+        for (IntegrityEvent event : events)
+        {
+            // have we moved onto a new node?
+            boolean newNode = !EqualsHelper.nullSafeEquals(currentNodeRefStr, event.getPrimaryNodeRef());
+            boolean newEventType = !EqualsHelper.nullSafeEquals(currentEventType, event.getEventType());
             
-            // cycle through the events, performing various integrity checks
-            for (IntegrityEvent event : events)
+            if (newNode)
             {
-                // have we moved onto a new node?
-                boolean newNode = !EqualsHelper.nullSafeEquals(currentNodeRefStr, event.getPrimaryNodeRef());
-                boolean newEventType = !EqualsHelper.nullSafeEquals(currentEventType, event.getEventType());
-                
-                if (newNode)
+                // primary node reference is mandatory on the event
+                currentNodeRef = event.getPrimaryNodeRef();
+                // reset flags
+                checkAllProperties = true;
+            }
+            if (newEventType)
+            {
+                currentEventType = event.getEventType();
+            }
+            // perform the various types of integrity checks
+            try
+            {
+                // check node properties
+                if (checkAllProperties && CHECK_ALL_PROPERTIES.contains(currentEventType))
                 {
-                    // primary node reference is mandatory on the event
-                    currentNodeRefStr = event.getPrimaryNodeRef();
-                    currentNodeRef = new NodeRef(currentNodeRefStr);
-                    // reset flags
-                    checkAllProperties = true;
+                    checkAllProperties = false;
+                    checkAllProperties(currentNodeRef, eventResults);
                 }
-                if (newEventType)
-                {
-                    currentEventType = event.getEventType();
-                }
-                // perform the various types of integrity checks
-                try
-                {
-                    // check node properties
-                    if (checkAllProperties && CHECK_ALL_PROPERTIES.contains(currentEventType))
-                    {
-                        checkAllProperties = false;
-                        checkAllProperties(currentNodeRef, eventResults);
-                    }
-                }
-                catch (Throwable e)
-                {
-                    // log it as an error and continue
-                    IntegrityRecord record = new IntegrityRecord(e.getMessage());
-                    record.addTrace(e.getStackTrace());
-                    eventResults.add(record);
-                }
+            }
+            catch (Throwable e)
+            {
+                // log it as an error and continue
+                IntegrityRecord record = new IntegrityRecord(e.getMessage());
+                record.addTrace(e.getStackTrace());
+                eventResults.add(record);
+            }
 
-                // keep track of results needing trace added
-                if (traceOn)
+            // keep track of results needing trace added
+            if (traceOn && event.getTrace() != null)
+            {
+                // record the current event trace if present
+                for (IntegrityRecord record : eventResults)
                 {
-                    if (newNode && newEventType)
-                    {
-                        // we have changed node and event type - clear the trace results
-                        traceResults.clear();
-                    }
-                    // add event results to the trace results
-                    traceResults.addAll(eventResults);
-                    // record the current event trace if present
-                    if (event.getTrace() != null)
-                    {
-                        for (IntegrityRecord record : traceResults)
-                        {
-                            record.addTrace(event.getTrace());
-                        }
-                    }
+                    record.addTrace(event.getTrace());
                 }
-                
-                // copy all the event results to the final results
-                results.addAll(eventResults);
-                // clear the event results
-                eventResults.clear();
-                
-                // Clean out the event.  We do this regardless of whether the transaction will be
-                // rolled back or not.  We have to be sure that no events are left lying around.
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Deleting event: " + event);
-                }
-                integrityDaoService.deleteEvent(event.getId());
             }
             
-            // flush and clear the caches after each batch
-            integrityDaoService.flushAndClear();
+            // copy all the event results to the final results
+            results.addAll(eventResults);
+            // clear the event results
+            eventResults.clear();
             
             if (results.size() >= maxErrorsPerTransaction)
             {
                 // only so many errors wanted at a time
                 break;
-            }
-            else if (events.size() < flushSize)
-            {
-                // retrieved fewer events than the maximum
-                break;
-            }
-            else
-            {
-                // may be more rows to fetch
-                currentRow += flushSize;
             }
         }
         // done

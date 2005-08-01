@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
@@ -126,6 +127,7 @@ public final class User
          FacesContext fc = FacesContext.getCurrentInstance();
          ServiceRegistry registry = Repository.getServiceRegistry(fc);
          NodeService nodeService = registry.getNodeService();
+         SearchService searchService = registry.getSearchService();
          NamespaceService namespaceService = registry.getNamespaceService();
          ConfigurableService configurableService = registry.getConfigurableService();
          
@@ -144,7 +146,7 @@ public final class User
          }
          
          String xpath = NamespaceService.ALFRESCO_PREFIX + ":" + "preferences";
-         List<NodeRef> nodes = nodeService.selectNodes(
+         List<NodeRef> nodes = searchService.selectNodes(
                configRef,
                xpath,
                null,

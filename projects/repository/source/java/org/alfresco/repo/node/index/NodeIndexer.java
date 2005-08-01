@@ -48,21 +48,26 @@ public class NodeIndexer
     private Indexer indexer;
     
     /**
-     * @param indexer the indexer that will be index
+     * @param policyComponent used for registrations
      */
-    public NodeIndexer(PolicyComponent policyComponent, Indexer indexer)
+    public void setPolicyComponent(PolicyComponent policyComponent)
     {
         this.policyComponent = policyComponent;
+    }
+
+    /**
+     * @param indexer the indexer that will be index
+     */
+    public void setIndexer(Indexer indexer)
+    {
         this.indexer = indexer;
     }
-    
+
     /**
      * Registers the policy behaviour methods
      */
     private void init()
     {
-        // TODO: Issue - How can we be sure that the behaviour isn't hijacked?
-        
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateStore"),
                 ContentModel.TYPE_STOREROOT,

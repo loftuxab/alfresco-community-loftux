@@ -22,6 +22,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.util.SearchLanguageConversion;
 
 /**
  * Provides basic searcher support
@@ -30,7 +31,11 @@ import org.alfresco.service.cmr.search.SearchService;
  */
 public abstract class AbstractSearcherComponent implements SearchService
 {
-    public String translateQuery(String fromLanguage, String toLangage, String query)
+    /**
+     * Not implemented, but will eventually map directly to
+     * {@link SearchLanguageConversion}. 
+     */
+    protected String translateQuery(String fromLanguage, String toLangage, String query)
     {
         throw new UnsupportedOperationException();
     }

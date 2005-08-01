@@ -6,7 +6,7 @@
    
    <import resource="classpath:applicationServices.xml"/>
    <import resource="classpath:alfresco/ruleService.xml"/>
-   <import resource="classpath:alfresco/integrityService.xml"/>
+   <import resource="classpath:alfresco/node-services-context.xml"/>
    <import resource="classpath:alfresco/networkProtocolServices.xml"/>
    <import resource="classpath:alfresco/contentServices.xml"/>
    
@@ -25,6 +25,22 @@
    </bean>   
    
    <!-- Datasource bean -->
+   <!--
+   <bean id="dataSource" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
+      <property name="dataSource">
+         <bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
+            <property name="transactionManager"><ref local="jotm"/></property>
+            <property name="driverName"><value>${db.driver}</value></property>
+            <property name="url"><value>${db.url}</value></property>
+            <property name="user"><value>${db.username}</value></property>
+            <property name="password"><value>${db.password}</value></property>
+         </bean>
+      </property>
+      <property name="user"><value>${db.username}</value></property>
+      <property name="password"><value>${db.password}</value></property>
+      <property name="maxSize"><value>100</value></property>
+   </bean>
+   -->
    <bean id='dataSource' class='org.apache.commons.dbcp.BasicDataSource'
          destroy-method='close'>
       <property name='driverClassName'>
@@ -41,6 +57,34 @@
       </property>
    </bean>
    
+   <!-- create a transaction manager -->
+   <!--
+   <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager" >
+      <property name="userTransaction"><ref local="jotm"/></property>
+   </bean>
+   -->
+   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+      <property name="transactionSynchronizationName" >
+         <value>SYNCHRONIZATION_ALWAYS</value>
+      </property>
+      <property name="sessionFactory">
+         <ref local="sessionFactory"/>
+      </property>
+   </bean>
+   
+   <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean"/>
+
+   <!-- factory for UserTransaction instances -->
+   <bean id="userTransaction" class="org.alfresco.util.transaction.UserTransactionFactory">
+      <constructor-arg>
+         <ref bean="transactionManager" />
+      </constructor-arg>
+      <property name="singleton">
+         <value>false</value>
+      </property>
+   </bean>
+
+   <!-- Hibernate session factory -->   
    <bean id='sessionFactory' class='org.springframework.orm.hibernate3.LocalSessionFactoryBean'>
       <property name='dataSource' >
          <ref local='dataSource' />
@@ -49,7 +93,6 @@
          <list>
             <value>org/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
             <value>org/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
-            <value>org/alfresco/repo/domain/hibernate/Integrity.hbm.xml</value>
             <value>org/alfresco/repo/domain/hibernate/VersionCount.hbm.xml</value>
          </list>
       </property>
@@ -65,32 +108,6 @@
             <prop key='hibernate.default_batch_fetch_size'>1</prop>
             <prop key='hibernate.jdbc.batch_size'>32</prop>
          </props>
-      </property>
-   </bean>
-   
-   <!-- create a transaction manager to handle the Hibernate sessions -->
-   <bean id="transactionManager" class="org.alfresco.repo.transaction.AlfrescoTransactionManager">
-      <property name="sessionFactory">
-         <ref local="sessionFactory"/>
-      </property>
-      <property name="luceneIndexerAndSearchFactory">
-         <ref bean="luceneIndexerAndSearcherFactory"/>
-      </property>
-      <property name="serviceRegistry">
-         <ref bean="serviceRegistry"/>
-      </property>
-      <property name="integrityService">
-         <ref bean="integrityService"/>
-      </property>
-   </bean>
-   
-   <!-- factory for UserTransaction instances -->
-   <bean id="userTransaction" class="org.alfresco.util.transaction.UserTransactionFactory">
-      <constructor-arg>
-         <ref bean="transactionManager" />
-      </constructor-arg>
-      <property name="singleton">
-         <value>false</value>
       </property>
    </bean>
    
@@ -132,121 +149,6 @@
       </constructor-arg>
    </bean>
    
-   <!--                    -->
-   <!--  INTERNAL SERVICES -->
-   <!--                    -->
-   
-   <bean id='nodeDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
-      <property name='proxyInterfaces'>
-         <value>org.alfresco.repo.node.db.NodeDaoService</value>
-      </property>
-      <property name='transactionManager'>
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <bean class="org.alfresco.repo.node.db.hibernate.HibernateNodeDaoServiceImpl" >
-            <property name="sessionFactory">
-               <ref bean="sessionFactory" />
-            </property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-      <!-- only enable for debugging
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
-               <constructor-arg>
-                  <value>nodeDaoService</value>
-               </constructor-arg>
-            </bean>
-         </list>
-      </property>
-      -->
-   </bean>   
-   
-   <!--                    -->
-   <!--  PUBLIC SERVICES   -->
-   <!--                    -->
-
-   <bean id="nodeService" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
-      <property name="proxyInterface">
-         <value>org.alfresco.service.cmr.repository.NodeService</value>
-      </property>
-      <property name="defaultBinding">
-         <ref bean="dbNodeService"></ref>
-      </property>
-      <property name="redirectedProtocolBindings">
-         <map>
-            <entry key="workspace"><ref bean="dbNodeService"></ref></entry>
-            <entry key="versionStore"><ref bean="versionNodeService"></ref></entry>
-         </map>
-      </property>
-   </bean>
-   
-   
-   
-   
-   <!-- NodeService implemented to persist to Database -->
-
-   <bean id="dbNodeServiceImpl" class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init" >
-      <constructor-arg>
-         <ref bean="policyComponent"/>
-      </constructor-arg>
-      <constructor-arg>
-         <ref bean="dictionaryService" />
-      </constructor-arg>
-      <constructor-arg>
-         <ref bean="nodeDaoService" />
-      </constructor-arg>
-      <property name="searcher">
-         <ref bean="searcherComponent" />
-      </property>
-   </bean>
-
-   <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.service.cmr.repository.NodeService</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-         <ref bean="dbNodeServiceImpl" />     
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-      <!-- only enable for debugging
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
-               <constructor-arg>
-                  <value>dbNodeService</value>
-               </constructor-arg>
-            </bean>
-         </list>
-      </property>
-      -->
-   </bean>   
-   
-   <!-- Handles policy callbacks to ensure that node hierarchy gets indexed -->
-   <bean id="nodeIndexer" class="org.alfresco.repo.node.index.NodeIndexer"  init-method="init">
-      <constructor-arg>
-         <ref bean="policyComponent" />
-      </constructor-arg>
-      <constructor-arg>
-         <ref bean="indexerComponent" />
-      </constructor-arg>
-   </bean>
-   
    <!--                         -->
    <!-- Indexing and Search API -->
    <!--                         -->
@@ -282,7 +184,7 @@
       </property>
    </bean>
    
-   <bean id="searcherComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="searchService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.search.SearchService</value>
       </property>
@@ -307,7 +209,6 @@
    <!--                                                                               -->
    <!-- Generic factory for making indexers and searchers for a given protol or store -->
    <!--                                                                               -->
-
    <bean id="indexerAndSearcherFactory" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
       <property name="proxyInterface">
          <value>org.alfresco.repo.search.IndexerAndSearcher</value>
@@ -322,7 +223,6 @@
          </map>
       </property>
    </bean>
-   
    
    <bean id="categoryService" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
       <property name="proxyInterface">
@@ -341,7 +241,7 @@
    
 
    <!-- Indexer and searchers for lucene -->
-   <bean id="luceneIndexerAndSearcherFactory" 
+   <bean id="luceneIndexerAndSearcherFactory"
         class="org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory">
       <property name="nodeService">
          <ref bean="nodeService"/>
@@ -468,7 +368,7 @@
 				<ref bean="versionCounterDaoService"/>
 			 </property>
 			 <property name="searcher">
-				<ref bean="searcherComponent"/>
+				<ref bean="searchService"/>
 			 </property>		 
 			 <property name="dictionaryService">
 			   <ref bean="dictionaryService" />
@@ -497,9 +397,6 @@
 			 <property name="dbNodeService">
 				<ref bean="dbNodeService" />
 			 </property>
-			 <property name="searcher">
-				<ref bean="searcherComponent"/>
-			 </property>		 
 			 <property name="dictionaryService">
 			   <ref bean="dictionaryService" />
 			 </property>
@@ -756,7 +653,7 @@
                      <ref bean="fileContentStore" />
                   </entry>
                   <entry key="searcher">
-                     <ref bean="searcherComponent" />
+                     <ref bean="searchService" />
                   </entry>
                   <entry key="protectHours">
                      <value>24</value>
@@ -830,6 +727,9 @@
       </property>
       <property name="passwordEncoder">
           <ref bean="passwordEncoder"/>
+      </property>
+      <property name="searchService">
+          <ref bean="searchService"/>
       </property>
    </bean>
    
@@ -916,6 +816,7 @@
       <property name="namespaceService"><ref bean="namespaceService"/></property>
       <property name="dictionaryService"><ref bean="dictionaryService"/></property>
       <property name="nodeService"><ref bean="nodeService"/></property>
+      <property name="searchService"><ref bean="searchService"/></property>
       <property name="contentService"><ref bean="contentService"/></property>
    </bean>
    

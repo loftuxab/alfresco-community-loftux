@@ -72,6 +72,7 @@
 
    <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper">
       <property name="nodeService"><ref bean="nodeService" /></property>
+      <property name="searchService"><ref bean="searchService" /></property>
       <property name="dictionaryService"><ref bean="dictionaryService" /></property>
       <property name="namespaceService"><ref bean="namespaceService" /></property>
       <property name="mimetypeService"><ref bean="mimetypeMap" /></property>

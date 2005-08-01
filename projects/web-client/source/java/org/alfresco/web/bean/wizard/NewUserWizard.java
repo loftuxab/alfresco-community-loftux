@@ -47,7 +47,6 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.apache.log4j.Logger;
 
 /**
@@ -341,7 +340,7 @@ public class NewUserWizard extends AbstractWizardBean
          else
          {
             // get the node ref of the node that will contain the content
-            NodeRef peopleNode = Repository.getSystemPeopleFolderRef(context, this.nodeService);
+            NodeRef peopleNode = Repository.getSystemPeopleFolderRef(context, this.nodeService, this.searchService);
             
             // create properties for Person type from submitted Form data
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
@@ -753,8 +752,9 @@ public class NewUserWizard extends AbstractWizardBean
          String companySpaceName = Application.getRootPath(context);
          String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
          
-         List<NodeRef> nodes = this.nodeService.selectNodes(
-               this.nodeService.getRootNode(Repository.getStoreRef()),
+         NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+         List<NodeRef> nodes = this.searchService.selectNodes(
+               rootNodeRef,
                companyXPath, null, this.namespaceService, false);
          
          if (nodes.size() == 0)

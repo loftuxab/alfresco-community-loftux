@@ -37,7 +37,7 @@ public class SearchParameters
     private String query;
     private ArrayList<Path> attributePaths = new ArrayList<Path>(1);
     private ArrayList<QueryParameterDefinition> queryParameterDefinitions = new ArrayList<QueryParameterDefinition>(1);
-    private boolean excludeDataInTheCurrentTransaction = true;
+    private boolean excludeDataInTheCurrentTransaction = false;
     private ArrayList<SortDefinition> sortDefinitions = new ArrayList<SortDefinition>(1);
     
     public SearchParameters()

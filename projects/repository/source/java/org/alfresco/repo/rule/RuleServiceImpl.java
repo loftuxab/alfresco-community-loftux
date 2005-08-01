@@ -35,6 +35,7 @@ import org.alfresco.repo.rule.common.RuleConditionDefinitionImpl;
 import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.repo.rule.condition.RuleConditionEvaluator;
 import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -61,12 +62,21 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Rule service implementation
+ * Rule service implementation.
+ * <p>
+ * This service automatically binds to the transaction flush hooks.  It will
+ * therefore participate in any flushes that occur during the transaction as
+ * well.
  * 
  * @author Roy Wetherall   
  */
-public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecution, ApplicationContextAware
+public class RuleServiceImpl implements RuleService, ApplicationContextAware
 {
+    /** key against which to store rules pending on the current transaction */
+    private static final String KEY_RULES_PENDING = "RuleServiceImpl.PendingRules";
+    /** key against which to store executed rules on the current transaction */
+    private static final String KEY_RULES_EXECUTED = "RuleServiceImpl.ExecutedRules";
+    
 	/**
 	 * The application context
 	 */
@@ -104,16 +114,16 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
      */
     private RuleStore ruleStore;
     
-	/**
-	 * Thread local set containing all the pending rules to be executed when the transaction ends
-	 */
-	private ThreadLocal<Set<PendingRuleData>> threadLocalPendingData = new ThreadLocal<Set<PendingRuleData>>();
-	
-	/**
-	 * Thread local set to the currently executing rule (this should prevent and execution loops)
-	 */
-	private ThreadLocal<Set<ExecutedRuleData>> threadLocalExecutedRules = new ThreadLocal<Set<ExecutedRuleData>>();
-    
+//	/**
+//	 * Thread local set containing all the pending rules to be executed when the transaction ends
+//	 */
+//	private ThreadLocal<Set<PendingRuleData>> threadLocalPendingData = new ThreadLocal<Set<PendingRuleData>>();
+//	
+//	/**
+//	 * Thread local set to the currently executing rule (this should prevent and execution loops)
+//	 */
+//	private ThreadLocal<Set<ExecutedRuleData>> threadLocalExecutedRules = new ThreadLocal<Set<ExecutedRuleData>>();
+//    
     /**
      * List of disabled node refs.  The rules associated with these nodes will node be added to the pending list, and
      * therefore not fired.  This list is transient.
@@ -341,6 +351,7 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
     /**  
      * @see org.alfresco.repo.rule.RuleService#getRules(org.alfresco.repo.ref.NodeRef, boolean)
      */
+    @SuppressWarnings("unchecked")
     public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied)
     {
         return (List<Rule>)this.ruleStore.get(nodeRef, includeInhertied);
@@ -357,6 +368,7 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
     /**
      * @see org.alfresco.repo.rule.RuleService#getRulesByRuleType(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleType)
      */
+    @SuppressWarnings("unchecked")
     public List<Rule> getRulesByRuleType(NodeRef nodeRef, RuleType ruleType)
     {
         return (List<Rule>)this.ruleStore.getByRuleType(nodeRef, ruleType);
@@ -405,24 +417,30 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	/**
 	 * @see org.alfresco.repo.rule.RuleService#addRulePendingExecution(NodeRef, NodeRef, Rule)
 	 */
-	public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
+	@SuppressWarnings("unchecked")
+    public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
 	{
         // First check to seee if the node has been disabled
         if (this.disabledNodeRefs.contains(actionableNodeRef) == false)
         {
     		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule);
-    		Set<ExecutedRuleData> executedRules = this.threadLocalExecutedRules.get();
+            Set<ExecutedRuleData> executedRules =
+                    (Set<ExecutedRuleData>) AlfrescoTransactionSupport.getResource(KEY_RULES_EXECUTED);
     		
     		if (executedRules == null || executedRules.contains(new ExecutedRuleData(actionableNodeRef, rule)) == false)
     		{
-    			Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
+                Set<PendingRuleData> pendingRules =
+                    (Set<PendingRuleData>) AlfrescoTransactionSupport.getResource(KEY_RULES_PENDING);
     			if (pendingRules == null)
     			{
-    				pendingRules = new HashSet<PendingRuleData>();					
+                    // bind pending rules to the current transaction
+    				pendingRules = new HashSet<PendingRuleData>();
+                    AlfrescoTransactionSupport.bindResource(KEY_RULES_PENDING, pendingRules);
+                    // bind this RuleService to receive callbacks when the transaction flushes
+                    AlfrescoTransactionSupport.bindRuleService(this);
     			}
     			
     			pendingRules.add(pendingRuleData);		
-    			this.threadLocalPendingData.set(pendingRules);
     		}
         }
 	}
@@ -432,30 +450,36 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 */
 	public void executePendingRules() 
 	{
-        this.threadLocalExecutedRules.set(new HashSet<ExecutedRuleData>());
+        AlfrescoTransactionSupport.bindResource(KEY_RULES_EXECUTED, new HashSet<ExecutedRuleData>());
         try
         {
             executePendingRulesImpl();
         }
         finally
         {
-            this.threadLocalExecutedRules.remove();
+            AlfrescoTransactionSupport.unbindResource(KEY_RULES_EXECUTED);
         }
 	}     
     
     /**
-     * Executes the pending rules
+     * Executes the pending rules, iterating until all pending rules have been executed
      */
+    @SuppressWarnings("unchecked")
     private void executePendingRulesImpl()
     {
-        Set<PendingRuleData> pendingRules = this.threadLocalPendingData.get();
-        if (pendingRules != null)
+        // get the transaction-local rules to execute
+        Set<PendingRuleData> pendingRules =
+                (Set<PendingRuleData>) AlfrescoTransactionSupport.getResource(KEY_RULES_PENDING);
+        // only execute if there are rules present
+        if (pendingRules != null && !pendingRules.isEmpty())
         {
             PendingRuleData[] pendingRulesArr = pendingRules.toArray(new PendingRuleData[0]);
-            this.threadLocalPendingData.remove();
+            // remove all pending rules from the transaction
+            AlfrescoTransactionSupport.unbindResource(KEY_RULES_PENDING);
+            // execute each rule
             for (PendingRuleData pendingRule : pendingRulesArr) 
             {
-                executePendingRule(pendingRule);                
+                executePendingRule(pendingRule);
             }
             
             // Run any rules that have been marked as pending during execution
@@ -468,7 +492,8 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	 * 
 	 * @param pendingRule	the pending rule data object
 	 */
-	private void executePendingRule(PendingRuleData pendingRule) 
+	@SuppressWarnings("unchecked")
+    private void executePendingRule(PendingRuleData pendingRule) 
 	{
 		NodeRef actionableNodeRef = pendingRule.getActionableNodeRef();
 		NodeRef actionedUponNodeRef = pendingRule.getActionedUponNodeRef();
@@ -509,8 +534,10 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 		// Evaluate the condition
 	    if (evaluator.evaluate(cond, actionableNodeRef, actionedUponNodeRef) == true)
 	    {
-            // Add the rule to the executed rule list (do this before this is executed to prevent rules being added to the pending list) 
-            Set<ExecutedRuleData> executedRules = this.threadLocalExecutedRules.get();
+            // Add the rule to the executed rule list
+            // (do this before this is executed to prevent rules being added to the pending list) 
+            Set<ExecutedRuleData> executedRules =
+                    (Set<ExecutedRuleData>) AlfrescoTransactionSupport.getResource(KEY_RULES_EXECUTED);
             executedRules.add(new ExecutedRuleData(actionableNodeRef, rule));
             
 			// Execute the rule
@@ -567,11 +594,11 @@ public class RuleServiceImpl implements RuleService, RuleRegistration, RuleExecu
 	/**
 	 * Register the action executor
 	 * 
-	 * @param ruleActionExecutor	the rule action executor
+	 * @param ruleActionExecuter	the rule action executor
 	 */
-	public void registerRuleActionExecutor(RuleActionExecuter ruleActionExecutor) 
+	public void registerRuleActionExecuter(RuleActionExecuter ruleActionExecuter) 
 	{
-		RuleActionDefinition action = ruleActionExecutor.getRuleActionDefinition();
+		RuleActionDefinition action = ruleActionExecuter.getRuleActionDefinition();
 		this.actionDefinitions.put(action.getName(), action);
 	}
     

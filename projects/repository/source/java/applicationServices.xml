@@ -124,7 +124,7 @@
       </property>
    </bean>
    
-   <alias alias="AlfSearchService" name="searcherComponent"/>
+   <alias alias="AlfSearchService" name="searchService"/>
 
    <bean parent="alfrescoService">
       <property name="name">

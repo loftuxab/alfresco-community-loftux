@@ -19,6 +19,8 @@ package org.alfresco.service.cmr.rule;
 
 import java.util.List;
 
+import org.alfresco.repo.rule.RuleExecution;
+import org.alfresco.repo.rule.RuleRegistration;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
@@ -26,7 +28,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
  * 
  * @author Roy Wetherall
  */
-public interface RuleService
+public interface RuleService extends  RuleRegistration, RuleExecution
 {
     /**
      * Get the rule types currently defined in the repository.

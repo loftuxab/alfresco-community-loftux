@@ -15,7 +15,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.integrity;
+package org.alfresco.repo.node.integrity;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -17,8 +17,15 @@
  */
 package org.alfresco.service.cmr.search;
 
+import java.io.Serializable;
+import java.util.List;
+
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.XPathException;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -114,4 +121,70 @@ public interface SearchService
      */
     
     public ResultSet query(SearchParameters searchParameters);
+    
+    /**
+     * Select nodes using an xpath expression.
+     * 
+     * @param contextNodeRef - the context node for relative expressions etc
+     * @param xpath - the xpath string to evaluate
+     * @param parameters - parameters to bind in to the xpath expression
+     * @param namespacePrefixResolver - prefix to namespace mappings
+     * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
+     * @return a list of all the child assoc relationships to the selected nodes
+     */
+    public List<NodeRef> selectNodes(
+            NodeRef contextNodeRef,
+            String xpath,
+            QueryParameterDefinition[] parameters,
+            NamespacePrefixResolver namespacePrefixResolver,
+            boolean followAllParentLinks)
+            throws InvalidNodeRefException, XPathException;
+
+    /**
+     * Select properties using an xpath expression 
+     * 
+     * @param contextNodeRef - the context node for relative expressions etc
+     * @param xpath - the xpath string to evaluate
+     * @param parameters - parameters to bind in to the xpath expression
+     * @param namespacePrefixResolver - prefix to namespace mappings
+     * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
+     * @return a list of property values 
+     */
+    public List<Serializable> selectProperties(
+            NodeRef contextNodeRef,
+            String xpath,
+            QueryParameterDefinition[] parameters,
+            NamespacePrefixResolver namespacePrefixResolver,
+            boolean followAllParentLinks)
+            throws InvalidNodeRefException, XPathException;
+
+    /**
+     * Search for string pattern in both the node text (if present) and node properties
+     * 
+     * @param nodeRef the node to get
+     * @param propertyQName the name of the property
+     * @param googleLikePattern a Google-like pattern to search for in the property value
+     * @return Returns true if the pattern could be found
+     */
+    public boolean contains(
+            NodeRef nodeRef,
+            QName propertyQName,
+            String googleLikePattern)
+            throws InvalidNodeRefException;
+    
+    /**
+     * Search for string pattern in both the node text (if present) and node properties
+     * 
+     * @param nodeRef the node to get
+     * @param propertyQName the name of the property (mandatory)
+     * @param sqlLikePattern a SQL-like pattern to search for
+     * @param includeFTS - include full text search matches in the like test
+     * @return Returns true if the pattern could be found
+     */
+    public boolean like(
+            NodeRef nodeRef,
+            QName propertyQName,
+            String sqlLikePattern,
+            boolean includeFTS)
+            throws InvalidNodeRefException;
 }

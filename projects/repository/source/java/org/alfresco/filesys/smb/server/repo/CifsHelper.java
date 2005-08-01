@@ -45,6 +45,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.SearchLanguageConversion;
@@ -66,6 +67,7 @@ public class CifsHelper
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
+    private SearchService searchService;
     private MimetypeService mimetypeService;
     
     /**
@@ -90,6 +92,11 @@ public class CifsHelper
         this.nodeService = nodeService;
     }
     
+    public void setSearchService(SearchService searchService)
+    {
+        this.searchService = searchService;
+    }
+
     public void setFilePathCache(FilePathCache filePathCache)
     {
         this.filePathCache = filePathCache;
@@ -435,7 +442,7 @@ public class CifsHelper
     
         String xpath = sb.toString();
         // execute the query
-        List<NodeRef> nodes = nodeService.selectNodes(
+        List<NodeRef> nodes = searchService.selectNodes(
                 pathRootNodeRef,
                 xpath,
                 params,

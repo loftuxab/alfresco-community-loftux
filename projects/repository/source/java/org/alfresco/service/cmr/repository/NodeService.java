@@ -410,49 +410,36 @@ public interface NodeService
     public List<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException;
     
     /**
-     * Select nodes using an xpath expression.
-     * 
-     * @param contextNodeRef - the context node for relative expressions etc
-     * @param XPath - the xpath string to evaluate
-     * @param parameters - parameters to bind in to the xpath expression
-     * @param namespacePrefixResolver - prefix to namespace mappings
-     * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
-     * @return a list of all the child assoc relationships to the selected nodes
+     * @deprecated
+     * @see org.alfresco.service.cmr.search.SearchService#selectNodes(NodeRef, String, QueryParameterDefinition[], NamespacePrefixResolver, boolean)
      */
+    @Deprecated
     public List<NodeRef> selectNodes(
             NodeRef contextNodeRef,
-            String XPath,
+            String xpath,
             QueryParameterDefinition[] parameters,
             NamespacePrefixResolver namespacePrefixResolver,
             boolean followAllParentLinks)
             throws InvalidNodeRefException, XPathException;
 
     /**
-     * Select properties using an xpath expression 
-     * 
-     * @param contextNodeRef - the context node for relative expressions etc
-     * @param XPath - the xpath string to evaluate
-     * @param parameters - parameters to bind in to the xpath expression
-     * @param namespacePrefixResolver - prefix to namespace mappings
-     * @param followAllParentLinks - if false ".." follows only the primary parent links, if true it follows all 
-     * @return a list of property values 
+     * @deprecated
+     * @see org.alfresco.service.cmr.search.SearchService#selectProperties(NodeRef, String, QueryParameterDefinition[], NamespacePrefixResolver, boolean)
      */
+    @Deprecated
     public List<Serializable> selectProperties(
             NodeRef contextNodeRef,
-            String XPath,
+            String xpath,
             QueryParameterDefinition[] parameters,
             NamespacePrefixResolver namespacePrefixResolver,
             boolean followAllParentLinks)
             throws InvalidNodeRefException, XPathException;
 
     /**
-     * Search for string pattern in both the node text (if present) and node properties
-     * 
-     * @param nodeRef the node to get
-     * @param propertyQName the name of the property
-     * @param googleLikePattern a Google-like pattern to search for in the property value
-     * @return Returns true if the pattern could be found
+     * @deprecated
+     * @see org.alfresco.service.cmr.search.SearchService#contains(NodeRef, QName, String)
      */
+    @Deprecated
     public boolean contains(
             NodeRef nodeRef,
             QName propertyQName,
@@ -460,14 +447,10 @@ public interface NodeService
             throws InvalidNodeRefException;
     
     /**
-     * Search for string pattern in both the node text (if present) and node properties
-     * 
-     * @param nodeRef the node to get
-     * @param propertyQName the name of the property (mandatory)
-     * @param sqlLikePattern a SQL-like pattern to search for
-     * @param includeFTS - include full text search matches in the like test
-     * @return Returns true if the pattern could be found
+     * @deprecated
+     * @see org.alfresco.service.cmr.search.SearchService#like(NodeRef, QName, String, boolean)
      */
+    @Deprecated
     public boolean like(
             NodeRef nodeRef,
             QName propertyQName,

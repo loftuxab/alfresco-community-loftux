@@ -15,19 +15,16 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.node;
+package org.alfresco.repo.search;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
-import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.jaxen.BaseXPath;
 import org.jaxen.Context;
@@ -41,6 +38,8 @@ import org.jaxen.function.BooleanFunction;
 import org.jaxen.function.StringFunction;
 
 /**
+ * Represents an xpath statement that resolves against a <code>NodeService</code>
+ * 
  * @author Andy Hind
  */
 public class NodeServiceXPath extends BaseXPath
@@ -49,15 +48,19 @@ public class NodeServiceXPath extends BaseXPath
     
     private boolean followAllParentLinks;
 
+    /**
+     * 
+     * @param xpath the xpath statement
+     * @param documentNavigator the navigator that will allow the xpath to be resolved
+     * @param paramDefs parameters to resolve variables required by xpath
+     * @throws JaxenException
+     */
     public NodeServiceXPath(
             String xpath,
-            DictionaryService dictionaryService,
-            NodeService nodeService,
-            NamespacePrefixResolver nspr,
-            QueryParameterDefinition[] paramDefs,
-            boolean followAllParentLinks) throws JaxenException
+            DocumentNavigator documentNavigator,
+            QueryParameterDefinition[] paramDefs) throws JaxenException
     {
-        super(xpath, new DocumentNavigator(dictionaryService, nodeService, nspr, followAllParentLinks));
+        super(xpath, documentNavigator);
         
         // Add support for parameters
         if (paramDefs != null)

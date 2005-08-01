@@ -27,11 +27,12 @@ import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.QName;
 
 /**
- * Simple searcher against another store using the JSR 170 API
+ * Simple searcher against another store using the JSR 170 API.
+ * <p>
+ * This class is not fully implemented and hence still abstract.
  */
-public class JCR170Searcher extends AbstractSearcherComponent
+public abstract class JCR170Searcher extends AbstractSearcherComponent
 {
-
     public ResultSet query(StoreRef store, String language, String query, Path[] queryOptions,
             QueryParameter[] queryParameters)
     {
@@ -56,6 +57,4 @@ public class JCR170Searcher extends AbstractSearcherComponent
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }
-
-    
 }

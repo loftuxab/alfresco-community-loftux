@@ -17,13 +17,20 @@
  */
 package org.alfresco.repo.search;
 
+import java.io.Serializable;
+import java.util.List;
+
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.XPathException;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -50,7 +57,7 @@ public class SearcherComponent extends AbstractSearcherComponent
             Path[] queryOptions,
             QueryParameterDefinition[] queryParameterDefinitions)
     {
-        SearchService searcher = indexerAndSearcherFactory.getSearcher(store, false);
+        SearchService searcher = indexerAndSearcherFactory.getSearcher(store, true);
         return searcher.query(store, language, query, queryOptions, queryParameterDefinitions);
     }
 
@@ -71,5 +78,27 @@ public class SearcherComponent extends AbstractSearcherComponent
         return searcher.query(searchParameters);
     }
 
-   
+    public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern) throws InvalidNodeRefException
+    {
+        SearchService searcher = indexerAndSearcherFactory.getSearcher(nodeRef.getStoreRef(), true);
+        return searcher.contains(nodeRef, propertyQName, googleLikePattern);
+    }
+
+    public boolean like(NodeRef nodeRef, QName propertyQName, String sqlLikePattern, boolean includeFTS) throws InvalidNodeRefException
+    {
+        SearchService searcher = indexerAndSearcherFactory.getSearcher(nodeRef.getStoreRef(), true);
+        return searcher.like(nodeRef, propertyQName, sqlLikePattern, includeFTS);
+    }
+
+    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    {
+        SearchService searcher = indexerAndSearcherFactory.getSearcher(contextNodeRef.getStoreRef(), true);
+        return searcher.selectNodes(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks);
+    }
+
+    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    {
+        SearchService searcher = indexerAndSearcherFactory.getSearcher(contextNodeRef.getStoreRef(), true);
+        return searcher.selectProperties(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks);
+    }
 }

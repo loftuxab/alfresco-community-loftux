@@ -32,16 +32,14 @@ import org.alfresco.repo.dictionary.impl.DictionaryComponent;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
-import org.alfresco.repo.search.QueryParameterDefImpl;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidAspectException;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationExistsException;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CyclicChildRelationshipException;
 import org.alfresco.service.cmr.repository.EntityRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -49,11 +47,10 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.QueryParameterDefinition;
-import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.hibernate.Session;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Provides a base set of tests of the various {@link org.alfresco.service.cmr.repository.NodeService}
@@ -83,8 +80,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     /** populated during setup */
     protected NodeRef rootNodeRef;
 
-    private ContentService contentService;
-
     protected void onSetUpInTransaction() throws Exception
     {
         DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
@@ -102,16 +97,39 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         
         DictionaryComponent dictionary = new DictionaryComponent();
         dictionary.setDictionaryDAO(dictionaryDao);
-        dictionaryService = dictionary;
+        dictionaryService = loadModel(applicationContext);
         
         nodeService = getNodeService();
-        contentService = getContentService();
         
         // create a first store directly
         StoreRef storeRef = nodeService.createStore(
                 StoreRef.PROTOCOL_WORKSPACE,
                 "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
+    }
+    
+    /**
+     * Loads the test model required for building the node graphs
+     */
+    public static DictionaryService loadModel(ApplicationContext applicationContext)
+    {
+        DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
+        // load the system model
+        ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
+        InputStream modelStream = cl.getResourceAsStream("org/alfresco/model/content_model.xml");
+        assertNotNull(modelStream);
+        M2Model model = M2Model.createModel(modelStream);
+        dictionaryDao.putModel(model);
+        // load the test model
+        modelStream = cl.getResourceAsStream("org/alfresco/repo/node/BaseNodeServiceTest_model.xml");
+        assertNotNull(modelStream);
+        model = M2Model.createModel(modelStream);
+        dictionaryDao.putModel(model);
+        
+        DictionaryComponent dictionary = new DictionaryComponent();
+        dictionary.setDictionaryDAO(dictionaryDao);
+        // done
+        return dictionary;
     }
     
     /**
@@ -127,15 +145,21 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     protected abstract NodeService getNodeService();
     
-    protected abstract ContentService getContentService();
-    
     public void testSetUp() throws Exception
     {
         assertNotNull("StoreService not set", nodeService);
         assertNotNull("NodeService not set", nodeService);
         assertNotNull("rootNodeRef not created", rootNodeRef);
     }
-    
+
+    /**
+     * @see #buildNodeGraph(NodeService, NodeRef)
+     */
+    public Map<QName, ChildAssociationRef> buildNodeGraph() throws Exception
+    {
+        return BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+    }
+
     /**
      * Builds a graph of child associations as follows:
      * <pre>
@@ -172,7 +196,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      * 
      * @return Returns a map <code>ChildAssocRef</code> instances keyed by qualified assoc name
      */
-    protected Map<QName, ChildAssociationRef> buildNodeGraph() throws Exception
+    public static Map<QName, ChildAssociationRef> buildNodeGraph(
+            NodeService nodeService,
+            NodeRef rootNodeRef) throws Exception
     {
         String ns = BaseNodeServiceTest.NAMESPACE;
         QName qname = null;
@@ -249,27 +275,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assoc = nodeService.addChild(n7, n8, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname);
         ret.put(qname, assoc);
 
-        // flush and clear
-        getSession().flush();
-        getSession().clear();
+//        // flush and clear
+//        getSession().flush();
+//        getSession().clear();
         
         // done
         return ret;
-    }
-    
-    /**
-     * Commits the node graph
-     * 
-     * @see #buildNodeGraph()
-     */
-    protected Map<QName, ChildAssociationRef> commitNodeGraph() throws Exception
-    {
-        Map<QName, ChildAssociationRef> answer = buildNodeGraph();
-        // commit node so that threads can see node
-        setComplete();
-        endTransaction();
-        // done
-        return answer;
     }
     
     private int countNodesById(NodeRef nodeRef)
@@ -888,224 +899,27 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertFalse("n8 not cascade deleted", nodeService.exists(n8Ref));
     }
     
-    public void testNodeXPath() throws Exception
+    /**
+     * Builds 10K a node graphs, flushing after each build.  Checks that memory is being cleared
+     * adequately.
+     * 
+     * @see BaseNodeServiceTest#buildNodeGraph()
+     */
+    public void testFlush() throws Exception
     {
-        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
-        QName qname = QName.createQName(BaseNodeServiceTest.NAMESPACE, "n2_p_n4");
+        int testCount = 500;
         
-        NodeServiceXPath xpath;
-        String xpathStr;
-        QueryParameterDefImpl paramDef;
-        List list;
-        
-        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
-        namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        
-        xpath = new NodeServiceXPath("//.[@test:animal='monkey']",
-                dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(1, list.size());
-      
-        xpath = new NodeServiceXPath("*", dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(2, list.size());
-        
-        xpath = new NodeServiceXPath("*/*", dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(4, list.size());
-        
-        xpath = new NodeServiceXPath("*/*/*", dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(3, list.size());
-        
-        xpath = new NodeServiceXPath("*/*/*/*", dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(2, list.size());
-        
-        xpath = new NodeServiceXPath("*/*/*/*/..", dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(2, list.size());
-        
-        xpath = new NodeServiceXPath("*//.", dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-//        assertEquals(11, list.size());
-        assertEquals(13, list.size());   // 13 unique paths through the graph - duplicates not being removed
-        
-        xpathStr = "test:root_p_n1";
-        xpath = new NodeServiceXPath(xpathStr, dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(1, list.size());
-        
-        xpathStr = "*//.[@test:animal]";
-        xpath = new NodeServiceXPath(xpathStr, dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(1, list.size());
-        
-        xpathStr = "*//.[@test:animal='monkey']";
-        xpath = new NodeServiceXPath(xpathStr, dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(1, list.size());
-        
-        xpathStr = "//.[@test:animal='monkey']";
-        xpath = new NodeServiceXPath(xpathStr, dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(1, list.size());
-        
-        paramDef = new QueryParameterDefImpl(
-                QName.createQName("test:test", namespacePrefixResolver),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
-                true,
-                "monkey");
-        xpathStr = "//.[@test:animal=$test:test]";
-        xpath = new NodeServiceXPath(
-                xpathStr,
-                dictionaryService,
-                nodeService,
-                namespacePrefixResolver,
-                new QueryParameterDefinition[]{paramDef},
-                false);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX,   BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(1, list.size());
-        
-        xpath = new NodeServiceXPath(".", dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(assocRefs.get(qname));
-        assertEquals(1, list.size());
-        
-        xpath = new NodeServiceXPath("..", dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        list = xpath.selectNodes(assocRefs.get(qname));
-        assertEquals(1, list.size());
-        
-        xpath = new NodeServiceXPath("..", dictionaryService, nodeService, namespacePrefixResolver, null, true);
-        list = xpath.selectNodes(assocRefs.get(qname));
-        assertEquals(2, list.size());
-        
-        xpathStr = "//@test:animal";
-        xpath = new NodeServiceXPath(xpathStr, dictionaryService, nodeService, namespacePrefixResolver, null, true);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(assocRefs.get(qname));
-        assertEquals(1, list.size());
-        assertTrue(list.get(0) instanceof DocumentNavigator.Property);
-        
-        xpathStr = "//@test:reference";
-        xpath = new NodeServiceXPath(xpathStr, dictionaryService, nodeService, namespacePrefixResolver, null, true);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(assocRefs.get(qname));
-        assertEquals(1, list.size());
-        
-        xpathStr = "deref(/test:root_p_n1/test:n1_p_n3/@test:reference, '')";
-        xpath = new NodeServiceXPath(xpathStr, dictionaryService, nodeService, namespacePrefixResolver, null, false);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(assocRefs.get(qname));
-        assertEquals(1, list.size());
-        
-        // test 'subtypeOf' function
-        paramDef = new QueryParameterDefImpl(
-                QName.createQName("test:type", namespacePrefixResolver),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.QNAME),
-                true,
-                TYPE_QNAME_TEST_CONTENT.toString());
-        xpathStr = "//.[subtypeOf($test:type)]";
-        xpath = new NodeServiceXPath(
-                xpathStr,
-                dictionaryService,
-                nodeService,
-                namespacePrefixResolver,
-                new QueryParameterDefinition[]{paramDef},
-                false);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(assocRefs.get(qname));
-        assertEquals(2, list.size());   // 2 distinct paths to node n8, which is of type content
-
-        xpath = new NodeServiceXPath("/", dictionaryService, nodeService, namespacePrefixResolver, null, true);
-        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        list = xpath.selectNodes(assocRefs.get(qname));
-        assertEquals(1, list.size());
+        try
+        {
+            for (int i = 0; i < testCount; i++)
+            {
+                buildNodeGraph();
+                AlfrescoTransactionSupport.flush();
+            }
+        }
+        catch (OutOfMemoryError e)
+        {
+            fail("Flush not clearing memory");
+        }
     }
-    
-    
-    public void testSelectAPI() throws Exception
-    {
-        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
-        NodeRef n6Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n3_p_n6")).getChildRef();
-        
-        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
-        namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        
-        List<NodeRef> answer =  nodeService.selectNodes(rootNodeRef, "/test:root_p_n1/test:n1_p_n3/*", null, namespacePrefixResolver, false);
-        assertEquals(1, answer.size());
-        assertTrue(answer.contains(n6Ref));
-        
-        //List<ChildAssocRef> 
-        answer =  nodeService.selectNodes(rootNodeRef, "*", null, namespacePrefixResolver, false);
-        assertEquals(2, answer.size());
-        
-        List<Serializable> attributes = nodeService.selectProperties(rootNodeRef, "//@test:animal", null, namespacePrefixResolver, false);
-        assertEquals(1, attributes.size());
-    }
-    
-    public void testLikeAndContains() throws Exception
-    {
-        Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
-        
-        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
-        namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
-        
-        List<NodeRef> answer =  nodeService.selectNodes(
-                rootNodeRef,
-                "//*[like(@test:animal, 'm__k%', false)]",
-                null,
-                namespacePrefixResolver, false);
-        assertEquals(1, answer.size());
-        
-        answer =  nodeService.selectNodes(rootNodeRef, "//*[contains('monkey')]", null, namespacePrefixResolver, false);
-        assertEquals(1, answer.size());
-
-        // select the monkey node in the second level
-        QueryParameterDefinition[] paramDefs = new QueryParameterDefinition[2];
-        paramDefs[0] = new QueryParameterDefImpl(
-                QName.createQName("test:animal", namespacePrefixResolver),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
-                true,
-                "monkey%");
-        paramDefs[1] = new QueryParameterDefImpl(
-                QName.createQName("test:type", namespacePrefixResolver),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
-                true,
-                TYPE_QNAME_TEST_CONTENT.toString());
-        answer = nodeService.selectNodes(
-                rootNodeRef,
-                "./*/*[like(@test:animal, $test:animal, false) or subtypeOf($test:type)]",
-                paramDefs,
-                namespacePrefixResolver,
-                false);
-        assertEquals(1, answer.size());
-        
-        // select the monkey node again, but use the first level as the starting poing
-        NodeRef n1Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "root_p_n1")).getChildRef();
-        NodeRef n3Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n1_p_n3")).getChildRef();
-        // fist time go too deep
-        answer = nodeService.selectNodes(
-                n1Ref,
-                "./*/*[like(@test:animal, $test:animal, false) or subtypeOf($test:type)]",
-                paramDefs,
-                namespacePrefixResolver,
-                false);
-        assertEquals(0, answer.size());
-        // second time get it right
-        answer = nodeService.selectNodes(
-                n1Ref,
-                "./*[like(@test:animal, $test:animal, false) or subtypeOf($test:type)]",
-                paramDefs,
-                namespacePrefixResolver,
-                false);
-        assertEquals(1, answer.size());
-        assertFalse("Incorrect result: search root node pulled back", answer.contains(n1Ref));
-        assertTrue("Incorrect result: incorrect node retrieved", answer.contains(n3Ref));
-   }
 }

@@ -35,13 +35,13 @@ import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
 import org.alfresco.repo.search.transaction.SimpleTransaction;
 import org.alfresco.repo.search.transaction.SimpleTransactionManager;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.GUID;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.BooleanQuery;
 
 /**
@@ -74,11 +74,6 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     private int indexerMaxMergeDocs;
 
     private String lockDirectory;
-
-    /**
-     * The factory instance
-     */
-    private static LuceneIndexerAndSearcherFactory factory = new LuceneIndexerAndSearcherFactory();
 
     /**
      * A map of active global transactions . It contains all the indexers a
@@ -132,20 +127,9 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      * Private constructor for the singleton TODO: FIt in with IOC
      */
 
-    private LuceneIndexerAndSearcherFactory()
+    public LuceneIndexerAndSearcherFactory()
     {
         super();
-    }
-
-    /**
-     * Get the factory instance
-     * 
-     * @return
-     */
-
-    public static LuceneIndexerAndSearcherFactory getInstance()
-    {
-        return factory;
     }
 
     /**
@@ -235,6 +219,10 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      */
     public LuceneIndexer getIndexer(StoreRef storeRef) throws IndexerException
     {
+        // register to receive txn callbacks
+        // TODO: make this conditional on whether the XA stuff is being used directly on not
+        AlfrescoTransactionSupport.bindLucene(this);
+        
         if (inGlobalTransaction())
         {
             SimpleTransaction tx = getTransaction();

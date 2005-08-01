@@ -36,7 +36,7 @@ import org.springframework.transaction.TransactionDefinition;
  * 
  * @author Derek Hulley
  */
-public class AlfrescoTransactionManagerTest extends TestCase
+public class AlfrescoTransactionSupportTest extends TestCase
 {
     private ServiceRegistry serviceRegistry;
     
@@ -50,11 +50,11 @@ public class AlfrescoTransactionManagerTest extends TestCase
     {
         // get a user transaction
         UserTransaction txn = serviceRegistry.getUserTransaction();
-        assertNull("Thread shouldn't have a txn ID", AlfrescoTransactionManager.getTransactionId());
+        assertNull("Thread shouldn't have a txn ID", AlfrescoTransactionSupport.getTransactionId());
         
         // begine the txn
         txn.begin();
-        String txnId = AlfrescoTransactionManager.getTransactionId();
+        String txnId = AlfrescoTransactionSupport.getTransactionId();
         assertNotNull("Expected thread to have a txn id", txnId);
         
         // check that it is threadlocal
@@ -62,13 +62,13 @@ public class AlfrescoTransactionManagerTest extends TestCase
                 {
                     public void run()
                     {
-                        String txnId = AlfrescoTransactionManager.getTransactionId();
+                        String txnId = AlfrescoTransactionSupport.getTransactionId();
                         assertNull("New thread seeing txn id");
                     }
                 });
         
         // check that the txn id doesn't change
-        String txnIdCheck = AlfrescoTransactionManager.getTransactionId();
+        String txnIdCheck = AlfrescoTransactionSupport.getTransactionId();
         assertEquals("Transaction ID changed on same thread", txnId, txnIdCheck);
         
         // begin a new, inner transaction
@@ -76,33 +76,33 @@ public class AlfrescoTransactionManagerTest extends TestCase
             SpringAwareUserTransaction txnInner = (SpringAwareUserTransaction) serviceRegistry.getUserTransaction();
             txnInner.setPropogationBehviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             
-            String txnIdInner = AlfrescoTransactionManager.getTransactionId();
+            String txnIdInner = AlfrescoTransactionSupport.getTransactionId();
             assertEquals("Inner transaction not started, so txn ID should not change", txnId, txnIdInner);
             
             // begin the nested txn
             txnInner.begin();
             // check the ID for the outer transaction
-            txnIdInner = AlfrescoTransactionManager.getTransactionId();
+            txnIdInner = AlfrescoTransactionSupport.getTransactionId();
             assertNotSame("Inner txn ID must be different from outer txn ID", txnIdInner, txnId);
             
             // rollback the nested txn
             txnInner.rollback();
-            txnIdCheck = AlfrescoTransactionManager.getTransactionId();
+            txnIdCheck = AlfrescoTransactionSupport.getTransactionId();
             assertEquals("Txn ID not popped inner txn completion", txnId, txnIdCheck);
         }
         
         // rollback
         txn.rollback();
-        assertNull("Thread shouldn't have a txn ID after rollback", AlfrescoTransactionManager.getTransactionId());
+        assertNull("Thread shouldn't have a txn ID after rollback", AlfrescoTransactionSupport.getTransactionId());
         
         // start a new transaction
         txn = serviceRegistry.getUserTransaction();
         txn.begin();
-        txnIdCheck = AlfrescoTransactionManager.getTransactionId();
+        txnIdCheck = AlfrescoTransactionSupport.getTransactionId();
         assertNotSame("New transaction has same ID", txnId, txnIdCheck);
         
         // rollback
         txn.rollback();
-        assertNull("Thread shouldn't have a txn ID after rollback", AlfrescoTransactionManager.getTransactionId());
+        assertNull("Thread shouldn't have a txn ID after rollback", AlfrescoTransactionSupport.getTransactionId());
     }
 }

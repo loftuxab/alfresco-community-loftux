@@ -30,7 +30,6 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.impl.DictionaryComponent;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Model;
-import org.alfresco.repo.transaction.AlfrescoTransactionManager;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -46,42 +45,29 @@ import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.transaction.SpringAwareUserTransaction;
 import org.apache.lucene.index.IndexWriter;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.PlatformTransactionManager;
 
 public class ConcurrentNodeServiceTest extends TestCase
 {
-
     public static final String NAMESPACE = "http://www.alfresco.org/test/BaseNodeServiceTest";
-
     public static final String TEST_PREFIX = "test";
-
     public static final QName TYPE_QNAME_TEST_CONTENT = QName.createQName(NAMESPACE, "content");
-
     public static final QName ASPECT_QNAME_TEST_TITLED = QName.createQName(NAMESPACE, "titled");
-
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
-
     public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
 
     static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     private DictionaryComponent dictionaryService;
-
     private ContentService contentService;
-
     private NodeService nodeService;
-
-    private AlfrescoTransactionManager transactionManager;
+    private PlatformTransactionManager transactionManager;
 
     private NodeRef rootNodeRef;
 
     public ConcurrentNodeServiceTest()
     {
         super();
-    }
-
-    public ConcurrentNodeServiceTest(String arg0)
-    {
-        super(arg0);
     }
 
     protected void setUp() throws Exception
@@ -105,7 +91,7 @@ public class ConcurrentNodeServiceTest extends TestCase
 
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         contentService = (ContentService) ctx.getBean("contentService");
-        transactionManager = (AlfrescoTransactionManager) ctx.getBean("transactionManager");
+        transactionManager = (PlatformTransactionManager) ctx.getBean("transactionManager");
 
         // create a first store directly
         SpringAwareUserTransaction tx = new SpringAwareUserTransaction(transactionManager);
@@ -231,8 +217,8 @@ public class ConcurrentNodeServiceTest extends TestCase
             }
         }
 
-        assertEquals(2 * ((count * repeats) + 1), nodeService.selectNodes(rootNodeRef, "/*", null, getNamespacePrefixReolsver(""), false).size());
-        SearchService searcher = (SearchService) ctx.getBean("searcherComponent");
+        SearchService searcher = (SearchService) ctx.getBean("searchService");
+        assertEquals(2 * ((count * repeats) + 1), searcher.selectNodes(rootNodeRef, "/*", null, getNamespacePrefixReolsver(""), false).size());
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*\"");
         // n6 has root aspect - there are three things at the root level in the index
         assertEquals(3 * ((count * repeats) + 1), results.length());
@@ -294,5 +280,4 @@ public class ConcurrentNodeServiceTest extends TestCase
         nspr.addDynamicNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
         return nspr;
     }
-
 }

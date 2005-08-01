@@ -51,6 +51,7 @@ public class FileImporterTest extends TestCase
 {
     static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
     private NodeService nodeService;
+    private SearchService searchService;
     private DictionaryService dictionaryService;
     private ContentService contentService;
     private AuthenticationService authenticationService;
@@ -78,6 +79,7 @@ public class FileImporterTest extends TestCase
 
         searcher = serviceRegistry.getSearchService();
         nodeService = serviceRegistry.getNodeService();
+        searchService = serviceRegistry.getSearchService();
         dictionaryService = serviceRegistry.getDictionaryService();
         contentService = serviceRegistry.getContentService();
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
@@ -197,7 +199,12 @@ public class FileImporterTest extends TestCase
                 }
 
                 NodeRef storeRoot = test.nodeService.getRootNode(spacesStore);
-                List<NodeRef> location = test.nodeService.selectNodes(storeRoot, args[1], null, test.namespaceService, false);
+                List<NodeRef> location = test.searchService.selectNodes(
+                        storeRoot,
+                        args[1],
+                        null,
+                        test.namespaceService,
+                        false);
                 if (location.size() == 0)
                 {
                 }
@@ -208,21 +215,7 @@ public class FileImporterTest extends TestCase
                 long first = end-start;
                 System.out.println("Created in: " + ((end - start) / 1000000.0) + "ms");
                 start = System.nanoTime();
-//                
-//                SearchParameters sp = new SearchParameters();
-//                sp.addStore(spacesStore);
-//                sp.setQuery("lucene", "PATH:\"//.\"");
-//                sp.addSort("ID", true);
-//                sp.excludeDataInTheCurrentTransaction(false);
-//                start = System.nanoTime();
-//                ResultSet results = test.searcher.query(sp);
-//               
-//                end = System.nanoTime();
-//                 
-//                System.out.println("Found(TX) "+results.length());
-//                System.out.println(" in " + ((end - start) / 1000000.0));
-//                results.close();
-//                
+
                 tx.commit();
                 end = System.nanoTime();
                 long second = end-start;
@@ -231,36 +224,6 @@ public class FileImporterTest extends TestCase
                 System.out.println("Total: "+ total + "ms");
                 System.out.println("Imported: " + importCount + " files or directories");
                 System.out.println("Average: " + (importCount / (total / 1000.0)) + " files per second");
-//                
-//                
-//                
-//              
-//                start = System.nanoTime();
-//                results = test.searcher.query(sp);
-//               
-//                end = System.nanoTime();
-//                 
-//                System.out.println("Found (noTX)"+results.length());
-//                System.out.println(" in " + ((end - start) / 1000000.0));
-//
-//                start = System.nanoTime();
-//                String current = null;
-//                for (ResultSetRow row : results)
-//                {
-//                    String id = row.getNodeRef().getId();
-//
-//                    if (current != null)
-//                    {
-//                        if (current.compareTo(id) > 0)
-//                        {
-//                            fail();
-//                        }
-//                    }
-//                    current = id;
-//                }
-//                results.close();
-//                end = System.nanoTime();
-//                System.out.println(" Checked order in  " + ((end - start) / 1000000.0));
             }
             catch (Throwable e)
             {

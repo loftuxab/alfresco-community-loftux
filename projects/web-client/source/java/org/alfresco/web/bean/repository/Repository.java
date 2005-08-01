@@ -17,7 +17,6 @@
  */
 package org.alfresco.web.bean.repository;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +26,6 @@ import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
-import javax.swing.text.StyledEditorKit.BoldAction;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -43,10 +41,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
-import org.alfresco.service.cmr.search.ResultSetRow;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
-import org.alfresco.service.namespace.NamespaceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
@@ -433,9 +429,10 @@ public final class Repository
     * 
     * @param context Faces Context
     * @param nodeService The node service
+    * @param searchService used to perform the search
     * @return List of Person node objects
     */
-   public static List<Node> getUsers(FacesContext context, NodeService nodeService)
+   public static List<Node> getUsers(FacesContext context, NodeService nodeService, SearchService searchService)
    {
       List<Node> personNodes = null;
       
@@ -445,7 +442,7 @@ public final class Repository
          tx = Repository.getUserTransaction(context);
          tx.begin();
          
-         NodeRef peopleRef = getSystemPeopleFolderRef(context, nodeService);
+         NodeRef peopleRef = getSystemPeopleFolderRef(context, nodeService, searchService);
          
          // TODO: better to perform an XPath search or a get for a specific child type here?
          List<ChildAssociationRef> childRefs = nodeService.getChildAssocs(peopleRef);
@@ -498,10 +495,12 @@ public final class Repository
     * Return a reference to the special system folder
     * 
     * @param context
+    * @param nodeService access to nodes
+    * @param searchService searches for the folder
     * 
     * @return NodeRef to System folder
     */
-   public static NodeRef getSystemFolderRef(FacesContext context, NodeService nodeService)
+   public static NodeRef getSystemFolderRef(FacesContext context, NodeService nodeService, SearchService searchService)
    {
       if (systemRef == null)
       {
@@ -509,8 +508,9 @@ public final class Repository
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
          
-         List<NodeRef> results = nodeService.selectNodes(
-               nodeService.getRootNode(Repository.getStoreRef()),
+         NodeRef rootNodeRef = nodeService.getRootNode(Repository.getStoreRef()); 
+         List<NodeRef> results = searchService.selectNodes(
+               rootNodeRef,
                RepositoryAuthenticationDao.SYSTEM_FOLDER,
                null,
                resolver,
@@ -534,16 +534,17 @@ public final class Repository
     * 
     * @return NodeRef to Person folder
     */
-   public static NodeRef getSystemPeopleFolderRef(FacesContext context, NodeService nodeService)
+   public static NodeRef getSystemPeopleFolderRef(FacesContext context, NodeService nodeService, SearchService searchService)
    {
       if (peopleRef == null)
       {
          // get a reference to the system/people folder node
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
          resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
-         
-         List<NodeRef> results = nodeService.selectNodes(
-               nodeService.getRootNode(Repository.getStoreRef()),
+    
+         NodeRef rootNodeRef = nodeService.getRootNode(Repository.getStoreRef()); 
+         List<NodeRef> results = searchService.selectNodes(
+               rootNodeRef,
                RepositoryAuthenticationDao.PEOPLE_FOLDER,
                null,
                resolver,

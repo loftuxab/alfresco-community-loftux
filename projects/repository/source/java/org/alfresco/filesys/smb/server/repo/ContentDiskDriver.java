@@ -48,6 +48,7 @@ import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -70,6 +71,7 @@ public class ContentDiskDriver implements ContentDiskInterface
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
+    private SearchService searchService;
     private ContentService contentService;
     private MimetypeService mimetypeService;
 
@@ -94,6 +96,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         namespaceService = serviceRegistry.getNamespaceService();
         dictionaryService = serviceRegistry.getDictionaryService();
         nodeService = serviceRegistry.getNodeService();
+        searchService = serviceRegistry.getSearchService();
         contentService = serviceRegistry.getContentService();
         mimetypeService = serviceRegistry.getMimetypeService();
         
@@ -124,7 +127,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         }
         String rootPath = rootPathElement.getValue();
         // find the root node for this device
-        List<NodeRef> nodeRefs = nodeService.selectNodes(
+        List<NodeRef> nodeRefs = searchService.selectNodes(
                 storeRootNodeRef, rootPath, null, namespaceService, false);
         if (nodeRefs.size() > 1)
         {

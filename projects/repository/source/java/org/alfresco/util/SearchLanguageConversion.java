@@ -13,7 +13,6 @@ public class SearchLanguageConversion
     public static LanguageDefinition DEF_REGEX = new SimpleLanguageDef('\\', ".*", ".", "\\*.+?^$(){}|");
     public static LanguageDefinition DEF_LUCENE = new LuceneLanguageDef();
 
-    
     /**
      * Escape a string according to the <b>XPath</b> like function syntax.
      * 

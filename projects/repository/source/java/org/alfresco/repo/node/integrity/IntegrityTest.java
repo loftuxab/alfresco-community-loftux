@@ -1,4 +1,4 @@
-package org.alfresco.repo.integrity;
+package org.alfresco.repo.node.integrity;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -8,13 +8,11 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.node.BaseNodeServiceTest;
-import org.alfresco.repo.transaction.AlfrescoTransactionManager;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -41,40 +39,32 @@ public class IntegrityTest extends TestCase
     public static final QName PROP_QNAME_TEST_NAME = QName.createQName(NAMESPACE, "name");
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
     
-    /** Integrity commented out for now */
-    public static TestSuite suite()
-    {
-        return new TestSuite();
-    }
-    
     private static ApplicationContext ctx;
-
-    private IntegrityService integrityService;
-    private ServiceRegistry serviceRegistry;
-    private NodeService nodeService;
-    private NodeRef rootNodeRef;
-    private UserTransaction txn;
-    private String txnId;
-    
     static
     {
         ctx = ApplicationContextHelper.getApplicationContext();
     }
+    
+    private IntegrityChecker integrityChecker;
+    private ServiceRegistry serviceRegistry;
+    private NodeService nodeService;
+    private NodeRef rootNodeRef;
+    private UserTransaction txn;
     
     public void setUp() throws Exception
     {
         DictionaryDAO dictionaryDao = (DictionaryDAO) ctx.getBean("dictionaryDAO");
         ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
         // load the test model
-        InputStream modelStream = cl.getResourceAsStream("org/alfresco/repo/integrity/IntegrityTest_model.xml");
+        InputStream modelStream = cl.getResourceAsStream("org/alfresco/repo/node/integrity/IntegrityTest_model.xml");
         assertNotNull(modelStream);
         M2Model model = M2Model.createModel(modelStream);
         dictionaryDao.putModel(model);
 
-        integrityService = (IntegrityService) ctx.getBean("integrityService");
-        integrityService.setEnabled(true);
-        integrityService.setFailOnViolation(true);
-        integrityService.setTraceOn(false);
+        integrityChecker = (IntegrityChecker) ctx.getBean("integrityChecker");
+        integrityChecker.setEnabled(true);
+        integrityChecker.setFailOnViolation(true);
+        integrityChecker.setTraceOn(false);
         
         serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
         nodeService = serviceRegistry.getNodeService();
@@ -87,7 +77,6 @@ public class IntegrityTest extends TestCase
         // begin a transaction
         txn = serviceRegistry.getUserTransaction();
         txn.begin();
-        txnId = AlfrescoTransactionManager.getTransactionId();
     }
     
     public void tearDown() throws Exception
@@ -97,23 +86,9 @@ public class IntegrityTest extends TestCase
     
     public void testSetUp() throws Exception
     {
-        assertNotNull("Static IntegrityService not created", integrityService);
+        assertNotNull("Static IntegrityChecker not created", integrityChecker);
     }
     
-//    /**
-//     * Create a node with a mandatory aspect and then remove it
-//     */
-//    public void testMissingAspect() throws Exception
-//    {
-//        // create node with mandatory aspect
-//        nodeService.createNode(
-//                rootNodeRef,
-//                ContentModel.ASSOC_CHILDREN,
-//                QName.createQName(NAMESPACE, "abc"),
-//                TYPE_QNAME_TEST_FOLDER);
-//        // check that it has the mandatory aspect
-//    }
-//    
     /**
      * Create a new node without a mandatory property
      */
@@ -130,7 +105,7 @@ public class IntegrityTest extends TestCase
         // check integrity
         try
         {
-            integrityService.checkIntegrity(txnId);
+            integrityChecker.checkIntegrity();
             fail("Failed to detect missing properties");
         }
         catch (IntegrityException e)
@@ -141,7 +116,7 @@ public class IntegrityTest extends TestCase
         
         // repeat the process - since integrity MUST remove all the events,
         // there should be no errors
-        integrityService.checkIntegrity(txnId);
+        integrityChecker.checkIntegrity();
         
         // add mandatory properties
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
@@ -149,14 +124,14 @@ public class IntegrityTest extends TestCase
         properties.put(PROP_QNAME_TEST_TITLE, "A title");
         nodeService.setProperties(nodeRef, properties);
         // it should succeed
-        integrityService.checkIntegrity(txnId);
+        integrityChecker.checkIntegrity();
         
         // remove one of the properties
         properties.remove(PROP_QNAME_TEST_NAME);
         nodeService.setProperties(nodeRef, properties);
         try
         {
-            integrityService.checkIntegrity(txnId);
+            integrityChecker.checkIntegrity();
             fail("Failed to detect missing property");
         }
         catch (IntegrityException e)
@@ -168,6 +143,6 @@ public class IntegrityTest extends TestCase
         // delete the node
         nodeService.deleteNode(nodeRef);
         // it should succeed this time
-        integrityService.checkIntegrity(txnId);
+        integrityChecker.checkIntegrity();
     }
 }

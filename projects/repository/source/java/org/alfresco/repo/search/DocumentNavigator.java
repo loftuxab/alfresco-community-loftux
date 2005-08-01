@@ -15,7 +15,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.node;
+package org.alfresco.repo.search;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.jaxen.DefaultNavigator;
@@ -53,35 +54,72 @@ public class DocumentNavigator extends DefaultNavigator
 
     private DictionaryService dictionaryService;
     private NodeService nodeService;
+    private SearchService searchService;
     private NamespacePrefixResolver nspr;
     
     // Support classes to encapsulate stuff more akin to xml
     
     public class Property 
     {
-        QName qname;
-        Serializable value;
-        NodeRef parent;
+        public final QName qname;
+        public final Serializable value;
+        public final NodeRef parent;
+        
+        public Property(QName qname, Serializable value, NodeRef parent)
+        {
+            this.qname = qname;
+            this.value = value;
+            this.parent = parent;
+        }
     }
     
     public class Namespace
     {
-        String prefix;
-        String uri;
+        public final String prefix;
+        public final String uri;
+        
+        public Namespace(String prefix, String uri)
+        {
+            this.prefix = prefix;
+            this.uri = uri;
+        }
     }
     
     private boolean followAllParentLinks;
 
+    /**
+     * @param dictionaryService used to resolve the <b>subtypeOf</b> function
+     *      and other type-related functions
+     * @param nodeService the <tt>NodeService</tt> against which to execute
+     * @param searchService the service that helps resolve functions such as
+     *      <b>like</b> and <b>contains</b>
+     * @param nspr resolves namespaces in the xpath
+     * @param followAllParentLinks true if the XPath should traverse all parent
+     *      associations when going up the hierarchy; false if the only the
+     *      primary parent-child association should be traversed
+     */
     public DocumentNavigator(
             DictionaryService dictionaryService,
             NodeService nodeService,
+            SearchService searchService,
             NamespacePrefixResolver nspr,
             boolean followAllParentLinks)
     {
         super();
         this.dictionaryService = dictionaryService;
         this.nodeService = nodeService;
+        this.searchService = searchService;
         this.nspr = nspr;
+        this.followAllParentLinks = followAllParentLinks;
+    }
+
+    /**
+     * Allow this to be set as it commonly changes from one search to the next
+     * 
+     * @param followAllParentLinks true
+     */
+    public void setFollowAllParentLinks(boolean followAllParentLinks)
+    {
         this.followAllParentLinks = followAllParentLinks;
     }
 
@@ -191,7 +229,7 @@ public class DocumentNavigator extends DefaultNavigator
 
     public XPath parseXPath(String o) throws JaxenException
     {
-        return new NodeServiceXPath(o, dictionaryService, nodeService, nspr, null, followAllParentLinks);
+        return new NodeServiceXPath(o, this, null);
     }
 
     // Basic navigation support
@@ -204,10 +242,7 @@ public class DocumentNavigator extends DefaultNavigator
         for(QName qName : map.keySet())
         {
             // Do not support multi value attributes - return the first
-            Property property = new Property();
-            property.qname = qName;
-            property.value = map.get(qName);
-            property.parent = nodeRef;
+            Property property = new Property(qName, map.get(qName), nodeRef);
             properties.add(property);
         }
         return properties.iterator();
@@ -229,9 +264,7 @@ public class DocumentNavigator extends DefaultNavigator
         for(String prefix : nspr.getPrefixes())
         {
             String uri = nspr.getNamespaceURI(prefix);
-            Namespace ns = new Namespace();
-            ns.prefix = prefix;
-            ns.uri = uri;
+            Namespace ns = new Namespace(prefix, uri);
             namespaces.add(ns);
         }
         return namespaces.iterator();
@@ -273,12 +306,12 @@ public class DocumentNavigator extends DefaultNavigator
 
     public Boolean like(NodeRef childRef, QName qname, String sqlLikePattern, boolean includeFTS)
     {
-       return nodeService.like(childRef, qname, sqlLikePattern, includeFTS);
+       return searchService.like(childRef, qname, sqlLikePattern, includeFTS);
     }
     
     public Boolean contains(NodeRef childRef, QName qname, String sqlLikePattern)
     {
-       return nodeService.contains(childRef, qname, sqlLikePattern);
+       return searchService.contains(childRef, qname, sqlLikePattern);
     }
     
     public Boolean isSubtypeOf(NodeRef nodeRef, QName typeQName)
