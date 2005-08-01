@@ -24,11 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.rule.action.RuleActionExecuter;
 import org.alfresco.repo.rule.common.RuleActionDefinitionImpl;
 import org.alfresco.repo.rule.common.RuleConditionDefinitionImpl;
@@ -39,13 +37,11 @@ import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.repository.AssociationRef;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.rule.ParameterDefinition;
+import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleAction;
 import org.alfresco.service.cmr.rule.RuleActionDefinition;
@@ -151,10 +147,10 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     private void init()
     {
         // Register the copy policy behaviour
-        //this.policyComponent.bindClassBehaviour(
-        //        QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
-        //        ContentModel.ASPECT_ACTIONABLE,
-        //        new JavaBehaviour(this, "onCopyNode"));
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyComplete"),
+                ContentModel.ASPECT_ACTIONABLE,
+                new JavaBehaviour(this, "onCopyComplete"));
     }
     
 	/**
@@ -602,45 +598,62 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 		this.actionDefinitions.put(action.getName(), action);
 	}
     
-    /**
-     * onCopyNode policy behaviour implementation.
-     *
-     * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, PolicyScope)
-     */
-  //  public void onCopyNode(
-  //          QName classRef,
-   //         NodeRef sourceNodeRef,
-  //          StoreRef destinationStoreRef,
-  //          boolean copyToNewNode,
-  //          PolicyScope copyDetails)
-  //  {
-        // The source node reference is configurable so get the config folder node
-//        NodeRef rootConfigFolder = getRootConfigNodeRef(destinationStoreRef);
-//        
-//        // Get the config folder from the actionable node
-//        List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(
-//                                                sourceNodeRef, 
-//                                                ContentModel.ASSOC_CONFIGURATIONS);
-//        if (nodeAssocRefs.size() == 0)
-//        {
-//            throw new RuleServiceException("The configuration folder has not been set for this actionable node.");
-//        }
-//        
-//        NodeRef sourceConfigFolder = nodeAssocRefs.get(0).getTargetRef();
-//        
-//        // Copy the source config folder into the destination root config folder
-//        CopyService copyService = this.serviceRegistry.getCopyService();
-//        NodeRef newConfigFolder = copyService.copy(
-//                sourceConfigFolder, 
-//                rootConfigFolder,
-//                ContentModel.ASSOC_CONTAINS,
-//                QName.createQName(NamespaceService.ALFRESCO_URI, "configurations"),
-//                true);
-//        
-//        // Add the aspect and add the reference to the copied config folder
-//        copyDetails.addAspect(classRef);
-//        copyDetails.addAssociation(classRef, new AssociationRef(sourceNodeRef, ContentModel.ASSOC_CONFIGURATIONS, newConfigFolder));
- //   }
+	/**
+	 * On copy complete behaviour implementation
+	 */
+	public void onCopyComplete(
+			QName classRef,
+			NodeRef sourceNodeRef,
+			NodeRef destinationRef,
+			Map<NodeRef, NodeRef> copyMap)
+	{
+		Set<Rule> modifiedRules = new HashSet<Rule>();
+		List<? extends Rule> rules = this.ruleStore.get(destinationRef, false);
+		for (Rule rule : rules)
+		{
+			// Check all the rule actions 
+			for (RuleAction ruleAction : rule.getRuleActions())
+			{
+				for (ParameterDefinition paramDef : ruleAction.getRuleActionDefinition().getParameterDefinitions())
+				{
+					if (ParameterType.NODE_REF.equals(paramDef.getType()))
+					{
+						NodeRef value = (NodeRef)ruleAction.getParameterValue(paramDef.getName());
+						if (value != null && copyMap.containsKey(value) == true)
+						{
+							// Change the parameter value to be relative
+							ruleAction.setParameterValue(paramDef.getName(), copyMap.get(value));
+							modifiedRules.add(rule);
+						}
+					}
+				}
+			}
+			
+			// Check all the rule conditions
+			for (RuleCondition ruleCondition : rule.getRuleConditions())
+			{
+				for (ParameterDefinition paramDef : ruleCondition.getRuleConditionDefinition().getParameterDefinitions())
+				{
+					if (ParameterType.NODE_REF.equals(paramDef.getType()))
+					{
+						NodeRef value = (NodeRef)ruleCondition.getParameterValue(paramDef.getName());
+						if (value != null && copyMap.containsKey(value) == true)
+						{
+							// Change the parameter value to be relative
+							ruleCondition.setParameterValue(paramDef.getName(), copyMap.get(value));
+							modifiedRules.add(rule);
+						}
+					}
+				}
+			}
+		}
+		
+		// Update any of the rules that have been modified
+		for (Rule modifiedRule : modifiedRules)
+		{
+			this.ruleStore.put(destinationRef, (RuleImpl)modifiedRule);
+		}
+	}
     
     /**
      * Helper class to contain the information about a rule that is executed

@@ -20,13 +20,11 @@ package org.alfresco.repo.copy;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -37,6 +35,7 @@ import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -81,7 +80,8 @@ public class CopyServiceImpl implements CopyService
 	/**
 	 * Policy delegates
 	 */
-	private ClassPolicyDelegate<OnCopyNodePolicy> onCopyNodeDelegate;
+	private ClassPolicyDelegate<CopyServicePolicies.OnCopyNodePolicy> onCopyNodeDelegate;
+	private ClassPolicyDelegate<CopyServicePolicies.OnCopyCompletePolicy> onCopyCompleteDelegate;
     
     /**
      * Set the node service
@@ -130,12 +130,17 @@ public class CopyServiceImpl implements CopyService
 	{
 		// Register the policies
 		this.onCopyNodeDelegate = this.policyComponent.registerClassPolicy(CopyServicePolicies.OnCopyNodePolicy.class);
+		this.onCopyCompleteDelegate = this.policyComponent.registerClassPolicy(CopyServicePolicies.OnCopyCompletePolicy.class);
 		
 		// Register policy behaviours
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
 				ContentModel.ASPECT_COPIEDFROM,
-				new JavaBehaviour(this, "copyAspectOnCopy"));
+				new JavaBehaviour(this, "copyAspectOnCopy"));		
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyComplete"),
+				ContentModel.ASPECT_COPIEDFROM,
+				new JavaBehaviour(this, "onCopyComplete"));	
 	}
 	
     /**
@@ -162,12 +167,149 @@ public class CopyServiceImpl implements CopyService
         }
 
         // Recursively copy node
-        //Set<NodeRef> copiedChildren = new HashSet<NodeRef>();
         Map<NodeRef, NodeRef> copiedChildren = new HashMap<NodeRef, NodeRef>();
-        return recursiveCopy(sourceNodeRef, destinationParent, destinationAssocTypeQName, destinationQName, copyChildren, copiedChildren);
+        NodeRef copy = recursiveCopy(sourceNodeRef, destinationParent, destinationAssocTypeQName, destinationQName, copyChildren, copiedChildren);
+        
+        // Foreach of the newly created copies call the copy complete policy
+        for (Map.Entry<NodeRef, NodeRef> entry : copiedChildren.entrySet())
+		{
+			invokeCopyComplete(entry.getKey(), entry.getValue(), copiedChildren);
+		}
+        
+        return copy;
     }
     
-    
+    /**
+     * Invokes the copy complete policy for the node reference provided
+     * 
+     * @param sourceNodeRef			the source node reference
+     * @param destinationNodeRef	the destination node reference
+     * @param copiedNodeRefs		the map of copied node references
+     */
+    private void invokeCopyComplete(
+    		NodeRef sourceNodeRef, 
+    		NodeRef destinationNodeRef, 
+    		Map<NodeRef, NodeRef> copiedNodeRefs)
+	{
+    	QName sourceClassRef = this.nodeService.getType(sourceNodeRef);		
+    	invokeCopyComplete(sourceClassRef, sourceNodeRef, destinationNodeRef, copiedNodeRefs);
+		
+		// Get the source aspects
+		Set<QName> sourceAspects = this.nodeService.getAspects(sourceNodeRef);
+		for (QName sourceAspect : sourceAspects) 
+		{
+			invokeCopyComplete(sourceAspect, sourceNodeRef, destinationNodeRef, copiedNodeRefs);
+		}
+	}
+
+    /**
+     * 
+     * @param typeQName
+     * @param sourceNodeRef
+     * @param destinationNodeRef
+     * @param copiedNodeRefs
+     */
+	private void invokeCopyComplete(
+			QName typeQName, 
+			NodeRef sourceNodeRef, 
+			NodeRef destinationNodeRef, 
+			Map<NodeRef, NodeRef> copiedNodeRefs)
+	{
+		Collection<CopyServicePolicies.OnCopyCompletePolicy> policies = this.onCopyCompleteDelegate.getList(typeQName);
+		if (policies.isEmpty() == true)
+		{
+			defaultOnCopyComplete(typeQName, sourceNodeRef, destinationNodeRef, copiedNodeRefs);
+		}
+		else
+		{
+			for (CopyServicePolicies.OnCopyCompletePolicy policy : policies) 
+			{
+				policy.onCopyComplete(typeQName, sourceNodeRef, destinationNodeRef, copiedNodeRefs);
+			}
+		}		
+	}
+
+	private void defaultOnCopyComplete(
+			QName typeQName, 
+			NodeRef sourceNodeRef, 
+			NodeRef destinationNodeRef, 
+			Map<NodeRef, NodeRef> copiedNodeRefs)
+	{
+		ClassDefinition classDefinition = this.dictionaryService.getClass(typeQName);	
+		if (classDefinition != null)
+		{
+             // Check the properties
+            Map<QName,PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
+            for (Map.Entry<QName,PropertyDefinition> entry : propertyDefinitions.entrySet()) 
+            {
+            	if (PropertyTypeDefinition.NODE_REF.equals(entry.getValue().getPropertyType().getName()) == true)
+            	{
+            		// Re-set the node ref so that it is still relative (if appropriate)
+            		NodeRef value = (NodeRef)this.nodeService.getProperty(destinationNodeRef, entry.getKey());
+            		if (value != null)
+            		{
+            			if (copiedNodeRefs.containsKey(value) == true)
+            			{
+            				this.nodeService.setProperty(destinationNodeRef, entry.getKey(), copiedNodeRefs.get(value));
+            			}
+            		}            		
+            	}
+            }           
+
+            // Copy the associations (child and target)
+            Map<QName, AssociationDefinition> assocDefs = classDefinition.getAssociations();
+
+            // TODO: Need way of getting child assocs of a given type
+            List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(destinationNodeRef);
+            for (ChildAssociationRef childAssocRef : childAssocRefs) 
+            {
+                if (assocDefs.containsKey(childAssocRef.getTypeQName()) &&
+                	childAssocRef.isPrimary() == false &&
+                	copiedNodeRefs.containsKey(childAssocRef.getChildRef()) == true)
+                {                    	
+                	// Remove the assoc and re-point to the new node
+                	this.nodeService.removeChild(destinationNodeRef, childAssocRef.getChildRef());
+                	this.nodeService.addChild(
+                			destinationNodeRef, 
+                			copiedNodeRefs.get(childAssocRef.getChildRef()) , 
+                			childAssocRef.getTypeQName(),
+                			childAssocRef.getQName());
+                }
+            }
+            
+            // TODO: Need way of getting assocs of a given type
+            List<AssociationRef> nodeAssocRefs = this.nodeService.getTargetAssocs(destinationNodeRef, RegexQNamePattern.MATCH_ALL);
+            for (AssociationRef nodeAssocRef : nodeAssocRefs) 
+            {
+                if (assocDefs.containsKey(nodeAssocRef.getTypeQName()) &&
+                	copiedNodeRefs.containsKey(nodeAssocRef.getTargetRef()) == true)
+                {
+                    // Remove the assoc and re-point to the new node
+                	this.nodeService.removeAssociation(
+                			destinationNodeRef, 
+                			nodeAssocRef.getTargetRef(), 
+                			nodeAssocRef.getTypeQName());
+                	this.nodeService.createAssociation(
+                			destinationNodeRef, 
+                			copiedNodeRefs.get(nodeAssocRef.getTargetRef()), 
+                			nodeAssocRef.getTypeQName());
+                }
+            }
+		}
+		
+	}
+
+	/**
+     * Recursive copy algorithm
+     * 
+     * @param sourceNodeRef
+     * @param destinationParent
+     * @param destinationAssocTypeQName
+     * @param destinationQName
+     * @param copyChildren
+     * @param copiedChildren
+     * @return
+     */
     private NodeRef recursiveCopy(
               NodeRef sourceNodeRef,
               NodeRef destinationParent, 
@@ -591,4 +733,13 @@ public class CopyServiceImpl implements CopyService
 		// Do nothing.  This will ensure that copy aspect on the source node does not get copied onto
 		// the destination node.
 	}	
+	
+	public void onCopyComplete(
+			QName classRef,
+			NodeRef sourceNodeRef,
+			NodeRef destinationRef,
+			Map<NodeRef, NodeRef> copyMap)
+	{
+		// Do nothing since we do not want the copy from aspect to be relative to the copied nodes
+	}
 }

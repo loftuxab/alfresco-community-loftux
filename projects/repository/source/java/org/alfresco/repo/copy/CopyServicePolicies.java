@@ -17,6 +17,8 @@
  */
 package org.alfresco.repo.copy;
 
+import java.util.Map;
+
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -34,7 +36,6 @@ public interface CopyServicePolicies
 	public interface OnCopyNodePolicy extends ClassPolicy
 	{
         /**
-         * 
          * @param classRef              the type of node being copied
          * @param sourceNodeRef         node being copied
          * @param destinationStoreRef   the destination store reference
@@ -47,5 +48,26 @@ public interface CopyServicePolicies
                 StoreRef destinationStoreRef,
                 boolean copyToNewNode,
 				PolicyScope copyDetails);
+	}
+	
+	/**
+	 * Policy invoked when the copy operation invoked on a <b>node</b> is complete.
+	 * <p>
+	 * The copy map contains all the nodes created during the copy, this helps to re-map
+	 * any potentially relative associations.
+	 */
+	public interface OnCopyCompletePolicy extends ClassPolicy
+	{
+		/**
+		 * @param classRef			the type of the node that was copied
+		 * @param sourceNodeRef		the origional node
+		 * @param destinationRef	the destination node
+		 * @param copyMap			a map containing all the nodes that have been created during the copy
+		 */
+		public void onCopyComplete(
+				QName classRef,
+				NodeRef sourceNodeRef,
+				NodeRef destinationRef,
+				Map<NodeRef, NodeRef> copyMap);
 	}
 }
