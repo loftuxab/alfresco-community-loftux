@@ -34,17 +34,21 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.alfresco.util.ApplicationContextHelper;
+import org.springframework.context.ApplicationContext;
 
 public class AuthenticationTest extends TestCase
 {
-    private static ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
+    private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     private NodeService nodeService;
+    
+    private SearchService searchService;
 
     private NodeRef rootNodeRef;
 
@@ -82,6 +86,7 @@ public class AuthenticationTest extends TestCase
     {
 
         nodeService = (NodeService) ctx.getBean("nodeService");
+        searchService = (SearchService) ctx.getBean("searchService");
         dictionaryService = (DictionaryService) ctx.getBean("dictionaryService");
         passwordEncoder = (PasswordEncoder) ctx.getBean("passwordEncoder");
         ticketComponent = (TicketComponent) ctx.getBean("ticketComponent");
@@ -118,6 +123,7 @@ public class AuthenticationTest extends TestCase
     {
         RepositoryAuthenticationDao dao = new RepositoryAuthenticationDao();
         dao.setNodeService(nodeService);
+        dao.setSearchService(searchService);
         dao.setDictionaryService(dictionaryService);
         dao.setNamespaceService(getNamespacePrefixReolsver(""));
         dao.setPasswordEncoder(passwordEncoder);
@@ -129,6 +135,7 @@ public class AuthenticationTest extends TestCase
     {
         RepositoryAuthenticationDao dao = new RepositoryAuthenticationDao();
         dao.setNodeService(nodeService);
+        dao.setSearchService(searchService);
         dao.setDictionaryService(dictionaryService);
         dao.setNamespaceService(getNamespacePrefixReolsver(""));
         dao.setPasswordEncoder(passwordEncoder);
