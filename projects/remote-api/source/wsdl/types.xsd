@@ -83,9 +83,8 @@
 			<xsd:group ref="alf:TextualDescription"></xsd:group>
 			<xsd:element name="superClass" type="alf:Name" maxOccurs="1" minOccurs="0"></xsd:element>
 			<xsd:element name="isAspect" type="xsd:boolean"></xsd:element>
-			<xsd:element name="properties"
-				type="alf:PropertyDefinition">
-			</xsd:element>
+			<xsd:element name="properties" type="alf:PropertyDefinition"></xsd:element>
+			<xsd:element name="associations" type="alf:AssociationDefinition"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -108,6 +107,31 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+	
+	<xsd:complexType name="AssociationDefinition">
+		<xsd:sequence>
+			<xsd:element name="name" type="alf:Name"></xsd:element>
+			<xsd:group ref="alf:TextualDescription"></xsd:group>
+			<xsd:element name="isChild" type="xsd:boolean" default="true"></xsd:element>
+			<xsd:element name="sourceRole" type="alf:RoleDefinition" maxOccurs="1" minOccurs="0"></xsd:element>			
+			<xsd:element name="targetRole" type="alf:RoleDefinition" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="targetClass" type="alf:Name"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="RoleDefinition">
+		<xsd:sequence>
+			<xsd:element name="name" type="alf:Name" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="cardinality" type="alf:Cardinality" default="*" maxOccurs="1" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="NodeDefinition">
+		<xsd:sequence>
+			<xsd:element name="type" type="alf:ClassDefinition"></xsd:element>
+			<xsd:element name="aspect" type="alf:ClassDefinition" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 
 	<xsd:group name="TextualDescription">
 		<xsd:sequence>
@@ -116,8 +140,17 @@
 		</xsd:sequence>
 	</xsd:group>
 
+	<xsd:simpleType name="Cardinality">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="0..1"></xsd:enumeration>
+			<xsd:enumeration value="1"></xsd:enumeration>
+			<xsd:enumeration value="*"></xsd:enumeration>
+			<xsd:enumeration value="1..*"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+
 	<!-- -->	
-	<!-- Content Definitions -->
+	<!-- Generic Content Definitions -->
 	<!-- -->
 	
     <xsd:complexType name="Node">
@@ -202,7 +235,7 @@
     
 	<xsd:complexType name="ResultSet">
 		<xsd:sequence>
-			<xsd:element name="rows" type="alf:ResultSetRow" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="row" type="alf:ResultSetRow" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 			<xsd:element name="size" type="xsd:long"></xsd:element>
 			<xsd:element name="metaData" type="alf:ResultSetMetaData" maxOccurs="1" minOccurs="0"></xsd:element>
 		</xsd:sequence>
@@ -210,8 +243,8 @@
 
 	<xsd:complexType name="ResultSetRow">
 		<xsd:sequence>
-			<xsd:element name="index" type="xsd:long"></xsd:element>
-			<xsd:element name="values" type="alf:Property" maxOccurs="unbounded" minOccurs="0"/>
+			<xsd:element name="rowIndex" type="xsd:long"></xsd:element>
+			<xsd:element name="column" type="alf:Property" maxOccurs="unbounded" minOccurs="0"/>
 			<xsd:element name="score" type="xsd:float" maxOccurs="1" minOccurs="0"></xsd:element>
 			<xsd:element name="node" maxOccurs="1" minOccurs="0">
 				<xsd:complexType>
@@ -234,7 +267,9 @@
 
 	<xsd:complexType name="Predicate">
 		<xsd:choice>
-			<xsd:element name="node" type="alf:Reference" maxOccurs="unbounded" minOccurs="1"></xsd:element>
+			<xsd:element name="node" type="alf:Reference"
+				maxOccurs="unbounded" minOccurs="1">
+			</xsd:element>
 			<xsd:sequence>
 				<xsd:element name="store" type="xsd:string"></xsd:element>
 				<xsd:element name="query" type="alf:Query">
@@ -243,18 +278,46 @@
 		</xsd:choice>
 	</xsd:complexType>
 
-	<xsd:complexType name="AssociationDefinition">
+	<!-- -->
+	<!-- Version Definitions -->
+	<!-- -->
+	
+	<xsd:complexType name="Version">
 		<xsd:sequence>
-			<xsd:element name="name" type="alf:Name"></xsd:element>
-			<xsd:group ref="alf:TextualDescription"></xsd:group>
-			<xsd:element name="isChild" type="xsd:boolean"></xsd:element>
-			<xsd:element name="sourceRoleName" type="alf:Name"></xsd:element>
-			<xsd:element name="sourceMinOccurs" type="xsd:string"></xsd:element>
+			<xsd:element name="id" type="alf:Reference"></xsd:element>
+			<xsd:element name="created" type="xsd:dateTime" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="creator" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="label" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+			<xsd:element name="major" type="xsd:boolean" default="true"></xsd:element>
+			<xsd:element name="commentary" type="alf:Property" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
-	<xsd:simpleType name="Cardinality">
-		<xsd:restriction base="xsd:string"></xsd:restriction>
-	</xsd:simpleType>
+	<xsd:complexType name="VersionHistory">
+		<xsd:sequence>
+			<xsd:element name="versions" type="alf:Version" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<!-- -->
+	<!-- Classification Definitions -->
+	<!-- -->
+	
+	<xsd:complexType name="Category">
+		<xsd:sequence>
+			<xsd:element name="id" type="alf:Reference"></xsd:element>
+			<xsd:group ref="alf:TextualDescription"></xsd:group>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Classification">
+		<xsd:complexContent>
+			<xsd:extension base="alf:Category">
+				<xsd:sequence>
+					<xsd:element name="rootCategory" type="alf:Category"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 
 </xsd:schema>
