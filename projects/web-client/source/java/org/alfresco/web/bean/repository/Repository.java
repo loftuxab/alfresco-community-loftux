@@ -125,7 +125,7 @@ public final class Repository
     */
    public static String getNameForNode(NodeService nodeService, NodeRef ref)
    {
-      String name;
+      String name = null;
       
       // try to find a display "name" property for this node
       Object nameProp = nodeService.getProperty(ref, ContentModel.PROP_NAME);
@@ -136,7 +136,11 @@ public final class Repository
       else
       {
          // revert to using QName if not found
-         name = nodeService.getPrimaryParent(ref).getQName().getLocalName();
+         QName qname = nodeService.getPrimaryParent(ref).getQName();
+         if (qname != null)
+         {
+            name = qname.getLocalName();
+         }
       }
       
       return name;

@@ -136,11 +136,15 @@ public class NewUserWizard extends AbstractWizardBean
       {
          ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(homeFolderRef);
          NodeRef parentRef = childAssocRef.getParentRef();
-         if (parentRef != null)
+         if (this.nodeService.getRootNode(Repository.getStoreRef()).equals(parentRef) == false)
          {
             this.homeSpaceLocation = parentRef.getId();
+            this.homeSpaceName = Repository.getNameForNode(nodeService, homeFolderRef);
          }
-         this.homeSpaceName = Repository.getNameForNode(nodeService, homeFolderRef);
+         else
+         {
+            this.homeSpaceLocation = homeFolderRef.getId();
+         }
       }
    }
    
