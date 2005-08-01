@@ -7,54 +7,43 @@
 		<parameter name="sendXMLDeclaration" value="true"/>
 		<parameter name="axis.sendMinimizedElements" value="true"/>
 		<parameter name="axis.servicesPath" value="/remote-api/"/>
+		<parameter name="axis.development.system" value="true"/>
 		<parameter name="axis.disableServiceList" value="true"/>
-		<requestFlow>
-			<handler type="java:org.apache.axis.handlers.JWSHandler">
-				<parameter name="scope" value="session"/>
-			</handler>
-			<handler type="java:org.apache.axis.handlers.JWSHandler">
-				<parameter name="scope" value="request"/>
-				<parameter name="extension" value=".jwr"/>
-			</handler>
-		</requestFlow>
 	</globalConfiguration>
 	
-	<handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
 	<handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
 	<handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
 	
-   <service name="NodeService" provider="java:SpringRPC" style="wrapped" use="literal">
-      <parameter name="wsdlTargetNamespace" value="http://node.webservice.repo.alfresco.org"/>
-      <parameter name="wsdlServiceElement" value="NodeService"/>
-      <parameter name="schemaQualified" value="http://node.webservice.repo.alfresco.org"/>
-      <parameter name="wsdlServicePort" value="NodeService"/>
-      <parameter name="springBean" value="nodeWebService"/>
-      <parameter name="wsdlPortType" value="NodeWebServiceImpl"/>
-      <parameter name="typeMappingVersion" value="1.1"/>
-      <parameter name="allowedMethods" value="*"/>
+	<service name="AuthenticationService" provider="java:SpringRPC" style="wrapped" use="literal">
+	   <documentation>Authenticates the caller with the Repository</documentation>
+	   <wsdlFile>/wsdl/authentication-service.wsdl</wsdlFile>
+	   <parameter name="springBean" value="authenticationWebService"/>
+      <parameter name="wsdlTargetNamespace" value="http://www.alfresco.org/ws/1.0/authentication"/>
+      <parameter name="wsdlServiceElement" value="AuthenticationService"/>
+      <parameter name="schemaQualified" value="http://www.alfresco.org/ws/1.0/authentication"/>
+      <parameter name="wsdlServicePort" value="AuthenticationService"/>
+      <parameter name="wsdlPortType" value="AuthenticationServiceSoapPort"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="authenticate" qname="operNS:authenticate" xmlns:operNS="http://www.alfresco.org/ws/1.0/authentication" returnQName="retNS:authenticateReturn" xmlns:retNS="http://www.alfresco.org/ws/1.0/authentication" returnType="rtns:AuthenticationResult" xmlns:rtns="http://www.alfresco.org/ws/1.0/authentication" soapAction="http://www.alfresco.org/ws/1.0/authentication/authenticate" >
+        	<parameter qname="pns:username" xmlns:pns="http://www.alfresco.org/ws/1.0/authentication" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        	<parameter qname="pns:password" xmlns:pns="http://www.alfresco.org/ws/1.0/authentication" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        	<fault name="AuthenticationFault" qname="fns:AuthenticationFault" xmlns:fns="http://www.alfresco.org/ws/1.0/authentication" class="org.alfresco.repo.webservice.authentication.AuthenticationFault" type="tns:AuthenticationFault" xmlns:tns="http://www.alfresco.org/ws/1.0/authentication"/>
+      </operation>
+      <parameter name="allowedMethods" value="authenticate"/>
 
-      <beanMapping xmlns:ns="http://node.webservice.repo.alfresco.org"
-        qname="ns:StoreRef" type="java:org.alfresco.service.cmr.repository.StoreRef"/>
-        
-      <beanMapping xmlns:ns="http://node.webservice.repo.alfresco.org"
-        qname="ns:QName" type="java:org.alfresco.service.namespace.QName"/>
-        
-      <!--
-      <beanMapping xmlns:ns="http://node.webservice.repo.alfresco.org"
-        qname="ns:Property" type="java:org.alfresco.web.service.Property"/>
-      -->
-      
-      <beanMapping xmlns:ns="http://node.webservice.repo.alfresco.org"
-        qname="ns:NodeRef" type="java:org.alfresco.service.cmr.repository.NodeRef"/>
-                
-      <beanMapping xmlns:ns="http://node.webservice.repo.alfresco.org"
-        qname="ns:QueryResult" type="java:org.alfresco.repo.webservice.QueryResult"/>
+      <typeMapping xmlns:ns="http://www.alfresco.org/ws/1.0/authentication" qname="ns:AuthenticationFault"
+        				 type="java:org.alfresco.repo.webservice.authentication.AuthenticationFault"
+                   serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+                   deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
+      <typeMapping xmlns:ns="http://www.alfresco.org/ws/1.0/authentication" qname="ns:AuthenticationResult"
+                   type="java:org.alfresco.repo.webservice.authentication.AuthenticationResult"
+                   serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+                   deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
    </service>
-	
+  
 	<transport name="http">
 		<requestFlow>
 			<handler type="URLMapper"/>
-			<handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
 		</requestFlow>
 	</transport>
 	<transport name="local">

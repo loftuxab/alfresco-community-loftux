@@ -3,7 +3,25 @@
    <path id="path.common" path="${basedir}/../.."/>
    <property name="dir.common" refid="path.common"/>
    <import file="${dir.common}/common.xml"/>
-   
+  
+   <!-- we need to override the compile-java target so that we can include the generated source -->  
+   <target name="compile-java" depends="init" description="Compiles the Java source code">
+      <mkdir dir="${dir.classes}"/>
+      <javac destdir="${dir.classes}" fork="true" deprecation="on" debug="on" target="1.5" source="1.5">
+         <src path="${dir.src.java}"/>
+         <src path="${dir.src.java.generated}"/>
+         <classpath refid="classpath.compile"/>
+      </javac>
+
+      <copy todir="${dir.classes}">
+         <fileset dir="${dir.src.java}">
+            <patternset>
+                <exclude name="**/*.java"/>
+            </patternset>
+         </fileset>
+      </copy>
+   </target>
+      
    <target name="package-jar" depends="common.package-jar" description="Packages the JAR file">
       <jar jarfile="${dir.dist}/${file.name.jar}" update="true">
          <metainf dir="${dir.src.metainf}"/>
@@ -14,35 +32,38 @@
       <echo>
          This project can not produce a WAR file, the Remote API functionality is currently
          packaged within the Web Client WAR file.
-      </echo>  
-   </target>  
+      </echo>
+   </target> 
       
-   <target name="generate-axis-client" depends="init" description="Generates Axis client side objects">
+   <target name="gen-auth-service-client" depends="init">  
       <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
          <classpath refid="classpath.compile"/>
       </taskdef>
-      <wsdl2java url="http://localhost:8080/web-client/remote-api/NodeService?wsdl"
-                 output="${dir.src.java}"
-                 serverSide="no"
-                 typeMappingVersion="1.1"
-                 testcase="no">
-         <mapping namespace="http://node.webservice.repo.alfresco.org" package="client.axis"/>
-         <mapping namespace="http://www.alfresco.org/ws/1.0/NodeService" package="client.axis"/>
-      </wsdl2java>  
+      <mkdir dir="${dir.src.java.generated}/org/alfresco/example/webservice/authentication"/>  
+      <delete>
+         <fileset dir="${dir.src.java.generated}/org/alfresco/example/webservice/authentication"/>
+      </delete>   
+      <wsdl2java url="${dir.src}/wsdl/authentication-service.wsdl" output="${dir.src.java.generated}" testcase="yes">
+         <mapping namespace="http://www.alfresco.org/ws/1.0/authentication" package="org.alfresco.example.webservice.authentication"/>
+      </wsdl2java>
    </target>
  
-   <target name="generate-axis-server" depends="init" description="Generates Axis server side objects">
-         <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
-            <classpath refid="classpath.compile"/>
-         </taskdef>
-         <wsdl2java url="http://localhost:8080/web-client/remote-api/NodeService?wsdl"
-                    output="${dir.src.java}"
-                    serverSide="yes"
-                    typeMappingVersion="1.1"
-                    testcase="no">
-            <mapping namespace="http://node.webservice.repo.alfresco.org" package="server.axis"/>
-            <mapping namespace="http://www.alfresco.org/ws/1.0/NodeService" package="server.axis"/>
-         </wsdl2java>  
-      </target>  
+   <target name="gen-auth-service-server" depends="init">
+      <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
+         <classpath refid="classpath.compile"/>
+      </taskdef>
+      <mkdir dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication"/>    
+      <delete>
+         <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication"/>
+      </delete> 
+      <wsdl2java url="${dir.src}/wsdl/authentication-service.wsdl" output="${dir.src.java.generated}" 
+                 serverSide="true" skeletondeploy="false">
+         <mapping namespace="http://www.alfresco.org/ws/1.0/authentication" package="org.alfresco.repo.webservice.authentication"/>
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication" 
+                  excludes="*Fault.java,*Result.java,*Port.java,deploy.wsdd"/>
+      </delete>
+   </target>  
       
 </project>

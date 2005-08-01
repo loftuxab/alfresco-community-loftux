@@ -3,9 +3,9 @@
 
 <beans>
 
-   <bean id="nodeWebService" class="org.alfresco.repo.webservice.node.NodeWebService">
-      <property name="nodeService">
-         <ref bean="AlfNodeService"/>
+   <bean id="authenticationWebService" class="org.alfresco.repo.webservice.authentication.AuthenticationWebService">
+      <property name="authenticationService">
+         <ref bean="authenticationService"/>
       </property>
    </bean>
    

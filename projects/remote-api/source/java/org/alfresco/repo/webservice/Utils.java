@@ -25,9 +25,7 @@ import org.alfresco.service.cmr.repository.NodeService;
  * @author gavinc
  */
 public class Utils
-{
-   private static NodeService nodeService; 
-   
+{   
    private Utils()
    {
       // don't allow construction

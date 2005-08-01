@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions name="alfresco"
+   targetNamespace="http://www.alfresco.org/ws/1.0/authentication" 
+   xmlns:apachesoap="http://xml.apache.org/xml-soap" 
+   xmlns:alfauth="http://www.alfresco.org/ws/1.0/authentication" 
+   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+   xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+   xmlns:alftypes="http://www.alfresco.org/ws/1.0/types">
+   <!-- ************************************** -->
+   <!-- Copyright Alfresco Software, Inc. 2005 -->
+   <!-- ************************************** -->
+   <wsdl:types>
+      <schema elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/1.0/authentication" xmlns="http://www.w3.org/2001/XMLSchema">
+         <element name="authenticate">
+            <complexType>
+               <sequence>
+                  <element name="username" type="xsd:string"/>
+                  <element name="password" type="xsd:string"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="authenticateResponse">
+            <complexType>
+               <sequence>
+                  <element name="authenticateReturn" type="alfauth:AuthenticationResult"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <complexType name="AuthenticationResult">
+            <sequence>
+               <element name="username" nillable="false" type="xsd:string"/>
+               <element name="ticket" nillable="false" type="xsd:string"/>
+            </sequence>
+         </complexType>
+         <element name="AuthenticationResult" type="alfauth:AuthenticationResult"/>
+         
+         <complexType name="AuthenticationFault">
+            <sequence>
+               <element name="code" type="xsd:int"/>
+               <element name="message" nillable="true" type="xsd:string"/>
+            </sequence>
+         </complexType>
+         <element name="AuthenticationFault" type="alfauth:AuthenticationFault"/>
+         
+      </schema>
+   </wsdl:types>
+
+   <wsdl:message name="authenticateRequest">
+      <wsdl:part element="alfauth:authenticate" name="parameters"/>
+   </wsdl:message>
+
+   <wsdl:message name="authenticateResponse">
+      <wsdl:part element="alfauth:authenticateResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="AuthenticationFault">
+      <wsdl:part element="alfauth:AuthenticationFault" name="fault"/>
+   </wsdl:message>
+   
+   <!--  
+   <wsdl:message name="Headers">
+      <wsdl:part element="alfauth:SecurityHeader" name="SecurityHeader"/>
+   </wsdl:message>
+   -->
+   
+   <wsdl:portType name="AuthenticationServiceSoapPort">
+      <wsdl:operation name="authenticate">
+         <wsdl:input message="alfauth:authenticateRequest" name="authenticateRequest"/>
+         <wsdl:output message="alfauth:authenticateResponse" name="authenticateResponse"/>
+         <wsdl:fault message="alfauth:AuthenticationFault" name="AuthenticationFault"/>
+      </wsdl:operation>
+   </wsdl:portType>
+   
+   <wsdl:binding name="AuthenticationServiceSoapBinding" type="alfauth:AuthenticationServiceSoapPort">
+        <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="authenticate">
+            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/1.0/authentication/authenticate"/>
+            <wsdl:input name="authenticateRequest">
+               <!--
+               <wsdlsoap:header use="literal" message="alfauth:Headers" part="SecurityHeader"/>
+               -->               <wsdlsoap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="authenticateResponse">
+               <wsdlsoap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AuthenticationFault">
+                <wsdlsoap:fault name="AuthenticationFault" use="literal"/> 
+            </wsdl:fault>
+        </wsdl:operation>
+   </wsdl:binding>
+
+   <wsdl:service name="AuthenticationService">
+      <wsdl:port binding="alfauth:AuthenticationServiceSoapBinding" name="AuthenticationService">
+         <wsdlsoap:address location="http://localhost:8080/web-client/remote-api/AuthenticationService"/>
+      </wsdl:port>
+   </wsdl:service>
+   
+</wsdl:definitions>

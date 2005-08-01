@@ -32,6 +32,7 @@
             <lib dir="${dir.common}/projects/repository/build/dist" includes="${dir.name.repository}.jar" />
             <lib dir="${dir.common}/projects/remote-api/build/dist" includes="${dir.name.remoteapi}.jar" />
             <webinf dir="${dir.project.remoteapi}/source/web/WEB-INF"/>
+            <zipfileset dir="${dir.project.remoteapi}/source/wsdl" prefix="wsdl"/>  
          </war>
       </sequential>
    </macrodef>
