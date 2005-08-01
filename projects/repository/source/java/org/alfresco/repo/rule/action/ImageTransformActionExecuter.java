@@ -23,6 +23,7 @@ import org.alfresco.repo.content.transform.magick.ImageMagickContentTransformer;
 import org.alfresco.repo.rule.common.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.rule.ParameterDefinition;
 import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.RuleAction;
@@ -70,6 +71,11 @@ public class ImageTransformActionExecuter extends TransformActionExecuter
 	 */
 	protected void doTransform(RuleAction ruleAction, ContentReader contentReader, ContentWriter contentWriter)
 	{
+        // check if the transformer is going to work, i.e. is available
+        if (!this.imageMagickContentTransformer.isAvailable())
+        {
+            throw new NoTransformerException(contentReader.getMimetype(), contentWriter.getMimetype());
+        }
 		// Try and transform the content
         String convertCommand = (String)ruleAction.getParameterValue(PARAM_CONVERT_COMMAND);
         if (convertCommand != null && convertCommand.length() != 0)
