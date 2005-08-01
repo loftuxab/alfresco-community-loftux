@@ -448,7 +448,6 @@ public class IntegrityChecker
 
         // the current node reference
         NodeRef currentNodeRef = null;
-        String currentNodeRefStr = null;
         // the current event type
         IntegrityEvent.EventType currentEventType = null;
         // failure results for the event
@@ -461,7 +460,7 @@ public class IntegrityChecker
         for (IntegrityEvent event : events)
         {
             // have we moved onto a new node?
-            boolean newNode = !EqualsHelper.nullSafeEquals(currentNodeRefStr, event.getPrimaryNodeRef());
+            boolean newNode = !EqualsHelper.nullSafeEquals(currentNodeRef, event.getPrimaryNodeRef());
             boolean newEventType = !EqualsHelper.nullSafeEquals(currentEventType, event.getEventType());
             
             if (newNode)
@@ -471,6 +470,14 @@ public class IntegrityChecker
                 // reset flags
                 checkAllProperties = true;
             }
+
+            // does the node still exist?
+            if (!nodeService.exists(currentNodeRef))
+            {
+                // ignore primary nodes that have disappeared
+                continue;
+            }
+            
             if (newEventType)
             {
                 currentEventType = event.getEventType();
