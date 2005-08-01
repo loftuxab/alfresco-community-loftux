@@ -115,7 +115,7 @@ public class LuceneCategoryTest extends TestCase
         dictionaryService = (DictionaryService)ctx.getBean("dictionaryService");
         luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
         dictionaryDAO = (DictionaryDAO) ctx.getBean("dictionaryDAO");
-        searcher = (SearchService) ctx.getBean("searcherComponent");
+        searcher = (SearchService) ctx.getBean("searchService");
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
         categoryService = (CategoryService) ctx.getBean("categoryService");
         serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");

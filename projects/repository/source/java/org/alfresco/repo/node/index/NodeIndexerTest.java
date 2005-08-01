@@ -53,7 +53,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
     protected void onSetUpInTransaction() throws Exception
     {
         super.onSetUpInTransaction();
-        searchService = (SearchService) applicationContext.getBean("searcherComponent");
+        searchService = (SearchService) applicationContext.getBean("searchService");
 
         if (localStoreRef == null)
         {
