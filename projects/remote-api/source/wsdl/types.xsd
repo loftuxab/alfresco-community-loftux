@@ -96,7 +96,7 @@
 		<xsd:sequence>
 			<xsd:element name="name" type="alf:Name"></xsd:element>
 			<xsd:group ref="alf:TextualDescription"></xsd:group>
-			<xsd:element name="dataType" type="xsd:anyType"></xsd:element>
+			<xsd:element name="dataType" type="alf:Name"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
