@@ -18,6 +18,8 @@
 package org.alfresco.web.bean;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.alfresco.service.namespace.NamespaceService;
@@ -55,6 +57,9 @@ public final class SearchContext implements Serializable
    
    /** true to search category children as well as category */
    private boolean categoryChildren = true;
+   
+   /** any additional attribute to add to the search */
+   private Map<QName, String> additionalAttributes = new HashMap<QName, String>(5, 1.0f);
    
    
    /**
@@ -145,6 +150,20 @@ public final class SearchContext implements Serializable
          }
       }
       
+      // match any additional attribute values specified
+      StringBuilder attributeQuery = null;
+      if (additionalAttributes.size() != 0)
+      {
+         attributeQuery = new StringBuilder(additionalAttributes.size() << 5);
+         for (QName qname : additionalAttributes.keySet())
+         {
+            String escapedName = Repository.escapeQName(qname);
+            String value = Utils.remove(additionalAttributes.get(qname), "\"");
+            attributeQuery.append(" +@").append(escapedName)
+                          .append(":").append(value);
+         }
+      }
+      
       // match against CONTENT type
       String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}content\" ";
       
@@ -171,6 +190,12 @@ public final class SearchContext implements Serializable
          
          default:
             throw new IllegalStateException("Unknown search mode specified: " + mode);
+      }
+      
+      // match entire query against any additional attributes specified
+      if (attributeQuery != null)
+      {
+         query = attributeQuery + " AND (" + query + ')';
       }
       
       // match entire query against specified Space path
@@ -279,5 +304,16 @@ public final class SearchContext implements Serializable
    public void setCategoryChildren(boolean categoryChildren)
    {
       this.categoryChildren = categoryChildren;
+   }
+   
+   /**
+    * Add an additional attribute to search against
+    * 
+    * @param qname      QName of the attribute to search against
+    * @param value      Value of the attribute to use
+    */
+   public void addAdditionalAttribute(QName qname, String value)
+   {
+      this.additionalAttributes.put(qname, value);
    }
 }

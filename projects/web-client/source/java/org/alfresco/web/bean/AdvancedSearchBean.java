@@ -17,13 +17,18 @@
  */
 package org.alfresco.web.bean;
 
+import java.util.Date;
+
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.util.Conversion;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 
 /**
@@ -178,6 +183,150 @@ public class AdvancedSearchBean
       this.categoryChildren = categoryChildren;
    }
    
+   /**
+    * @return Returns the createdDateFrom.
+    */
+   public Date getCreatedDateFrom()
+   {
+      return this.createdDateFrom;
+   }
+
+   /**
+    * @param createdDateFrom The createdDateFrom to set.
+    */
+   public void setCreatedDateFrom(Date createdDate)
+   {
+      this.createdDateFrom = createdDate;
+   }
+
+   /**
+    * @return Returns the description.
+    */
+   public String getDescription()
+   {
+      return this.description;
+   }
+
+   /**
+    * @param description The description to set.
+    */
+   public void setDescription(String description)
+   {
+      this.description = description;
+   }
+
+   /**
+    * @return Returns the modifiedDateFrom.
+    */
+   public Date getModifiedDateFrom()
+   {
+      return this.modifiedDateFrom;
+   }
+
+   /**
+    * @param modifiedDateFrom The modifiedDateFrom to set.
+    */
+   public void setModifiedDateFrom(Date modifiedDate)
+   {
+      this.modifiedDateFrom = modifiedDate;
+   }
+   
+   /**
+    * @return Returns the createdDateTo.
+    */
+   public Date getCreatedDateTo()
+   {
+      return this.createdDateTo;
+   }
+
+   /**
+    * @param createdDateTo The createdDateTo to set.
+    */
+   public void setCreatedDateTo(Date createdDateTo)
+   {
+      this.createdDateTo = createdDateTo;
+   }
+
+   /**
+    * @return Returns the modifiedDateTo.
+    */
+   public Date getModifiedDateTo()
+   {
+      return this.modifiedDateTo;
+   }
+
+   /**
+    * @param modifiedDateTo The modifiedDateTo to set.
+    */
+   public void setModifiedDateTo(Date modifiedDateTo)
+   {
+      this.modifiedDateTo = modifiedDateTo;
+   }
+
+   /**
+    * @return Returns the title.
+    */
+   public String getTitle()
+   {
+      return this.title;
+   }
+
+   /**
+    * @param title The title to set.
+    */
+   public void setTitle(String title)
+   {
+      this.title = title;
+   }
+   
+   /**
+    * @return Returns the author.
+    */
+   public String getAuthor()
+   {
+      return this.author;
+   }
+
+   /**
+    * @param author The author to set.
+    */
+   public void setAuthor(String author)
+   {
+      this.author = author;
+   }
+   
+   /**
+    * @return Returns the modifiedDateChecked.
+    */
+   public boolean isModifiedDateChecked()
+   {
+      return this.modifiedDateChecked;
+   }
+
+   /**
+    * @param modifiedDateChecked The modifiedDateChecked to set.
+    */
+   public void setModifiedDateChecked(boolean modifiedDateChecked)
+   {
+      this.modifiedDateChecked = modifiedDateChecked;
+   }
+
+   /**
+    * @return Returns the createdDateChecked.
+    */
+   public boolean isCreatedDateChecked()
+   {
+      return this.createdDateChecked;
+   }
+
+   /**
+    * @param createdDateChecked The createdDateChecked to set.
+    */
+   public void setCreatedDateChecked(boolean createdDateChecked)
+   {
+      this.createdDateChecked = createdDateChecked;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Action event handlers
@@ -192,6 +341,13 @@ public class AdvancedSearchBean
       this.lookin = LOOKIN_ALL;
       this.location = null;
       this.category = null;
+      this.title = null;
+      this.description = null;
+      this.author = null;
+      this.createdDateFrom = null;
+      this.modifiedDateFrom = null;
+      this.createdDateChecked = false;
+      this.modifiedDateChecked = false;
    }
    
    /**
@@ -226,6 +382,32 @@ public class AdvancedSearchBean
             search.setMode(SearchContext.SEARCH_SPACE_NAMES);
          }
          this.navigator.setSearchContext(search);
+         
+         // additional attributes search
+         if (this.description != null && this.description.length() != 0)
+         {
+            search.addAdditionalAttribute(ContentModel.PROP_DESCRIPTION, this.description + '*');
+         }
+         if (this.title != null && this.title.length() != 0)
+         {
+            search.addAdditionalAttribute(ContentModel.PROP_TITLE, this.title + '*');
+         }
+         if (this.author != null && this.author.length() != 0)
+         {
+            search.addAdditionalAttribute(ContentModel.PROP_CREATOR, this.author + '*');
+         }
+         if (this.createdDateChecked == true)
+         {
+            String strCreatedDate = Conversion.dateToXmlDate(this.createdDateFrom).substring(0, 10);
+            String strCreatedDateTo = Conversion.dateToXmlDate(this.createdDateTo).substring(0, 10);
+            search.addAdditionalAttribute(ContentModel.PROP_CREATED, "[" + strCreatedDate + " TO " + strCreatedDateTo + "]");
+         }
+         if (this.modifiedDateChecked == true)
+         {
+            String strModifiedDate = Conversion.dateToXmlDate(this.modifiedDateFrom).substring(0, 10);
+            String strModifiedDateTo = Conversion.dateToXmlDate(this.modifiedDateTo).substring(0, 10);
+            search.addAdditionalAttribute(ContentModel.PROP_MODIFIED, "[" + strModifiedDate + " TO " + strModifiedDateTo + "]");
+         }
          
          // location path search
          if (this.lookin.equals(LOOKIN_OTHER) && this.location != null)
@@ -324,9 +506,33 @@ public class AdvancedSearchBean
    /** categories to search */
    private String category = null;
    
+   /** title attribute to search */
+   private String title = null;
+   
+   /** description attribute to search */
+   private String description = null;
+   
+   /** created attribute to search from */
+   private Date createdDateFrom = null;
+   
+   /** created attribute to search to */
+   private Date createdDateTo = null;
+   
+   /** modified attribute to search from */
+   private Date modifiedDateFrom = null;
+   
+   /** modified attribute to search to */
+   private Date modifiedDateTo = null;
+   
    /** true to search location children as well as location */
    private boolean locationChildren = true;
    
    /** true to search category children as well as category */
    private boolean categoryChildren = true;
+   
+   /** author (creator) attribute to search */
+   private String author = null;
+   
+   private boolean modifiedDateChecked = false;
+   private boolean createdDateChecked = false;
 }

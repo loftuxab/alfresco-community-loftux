@@ -146,7 +146,7 @@ public class DatePickerRenderer extends BaseRenderer
          Calendar calendar = new GregorianCalendar();
          calendar.setTime(date);
          renderMenu(out, component, getDays(), calendar.get(Calendar.DAY_OF_MONTH), clientId + "_day");
-         renderMenu(out, component, getMonths(), calendar.get(Calendar.MONTH) + 1, clientId + "_month");
+         renderMenu(out, component, getMonths(), calendar.get(Calendar.MONTH), clientId + "_month");
          renderMenu(out, component, getYears(nStartYear, nYearCount), calendar.get(Calendar.YEAR), clientId + "_year");
       }
    }
@@ -214,7 +214,7 @@ public class DatePickerRenderer extends BaseRenderer
       List<SelectItem> months = new ArrayList<SelectItem>(12);
       for (int i=0; i<12; i++)
       {
-         Integer key = Integer.valueOf(i + 1);
+         Integer key = Integer.valueOf(i);
          months.add(new SelectItem(key, names[i]));
       }
       return months;
