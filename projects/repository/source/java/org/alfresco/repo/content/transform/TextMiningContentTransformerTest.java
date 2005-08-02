@@ -17,7 +17,13 @@
  */
 package org.alfresco.repo.content.transform;
 
+import java.io.File;
+import java.io.InputStream;
+
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.content.filestore.FileContentWriter;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.util.TempFileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,5 +58,34 @@ public class TextMiningContentTransformerTest extends AbstractContentTransformer
         assertEquals("Mimetype should not be supported", 0.0, reliability);
         reliability = transformer.getReliability(MimetypeMap.MIMETYPE_WORD, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         assertEquals("Mimetype should be supported", 1.0, reliability);
+    }
+    
+    /**
+     * Tests a specific failure in the library
+     */
+    public void testBugFixAR1() throws Exception
+    {
+        File tempFile = TempFileProvider.createTempFile(
+                getClass().getSimpleName() + "_" + getName() + "_",
+                ".doc");
+        FileContentWriter writer = new FileContentWriter(tempFile);
+        writer.setMimetype(MimetypeMap.MIMETYPE_WORD);
+        // get the test resource and write it (MS Word)
+        InputStream is = getClass().getClassLoader().getResourceAsStream("farmers_markets_list_2003.doc");
+        assertNotNull("Test resource not found: farmers_markets_list_2003.doc");
+        writer.putContent(is);
+        
+        // get the source of the transformation
+        ContentReader reader = writer.getReader(); 
+        
+        // make a new location of the transform output (plain text)
+        tempFile = TempFileProvider.createTempFile(
+                getClass().getSimpleName() + "_" + getName() + "_",
+                ".txt");
+        writer = new FileContentWriter(tempFile);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        
+        // transform it
+        transformer.transform(reader, writer);
     }
 }

@@ -47,7 +47,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-run.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-2.5.1.jar"/>
-	<classpathentry exported="true" sourcepath="src/textmining_src.zip" kind="lib" path="lib/tm-extractors-0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/acegi-security-0.8.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
@@ -68,5 +67,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jotm/ow_carol.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jotm/xapool.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jotm/howl.jar"/>
+	<classpathentry exported="true" sourcepath="src/textmining_src.zip" kind="lib" path="lib/tm-extractors-0.4_patched.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
