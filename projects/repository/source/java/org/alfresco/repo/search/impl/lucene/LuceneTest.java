@@ -294,7 +294,6 @@ public class LuceneTest extends TestCase
         for (ResultSetRow row : results)
         {
             String id = row.getNodeRef().getId();
-            System.out.println(current + "             " + id);
             if (current != null)
             {
                 if (current.compareTo(id) < 0)

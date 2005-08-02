@@ -49,6 +49,11 @@ public class DynamicNamespacePrefixResolver implements NamespacePrefixResolver
         super();
         this.delegate = delegate;
     }
+    
+    public DynamicNamespacePrefixResolver()
+    {
+        this(null);
+    }
 
     /**
      * Add prefix to name space mapping override

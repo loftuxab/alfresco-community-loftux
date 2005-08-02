@@ -1,0 +1,101 @@
+/*
+ * Copyright (C) 2005 Alfresco, Inc.
+ *
+ * Licensed under the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.gnu.org/licenses/lgpl.txt
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ *
+ * Created on 01-Aug-2005
+ */
+package org.alfresco.repo.security.permissions.impl.model;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.alfresco.repo.security.permissions.NodePermissionEntry;
+import org.alfresco.repo.security.permissions.PermissionEntry;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
+
+public class NodePermission implements NodePermissionEntry, XMLModelInitialisable
+{
+    private static final String NODE_REF = "nodeRef";
+    
+    private static final String NODE_PERMISSION = "nodePermission";
+    
+    private static final String INHERIT_FROM_PARENT = "inheritFromParent";
+    
+    // If null then it is the root.
+    private NodeRef nodeRef;
+    
+    private Set<PermissionEntry> permissionEntries = new HashSet<PermissionEntry>();
+    
+    private boolean inheritPermissionsFromParent;
+    
+    public NodePermission()
+    {
+        super();
+    }
+
+    public NodeRef getNodeRef()
+    {
+       return nodeRef;
+    }
+
+    public boolean inheritPermissions()
+    {
+        return inheritPermissionsFromParent;
+    }
+
+    public Set<PermissionEntry> getPermissionEntries()
+    {
+       return Collections.unmodifiableSet(permissionEntries);
+    }
+
+    public void initialise(Element element, NamespacePrefixResolver nspr)
+    {
+       Attribute nodeRefAttribute = element.attribute(NODE_REF);
+       if(nodeRefAttribute != null)
+       {
+           nodeRef = new NodeRef(nodeRefAttribute.getStringValue());
+       }
+       
+       Attribute inheritFromParentAttribute = element.attribute(INHERIT_FROM_PARENT);
+       if(inheritFromParentAttribute != null)
+       {
+           inheritPermissionsFromParent = Boolean.parseBoolean(inheritFromParentAttribute.getStringValue());
+       }
+       else
+       {
+           inheritPermissionsFromParent = true;
+       }
+       
+       // Node Permissions Entry
+
+       for (Iterator npit = element.elementIterator(NODE_PERMISSION); npit.hasNext(); /**/)
+       {
+           Element permissionEntryElement = (Element) npit.next();
+           ModelPermissionEntry permissionEntry = new ModelPermissionEntry(nodeRef);
+           permissionEntry.initialise(permissionEntryElement, nspr);
+           permissionEntries.add(permissionEntry);
+       }
+        
+    }
+
+    
+    
+}

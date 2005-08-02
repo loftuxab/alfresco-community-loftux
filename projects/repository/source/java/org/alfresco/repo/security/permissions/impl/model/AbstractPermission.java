@@ -1,0 +1,132 @@
+/*
+ * Copyright (C) 2005 Alfresco, Inc.
+ *
+ * Licensed under the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.gnu.org/licenses/lgpl.txt
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ *
+ * Created on 02-Aug-2005
+ */
+package org.alfresco.repo.security.permissions.impl.model;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
+
+public abstract class AbstractPermission implements XMLModelInitialisable
+{
+    /* XML Constants */
+    
+    private static final String NAME = "name";
+    
+    private static final String REQUIRED_PERMISSION = "requiredPermission";
+    
+    private static final String RP_NAME = "name";
+
+    private static final String RP_TYPE = "type";
+    
+    private static final String RP_ON = "on";
+
+    private static final String RP_IMPLIES = "implies";
+    
+    private static final String NODE_ENTRY = "node";
+
+    private static final String PARENT_ENTRY = "parent";
+    
+    /* Instance variables */
+    
+    private String name;
+
+    private QName typeQName;
+
+    private Set<RequiredPermission> requiredPermissions = new HashSet<RequiredPermission>();
+    
+    public AbstractPermission(QName typeQName)
+    {
+        super();
+        this.typeQName = typeQName;
+    }
+
+    public void initialise(Element element, NamespacePrefixResolver nspr)
+    {
+        name = element.attributeValue(NAME);
+        
+        for (Iterator rpit = element.elementIterator(REQUIRED_PERMISSION); rpit.hasNext(); /**/)
+        {
+            QName qName;
+            Element requiredPermissionElement = (Element) rpit.next();
+            Attribute typeAttribute = requiredPermissionElement.attribute(RP_TYPE);
+            if (typeAttribute != null)
+            {
+                qName = QName.createQName(typeAttribute.getStringValue(), nspr);
+            }
+            else
+            {
+                qName = typeQName;
+            }
+
+            String requiredName = requiredPermissionElement.attributeValue(RP_NAME);
+
+            RequiredPermission.On on;
+            String onString = requiredPermissionElement.attributeValue(RP_ON);
+            if (onString.equalsIgnoreCase(NODE_ENTRY))
+            {
+                on = RequiredPermission.On.NODE;
+            }
+            else if (onString.equalsIgnoreCase(PARENT_ENTRY))
+            {
+                on = RequiredPermission.On.PARENT;
+            }
+            else
+            {
+                throw new PermissionModelException("Required permission must specify parent or node for the on attribute.");
+            }
+            
+             boolean implies = false;
+             Attribute impliesAttribute = requiredPermissionElement.attribute(RP_IMPLIES);
+             if( impliesAttribute != null)
+             {
+                 implies = Boolean.parseBoolean(impliesAttribute.getStringValue());
+             }
+             
+             RequiredPermission rq = new RequiredPermission(qName, requiredName, on, implies);
+             
+             requiredPermissions.add(rq);
+            
+        }
+        
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public Set<RequiredPermission> getRequiredPermissions()
+    {
+        return Collections.unmodifiableSet(requiredPermissions);
+    }
+
+    public QName getTypeQName()
+    {
+        return typeQName;
+    }
+
+    
+}
