@@ -33,12 +33,16 @@ import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.debug.NodeStoreInspector;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Roy Wetherall
  */
 public class NodeServiceImplTest extends BaseVersionStoreTest 
 {
+    private static Log logger = LogFactory.getLog(NodeServiceImplTest.class);
+    
 	/**
 	 * Light weight version store node service
 	 */
@@ -139,10 +143,14 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
      */
     public void testGetChildAssocs()
     {
-//      Lets have a look at the version store ..
-        System.out.println(NodeStoreInspector.dumpNodeStore(
-                this.dbNodeService, 
-                this.versionService.getVersionStoreReference()) + "\n\n");
+        if (logger.isDebugEnabled())
+        {
+            // Let's have a look at the version store ..
+            System.out.println(NodeStoreInspector.dumpNodeStore(
+                    this.dbNodeService, 
+                    this.versionService.getVersionStoreReference()) + "\n\n");
+            logger.debug("");
+        }
         
         // Create a new versionable node
         NodeRef versionableNode = createNewVersionableNode();
@@ -159,10 +167,13 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
         
-        // Lets have a look at the version store ..
-        System.out.println(NodeStoreInspector.dumpNodeStore(
-                this.dbNodeService, 
-                this.versionService.getVersionStoreReference()));
+        if (logger.isDebugEnabled())
+        {
+            // Let's have a look at the version store ..
+            System.out.println(NodeStoreInspector.dumpNodeStore(
+                    this.dbNodeService, 
+                    this.versionService.getVersionStoreReference()));
+        }
         
         // Get the children of the versioned node
         Collection<ChildAssociationRef> versionedChildren = this.lightWeightVersionStoreNodeService.getChildAssocs(version.getNodeRef());

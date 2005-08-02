@@ -74,12 +74,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
     public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
     public static final QName ASSOC_TYPE_QNAME_TEST_CHILDREN = ContentModel.ASSOC_CHILDREN;
+    public static final QName ASSOC_TYPE_QNAME_TEST_NEXT = QName.createQName(NAMESPACE, "next");
     
     protected DictionaryService dictionaryService;
     protected NodeService nodeService;
     /** populated during setup */
     protected NodeRef rootNodeRef;
 
+    @Override
     protected void onSetUpInTransaction() throws Exception
     {
         DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
@@ -108,6 +110,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         rootNodeRef = nodeService.getRootNode(storeRef);
     }
     
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        flushAndClear();
+    }
+
+
+
     /**
      * Loads the test model required for building the node graphs
      */
@@ -559,19 +569,43 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testRemoveChildByRef() throws Exception
     {
-        ChildAssociationRef pathARef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef pathARef = nodeService.createNode(
+                rootNodeRef,
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
         NodeRef nodeRef = pathARef.getChildRef();
-        ChildAssociationRef pathBRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathB"));
-        ChildAssociationRef pathCRef = nodeService.addChild(rootNodeRef, nodeRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathC"));
+        ChildAssociationRef pathBRef = nodeService.addChild(
+                rootNodeRef, nodeRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathB"));
+        ChildAssociationRef pathCRef = nodeService.addChild(
+                rootNodeRef, nodeRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathC"));
         // delete all the associations
         Collection<EntityRef> deletedRefs = nodeService.removeChild(rootNodeRef, nodeRef);
         assertTrue("Primary child not deleted", deletedRefs.contains(nodeRef));
         assertTrue("Primary A path not deleted", deletedRefs.contains(pathARef));
         assertTrue("Secondary B path not deleted", deletedRefs.contains(pathBRef));
         assertTrue("Secondary C path not deleted", deletedRefs.contains(pathCRef));
+    }
+    
+    public void testAddAndRemoveChild() throws Exception
+    {
+        ChildAssociationRef pathARef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("pathA"),
+                ContentModel.TYPE_CONTAINER);
+        NodeRef childRef = pathARef.getChildRef();
+        // make a duplication, but non-primary, child associaton
+        nodeService.addChild(
+                rootNodeRef,
+                pathARef.getChildRef(),
+                pathARef.getTypeQName(),
+                pathARef.getQName());
+        // now remove the association - it will cascade to the child
+        nodeService.removeChild(rootNodeRef, childRef);
+        
+        // attempt a flush
+        flushAndClear();
     }
     
     public void testProperties() throws Exception
@@ -727,25 +761,29 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         fillProperties(TYPE_QNAME_TEST_CONTENT, properties);
         fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
         
-        ChildAssociationRef childAssocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef childAssocRef = nodeService.createNode(
+                rootNodeRef,
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName(null, "N1"),
                 TYPE_QNAME_TEST_CONTENT);
         NodeRef sourceRef = childAssocRef.getChildRef();
-        childAssocRef = nodeService.createNode(rootNodeRef,
+        childAssocRef = nodeService.createNode(
+                rootNodeRef,
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName(null, "N2"),
                 TYPE_QNAME_TEST_CONTENT,
                 properties);
         NodeRef targetRef = childAssocRef.getChildRef();
         
-        QName qname = QName.createQName(NAMESPACE, "next");
-        AssociationRef assocRef = nodeService.createAssociation(sourceRef, targetRef, qname);
+        AssociationRef assocRef = nodeService.createAssociation(
+                sourceRef,
+                targetRef,
+                ASSOC_TYPE_QNAME_TEST_NEXT);
         // done
         return assocRef;
     }
     
-    public void testCreateAssociation() throws Exception
+    public void testCreateAndRemoveAssociation() throws Exception
     {
         AssociationRef assocRef = createAssociation();
         NodeRef sourceRef = assocRef.getSourceRef();
@@ -771,18 +809,28 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         {
             // expected
         }
-    }
-    
-    public void testRemoveAssociation() throws Exception
-    {
-        AssociationRef assocRef = createAssociation();
-        NodeRef sourceRef = assocRef.getSourceRef();
-        NodeRef targetRef = assocRef.getTargetRef();
-        QName qname = assocRef.getTypeQName();
-        // remove the association
-        nodeService.removeAssociation(sourceRef, targetRef, qname);
-        // remake association
-        nodeService.createAssociation(sourceRef, targetRef, qname);
+        
+        // create another
+        ChildAssociationRef childAssocRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName(null, "N3"),
+                TYPE_QNAME_TEST_CONTENT);
+        NodeRef anotherTargetRef = childAssocRef.getChildRef();
+        AssociationRef anotherAssocRef = nodeService.createAssociation(
+                sourceRef,
+                anotherTargetRef,
+                ASSOC_TYPE_QNAME_TEST_NEXT);
+        
+        // remove assocs
+        List<AssociationRef> assocs = nodeService.getTargetAssocs(sourceRef, ASSOC_TYPE_QNAME_TEST_NEXT);
+        for (AssociationRef assoc : assocs)
+        {
+            nodeService.removeAssociation(
+                    assoc.getSourceRef(),
+                    assoc.getTargetRef(),
+                    assoc.getTypeQName());
+        }
     }
     
     public void testGetTargetAssocs() throws Exception

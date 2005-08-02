@@ -21,6 +21,7 @@ import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.EqualsHelper;
 
 /**
  * Hibernate-specific implementation of the generic node association
@@ -78,6 +79,31 @@ public class NodeAssocImpl implements NodeAssoc
           .append(", name=").append(getTypeQName())
           .append("]");
         return sb.toString();
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        else if (obj == this)
+        {
+            return true;
+        }
+        else if (!(obj instanceof NodeAssoc))
+        {
+            return false;
+        }
+        NodeAssoc that = (NodeAssoc) obj;
+        return (EqualsHelper.nullSafeEquals(this.getTypeQName(), that.getTypeQName())
+                && EqualsHelper.nullSafeEquals(this.getTarget(), that.getTarget())
+                && EqualsHelper.nullSafeEquals(this.getSource(), that.getSource()));
+    }
+    
+    public int hashCode()
+    {
+        return (this.getTypeLocalName() == null ? 0 : getTypeLocalName().hashCode());
     }
 
     public long getId()

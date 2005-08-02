@@ -17,9 +17,7 @@
  */
 package org.alfresco.repo.version;
 
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
@@ -262,8 +260,6 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	ContentWriter contentWriter2 = this.contentService.getUpdatingWriter(versionableNode);
     	assertNotNull(contentWriter2);
     	contentWriter2.putContent(UPDATED_CONTENT_2);
-    	
-    	// TODO change the aspects on the node
     	
     	// Revert to the previous version
     	this.versionService.revert(versionableNode);

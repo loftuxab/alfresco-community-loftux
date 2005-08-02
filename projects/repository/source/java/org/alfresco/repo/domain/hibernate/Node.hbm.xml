@@ -75,7 +75,8 @@
             name="parentAssocs"
             lazy="true"
             inverse="true" 
-            cascade="none" optimistic-lock="true"
+            cascade="none"
+            optimistic-lock="true"
             fetch="select" >
          <cache usage="read-write"></cache>
          <key>
@@ -90,7 +91,8 @@
             name="childAssocs"
             inverse="true"
             lazy="true" 
-            cascade="none" optimistic-lock="true"
+            cascade="none"
+            optimistic-lock="true"
             fetch="select" >
          <cache usage="read-write"></cache>
          <key>
@@ -105,7 +107,8 @@
       <set
             name="sourceNodeAssocs"
             inverse="true" 
-            cascade="delete" >
+            cascade="none"
+            optimistic-lock="true" >
          <cache usage="read-write"></cache>
          <key>
             <column name="target_protocol" />
@@ -118,7 +121,8 @@
       <set
             name="targetNodeAssocs"
             inverse="true" 
-            cascade="delete" >
+            cascade="none"
+            optimistic-lock="true" >
          <cache usage="read-write"></cache>
          <key>
             <column name="source_protocol" />
@@ -154,7 +158,8 @@
             name="parent"
             class="org.alfresco.repo.domain.hibernate.NodeImpl"
             lazy="false"
-            fetch="join" optimistic-lock="true"
+            fetch="join"
+            optimistic-lock="true"
             not-null="true" >
          <column name="parent_protocol" />
          <column name="parent_identifier" />

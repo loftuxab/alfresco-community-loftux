@@ -17,8 +17,8 @@
  */
 package org.alfresco.repo.node.db.hibernate;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -209,18 +209,32 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public void deleteNode(Node node, boolean cascade)
     {
         // delete all parent assocs
-        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
-        parentAssocs = new HashSet<ChildAssoc>(parentAssocs);
+        Collection<ChildAssoc> parentAssocs = node.getParentAssocs();
+        parentAssocs = new ArrayList<ChildAssoc>(parentAssocs);
         for (ChildAssoc assoc : parentAssocs)
         {
             deleteChildAssoc(assoc, false);  // we don't cascade upwards
         }
         // delete all child assocs
-        Set<ChildAssoc> childAssocs = node.getChildAssocs();
-        childAssocs = new HashSet<ChildAssoc>(childAssocs);
+        Collection<ChildAssoc> childAssocs = node.getChildAssocs();
+        childAssocs = new ArrayList<ChildAssoc>(childAssocs);
         for (ChildAssoc assoc : childAssocs)
         {
             deleteChildAssoc(assoc, cascade);   // potentially cascade downwards
+        }
+        // delete all target assocs
+        Collection<NodeAssoc> targetAssocs = node.getTargetNodeAssocs();
+        targetAssocs = new ArrayList<NodeAssoc>(targetAssocs);
+        for (NodeAssoc assoc : targetAssocs)
+        {
+            deleteNodeAssoc(assoc);
+        }
+        // delete all source assocs
+        Collection<NodeAssoc> sourceAssocs = node.getSourceNodeAssocs();
+        sourceAssocs = new ArrayList<NodeAssoc>(sourceAssocs);
+        for (NodeAssoc assoc : sourceAssocs)
+        {
+            deleteNodeAssoc(assoc);
         }
         // finally delete the node
         getHibernateTemplate().delete(node);
@@ -400,6 +414,9 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
 
     public void deleteNodeAssoc(NodeAssoc assoc)
     {
+        // maintain inverse association sets
+        assoc.removeAssociation();
+        // remove instance
         getHibernateTemplate().delete(assoc);
     }
 }

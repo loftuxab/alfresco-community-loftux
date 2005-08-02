@@ -98,7 +98,8 @@ public class ChildAssocImpl implements ChildAssoc
             return false;
         }
         ChildAssoc that = (ChildAssoc) obj;
-        return (EqualsHelper.nullSafeEquals(this.getTypeQName(), that.getTypeQName())
+        return (this.getIsPrimary() == that.getIsPrimary()
+                && EqualsHelper.nullSafeEquals(this.getTypeQName(), that.getTypeQName())
                 && EqualsHelper.nullSafeEquals(this.getQName(), that.getQName())
                 && EqualsHelper.nullSafeEquals(this.getParent(), that.getParent())
                 && EqualsHelper.nullSafeEquals(this.getChild(), that.getChild()));

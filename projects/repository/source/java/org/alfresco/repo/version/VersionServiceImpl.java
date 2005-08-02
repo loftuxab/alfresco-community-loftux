@@ -850,11 +850,12 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 			this.nodeService.removeAspect(nodeRef, aspect);
 		}
 		// TODO do we need to manually re-apply the versionable aspect (since it is not versioned)
-		
+
 		// Add/remove the child nodes
 		List<ChildAssociationRef> children = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(nodeRef));
 		for (ChildAssociationRef versionedChild : this.nodeService.getChildAssocs(versionNodeRef)) 
 		{
+		    // TODO: BUG AR112
 			if (children.contains(versionedChild) == false)
 			{			
 				if (this.nodeService.exists(versionedChild.getChildRef()) == true)
@@ -881,23 +882,22 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 			this.nodeService.removeChild(nodeRef, ref.getChildRef());
 		}
 		
-		// TODO currently causes hibernate integrity error?
 		// Add/remove the target associations
-		//for (AssociationRef assocRef : this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL)) 
-		//{
-		//	this.nodeService.removeAssociation(assocRef.getSourceRef(), assocRef.getTargetRef(), assocRef.getTypeQName());
-		//}		
-		//for (AssociationRef versionedAssoc : this.nodeService.getTargetAssocs(versionNodeRef, RegexQNamePattern.MATCH_ALL)) 
-		//{
-		//	if (this.nodeService.exists(versionedAssoc.getTargetRef()) == true)
-		//	{
-		//		this.nodeService.createAssociation(nodeRef, versionedAssoc.getTargetRef(), versionedAssoc.getTypeQName());
-		//	}
-		//	else
-		//	{
-		//		// TODO we should restore this from the version service if possible
-		//	}
-		//}	
+		for (AssociationRef assocRef : this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL)) 
+		{
+			this.nodeService.removeAssociation(assocRef.getSourceRef(), assocRef.getTargetRef(), assocRef.getTypeQName());
+		}		
+		for (AssociationRef versionedAssoc : this.nodeService.getTargetAssocs(versionNodeRef, RegexQNamePattern.MATCH_ALL)) 
+		{
+			if (this.nodeService.exists(versionedAssoc.getTargetRef()) == true)
+			{
+				this.nodeService.createAssociation(nodeRef, versionedAssoc.getTargetRef(), versionedAssoc.getTypeQName());
+			}
+			else
+			{
+				// TODO we should restore this from the version service if possible
+			}
+		}	
 		
 		// TODO what do we do about the version label (do we reset it the reverted label??)
 	}
