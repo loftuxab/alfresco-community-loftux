@@ -65,13 +65,17 @@
     <xsd:complexType name="ParentReference">
     	<xsd:complexContent>
     		<xsd:extension base="alf:Reference">
-    			<xsd:sequence>
-    				<xsd:element maxOccurs="1" minOccurs="0" name="childAssociation" type="alf:Name"/>
-    				<xsd:element maxOccurs="1" minOccurs="0" name="childName" type="alf:Name"/>
-    			</xsd:sequence>
-    		</xsd:extension>
+    			<xsd:group ref="alf:ChildAssociation"></xsd:group>
+   			</xsd:extension>
     	</xsd:complexContent>
     </xsd:complexType>
+
+	<xsd:group name="ChildAssociation">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="0" name="associationType" type="alf:Name"/>
+ 			<xsd:element maxOccurs="1" minOccurs="0" name="childName" type="alf:Name"/>
+		</xsd:sequence>
+	</xsd:group>
 
 	<!-- -->
 	<!-- Meta Data Definitions -->
@@ -271,7 +275,7 @@
 				maxOccurs="unbounded" minOccurs="1">
 			</xsd:element>
 			<xsd:sequence>
-				<xsd:element name="store" type="xsd:string"></xsd:element>
+				<xsd:element name="store" type="alf:Store"></xsd:element>
 				<xsd:element name="query" type="alf:Query">
 				</xsd:element>
 			</xsd:sequence>
