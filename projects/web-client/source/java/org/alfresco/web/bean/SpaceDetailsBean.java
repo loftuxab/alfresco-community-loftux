@@ -24,7 +24,6 @@ import javax.faces.event.ActionEvent;
 
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.alfresco.web.ui.repo.component.property.UIPropertySheet;
 
 /**
  * Back bean provided access to the details of a Space
@@ -38,10 +37,6 @@ public class SpaceDetailsBean
    
    /** The NavigationBean bean reference */
    private NavigationBean navigator;
-   
-   /** UIPropertySheet component binding reference */
-   private UIPropertySheet propertySheet;
-   
    
    // ------------------------------------------------------------------------------
    // Bean property getters and setters 
@@ -62,22 +57,6 @@ public class SpaceDetailsBean
    public void setNavigator(NavigationBean navigator)
    {
       this.navigator = navigator;
-   }
-   
-   /**
-    * @return Returns the propertySheet component reference.
-    */
-   public UIPropertySheet getPropertySheet()
-   {
-      return this.propertySheet;
-   }
-
-   /**
-    * @param propertySheet The propertySheet component to set.
-    */
-   public void setPropertySheet(UIPropertySheet propertySheet)
-   {
-      this.propertySheet = propertySheet;
    }
    
    /**
@@ -149,9 +128,6 @@ public class SpaceDetailsBean
                   
                   // prepare for showing details for this node
                   this.browseBean.setupSpaceAction(next.getId(), false);
-                  
-                  // clear the property sheet component cached value
-                  this.propertySheet.setNode(null);
                }
             }
          }
@@ -190,9 +166,6 @@ public class SpaceDetailsBean
                   
                   // show details for this node
                   this.browseBean.setupSpaceAction(previous.getId(), false);
-                  
-                  // clear the property sheet component cached value
-                  this.propertySheet.setNode(null);
                }
             }
          }

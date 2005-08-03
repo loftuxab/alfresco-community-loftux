@@ -231,7 +231,9 @@ public class Node implements Serializable
    {
       if (this.nodeService != null)
       {
-         return "Node Properties: " + this.getProperties().toString() + "\nNode Aspects: " + this.getAspects().toString();
+         return "Node Type: " + this.type + 
+                "\nNode Properties: " + this.getProperties().toString() + 
+                "\nNode Aspects: " + this.getAspects().toString();
       }
       else
       {

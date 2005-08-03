@@ -169,6 +169,14 @@
          <from-outcome>deleteSpace</from-outcome>
          <to-view-id>/jsp/dialog/delete-space.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>nextItem</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>previousItem</from-outcome>
+         <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>
@@ -224,6 +232,14 @@
       <navigation-case>
          <from-outcome>editCategory</from-outcome>
          <to-view-id>/jsp/dialog/edit-category.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>nextItem</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>previousItem</from-outcome>
+         <to-view-id>/jsp/dialog/document-details.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

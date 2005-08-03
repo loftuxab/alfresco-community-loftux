@@ -100,10 +100,10 @@
                            <td bgcolor="#465F7D" width=1></td>
                            <td width=100>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.navigation}" /><br>
-                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{SpaceDetailsBean.nextItem}">
+                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{SpaceDetailsBean.nextItem}" action="nextItem">
                                  <f:param name="id" value="#{SpaceDetailsBean.id}" />
                               </a:actionLink>
-                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{SpaceDetailsBean.previousItem}">
+                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{SpaceDetailsBean.previousItem}" action="previousItem">
                                  <f:param name="id" value="#{SpaceDetailsBean.id}" />
                               </a:actionLink>
                            </td>
@@ -154,7 +154,7 @@
                                           <%-- properties for the space --%>
                                           <r:propertySheetGrid id="space-props" value="#{SpaceDetailsBean.space}" var="spaceProps" 
                                                          columns="1" mode="view" labelStyleClass="propertiesLabel" 
-                                                         externalConfig="true" binding="#{SpaceDetailsBean.propertySheet}" />
+                                                         externalConfig="true" />
                                           <h:messages styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>

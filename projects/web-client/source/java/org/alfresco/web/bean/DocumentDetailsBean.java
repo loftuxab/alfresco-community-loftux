@@ -45,7 +45,6 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewRuleWizard;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.alfresco.web.ui.repo.component.property.UIPropertySheet;
 import org.apache.log4j.Logger;
 
 /**
@@ -64,44 +63,7 @@ public class DocumentDetailsBean
    private CopyService copyService;
    private VersionService versionService;
    
-   /** UIPropertySheet component binding references */
-   private UIPropertySheet propertySheet;
-   private UIPropertySheet propertySheetLocked;
-   
    private Map<String, String> workflowProperties;
-   
-   
-   /**
-    * @return Returns the propertySheet component reference.
-    */
-   public UIPropertySheet getPropertySheet()
-   {
-      return this.propertySheet;
-   }
-
-   /**
-    * @param propertySheet The propertySheet component to set.
-    */
-   public void setPropertySheet(UIPropertySheet propertySheet)
-   {
-      this.propertySheet = propertySheet;
-   }
-   
-   /**
-    * @return Returns the propertySheetLocked component reference.
-    */
-   public UIPropertySheet getPropertySheetLocked()
-   {
-      return this.propertySheetLocked;
-   }
-
-   /**
-    * @param propertySheetLocked The propertySheetLocked component to set.
-    */
-   public void setPropertySheetLocked(UIPropertySheet propertySheetLocked)
-   {
-      this.propertySheetLocked = propertySheetLocked;
-   }
 
    /**
     * Returns the id of the current document
@@ -856,16 +818,6 @@ public class DocumentDetailsBean
                   
                   // prepare for showing details for this node
                   this.browseBean.setupContentAction(next.getId(), false);
-                  
-                  //  clear the property sheet component cached value
-                  if (this.propertySheet != null)
-                  {
-                     this.propertySheet.setNode(null);
-                  }
-                  if (this.propertySheetLocked != null)
-                  {
-                     this.propertySheetLocked.setNode(null);
-                  }
                }
             }
          }
@@ -904,16 +856,6 @@ public class DocumentDetailsBean
                   
                   // prepare for showing details for this node
                   this.browseBean.setupContentAction(previous.getId(), false);
-                  
-                  //  clear the property sheet component cached value
-                  if (this.propertySheet != null)
-                  {
-                     this.propertySheet.setNode(null);
-                  }
-                  if (this.propertySheetLocked != null)
-                  {
-                     this.propertySheetLocked.setNode(null);
-                  }
                }
             }
          }

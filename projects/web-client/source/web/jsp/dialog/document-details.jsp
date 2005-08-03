@@ -162,10 +162,10 @@
                            <td bgcolor="#465F7D" width=1></td>
                            <td width=100>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.navigation}" /><br>
-                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{DocumentDetailsBean.nextItem}">
+                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{DocumentDetailsBean.nextItem}" action="nextItem">
                                  <f:param name="id" value="#{DocumentDetailsBean.id}" />
                               </a:actionLink>
-                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{DocumentDetailsBean.previousItem}">
+                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{DocumentDetailsBean.previousItem}" action="previousItem">
                                  <f:param name="id" value="#{DocumentDetailsBean.id}" />
                               </a:actionLink>
                            </td>
@@ -230,7 +230,7 @@
                                           <%-- properties for the doc --%>
                                           <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
-                                                      externalConfig="true" binding="#{DocumentDetailsBean.propertySheetLocked}" />
+                                                      externalConfig="true" />
                                           <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>
@@ -260,7 +260,7 @@
                                        <td>
                                           <r:propertySheetGrid id="document-props-locked" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
-                                                      externalConfig="true" binding="#{DocumentDetailsBean.propertySheet}" />
+                                                      externalConfig="true" />
                                           <h:messages id="props-locked-msgs" styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>
