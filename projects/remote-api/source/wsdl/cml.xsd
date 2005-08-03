@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema targetNamespace="http://www.alfresco.org/cml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cml="http://www.alfresco.org/cml" xmlns:alf="http://www.alfresco.org/cms" version="0.1">
+<xsd:schema targetNamespace="http://www.alfresco.org/cml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cml="http://www.alfresco.org/cml" xmlns:alf="http://www.alfresco.org/cms" elementFormDefault="qualified" version="0.1">
 
     <xsd:annotation>
     	<xsd:documentation>

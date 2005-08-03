@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:alf="http://www.alfresco.org/cms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.alfresco.org/cms" version="0.1">
+<xsd:schema xmlns:alf="http://www.alfresco.org/cms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.alfresco.org/cms" elementFormDefault="qualified" version="0.1">
     <xsd:annotation>
     	<xsd:documentation>Alfresco Web Services for Content Management. Type Definitions - Draft.</xsd:documentation>
     </xsd:annotation>
