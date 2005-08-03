@@ -28,6 +28,9 @@
 
       <type name="alf:base">
          <title>Base</title>
+         <mandatory-aspects>
+            <aspect>alf:referencable</aspect>
+         </mandatory-aspects>
       </type>
 
       <type name="alf:container">
@@ -366,6 +369,25 @@
    
    <aspects>
    
+      <!-- aspect to store the fundamental node identifiers -->
+      <aspect name="alf:referencable">
+         <title>Referencable</title>
+         <properties>
+            <property name="alf:store-protocol">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="alf:store-identifier">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="alf:node-uuid">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+      </aspect>
+
       <aspect name="alf:titled">
          <title>Titled</title>
          <properties>
@@ -567,8 +589,8 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:referenceable">
-         <title>Referencable</title>
+      <aspect name="alf:referencing">
+         <title>Referencing</title>
          <associations>
             <association name="alf:references">
                <source>

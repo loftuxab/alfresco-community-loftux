@@ -67,12 +67,13 @@ public interface NodeDaoService
 
     /**
      * @param store the store to which the node must belong
+     * @param id the node store-unique identifier
      * @param nodeTypeQName the type of the node
      * @return Returns a new node of the given type and attached to the store
      * @throws InvalidTypeException if the node type is invalid or if the node type
      *      is not a valid real node
      */
-    public Node newNode(Store store, QName nodeTypeQName) throws InvalidTypeException;
+    public Node newNode(Store store, String id, QName nodeTypeQName) throws InvalidTypeException;
     
     /**
      * @param protocol the store protocol

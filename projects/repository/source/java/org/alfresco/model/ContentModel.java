@@ -25,8 +25,15 @@ import org.alfresco.service.namespace.QName;
  * Content Model Constants
  */
 public interface ContentModel
-{   
+{
     // base type constants
+    static final QName TYPE_BASE = QName.createQName(NamespaceService.ALFRESCO_URI, "base");
+    static final QName ASPECT_REFERENCABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "referencable");
+    static final QName PROP_STORE_PROTOCOL = QName.createQName(NamespaceService.ALFRESCO_URI, "store-protocol");
+    static final QName PROP_STORE_IDENTIFIER = QName.createQName(NamespaceService.ALFRESCO_URI, "store-identifier");
+    static final QName PROP_NODE_UUID = QName.createQName(NamespaceService.ALFRESCO_URI, "node-uuid");
+    
+    // content management type constants
     static final QName TYPE_CMOBJECT = QName.createQName(NamespaceService.ALFRESCO_URI, "cmobject");
     static final QName PROP_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
     

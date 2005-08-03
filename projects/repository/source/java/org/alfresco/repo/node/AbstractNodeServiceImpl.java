@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateNodePolicy;
@@ -435,6 +436,62 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         return qnames;
     }
 
+    /**
+     * Generates a GUID for the node using either the creation properties or just by
+     * generating a value randomly.
+     * 
+     * @param preCreationProperties the properties that will be applied to the node
+     * @return Returns the ID to create the node with
+     */
+    protected String generateGuid(Map<QName, Serializable> preCreationProperties)
+    {
+        String uuid = (String) preCreationProperties.get(ContentModel.PROP_NODE_UUID);
+        if (uuid == null)
+        {
+            uuid = GUID.generate();
+        }
+        else
+        {
+            // remove the property as we don't want to persist it
+            preCreationProperties.remove(ContentModel.PROP_NODE_UUID);
+        }
+        // done
+        return uuid;
+    }
+    
+    /**
+     * Remove all properties used by the
+     * {@link ContentModel#ASPECT_REFERENCABLE referencable aspect}.
+     * <p>
+     * This method can be used to ensure that the information already stored
+     * by the node key is not duplicated by the properties.
+     * 
+     * @param properties properties to change
+     */
+    protected void removeReferencableProperties(Map<QName, Serializable> properties)
+    {
+        properties.remove(ContentModel.PROP_STORE_PROTOCOL);
+        properties.remove(ContentModel.PROP_STORE_IDENTIFIER);
+        properties.remove(ContentModel.PROP_NODE_UUID);
+    }
+    
+    /**
+     * Adds all properties used by the
+     * {@link ContentModel#ASPECT_REFERENCABLE referencable aspect}.
+     * <p>
+     * This method can be used to ensure that the values used by the aspect
+     * are present as node properties.
+     * 
+     * @param nodeRef the node reference containing the values required
+     * @param properties the node properties
+     */
+    protected void addReferencableProperties(NodeRef nodeRef, Map<QName, Serializable> properties)
+    {
+        properties.put(ContentModel.PROP_STORE_PROTOCOL, nodeRef.getStoreRef().getProtocol());
+        properties.put(ContentModel.PROP_STORE_IDENTIFIER, nodeRef.getStoreRef().getIdentifier());
+        properties.put(ContentModel.PROP_NODE_UUID, nodeRef.getId());
+    }
+    
     /**
      * Defers to the pattern matching overload
      * 

@@ -49,6 +49,7 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.GUID;
 import org.hibernate.Session;
 import org.springframework.context.ApplicationContext;
 
@@ -366,10 +367,32 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         QName checkType = nodeService.getType(childRef);
         assertEquals("Child node type incorrect", ContentModel.TYPE_CONTAINER, checkType);
     }
+    
+    /**
+     * Tests node creation with a pre-determined {@link ContentModel#PROP_NODE_UUID uuid}.
+     */
+    public void testCreateNodeWithId() throws Exception
+    {
+        String uuid = GUID.generate();
+        // create a node with an explicit UUID
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+        properties.put(ContentModel.PROP_NODE_UUID, uuid);
+        ChildAssociationRef assocRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("pathA"),
+                ContentModel.TYPE_CONTAINER,
+                properties);
+        // check it
+        NodeRef expectedNodeRef = new NodeRef(rootNodeRef.getStoreRef(), uuid);
+        NodeRef checkNodeRef = assocRef.getChildRef();
+        assertEquals("Failed to create node with a chosen ID", expectedNodeRef, checkNodeRef);
+    }
 
     public void testGetType() throws Exception
     {
-        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
+        ChildAssociationRef assocRef = nodeService.createNode(
+                rootNodeRef,
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
@@ -662,6 +685,32 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         {
             fail("Null property values are allowed in the map");
         }
+    }
+    
+    /**
+     * Checks that the {@link ContentModel#ASPECT_REFERENCABLE referencable} properties
+     * are present
+     */
+    public void testGetReferencableProperties() throws Exception
+    {
+        // check individual property retrieval
+        Serializable wsProtocol = nodeService.getProperty(rootNodeRef, ContentModel.PROP_STORE_PROTOCOL);
+        Serializable wsIdentifier = nodeService.getProperty(rootNodeRef, ContentModel.PROP_STORE_IDENTIFIER);
+        Serializable nodeUuid = nodeService.getProperty(rootNodeRef, ContentModel.PROP_NODE_UUID);
+        
+        assertNotNull("Workspace Protocol property not present", wsProtocol);
+        assertNotNull("Workspace Identifier property not present", wsIdentifier);
+        assertNotNull("Node UUID property not present", nodeUuid);
+        
+        assertEquals("Workspace Protocol property incorrect", rootNodeRef.getStoreRef().getProtocol(), wsProtocol);
+        assertEquals("Workspace Identifier property incorrect", rootNodeRef.getStoreRef().getIdentifier(), wsIdentifier);
+        assertEquals("Node UUID property incorrect", rootNodeRef.getId(), nodeUuid);
+        
+        // check mass property retrieval
+        Map<QName, Serializable> properties = nodeService.getProperties(rootNodeRef);
+        assertTrue("Workspace Protocol property not present in map", properties.containsKey(ContentModel.PROP_STORE_PROTOCOL));
+        assertTrue("Workspace Identifier property not present in map", properties.containsKey(ContentModel.PROP_STORE_IDENTIFIER));
+        assertTrue("Node UUID property not present in map", properties.containsKey(ContentModel.PROP_NODE_UUID));
     }
     
     public void testGetParentAssocs() throws Exception

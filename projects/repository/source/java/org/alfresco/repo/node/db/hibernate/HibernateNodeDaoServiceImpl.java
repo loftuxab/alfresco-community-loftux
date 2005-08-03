@@ -154,7 +154,10 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // persist so that it is present in the hibernate cache
         getHibernateTemplate().save(store);
         // create and assign a root node
-        Node rootNode = newNode(store, ContentModel.TYPE_STOREROOT);
+        Node rootNode = newNode(
+                store,
+                "root-node",                    // there can only be one per store
+                ContentModel.TYPE_STOREROOT);
         store.setRootNode(rootNode);
         // done
         return store;
@@ -168,12 +171,12 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return store;
     }
 
-    public Node newNode(Store store, QName nodeTypeQName) throws InvalidTypeException
+    public Node newNode(Store store, String id, QName nodeTypeQName) throws InvalidTypeException
     {
         // build a concrete node based on a bootstrap type
         Node node = new NodeImpl();
         // set other required properties
-		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
+		NodeKey key = new NodeKey(store.getKey(), id);
 		node.setKey(key);
         node.setTypeQName(nodeTypeQName);
         node.setStore(store);

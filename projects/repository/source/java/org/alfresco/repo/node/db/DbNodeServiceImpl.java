@@ -182,7 +182,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * @see #createNode(NodeRef, QName, QName, QName, Map)
      */
-    public ChildAssociationRef createNode(NodeRef parentRef,
+    public ChildAssociationRef createNode(
+            NodeRef parentRef,
             QName assocTypeQName,
             QName assocQName,
             QName nodeTypeQName)
@@ -193,7 +194,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * @see org.alfresco.service.cmr.repository.NodeService#createNode(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, org.alfresco.service.namespace.QName, org.alfresco.service.namespace.QName, java.util.Map)
      */
-    public ChildAssociationRef createNode(NodeRef parentRef,
+    public ChildAssociationRef createNode(
+            NodeRef parentRef,
             QName assocTypeQName,
             QName assocQName,
             QName nodeTypeQName,
@@ -228,8 +230,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             throw new InvalidTypeException(nodeTypeQName);
         }
         
+        // get/generate an ID for the node
+        String newId = generateGuid(properties);
+        
         // create the node instance
-        Node node = nodeDaoService.newNode(store, nodeTypeQName);
+        Node node = nodeDaoService.newNode(store, newId, nodeTypeQName);
         NodeRef childRef = node.getNodeRef();
         // get the parent node
         Node parentNode = getNodeNotNull(parentRef);
@@ -557,11 +562,28 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             // copy across
             ret.put(qname, value);
         }
+        // spoof referencable properties
+        addReferencableProperties(nodeRef, ret);
+        // done
         return ret;
     }
     
     public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException
     {
+        // spoof referencable properties
+        if (qname.equals(ContentModel.PROP_STORE_PROTOCOL))
+        {
+            return nodeRef.getStoreRef().getProtocol();
+        }
+        else if (qname.equals(ContentModel.PROP_STORE_IDENTIFIER))
+        {
+            return nodeRef.getStoreRef().getIdentifier();
+        }
+        else if (qname.equals(ContentModel.PROP_NODE_UUID))
+        {
+            return nodeRef.getId();
+        }
+        
         Node node = getNodeNotNull(nodeRef);
         Map<String, Serializable> properties = node.getProperties();
         Serializable value = properties.get(qname.toString());
@@ -594,6 +616,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             throw new IllegalArgumentException("Properties may not be null");
         }
+        
+        // remove referencable properties
+        removeReferencableProperties(properties);
+        
         // find the node
         Node node = getNodeNotNull(nodeRef);
         // get the properties before
