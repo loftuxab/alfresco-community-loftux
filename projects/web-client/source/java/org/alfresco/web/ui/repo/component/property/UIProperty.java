@@ -341,8 +341,7 @@ public class UIProperty extends UIPanel implements NamingContainer
             XMLDateConverter conv = (XMLDateConverter)context.getApplication().
                createConverter("org.alfresco.faces.XMLDataConverter");
             conv.setType("both");
-            conv.setDateStyle("long");
-            conv.setTimeStyle("short");
+            conv.setPattern("MMMM, d yyyy HH:mm");
             control.setConverter(conv);
          }
       }

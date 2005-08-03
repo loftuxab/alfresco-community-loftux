@@ -136,6 +136,14 @@ public class DocumentDetailsBean
    }
    
    /**
+    * @return true if the current document has the 'inlineeditable' aspect applied
+    */
+   public boolean isInlineEditable()
+   {
+      return getDocument().hasAspect(ContentModel.ASPECT_INLINEEDITABLE);
+   }
+   
+   /**
     * Returns a list of objects representing the versions of the 
     * current document 
     * 
@@ -750,7 +758,7 @@ public class DocumentDetailsBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to apply the classifiable aspect to the document", e);
+         throw new AlfrescoRuntimeException("Failed to apply the 'classifiable' aspect to the document", e);
       }
    }
    
@@ -779,8 +787,40 @@ public class DocumentDetailsBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to apply the versionable aspect to the document", e);
+         throw new AlfrescoRuntimeException("Failed to apply the 'versionable' aspect to the document", e);
       }
+   }
+   
+   /**
+    * Applies the inlineeditable aspect to the current document
+    */
+   public String applyInlineEditable()
+   {
+      UserTransaction tx = null;
+      
+      try
+      {
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx.begin();
+         
+         // add the versionable aspect to the node
+         this.nodeService.addAspect(getDocument().getNodeRef(), ContentModel.ASPECT_INLINEEDITABLE, null);
+         
+         // commit the transaction
+         tx.commit();
+         
+         // reset the state of the current document
+         getDocument().reset();
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         throw new AlfrescoRuntimeException("Failed to apply the 'inlineeditable' aspect to the document", e);
+      }
+      
+      // force recreation of the details view - this means the properties sheet component will reinit
+      return "showDocDetails";
    }
    
    /**

@@ -175,6 +175,17 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
+                                    <td>Inline Editable:</td>
+                                    <td>
+                                       <table cellspacing=0 cellpadding=0>
+                                       <tr><td><h:selectBooleanCheckbox value="#{AddContentWizard.inlineEdit}" /></td>
+                                       <td>&nbsp;&nbsp;<img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                           <h:outputText value="#{msg.warning_inline}" /></td>
+                                       </tr></table>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
                                     <td colspan="2"><h:outputText value="#{AddContentWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>

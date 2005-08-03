@@ -32,4 +32,10 @@
       </property-sheet>
    </config>
    
+   <config evaluator="aspect-name" condition="inlineeditable">
+      <property-sheet>
+         <show-property name="editInline" displayLabel="Edit Inline" />
+      </property-sheet>
+   </config>
+   
 </alfresco-config>

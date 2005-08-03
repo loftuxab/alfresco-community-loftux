@@ -39,6 +39,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Kevin Roast
+ * 
+ * Servlet filter responsible for redirecting to the login page for the web-client if the user
+ * does not have a valid ticket.
+ * <p>
+ * The current ticker is validated for each page request and the login page is shown if the
+ * ticker has expired.
+ * <p>
+ * Note that this filter is only active when the system is running in a servlet container -
+ * the AlfrescoFacesPortlet will be used for a JSR-168 Portal environment.
  */
 public class AuthenticationFilter implements Filter
 {

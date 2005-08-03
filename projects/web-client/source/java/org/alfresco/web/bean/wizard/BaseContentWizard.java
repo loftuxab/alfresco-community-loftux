@@ -63,6 +63,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
    protected String title;
    protected String description;
    protected String contentType;
+   protected boolean inlineEdit;
    protected List<SelectItem> contentTypes;
    protected ContentService contentService;
    
@@ -96,6 +97,17 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             contentProps.put(ContentModel.PROP_DESCRIPTION, this.description);
             contentProps.put(ContentModel.PROP_MIME_TYPE, this.contentType);
             contentProps.put(ContentModel.PROP_CREATOR, this.author);
+            
+            if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_INLINEEDITABLE) == false)
+            {
+               Map<QName, Serializable> editProps = new HashMap<QName, Serializable>(1, 1.0f);
+               editProps.put(ContentModel.PROP_EDITINLINE, this.inlineEdit);
+               this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_INLINEEDITABLE, editProps);
+            }
+            else
+            {
+               contentProps.put(ContentModel.PROP_EDITINLINE, this.inlineEdit);
+            }
             this.nodeService.setProperties(nodeRef, contentProps);
          }
          else
@@ -111,9 +123,9 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             {
                containerNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
             }
-
+            
             // create properties for content type
-            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(3, 1.0f);
+            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(5, 1.0f);
             contentProps.put(ContentModel.PROP_NAME, this.fileName);
             contentProps.put(ContentModel.PROP_ENCODING, "UTF-8");
             contentProps.put(ContentModel.PROP_MIME_TYPE, this.contentType);
@@ -134,13 +146,24 @@ public abstract class BaseContentWizard extends AbstractWizardBean
                logger.debug("Created file node for file: " + this.fileName);
             
             // apply the titled aspect - title and description
-            Map<QName, Serializable> titledProps = new HashMap<QName, Serializable>(5);
+            Map<QName, Serializable> titledProps = new HashMap<QName, Serializable>(3, 1.0f);
             titledProps.put(ContentModel.PROP_TITLE, this.title);
             titledProps.put(ContentModel.PROP_DESCRIPTION, this.description);
             this.nodeService.addAspect(fileNodeRef, ContentModel.ASPECT_TITLED, titledProps);
             
             if (logger.isDebugEnabled())
                logger.debug("Added titled aspect with properties: " + titledProps);
+            
+            // apply the inlineeditable aspect
+            if (this.inlineEdit == true)
+            {
+               Map<QName, Serializable> editProps = new HashMap<QName, Serializable>(1, 1.0f);
+               editProps.put(ContentModel.PROP_EDITINLINE, this.inlineEdit);
+               this.nodeService.addAspect(fileNodeRef, ContentModel.ASPECT_INLINEEDITABLE, editProps);
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Added inlineeditable aspect with properties: " + editProps);
+            }
             
             // get a writer for the content and put the file
             ContentWriter writer = contentService.getUpdatingWriter(fileNodeRef);
@@ -200,6 +223,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       this.title = null;
       this.description = null;
       this.contentType = null;
+      this.inlineEdit = false;
       
       if (this.contentTypes != null)
       {
@@ -217,6 +241,8 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       Node currentDocument = this.browseBean.getDocument();
       Map<String, Object> props = currentDocument.getProperties();
       
+      Boolean inline = (Boolean)props.get("editInline");
+      this.inlineEdit = inline != null ? inline.booleanValue() : false;
       this.author = (String)props.get("creator");
       this.contentType = (String)props.get("mimetype");
       this.description = (String)props.get("description");
@@ -318,6 +344,22 @@ public abstract class BaseContentWizard extends AbstractWizardBean
    public void setTitle(String title)
    {
       this.title = title;
+   }
+   
+   /**
+    * @return Returns the inline edit flag.
+    */
+   public boolean isInlineEdit()
+   {
+      return this.inlineEdit;
+   }
+
+   /**
+    * @param inlineEdit The inline edit flag to set.
+    */
+   public void setInlineEdit(boolean inlineEdit)
+   {
+      this.inlineEdit = inlineEdit;
    }
 
    /**

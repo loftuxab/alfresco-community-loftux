@@ -565,9 +565,15 @@ public class BrowseBean implements IContextListener
       }
    };
    
-   private NodePropertyResolver resolverUrl = new NodePropertyResolver() {
+   private NodePropertyResolver resolverDownload = new NodePropertyResolver() {
       public Object get(Node node) {
          return DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName());
+      }
+   };
+   
+   private NodePropertyResolver resolverUrl = new NodePropertyResolver() {
+      public Object get(Node node) {
+         return DownloadContentServlet.generateBrowserURL(node.getNodeRef(), node.getName());
       }
    };
    
@@ -814,7 +820,7 @@ public class BrowseBean implements IContextListener
             
             // store the URL to for downloading the content
             String name = node.getName();
-            node.addPropertyResolver("url", this.resolverUrl);
+            node.addPropertyResolver("url", this.resolverDownload);
             node.addPropertyResolver("fileType32", this.resolverFileType32);
             
             // remember the document

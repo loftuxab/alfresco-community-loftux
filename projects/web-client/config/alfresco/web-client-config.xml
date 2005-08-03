@@ -52,6 +52,12 @@
       </property-sheet>
    </config>
    
+   <config evaluator="aspect-name" condition="inlineeditable">
+      <property-sheet>
+         <show-property name="editInline" displayLabel="Edit Inline" converter="org.alfresco.faces.BooleanLabelConverter" />
+      </property-sheet>
+   </config>
+   
    <config evaluator="aspect-name" condition="complianceable">
       <property-sheet>
          <show-property name="removeAfter" displayLabel="Remove After" />

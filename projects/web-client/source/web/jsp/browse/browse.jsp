@@ -264,7 +264,7 @@
                               <a:sortLink label="Created" value="created" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.created}">
-                              <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
+                              <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
                            </h:outputText>
                         </a:column>
                         
@@ -274,7 +274,7 @@
                               <a:sortLink label="Modified" value="modified" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.modified}">
-                              <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
+                              <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
                            </h:outputText>
                         </a:column>
                         
@@ -388,7 +388,7 @@
                               <a:sortLink label="Created" value="created" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.created}">
-                              <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
+                              <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
                            </h:outputText>
                         </a:column>
                         
@@ -398,7 +398,7 @@
                               <a:sortLink label="Modified" value="modified" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.modified}">
-                              <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
+                              <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
                            </h:outputText>
                         </a:column>
                         

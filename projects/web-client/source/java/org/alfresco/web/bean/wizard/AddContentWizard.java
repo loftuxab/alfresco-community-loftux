@@ -21,6 +21,7 @@ import java.io.File;
 
 import javax.faces.context.FacesContext;
 
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.commons.logging.Log;
@@ -62,6 +63,9 @@ public class AddContentWizard extends BaseContentWizard
          {
             this.contentType = Repository.getMimeTypeForFileName(
                   FacesContext.getCurrentInstance(), this.fileName);
+            
+            // set default for in-line editing flag
+            this.inlineEdit = (this.contentType.equals(MimetypeMap.MIMETYPE_HTML));
          }
          
          if (this.title == null)
@@ -230,8 +234,8 @@ public class AddContentWizard extends BaseContentWizard
    public String getSummary()
    {
       return buildSummary(
-            new String[] {"File Name", "Content Type", "Title", "Description", "Author"},
-            new String[] {this.fileName, getSummaryContentType(), this.title, this.description, this.author});
+            new String[] {"File Name", "Content Type", "Title", "Description", "Author", "Inline Editable"},
+            new String[] {this.fileName, getSummaryContentType(), this.title, this.description, this.author, Boolean.toString(this.inlineEdit)});
    }
    
    /**

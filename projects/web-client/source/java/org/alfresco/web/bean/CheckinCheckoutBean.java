@@ -504,14 +504,15 @@ public class CheckinCheckoutBean
       if (id != null && id.length() != 0)
       {
          Node node = setupContentDocument(id);
-         // TODO: detect the inline editing aspect here instead
-         String mimetype = (String)node.getProperties().get("mimetype");
-         if ("text/html".equals(mimetype))
+         
+         // detect the inline editing aspect to see which edit mode to use
+         if (node.hasAspect(ContentModel.ASPECT_INLINEEDITABLE) &&
+             ((Boolean)node.getProperties().get("editInline")) == true)
          {
             // found a document that can be edited in-line
             // retrieve the content so it's available to the editing screen
             ContentReader reader = getContentService().getReader(node.getNodeRef());
-            setDocumentContent( reader.getContentString() );
+            setDocumentContent(reader.getContentString());
             setEditorOutput(null);
             
             // navigate to appropriate screen

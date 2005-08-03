@@ -21,14 +21,14 @@ import java.text.DecimalFormat;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.DateTimeConverter;
+import javax.faces.convert.Converter;
 
 /**
  * Converter class to convert the size of an item in bytes into a readable KB/MB form.
  * 
- * @author gavinc
+ * @author Kevin Roast
  */
-public class ByteSizeConverter extends DateTimeConverter
+public class ByteSizeConverter implements Converter
 {
    /**
     * <p>The standard converter id for this converter.</p>

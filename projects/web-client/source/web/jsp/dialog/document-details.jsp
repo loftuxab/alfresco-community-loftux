@@ -194,9 +194,6 @@
                                  <table width=100% cellspacing=0 cellpadding=0 border=0>
                                     <tr>
                                        <td align=left>
-                                          <a:actionLink value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" />
-                                       </td>
-                                       <td align=right>
                                           <a:actionLink value="#{msg.view_in_browser}" href="#{DocumentDetailsBean.browserUrl}" />
                                        </td>
                                     </tr>
@@ -216,7 +213,7 @@
                                              <tr>
                                                 <td>
                                                    <div style="border: thin solid #CCCCCC; padding:4px">
-                                                      <h:graphicImage id="doc-logo1" url="#{DocumentDetailsBean.document.properties.fileType32}" width="32" height="32" />
+                                                      <a:actionLink id="doc-logo1" value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" image="#{DocumentDetailsBean.document.properties.fileType32}" showLink="false" />
                                                    </div>
                                                 </td>
                                                 <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
@@ -231,6 +228,11 @@
                                           <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
+                                          <h:outputText id="no-inline-msg" value="<br/>This document is not inline editable.<br/><br/>"
+                                               rendered="#{DocumentDetailsBean.inlineEditable == false}" escape="false" />
+                                          <a:actionLink id="make-inline" value="Allow Inline Editing" 
+                                               action="#{DocumentDetailsBean.applyInlineEditable}"
+                                               rendered="#{DocumentDetailsBean.inlineEditable == false}" />
                                           <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>
@@ -247,7 +249,7 @@
                                              <tr>
                                                 <td>
                                                    <div style="border: thin solid #CCCCCC; padding:4px">
-                                                      <h:graphicImage id="doc-logo2" url="#{DocumentDetailsBean.document.properties.fileType32}" width="32" height="32" />
+                                                      <a:actionLink id="doc-logo2" value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" image="#{DocumentDetailsBean.document.properties.fileType32}" showLink="false" />
                                                    </div>
                                                 </td>
                                                 <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
@@ -261,6 +263,8 @@
                                           <r:propertySheetGrid id="document-props-locked" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
+                                          <h:outputText id="no-inline-msg2" value="<br/>This document is not inline editable.<br/>"
+                                               rendered="#{DocumentDetailsBean.inlineEditable == false}" escape="false" />
                                           <h:messages id="props-locked-msgs" styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>
@@ -329,7 +333,7 @@
                                           <a:sortLink label="Date" value="versionDate" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="date" value="#{r.versionDate}">
-                                          <a:convertXMLDate dateStyle="long" type="both" timeStyle="short" />
+                                          <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
                                        </h:outputText>
                                     </a:column>
                                     

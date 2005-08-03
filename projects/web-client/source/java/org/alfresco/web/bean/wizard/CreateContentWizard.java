@@ -168,6 +168,9 @@ public class CreateContentWizard extends BaseContentWizard
       this.contentType = Repository.getMimeTypeForFileName(
                FacesContext.getCurrentInstance(), this.fileName);
       this.title = this.fileName;
+      
+      // created content is inline editable by default
+      this.inlineEdit = true;
    }
    
    /**

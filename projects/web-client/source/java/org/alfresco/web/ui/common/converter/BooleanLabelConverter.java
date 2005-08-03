@@ -20,45 +20,40 @@ package org.alfresco.web.ui.common.converter;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-
-import org.alfresco.service.cmr.repository.MimetypeService;
-import org.alfresco.web.bean.repository.Repository;
+import javax.faces.convert.ConverterException;
 
 /**
- * Converter class to convert an XML date representation into a Date
+ * Converter class to convert a Boolean value (including null) into a human readable form.
  * 
- * @author gavinc
+ * @author Kevin Roast
  */
-public class MimeTypeConverter implements Converter
+public class BooleanLabelConverter implements Converter
 {
    /**
     * <p>The standard converter id for this converter.</p>
     */
-   public static final String CONVERTER_ID = "org.alfresco.faces.MimeTypeConverter";
-
+   public static final String CONVERTER_ID = "org.alfresco.faces.BooleanLabelConverter";
+   
    /**
     * @see javax.faces.convert.Converter#getAsObject(javax.faces.context.FacesContext, javax.faces.component.UIComponent, java.lang.String)
     */
    public Object getAsObject(FacesContext context, UIComponent component, String value)
+         throws ConverterException
    {
-      return value;
+      return Boolean.valueOf(value);
    }
 
    /**
     * @see javax.faces.convert.Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, java.lang.Object)
     */
    public String getAsString(FacesContext context, UIComponent component, Object value)
+         throws ConverterException
    {
-      String result = null;
+      String result = "No";
       
-      if (value instanceof String)
+      if (value instanceof Boolean)
       {
-         MimetypeService mimetypeService = Repository.getServiceRegistry(context).getMimetypeService();
-         result = mimetypeService.getDisplaysByMimetype().get(value.toString());
-      }
-      else if (value != null)
-      {
-         result = value.toString();
+         result = ((Boolean)value).booleanValue() ? "Yes" : "No";
       }
       
       return result;

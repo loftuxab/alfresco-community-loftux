@@ -48,9 +48,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * The appropriate mimetype is calculated based on filename extension.
  * <p>
  * The URL to the servlet should be generated thus:
- * <pre>/web-client/download/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
- * the store protocol, followed by the store ID, followed by the content Node Id
- * the last part is used for mimetype calculation and browser default filename
+ * <pre>/web-client/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
+ * or
+ * <pre>/web-client/download/direct/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
+ * The store protocol, followed by the store ID, followed by the content Node Id
+ * the last part is used for mimetype calculation and browser default filename.
+ * The 'attach' or 'direct' element is used to indicate whether to display the stream directly
+ * in the browser or download it as a file attachment.
  * 
  * @author Kevin Roast
  */
@@ -169,7 +173,7 @@ public class DownloadContentServlet extends HttpServlet
                   ref.getStoreRef().getProtocol(),
                   ref.getStoreRef().getIdentifier(),
                   ref.getId(),
-                  URLEncoder.encode(name, "UTF-8") } );
+                  URLEncoder.encode(name, "US-ASCII") } );
       }
       catch (UnsupportedEncodingException uee)
       {
