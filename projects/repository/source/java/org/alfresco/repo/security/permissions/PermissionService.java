@@ -128,20 +128,20 @@ public interface PermissionService
      * Find and delete a permission by node, authentication and permission definition.
      * 
      * @param nodeRef
-     * @param auth
+     * @param authority
      * @param perm
      */
-    public void deletePermission(NodeRef nodeRef, Authentication auth, PermissionReference perm);
+    public void deletePermission(NodeRef nodeRef, String authority, PermissionReference perm);
     
     /**
      * Set a specific permission on a node.
      * 
      * @param nodeRef
-     * @param auth
+     * @param authority
      * @param perm
      * @param allow
      */
-    public void setPermission(NodeRef nodeRef, Authentication auth, PermissionReference perm, boolean allow);
+    public void setPermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow);
 
     /**
      * Add or set a permission entry on a node.

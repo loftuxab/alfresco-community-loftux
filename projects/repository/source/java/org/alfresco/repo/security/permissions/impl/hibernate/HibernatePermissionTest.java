@@ -20,7 +20,6 @@ package org.alfresco.repo.security.permissions.impl.hibernate;
 import java.io.Serializable;
 
 import org.alfresco.repo.domain.NodeKey;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
 /**
@@ -78,7 +77,8 @@ public class HibernatePermissionTest extends BaseSpringTest
     {
         PermissionReference permissionReference = new PermissionReferenceImpl();
         permissionReference.setName("Test");
-        permissionReference.setTypeQName(QName.createQName("TestUri", "TestName"));
+        permissionReference.setTypeUri("TestUri");
+        permissionReference.setTypeName("TestName");
         
         Serializable id = getSession().save(permissionReference);
         
@@ -86,20 +86,21 @@ public class HibernatePermissionTest extends BaseSpringTest
         permissionReference = (PermissionReference) getSession().load(PermissionReferenceImpl.class, id);
         assertNotNull("Node not found", permissionReference);
         assertEquals("Test", permissionReference.getName());
-        assertEquals("TestUri", permissionReference.getTypeQName().getNamespaceURI());
-        assertEquals("TestName", permissionReference.getTypeQName().getLocalName());
+        assertEquals("TestUri", permissionReference.getTypeUri());
+        assertEquals("TestName", permissionReference.getTypeName());
         
-        // Update
+        // Test key
         
-        permissionReference.setName("Test2");
-        permissionReference.setTypeQName(QName.createQName("TestUri2", "TestName2"));
-      
-        // Throw the reference away and get the a new one for the id
-        permissionReference = (PermissionReference) getSession().load(PermissionReferenceImpl.class, id);
+        PermissionReference key = new PermissionReferenceImpl();
+        key.setName("Test");
+        key.setTypeUri("TestUri");
+        key.setTypeName("TestName");
+        
+        permissionReference = (PermissionReference) getSession().load(PermissionReferenceImpl.class, key);
         assertNotNull("Node not found", permissionReference);
-        assertEquals("Test2", permissionReference.getName());
-        assertEquals("TestUri2", permissionReference.getTypeQName().getNamespaceURI());
-        assertEquals("TestName2", permissionReference.getTypeQName().getLocalName());
+        assertEquals("Test", permissionReference.getName());
+        assertEquals("TestUri", permissionReference.getTypeUri());
+        assertEquals("TestName", permissionReference.getTypeName());
     }
     
     public void testSimpleRecipient()
@@ -116,30 +117,41 @@ public class HibernatePermissionTest extends BaseSpringTest
         assertEquals("Test", recipient.getRecipient());
         assertEquals(1, recipient.getExternalKeys().size());
         
+        // Key
+        
+
+        Recipient key = new RecipientImpl();
+        key.setRecipient("Test");
+        
+        recipient = (Recipient) getSession().load(RecipientImpl.class, key);
+        assertNotNull("Node not found", recipient);
+        assertEquals("Test", recipient.getRecipient());
+        assertEquals(1, recipient.getExternalKeys().size());
+        
         
         // Update
         
-        recipient.setRecipient("Test2");
         recipient.getExternalKeys().add("Two");
+        id  = getSession().save(recipient);
       
         // throw the reference away and get the a new one for the id
         recipient = (Recipient) getSession().load(RecipientImpl.class, id);
         assertNotNull("Node not found", recipient);
-        assertEquals("Test2", recipient.getRecipient());
+        assertEquals("Test", recipient.getRecipient());
         assertEquals(2, recipient.getExternalKeys().size());
         
         
         // complex
         
-        recipient.setRecipient("Test3");
         recipient.getExternalKeys().add("Three");
         recipient.getExternalKeys().remove("One");
         recipient.getExternalKeys().remove("Two");
+        id  = getSession().save(recipient);
         
         // Throw the reference away and get the a new one for the id
         recipient = (Recipient) getSession().load(RecipientImpl.class, id);
         assertNotNull("Node not found", recipient);
-        assertEquals("Test3", recipient.getRecipient());
+        assertEquals("Test", recipient.getRecipient());
         assertEquals(1, recipient.getExternalKeys().size());
         
         
@@ -159,7 +171,8 @@ public class HibernatePermissionTest extends BaseSpringTest
         
         PermissionReference permissionReference = new PermissionReferenceImpl();
         permissionReference.setName("Test");
-        permissionReference.setTypeQName(QName.createQName("TestUri", "TestName"));
+        permissionReference.setTypeUri("TestUri");
+        permissionReference.setTypeName("TestName");
         
         PermissionEntry permissionEntry = PermissionEntryImpl.create(nodePermission, permissionReference, recipient, true);
         

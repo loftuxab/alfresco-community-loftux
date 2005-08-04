@@ -89,7 +89,7 @@ public class PermissionEntryImpl implements PermissionEntry
     }
 
 
-    public static PermissionEntry create(NodePermissionEntry nodePermissionEntry, PermissionReference permissionReference, Recipient recipient, boolean allowed)
+    public static PermissionEntryImpl create(NodePermissionEntry nodePermissionEntry, PermissionReference permissionReference, Recipient recipient, boolean allowed)
     {
         PermissionEntryImpl permissionEntry = new PermissionEntryImpl();
         permissionEntry.setNodePermissionEntry(nodePermissionEntry);

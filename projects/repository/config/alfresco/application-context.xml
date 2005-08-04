@@ -898,4 +898,60 @@
       </property>
    </bean>
 
+   <!--                         -->
+   <!-- Support for permissions -->
+   <!--                         -->
+   
+   <!-- Permission Service -->
+   
+   <bean id='permissionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.repo.security.permissions.PermissionService</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="org.alfresco.repo.security.permissions.impl.PermissionServiceImpl">
+            <property name="nodeService">
+                <ref bean="nodeService" />
+            </property>  
+            <property name="dictionaryService">
+                <ref bean="dictionaryService" />
+            </property>
+            <property name="permissionsDAO">
+                <ref bean="permissionsDAO" />
+            </property>     
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <!-- Permissions DAO -->
+
+   <bean id='permissionsDAO' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.repo.security.permissions.impl.PermissionsDAO</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="org.alfresco.repo.security.permissions.impl.hibernate.HibernatePermissionsDAO">
+            <property name="sessionFactory">
+               <ref bean="sessionFactory" />
+            </property>
+         </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+   
 </beans>

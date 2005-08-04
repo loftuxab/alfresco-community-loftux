@@ -24,8 +24,11 @@ import java.util.Set;
 
 public class RecipientImpl implements Recipient
 {
-    private long id;
-    
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = -5582068692208928127L;
+
     private String recipient;
     
     private Set<String> externalKeys = new HashSet<String>();
@@ -33,16 +36,6 @@ public class RecipientImpl implements Recipient
     public RecipientImpl()
     {
         super();
-    }
-
-    public long getId()
-    {
-        return id;
-    }
-    
-    /* package */ void setId(long id)
-    {
-        this.id = id;
     }
     
     public String getRecipient()
@@ -72,18 +65,18 @@ public class RecipientImpl implements Recipient
         {
             return true;
         }
-        if(!(o instanceof RecipientImpl))
+        if(!(o instanceof Recipient))
         {
             return false;
         }
-        RecipientImpl other = (RecipientImpl)o;
-        return this.recipient.equals(other.recipient) && this.externalKeys.equals(other.externalKeys);
+        Recipient other = (Recipient)o;
+        return this.getRecipient().equals(other.getRecipient());
     }
 
     @Override
     public int hashCode()
     {
-        return recipient.hashCode() * 37 + externalKeys.hashCode();
+        return getRecipient().hashCode();
     }
     
     

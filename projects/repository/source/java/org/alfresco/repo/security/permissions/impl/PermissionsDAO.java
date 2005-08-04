@@ -19,7 +19,30 @@
  */
 package org.alfresco.repo.security.permissions.impl;
 
+import org.alfresco.repo.security.permissions.NodePermissionEntry;
+import org.alfresco.repo.security.permissions.PermissionEntry;
+import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.service.cmr.repository.NodeRef;
+
 public interface PermissionsDAO
 {
+
+    public NodePermissionEntry getPermissions(NodeRef nodeRef);
+
+    public void deletePermissions(NodeRef nodeRef);
+
+    public void deletePermissions(NodePermissionEntry nodePermissionEntry);
+
+    public void deletePermissions(PermissionEntry permissionEntry);
+
+    public void deletePermissions(NodeRef nodeRef, String authority, PermissionReference perm);
+
+    public void setPermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow);
+
+    public void setPermission(PermissionEntry permissionEntry);
+
+    public void setPermission(NodePermissionEntry nodePermissionEntry);
+
+    public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
 
 }

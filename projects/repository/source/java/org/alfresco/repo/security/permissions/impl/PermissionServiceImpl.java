@@ -102,8 +102,7 @@ public class PermissionServiceImpl implements PermissionService
 
     public NodePermissionEntry getSetPermissions(NodeRef nodeRef)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return permissionsDAO.getPermissions(nodeRef);
     }
 
     public boolean hasPermision(NodeRef nodeRef, Authentication auth, PermissionReference perm)
@@ -120,50 +119,43 @@ public class PermissionServiceImpl implements PermissionService
 
     public void deletePermissions(NodeRef nodeRef)
     {
-        // TODO Auto-generated method stub
-
+        permissionsDAO.deletePermissions(nodeRef);
     }
 
     public void deletePermissions(NodePermissionEntry nodePermissionEntry)
-    {
-        // TODO Auto-generated method stub
-
+    {  
+        permissionsDAO.deletePermissions(nodePermissionEntry);
     }
 
     public void deletePermission(PermissionEntry permissionEntry)
     {
-        // TODO Auto-generated method stub
+        permissionsDAO.deletePermissions(permissionEntry);
+    }
+
+    public void deletePermission(NodeRef nodeRef, String authority, PermissionReference perm)
+    {
+        permissionsDAO.deletePermissions(nodeRef, authority, perm);
 
     }
 
-    public void deletePermission(NodeRef nodeRef, Authentication auth, PermissionReference perm)
+    public void setPermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow)
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void setPermission(NodeRef nodeRef, Authentication auth, PermissionReference perm, boolean allow)
-    {
-        // TODO Auto-generated method stub
-
+        permissionsDAO.setPermission(nodeRef, authority, perm, allow);
     }
 
     public void setPermission(PermissionEntry permissionEntry)
     {
-        // TODO Auto-generated method stub
-
+        permissionsDAO.setPermission(permissionEntry);
     }
 
     public void setPermission(NodePermissionEntry nodePermissionEntry)
     {
-        // TODO Auto-generated method stub
-
+        permissionsDAO.setPermission(nodePermissionEntry);
     }
 
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions)
     {
-        // TODO Auto-generated method stub
-
+        permissionsDAO.setInheritParentPermissions(nodeRef, inheritParentPermissions);
     }
 
 }

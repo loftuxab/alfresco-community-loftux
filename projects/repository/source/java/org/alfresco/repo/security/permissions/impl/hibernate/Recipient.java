@@ -19,12 +19,11 @@
  */
 package org.alfresco.repo.security.permissions.impl.hibernate;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public interface Recipient
+public interface Recipient extends Serializable 
 {
-    public long getId();
-    
     public String getRecipient();
     
     public void setRecipient(String recipient);

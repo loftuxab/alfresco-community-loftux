@@ -50,5 +50,5 @@ public interface NodePermissionEntry
      * 
      * @return
      */
-    public Set<PermissionEntry> getPermissionEntries();
+    public Set<? extends PermissionEntry> getPermissionEntries();
 }

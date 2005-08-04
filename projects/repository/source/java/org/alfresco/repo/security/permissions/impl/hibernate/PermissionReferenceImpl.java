@@ -19,13 +19,18 @@
  */
 package org.alfresco.repo.security.permissions.impl.hibernate;
 
-import org.alfresco.service.namespace.QName;
+
 
 public class PermissionReferenceImpl implements PermissionReference
-{
-    private long id;
+{   
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = -6352566900815035461L;
+
+    private String typeUri;
     
-    private QName typeQName;
+    private String typeName;
     
     private String name;
 
@@ -33,25 +38,25 @@ public class PermissionReferenceImpl implements PermissionReference
     {
         super();
     }
-
-    public long getId()
-    {
-        return id;
-    }
     
-    /* package */ void setId(long id)
+    public String getTypeUri()
     {
-        this.id = id;
-    }
-    
-    public QName getTypeQName()
-    {
-        return typeQName;
+        return typeUri;
     }
 
-    public void setTypeQName(QName typeQName)
+    public void setTypeUri(String typeUri)
     {
-       this.typeQName = typeQName;
+       this.typeUri = typeUri;
+    }
+    
+    public String getTypeName()
+    {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName)
+    {
+       this.typeName = typeName;
     }
 
     public String getName()
@@ -71,18 +76,18 @@ public class PermissionReferenceImpl implements PermissionReference
         {
             return true;
         }
-        if(!(o instanceof PermissionReferenceImpl))
+        if(!(o instanceof PermissionReference))
         {
             return false;
         }
-        PermissionReferenceImpl other = (PermissionReferenceImpl)o;
-        return this.name.equals(other.name) && this.typeQName.equals(other.typeQName);
+        PermissionReference other = (PermissionReference)o;
+        return this.getTypeUri().equals(other.getTypeUri()) && this.getTypeName().equals(other.getTypeName()) && this.getName().equals(other.getName()); 
     }
 
     @Override
     public int hashCode()
     {
-        return typeQName.hashCode() * 37 + name.hashCode();
+        return ((typeUri.hashCode() * 37) + typeName.hashCode() ) * 37 + name.hashCode();
     }
     
     

@@ -15,25 +15,11 @@
  * language governing permissions and limitations under the
  * License.
  *
- * Created on 02-Aug-2005
+ * Created on 03-Aug-2005
  */
-package org.alfresco.repo.security.permissions.impl.hibernate;
+package org.alfresco.repo.security.permissions;
 
-import java.io.Serializable;
-
-
-public interface PermissionReference extends Serializable
+public interface AuthorityReference
 {
-    
-    public String getTypeUri();
-    
-    public void setTypeUri(String typeUri);
-    
-    public String getTypeName();
-    
-    public void setTypeName(String typeName);
-    
-    public String getName();
-    
-    public void setName(String name);
+    public String getAuthority();
 }

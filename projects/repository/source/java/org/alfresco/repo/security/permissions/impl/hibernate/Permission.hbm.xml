@@ -77,6 +77,9 @@
             name="permissionReference" 
             class="org.alfresco.repo.security.permissions.impl.hibernate.PermissionReferenceImpl" 
             lazy="false" fetch="join" optimistic-lock="true" not-null="false">
+            <column name="typeUri" length="100" />
+            <column name="typeName" length="100" />
+            <column name="name" length="100" />
         </many-to-one>
         
         <many-to-one 
@@ -101,17 +104,11 @@
         
         <cache usage="read-write" />
         
-        <id
-            name="id"
-            column="id" 
-            type="long" >
-         <generator class="increment" />
-        </id>
-        
-        <property name="typeQName" column="qname" type="serializable" />
-        
-        <property name="name" column="name" length="100" not-null="true" />
-        
+        <composite-id>
+            <key-property name="typeUri" type="string" length="100" column="type_uri"/>
+            <key-property name="typeName" type="string" length="100" column="type_name"/>
+            <key-property name="name" type="string" length="100" column="name"/>
+        </composite-id>
     </class>
     
     <class
@@ -126,14 +123,13 @@
         
         <cache usage="read-write" />
         
-        <id
-            name="id"
-            column="id" 
-            type="long" >
-         <generator class="increment" />
-        </id>
-        
-        <property name="recipient" column="recipient" length="100" not-null="true" />
+        <composite-id>
+            <key-property name="recipient"
+            column="recipient" 
+            type="string" length="100"  />
+        </composite-id>
+            
+
         
         <set name="externalKeys" lazy="true"
             sort="unsorted"
