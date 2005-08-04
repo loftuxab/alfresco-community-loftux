@@ -13,11 +13,18 @@
 	
 	<handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
 	<handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
+	<handler name="CreateSpringTicketCallback" type="java:org.alfresco.repo.webservice.axis.TicketCallbackSpringHandler"/>
+	<handler name="WSSecurity" type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+	   <parameter name="action" value="UsernameToken"/>
+	   <!-- Uncomment the following line and comment the one above for .NET support (but only .NET support) -->
+	   <!-- <parameter name="action" value="UsernameToken Timestamp"/> -->
+	</handler>
 	
 	<service name="AuthenticationService" provider="java:SpringRPC" style="wrapped" use="literal">
-	   <documentation>Authenticates the caller with the Repository</documentation>
+	   <documentation>Authenticates the caller with the repository</documentation>
 	   <wsdlFile>/wsdl/authentication-service.wsdl</wsdlFile>
 	   <parameter name="springBean" value="authenticationWebService"/>
+	   <!-- generated below here -->
       <parameter name="wsdlTargetNamespace" value="http://www.alfresco.org/ws/1.0/authentication"/>
       <parameter name="wsdlServiceElement" value="AuthenticationService"/>
       <parameter name="schemaQualified" value="http://www.alfresco.org/ws/1.0/authentication"/>
@@ -40,6 +47,61 @@
                    serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
                    deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
    </service>
+   
+   <service name="RepositoryService" provider="java:SpringRPC" style="wrapped" use="literal">
+      <documentation>Provides repository query and model services</documentation>
+	   <wsdlFile>/wsdl/repository-service.wsdl</wsdlFile>
+	   <parameter name="springBean" value="repositoryWebService"/>
+	   <requestFlow>
+	      <handler type="CreateSpringTicketCallback"/>
+      	<handler type="WSSecurity"/>
+  		</requestFlow>
+	   <!-- generated below here -->
+      <parameter name="wsdlTargetNamespace" value="http://www.alfresco.org/ws/1.0/repository"/>
+      <parameter name="wsdlServiceElement" value="RepositoryService"/>
+      <parameter name="schemaQualified" value="http://www.alfresco.org/ws/1.0/repository"/>
+      <parameter name="schemaUnqualified" value="http://www.alfresco.org/cms"/>
+      <parameter name="wsdlServicePort" value="RepositoryService"/>
+      <parameter name="wsdlPortType" value="RepositoryServiceSoapPort"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="getStores" qname="operNS:getStores" xmlns:operNS="http://www.alfresco.org/ws/1.0/repository" returnQName="retNS:getStoresReturn" xmlns:retNS="http://www.alfresco.org/ws/1.0/repository" returnType="rtns:Store" xmlns:rtns="http://www.alfresco.org/cms" soapAction="http://www.alfresco.org/ws/1.0/repository/getStores" >
+        <fault name="RepositoryFault" qname="fns:RepositoryFault" xmlns:fns="http://www.alfresco.org/ws/1.0/repository" class="org.alfresco.repo.webservice.repository.RepositoryFault" type="tns:RepositoryFault" xmlns:tns="http://www.alfresco.org/ws/1.0/repository"/>
+      </operation>
+      <parameter name="allowedMethods" value="getStores"/>
+
+      <typeMapping
+        xmlns:ns="http://www.alfresco.org/ws/1.0/repository"
+        qname="ns:RepositoryFault"
+        type="java:org.alfresco.repo.webservice.repository.RepositoryFault"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.alfresco.org/cms"
+        qname="ns:StoreEnum"
+        type="java:org.alfresco.repo.webservice.types.StoreEnum"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.alfresco.org/cms"
+        qname="ns:Store"
+        type="java:org.alfresco.repo.webservice.types.Store"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.alfresco.org/cms"
+        qname="ns:>Store>address"
+        type="java:java.lang.String"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
   
 	<transport name="http">
 		<requestFlow>

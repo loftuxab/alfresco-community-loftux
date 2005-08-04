@@ -3,9 +3,21 @@
 
 <beans>
 
+   <bean id="ticketCallbackHandler" class="org.alfresco.repo.webservice.axis.TicketCallbackHandler">
+      <property name="authenticationService">
+         <ref bean="authenticationService"/>
+      </property>
+   </bean>
+   
    <bean id="authenticationWebService" class="org.alfresco.repo.webservice.authentication.AuthenticationWebService">
       <property name="authenticationService">
          <ref bean="authenticationService"/>
+      </property>
+   </bean>
+   
+   <bean id="repositoryWebService" class="org.alfresco.repo.webservice.repository.RepositoryWebService">
+      <property name="nodeService">
+         <ref bean="AlfNodeService"/>
       </property>
    </bean>
    

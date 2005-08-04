@@ -97,6 +97,11 @@ public class InMemoryTicketComponentImpl implements TicketComponent
 
     public Authentication validateTicket(String ticketString)
     {
+        if (ticketString.length() < GRANTED_AUTHORITY_TICKET_PREFIX.length())
+        {
+           throw new AuthenticationException(ticketString  + " is an invalid ticket format");
+        }
+        
         String key = ticketString.substring(GRANTED_AUTHORITY_TICKET_PREFIX.length());
         Ticket ticket = tickets.get(key);
         if (ticket == null)

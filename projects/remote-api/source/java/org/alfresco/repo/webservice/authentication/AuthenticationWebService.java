@@ -24,13 +24,20 @@ import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
+ * Web service implementation of the AuthenticationService.
+ * The WSDL for this service can be accessed from http://localhost:8080/web-client/remote-api/AuthenticationService?wsdl
+ *  
  * @author gavinc
  */
 public class AuthenticationWebService implements AuthenticationServiceSoapPort
 {
-   private AuthenticationService authenticationSvc;
+   private static Log logger = LogFactory.getLog(AuthenticationWebService.class);
+   
+   private AuthenticationService authenticationService;
    
    /**
     * Sets the AuthenticationService instance to use
@@ -39,7 +46,7 @@ public class AuthenticationWebService implements AuthenticationServiceSoapPort
     */
    public void setAuthenticationService(AuthenticationService authenticationSvc)
    {
-      this.authenticationSvc = authenticationSvc;
+      this.authenticationService = authenticationSvc;
    }
 
    /**
@@ -48,13 +55,18 @@ public class AuthenticationWebService implements AuthenticationServiceSoapPort
    public AuthenticationResult authenticate(String username, String password) throws RemoteException, AuthenticationFault
    {
       // TODO: This needs to be configured or passed in as a parameter
-      StoreRef storeRef = new StoreRef("workspace", "SpacesStore");
+      StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
       
       try
       {
          UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-         this.authenticationSvc.authenticate(storeRef, token);
-         return new AuthenticationResult(username, this.authenticationSvc.getCurrentTicket());
+         this.authenticationService.authenticate(storeRef, token);
+         String ticket = this.authenticationService.getCurrentTicket();
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Issued ticket '" + ticket + "' for '" + username + "'");
+         
+         return new AuthenticationResult(username, ticket);
       }
       catch (AuthenticationException ae)
       {

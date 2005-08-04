@@ -4,6 +4,12 @@
    <property name="dir.common" refid="path.common"/>
    <import file="${dir.common}/common.xml"/>
   
+   <target name="init" depends="common-init.init">
+      <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
+         <classpath refid="classpath.compile"/>
+      </taskdef>
+   </target>
+   
    <!-- we need to override the compile-java target so that we can include the generated source -->  
    <target name="compile-java" depends="init" description="Compiles the Java source code">
       <mkdir dir="${dir.classes}"/>
@@ -35,23 +41,19 @@
       </echo>
    </target> 
       
+   <target name="gen-auth-service" depends="gen-auth-service-client, gen-auth-service-server"/>
+  
    <target name="gen-auth-service-client" depends="init">  
-      <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
-         <classpath refid="classpath.compile"/>
-      </taskdef>
       <mkdir dir="${dir.src.java.generated}/org/alfresco/example/webservice/authentication"/>  
       <delete>
          <fileset dir="${dir.src.java.generated}/org/alfresco/example/webservice/authentication"/>
       </delete>   
-      <wsdl2java url="${dir.src}/wsdl/authentication-service.wsdl" output="${dir.src.java.generated}" testcase="yes">
+      <wsdl2java url="${dir.src}/wsdl/authentication-service.wsdl" output="${dir.src.java.generated}" testcase="no">
          <mapping namespace="http://www.alfresco.org/ws/1.0/authentication" package="org.alfresco.example.webservice.authentication"/>
       </wsdl2java>
    </target>
- 
+      
    <target name="gen-auth-service-server" depends="init">
-      <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
-         <classpath refid="classpath.compile"/>
-      </taskdef>
       <mkdir dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication"/>    
       <delete>
          <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication"/>
@@ -63,6 +65,35 @@
       <delete>
          <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication" 
                   excludes="*Fault.java,*Result.java,*Port.java,deploy.wsdd"/>
+      </delete>
+   </target>
+ 
+   <target name="gen-repo-service" depends="gen-repo-service-client, gen-repo-service-server"/>
+   
+   <target name="gen-repo-service-client" depends="init">  
+      <mkdir dir="${dir.src.java.generated}/org/alfresco/example/webservice/repository"/>  
+      <delete>
+         <fileset dir="${dir.src.java.generated}/org/alfresco/example/webservice/repository"/>
+      </delete>   
+      <wsdl2java url="${dir.src}/wsdl/repository-service.wsdl" output="${dir.src.java.generated}" testcase="no">
+         <mapping namespace="http://www.alfresco.org/ws/1.0/repository" package="org.alfresco.example.webservice.repository"/>
+         <mapping namespace="http://www.alfresco.org/cms" package="org.alfresco.example.webservice.types"/>  
+      </wsdl2java>
+   </target>
+ 
+   <target name="gen-repo-service-server" depends="init">
+      <mkdir dir="${dir.src.java.generated}/org/alfresco/repo/webservice/repository"/>    
+      <delete>
+         <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/repository"/>
+      </delete> 
+      <wsdl2java url="${dir.src}/wsdl/repository-service.wsdl" output="${dir.src.java.generated}" 
+                 serverSide="true" skeletondeploy="false">
+         <mapping namespace="http://www.alfresco.org/ws/1.0/repository" package="org.alfresco.repo.webservice.repository"/>
+         <mapping namespace="http://www.alfresco.org/cms" package="org.alfresco.repo.webservice.types"/>  
+      </wsdl2java>
+      <delete>
+         <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/repository" 
+                  excludes="*Fault.java,*Port.java,deploy.wsdd"/>
       </delete>
    </target>  
       
