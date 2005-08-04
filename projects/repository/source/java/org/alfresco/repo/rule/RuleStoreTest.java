@@ -307,7 +307,7 @@ public class RuleStoreTest extends BaseRuleTest
      * Tests the rule inheritance within the store, checking that the cache is reset correctly when 
      * rules are added and removed.
      */
-    public void testRuleInheritance()
+    public void xtestRuleInheritance()
     {
         // Create the nodes and rules
         
