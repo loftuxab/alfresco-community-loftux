@@ -63,7 +63,18 @@ public abstract class AbstractContentTransformerTest extends BaseSpringTest
      *      acceptable if the source and target mimetypes are not of interest.
      */
     protected abstract ContentTransformer getTransformer(String sourceMimetype, String targetMimetype);
-    
+
+    /**
+     * Ensures that the temp locations are cleaned out before the tests start
+     */
+    @Override
+    protected void onSetUpInTransaction() throws Exception
+    {
+        // perform a little cleaning up
+        long now = System.currentTimeMillis();
+        TempFileProvider.TempFileCleanerJob.removeFiles(now);
+    }
+
     /**
      * Check that all objects are present
      */
