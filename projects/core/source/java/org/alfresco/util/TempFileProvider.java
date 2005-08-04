@@ -181,12 +181,26 @@ public class TempFileProvider
         }
         
         /**
+         * Removes all temporary files created before the given time.
+         * <p>
+         * The delete will cascade down through directories as well.
+         * 
+         * @param removeBefore only remove files created <b>before</b> this time
+         * @return Returns the number of files removed
+         */
+        public static int removeFiles(long removeBefore)
+        {
+            File tempDir = TempFileProvider.getTempDir();
+            return removeFiles(tempDir, removeBefore, false);
+        }
+        
+        /**
          * @param directory the directory to clean out - the directory will optionally be removed
          * @param removeBefore only remove files created <b>before</b> this time
          * @param removeDir true if the directory must be removed as well, otherwise false
          * @return Returns the number of files removed
          */
-        private int removeFiles(File directory, long removeBefore, boolean removeDir)
+        private static int removeFiles(File directory, long removeBefore, boolean removeDir)
         {
             if (!directory.isDirectory())
             {
