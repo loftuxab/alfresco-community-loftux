@@ -276,5 +276,22 @@
          <idref bean="AlfConfigurableService"/>
       </property>
    </bean>
+   
+   <alias alias="AlfActionService" name="actionService"/>
+
+   <bean parent="alfrescoService">
+      <property name="name">
+         <value>ActionService</value>
+      </property>
+      <property name="interface">
+         <value>org.alfresco.service.cmr.action.ActionService</value>
+      </property>
+      <property name="description">
+         <value>Action Service</value>
+      </property>
+      <property name="implementation">
+         <idref bean="AlfActionService"/>
+      </property>
+   </bean>
 
 </beans>

@@ -379,6 +379,10 @@
          <value>#{AlfRuleService}</value>
       </managed-property>
       <managed-property>
+         <property-name>actionService</property-name>
+         <value>#{AlfActionService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>rulesBean</property-name>
          <value>#{RulesBean}</value>
       </managed-property>

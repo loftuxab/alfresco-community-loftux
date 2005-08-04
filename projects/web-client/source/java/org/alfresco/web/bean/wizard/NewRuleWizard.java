@@ -33,22 +33,23 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
-import org.alfresco.repo.rule.action.CheckInActionExecuter;
-import org.alfresco.repo.rule.action.CheckOutActionExecuter;
-import org.alfresco.repo.rule.action.CopyActionExecuter;
-import org.alfresco.repo.rule.action.ImageTransformActionExecuter;
-import org.alfresco.repo.rule.action.LinkCategoryActionExecuter;
-import org.alfresco.repo.rule.action.MailActionExecuter;
-import org.alfresco.repo.rule.action.MoveActionExecuter;
-import org.alfresco.repo.rule.action.SimpleWorkflowActionExecuter;
-import org.alfresco.repo.rule.action.TransformActionExecuter;
-import org.alfresco.repo.rule.condition.InCategoryEvaluator;
-import org.alfresco.repo.rule.condition.MatchTextEvaluator;
+import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
+import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
+import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
+import org.alfresco.repo.action.executer.CheckInActionExecuter;
+import org.alfresco.repo.action.executer.CheckOutActionExecuter;
+import org.alfresco.repo.action.executer.CopyActionExecuter;
+import org.alfresco.repo.action.executer.ImageTransformActionExecuter;
+import org.alfresco.repo.action.executer.LinkCategoryActionExecuter;
+import org.alfresco.repo.action.executer.MailActionExecuter;
+import org.alfresco.repo.action.executer.MoveActionExecuter;
+import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
+import org.alfresco.repo.action.executer.TransformActionExecuter;
+import org.alfresco.service.cmr.action.ActionConditionDefinition;
+import org.alfresco.service.cmr.action.ActionDefinition;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
-import org.alfresco.service.cmr.rule.RuleActionDefinition;
-import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
@@ -98,8 +99,8 @@ public class NewRuleWizard extends AbstractWizardBean
    private static final String WIZARD_DESC = "This wizard helps you create a new rule.";
    private static final String WIZARD_DESC_EDIT = "This wizard helps you modify a rule.";
    private static final String STEP1_TITLE = "Step One - Enter Details";
-   private static final String STEP2_TITLE = "Step Two - Select Condition";
-   private static final String STEP3_TITLE = "Step Three - Condition Settings";
+   private static final String STEP2_TITLE = "Step Two - Select ActionCondition";
+   private static final String STEP3_TITLE = "Step Three - ActionCondition Settings";
    private static final String STEP4_TITLE = "Step Four - Select Action";
    private static final String STEP5_TITLE = "Step Five - Action Settings";
    private static final String FINISH_INSTRUCTION = "To create the rule click Finish.";
@@ -112,6 +113,7 @@ public class NewRuleWizard extends AbstractWizardBean
    private String condition;
    private String action;
    private RuleService ruleService;
+   private ActionService actionService;
    private RulesBean rulesBean;
    private List<SelectItem> types;
    private List<SelectItem> conditions;
@@ -338,10 +340,7 @@ public class NewRuleWizard extends AbstractWizardBean
                   this.actionProperties.get(PROP_SUBJECT));
          }
 
-         // get the definition for the selected condition and action
          Rule rule = null;
-         RuleConditionDefinition cond = this.ruleService.getConditionDefinition(this.getCondition());
-         RuleActionDefinition action = this.ruleService.getActionDefinition(this.getAction());
          
          // get hold of the space the rule will apply to and make sure
          // it is actionable
@@ -358,8 +357,8 @@ public class NewRuleWizard extends AbstractWizardBean
             
             // we know there is only one condition and action
             // so remove the first one
-            rule.removeRuleCondition(rule.getRuleConditions().get(0));
-            rule.removeRuleAction(rule.getRuleActions().get(0));
+            rule.removeActionCondition(rule.getActionConditions().get(0));
+            rule.removeAction(rule.getActions().get(0));
          }
          else
          {
@@ -370,9 +369,9 @@ public class NewRuleWizard extends AbstractWizardBean
          // setup the rule and add it to the space
          rule.setTitle(this.title);
          rule.setDescription(this.description);
-         rule.addRuleCondition(cond, conditionParams);
-         rule.addRuleAction(action, actionParams);
-         this.ruleService.addRule(currentSpace.getNodeRef(), rule);
+         rule.addActionCondition(this.getCondition(), conditionParams);
+         rule.addAction(this.getAction(), actionParams);
+         this.ruleService.saveRule(currentSpace.getNodeRef(), rule);
          
          if (logger.isDebugEnabled())
          {
@@ -669,11 +668,11 @@ public class NewRuleWizard extends AbstractWizardBean
       this.title = rule.getTitle();
       this.description = rule.getDescription();
       // we know there is only 1 condition and action
-      this.condition = rule.getRuleConditions().get(0).getRuleConditionDefinition().getName();
-      this.action = rule.getRuleActions().get(0).getRuleActionDefinition().getName();
+      this.condition = rule.getActionConditions().get(0).getActionConditionDefinitionName();
+      this.action = rule.getActions().get(0).getActionDefinitionName();
       
       // populate the condition property bag with the relevant values
-      Map<String, Serializable> condProps = rule.getRuleConditions().get(0).getParameterValues();
+      Map<String, Serializable> condProps = rule.getActionConditions().get(0).getParameterValues();
       if (this.condition.equals(MatchTextEvaluator.NAME))
       {
          this.conditionProperties.put(PROP_CONTAINS_TEXT, 
@@ -686,7 +685,7 @@ public class NewRuleWizard extends AbstractWizardBean
       }
       
       // populate the action property bag with the relevant values
-      Map<String, Serializable> actionProps = rule.getRuleActions().get(0).getParameterValues();
+      Map<String, Serializable> actionProps = rule.getActions().get(0).getParameterValues();
       if (this.action.equals(AddFeaturesActionExecuter.NAME))
       {
          QName aspect = (QName)actionProps.get(AddFeaturesActionExecuter.PARAM_ASPECT_NAME);
@@ -782,14 +781,14 @@ public class NewRuleWizard extends AbstractWizardBean
     */
    public String getSummary()
    {
-      String summaryCondition = this.ruleService.getConditionDefinition(
+      String summaryCondition = this.actionService.getActionConditionDefinition(
             this.condition).getTitle();
       
-      String summaryAction = this.ruleService.getActionDefinition(
+      String summaryAction = this.actionService.getActionDefinition(
             this.action).getTitle();
       
       return buildSummary(
-            new String[] {"Name", "Description", "Condition", "Action"},
+            new String[] {"Name", "Description", "ActionCondition", "Action"},
             new String[] {this.title, this.description, summaryCondition, summaryAction});
    }
    
@@ -890,6 +889,16 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       this.rulesBean = rulesBean;
    }
+   
+   /**
+    * Sets the action service
+    * 
+    * @param actionService  the action service
+    */
+   public void setActionService(ActionService actionService)
+   {
+	  this.actionService = actionService;
+   }
 
    /**
     * @return Returns the list of selectable actions
@@ -898,9 +907,9 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.actions == null)
       {
-         List<RuleActionDefinition> ruleActions = this.ruleService.getActionDefinitions();
+         List<ActionDefinition> ruleActions = this.actionService.getActionDefinitions();
          this.actions = new ArrayList<SelectItem>();
-         for (RuleActionDefinition ruleActionDef : ruleActions)
+         for (ActionDefinition ruleActionDef : ruleActions)
          {
             this.actions.add(new SelectItem(ruleActionDef.getName(), ruleActionDef.getTitle()));
          }
@@ -920,9 +929,9 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.actionDescriptions == null)
       {
-         List<RuleActionDefinition> ruleActions = this.ruleService.getActionDefinitions();
+         List<ActionDefinition> ruleActions = this.actionService.getActionDefinitions();
          this.actionDescriptions = new HashMap<String, String>();
-         for (RuleActionDefinition ruleActionDef : ruleActions)
+         for (ActionDefinition ruleActionDef : ruleActions)
          {
             this.actionDescriptions.put(ruleActionDef.getName(), ruleActionDef.getDescription());
          }
@@ -938,9 +947,9 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.conditions == null)
       {
-         List<RuleConditionDefinition> ruleConditions = this.ruleService.getConditionDefinitions();
+         List<ActionConditionDefinition> ruleConditions = this.actionService.getActionConditionDefinitions();
          this.conditions = new ArrayList<SelectItem>();
-         for (RuleConditionDefinition ruleConditionDef : ruleConditions)
+         for (ActionConditionDefinition ruleConditionDef : ruleConditions)
          {
             this.conditions.add(new SelectItem(ruleConditionDef.getName(), 
                   ruleConditionDef.getTitle()));
@@ -961,9 +970,9 @@ public class NewRuleWizard extends AbstractWizardBean
    {
       if (this.conditionDescriptions == null)
       {
-         List<RuleConditionDefinition> ruleConditions = this.ruleService.getConditionDefinitions();
+         List<ActionConditionDefinition> ruleConditions = this.actionService.getActionConditionDefinitions();
          this.conditionDescriptions = new HashMap<String, String>();
-         for (RuleConditionDefinition ruleConditionDef : ruleConditions)
+         for (ActionConditionDefinition ruleConditionDef : ruleConditions)
          {
             this.conditionDescriptions.put(ruleConditionDef.getName(), 
                   ruleConditionDef.getDescription());

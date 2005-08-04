@@ -24,14 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -81,6 +79,11 @@ public class RuleStoreImpl implements RuleStore
      * The configurable service
      */
     private ConfigurableService configService;
+    
+    /**
+     * The action service
+     */
+    private ActionService actionService;
     
     /**
      * Rule cache entries indexed by node reference
@@ -137,9 +140,24 @@ public class RuleStoreImpl implements RuleStore
         this.policyComponent = policyComponent;
     }
     
+    /**
+     * Set the configurable service
+     * 
+     * @param configService  the configurable service
+     */
     public void setConfigService(ConfigurableService configService)
 	{
 		this.configService = configService;
+	}
+    
+    /**
+     * Set the action service 
+     * 
+     * @param actionService  the action service
+     */
+    public void setActionService(ActionService actionService)
+	{
+		this.actionService = actionService;
 	}
     
     /**
@@ -281,7 +299,7 @@ public class RuleStoreImpl implements RuleStore
 	}
     
     /**
-	 * @see org.alfresco.repo.rule.RuleStore#put(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.repo.rule.common.RuleImpl)
+	 * @see org.alfresco.repo.rule.RuleStore#put(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.repo.rule.RuleImpl)
 	 */
     public void put(NodeRef nodeRef, RuleImpl rule)
     {
@@ -301,7 +319,7 @@ public class RuleStoreImpl implements RuleStore
     }
     
     /**
-	 * @see org.alfresco.repo.rule.RuleStore#remove(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.repo.rule.common.RuleImpl)
+	 * @see org.alfresco.repo.rule.RuleStore#remove(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.repo.rule.RuleImpl)
 	 */
     public void remove(NodeRef nodeRef, RuleImpl rule)
     {
@@ -379,7 +397,7 @@ public class RuleStoreImpl implements RuleStore
         
         // Write the rule's XML representation to the node
         ContentWriter contentWriter = this.contentService.getUpdatingWriter(ruleContent);
-        contentWriter.putContent(RuleXMLUtil.ruleToXML(rule));
+        contentWriter.putContent(RuleXMLUtil.ruleToXML(this.actionService, rule));
     }
     
     /**
@@ -404,7 +422,7 @@ public class RuleStoreImpl implements RuleStore
                 {
                     // Create the rule from the XML content
                     String ruleXML = contentReader.getContentString();
-                    RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, ruleXML, this.dictionaryService);
+                    RuleImpl rule = RuleXMLUtil.XMLToRule(this.actionService, this.ruleService, ruleXML, this.dictionaryService);
                     
                     // Set the rule content id
                     rule.setRuleContentNodeRef(nodeRef);

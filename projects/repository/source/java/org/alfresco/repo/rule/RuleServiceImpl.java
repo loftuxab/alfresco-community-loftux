@@ -27,35 +27,25 @@ import java.util.Set;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.rule.action.RuleActionExecuter;
-import org.alfresco.repo.rule.common.RuleActionDefinitionImpl;
-import org.alfresco.repo.rule.common.RuleConditionDefinitionImpl;
-import org.alfresco.repo.rule.common.RuleImpl;
-import org.alfresco.repo.rule.condition.RuleConditionEvaluator;
 import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.action.ActionConditionDefinition;
+import org.alfresco.service.cmr.action.ActionDefinition;
+import org.alfresco.service.cmr.action.ActionService;
+import org.alfresco.service.cmr.action.ParameterDefinition;
+import org.alfresco.service.cmr.action.ParameterType;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.rule.ParameterDefinition;
-import org.alfresco.service.cmr.rule.ParameterType;
 import org.alfresco.service.cmr.rule.Rule;
-import org.alfresco.service.cmr.rule.RuleAction;
-import org.alfresco.service.cmr.rule.RuleActionDefinition;
-import org.alfresco.service.cmr.rule.RuleCondition;
-import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * Rule service implementation.
@@ -66,17 +56,13 @@ import org.springframework.context.ApplicationContextAware;
  * 
  * @author Roy Wetherall   
  */
-public class RuleServiceImpl implements RuleService, ApplicationContextAware
+public class RuleServiceImpl implements RuleService
 {
     /** key against which to store rules pending on the current transaction */
     private static final String KEY_RULES_PENDING = "RuleServiceImpl.PendingRules";
+    
     /** key against which to store executed rules on the current transaction */
     private static final String KEY_RULES_EXECUTED = "RuleServiceImpl.ExecutedRules";
-    
-	/**
-	 * The application context
-	 */
-	private ApplicationContext applicationContext;
     
     /**
      * The node service
@@ -84,25 +70,13 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     private NodeService nodeService;
     
     /**
-     * The content service
-     */
-    private ContentService contentService;
-    
-    /**
-     * The dictionary service
-     */
-    private DictionaryService dictionaryService;
-	
-	/**
-	 * The service registry
-	 */
-	private ServiceRegistry serviceRegistry;
-    
-    /**
      * The policy component
      */
     private PolicyComponent policyComponent;
     
+    /**
+     * The configurable service
+     */
     private ConfigurableService configService;
     
     /**
@@ -110,16 +84,11 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
      */
     private RuleStore ruleStore;
     
-//	/**
-//	 * Thread local set containing all the pending rules to be executed when the transaction ends
-//	 */
-//	private ThreadLocal<Set<PendingRuleData>> threadLocalPendingData = new ThreadLocal<Set<PendingRuleData>>();
-//	
-//	/**
-//	 * Thread local set to the currently executing rule (this should prevent and execution loops)
-//	 */
-//	private ThreadLocal<Set<ExecutedRuleData>> threadLocalExecutedRules = new ThreadLocal<Set<ExecutedRuleData>>();
-//    
+    /**
+     * The action service
+     */
+    private ActionService actionService;
+       
     /**
      * List of disabled node refs.  The rules associated with these nodes will node be added to the pending list, and
      * therefore not fired.  This list is transient.
@@ -129,22 +98,12 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 	/**
 	 * All the rule type currently registered
 	 */
-	private Map<String, RuleType> ruleTypes = new HashMap<String, RuleType>();
-	
-	/**
-	 * All the condition definitions currently registered
-	 */
-	private Map<String, RuleConditionDefinition> conditionDefinitions = new HashMap<String, RuleConditionDefinition>();
-	
-	/**
-	 * All the action definitions currently registered
-	 */
-	private Map<String, RuleActionDefinition> actionDefinitions = new HashMap<String, RuleActionDefinition>();       
+	private Map<String, RuleType> ruleTypes = new HashMap<String, RuleType>();      
 
     /**
      * Service initialisation methods     
      */
-    private void init()
+    public void init()
     {
         // Register the copy policy behaviour
         this.policyComponent.bindClassBehaviour(
@@ -152,16 +111,6 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
                 ContentModel.ASPECT_ACTIONABLE,
                 new JavaBehaviour(this, "onCopyComplete"));
     }
-    
-	/**
-	 * Set the application context
-	 * 
-	 * @param applicationContext	the application context
-	 */
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException 
-	{
-		this.applicationContext = applicationContext;
-	}
 	
 	/**
 	 * Set the rule store
@@ -185,36 +134,6 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     }
     
     /**
-     * Set the content service
-     * 
-     * @param contentService    the content service
-     */
-    public void setContentService(ContentService contentService)
-    {
-        this.contentService = contentService;
-    }
-    
-    /**
-     * Set the dictionary service
-     * 
-     * @param dictionaryService     the dictionary service
-     */
-    public void setDictionaryService(DictionaryService dictionaryService)
-    {
-        this.dictionaryService = dictionaryService;
-    }
-	
-	/**
-	 * Set the service registry
-	 * 
-	 * @param serviceRegistry	the service registry
-	 */
-	public void setServiceRegistry(ServiceRegistry serviceRegistry) 
-	{
-		this.serviceRegistry = serviceRegistry;
-	}
-    
-    /**
      * Sets the policy component
      * 
      * @param policyComponent  the policy component
@@ -223,6 +142,16 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     {
         this.policyComponent = policyComponent;
     }
+    
+    /**
+     * Set the action service
+     * 
+     * @param actionService  the action service
+     */
+    public void setActionService(ActionService actionService)
+	{
+		this.actionService = actionService;
+	}
     
     /**
      * @see org.alfresco.repo.rule.RuleService#getRuleTypes()
@@ -244,38 +173,6 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 	{
 		this.configService = configService;
 	}
-
-    /**
-     * @see org.alfresco.repo.rule.RuleService#getConditionDefinitions()
-     */
-    public List<RuleConditionDefinition> getConditionDefinitions()
-    {
-		return new ArrayList<RuleConditionDefinition>(this.conditionDefinitions.values());
-    }
-    
-    /**
-     * @see org.alfresco.repo.rule.RuleService#getConditionDefinition(java.lang.String)
-     */
-    public RuleConditionDefinition getConditionDefinition(String name)
-    {
-		return this.conditionDefinitions.get(name);
-    }
-
-    /**
-     * @see org.alfresco.repo.rule.RuleService#getActionDefinitions()
-     */
-    public List<RuleActionDefinition> getActionDefinitions()
-    {
-		return new ArrayList<RuleActionDefinition>(this.actionDefinitions.values());
-    }
-
-    /**
-     * @see org.alfresco.repo.rule.RuleService#getActionDefinition(java.lang.String)
-     */
-    public RuleActionDefinition getActionDefinition(String name)
-    {
-		return this.actionDefinitions.get(name);
-    }
 
     /**
      * @see org.alfresco.repo.rule.RuleService#makeActionable(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
@@ -381,16 +278,16 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
     }
 
     /**
-     * @see org.alfresco.repo.rule.RuleService#addRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.Rule)
+     * @see org.alfresco.repo.rule.RuleService#saveRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.Rule)
      */
-    public void addRule(NodeRef nodeRef, Rule rule)
+    public void saveRule(NodeRef nodeRef, Rule rule)
     {
         // Add the rule to the rule store
         this.ruleStore.put(nodeRef, (RuleImpl)rule);
     }
     
     /**
-     * @see org.alfresco.repo.rule.RuleService#removeRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.common.RuleImpl)
+     * @see org.alfresco.repo.rule.RuleService#removeRule(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleImpl)
      */
     public void removeRule(NodeRef nodeRef, Rule rule)
     {
@@ -496,7 +393,7 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 		Rule rule = pendingRule.getRule();
 		
 		// Get the rule conditions
-		List<RuleCondition> conds = rule.getRuleConditions();				
+		List<ActionCondition> conds = rule.getActionConditions();				
 		if (conds.size() == 0)
 		{
 			throw new RuleServiceException("No rule conditions have been specified for the rule:" + rule.getTitle());
@@ -508,11 +405,11 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 		}
 		
 		// Get the single rule condition
-		RuleCondition cond = conds.get(0);
-	    RuleConditionEvaluator evaluator = getConditionEvaluator(cond);
+		ActionCondition condition = conds.get(0);
+	    //ActionConditionEvaluator evaluator = getConditionEvaluator(cond);
 	      
 	    // Get the rule acitons
-	    List<RuleAction> actions = rule.getRuleActions();
+	    List<Action> actions = rule.getActions();
 		if (actions.size() == 0)
 		{
 			throw new RuleServiceException("No rule actions have been specified for the rule:" + rule.getTitle());
@@ -524,11 +421,12 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 		}
 			
 		// Get the single action
-	    RuleAction action = actions.get(0);
-	    RuleActionExecuter executor = getActionExecutor(action);
+	    Action action = actions.get(0);
+	    //ActionExecuter executor = getActionExecutor(action);
 	      
 		// Evaluate the condition
-	    if (evaluator.evaluate(cond, actionableNodeRef, actionedUponNodeRef) == true)
+	    //if (evaluator.evaluate(cond, actionedUponNodeRef) == true)
+	    if (this.actionService.evaluateActionCondition(condition, actionedUponNodeRef) == true)
 	    {
             // Add the rule to the executed rule list
             // (do this before this is executed to prevent rules being added to the pending list) 
@@ -537,33 +435,10 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
             executedRules.add(new ExecutedRuleData(actionableNodeRef, rule));
             
 			// Execute the rule
-	        executor.execute(action, actionableNodeRef, actionedUponNodeRef);
+	        //executor.execute(action, actionedUponNodeRef);
+            this.actionService.executeAction(action, actionedUponNodeRef);
 	    }
 	}
-	
-	/**
-     * Get the action executor instance.
-     * 
-     * @param action	the action
-     * @return			the action executor
-     */
-    private RuleActionExecuter getActionExecutor(RuleAction action)
-    {
-        String executorString = ((RuleActionDefinitionImpl)action.getRuleActionDefinition()).getRuleActionExecutor();
-        return (RuleActionExecuter)applicationContext.getBean(executorString);
-    }
-
-	/**
-	 * Get the condition evaluator.
-	 * 
-	 * @param cond	the rule condition
-	 * @return		the rule condition evaluator
-	 */
-    private RuleConditionEvaluator getConditionEvaluator(RuleCondition cond)
-    {
-        String evaluatorString = ((RuleConditionDefinitionImpl)cond.getRuleConditionDefinition()).getConditionEvaluator();
-        return (RuleConditionEvaluator)this.applicationContext.getBean(evaluatorString);
-    }
 	
 	/**
 	 * Register the rule type
@@ -574,28 +449,6 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 	{
 		RuleType ruleType = ruleTypeAdapter.getRuleType();
 		this.ruleTypes.put(ruleType.getName(), ruleType);
-	}
-	
-	/**
-	 * Register the condition definition
-	 * 
-	 * @param ruleConditionEvaluator  the rule condition evaluator
-	 */
-	public void registerRuleConditionEvaluator(RuleConditionEvaluator ruleConditionEvaluator) 
-	{
-		RuleConditionDefinition cond = ruleConditionEvaluator.getRuleConditionDefintion();
-		this.conditionDefinitions.put(cond.getName(), cond);
-	}
-
-	/**
-	 * Register the action executor
-	 * 
-	 * @param ruleActionExecuter	the rule action executor
-	 */
-	public void registerRuleActionExecuter(RuleActionExecuter ruleActionExecuter) 
-	{
-		RuleActionDefinition action = ruleActionExecuter.getRuleActionDefinition();
-		this.actionDefinitions.put(action.getName(), action);
 	}
     
 	/**
@@ -612,9 +465,10 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 		for (Rule rule : rules)
 		{
 			// Check all the rule actions 
-			for (RuleAction ruleAction : rule.getRuleActions())
+			for (Action ruleAction : rule.getActions())
 			{
-				for (ParameterDefinition paramDef : ruleAction.getRuleActionDefinition().getParameterDefinitions())
+				ActionDefinition actionDefinition = this.actionService.getActionDefinition(ruleAction.getActionDefinitionName());
+				for (ParameterDefinition paramDef : actionDefinition.getParameterDefinitions())
 				{
 					if (ParameterType.NODE_REF.equals(paramDef.getType()))
 					{
@@ -630,9 +484,10 @@ public class RuleServiceImpl implements RuleService, ApplicationContextAware
 			}
 			
 			// Check all the rule conditions
-			for (RuleCondition ruleCondition : rule.getRuleConditions())
+			for (ActionCondition ruleCondition : rule.getActionConditions())
 			{
-				for (ParameterDefinition paramDef : ruleCondition.getRuleConditionDefinition().getParameterDefinitions())
+				ActionConditionDefinition actionConditionDefinition = this.actionService.getActionConditionDefinition(ruleCondition.getActionConditionDefinitionName());
+				for (ParameterDefinition paramDef : actionConditionDefinition.getParameterDefinitions())
 				{
 					if (ParameterType.NODE_REF.equals(paramDef.getType()))
 					{

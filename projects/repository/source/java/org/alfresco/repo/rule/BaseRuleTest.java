@@ -23,19 +23,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
-import org.alfresco.repo.rule.common.RuleImpl;
-import org.alfresco.repo.rule.condition.MatchTextEvaluator;
+import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
+import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
 import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.rule.RuleAction;
-import org.alfresco.service.cmr.rule.RuleActionDefinition;
-import org.alfresco.service.cmr.rule.RuleCondition;
-import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.QName;
@@ -63,7 +61,7 @@ public class BaseRuleTest extends BaseSpringTest
     protected static final QName ACTION_PROP_VALUE_1 = ContentModel.ASPECT_LOCKABLE;
 
     /**
-     * Condition used in tests
+     * ActionCondition used in tests
      */
     protected static final String CONDITION_DEF_NAME = MatchTextEvaluator.NAME;
     protected static final String COND_PROP_NAME_1 = MatchTextEvaluator.PARAM_TEXT;
@@ -95,6 +93,7 @@ public class BaseRuleTest extends BaseSpringTest
     protected NodeRef rootNodeRef;
     protected NodeRef nodeRef;
     protected NodeRef configFolder;
+    protected ActionService actionService;
 
     /**
      * onSetUpInTransaction implementation
@@ -111,6 +110,7 @@ public class BaseRuleTest extends BaseSpringTest
                 .getBean("ruleService");
         this.configService = (ConfigurableService)this.applicationContext
         		.getBean("configurableService");
+        this.actionService = (ActionService)this.applicationContext.getBean("actionService");
 
         // Get the rule type
         this.ruleType = this.ruleService.getRuleType(RULE_TYPE_NAME);
@@ -148,19 +148,14 @@ public class BaseRuleTest extends BaseSpringTest
 
         Map<String, Serializable> actionProps = new HashMap<String, Serializable>();
         actionProps.put(ACTION_PROP_NAME_1, ACTION_PROP_VALUE_1);
-
-        RuleConditionDefinition cond = this.ruleService
-                .getConditionDefinition(CONDITION_DEF_NAME);
-        RuleActionDefinition action = this.ruleService
-                .getActionDefinition(ACTION_DEF_NAME);
-
+        
         // Create the rule
         RuleImpl rule = new RuleImpl(id, this.ruleType);
         rule.setTitle(TITLE);
         rule.setDescription(DESCRIPTION);
         rule.applyToChildren(isAppliedToChildren);
-        rule.addRuleCondition(cond, conditionProps);
-        rule.addRuleAction(action, actionProps);
+        rule.addActionCondition(CONDITION_DEF_NAME, conditionProps);
+        rule.addAction(ACTION_DEF_NAME, actionProps);
 
         return rule;
     }
@@ -174,11 +169,11 @@ public class BaseRuleTest extends BaseSpringTest
         assertEquals(DESCRIPTION, rule.getDescription());
 
         // Check conditions
-        List<RuleCondition> ruleConditions = rule.getRuleConditions();
+        List<ActionCondition> ruleConditions = rule.getActionConditions();
         assertNotNull(ruleConditions);
         assertEquals(1, ruleConditions.size());
         assertEquals(CONDITION_DEF_NAME, ruleConditions.get(0)
-                .getRuleConditionDefinition().getName());
+                .getActionConditionDefinitionName());
         Map<String, Serializable> condParams = ruleConditions.get(0)
                 .getParameterValues();
         assertNotNull(condParams);
@@ -187,13 +182,11 @@ public class BaseRuleTest extends BaseSpringTest
         assertEquals(COND_PROP_VALUE_1, condParams.get(COND_PROP_NAME_1));
 
         // Check the actions
-        List<RuleAction> ruleActions = rule.getRuleActions();
+        List<Action> ruleActions = rule.getActions();
         assertNotNull(ruleActions);
         assertEquals(1, ruleActions.size());
-        assertEquals(ACTION_DEF_NAME, ruleActions.get(0)
-                .getRuleActionDefinition().getName());
-        Map<String, Serializable> actionParams = ruleActions.get(0)
-                .getParameterValues();
+        assertEquals(ACTION_DEF_NAME, ruleActions.get(0).getActionDefinitionName());
+        Map<String, Serializable> actionParams = ruleActions.get(0).getParameterValues();
         assertNotNull(actionParams);
         assertEquals(1, actionParams.size());
         assertTrue(actionParams.containsKey(ACTION_PROP_NAME_1));

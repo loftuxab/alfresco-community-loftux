@@ -5,6 +5,7 @@
 <beans>
    
    <import resource="classpath:applicationServices.xml"/>
+   <import resource="classpath:alfresco/actionService.xml"/>	
    <import resource="classpath:alfresco/ruleService.xml"/>
    <import resource="classpath:alfresco/node-services-context.xml"/>
    <import resource="classpath:alfresco/networkProtocolServices.xml"/>

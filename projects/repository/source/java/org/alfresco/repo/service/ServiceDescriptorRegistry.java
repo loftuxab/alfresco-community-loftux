@@ -27,6 +27,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.repo.importer.ImporterService;
 import org.alfresco.service.ServiceDescriptor;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -241,5 +242,14 @@ public class ServiceDescriptorRegistry
     public ConfigurableService getConfigurableService()
     {
     	return (ConfigurableService)getService(CONFIGURABLE_SERVICE);
+    }
+    
+    /*
+     *  (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getActionService()
+     */
+    public ActionService getActionService()
+    {
+    	return (ActionService)getService(ACTION_SERVICE);
     }
 }

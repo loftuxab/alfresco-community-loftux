@@ -28,26 +28,28 @@ import javax.transaction.UserTransaction;
 import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
+import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
+import org.alfresco.repo.action.evaluator.NoConditionEvaluator;
+import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
+import org.alfresco.repo.action.executer.CheckInActionExecuter;
+import org.alfresco.repo.action.executer.CheckOutActionExecuter;
+import org.alfresco.repo.action.executer.CopyActionExecuter;
+import org.alfresco.repo.action.executer.ImageTransformActionExecuter;
+import org.alfresco.repo.action.executer.LinkCategoryActionExecuter;
+import org.alfresco.repo.action.executer.MailActionExecuter;
+import org.alfresco.repo.action.executer.MoveActionExecuter;
+import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
+import org.alfresco.repo.action.executer.TransformActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.dictionary.impl.DictionaryDAO;
 import org.alfresco.repo.dictionary.impl.M2Aspect;
 import org.alfresco.repo.dictionary.impl.M2Model;
 import org.alfresco.repo.dictionary.impl.M2Property;
-import org.alfresco.repo.rule.action.AddFeaturesActionExecuter;
-import org.alfresco.repo.rule.action.CheckInActionExecuter;
-import org.alfresco.repo.rule.action.CheckOutActionExecuter;
-import org.alfresco.repo.rule.action.ImageTransformActionExecuter;
-import org.alfresco.repo.rule.action.LinkCategoryActionExecuter;
-import org.alfresco.repo.rule.action.MailActionExecuter;
-import org.alfresco.repo.rule.action.MoveActionExecuter;
-import org.alfresco.repo.rule.action.SimpleWorkflowActionExecuter;
-import org.alfresco.repo.rule.action.TransformActionExecuter;
-import org.alfresco.repo.rule.condition.InCategoryEvaluator;
-import org.alfresco.repo.rule.condition.MatchTextEvaluator;
-import org.alfresco.repo.rule.condition.NoConditionEvaluator;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.lock.LockService;
@@ -59,8 +61,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.Rule;
-import org.alfresco.service.cmr.rule.RuleActionDefinition;
-import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
@@ -89,13 +89,13 @@ public class RuleServiceCoverageTest extends TestCase
     private StoreRef testStoreRef;
     private NodeRef rootNodeRef;
     private NodeRef nodeRef;
-    private NodeRef configFolder;
     private CheckOutCheckInService cociService;
     private LockService lockService;
 	private ContentService contentService;
 	private ServiceRegistry serviceRegistry;
     private DictionaryDAO dictionaryDAO;
     private AuthenticationService authenticationService;
+    private ActionService actionService;
 
     /**
      * Category related values
@@ -136,6 +136,7 @@ public class RuleServiceCoverageTest extends TestCase
 		this.contentService = (ContentService)applicationContext.getBean("contentService");
         this.dictionaryDAO = (DictionaryDAO)applicationContext.getBean("dictionaryDAO");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
+        this.actionService = (ActionService)applicationContext.getBean("actionService");
         
         this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
@@ -207,17 +208,15 @@ public class RuleServiceCoverageTest extends TestCase
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(AddFeaturesActionExecuter.NAME, params);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
 
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
@@ -237,9 +236,9 @@ public class RuleServiceCoverageTest extends TestCase
         params2.put(AddFeaturesActionExecuter.PARAM_ASPECT_PROPERTIES, (Serializable)aspectProps);
         
         // Test that rule can be updated and execute correctly
-        rule.removeAllRuleActions();
-        rule.addRuleAction(action, params2);
-        this.ruleService.addRule(this.nodeRef, rule);
+        rule.removeAllActions();
+        rule.addAction(AddFeaturesActionExecuter.NAME, params2);
+        this.ruleService.saveRule(this.nodeRef, rule);
         
         NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
@@ -275,8 +274,6 @@ public class RuleServiceCoverageTest extends TestCase
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition(SimpleWorkflowActionExecuter.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_STEP, "approveStep");
@@ -287,10 +284,10 @@ public class RuleServiceCoverageTest extends TestCase
 		params.put(SimpleWorkflowActionExecuter.PARAM_REJECT_MOVE, false);
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(SimpleWorkflowActionExecuter.NAME, params);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
 				
 		NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
@@ -325,8 +322,6 @@ public class RuleServiceCoverageTest extends TestCase
             this.ruleService.makeActionable(this.nodeRef);
             
             RuleType ruleType = this.ruleService.getRuleType("inbound");
-            RuleConditionDefinition cond = this.ruleService.getConditionDefinition(InCategoryEvaluator.NAME);
-            RuleActionDefinition action = this.ruleService.getActionDefinition(AddFeaturesActionExecuter.NAME);
             
             Map<String, Serializable> params = new HashMap<String, Serializable>(1);
             params.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, this.regionCategorisationQName);
@@ -336,10 +331,10 @@ public class RuleServiceCoverageTest extends TestCase
             params2.put("aspect-name", ContentModel.ASPECT_VERSIONABLE); 
             
             Rule rule = this.ruleService.createRule(ruleType);
-            rule.addRuleCondition(cond, params);
-            rule.addRuleAction(action, params2);
+            rule.addActionCondition(InCategoryEvaluator.NAME, params);
+            rule.addAction(AddFeaturesActionExecuter.NAME, params2);
             
-            this.ruleService.addRule(this.nodeRef, rule);
+            this.ruleService.saveRule(this.nodeRef, rule);
                     
             // Check rule does not get fired when a node without the aspect is added
             NodeRef newNodeRef2 = this.nodeService.createNode(
@@ -402,18 +397,16 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition(NoConditionEvaluator.NAME);
-        RuleActionDefinition action = this.ruleService.getActionDefinition(LinkCategoryActionExecuter.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(LinkCategoryActionExecuter.PARAM_CATEGORY_ASPECT, this.regionCategorisationQName);
         params.put(LinkCategoryActionExecuter.PARAM_CATEGORY_VALUE, this.catROne); 
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(LinkCategoryActionExecuter.NAME, params);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
                 
         NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
@@ -445,8 +438,6 @@ public class RuleServiceCoverageTest extends TestCase
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition(MailActionExecuter.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(MailActionExecuter.PARAM_TO, "alfresco.test@gmail.com");
@@ -454,10 +445,10 @@ public class RuleServiceCoverageTest extends TestCase
         params.put(MailActionExecuter.PARAM_TEXT, "This is a test to check that the mail action is working.");
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(MailActionExecuter.NAME, params);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
                 
         this.nodeService.createNode(
                 this.nodeRef,
@@ -482,8 +473,6 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition("copy");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
@@ -491,10 +480,10 @@ public class RuleServiceCoverageTest extends TestCase
         params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(CopyActionExecuter.NAME, params);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
 
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
@@ -542,8 +531,6 @@ public class RuleServiceCoverageTest extends TestCase
 	        this.ruleService.makeActionable(this.nodeRef);
 	        
 	        RuleType ruleType = this.ruleService.getRuleType("inbound");
-	        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-	        RuleActionDefinition action = this.ruleService.getActionDefinition(TransformActionExecuter.NAME);
 	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
 			params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
@@ -552,10 +539,10 @@ public class RuleServiceCoverageTest extends TestCase
 	        params.put(TransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
 	        
 	        Rule rule = this.ruleService.createRule(ruleType);
-	        rule.addRuleCondition(cond, null);
-	        rule.addRuleAction(action, params);
+	        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+	        rule.addAction(TransformActionExecuter.NAME, params);
 	        
-	        this.ruleService.addRule(this.nodeRef, rule);
+	        this.ruleService.saveRule(this.nodeRef, rule);
 	
 	        UserTransaction tx = serviceRegistry.getUserTransaction();
 			tx.begin();
@@ -622,8 +609,6 @@ public class RuleServiceCoverageTest extends TestCase
 	        this.ruleService.makeActionable(this.nodeRef);
 	        
 	        RuleType ruleType = this.ruleService.getRuleType("inbound");
-	        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-	        RuleActionDefinition action = this.ruleService.getActionDefinition(ImageTransformActionExecuter.NAME);
 	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
 			params.put(ImageTransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
@@ -633,10 +618,10 @@ public class RuleServiceCoverageTest extends TestCase
 	        params.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, "-negate");
 	        
 	        Rule rule = this.ruleService.createRule(ruleType);
-	        rule.addRuleCondition(cond, null);
-	        rule.addRuleAction(action, params);
+	        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+	        rule.addAction(ImageTransformActionExecuter.NAME, params);
 	        
-	        this.ruleService.addRule(this.nodeRef, rule);
+	        this.ruleService.saveRule(this.nodeRef, rule);
 	
 	        UserTransaction tx = serviceRegistry.getUserTransaction();
 			tx.begin();
@@ -699,8 +684,6 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition("move");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
@@ -708,10 +691,10 @@ public class RuleServiceCoverageTest extends TestCase
         params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(MoveActionExecuter.NAME, params);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
                 
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
@@ -751,14 +734,12 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition(CheckOutActionExecuter.NAME);
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, null);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(CheckOutActionExecuter.NAME, null);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
          
         NodeRef newNodeRef = null;
         UserTransaction tx = this.serviceRegistry.getUserTransaction();
@@ -817,17 +798,15 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition(CheckInActionExecuter.NAME);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(CheckInActionExecuter.PARAM_DESCRIPTION, "The version description.");
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(CheckInActionExecuter.NAME, params);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
          
         // Create a new node and check-it out
         NodeRef newNodeRef = this.nodeService.createNode(
@@ -862,17 +841,15 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition(NoConditionEvaluator.NAME);
-        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
         
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
         actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, actionParams);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(AddFeaturesActionExecuter.NAME, actionParams);
         
-        this.ruleService.addRule(this.nodeRef, rule);        
+        this.ruleService.saveRule(this.nodeRef, rule);        
         this.ruleService.disableRules(this.nodeRef);
         
         NodeRef newNodeRef = this.nodeService.createNode(
@@ -918,8 +895,6 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition(MatchTextEvaluator.NAME);
-        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
         
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
         actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
@@ -928,10 +903,10 @@ public class RuleServiceCoverageTest extends TestCase
         // should be setting the condition parameter here
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, condParams);
-        rule.addRuleAction(action, actionParams);
+        rule.addActionCondition(MatchTextEvaluator.NAME, condParams);
+        rule.addAction(AddFeaturesActionExecuter.NAME, actionParams);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
         
         try
         {
@@ -967,21 +942,19 @@ public class RuleServiceCoverageTest extends TestCase
 		this.ruleService.makeActionable(this.nodeRef);
         
         RuleType ruleType = this.ruleService.getRuleType("inbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition(MatchTextEvaluator.NAME);
-        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
         
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
 		actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
-        // Condition parameter's 
+        // ActionCondition parameter's 
 		Map<String, Serializable> condParams = new HashMap<String, Serializable>(1);
 		condParams.put(MatchTextEvaluator.PARAM_TEXT, ".doc");        
 		
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, condParams);
-        rule.addRuleAction(action, actionParams);
+        rule.addActionCondition(MatchTextEvaluator.NAME, condParams);
+        rule.addAction(AddFeaturesActionExecuter.NAME, actionParams);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
 		
 		// Test condition failure
 		Map<QName, Serializable> props1 = new HashMap<QName, Serializable>();
@@ -995,8 +968,8 @@ public class RuleServiceCoverageTest extends TestCase
                 props1).getChildRef();   
 		addContentToNode(newNodeRef);
         
-        Map<QName, Serializable> map = this.nodeService.getProperties(newNodeRef);
-        String value = (String)this.nodeService.getProperty(newNodeRef, ContentModel.PROP_NAME);
+        //Map<QName, Serializable> map = this.nodeService.getProperties(newNodeRef);
+        //String value = (String)this.nodeService.getProperty(newNodeRef, ContentModel.PROP_NAME);
         
         assertFalse(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));  
 		
@@ -1034,9 +1007,9 @@ public class RuleServiceCoverageTest extends TestCase
         // Test begins with
         Map<String, Serializable> condParamsBegins = new HashMap<String, Serializable>(1);
         condParamsBegins.put(MatchTextEvaluator.PARAM_TEXT, "bob*");
-        rule.removeAllRuleConditions();
-        rule.addRuleCondition(cond, condParamsBegins);
-        this.ruleService.addRule(this.nodeRef, rule);
+        rule.removeAllActionConditions();
+        rule.addActionCondition(MatchTextEvaluator.NAME, condParamsBegins);
+        this.ruleService.saveRule(this.nodeRef, rule);
         Map<QName, Serializable> propsx = new HashMap<QName, Serializable>();
         propsx.put(ContentModel.PROP_NAME, "mybobbins.doc");
         propsx.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
@@ -1065,9 +1038,9 @@ public class RuleServiceCoverageTest extends TestCase
         // Test ends with
         Map<String, Serializable> condParamsEnds = new HashMap<String, Serializable>(1);
         condParamsEnds.put(MatchTextEvaluator.PARAM_TEXT, "*s.doc");
-        rule.removeAllRuleConditions();
-        rule.addRuleCondition(cond, condParamsEnds);
-        this.ruleService.addRule(this.nodeRef, rule);
+        rule.removeAllActionConditions();
+        rule.addActionCondition(MatchTextEvaluator.NAME, condParamsEnds);
+        this.ruleService.saveRule(this.nodeRef, rule);
         Map<QName, Serializable> propsa = new HashMap<QName, Serializable>();
         propsa.put(ContentModel.PROP_NAME, "bobbins.document");
         propsa.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
@@ -1109,17 +1082,15 @@ public class RuleServiceCoverageTest extends TestCase
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         RuleType ruleType = this.ruleService.getRuleType("outbound");
-        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
         Rule rule = this.ruleService.createRule(ruleType);
-        rule.addRuleCondition(cond, null);
-        rule.addRuleAction(action, params);
+        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        rule.addAction(AddFeaturesActionExecuter.NAME, params);
         
-        this.ruleService.addRule(this.nodeRef, rule);
+        this.ruleService.saveRule(this.nodeRef, rule);
         
         // Create a node
         NodeRef newNodeRef = this.nodeService.createNode(
@@ -1171,17 +1142,15 @@ public class RuleServiceCoverageTest extends TestCase
 	        this.ruleService.makeActionable(this.nodeRef);
 	        
 	        RuleType ruleType = this.ruleService.getRuleType("inbound");
-	        RuleConditionDefinition cond = this.ruleService.getConditionDefinition("no-condition");
-	        RuleActionDefinition action = this.ruleService.getActionDefinition("add-features");
 	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
 	        params.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
 	        
 	        Rule rule = this.ruleService.createRule(ruleType);
-	        rule.addRuleCondition(cond, null);
-	        rule.addRuleAction(action, params);
+	        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+	        rule.addAction(AddFeaturesActionExecuter.NAME, params);
 	        
-	        this.ruleService.addRule(this.nodeRef, rule);
+	        this.ruleService.saveRule(this.nodeRef, rule);
 	        
 	        sw.start("create nodes with one rule run (apply versionable aspect)");
 			UserTransaction userTransaction2 = this.serviceRegistry.getUserTransaction();

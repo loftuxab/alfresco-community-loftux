@@ -32,7 +32,7 @@ public class OutboundRuleTypeAdapter extends RuleTypeAdapterAbstractBase
 	private static final String DISPLAY_LABEL = "outbound.display-label";
 	
 	/**
-     * @see org.alfresco.repo.rule.ruletype.RuleTypeAdapter#registerPolicyBehaviour()
+     * @see org.alfresco.repo.action.rule.ruletype.RuleTypeAdapter#registerPolicyBehaviour()
      */
     public void registerPolicyBehaviour()
     {

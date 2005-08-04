@@ -21,10 +21,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.rule.RuleAction;
-import org.alfresco.service.cmr.rule.RuleCondition;
 
 
 /**
@@ -88,7 +87,7 @@ public class RuleXMLUtilTest extends BaseRuleTest
     public void testXMLToRule()
     {
         // Get the rule from the XML
-        RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, XML, this.dictionaryService);
+        RuleImpl rule = RuleXMLUtil.XMLToRule(this.actionService, this.ruleService, XML, this.dictionaryService);
         assertNotNull(rule);
         
         // Check the basic details of the rule
@@ -98,11 +97,11 @@ public class RuleXMLUtilTest extends BaseRuleTest
         assertEquals(DESCRIPTION, rule.getDescription());
 
         // Check conditions
-        List<RuleCondition> ruleConditions = rule.getRuleConditions();
+        List<ActionCondition> ruleConditions = rule.getActionConditions();
         assertNotNull(ruleConditions);
         assertEquals(1, ruleConditions.size());
         assertEquals(CONDITION_DEF_NAME, ruleConditions.get(0)
-                .getRuleConditionDefinition().getName());
+                .getActionConditionDefinitionName());
         Map<String, Serializable> condParams = ruleConditions.get(0)
                 .getParameterValues();
         assertNotNull(condParams);
@@ -111,11 +110,11 @@ public class RuleXMLUtilTest extends BaseRuleTest
         assertEquals(COND_PROP_VALUE_1, condParams.get(COND_PROP_NAME_1));
 
         // Check the actions
-        List<RuleAction> ruleActions = rule.getRuleActions();
+        List<Action> ruleActions = rule.getActions();
         assertNotNull(ruleActions);
         assertEquals(1, ruleActions.size());
         assertEquals(ACTION_DEF_NAME, ruleActions.get(0)
-                .getRuleActionDefinition().getName());
+                .getActionDefinitionName());
         Map<String, Serializable> actionParams = ruleActions.get(0)
                 .getParameterValues();
         assertNotNull(actionParams);
@@ -130,7 +129,7 @@ public class RuleXMLUtilTest extends BaseRuleTest
     public void testRuleToXML()
     {
         // Get the XML from the rule
-        String ruleXML = RuleXMLUtil.ruleToXML(this.rule);
+        String ruleXML = RuleXMLUtil.ruleToXML(this.actionService, this.rule);
         assertEquals(XML, ruleXML);		
     }
 
@@ -142,8 +141,8 @@ public class RuleXMLUtilTest extends BaseRuleTest
 	{
 		this.rule.setTitle(null);
 		this.rule.setDescription(null);
-		String ruleXML = RuleXMLUtil.ruleToXML(this.rule);
-		RuleImpl rule = RuleXMLUtil.XMLToRule(this.ruleService, ruleXML, this.dictionaryService);
+		String ruleXML = RuleXMLUtil.ruleToXML(this.actionService, this.rule);
+		RuleImpl rule = RuleXMLUtil.XMLToRule(this.actionService, this.ruleService, ruleXML, this.dictionaryService);
 		assertNull(rule.getTitle());
 		assertNull(rule.getDescription());
 	}

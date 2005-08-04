@@ -19,11 +19,11 @@ package org.alfresco.repo.rule.ruletype;
 
 import java.util.List;
 
+import org.alfresco.repo.action.CommonResourceAbstractBase;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.rule.CommonResourceAbstractBase;
 import org.alfresco.repo.rule.RuleExecution;
 import org.alfresco.repo.rule.RuleRegistration;
-import org.alfresco.repo.rule.common.RuleTypeImpl;
+import org.alfresco.repo.rule.RuleTypeImpl;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;

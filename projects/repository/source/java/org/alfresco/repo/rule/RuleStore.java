@@ -19,7 +19,6 @@ package org.alfresco.repo.rule;
 
 import java.util.List;
 
-import org.alfresco.repo.rule.common.RuleImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleType;

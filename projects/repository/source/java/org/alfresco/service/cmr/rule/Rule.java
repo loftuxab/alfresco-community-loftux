@@ -23,6 +23,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionCondition;
+
 
 /**
  * 
@@ -35,7 +38,7 @@ public interface Rule
      * 
      * @return  the id
      */
-    String getId();
+    String getId(); 
     
     /**
      * Indicates that the rule is applied to the children of the associated
@@ -107,63 +110,63 @@ public interface Rule
     void setDescription(String description);
 
     /**
-     * Get a list of rule conditions.
+     * Get a list of action conditions.
      * 
-     * @return     the list of rule conditions
+     * @return     the list of action conditions
      */
-    List<RuleCondition> getRuleConditions();
+    List<ActionCondition> getActionConditions();
 
     /**
-     * Add a rule condition to the rule.
+     * Add an action condition to the rule.
      * 
-     * @param ruleConditionDefinition	the rule condition definition
-     * @param parameterValues			the parameter values
-     * @return							the added rule condition
+     * @param actionConditionDefinitionName	the action condition definition name
+     * @param parameterValues				the parameter values
+     * @return								the added rule condition
      */
-    RuleCondition addRuleCondition(
-            RuleConditionDefinition ruleConditionDefinition,
+    ActionCondition addActionCondition(
+            String actionConditionDefinitionName,
             Map<String, Serializable> parameterValues);
 
     /**
-     * Remove a rule condition
+     * Remove an action condition
      * 
-     * @param ruleCondition		the rule condition
+     * @param actionCondition	the action condition
      */
-    void removeRuleCondition(RuleCondition ruleCondition);
+    void removeActionCondition(ActionCondition ruleCondition);
     
     /**
-     * Removes all the rule conditions from the rule   
+     * Removes all the action conditions from the rule   
      */
-    void removeAllRuleConditions();
+    void removeAllActionConditions();
 
     /**
-     * Get a list of rule actions.
+     * Get a list of all the actions.
      * 
-     * @return      the list of rule actions
+     * @return      the list of actions
      */
-    List<RuleAction> getRuleActions();
+    List<Action> getActions();
 
     /**
      * Add a rule action to the rule.
      * 
-     * @param ruleActionDefinition	the rule action definition
+     * @param actionDefinitionName	the action defintion name
      * @param parameterValues		the action parameters
      * @return						the rule action
      */
-    RuleAction addRuleAction(
-    		RuleActionDefinition ruleActionDefinition,
+    Action addAction(
+    		String actionDefinitionName,
     		Map<String, Serializable> parameterValues);
     
     /**
-     * Remove a rule action
+     * Remove an action
      * 
-     * @param ruleAction	the rule action
+     * @param ruleAction	the action
      */
-    void removeRuleAction(RuleAction ruleAction);
+    void removeAction(Action ruleAction);
     
     /**
-     * Removes all the rule actions
+     * Removes all the actions
      */
-    void removeAllRuleActions();
+    void removeAllActions();
 
 }

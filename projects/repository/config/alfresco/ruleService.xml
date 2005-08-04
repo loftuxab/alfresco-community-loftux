@@ -9,24 +9,18 @@
 		<property name="nodeService">
 			<ref bean="nodeService"/>
 		</property>
-		<property name="contentService">
-			<ref bean="contentService"/>
-		</property>
-		<property name="dictionaryService">
-			<ref bean="dictionaryService"/>
-		</property>
 		<property name="policyComponent">
 			<ref bean="policyComponent"/>
 		</property>			
-		<property name="serviceRegistry">
-			<ref bean="serviceRegistry"/>
-		</property>
 		<property name="ruleStore">
 			<ref bean="ruleStore"/>
 		</property>
 		<property name="configService">
 			<ref bean="configurableService"/>
-		</property>
+		</property>	
+	  <property name="actionService">
+		 <ref bean="actionService"/>
+	  </property>
    </bean>
    
    <!-- Rule Store -->
@@ -46,12 +40,15 @@
 	  </property>	
 	  <property name="configService">
 		 <ref bean="configurableService"/>
+	  </property>	
+	  <property name="actionService">
+		 <ref bean="actionService"/>
 	  </property>
    </bean>
    
    <!-- Definitions for beans that use the common resource -->
    
-   <bean id="common-resource">
+   <bean id="rule-common-resource">
       <property name="resource">
 		<value>classpath:org/alfresco/repo/rule/rule-config.properties</value>
 	  </property>  
@@ -59,7 +56,7 @@
    
    <!-- Rule types -->
    
-   <bean id="rule-type-adapter" parent="common-resource" init-method="init">
+   <bean id="rule-type-adapter" parent="rule-common-resource" init-method="init">
 	  <property name="ruleService">
 		<ref bean="ruleService"/>
 	  </property>					
@@ -72,138 +69,5 @@
    </bean>
    
    <bean id="inbound" class="org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter" parent="rule-type-adapter"/>		
-   
-   <!-- Rule conditions -->
-
-   <bean id="rule-condition-evaluator" parent="common-resource" init-method="init">
-	  <property name="ruleService">
-	     <ref bean="ruleService"/>
-	  </property>
-   </bean>	
-
-   <bean id="no-condition" class="org.alfresco.repo.rule.condition.NoConditionEvaluator" parent="rule-condition-evaluator">
-	  <property name="nodeService">
-         <ref bean="nodeService"/>
-	  </property>
-	  <property name="dictionaryService">
-         <ref bean="dictionaryService"/>
-	  </property>
-   </bean>
-	
-   <bean id="match-text" class="org.alfresco.repo.rule.condition.MatchTextEvaluator" parent="rule-condition-evaluator">
-	  <property name="nodeService">
-         <ref bean="nodeService"/>
-	  </property>
-	  <property name="dictionaryService">
-         <ref bean="dictionaryService"/>
-	  </property>
-   </bean>
-   
-   <bean id="in-category" class="org.alfresco.repo.rule.condition.InCategoryEvaluator" parent="rule-condition-evaluator">
-	  <property name="nodeService">
-         <ref bean="nodeService"/>
-	  </property>
-	  <property name="dictionaryService">
-         <ref bean="dictionaryService"/>
-	  </property>
-	  <property name="categoryService">
-         <ref bean="categoryService"/>
-	  </property>
-   </bean>   
-   
-   <!-- Rule actions -->
-   
-   <bean id="rule-condition-executer" parent="common-resource" init-method="init">
-	  <property name="ruleService">
-	     <ref bean="ruleService"/>
-	  </property>
-   </bean>
-   
-   <bean id="add-features" class="org.alfresco.repo.rule.action.AddFeaturesActionExecuter" parent="rule-condition-executer">
-	  <property name="nodeService">
-         <ref bean="nodeService"/>
-	  </property>
-   </bean>
-     
-   <bean id="link-category" class="org.alfresco.repo.rule.action.LinkCategoryActionExecuter" parent="rule-condition-executer">
-	  <property name="nodeService">
-         <ref bean="nodeService"/>
-	  </property>
-	  <property name="dictionaryService">
-         <ref bean="dictionaryService"/>
-	  </property>
-	  <property name="categoryService">
-         <ref bean="categoryService"/>
-	  </property>
-   </bean>
-
-   <bean id="simple-workflow" class="org.alfresco.repo.rule.action.SimpleWorkflowActionExecuter" parent="rule-condition-executer">
-	  <property name="nodeService">
-         <ref bean="nodeService"/>
-	  </property>
-   </bean>
-
-	<bean id="transform" class="org.alfresco.repo.rule.action.TransformActionExecuter" parent="rule-condition-executer">
-	  <property name="nodeService">
-		 <ref bean="nodeService"/>
-	  </property>
-	  <property name="dictionaryService">
-		 <ref bean="dictionaryService"/>
-	  </property>
-	  <property name="contentService">
-		 <ref bean="contentService"/>
-	  </property>
-	  <property name="copyService">
-		 <ref bean="copyService"/>
-	  </property>	  
-	  <property name="mimetypeService">
-		 <ref bean="mimetypeMap"/>
-	  </property>	  
-	</bean>
-	
-	<bean id="transform-image" class="org.alfresco.repo.rule.action.ImageTransformActionExecuter" parent="transform">	  	  
-	  <property name="imageMagickContentTransformer">
-		 <ref bean="transformer.ImageMagick"/>
-	  </property>	
-	</bean>
-	
-	<bean id="copy" class="org.alfresco.repo.rule.action.CopyActionExecuter" parent="rule-condition-executer">
-	  <property name="nodeService">
-		 <ref bean="nodeService"/>
-	  </property>
-	  <property name="copyService">
-		 <ref bean="copyService"/>
-	  </property>
-   </bean>
-	   
-	<bean id="move" class="org.alfresco.repo.rule.action.MoveActionExecuter" parent="rule-condition-executer">
-	  <property name="nodeService">
-		 <ref bean="nodeService"/>
-	  </property>
-   </bean>
-	
-	<bean id="check-in" class="org.alfresco.repo.rule.action.CheckInActionExecuter" parent="rule-condition-executer">
-	  <property name="nodeService">
-		 <ref bean="nodeService"/>
-	  </property>
-	  <property name="cociService">
-		 <ref bean="checkOutCheckInService"></ref>
-	  </property>
-   </bean>
-	
-	<bean id="check-out" class="org.alfresco.repo.rule.action.CheckOutActionExecuter" parent="rule-condition-executer">
-	  <property name="nodeService">
-		 <ref bean="nodeService"/>
-	  </property>
-	  <property name="cociService">
-		 <ref bean="checkOutCheckInService"></ref>
-	  </property>
-   </bean>
-   
-   <bean id="mail" class="org.alfresco.repo.rule.action.MailActionExecuter" parent="rule-condition-executer">
-	  <property name="mailService">
-		 <ref bean="mailService"></ref>
-	  </property>
-   </bean>
    
 </beans>

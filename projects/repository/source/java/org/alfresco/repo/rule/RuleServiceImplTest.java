@@ -20,13 +20,12 @@ package org.alfresco.repo.rule;
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.rule.common.RuleTypeImpl;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionDefinition;
+import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.action.ActionConditionDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.rule.Rule;
-import org.alfresco.service.cmr.rule.RuleAction;
-import org.alfresco.service.cmr.rule.RuleActionDefinition;
-import org.alfresco.service.cmr.rule.RuleCondition;
-import org.alfresco.service.cmr.rule.RuleConditionDefinition;
 import org.alfresco.service.cmr.rule.RuleType;
 
 
@@ -52,7 +51,7 @@ public class RuleServiceImplTest extends BaseRuleTest
      */
     public void testGetActionDefinitions()
     {
-        List<RuleActionDefinition> actions = this.ruleService.getActionDefinitions();
+        List<ActionDefinition> actions = this.actionService.getActionDefinitions();
         assertNotNull(actions);   	
     }
     
@@ -61,7 +60,7 @@ public class RuleServiceImplTest extends BaseRuleTest
      */
     public void testGetConditionDefinitions()
     {
-        List<RuleConditionDefinition> conds = this.ruleService.getConditionDefinitions();
+        List<ActionConditionDefinition> conds = this.actionService.getActionConditionDefinitions();
         assertNotNull(conds);    
     }
 
@@ -110,7 +109,7 @@ public class RuleServiceImplTest extends BaseRuleTest
     {
         this.ruleService.makeActionable(this.nodeRef);
         Rule newRule = createTestRule("123");        
-        this.ruleService.addRule(this.nodeRef, newRule);        
+        this.ruleService.saveRule(this.nodeRef, newRule);        
     }
     
     public void testRemoveAllRules()
@@ -122,9 +121,9 @@ public class RuleServiceImplTest extends BaseRuleTest
         
         this.ruleService.makeActionable(this.nodeRef);
         Rule newRule = this.ruleService.createRule(ruleType);        
-        this.ruleService.addRule(this.nodeRef, newRule); 
+        this.ruleService.saveRule(this.nodeRef, newRule); 
         Rule newRule2 = this.ruleService.createRule(ruleType);
-        this.ruleService.addRule(this.nodeRef, newRule2); 
+        this.ruleService.saveRule(this.nodeRef, newRule2); 
         
         List<Rule> rules2 = this.ruleService.getRules(this.nodeRef);
         assertNotNull(rules2);
@@ -170,10 +169,10 @@ public class RuleServiceImplTest extends BaseRuleTest
         assertNotNull(rule.getModifiedDate());
         
         // Check that the condition action have been retireved correctly
-        List<RuleCondition> conditions = rule.getRuleConditions();
+        List<ActionCondition> conditions = rule.getActionConditions();
         assertNotNull(conditions);
         assertEquals(1, conditions.size());        
-        List<RuleAction> actions = rule.getRuleActions();
+        List<Action> actions = rule.getActions();
         assertNotNull(actions);
         assertEquals(1, actions.size());
     }

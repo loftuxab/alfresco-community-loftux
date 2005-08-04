@@ -46,36 +46,6 @@ public interface RuleService extends  RuleRegistration, RuleExecution
     public RuleType getRuleType(String name);
 
     /**
-     * Get the condition definitions currently defined in the repository.
-     * 
-     * @return a list of condition definitions
-     */
-    public List<RuleConditionDefinition> getConditionDefinitions();
-
-    /**
-     * Get a condition defintion by name.
-     * 
-     * @param name the name of the condition definition
-     * @return the condition definition, null if not found
-     */
-    public RuleConditionDefinition getConditionDefinition(String name);
-
-    /**
-     * Get the action definitions currently defined in the repository.
-     * 
-     * @return a list of action definitions
-     */
-    public List<RuleActionDefinition> getActionDefinitions();
-
-    /**
-     * Get an action definition by name
-     * 
-     * @param name the name of the action definition
-     * @return the action definition, null if not found
-     */
-    public RuleActionDefinition getActionDefinition(String name);
-
-    /**
      * Makes a specified node Actionable.
      * 
      * @param nodeRef the node reference
@@ -180,7 +150,7 @@ public interface RuleService extends  RuleRegistration, RuleExecution
     public Rule createRule(RuleType ruleType);
 
     /**
-     * Adds the details of the rule to the specified node reference.
+     * Saves the details of the rule to the specified node reference.
      * <p>	
      * If the rule is already associated with the node, the details are updated
      * with those specified.
@@ -188,9 +158,8 @@ public interface RuleService extends  RuleRegistration, RuleExecution
      * @param nodeRef
      * @param rule
      */
-    public void addRule(NodeRef nodeRef, Rule rule);
-    
-    
+    public void saveRule(NodeRef nodeRef, Rule rule);
+        
     /**
      * Removes a rule from the given rule actionable node
      * 

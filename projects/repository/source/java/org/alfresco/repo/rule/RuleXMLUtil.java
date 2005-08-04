@@ -24,19 +24,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.rule.common.RuleImpl;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionDefinition;
+import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.action.ActionConditionDefinition;
+import org.alfresco.service.cmr.action.ActionService;
+import org.alfresco.service.cmr.action.ParameterDefinition;
+import org.alfresco.service.cmr.action.ParameterType;
+import org.alfresco.service.cmr.action.ParameterizedItem;
+import org.alfresco.service.cmr.action.ParameterizedItemDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
-import org.alfresco.service.cmr.rule.ParameterDefinition;
-import org.alfresco.service.cmr.rule.ParameterType;
-import org.alfresco.service.cmr.rule.RuleAction;
-import org.alfresco.service.cmr.rule.RuleActionDefinition;
-import org.alfresco.service.cmr.rule.RuleCondition;
-import org.alfresco.service.cmr.rule.RuleConditionDefinition;
-import org.alfresco.service.cmr.rule.RuleItem;
-import org.alfresco.service.cmr.rule.RuleItemDefinition;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
@@ -80,7 +80,7 @@ import org.dom4j.io.SAXReader;
      * @param ruleService	the rule service
      * @param ruleXML		the rule XML
      */
-    public static RuleImpl XMLToRule(RuleService ruleService, String ruleXML, DictionaryService dictionaryService)
+    public static RuleImpl XMLToRule(ActionService actionService, RuleService ruleService, String ruleXML, DictionaryService dictionaryService)
     {
         try
         {
@@ -134,7 +134,7 @@ import org.dom4j.io.SAXReader;
                 String conditionName = conditionNameAttribute.getValue();
                 
                 // Create the condition
-                RuleConditionDefinition ruleConditionDefinition = ruleService.getConditionDefinition(conditionName);
+                ActionConditionDefinition ruleConditionDefinition = actionService.getActionConditionDefinition(conditionName);
                 if (ruleConditionDefinition == null)
                 {
                     throw new RuleServiceException(
@@ -145,7 +145,7 @@ import org.dom4j.io.SAXReader;
                 Map<String, Serializable> params = XMLToParameters(ruleConditionDefinition, conditionElement, dictionaryService);
                 
                 // Add the condition to the rule
-                rule.addRuleCondition(ruleConditionDefinition, params);
+                rule.addActionCondition(conditionName, params);
             } 
             
             // Get the actions
@@ -159,7 +159,7 @@ import org.dom4j.io.SAXReader;
                 String actionName = actionNameAttribute.getValue();
                 
                 // Get the action definition
-                RuleActionDefinition ruleActionDefinition = ruleService.getActionDefinition(actionName);
+                ActionDefinition ruleActionDefinition = actionService.getActionDefinition(actionName);
                 if (ruleActionDefinition == null)
                 {
                     throw new RuleServiceException(
@@ -170,7 +170,7 @@ import org.dom4j.io.SAXReader;
                 Map<String, Serializable> params = XMLToParameters(ruleActionDefinition, actionElement, dictionaryService);
                 
                 // Add the condition to the rule
-                rule.addRuleAction(ruleActionDefinition, params);
+                rule.addAction(actionName, params);
             }
             
             return rule;
@@ -189,7 +189,7 @@ import org.dom4j.io.SAXReader;
      * @return						map containing the parameters
      */
     private static Map<String, Serializable> XMLToParameters(
-            RuleItemDefinition ruleItemDefinition, 
+            ParameterizedItemDefinition ruleItemDefinition, 
             Element itemElement,
             DictionaryService dictionaryService)
     {
@@ -229,7 +229,7 @@ import org.dom4j.io.SAXReader;
      * @param rule  the rule
      * @return      XML string
      */
-    public static String ruleToXML(RuleImpl rule)
+    public static String ruleToXML(ActionService actionService, RuleImpl rule)
     {
         StringBuilder builder = new StringBuilder();
         
@@ -253,22 +253,26 @@ import org.dom4j.io.SAXReader;
         
         // Output the details of the conditions
         builder.append("<conditions>");
-        for (RuleCondition ruleCondition : rule.getRuleConditions())
+        for (ActionCondition ruleCondition : rule.getActionConditions())
         {
+        	ActionConditionDefinition conditionDefinition = actionService.getActionConditionDefinition(ruleCondition.getActionConditionDefinitionName());
+        	
             builder.
-               append("<condition name='").append(ruleCondition.getRuleConditionDefinition().getName()).append("'>").
-               append(parametersToXML(ruleCondition, ruleCondition.getRuleConditionDefinition())).
+               append("<condition name='").append(ruleCondition.getActionConditionDefinitionName()).append("'>").
+               append(parametersToXML(ruleCondition, conditionDefinition)).
                append("</condition>");
         }
         builder.append("</conditions>");
         
         // Output the details of the actions
         builder.append("<actions>");
-        for (RuleAction ruleAction : rule.getRuleActions())
+        for (Action ruleAction : rule.getActions())
         {
+        	ActionDefinition actionDefinition = actionService.getActionDefinition(ruleAction.getActionDefinitionName());
+        	
             builder.
-               append("<action name='").append(ruleAction.getRuleActionDefinition().getName()).append("'>").
-               append(parametersToXML(ruleAction, ruleAction.getRuleActionDefinition())).
+               append("<action name='").append(ruleAction.getActionDefinitionName()).append("'>").
+               append(parametersToXML(ruleAction, actionDefinition)).
                append("</action>");
         }
         builder.append("</actions>");
@@ -284,7 +288,7 @@ import org.dom4j.io.SAXReader;
      * @param ruleItem  the rule item
      * @return          the XML string
      */
-    private static String parametersToXML(RuleItem ruleItem, RuleItemDefinition ruleItemDefinition)
+    private static String parametersToXML(ParameterizedItem ruleItem, ParameterizedItemDefinition ruleItemDefinition)
     {
         StringBuilder builder = new StringBuilder();
         
