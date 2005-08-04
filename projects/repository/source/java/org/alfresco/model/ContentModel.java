@@ -82,6 +82,10 @@ public interface ContentModel
     static final QName PROP_MODIFIER = QName.createQName(NamespaceService.ALFRESCO_URI, "modifier");
     static final QName PROP_ACCESSED = QName.createQName(NamespaceService.ALFRESCO_URI, "accessed");
     
+    // inlineeditable aspect
+    static final QName ASPECT_INLINEEDITABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "inlineeditable");
+    static final QName PROP_EDITINLINE = QName.createQName(NamespaceService.ALFRESCO_URI, "editInline");
+    
     // categories
     static final QName ASPECT_CLASSIFIABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "classifiable");
     //static final QName ASPECT_CATEGORISATION = QName.createQName(NamespaceService.ALFRESCO_URI, "aspect_categorisation");

@@ -37,8 +37,10 @@ import org.alfresco.repo.security.authentication.RepositoryUserDetails;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
+import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
@@ -57,27 +59,11 @@ public class LoginBean
    // Managed bean properties 
    
    /**
-    * @return Returns the AuthenticationService.
-    */
-   public AuthenticationService getAuthenticationService()
-   {
-      return this.authenticationService;
-   }
-   
-   /**
     * @param authenticationService  The AuthenticationService to set.
     */
    public void setAuthenticationService(AuthenticationService authenticationService)
    {
       this.authenticationService = authenticationService;
-   }
-   
-   /**
-    * @return Returns the nodeService.
-    */
-   public NodeService getNodeService()
-   {
-      return this.nodeService;
    }
 
    /**
@@ -89,19 +75,19 @@ public class LoginBean
    }
    
    /**
-    * @return Returns the navigation bean instance.
-    */
-   public NavigationBean getNavigator()
-   {
-      return this.navigator;
-   }
-   
-   /**
     * @param navigator The NavigationBean to set.
     */
    public void setNavigator(NavigationBean navigator)
    {
       this.navigator = navigator;
+   }
+   
+   /**
+    * @param browseBean The BrowseBean to set.
+    */
+   public void setBrowseBean(BrowseBean browseBean)
+   {
+      this.browseBean = browseBean;
    }
    
    public void setUsername(String val)
@@ -216,7 +202,46 @@ public class LoginBean
             elements.add(this.navigator.new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
             this.navigator.setLocation(elements);
             
-            outcome = "success";
+            // if an external outcome has been provided then use that, else use default
+            String externalOutcome = (String)fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_KEY);
+            if (externalOutcome != null)
+            {
+               // TODO: This is a quick solution. It would be better to specify the (identifier?) of a handler
+               //       class that would be responsible for processing specific outcome arguments.
+               
+               // setup is required for certain outcome requests
+               if (OUTCOME_DOCDETAILS.equals(externalOutcome))
+               {
+                  String[] args = (String[])fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
+                  if (args.length == 3)
+                  {
+                     StoreRef storeRef = new StoreRef(args[0], args[1]);
+                     NodeRef nodeRef = new NodeRef(storeRef, args[2]);
+                     // setup the Document on the browse bean
+                     // TODO: the browse bean should accept a full NodeRef - not just an ID
+                     this.browseBean.setupContentAction(nodeRef.getId(), true);
+                  }
+               }
+               else if (OUTCOME_SPACEDETAILS.equals(externalOutcome))
+               {
+                  String[] args = (String[])fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
+                  if (args.length == 3)
+                  {
+                     StoreRef storeRef = new StoreRef(args[0], args[1]);
+                     NodeRef nodeRef = new NodeRef(storeRef, args[2]);
+                     // setup the Space on the browse bean
+                     // TODO: the browse bean should accept a full NodeRef - not just an ID
+                     this.browseBean.setupSpaceAction(nodeRef.getId(), true);
+                  }
+               }
+               
+               fc.getExternalContext().getSessionMap().remove(LOGIN_OUTCOME_KEY);
+               return externalOutcome;
+            }
+            else
+            {
+               return "success";
+            }
          }
          catch (AuthenticationException aerr)
          {
@@ -256,6 +281,12 @@ public class LoginBean
    // ------------------------------------------------------------------------------
    // Private data
    
+   public static final String LOGIN_OUTCOME_KEY  = "_alfOutcome";
+   public static final String LOGIN_OUTCOME_ARGS = "_alfOutcomeArgs";
+   
+   private final static String OUTCOME_DOCDETAILS = "showDocDetails";
+   private final static String OUTCOME_SPACEDETAILS = "showSpaceDetails";
+   
    /** user name */
    private String username = null;
    
@@ -270,4 +301,7 @@ public class LoginBean
    
    /** The NavigationBean reference */
    private NavigationBean navigator;
+   
+   /** The BrowseBean reference */
+   private BrowseBean browseBean;
 }
