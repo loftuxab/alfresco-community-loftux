@@ -156,7 +156,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // create and assign a root node
         Node rootNode = newNode(
                 store,
-                "root-node",                    // there can only be one per store
+                GUID.generate(),
                 ContentModel.TYPE_STOREROOT);
         store.setRootNode(rootNode);
         // done
