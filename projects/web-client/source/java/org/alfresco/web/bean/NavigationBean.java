@@ -38,6 +38,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
@@ -277,6 +278,24 @@ public class NavigationBean
     */
    public List<IBreadcrumbHandler> getLocation()
    {
+      if (this.location == null)
+      {
+         // init the location from the User object for the first time
+         FacesContext fc = FacesContext.getCurrentInstance();
+         User user = (User)fc.getExternalContext().getSessionMap().get(AuthenticationFilter.AUTHENTICATION_USER);
+         
+         NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), user.getHomeSpaceId());
+         String homeSpaceName = Repository.getNameForNode(this.nodeService, homeSpaceRef);
+         
+         // set the current node to the users Home Space Id
+         setCurrentNodeId(user.getHomeSpaceId());
+         
+         // setup the breadcrumb with the same location
+         List<IBreadcrumbHandler> elements = new ArrayList(1);
+         elements.add(new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
+         setLocation(elements);
+      }
+      
       return this.location;
    }
    
@@ -489,5 +508,5 @@ public class NavigationBean
    private boolean[] shelfItemExpanded = new boolean[] {true, true, true, false, false};
    
    /** list of the breadcrumb handler elements representing the location path of the UI */
-   private List<IBreadcrumbHandler> location = Collections.EMPTY_LIST;
+   private List<IBreadcrumbHandler> location = null;
 }

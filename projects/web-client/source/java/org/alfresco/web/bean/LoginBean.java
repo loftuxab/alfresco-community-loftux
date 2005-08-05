@@ -75,14 +75,6 @@ public class LoginBean
    }
    
    /**
-    * @param navigator The NavigationBean to set.
-    */
-   public void setNavigator(NavigationBean navigator)
-   {
-      this.navigator = navigator;
-   }
-   
-   /**
     * @param browseBean The BrowseBean to set.
     */
    public void setBrowseBean(BrowseBean browseBean)
@@ -184,23 +176,15 @@ public class LoginBean
             Authentication auth = this.authenticationService.authenticate(Repository.getStoreRef(), token);
             RepositoryUserDetails principal = (RepositoryUserDetails)auth.getPrincipal();
             
-            // setup User object and Home space ID etc.
+            // setup User object and Home space ID
             User user = new User(principal.getUserNodeRef(), this.username, this.authenticationService.getCurrentTicket(), principal.getPersonNodeRef());
             String homeSpaceId = (String)this.nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
             user.setHomeSpaceId(homeSpaceId);
             
+            // put the User object in the Session - the authentication servlet will then allow
+            // the app to continue without redirecting to the login page
             Map session = fc.getExternalContext().getSessionMap();
             session.put(AuthenticationFilter.AUTHENTICATION_USER, user);
-            
-            // kick off the breadcrumb path and our root node Id
-            NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
-            String homeSpaceName = Repository.getNameForNode(this.nodeService, homeSpaceRef);
-            
-            this.navigator.setCurrentNodeId(homeSpaceId);
-            
-            List<IBreadcrumbHandler> elements = new ArrayList(1);
-            elements.add(this.navigator.new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
-            this.navigator.setLocation(elements);
             
             // if an external outcome has been provided then use that, else use default
             String externalOutcome = (String)fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_KEY);
@@ -298,9 +282,6 @@ public class LoginBean
    
    /** NodeService bean reference */
    private NodeService nodeService;
-   
-   /** The NavigationBean reference */
-   private NavigationBean navigator;
    
    /** The BrowseBean reference */
    private BrowseBean browseBean;
