@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema targetNamespace="http://www.alfresco.org/cml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cml="http://www.alfresco.org/cml" xmlns:alf="http://www.alfresco.org/cms" elementFormDefault="qualified" version="0.1">
+<xsd:schema targetNamespace="http://www.alfresco.org/ws/cml/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cml="http://www.alfresco.org/ws/cml/1.0" xmlns:cms="http://www.alfresco.org/ws/model/content/1.0" elementFormDefault="qualified" version="0.1">
 
     <xsd:annotation>
     	<xsd:documentation>
@@ -7,7 +7,7 @@
     	</xsd:documentation>
     </xsd:annotation>
 
-	<xsd:import namespace="http://www.alfresco.org/cms" schemaLocation="types.xsd"></xsd:import>
+	<xsd:import namespace="http://www.alfresco.org/ws/model/content/1.0" schemaLocation="types.xsd"></xsd:import>
 
 	<xsd:element name="cml">
 		<xsd:complexType>
@@ -21,9 +21,9 @@
 					<xsd:complexType>
 						<xsd:sequence>
 						    <xsd:element name="id" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-							<xsd:element name="parent" type="alf:ParentReference"></xsd:element>
-							<xsd:element name="type" type="alf:Name" maxOccurs="1" minOccurs="0"></xsd:element>
-							<xsd:element name="property" type="alf:NamedValue" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+							<xsd:element name="parent" type="cms:ParentReference"></xsd:element>
+							<xsd:element name="type" type="cms:Name" maxOccurs="1" minOccurs="0"></xsd:element>
+							<xsd:element name="property" type="cms:NamedValue" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>
@@ -31,8 +31,8 @@
 				<xsd:element name="addAspect" maxOccurs="unbounded" minOccurs="0">
 					<xsd:complexType>
 						<xsd:sequence>
-							<xsd:element name="aspect" type="alf:Name"></xsd:element>
-							<xsd:element name="property" type="alf:NamedValue" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+							<xsd:element name="aspect" type="cms:Name"></xsd:element>
+							<xsd:element name="property" type="cms:NamedValue" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 							<xsd:group ref="cml:Where"></xsd:group>
 						</xsd:sequence>
 					</xsd:complexType>
@@ -41,7 +41,7 @@
 				<xsd:element name="update" maxOccurs="unbounded" minOccurs="0">
 					<xsd:complexType>
 						<xsd:sequence>
-							<xsd:element name="property" type="alf:NamedValue" maxOccurs="unbounded" minOccurs="1"></xsd:element>
+							<xsd:element name="property" type="cms:NamedValue" maxOccurs="unbounded" minOccurs="1"></xsd:element>
 							<xsd:group ref="cml:Where"></xsd:group>
 						</xsd:sequence>
 					</xsd:complexType>
@@ -50,7 +50,7 @@
 				<xsd:element name="delete" maxOccurs="unbounded" minOccurs="0">
 					<xsd:complexType>
 						<xsd:sequence>
-							<xsd:element name="where" type="alf:Predicate"></xsd:element>
+							<xsd:element name="where" type="cms:Predicate"></xsd:element>
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>
@@ -87,7 +87,7 @@
 					<xsd:complexType>
 						<xsd:sequence>
 							<xsd:choice>
-								<xsd:element name="from" type="alf:Reference"></xsd:element>
+								<xsd:element name="from" type="cms:Reference"></xsd:element>
 								<xsd:element name="from_id" type="xsd:string"></xsd:element>
 							</xsd:choice>
 							<xsd:group ref="cml:Where"></xsd:group>
@@ -100,7 +100,7 @@
 						<xsd:sequence>
 							<xsd:group ref="cml:From"></xsd:group>
 							<xsd:group ref="cml:To"></xsd:group>
-							<xsd:element name="association" type="alf:Name"></xsd:element>
+							<xsd:element name="association" type="cms:Name"></xsd:element>
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>
@@ -110,7 +110,7 @@
 						<xsd:sequence>
 							<xsd:group ref="cml:From"></xsd:group>
 							<xsd:group ref="cml:To"></xsd:group>
-							<xsd:element name="association" type="alf:Name"></xsd:element>
+							<xsd:element name="association" type="cms:Name"></xsd:element>
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>
@@ -150,31 +150,31 @@
 	
 	<xsd:group name="Where">
 		<xsd:choice>
-			<xsd:element name="where" type="alf:Predicate"></xsd:element>
+			<xsd:element name="where" type="cms:Predicate"></xsd:element>
 			<xsd:element name="where_id" type="xsd:string"></xsd:element>
 		</xsd:choice>
 	</xsd:group>
 	
 	<xsd:group name="From">
 		<xsd:choice>
-			<xsd:element name="from" type="alf:Predicate"></xsd:element>
+			<xsd:element name="from" type="cms:Predicate"></xsd:element>
 			<xsd:element name="from_id" type="xsd:string"></xsd:element>
 		</xsd:choice>
 	</xsd:group>
 
 	<xsd:group name="To">
 		<xsd:choice>
-			<xsd:element name="to" type="alf:Predicate"></xsd:element>
+			<xsd:element name="to" type="cms:Predicate"></xsd:element>
 			<xsd:element name="to_id" type="xsd:string"></xsd:element>
 		</xsd:choice>
 	</xsd:group>
 
 	<xsd:group name="ToParent">
 		<xsd:choice>
-			<xsd:element name="to" type="alf:ParentReference"></xsd:element>
+			<xsd:element name="to" type="cms:ParentReference"></xsd:element>
 			<xsd:sequence>
 				<xsd:element name="to_id" type="xsd:string"></xsd:element>
-				<xsd:group ref="alf:ChildAssociation"></xsd:group>
+				<xsd:group ref="cms:ChildAssociation"></xsd:group>
 			</xsd:sequence>
 		</xsd:choice>
 	</xsd:group>							
