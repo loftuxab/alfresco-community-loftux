@@ -507,7 +507,8 @@ public class CheckinCheckoutBean
          
          // detect the inline editing aspect to see which edit mode to use
          if (node.hasAspect(ContentModel.ASPECT_INLINEEDITABLE) &&
-             ((Boolean)node.getProperties().get("editInline")) == true)
+             node.getProperties().get("editInline") != null &&
+             ((Boolean)node.getProperties().get("editInline")).booleanValue() == true)
          {
             // found a document that can be edited in-line
             // retrieve the content so it's available to the editing screen
