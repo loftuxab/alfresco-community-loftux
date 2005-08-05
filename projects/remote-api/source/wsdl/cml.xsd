@@ -23,7 +23,7 @@
 						    <xsd:element name="id" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
 							<xsd:element name="parent" type="alf:ParentReference"></xsd:element>
 							<xsd:element name="type" type="alf:Name" maxOccurs="1" minOccurs="0"></xsd:element>
-							<xsd:element name="property" type="alf:Property" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+							<xsd:element name="property" type="alf:NamedValue" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>
@@ -32,7 +32,7 @@
 					<xsd:complexType>
 						<xsd:sequence>
 							<xsd:element name="aspect" type="alf:Name"></xsd:element>
-							<xsd:element name="property" type="alf:Property" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+							<xsd:element name="property" type="alf:NamedValue" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 							<xsd:group ref="cml:Where"></xsd:group>
 						</xsd:sequence>
 					</xsd:complexType>
@@ -41,7 +41,7 @@
 				<xsd:element name="update" maxOccurs="unbounded" minOccurs="0">
 					<xsd:complexType>
 						<xsd:sequence>
-							<xsd:element name="property" type="alf:Property" maxOccurs="unbounded" minOccurs="1"></xsd:element>
+							<xsd:element name="property" type="alf:NamedValue" maxOccurs="unbounded" minOccurs="1"></xsd:element>
 							<xsd:group ref="cml:Where"></xsd:group>
 						</xsd:sequence>
 					</xsd:complexType>
