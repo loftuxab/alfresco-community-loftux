@@ -26,7 +26,6 @@
    </bean>   
    
    <!-- Datasource bean -->
-   <!--
    <bean id="dataSource" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
       <property name="dataSource">
          <bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
@@ -41,29 +40,29 @@
       <property name="password"><value>${db.password}</value></property>
       <property name="maxSize"><value>100</value></property>
    </bean>
-   -->
-   <bean id='dataSource' class='org.apache.commons.dbcp.BasicDataSource'
-         destroy-method='close'>
-      <property name='driverClassName'>
+   <!--
+   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+         destroy-method="close">
+      <property name="driverClassName">
          <value>${db.driver}</value>
       </property>
-      <property name='url'>
+      <property name="url">
          <value>${db.url}</value>
       </property>
-      <property name='username'>
+      <property name="username">
          <value>${db.username}</value>
       </property>
-      <property name='password'>
+      <property name="password">
          <value>${db.password}</value>
       </property>
    </bean>
+   -->
    
    <!-- create a transaction manager -->
-   <!--
    <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager" >
       <property name="userTransaction"><ref local="jotm"/></property>
    </bean>
-   -->
+   <!--
    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
       <property name="transactionSynchronizationName" >
          <value>SYNCHRONIZATION_ALWAYS</value>
@@ -72,6 +71,7 @@
          <ref local="sessionFactory"/>
       </property>
    </bean>
+   -->
    
    <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean"/>
 
@@ -86,11 +86,11 @@
    </bean>
 
    <!-- Hibernate session factory -->   
-   <bean id='sessionFactory' class='org.springframework.orm.hibernate3.LocalSessionFactoryBean'>
-      <property name='dataSource' >
-         <ref local='dataSource' />
+   <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+      <property name="dataSource" >
+         <ref local="dataSource" />
       </property>
-      <property name='mappingResources' >
+      <property name="mappingResources" >
          <list>
             <value>org/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
             <value>org/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
@@ -98,17 +98,18 @@
             <value>org/alfresco/repo/security/permissions/impl/hibernate/Permission.hbm.xml</value>
          </list>
       </property>
-      <property name='hibernateProperties' >
+      <property name="hibernateProperties" >
          <props>
-            <prop key='hibernate.jdbc.use_streams_for_binary'>true</prop>
-            <prop key='hibernate.dialect' >org.hibernate.dialect.MySQLDialect</prop>
-            <prop key='hibernate.show_sql'>false</prop>
-            <prop key='hibernate.hbm2ddl.auto'>update</prop>
-            <prop key='hibernate.cache.use_query_cache'>true</prop>
-            <prop key='hibernate.max_fetch_depth'>10</prop>
-            <prop key='hibernate.cache.provider_class'>org.hibernate.cache.EhCacheProvider</prop>
-            <prop key='hibernate.default_batch_fetch_size'>1</prop>
-            <prop key='hibernate.jdbc.batch_size'>32</prop>
+            <prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JOTMTransactionManagerLookup</prop>
+            <prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
+            <prop key="hibernate.dialect" >org.hibernate.dialect.MySQLDialect</prop>
+            <prop key="hibernate.show_sql">false</prop>
+            <prop key="hibernate.hbm2ddl.auto">update</prop>
+            <prop key="hibernate.cache.use_query_cache">true</prop>
+            <prop key="hibernate.max_fetch_depth">10</prop>
+            <prop key="hibernate.cache.provider_class">org.hibernate.cache.TreeCacheProvider</prop>
+            <prop key="hibernate.default_batch_fetch_size">1</prop>
+            <prop key="hibernate.jdbc.batch_size">32</prop>
          </props>
       </property>
    </bean>
@@ -319,7 +320,7 @@
    <!--  Lock Service           -->
    <!--                               -->
    
-   <bean id='lockService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="lockService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.lock.LockService</value>
       </property>
@@ -351,7 +352,7 @@
    <!--                               -->
    
    
-   <bean id='versionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="versionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.version.VersionService</value>
       </property>
@@ -387,7 +388,7 @@
       </property>
    </bean>
    
-   <bean id='versionNodeService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="versionNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.repository.NodeService</value>
       </property>
@@ -411,11 +412,11 @@
       </property>
    </bean>      
    
-   <bean id='versionCounterDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
-      <property name='proxyInterfaces'>
+   <bean id="versionCounterDaoService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
          <value>org.alfresco.repo.version.common.counter.VersionCounterDaoService</value>
       </property>
-      <property name='transactionManager'>
+      <property name="transactionManager">
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
@@ -877,7 +878,7 @@
    </bean>
    
    <!-- Configurable service -->
-   <bean id='configurableService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="configurableService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
          <value>org.alfresco.service.cmr.configuration.ConfigurableService</value>
       </property>

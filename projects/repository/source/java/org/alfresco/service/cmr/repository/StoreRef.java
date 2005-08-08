@@ -67,7 +67,7 @@ public final class StoreRef implements EntityRef, Serializable
         int dividerPatternPosition = string.indexOf("://");
         if(dividerPatternPosition == -1)
         {
-            throw new AlfrescoRuntimeException("Invalid store ref: does not contain //:");
+            throw new AlfrescoRuntimeException("Invalid store ref: Does not contain //:" + string);
         }
         this.protocol = string.substring(0, dividerPatternPosition);
         this.identifier = string.substring(dividerPatternPosition+3);

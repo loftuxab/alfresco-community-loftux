@@ -65,14 +65,20 @@
 	<classpathentry exported="true" kind="lib" path="lib/jotm/jotm_jrmp_stubs.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jotm/jotm.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jotm/ow_carol.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jotm/xapool.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jotm/howl.jar"/>
 	<classpathentry exported="true" sourcepath="src/textmining_src.zip" kind="lib" path="lib/tm-extractors-0.4_patched.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jotm/xapool-1.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bcprov-jdk15-129.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/opensaml-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/wss4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlsec-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/treecache/concurrent.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-cache.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-common.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-jmx.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-system.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/treecache/jgroups.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

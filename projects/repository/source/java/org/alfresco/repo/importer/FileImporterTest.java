@@ -33,6 +33,7 @@ import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
@@ -207,6 +208,11 @@ public class FileImporterTest extends TestCase
                         false);
                 if (location.size() == 0)
                 {
+                    throw new AlfrescoRuntimeException(
+                            "Root node not found, " +
+                            args[1] +
+                            " not found in store, " +
+                            storeRoot);
                 }
 
                 long start = System.nanoTime();

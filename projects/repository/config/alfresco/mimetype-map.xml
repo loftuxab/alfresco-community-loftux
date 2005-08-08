@@ -7,6 +7,7 @@
             <extension display="Comma Separated Values">csv</extension>
             <extension display="Java Source">java</extension>
             <extension display="SQL">sql</extension>
+            <extension display="Java Properties">properties</extension>
          </mimetype>
          <mimetype mimetype="text/html" display="HTML">
             <!-- first extension will be default unless otherwise specified -->
