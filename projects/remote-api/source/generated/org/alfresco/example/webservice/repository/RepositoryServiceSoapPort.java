@@ -9,4 +9,5 @@ package org.alfresco.example.webservice.repository;
 
 public interface RepositoryServiceSoapPort extends java.rmi.Remote {
     public org.alfresco.example.webservice.types.Store[] getStores() throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault;
+    public org.alfresco.example.webservice.repository.QueryResult query(org.alfresco.example.webservice.types.Store store, org.alfresco.example.webservice.types.Query query, boolean includeMetaData) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault;
 }

@@ -25,19 +25,19 @@ public class AuthenticationServiceSoapBindingStub extends org.apache.axis.client
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("authenticate");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "AuthenticationResult"));
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationResult"));
         oper.setReturnClass(org.alfresco.example.webservice.authentication.AuthenticationResult.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "authenticateReturn"));
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "authenticateReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "AuthenticationFault"),
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationFault"),
                       "org.alfresco.example.webservice.authentication.AuthenticationFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "AuthenticationFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationFault"), 
                       true
                      ));
         _operations[0] = oper;
@@ -73,14 +73,14 @@ public class AuthenticationServiceSoapBindingStub extends org.apache.axis.client
             java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
             java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
             java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "AuthenticationFault");
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationFault");
             cachedSerQNames.add(qName);
             cls = org.alfresco.example.webservice.authentication.AuthenticationFault.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "AuthenticationResult");
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationResult");
             cachedSerQNames.add(qName);
             cls = org.alfresco.example.webservice.authentication.AuthenticationResult.class;
             cachedSerClasses.add(cls);
@@ -160,12 +160,12 @@ public class AuthenticationServiceSoapBindingStub extends org.apache.axis.client
         org.apache.axis.client.Call _call = createCall();
         _call.setOperation(_operations[0]);
         _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/1.0/authentication/authenticate");
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/authentication/1.0/authenticate");
         _call.setEncodingStyle(null);
         _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
         _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "authenticate"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "authenticate"));
 
         setRequestHeaders(_call);
         setAttachments(_call);

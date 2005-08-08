@@ -105,17 +105,17 @@ public class Store  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(Store.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/cms", "Store"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Store"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("scheme");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "scheme"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/cms", "StoreEnum"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "scheme"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "StoreEnum"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("address");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "address"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/cms", ">Store>address"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "address"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">Store>address"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }

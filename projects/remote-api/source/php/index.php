@@ -22,11 +22,11 @@
 
       // get hold of the authentication service
       $client = new SOAP_Client("http://localhost:8080/web-client/remote-api/AuthenticationService");
-      $namespace = array('namespace' => 'http://www.alfresco.org/ws/1.0/authentication', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
+      $namespace = array('namespace' => 'http://www.alfresco.org/ws/service/authentication/1.0', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
       $client->__options = array('trace'=>1);
       		
       // authenticate with a username and password
-      $params =& new SOAP_Value('{http://www.alfresco.org/ws/1.0/authentication}authenticate', false,
+      $params =& new SOAP_Value('{http://www.alfresco.org/ws/service/authentication/1.0}authenticate', false,
                                 $v=array('username' => 'admin', 'password' => 'admin'));
 
       $authResult = $client->call('authenticate', $v = array('authenticate' => $params), $namespace);
@@ -58,7 +58,7 @@
       
       // get hold of the repository service
       $client = new SOAP_Client("http://localhost:8080/web-client/remote-api/RepositoryService");
-      $namespace = array('namespace' => 'http://www.alfresco.org/ws/1.0/repository', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
+      $namespace = array('namespace' => 'http://www.alfresco.org/ws/service/repository/1.0', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
       $client->__options = array('trace'=>1);
 
       $username =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Username', false,
@@ -73,7 +73,7 @@
       unset($securityHeader->attributes['SOAP-ENV:actor']);
       $client->addHeader($securityHeader);
 
-      $params =& new SOAP_Value('{http://www.alfresco.org/ws/1.0/repository}getStores', false);
+      $params =& new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}getStores', false);
       $stores = $client->call('getStores', $v = array('getStores' => $params), $namespace);
       
       /*print "<xmp>";

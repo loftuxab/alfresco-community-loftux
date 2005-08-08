@@ -105,7 +105,7 @@ public class RepositoryServiceLocator extends org.apache.axis.client.Service imp
     }
 
     public javax.xml.namespace.QName getServiceName() {
-        return new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/repository", "RepositoryService");
+        return new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryService");
     }
 
     private java.util.HashSet ports = null;
@@ -113,7 +113,7 @@ public class RepositoryServiceLocator extends org.apache.axis.client.Service imp
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/repository", "RepositoryService"));
+            ports.add(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryService"));
         }
         return ports.iterator();
     }

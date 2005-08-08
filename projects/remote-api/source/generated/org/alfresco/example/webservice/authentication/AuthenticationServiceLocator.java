@@ -105,7 +105,7 @@ public class AuthenticationServiceLocator extends org.apache.axis.client.Service
     }
 
     public javax.xml.namespace.QName getServiceName() {
-        return new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "AuthenticationService");
+        return new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationService");
     }
 
     private java.util.HashSet ports = null;
@@ -113,7 +113,7 @@ public class AuthenticationServiceLocator extends org.apache.axis.client.Service
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "AuthenticationService"));
+            ports.add(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationService"));
         }
         return ports.iterator();
     }

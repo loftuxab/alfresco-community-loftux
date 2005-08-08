@@ -8,37 +8,37 @@
 package org.alfresco.example.webservice.repository;
 
 public class RepositoryFault  extends org.apache.axis.AxisFault  implements java.io.Serializable {
-    private int code;
+    private int errorCode;
     private java.lang.String message1;
 
     public RepositoryFault() {
     }
 
     public RepositoryFault(
-           int code,
+           int errorCode,
            java.lang.String message1) {
-        this.code = code;
+        this.errorCode = errorCode;
         this.message1 = message1;
     }
 
 
     /**
-     * Gets the code value for this RepositoryFault.
+     * Gets the errorCode value for this RepositoryFault.
      * 
-     * @return code
+     * @return errorCode
      */
-    public int getCode() {
-        return code;
+    public int getErrorCode() {
+        return errorCode;
     }
 
 
     /**
-     * Sets the code value for this RepositoryFault.
+     * Sets the errorCode value for this RepositoryFault.
      * 
-     * @param code
+     * @param errorCode
      */
-    public void setCode(int code) {
-        this.code = code;
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
     }
 
 
@@ -73,7 +73,7 @@ public class RepositoryFault  extends org.apache.axis.AxisFault  implements java
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            this.code == other.getCode() &&
+            this.errorCode == other.getErrorCode() &&
             ((this.message1==null && other.getMessage1()==null) || 
              (this.message1!=null &&
               this.message1.equals(other.getMessage1())));
@@ -88,7 +88,7 @@ public class RepositoryFault  extends org.apache.axis.AxisFault  implements java
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        _hashCode += getCode();
+        _hashCode += getErrorCode();
         if (getMessage1() != null) {
             _hashCode += getMessage1().hashCode();
         }
@@ -101,18 +101,18 @@ public class RepositoryFault  extends org.apache.axis.AxisFault  implements java
         new org.apache.axis.description.TypeDesc(RepositoryFault.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/repository", "RepositoryFault"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("code");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/repository", "code"));
+        elemField.setFieldName("errorCode");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "errorCode"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("message1");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/repository", "message"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "message"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
+        elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }
 

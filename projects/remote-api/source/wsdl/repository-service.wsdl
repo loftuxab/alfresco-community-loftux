@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<wsdl:definitions name="alfresco"
-   targetNamespace="http://www.alfresco.org/ws/1.0/repository" 
+<wsdl:definitions name="repository-service"
+   targetNamespace="http://www.alfresco.org/ws/service/repository/1.0" 
    xmlns:apachesoap="http://xml.apache.org/xml-soap" 
-   xmlns:alfrep="http://www.alfresco.org/ws/1.0/repository" 
+   xmlns:rep="http://www.alfresco.org/ws/service/repository/1.0" 
    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
    xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-   xmlns:alftypes="http://www.alfresco.org/cms">
+   xmlns:cms="http://www.alfresco.org/ws/model/content/1.0">
    <!-- ************************************** -->
    <!-- Copyright Alfresco Software, Inc. 2005 -->
    <!-- ************************************** -->
-   <wsdl:import namespace="http://www.alfresco.org/cms" location="types.xsd"/>
+   <wsdl:import namespace="http://www.alfresco.org/ws/model/content/1.0" location="types.xsd"/>
    <wsdl:types>
-      <schema elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/1.0/repository" xmlns="http://www.w3.org/2001/XMLSchema">
+      <schema elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/service/repository/1.0" xmlns="http://www.w3.org/2001/XMLSchema">
          <element name="getStores">
             <complexType>
                <sequence/>
@@ -23,32 +23,66 @@
          <element name="getStoresResponse">
             <complexType>
                <sequence>
-                  <element name="getStoresReturn" type="alftypes:Store" minOccurs="1" maxOccurs="unbounded"/>
+                  <element name="getStoresReturn" type="cms:Store" minOccurs="1" maxOccurs="unbounded"/>
                </sequence>
             </complexType>
          </element>
          
-         <complexType name="RepositoryFault">
+         <element name="query">
+            <complexType>
+               <sequence>
+                  <element name="store" type="cms:Store"/>
+                  <element name="query" type="cms:Query"/>
+                  <element name="includeMetaData" type="xsd:boolean"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="queryResponse">
+            <complexType>
+               <sequence>
+                  <element name="queryReturn" type="rep:QueryResult"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <complexType name="QueryResult">
             <sequence>
-               <element name="code" type="xsd:int"/>
-               <element name="message" nillable="true" type="xsd:string"/>
+               <element name="querySession" type="xsd:string"/>
+               <element name="resultSet" type="cms:ResultSet"/>
             </sequence>
          </complexType>
-         <element name="RepositoryFault" type="alfrep:RepositoryFault"/>
+         <element name="QueryResult" type="rep:QueryResult"/>
+         
+         <complexType name="RepositoryFault">
+            <sequence>
+               <element name="errorCode" type="xsd:int"/>
+               <element name="message" type="xsd:string"/>
+            </sequence>
+         </complexType>
+         <element name="RepositoryFault" type="rep:RepositoryFault"/>
          
       </schema>
    </wsdl:types>
 
    <wsdl:message name="getStoresRequest">
-      <wsdl:part element="alfrep:getStores" name="parameters"/>
+      <wsdl:part element="rep:getStores" name="parameters"/>
    </wsdl:message>
 
    <wsdl:message name="getStoresResponse">
-      <wsdl:part element="alfrep:getStoresResponse" name="parameters"/>
+      <wsdl:part element="rep:getStoresResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="queryRequest">
+      <wsdl:part element="rep:query" name="parameters"/>
+   </wsdl:message>
+
+   <wsdl:message name="queryResponse">
+      <wsdl:part element="rep:queryResponse" name="parameters"/>
    </wsdl:message>
    
    <wsdl:message name="RepositoryFault">
-      <wsdl:part element="alfrep:RepositoryFault" name="fault"/>
+      <wsdl:part element="rep:RepositoryFault" name="fault"/>
    </wsdl:message>
    
    <!--  
@@ -59,30 +93,25 @@
    
    <wsdl:portType name="RepositoryServiceSoapPort">
       <wsdl:operation name="getStores">
-         <wsdl:input message="alfrep:getStoresRequest" name="getStoresRequest"/>
-         <wsdl:output message="alfrep:getStoresResponse" name="getStoreResponse"/>
-         <wsdl:fault message="alfrep:RepositoryFault" name="RepositoryFault"/>
+         <wsdl:input message="rep:getStoresRequest" name="getStoresRequest"/>
+         <wsdl:output message="rep:getStoresResponse" name="getStoreResponse"/>
+         <wsdl:fault message="rep:RepositoryFault" name="RepositoryFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="query">
+         <wsdl:input message="rep:queryRequest" name="queryRequest"/>
+         <wsdl:output message="rep:queryResponse" name="queryResponse"/>
+         <wsdl:fault message="rep:RepositoryFault" name="RepositoryFault"/>
       </wsdl:operation>
    </wsdl:portType>
    
-   <wsdl:binding name="RepositoryServiceSoapBinding" type="alfrep:RepositoryServiceSoapPort">
+   <wsdl:binding name="RepositoryServiceSoapBinding" type="rep:RepositoryServiceSoapPort">
         <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        <wsdl:operation name="getStores">
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/1.0/repository/getStores"/>
-            <wsdl:input name="getStoresRequest">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
-         <wsdl:output name="getStoreResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
-         <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/1.0/repository" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
-      </wsdl:operation>
+        <wsdl:operation name="getStores"><wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/getStores"/><wsdl:input name="getStoresRequest"><wsdlsoap:body use="literal"/></wsdl:input><wsdl:output name="getStoreResponse"><wsdlsoap:body use="literal"/></wsdl:output><wsdl:fault name="RepositoryFault"><wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/></wsdl:fault></wsdl:operation>
+      <wsdl:operation name="query"><wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/query"/><wsdl:input name="queryRequest"><wsdlsoap:body use="literal"/></wsdl:input><wsdl:output name="queryResponse"><wsdlsoap:body use="literal"/></wsdl:output><wsdl:fault name="RepositoryFault"><wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/></wsdl:fault></wsdl:operation>
    </wsdl:binding>
 
    <wsdl:service name="RepositoryService">
-      <wsdl:port binding="alfrep:RepositoryServiceSoapBinding" name="RepositoryService">
+      <wsdl:port binding="rep:RepositoryServiceSoapBinding" name="RepositoryService">
          <wsdlsoap:address location="http://localhost:8080/web-client/remote-api/RepositoryService"/>
       </wsdl:port>
    </wsdl:service>

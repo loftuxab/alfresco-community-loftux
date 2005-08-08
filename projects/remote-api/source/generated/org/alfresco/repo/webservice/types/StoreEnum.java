@@ -62,7 +62,7 @@ public class StoreEnum implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(StoreEnum.class);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/cms", "StoreEnum"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "StoreEnum"));
     }
     /**
      * Return type metadata object

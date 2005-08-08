@@ -41,6 +41,8 @@
       </echo>
    </target> 
       
+   <target name="gen-all-services" depends="gen-auth-service, gen-repo-service"/>
+   
    <target name="gen-auth-service" depends="gen-auth-service-client, gen-auth-service-server"/>
   
    <target name="gen-auth-service-client" depends="init">  
@@ -49,7 +51,8 @@
          <fileset dir="${dir.src.java.generated}/org/alfresco/example/webservice/authentication"/>
       </delete>   
       <wsdl2java url="${dir.src}/wsdl/authentication-service.wsdl" output="${dir.src.java.generated}" testcase="no">
-         <mapping namespace="http://www.alfresco.org/ws/1.0/authentication" package="org.alfresco.example.webservice.authentication"/>
+         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" package="org.alfresco.example.webservice.authentication"/>
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.example.webservice.types"/>    
       </wsdl2java>
    </target>
       
@@ -60,7 +63,8 @@
       </delete> 
       <wsdl2java url="${dir.src}/wsdl/authentication-service.wsdl" output="${dir.src.java.generated}" 
                  serverSide="true" skeletondeploy="false">
-         <mapping namespace="http://www.alfresco.org/ws/1.0/authentication" package="org.alfresco.repo.webservice.authentication"/>
+         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" package="org.alfresco.repo.webservice.authentication"/>
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types"/>    
       </wsdl2java>
       <delete>
          <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication" 
@@ -76,8 +80,8 @@
          <fileset dir="${dir.src.java.generated}/org/alfresco/example/webservice/repository"/>
       </delete>   
       <wsdl2java url="${dir.src}/wsdl/repository-service.wsdl" output="${dir.src.java.generated}" testcase="no">
-         <mapping namespace="http://www.alfresco.org/ws/1.0/repository" package="org.alfresco.example.webservice.repository"/>
-         <mapping namespace="http://www.alfresco.org/cms" package="org.alfresco.example.webservice.types"/>  
+         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" package="org.alfresco.example.webservice.repository"/>
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.example.webservice.types"/>  
       </wsdl2java>
    </target>
  
@@ -88,12 +92,12 @@
       </delete> 
       <wsdl2java url="${dir.src}/wsdl/repository-service.wsdl" output="${dir.src.java.generated}" 
                  serverSide="true" skeletondeploy="false">
-         <mapping namespace="http://www.alfresco.org/ws/1.0/repository" package="org.alfresco.repo.webservice.repository"/>
-         <mapping namespace="http://www.alfresco.org/cms" package="org.alfresco.repo.webservice.types"/>  
+         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" package="org.alfresco.repo.webservice.repository"/>
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types"/>  
       </wsdl2java>
       <delete>
          <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/repository" 
-                  excludes="*Fault.java,*Port.java,deploy.wsdd"/>
+                  excludes="*Fault.java,*Result.java,*Port.java,deploy.wsdd"/>
       </delete>
    </target>  
       

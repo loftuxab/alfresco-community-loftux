@@ -105,16 +105,16 @@ public class AuthenticationResult  implements java.io.Serializable {
         new org.apache.axis.description.TypeDesc(AuthenticationResult.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "AuthenticationResult"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationResult"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("username");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "username"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "username"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("ticket");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/1.0/authentication", "ticket"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "ticket"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
