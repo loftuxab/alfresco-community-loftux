@@ -245,59 +245,68 @@ public class LockBehaviourImplTest extends BaseSpringTest
         }
     }
 	
-	/**
-	 * Test version service lock checking
-	 */
-	public void testVersionServiceLockBehaviour()
-	{
-		// Add the version aspect to the node
-		this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
-		
-		try
-		{
-			this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
-		}
-		catch (NodeLockedException exception)
-		{
-			fail("There is no lock so this should have worked.");
-		}
-		
-		// Lock the node as the good user with a write lock
-		this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.WRITE_LOCK);
-		try
-		{
-			this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
-		}
-		catch (NodeLockedException exception)
-		{
-			fail("Tried to version as the lock owner so should work.");
-		}
-		this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
-		
-		// Lock the node as the good user with a read only lock
-		this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.READ_ONLY_LOCK);
-		try
-		{
-			this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
-			fail("Should have failed since this node has been locked with a read only lock.");
-		}
-		catch (NodeLockedException exception)
-		{
-		}
-		this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
-		
-		// Lock the node as the bad user with a write lock
-		this.lockService.lock(this.nodeRef, this.badUserNodeRef, LockType.WRITE_LOCK);
-		try
-		{
-			this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
-			fail("Shoudl have failed since this node has been locked by another user with a write lock.");
-		}
-		catch (NodeLockedException exception)
-		{
-		}
-	}
-	
+    /**
+     * Test version service lock checking
+     */
+    public void testVersionServiceLockBehaviour01()
+    {
+        // Add the version aspect to the node
+        this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
+        
+        try
+        {
+            this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
+        }
+        catch (NodeLockedException exception)
+        {
+            fail("There is no lock so this should have worked.");
+        }
+        
+        // Lock the node as the good user with a write lock
+        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.WRITE_LOCK);
+        try
+        {
+            this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
+        }
+        catch (NodeLockedException exception)
+        {
+            fail("Tried to version as the lock owner so should work.");
+        }
+        this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
+        
+        // Lock the node as the good user with a read only lock
+        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.READ_ONLY_LOCK);
+        try
+        {
+            this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
+            fail("Should have failed since this node has been locked with a read only lock.");
+        }
+        catch (NodeLockedException exception)
+        {
+        }
+        this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
+    }
+    
+    /**
+     * Test version service lock checking
+     */
+    public void testVersionServiceLockBehaviour02()
+    {
+        // Add the version aspect to the node
+        this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
+        
+        // Lock the node as the bad user with a write lock
+        this.lockService.lock(this.nodeRef, this.badUserNodeRef, LockType.WRITE_LOCK);
+        try
+        {
+            this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
+            fail("Should have failed since this node has been locked by another user with a write lock.");
+        }
+        catch (NodeLockedException exception)
+        {
+        }
+    }
+    
 	/**
 	 * Test that the node service lock behaviour is as we expect
 	 *
